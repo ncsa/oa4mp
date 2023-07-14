@@ -46,7 +46,7 @@ public class ClientStoreCommands extends BaseClientStoreCommands {
     }
 
     @Override
-    public void extraUpdates(Identifiable identifiable) throws IOException {
+    public void extraUpdates(Identifiable identifiable, int magicNumber) throws IOException {
         Client client = (Client) identifiable;
 /*        client.setErrorUri(getInput("enter error uri", client.getErrorUri()));
         client.setHomeUri(getInput("enter home uri", client.getHomeUri()));
@@ -76,7 +76,7 @@ public class ClientStoreCommands extends BaseClientStoreCommands {
         client.setHomeUri(getPropertyHelp(keys.homeURL(),"enter home url", client.getHomeUri()));
         client.setProxyLimited(isOk(getPropertyHelp(keys.proxyLimited(),"does this client require limited proxies?", client.isProxyLimited() ? "y" : "n")));
         // set file not found message.
-        extraUpdates(client);
+        extraUpdates(client, DEFAULT_MAGIC_NUMBER);
         sayi("here is the complete client:");
         longFormat(client);
         if (!newIdentifier.equals(client.getIdentifierString())) {

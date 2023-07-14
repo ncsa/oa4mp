@@ -11,10 +11,7 @@ import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
 import edu.uiuc.ncsa.security.storage.sql.internals.Table;
 
 import javax.inject.Provider;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -81,8 +78,8 @@ public class SQLPermissionStore<V extends Permission> extends SQLStore<V> implem
         try {
             String searchTerm = "0 < LOCATE('" + ersatzID + "'," + permissionKeys.ersatzID() + ")";
             PreparedStatement stmt = c.prepareStatement("select * from " +
-                            getTable().getFQTablename() + " where " + searchTerm + " AND " +
-                            permissionKeys.adminID() + "=? AND " + permissionKeys.substitute() + "=1");
+                    getTable().getFQTablename() + " where " + searchTerm + " AND " +
+                    permissionKeys.adminID() + "=? AND " + permissionKeys.substitute() + "=1");
             stmt.setString(1, adminID.toString());
             stmt.execute();// just execute() since executeQuery(x) would throw an exception regardless of content per JDBC spec.
 
@@ -116,7 +113,11 @@ public class SQLPermissionStore<V extends Permission> extends SQLStore<V> implem
                     getTable().getFQTablename() + " where " + permissionKeys.clientID() + "=? AND " +
                     permissionKeys.adminID() + "=? AND " + permissionKeys.substitute() + "=1");
             stmt.setString(1, clientID.toString());
-            stmt.setString(2, adminID.toString());
+            if (adminID == null) {
+                stmt.setNull(2, Types.LONGNVARCHAR);
+            } else {
+                stmt.setString(2, adminID.toString());
+            }
             stmt.execute();// just execute() since executeQuery(x) would throw an exception regardless of content per JDBC spec.
 
             ResultSet rs = stmt.getResultSet();

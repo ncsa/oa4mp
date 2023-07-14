@@ -31,12 +31,7 @@ public class OA2PermissionCommands extends StoreCommands2 {
         return (PermissionsStore) getStore();
     }
 
-    @Override
-    public void extraUpdates(Identifiable identifiable) {
-
-    }
-
-    @Override
+     @Override
     public String getName() {
         return "permissions";
     }

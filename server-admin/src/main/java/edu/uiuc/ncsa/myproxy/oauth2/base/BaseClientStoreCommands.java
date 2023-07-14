@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oauth2.base;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClient;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.ClientApprovalKeys;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.BaseClientStore;
@@ -309,8 +310,12 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
         }
 
         BaseClient client = (BaseClient) findItem(inputLine);
-        // Fix https://github.com/ncsa/oa4mp/issues/109
         client = approvalMods(inputLine, client);
+        approve(client);
+    }
+    protected void approve(BaseClient client) throws IOException {
+
+        // Fix https://github.com/ncsa/oa4mp/issues/109
         ClientApproval ca = null;
         if (getClientApprovalStore().containsKey(client.getIdentifier())) {
             ca = (ClientApproval) getClientApprovalStore().get(client.getIdentifier());
@@ -319,7 +324,7 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
             ca.setIdentifier(client.getIdentifier());
         }
         // now we have the right approval record for this identifier
-        if(clientApprovalStoreCommands.approve(ca)){
+        if (clientApprovalStoreCommands.approve(ca)) {
             getStore().save(client); // if they approve it, save any changes made in approvalMods
         }
     }
@@ -649,7 +654,13 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
         }
         say("password : " + secret);
         say("    hash : " + hash);
+    }
 
-
+    @Override
+    public void create(InputLine inputLine) throws IOException {
+        OA2Client client = (OA2Client) actualCreate(inputLine, DEFAULT_MAGIC_NUMBER);
+        if (isOk(readline("approve this client [y/n]?"))) {
+            approve(client);
+        }
     }
 }

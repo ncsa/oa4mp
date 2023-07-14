@@ -19,9 +19,6 @@ public class ClientApprovalStoreCommands extends StoreCommands2 {
 
     public static final String SHOW_UNAPPROVED_FLAG = "-n";
 
-    @Override
-    public void extraUpdates(Identifiable identifiable) {
-    }
 
     public ClientApprovalStoreCommands(MyLoggingFacade logger, String defaultIndent, Store store) throws Throwable {
         super(logger, defaultIndent, store);

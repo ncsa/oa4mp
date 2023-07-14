@@ -235,10 +235,7 @@ public class JSONStoreCommands extends StoreCommands2 {
         return false; // default is to bail and do nothing.
     }
 
-    @Override
-    public void extraUpdates(Identifiable identifiable) {
-//        JSONEntry jsonEntry = (JSONEntry) identifiable;
-    }
+
 
 
     @Override

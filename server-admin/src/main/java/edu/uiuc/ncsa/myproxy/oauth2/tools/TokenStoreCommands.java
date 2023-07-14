@@ -39,11 +39,6 @@ public class TokenStoreCommands extends StoreCommands2 {
     }
 
     @Override
-    public void extraUpdates(Identifiable identifiable) throws IOException {
-
-    }
-
-    @Override
     protected String format(Identifiable identifiable) {
         TXRecord txRecord = (TXRecord)identifiable;
         Date issuedAt = new Date();

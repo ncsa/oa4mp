@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -62,7 +63,7 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
     }
 
     @Override
-    public void extraUpdates(Identifiable identifiable) throws IOException {
+    public void extraUpdates(Identifiable identifiable, int magicNumber) throws IOException {
         AdminClient client = (AdminClient) identifiable;
         AdminClientKeys keys = (AdminClientKeys) getMapConverter().getKeys();
         String secret = client.getSecret();
@@ -153,7 +154,9 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
         if (clients == null || clients.isEmpty()) {
             say("(none)");
         }
-        for (Identifier identifier : clients) {
+        TreeSet<Identifier> sortedClients = new TreeSet<>();
+        sortedClients.addAll(clients);
+        for (Identifier identifier : sortedClients) {
             say("(" + (getClientApprovalStore().isApproved(identifier) ? "Y" : "N") + ") " + identifier);
         }
         say(clients.size() + " total clients");

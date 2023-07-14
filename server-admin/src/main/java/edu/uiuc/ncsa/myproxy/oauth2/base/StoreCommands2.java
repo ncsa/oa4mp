@@ -1,12 +1,14 @@
 package edu.uiuc.ncsa.myproxy.oauth2.base;
 
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenUtils;
+import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.storage.cli.StoreCommands;
 import edu.uiuc.ncsa.security.util.cli.CommandLineTokenizer;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 
+import java.io.IOException;
 import java.util.Vector;
 
 /**
@@ -107,4 +109,8 @@ public abstract class StoreCommands2 extends StoreCommands {
         InputLine inputLine = new InputLine(v);
     }
 
+    @Override
+    public void extraUpdates(Identifiable identifiable, int magicNumber) throws IOException {
+
+    }
 }

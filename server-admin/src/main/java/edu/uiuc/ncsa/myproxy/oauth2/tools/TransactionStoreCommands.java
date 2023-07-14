@@ -67,10 +67,6 @@ public class TransactionStoreCommands extends StoreCommands2 {
         return false;
     }
 
-    @Override
-    public void extraUpdates(Identifiable identifiable) throws IOException {
-
-    }
 
     @Override
     protected String format(Identifiable identifiable) {

@@ -220,7 +220,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
      * @param identifiable
      */
     @Override
-    public void extraUpdates(Identifiable identifiable) throws IOException {
+    public void extraUpdates(Identifiable identifiable, int magicNumber) throws IOException {
         OA2ClientKeys keys = (OA2ClientKeys) getMapConverter().getKeys();
         OA2Client client = (OA2Client) identifiable;
         String secret = client.getSecret();
@@ -374,36 +374,13 @@ public class OA2ClientCommands extends ClientStoreCommands {
 
         }
         // CIL-1507 simplify cfg entry
-        boolean doCfg = getPropertyHelp(keys.cfg(), "Edit the " + keys.cfg() + " (as JSON)? (y/n)", "n").equalsIgnoreCase("y");
+        boolean doCfg = getPropertyHelp(keys.cfg(), "edit \"" + keys.cfg() + "\" (as JSON)? (y/n)", "n").equalsIgnoreCase("y");
         if (doCfg) {
             JSONObject newConfig = inputJSON(client.getConfig(), "client configuration");
             if (newConfig != null) {
                 client.setConfig(newConfig);
             }
-        } else {
-            say("skipped");
         }
-/*    old way -- allowed for editing components of QDL script reference. Now that is way too complex
-      so don't do that any more. Just paste the whole thing or don't.
-        switch (xx){
-            case "q":
-                JSONObject oldCfg = client.getConfig();
-                JSONObject qdlcfg = loadQDLScript(oldCfg);
-                if (qdlcfg == null) {
-                    // do nothing
-                }
-                break;
-            case "j":
-                JSONObject newConfig = (JSONObject) inputJSON(client.getConfig(), "client configuration");
-                if (newConfig != null) {
-                    client.setConfig(newConfig);
-                }
-                break;
-            default:
-                say("skipped");
-        }
-*/
-
     }
 
     @Override
@@ -774,14 +751,22 @@ public class OA2ClientCommands extends ClientStoreCommands {
     public static String E_CREATE_FLAG = "-create";
     public static String E_LINK_FLAG = "-link";
     public static String E_LIST_FLAG = "-list";
+    public static String E_LIST_AS_ARRAY_FLAG = "-array";
+    public static String E_LIST_AS_JSON_FLAG = "-json";
+    public static String E_LIST_AS_MULTILINE_FLAG = "-m";
     public static String E_UNLINK_FLAG = "-unlink";
+    public static String E_ADMIN_ID_FLAG = "-adminID";
 
     protected void showErsatzHelp() {
-        say("ersatz [" + E_CREATE_FLAG + " | " + E_LINK_FLAG + " | " + E_LIST_FLAG + " | " + E_UNLINK_FLAG + "] - operations on ersatz clients.");
-        say(E_CREATE_FLAG + " [client_id] - create a new ersatz client with many defaults");
-        say(E_LINK_FLAG + " ersatz_id | [e0,e1,...] [client_id]- link an existing ersatz client to the current one");
-        say(E_LIST_FLAG + " [client_id] - list all of the ersatz clients for the current client");
-        say(E_UNLINK_FLAG + " ersatz_id | [e0,e1,...]  [client_id] - unlink the ersatz client from this client. It does not do anything to the ersatz client.");
+        say("Create, link, unlink or list ersatz clients");
+        say("ersatz " + E_CREATE_FLAG + " [new_id] [" + E_LINK_FLAG + "] [" + E_ADMIN_ID_FLAG + " admin_id] [provisioner_id] - create a new ersatz client, ");
+        say("     optionally linking it to the provisioner. Note that if you do not supply an admin id and the provisioner is administered,");
+        say("     then the new ersatz client will be added to the admin. If there is no admin, then none will be specified");
+        say("     Finally, if the provisioner has multiple admins, you must specify which to use or the request will be rejected.");
+        say("ersatz " + E_LIST_FLAG + " [" + E_LIST_AS_MULTILINE_FLAG + " | " + E_LIST_AS_ARRAY_FLAG + " | " + E_LIST_AS_JSON_FLAG + "] [provisioner_id] - list the ersatz clients associated with this provisioner");
+        say("     Optionally list any chains as arrays, a json array or the (default) multi-line format");
+        say("ersatz " + E_LINK_FLAG + " ersatz_id | [e0,e1,...] [" + E_ADMIN_ID_FLAG + " adminID] [provisioner_id]- link an existing ersatz client/chain to the current one");
+        say("ersatz " + E_UNLINK_FLAG + " ersatz_id | [e0,e1,...] [" + E_ADMIN_ID_FLAG + " adminID] [provisioner_id] - unlink the ersatz client from this client. It does not do anything to the ersatz client.");
         say();
         say("Note that listing the ersatz clients lists the chains of them, so a typical output might be");
         say("client_id_1");
@@ -803,18 +788,42 @@ public class OA2ClientCommands extends ClientStoreCommands {
             showErsatzHelp();
             return;
         }
+        boolean createClient = inputLine.hasArg(E_CREATE_FLAG);
+        inputLine.removeSwitch(E_CREATE_FLAG);
+        boolean hasAdminID = inputLine.hasArg(E_ADMIN_ID_FLAG);
+        Identifier adminID = null;
+        if (hasAdminID) {
+            adminID = BasicIdentifier.newID(inputLine.getNextArgFor(E_ADMIN_ID_FLAG));
+        }
+        inputLine.removeSwitch(E_ADMIN_ID_FLAG);
+
+        boolean listAsJSON = inputLine.hasArg(E_LIST_AS_JSON_FLAG);
+        inputLine.removeSwitch(E_LIST_AS_JSON_FLAG);
+
+        boolean listAsArray = inputLine.hasArg(E_LIST_AS_ARRAY_FLAG);
+        inputLine.removeSwitch(E_LIST_AS_ARRAY_FLAG);
+
+        boolean listAsMultiline = inputLine.hasArg(E_LIST_AS_MULTILINE_FLAG);
+        inputLine.removeSwitch(E_LIST_AS_MULTILINE_FLAG);
+
         boolean linkClient = inputLine.hasArg(E_LINK_FLAG);
         List<Identifier> linkList = null;
+
         if (linkClient) {
-            if (inputLine.hasArgList(E_LINK_FLAG)) {
-                List<String> rawIDs = inputLine.getArgList(E_LINK_FLAG);
-                linkList = new ArrayList<>();
-                for (String s : rawIDs) {
-                    linkList.add(BasicIdentifier.newID(s));
-                }
+            if (createClient) {
+                // in this case, the flag means to link the newly created client, so
+                // there is no chain.
             } else {
-                linkList = new ArrayList<>();
-                linkList.add(BasicIdentifier.newID(inputLine.getNextArgFor(E_LINK_FLAG)));
+                if (inputLine.hasArgList(E_LINK_FLAG)) { // checks if it has a list as an argument
+                    List<String> rawIDs = inputLine.getArgList(E_LINK_FLAG);
+                    linkList = new ArrayList<>();
+                    for (String s : rawIDs) {
+                        linkList.add(BasicIdentifier.newID(s));
+                    }
+                } else {
+                    linkList = new ArrayList<>();
+                    linkList.add(BasicIdentifier.newID(inputLine.getNextArgFor(E_LINK_FLAG)));
+                }
             }
             inputLine.removeSwitch(E_LINK_FLAG);
         }
@@ -836,112 +845,144 @@ public class OA2ClientCommands extends ClientStoreCommands {
             }
             inputLine.removeSwitch(E_UNLINK_FLAG);
         }
-        boolean createClient = inputLine.hasArg(E_CREATE_FLAG);
-        inputLine.removeSwitch(E_CREATE_FLAG);
         if (createClient) {
-            // set redundant switches correctly
-            linkClient = false;
+            // set errant switches correctly. I.e. if they pass this in and try to create, ignore it later
             unlinkClient = false;
         }
         boolean listClients = inputLine.hasArg(E_LIST_FLAG);
         inputLine.removeSwitch(E_LIST_FLAG);
-        if (listClients) {
-            OA2Client client = (OA2Client) findItem(inputLine);
-            if (client == null) {
-                say("no such client");
-                return;
-            }
-            String ersatzId = inputLine.getLastArg();
-            List<Identifier> admins = getPermissionsStore().getAdmins(client.getIdentifier());
+        OA2Client provisioner = (OA2Client) findItem(inputLine);
+        if (provisioner == null) {
+            say("could not find the provisioner...");
+            return;
+        }
+        if (adminID == null) {
+            List<Identifier> admins = getPermissionsStore().getAdmins(provisioner.getIdentifier());
             if (1 < admins.size()) {
                 say("ambiguous case: too many admins for this client. Cannot tell which to link to");
                 return;
             }
-            if (admins.size() == 1) {
-                PermissionList pList = getPermissionsStore().getErsatzChains(admins.get(0), client.getIdentifier());
-                for (Permission permission : pList) {
-                    if (permission.canSubstitute()) {
-                        List<Identifier> eChain = permission.getErsatzChain();
-                        int indent = 0;
-                        for (Identifier ee : eChain) {
+            if (1 == admins.size()) {
+                adminID = admins.get(0);
+            }
+            // otherwise, no such admin.
+        }
+
+        if (listClients) {
+            if (provisioner == null) {
+                say("no such client");
+                return;
+            }
+            boolean arrayOutput = listAsArray || listAsJSON;
+            if (!arrayOutput && !listAsMultiline) {
+                listAsMultiline = true; // sets the default if nothing is specified
+            }
+            PermissionList pList = getPermissionsStore().getErsatzChains(adminID, provisioner.getIdentifier());
+            for (Permission permission : pList) {
+                JSONArray jsonArray = new JSONArray();
+                String cliArray = "[";
+                boolean firstPass = true;
+                if (permission.canSubstitute()) {
+
+                    List<Identifier> eChain = permission.getErsatzChain();
+                    int indent = 0;
+                    for (Identifier ee : eChain) {
+                        if (listAsJSON) {
+                            jsonArray.add(ee.toString());
+                        }
+                        if (listAsArray) {
+                            if (firstPass) {
+                                firstPass = false;
+                            }
+                            cliArray = cliArray + ee.toString();
+                        }
+                        if (listAsMultiline) {
                             say(StringUtils.getBlanks(2 * indent++) + ee);
                         }
                     }
+                }
+                if (listAsArray) {
+                    say(cliArray + "]");
+                }
+                if (listAsJSON) {
+                    say(jsonArray.toString());
+                }
+                if (listAsMultiline) {
                     say();
                 }
             }
-            if (admins.size() == 0) {
-                say("no admin client  is an unsupported case");
-                return;
-            }
+
             return;
         }
         if (createClient) {
-            OA2Client provisioner = (OA2Client) findItem(inputLine);
-            OA2Client createdClient = (OA2Client) create(ERSATZ_CREATE_MAGIC_NUMBER);
-            linkList = new ArrayList<>();
-            linkList.add(createdClient.getIdentifier());
-            linkErsatz(provisioner, linkList);
+            OA2Client c = (OA2Client) getStore().create();
+            c = (OA2Client) setIDFromInputLine(c, inputLine);
+            OA2Client createdClient = (OA2Client) create(c, ERSATZ_CREATE_MAGIC_NUMBER);
+            if (linkClient) {
+                linkList = new ArrayList<>();
+                linkList.add(createdClient.getIdentifier());
+                linkErsatz(provisioner, adminID, linkList);
+                say("ersatz client linked, done.");
+            } else {
+                say("client created, not linked. done.");
+            }
             return;
         }
         if (linkClient) {
-            OA2Client provisioner = (OA2Client) findItem(inputLine);
-
-            linkErsatz(provisioner, linkList);
-            say("done!");
+            linkErsatz(provisioner, adminID, linkList);
+            say("linking done!");
             return;
         }
 
         if (unlinkClient) {
-            OA2Client provisioner = (OA2Client) findItem(inputLine);
-            unlinkErsatz(provisioner, linkList);
-            say("done!");
+            unlinkErsatz(provisioner, adminID, linkList);
+            say("unlink done!");
             return;
         }
         say("unknown/missing option");
     }
 
-    protected void linkErsatz(OA2Client provisioner, List<Identifier> ersatz) {
-        List<Identifier> admins = getPermissionsStore().getAdmins(provisioner.getIdentifier());
-        if (admins.size() == 1) {
-            for(Identifier id : ersatz) {
-                // Check that the ersatz clients are administered by this admin and, if not
-                // set them to be so.
-                PermissionList pList = getPermissionsStore().get(admins.get(0), id);
-                if(pList.isEmpty()){
-                    Permission newErsatzPermission = (Permission) getPermissionsStore().create();
-                    newErsatzPermission.setAdminID(admins.get(0));
-                    newErsatzPermission.setClientID(id);
-                    newErsatzPermission.setApprove(true);
-                    newErsatzPermission.setCreate(true);
-                    newErsatzPermission.setDelete(true);
-                    newErsatzPermission.setRead(true);
-                    newErsatzPermission.setWrite(true);
-                    getPermissionsStore().save(newErsatzPermission);
-                }
+    protected void linkErsatz(OA2Client provisioner, Identifier adminID, List<Identifier> ersatz) {
+
+        for (Identifier id : ersatz) {
+            // Check that the ersatz clients are administered by this admin and, if not
+            // set them to be so.
+            PermissionList pList = getPermissionsStore().get(adminID, id);
+            if (pList.isEmpty()) {
+                Permission newErsatzPermission = (Permission) getPermissionsStore().create();
+                newErsatzPermission.setAdminID(adminID);
+                newErsatzPermission.setClientID(id);
+                newErsatzPermission.setApprove(true);
+                newErsatzPermission.setCreate(true);
+                newErsatzPermission.setDelete(true);
+                newErsatzPermission.setRead(true);
+                newErsatzPermission.setWrite(true);
+                getPermissionsStore().save(newErsatzPermission);
             }
-            PermissionList permissions = getPermissionsStore().getErsatzChains(admins.get(0), provisioner.getIdentifier());
+            PermissionList permissions = getPermissionsStore().getErsatzChains(adminID, provisioner.getIdentifier());
             if (!hasEChain(permissions, ersatz)) {
                 Permission p = (Permission) getPermissionsStore().create();
-                p.setAdminID(admins.get(0));
+                p.setAdminID(adminID);
                 p.setClientID(provisioner.getIdentifier());
                 p.setSubstitute(true);
                 p.setErsatzChain(ersatz);
                 getPermissionsStore().save(p);
             }
         }
-        say("zero or multiple admins not supported at this time.");
     }
 
-    protected boolean hasEChain(PermissionList permissions, List<Identifier> echain) {
+    protected boolean hasEChain(PermissionList permissions, List<Identifier> eChain) {
+        if (permissions.isEmpty()) {
+            return false;
+        }
         for (Permission p : permissions) {
             if (p.canSubstitute()) {
-                List<Identifier> eChain = p.getErsatzChain();
-                if (eChain.size() != eChain.size()) {
+                List<Identifier> eee = p.getErsatzChain();
+                if (eee.size() != eChain.size()) {
                     continue;
                 }
-                for (int i = 0; i < eChain.size(); i++) {
-                    if (!eChain.get(i).equals(eChain.get(i))) {
+                for (int i = 0; i < eee.size(); i++) {
+                    if (!eee.get(i).equals(eChain.get(i))) {
                         return false;
                     }
                 }
@@ -950,34 +991,29 @@ public class OA2ClientCommands extends ClientStoreCommands {
         return true;
     }
 
-    protected void unlinkErsatz(OA2Client provisioner, List<Identifier> ersatz) {
-        List<Identifier> admins = getPermissionsStore().getAdmins(provisioner.getIdentifier());
-        if (admins.size() == 1) {
-            PermissionList permissions = getPermissionsStore().getErsatzChains(admins.get(0), provisioner.getIdentifier());
-            for (Permission p : permissions) {
-                List<Identifier> eChain = p.getErsatzChain();
-                if (eChain.size() == ersatz.size()) {
-                    boolean notFound = true;
-                    for (int i = 0; i < eChain.size(); i++) {
-                        if (!eChain.get(i).equals(ersatz.get(i))) {
-                            notFound = false;
-                            break;
-                        }
-                    }
-                    if (notFound) {
-                        getPermissionsStore().remove(p.getIdentifier());
+    protected void unlinkErsatz(OA2Client provisioner, Identifier adminID, List<Identifier> ersatz) {
+        PermissionList permissions = getPermissionsStore().getErsatzChains(adminID, provisioner.getIdentifier());
+        for (Permission p : permissions) {
+            List<Identifier> eChain = p.getErsatzChain();
+            if (eChain.size() == ersatz.size()) {
+                boolean notFound = true;
+                for (int i = 0; i < eChain.size(); i++) {
+                    if (!eChain.get(i).equals(ersatz.get(i))) {
+                        notFound = false;
+                        break;
                     }
                 }
+                if (notFound) {
+                    getPermissionsStore().remove(p.getIdentifier());
+                }
             }
-            say("done with unlink");
         }
-        say("zero or multiple admins not supported at this time.");
     }
 
     public static final int ERSATZ_CREATE_MAGIC_NUMBER = 1;
 
     @Override
-    protected Identifiable additionalCreation(Identifiable identifiable, int magicNumber) {
+    protected Identifiable preCreation(Identifiable identifiable, int magicNumber) {
         OA2Client client = (OA2Client) identifiable;
         if (magicNumber == ERSATZ_CREATE_MAGIC_NUMBER) {
             client.setErsatzClient(true);

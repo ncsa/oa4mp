@@ -113,7 +113,7 @@ public class VOCommands extends StoreCommands2 {
             }
         }
         vo.setDefaultKeyID(getPropertyHelp(keys.defaultKeyID(),"enter the default key id", defaultKey));
-        extraUpdates(vo);
+        extraUpdates(vo, DEFAULT_MAGIC_NUMBER);
         sayi("here is the complete virtual organization (VO):");
         longFormat(vo);
         if (!newIdentifier.equals(vo.getIdentifierString())) {
@@ -208,11 +208,6 @@ public class VOCommands extends StoreCommands2 {
             }
             sayi(out);
         }
-    }
-
-    @Override
-    public void extraUpdates(Identifiable identifiable) throws IOException {
-
     }
 
     @Override
