@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionRecord;
@@ -231,7 +232,9 @@ public class SQLPermissionStore<V extends Permission> extends SQLStore<V> implem
             ResultSet rs = stmt.getResultSet();
             while (rs.next()) {
                 String adminID = rs.getString(permissionKeys.adminID());
-                uniqueIDs.add(BasicIdentifier.newID(adminID));
+                if(!StringUtils.isTrivial(adminID)) {
+                    uniqueIDs.add(BasicIdentifier.newID(adminID));
+                }
             }
             rs.close();
             stmt.close();

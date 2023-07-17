@@ -99,7 +99,6 @@ tokens. := clc#access();
 claims. := clc#claims();
 
 test(tokens., claims., expected_token_scopes., user_id);
-say(1);
 issued_at := claims().'iat';
 tokens. := clc#refresh();
 claims. := clc#claims();

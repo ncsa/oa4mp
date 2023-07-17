@@ -40,7 +40,7 @@
 */
 path := '/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests';
 if[path∉script_path()][script_path(path ~ script_path());];
-
+ debugger(1);
 cfg.'id'  := 'localhost:test/no_qdl'; //id
 cfg.'idp'  := 'Google -- use "j g" identity';
 cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';

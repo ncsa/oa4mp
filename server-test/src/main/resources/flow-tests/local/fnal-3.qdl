@@ -51,6 +51,5 @@ expected_scopes. := ['compute.create', 'compute.read', 'compute.cancel', 'comput
 ss. := tokenize(at.'scope', ' ');
 ⊨ reduce(@&&, expected_scopes. ∈ ss.) : 'incorrect access token scopes';
 ⊨ abs(tokens.'access_token'.'lifetime' -750000)<2000 : 'wrong lifetime, expected 750000, got ' + (tokens.'access_token'.'lifetime');
-clc#write('/home/ncsa/temp/cil-1772/igwn.qdl');
 
 say('FNAL test: ok');
