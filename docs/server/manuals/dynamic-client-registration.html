@@ -48,7 +48,7 @@
     
         
                     <div class="xleft">
-            Last Published: 2023-05-24
+            Last Published: 2023-07-17
                                 </div>
                 <div class="xright">            
     
@@ -58,7 +58,7 @@
                         
     
         
-                         Version: 5.3-SNAPSHOT
+                         Version: 5.3.3
             </div>
     <div class="clear">
         <hr/>
@@ -325,6 +325,18 @@
     
 <tr class="a" align="left" valign="top">
         
+<td>is_service_client</td>
+        
+<td>N</td>
+        
+<td>--</td>
+        
+<td>Is this client a <a href="rfc7523-clients.html">service client</a>?
+        </td>
+    </tr>
+    
+<tr class="b" align="left" valign="top">
+        
 <td>name</td>
         
 <td>Y</td>
@@ -334,7 +346,7 @@
 <td>Note that the RFC's do not require this, but OA4MP does.</td>
     </tr>
     
-<tr class="b" align="left" valign="top">
+<tr class="a" align="left" valign="top">
         
 <td>response_type</td>
         
@@ -350,7 +362,7 @@
         </td>
     </tr>
     
-<tr class="a" align="left" valign="top">
+<tr class="b" align="left" valign="top">
         
 <td>scope</td>
         
@@ -378,7 +390,20 @@
             the service supports X509 certs and you really need it.
             <br /><b>Public clients:</b> Only openid scope is allowed and attempts to change the scopes will result in
             an error. It is not possible to change a public client to a confidential client. You must
-            register a new client instead (This is due to our policies regarding creation of client secrets.).
+            register a new client instead (This is due to our policies regarding creation of client secrets).
+        </td>
+    </tr>
+    
+<tr class="a" align="left" valign="top">
+        
+<td>service_client_users</td>
+        
+<td>N</td>
+        
+<td>*</td>
+        
+<td>A list of users (or wildcard to allow all) that the server will accept for
+            grant requests to the token endpoint. See <a href="rfc7523-clients.html">service client</a>?
         </td>
     </tr>
 </table>
@@ -522,6 +547,22 @@
     
 <tr class="b" align="left" valign="top">
         
+<td>is_service_client</td>
+        
+<td>N</td>
+        
+<td>false</td>
+        
+<td>N</td>
+        
+<td>Boolean</td>
+        
+<td>If this client is to be a <a href="rfc7523-clients.html">service client</a>
+        </td>
+    </tr>
+    
+<tr class="a" align="left" valign="top">
+        
 <td>prototypes</td>
         
 <td>N</td>
@@ -537,7 +578,7 @@
         </td>
     </tr>
     
-<tr class="a" align="left" valign="top">
+<tr class="b" align="left" valign="top">
         
 <td>proxy_claims_list</td>
         
@@ -556,7 +597,7 @@
         </td>
     </tr>
     
-<tr class="b" align="left" valign="top">
+<tr class="a" align="left" valign="top">
         
 <td>proxy_request_scopes</td>
         
@@ -581,7 +622,7 @@
         </td>
     </tr>
     
-<tr class="a" align="left" valign="top">
+<tr class="b" align="left" valign="top">
         
 <td>rt_lifetime</td>
         
@@ -598,6 +639,23 @@
             it will be valid. Normally this is set for a very long time, as in weeks if not months. If this is omitted
             or set to 0 (zero) then no refresh tokens will be created. The default value means to use whatever the
             server deefaults are.
+        </td>
+    </tr>
+    
+<tr class="a" align="left" valign="top">
+        
+<td>service_client_users</td>
+        
+<td>N</td>
+        
+<td>false</td>
+        
+<td>N</td>
+        
+<td>List</td>
+        
+<td>If this is a service client, restrict the sub claim of requests to the token endpoint to
+            what is on this list. If any sub is allowed, set this to *.
         </td>
     </tr>
     

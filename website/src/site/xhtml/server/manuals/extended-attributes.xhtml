@@ -25,7 +25,7 @@ They are made available to QDL in the <b><code>xas.</code></b> stem.</p>
 <h2>Example</h2>
 <p>Let us say you made the following request to the authorization end point:</p>
 <pre>
-    https://phys.bigstate.edu/oauth2/authorize?org.oa4mp:/tokens/access/lifetime=1000000&org.oa4mp:/roles=admin,all-user&scope=openid profile email... (truncated)
+    https://phys.bigstate.edu/oauth2/authorize?org.oa4mp:/tokens/access/lifetime=1000000&amp;org.oa4mp:/roles=admin,all-user&amp;scope=openid profile email... (truncated)
 </pre>
 <p>
     This means that in the QDL environment you would have an <b>xas.</b> (extended attributes) stem of
@@ -37,7 +37,7 @@ They are made available to QDL in the <b><code>xas.</code></b> stem.</p>
 <h2>Example of multiple values</h2>
 <p>If your request had the following values in it</p>
 <pre>
-    https://phys.bigstate.edu/oauth2/authorize?&org.oa4mp:/roles=admin&org.oa4mp:/roles=all-user&org.oa4mp:/roles=jira-user&... (truncated)
+    https://phys.bigstate.edu/oauth2/authorize?&amp;org.oa4mp:/roles=admin&amp;org.oa4mp:/roles=all-user&amp;org.oa4mp:/roles=jira-user&amp;... (truncated)
 </pre>
 <p>You would then get an <b>xas.</b> stem with</p>
 <pre>
