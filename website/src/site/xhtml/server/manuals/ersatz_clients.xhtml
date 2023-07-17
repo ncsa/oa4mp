@@ -14,70 +14,92 @@
 <h1>Ersatz Clients</h1>
 <h2>Introduction</h2>
 <p>The ability for a client to take over the flow that another has initiated is
-referred to as <i>substitution</i> and clients that are specifically tasked with
-this as referred to as <i>ersatz clients</i>. We use the cognated word
-𝕰𝖗s𝖆𝖙𝖟 (which just means substitute in German) because words like delegate,
-impersonate, substitute etc. are so overloaded in English that discourse
-is getting hard -- more time is spent on what the word means in context than anything
-else. An ersatz client has a very specific, narrow definition
-and there should be few if any conflicts with other nomenclature.</p>
+    referred to as <i>substitution</i> and clients that are specifically tasked with
+    this as referred to as <i>ersatz clients</i>. We use the cognated word
+    𝕰𝖗s𝖆𝖙𝖟 (which just means substitute in German) because words like delegate,
+    impersonate, substitute etc. are so overloaded in English that discourse
+    is getting hard -- more time is spent on what the word means in context than anything
+    else. An ersatz client has a very specific, narrow definition
+    and there should be few if any conflicts with other nomenclature.</p>
 <h3>Definition of an ersatz client</h3>
 <p>An <i>ersatz client</i> in OA4MP is a specific type of
-client which may substitute for another in a flow. A client that starts a flow is called
-the <i>provisioning client.</i> A provisioning client is just a standard client
-in OA4MP and may be confidential or public. If A is the provisioning client and α is an ersatz client
-we say write A ≻ α and refer to "A provisions α" or that "α can substitute for A". ≺ 	≻  </p>
+    client which may substitute for another in a flow. A client that starts a flow is called
+    the <i>provisioning client.</i> A provisioning client is just a standard client
+    in OA4MP and may be confidential or public.</p>
+
+<p><b><i>Definition:</i></b>If A is the provisioning client and α is an ersatz client
+    we say write <b><i>A ≻ α</i></b> read <i>A provisions α</i> or <i>α can substitute for A</i></p>
+
+<h3>Ersatz Client Properties</h3>
 <ul>
     <li>All substitution relations are explicit and must be set.</li>
-    <li>Ersatz clients cannot start a flow and can only be used at the token exchange (RFC 8693) endpoint.</li>
-    <li>Ersatz clients are restricted in their scopes to whatever the provisioning client has and may only downscope.</li>
+    <li>Ersatz clients cannot start a flow.</li>
+    <li>Ersatz clients can only be substituted at the token exchange (RFC 8693) endpoint.</li>
+    <li>once provisioned, are simply clients can be used at the
+        refresh endpoint, revoked, introspected etc.
+    </li>
+    <li>Ersatz clients are restricted in their scopes to whatever the provisioning client has and may only downscope.
+    </li>
     <li>If A ≻ α, then α inherits the configuration (lifetimes, scripts etc.) from A unless explicitly overridden.</li>
-    <li>These may be chained as A ≻ α ≻ β ≻ γ ... which connotes an inheritance chain for abilities, not necessarily a custodial chain.</li>
-    <li>≻ is not an ordering relationship! It is perfectly acceptable to have a multiple provisioning
-    clients, A, B, C and set A ≻ α, B ≻ α, C ≻ α.  This is because these relations are set by security policies which
-    may be quite arbitrary.</li>
-    <li>it is perfectly acceptable to have multiple ersatz clients, so A ≻ α, A ≻ β, A ≻ γ.</li>
+    <li>Provisioning chains may have multiple elements: A ≻ α ≻ β ≻ γ ... which connotes
+        an inheritance chain for abilities, not necessarily a custodial chain. Note especially that α, β and γ
+        are ersatz client. There is exactly one provisioning client as the first element of the chain.
+    </li>
+    <li>≻ is not an ordering relationship! It is perfectly acceptable to have provision multiple
+        clients, A, B, C and set A ≻ α, B ≻ α, C ≻ α. This is because these relations are set by security policies which
+        may be quite arbitrary.
+    </li>
+    <li>It is perfectly acceptable to have multiple ersatz clients, so A ≻ α, A ≻ β, A ≻ γ.</li>
 </ul>
 <h2>Relationship to </h2>
 <p><a href="https://datatracker.ietf.org/doc/html/rfc8693">The token exchange specification</a> has
-a section on impersonation and delegation semantics. It states <i>in toto</i> </p>
+    a section on impersonation and delegation semantics. It states <i>in toto</i></p>
 
 <blockquote> When principal A impersonates principal B, A is given all the rights
-   that B has within some defined rights context and is
-   indistinguishable from B in that context.  Thus, when principal A
-   impersonates principal B, then insofar as any entity receiving such a
-   token is concerned, they are actually dealing with B.  It is true
-   that some members of the identity system might have awareness that
-   impersonation is going on, but it is not a requirement.  For all
-   intents and purposes, when A is impersonating B, A is B within the
-   context of the rights authorized by the token.  A's ability to
-   impersonate B could be limited in scope or time, or even with a one-
-   time-use restriction, whether via the contents of the token or an
-   out-of-band mechanism.</blockquote>
+    that B has within some defined rights context and is
+    indistinguishable from B in that context. Thus, when principal A
+    impersonates principal B, then insofar as any entity receiving such a
+    token is concerned, they are actually dealing with B. It is true
+    that some members of the identity system might have awareness that
+    impersonation is going on, but it is not a requirement. For all
+    intents and purposes, when A is impersonating B, A is B within the
+    context of the rights authorized by the token. A's ability to
+    impersonate B could be limited in scope or time, or even with a one-
+    time-use restriction, whether via the contents of the token or an
+    out-of-band mechanism.
+</blockquote>
 
 <p>What this means is that our substitutions are a form of impersonation and that
-the trust relations are made out of band. Why not call this impersonation? Because
-other OAuth systems are free to implement this any way they want and we want to be clear
-exactly how we do it. </p>
-<h2>Where do they live?</h2>
-<p>Ersatz clients are administered by an admin client just like any other and may be
-created like any other. Since they may inherit from the provisioning client, there is really
-not much of a need to do more than create it with credentials and flag it as an ersatz client.</p>
+    the trust relations are made out of band. Why not call this impersonation? Because
+    other OAuth systems are free to implement this any way they want, and we want to be clear
+    exactly how we do it. </p>
+<h3>Note on provisioning chains</h3>
+<p>
+    You may have ersatz clients substitute for other ersatz clients, so  A ≻ α, α ≻ β and  β ≻ γ is perfectly fine.
+    This means that A provisions and that α may substitute for it. Later, β may substitute for α, but cannot substitute for
+    A (unless that relation is made explicit). This allows for chains of substitution. We may write this chain
+    more compactly as A ≻ α ≻ β  ≻ γ
+</p>
+<h2>Creation</h2>
+<p>Ersatz clients may be created by an admin client, just like any other.
+    In order to set up the provisioners, you set the property <code>org.oa4mp:/ersatz/provisioners</code>
+    to be either the provisioner ID (i.e., the client ID of the client that an start the flow) or
+    a list of IDs. The list of IDs is <br/><br/>
+    provisionerID ≻ ersatzID_0 ≻ ersatzID_1 ≻ ... ≻ ersatzID_n<br/><br/>
+    All of these must be administered by the same admin client.</p>
 <h2>Using them</h2>
 <p>Normally if A ≻ α, then A starts the flow and in the token exchange, α presents the
-access or refresh token to the exchange endpoint. If α is presented for the first time,
-the flow forks. Note that A cannot resume the flow for α after this point and they become
-independent, meaning that if A provisions α with an access token, τ, then α exchanges it for τ',
-A cannot use τ'. On the other hand, if A ≻ β as well then A may provision β with τ too.</p>
-<p>While there may be chains of substitution, such as A ≻ α ≻ β ≻ γ, you must present the final
-ersatz client, γ here. In other words, the endpoints of chains determine how the substitution is made</p>
+    access or refresh token to the exchange endpoint. If α is presented for the first time,
+    the flow forks. Note that A cannot resume the flow for α after this point and they become
+    independent, meaning that if A provisions α with an access token, τ, then α exchanges it for τ',
+    A cannot use τ'. On the other hand, if A ≻ β as well then A may provision β with τ too.</p>
+
 <h3>Why would you want intermediate ersatz clients?</h3>
-<p>If you have a very large and complex set of substitutions, you may stream line the flow. Let
-us say that you have provisioning clients A, B, C, D and (say these provision with some logic
-centered on IDPs or perhaps the hosting institution)
-you need to have finer grained control. An ersatz client ξ with a specific script
-(say allowing Lab X) could be used as A ≻ ξ ≻ α and B ≻ ξ ≻ β, (say α and β are used by specific groups
-within Lab X) so that α and β have consistent behavior but can add their own logic. </p>
+<p>If you have a very large and complex set of substitutions, you may streamline the flow. Let
+    us say that you have provisioning clients A, B, C, D and
+    you need to have finer grained control. An ersatz client ξ with a specific script
+    (say allowing Lab X) could be used as A ≻ ξ ≻ α and B ≻ ξ ≻ β, (say α and β are used by specific groups
+    within Lab X) so that α and β have consistent behavior but can add their own logic. </p>
 <h2>Inheritance and provisioning</h2>
 <p>
     Clients in OA4MP may set <i>prototypes</i> which are other clients from which they

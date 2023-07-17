@@ -8,6 +8,14 @@ import edu.uiuc.ncsa.security.core.Identifier;
  * on 5/21/22 at  6:56 AM
  */
 public class PermissionStoreUtil {
+    /**
+     * returns the chain or a null if there is no such chain.
+     * @param permissionsStore
+     * @param adminID
+     * @param clientID
+     * @param ersatzID
+     * @return
+     */
     public static Permission getErsatzChain(PermissionsStore permissionsStore, Identifier adminID, Identifier clientID, Identifier ersatzID){
             PermissionList pList = permissionsStore.getErsatzChains(adminID, clientID);
             for(Permission p : pList){

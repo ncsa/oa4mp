@@ -11,6 +11,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientConverter;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientKeys;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.Permission;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.EnvServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
@@ -77,6 +78,7 @@ public class OIDCCMServlet extends EnvServlet {
     public static final String PROXY_REQUEST_SCOPES = "proxy_request_scopes";
     public static final String IS_SERVICE_CLIENT = "is_service_client";
     public static final String SERVICE_CLIENT_USERS = "service_client_users";
+    public static final String ERSATZ_CLIENT_PROVISIONERS = "org.oa4mp:/ersatz/provisioners";
 
     @Override
     public void storeUpdates() throws IOException, SQLException {
@@ -1206,6 +1208,32 @@ public class OIDCCMServlet extends EnvServlet {
             }
             if (jsonRequest.containsKey(clientKeys.ersatzClient())) {
                 client.setErsatzClient(jsonRequest.getBoolean(clientKeys.ersatzClient()));
+            }
+            if(jsonRequest.containsKey(ERSATZ_CLIENT_PROVISIONERS)){
+                JSONArray array;
+                try {
+                     array = jsonRequest.getJSONArray(ERSATZ_CLIENT_PROVISIONERS);
+                }catch(Throwable t){
+                    array = new JSONArray();
+                    array.add(jsonRequest.getString(ERSATZ_CLIENT_PROVISIONERS));
+                }
+                Identifier provisionerID = BasicIdentifier.newID(array.getString(0));
+                Permission permission = getOA2SE().getPermissionStore().getErsatzChain(
+                        adminClient.getIdentifier(),
+                        provisionerID,
+                        client.getIdentifier());
+                if(permission == null){
+                    // new clients this is null, but it may exist from a previous attempt.
+                    permission = getOA2SE().getPermissionStore().create();
+                    permission.setSubstitute(true);
+                    permission.setAdminID(adminClient.getIdentifier());
+                    permission.setClientID(provisionerID);
+                    permission.setErsatzChain(array);
+                }else{
+                    // check that this has the right information, so treat this as an update
+                    permission.setErsatzChain(array);
+                }
+                getOA2SE().getPermissionStore().save(permission);
             }
             if (jsonRequest.containsKey(STRICT_SCOPES)) {
                 client.setStrictscopes(jsonRequest.getBoolean(STRICT_SCOPES));

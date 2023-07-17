@@ -47,7 +47,11 @@ public class SQLPermissionStore<V extends Permission> extends SQLStore<V> implem
                     getTable().getFQTablename() + " where " + permissionKeys.clientID() + "=? AND " +
                     permissionKeys.adminID() + "=?");
             stmt.setString(1, clientID.toString());
-            stmt.setString(2, adminID.toString());
+            if (adminID == null) {
+                stmt.setNull(2, Types.LONGNVARCHAR);
+            } else {
+                stmt.setString(2, adminID.toString());
+            }
             stmt.execute();// just execute() since executeQuery(x) would throw an exception regardless of content per JDBC spec.
 
             ResultSet rs = stmt.getResultSet();
@@ -109,14 +113,20 @@ public class SQLPermissionStore<V extends Permission> extends SQLStore<V> implem
 
         PermissionKeys permissionKeys = new PermissionKeys();
         try {
-            PreparedStatement stmt = c.prepareStatement("select * from " +
-                    getTable().getFQTablename() + " where " + permissionKeys.clientID() + "=? AND " +
-                    permissionKeys.adminID() + "=? AND " + permissionKeys.substitute() + "=1");
+            PreparedStatement stmt;
+            if (adminID == null) {
+                stmt = c.prepareStatement("select * from " +
+                        getTable().getFQTablename() + " where " + permissionKeys.clientID() + "=? AND " +
+                        permissionKeys.substitute() + "=1");
+
+            } else {
+                stmt = c.prepareStatement("select * from " +
+                        getTable().getFQTablename() + " where " + permissionKeys.clientID() + "=? AND " +
+                        permissionKeys.adminID() + "=? AND " + permissionKeys.substitute() + "=1");
+                stmt.setString(2, adminID.toString());
+            }
             stmt.setString(1, clientID.toString());
             if (adminID == null) {
-                stmt.setNull(2, Types.LONGNVARCHAR);
-            } else {
-                stmt.setString(2, adminID.toString());
             }
             stmt.execute();// just execute() since executeQuery(x) would throw an exception regardless of content per JDBC spec.
 
