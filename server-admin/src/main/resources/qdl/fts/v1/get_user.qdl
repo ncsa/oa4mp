@@ -29,7 +29,7 @@ block[
 ];
 */
 
-block[
+block[ // emulates having claims for duneana and dunepro, plus a couple of WLCG groups.
        at_claims. := {EPE:['wlcg.capabilityset:/duneana','wlcg.capabilityset:/dunepro'],
                       EPPN:claims.'eppn',
                       IS_MEMBER_OF : ['/wlcg','/wlcg/xfers']};

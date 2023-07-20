@@ -25,7 +25,7 @@ public class RFC7662 extends TokenManagerServlet {
 
     @Override
     protected void doIt(HttpServletRequest req, HttpServletResponse resp) throws Throwable {
-        printAllParameters(req);
+     //   printAllParameters(req);
         State state;
         TokenImpl token;
         try {

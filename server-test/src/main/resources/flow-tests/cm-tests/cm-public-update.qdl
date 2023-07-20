@@ -1,17 +1,21 @@
 #! /usr/bin/env -S qdl-run  
-
+/*
+   This is a critical regression test. Setting a client to have openid scope
+   but not having it be a public client should let the scopes be updated.
+   Scott in particular needs this case since clients upgrade their scopes in CoManage.
+*/
 script_load('init.qdl');
 
-payload. := from_json(file_read(ini.'payloads' + 'create.json'));
+payload. := from_json(file_read(ini.'payloads' + 'create-openid.json'));
 resp. := http#post(payload.);
 ⊨ resp.'status'.'code' == 201 : logger(4,say('incorrect returned status of ' + resp.'status'.'code'));
 update. := from_json(file_read(ini.'payloads' + 'update.json'));
-update.'client_id' := resp.'content'.'client_id';
+update.'client_id' := resp.'content'.'client_id';  // has a lot mroe scopes in it.
 resp2. := http#put(update.);
 ⊨ resp2.'status'.'code' == 200 : logger(4,say('incorrect returned status of ' + resp.'status'.'code'));
 r. := http#get({'client_id':resp2.'content'.'client_id'});
 // r. now contains the uploaded client
 script_load('cm-compare.qdl', r.'content', update., {'application_type', 'token_endpoint_auth_method'});
 r. := http#delete({'client_id':resp.'content'.'client_id'});
-logger(say('ok: Admin creation and update of a client'));
+logger(say('ok: Admin creation and update of a openid client'));
 

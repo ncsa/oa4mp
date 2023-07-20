@@ -14,6 +14,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.oa2.NonceHerder;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.UserInfo;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.client.ATResponse2;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.client.RFC7523Utils;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.JWTUtil2;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
 import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2Asset;
@@ -217,36 +218,20 @@ public class OA2CLCCommands extends CommonCommands {
         }
         dummyAsset = (OA2Asset) getCe().getAssetStore().create();
 
-        OA2ClientEnvironment oa2ce = (OA2ClientEnvironment) getCe();
-        String requestString = oa2ce.getDeviceAuthorizationUri().toString();
+        OA2ClientEnvironment oa2ce =  getCe();
+        String rawResponse=null;
+        if(oa2ce.getClient().hasJWKS()){
+            Map map = new HashMap();
+            map.put(OA2Constants.SCOPE, oa2ce.scopesToString());
+            rawResponse = RFC7523Utils.doPost(getService().getRFC8623ServiceClient(),
+                    oa2ce.getClient(), oa2ce.getDeviceAuthorizationUri(),
+                    oa2ce.getKid(),map);
 
-        String scopes = oa2ce.scopesToString();
-
-        String extraParams = "";
-        boolean isFirstPass = true;
-        for (String key : requestParameters.keySet()) {
-            if (key.equals(SCOPE)) {
-                scopes = scopes + " " + requestParameters.get(key); // take the default, add new ones
-            } else {
-                String x = key + "=" + URLEncoder.encode(requestParameters.get(key), "UTF-8");
-                if (isFirstPass) {
-
-                    isFirstPass = false;
-                    extraParams = x;
-                } else {
-                    extraParams = extraParams + "&" + x;
-                }
-            }
+        }else{
+            rawResponse = getService().getServiceClient().doGet(getRequestString(oa2ce),
+                    oa2ce.getClient().getIdentifierString(),
+                    oa2ce.getClient().getSecret());
         }
-
-        requestString = requestString + "?" + OA2Constants.CLIENT_ID + "=" + oa2ce.getClientId();
-        requestString = requestString + "&" + SCOPE + "=" + URLEncoder.encode(scopes, "UTF-8");
-        if (!StringUtils.isTrivial(extraParams)) {
-            requestString = requestString + "&" + extraParams;
-        }
-        String rawResponse = getService().getServiceClient().doGet(requestString,
-                oa2ce.getClient().getIdentifierString(),
-                oa2ce.getClient().getSecret());
         try {
             dfResponse = JSONObject.fromObject(rawResponse);
             deviceFlowCallback = dfResponse.getString(RFC8628Constants2.VERIFICATION_URI);
@@ -277,6 +262,36 @@ public class OA2CLCCommands extends CommonCommands {
             }
         }
 
+    }
+
+    private String getRequestString(OA2ClientEnvironment oa2ce) throws UnsupportedEncodingException {
+        String requestString = oa2ce.getDeviceAuthorizationUri().toString();
+
+        String scopes = oa2ce.scopesToString();
+
+        String extraParams = "";
+        boolean isFirstPass = true;
+        for (String key : requestParameters.keySet()) {
+            if (key.equals(SCOPE)) {
+                scopes = scopes + " " + requestParameters.get(key); // take the default, add new ones
+            } else {
+                String x = key + "=" + URLEncoder.encode(requestParameters.get(key), "UTF-8");
+                if (isFirstPass) {
+
+                    isFirstPass = false;
+                    extraParams = x;
+                } else {
+                    extraParams = extraParams + "&" + x;
+                }
+            }
+        }
+
+        requestString = requestString + "?" + OA2Constants.CLIENT_ID + "=" + oa2ce.getClientId();
+        requestString = requestString + "&" + SCOPE + "=" + URLEncoder.encode(scopes, "UTF-8");
+        if (!StringUtils.isTrivial(extraParams)) {
+            requestString = requestString + "&" + extraParams;
+        }
+        return requestString;
     }
 
     public long getDfInterval() {

@@ -30,7 +30,7 @@ import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims.SUBJECT
 
 public class ATServer2 extends TokenAwareServer implements ATServer {
     /**
-     * Place holder class for storing ID tokens. ID tokens are consumable in the sense that once we
+     * Placeholder class for storing ID tokens. ID tokens are consumable in the sense that once we
      * get them back, they are checked for validity and passed along to the client. The problem is that
      * many applications (such as Kubernetes) are using them as a "poor man's SciToken", necessitating
      * that we keep them around for at least a bit. This store holds the raw token (as a string) and
@@ -64,7 +64,6 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
     }
 
     boolean useBasicAuth = false;
-    long expiresIn = 0L;
 
     /**
      * Processes access token request

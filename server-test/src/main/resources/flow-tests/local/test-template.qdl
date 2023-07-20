@@ -67,13 +67,13 @@ s. := tokenize(at.'scope', ' ');
                'read:/home/' + user_id,
                'read:/public/lsst/' + user_id,
                'x.y:/abc/def'] ∈ s.) : 'Wrong scopes in access token:' + to_string(s.);
-⊨ tokens.'access_token'.'lifetime' - 750000 ≤ 2000 : 'wrong access token lifetime';
+⊨ tokens.'access_token'.'lifetime' - 750000 ≤ 2000 : 'wrong access token lifetime #1';
 ⊨ at.'iss' == 'https://access.cilogon.org' : 'wrong access token issuer';
 ⊨ at.'aud' == 'https://wlcg.cern.ch/jwt/v1/access' : 'wrong access token audience';
 ⊨ at.'sub' == user_id : 'wrong access token subject';
 ⊨ at.'wlcg.ver' == '1.0' : 'wrong access token wlcg version';
 
-⊨ tokens.'refresh_token'.'lifetime' == 3600000 : 'wrong refresh token lifetime';
+⊨ tokens.'refresh_token'.'lifetime' == 3600000 : 'wrong refresh token lifetime #1';
 ⊨ rt.'iss' == 'https://refresh.cilogon.org' : 'wrong refresh token issuer';
 
 ⊨ claims().'aud' == cfg.'id' : 'wrong audience';  // Audience is a little different than usual.
@@ -83,10 +83,10 @@ tokens. := refresh();
 at. := tokens.'access_token'.'jwt';
 rt. := tokens.'refresh_token'.'jwt';
 ⊨ 'x.z'== at.'scope' : 'Wrong scopes in access token. Expected only x.z and got ' + at.'scope';
-⊨ tokens.'access_token'.'lifetime' - 750000 ≤ 2000 : 'wrong access token lifetime'; // some skew may happen. Allow a couple of seconds.
+⊨ tokens.'access_token'.'lifetime' - 750000 ≤ 2000 : 'wrong access token lifetime #2'; // some skew may happen. Allow a couple of seconds.
 ⊨ at.'iss' == 'https://access.cilogon.org' : 'wrong access token issuer';
 ⊨ at.'aud' == 'https://wlcg.cern.ch/jwt/v1/access' : 'wrong access token audience';
-⊨ tokens.'refresh_token'.'lifetime' == 3600000 : 'wrong refresh token lifetime';
+⊨ tokens.'refresh_token'.'lifetime' == 3600000 : 'wrong refresh token lifetime #2';
 
 // now to test the exchange
 
@@ -100,12 +100,12 @@ s. := tokenize(at.'scope', ' ');
 ⊨ reduce(@∧, [ 'read:/home/' + user_id,
                'read:/public/lsst/' + user_id,
                'x.y:/abc/def/pqr'] ∈ s.) : 'Wrong scopes in access token';
-⊨ tokens.'access_token'.'lifetime' == 750000 : 'wrong access token lifetime';
+⊨ tokens.'access_token'.'lifetime' == 750000 : 'wrong access token lifetime #3';
 ⊨ at.'iss' == 'https://access.cilogon.org' : 'wrong access token issuer';
 ⊨ at.'aud' == 'https://wlcg.cern.ch/jwt/v1/access' : 'wrong access token audience';
 
 tokens. := exchange('-rt');
 rt. := tokens.'refresh_token'.'jwt';
-⊨ tokens.'refresh_token'.'lifetime' == 3600000 : 'wrong refresh token lifetime';
+⊨ tokens.'refresh_token'.'lifetime' == 3600000 : 'wrong refresh token lifetime #3';
 
 say('Test basic client configuration: ok');

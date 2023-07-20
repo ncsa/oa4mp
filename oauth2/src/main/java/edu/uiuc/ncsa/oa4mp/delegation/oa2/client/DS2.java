@@ -33,14 +33,26 @@ public class DS2 extends DelegationService {
                RTServer rtServer,
                RFC7009Server rfc7009Server,
                RFC7662Server rfc7662Server,
-               RFC7523Server rfc7523Server) {
+               RFC7523Server rfc7523Server,
+               RFC8623Server rfc8623Server) {
         super(agServer, atServer, paServer);
         this.uiServer = uiServer;
         this.rtServer = rtServer;
         this.rfc7009Server = rfc7009Server;
         this.rfc7662Server = rfc7662Server;
         this.rfc7523Server = rfc7523Server;
+        this.rfc8623Server = rfc8623Server;
     }
+
+    public RFC8623Server getRfc8623Server() {
+        return rfc8623Server;
+    }
+
+    public void setRfc8623Server(RFC8623Server rfc8623Server) {
+        this.rfc8623Server = rfc8623Server;
+    }
+
+    RFC8623Server rfc8623Server;
     RFC7523Server rfc7523Server;
     RTServer rtServer;
 

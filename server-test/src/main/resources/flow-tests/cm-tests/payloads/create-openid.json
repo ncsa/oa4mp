@@ -1,0 +1,20 @@
+{
+  "comment": [
+    "This creates a client with only an openid scope, but does not set the token endpoint auth",
+    "method to 'none', which would turn this into a public client (and prevent updates to its scopes)."
+    ],
+  "redirect_uris": [
+    "http://localhost/callback",
+        "http://localhost/callback2",
+        "http://localhost/callback3"
+  ],
+  "client_name": "Another test client",
+  "scope": "openid",
+  "token_endpoint_auth_method": "client_secret_basic",
+  "contacts": [
+    "test-client@test.org"
+  ],
+  "grant_types":["refresh_token","urn:ietf:params:oauth:grant-type:device_code"],
+  "rt_lifetime" :3600,
+  "at_lifetime" :900
+}

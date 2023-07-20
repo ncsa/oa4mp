@@ -17,10 +17,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.NonceHerder;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.UserInfo;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.client.ATResponse2;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.client.ATServer2;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.client.DS2;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.client.RFC7523Utils;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.client.*;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.JWTUtil2;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.InvalidNonceException;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
@@ -453,6 +450,10 @@ public class OA2MPService extends OA4MPService {
     public ServiceClient getServiceClient() {
         ATServer2 atServer2 = (ATServer2) getEnvironment().getDelegationService().getAtServer();
         return atServer2.getServiceClient();
+    }
+    public ServiceClient getRFC8623ServiceClient() {
+        DS2 ds2 = (DS2)getEnvironment().getDelegationService();
+        return ds2.getRfc8623Server().getServiceClient();
     }
 
     protected void updateExchangedAsset(OA2Asset asset, JSONObject claims) {

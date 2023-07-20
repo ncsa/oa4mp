@@ -103,15 +103,12 @@ public class OIDCCMServlet extends EnvServlet {
      */
     @Override
     public void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws ServletException, IOException {
-        //      printAllParameters(httpServletRequest);
 
 
         try {
             if (!(getOA2SE().getCmConfigs().hasRFC7592Config() && getOA2SE().getCmConfigs().getRFC7592Config().enabled) && getOA2SE().getCmConfigs().isEnabled()) {
                 throw new IllegalAccessError("Error: RFC 7592 not supported on this server. Request rejected.");
             }
-            CM7591Config cm7591Config = getOA2SE().getCmConfigs().getRFC7591Config();
-
             if (doPing(httpServletRequest, httpServletResponse)) return;
             if (!getOA2SE().getCmConfigs().hasRFC7592Config()) {
                 throw new IllegalAccessError("Error: RFC 7592 not supported on this server. Request rejected.");
@@ -142,6 +139,9 @@ public class OIDCCMServlet extends EnvServlet {
                 debugger = MyProxyDelegationServlet.createDebugger(adminClient);
             }
             debugger.trace(this, "Starting get");
+            if(debugger.getDebugLevel() == MetaDebugUtil.DEBUG_LEVEL_TRACE){
+                printAllParameters(httpServletRequest);
+            }
             String rawID = getFirstParameterValue(httpServletRequest, OA2Constants.CLIENT_ID);
             if (rawID == null || rawID.isEmpty()) {
                 // CIL-1092
@@ -193,6 +193,7 @@ public class OIDCCMServlet extends EnvServlet {
   /*          if ((!isAnonymous) && adminClient.isDebugOn()) {
                 fireMessage(getOA2SE(), defaultReplacements(httpServletRequest, adminClient, oa2Client));
             }*/
+            debugger.trace(this, "GET returns payload\n" + json.toString(2));
             writeOK(httpServletResponse, json); //send it back with an ok.
         } catch (Throwable t) {
             handleException(new ExceptionHandlerThingie(t, httpServletRequest, httpServletResponse));
@@ -455,7 +456,6 @@ public class OIDCCMServlet extends EnvServlet {
      */
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        //   printAllParameters(req);
         AdminClient adminClient = null;
         OA2Client client = null;
         try {
@@ -465,17 +465,32 @@ public class OIDCCMServlet extends EnvServlet {
 
             adminClient = getAndCheckAdminClient(req);
             MetaDebugUtil adminDebugger = MyProxyDelegationServlet.createDebugger(adminClient);
-            client = getClient(req);
-            checkAdminPermission(adminClient, client);
+            if(adminDebugger.getDebugLevel() == MetaDebugUtil.DEBUG_LEVEL_TRACE){
+                printAllParameters(req);
 
+            }
             JSON rawJSON = getPayload(req, adminDebugger);
-
-            adminDebugger.trace(this, rawJSON.toString());
             if (rawJSON.isArray()) {
                 adminDebugger.info(this, "Error: Got a JSON array rather than a request:" + rawJSON);
                 throw new IllegalArgumentException("Error: incorrect argument. Not a valid JSON request");
             }
             JSONObject jsonRequest = (JSONObject) rawJSON;
+            // can send the client id as either a parameter or in the JSON blob.
+            if(jsonRequest.containsKey(OA2Constants.CLIENT_ID)){
+                client = (OA2Client) getOA2SE().getClientStore().get(BasicIdentifier.newID(jsonRequest.getString(OA2Constants.CLIENT_ID)));
+            }else{
+                client = getClient(req);
+            }
+            if(client == null){
+                throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
+                        "unknown client",
+                        HttpStatus.SC_BAD_REQUEST,
+                        null, adminClient);
+
+            }
+            checkAdminPermission(adminClient, client);
+
+            adminDebugger.trace(this, rawJSON.toString());
 
             if (jsonRequest.size() == 0) {
                 // Playing nice here. If they upload an empty object, the net effect is going to be to zero out
@@ -521,12 +536,13 @@ public class OIDCCMServlet extends EnvServlet {
                 // previous version the only permits a reduction in scopes is allowed.
                 // We do reject a scope if it is not on the supported list for this server
                 Collection<String> supportedScopes = getOA2SE().getScopes();
-
+                String scope = null;
                 for (Object x : newScopes) {
-                    String scope = x.toString();
+                    scope = x.toString();
                     if (!supportedScopes.contains(scope)) {
                         // then this is not in the list, request is rejected
                         rejectRequest = true;
+                        adminDebugger.trace(this, "rejected scope '" + scope + "', not on list of server supported scopes:" + supportedScopes);
                         break;
                     }
                     newScopeList.add(scope);
@@ -714,7 +730,6 @@ public class OIDCCMServlet extends EnvServlet {
         if (!getOA2SE().getCmConfigs().isEnabled()) {
             throw new ServletException("unsupported service");
         }
-        printAllParameters(httpServletRequest);
         CM7591Config cm7591Config = getOA2SE().getCmConfigs().getRFC7591Config();
         boolean isAnonymous = false;
         String host = httpServletRequest.getRemoteHost();
@@ -735,6 +750,9 @@ public class OIDCCMServlet extends EnvServlet {
         }
 
         MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(adminClient);
+        if(debugger.getDebugLevel() == MetaDebugUtil.DEBUG_LEVEL_TRACE){
+            printAllParameters(httpServletRequest);
+        }
         debugger.trace(this, "Starting to process " + httpServletRequest.getMethod());
         // Now that we have the admin client (so we can do this request), we read the payload:
         JSON rawJSON = getPayload(httpServletRequest, debugger);
@@ -867,7 +885,7 @@ public class OIDCCMServlet extends EnvServlet {
         writeCreateOK(httpServletResponse, jsonResp);
         logOK(httpServletRequest); // CIL-1722
 
-        //writeOK(httpServletResponse, jsonResp);
+      //  writeOK(httpServletResponse, jsonResp);
     }
 
 
@@ -1121,12 +1139,12 @@ public class OIDCCMServlet extends EnvServlet {
             }
         }
         if (jsonRequest.containsKey(OIDCCMConstants.CONTACTS)) {
-            // This is a set of strings thjat are typically email addresses.
             // Todo: Really check these and allow for multiple values
             // Todo: This takes only the very first.
             JSONArray emails = toJA(jsonRequest, OIDCCMConstants.CONTACTS);
-            //= jsonRequest.getJSONArray(OIDCCMConstants.CONTACTS);
-            ServletDebugUtil.info(this, "Multiple contacts addresses found " + emails + "\n Only the first is used currently.");
+            if(1 < emails.size()) {
+                ServletDebugUtil.info(this, "Multiple contacts addresses found " + emails + "\n Only the first is used currently.");
+            }
             if (!emails.isEmpty()) {
                 client.setEmail(emails.getString(0));
             }

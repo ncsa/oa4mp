@@ -12,6 +12,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AuthorizationGrantImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenUtils;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.*;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.AGRequest2;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC7523Constants;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC8628Constants;
 import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.oa4mp.delegation.server.request.AGResponse;
@@ -72,24 +73,32 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
         // lastAttemptTS = System.currentTimeMillis();
         // Next two lines also verify that it is a client, has been approved and has the right secret.
         OA2Client client = null;
-        try {
-            client = (OA2Client) getClient(req);
-        } catch (UnknownClientException unknownClientException) {
-            throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
-                    "unknown client",
-                    HttpStatus.SC_BAD_REQUEST,
-                    null);
-        }
-        if (!client.isPublicClient()) {
+        String type = req.getParameter(RFC7523Constants.CILENT_ASSERTION_TYPE );
+  //      printAllParameters(req);
+        if (type != null && type.equals(RFC7523Constants.ASSERTION_JWT_BEARER)) {
+            // If the client is doing an RFC 7523 grant, then it must authorize accordingly.
+            client = OA2HeaderUtils.getAndVerifyRFC7523Client(req, (OA2SE) getServiceEnvironment(), true);
+        }else{
             try {
-                ClientUtils.verifyClientSecret(client, getClientSecret(req), false);
-            } catch (Throwable t) {
-                DebugUtil.error(this, "Error verifying client secret", t);
+                client = (OA2Client) getClient(req);
+            } catch (UnknownClientException unknownClientException) {
                 throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
-                        "incorrect password",
+                        "unknown client",
                         HttpStatus.SC_BAD_REQUEST,
-                        null, client);
+                        null);
             }
+            if (!client.isPublicClient()) {
+                try {
+                    ClientUtils.verifyClientSecret(client, getClientSecret(req), false);
+                } catch (Throwable t) {
+                    DebugUtil.error(this, "Error verifying client secret", t);
+                    throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
+                            "incorrect password",
+                            HttpStatus.SC_BAD_REQUEST,
+                            null, client);
+                }
+            }
+
         }
         MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(client);
         debugger.trace(this, "is response committed?" + resp.isCommitted());

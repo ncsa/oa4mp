@@ -716,15 +716,28 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
 
                 // found something under another client id. Check for substitution
                 PermissionsStore<? extends Permission> pStore = getOA2SE().getPermissionStore();
-                List<Identifier> adminIDS = pStore.getAdmins(client.getIdentifier());
-                if (adminIDS.isEmpty()) {
-                    // If the client is not managed, it should not be substituting for anything.
-                    debugger.trace(this, "client is not managed, any place");
-                    throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
-                            "no substitutions allowed for unmanaged clients",
-                            HttpStatus.SC_UNAUTHORIZED, null, t.getClient());
+                List<Identifier> eAdminIDS = pStore.getAdmins(client.getIdentifier());
+                Permission ersatzChain = null;
+                Identifier pAdminID = null;
+                List<Identifier> pAdminIDS = pStore.getAdmins(t.getOA2Client().getIdentifier());
+                if (eAdminIDS.isEmpty()) {
+                    if(!pAdminIDS.isEmpty()){
+                        debugger.trace(this, "ersatz client is not managed, any place");
+                        throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
+                                "no substitutions allowed for unmanaged clients",
+                                HttpStatus.SC_UNAUTHORIZED, null, t.getClient());
+                    }
                 }
-                if (1 < adminIDS.size()) {
+                if(1 == eAdminIDS.size()){
+                    if(!pAdminIDS.contains(eAdminIDS.get(0))){ // we only care that the admin for the E client is also one for the P client
+                        throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
+                                "clients must be managed by same admin",
+                                HttpStatus.SC_UNAUTHORIZED, null, t.getClient());
+                    }
+                    pAdminID = pAdminIDS.get(0);
+                }
+                ersatzChain = pStore.getErsatzChain(pAdminID, t.getOA2Client().getIdentifier(), client.getIdentifier());
+                if (1 < eAdminIDS.size()) {
                     // So if there is a client managed by multiple admins, we don't just switch
                     // virtual organizations in the middle. No hijacking allowed. This is possible to do, but generally
                     // admins do not share clients, so we'll flag it as an exception here and if this
@@ -735,9 +748,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                             HttpStatus.SC_UNAUTHORIZED, null, t.getClient());
                 }
 
-                Permission p = pStore.getErsatzChain(adminIDS.get(0), t.getOA2Client().getIdentifier(), client.getIdentifier());
-
-                if (p == null) {
+                if (ersatzChain == null) {
                     // This client cannot sub in the original flow.
                     debugger.trace(this, "client \"" + client.getIdentifier() + "\" does not have permission to sub for \"" + t.getOA2Client().getIdentifier() + "\".");
                     throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
@@ -765,7 +776,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 t2.setRefreshToken(rt);
                 // Need inheritance from provisioning client,
                 try {
-                    client = createErsatz(t.getOA2Client().getIdentifier(), client, p.getErsatzChain());
+                    client = createErsatz(t.getOA2Client().getIdentifier(), client, ersatzChain.getErsatzChain());
                 } catch (UnknownClientException ucx) {
                     debugger.trace(this, "ersatz client has unknown provisioner in chain.");
 
@@ -775,7 +786,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                             t.getClient());
                 }
                 t2.setProvisioningClientID(t.getOA2Client().getIdentifier()); // So we can find it later
-                t2.setProvisioningAdminID(adminIDS.get(0));
+                t2.setProvisioningAdminID(pAdminID);
                 t2.setClient(client);
                 t2.getUserMetaData().put(OA2Claims.AUDIENCE, client.getIdentifierString()); // so id token has right audience
 

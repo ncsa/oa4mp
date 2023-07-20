@@ -441,7 +441,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
      * @param provisioningAdminID
      */
     public void setProvisioningAdminID(Identifier provisioningAdminID) {
-        getState().put(PROVISIONING_ADMIN_ID, provisioningAdminID.toString());
+        getState().put(PROVISIONING_ADMIN_ID, provisioningAdminID==null?null:provisioningAdminID.toString());
     }
 
     String PROVISIONING_CLIENT_ID = "provisioning_client_id";

@@ -162,6 +162,7 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
             IdentifierProvider.setSchemeSpecificPart(spp);
         }
         DebugUtil.setInstance(getDebugger());
+        myLogger.setClassName("oa4mp"); // sets the default logger name, sctually.
     }
 
     protected AuthorizationServletConfig authorizationServletConfig;

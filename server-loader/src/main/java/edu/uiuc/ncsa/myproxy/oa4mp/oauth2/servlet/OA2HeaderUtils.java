@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Errors;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2GeneralError;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.JWTUtil2;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC7523Constants;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC8628Constants;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
@@ -58,6 +59,9 @@ public class OA2HeaderUtils extends HeaderUtils {
      * @param request
      */
     public static OA2Client getAndVerifyRFC7523Client(HttpServletRequest request, OA2SE oa2SE) throws NoSuchAlgorithmException, InvalidKeySpecException {
+           return getAndVerifyRFC7523Client(request, oa2SE, false); // default is to use token endpoint
+    }
+    public static OA2Client getAndVerifyRFC7523Client(HttpServletRequest request, OA2SE oa2SE, boolean isDeviceFlow) throws NoSuchAlgorithmException, InvalidKeySpecException {
 
         String raw = request.getParameter(RFC7523Constants.CILENT_ASSERTION);
         if (StringUtils.isTrivial(raw)) {
@@ -101,7 +105,11 @@ public class OA2HeaderUtils extends HeaderUtils {
 
         if (json.containsKey(AUDIENCE)) {
             String serverName = oa2SE.getServiceAddress().toString();
-            serverName = serverName + (serverName.endsWith("/") ? "" : "/") + "token"; // construct the token endpoint
+            if(isDeviceFlow){
+                serverName = serverName + (serverName.endsWith("/") ? "" : "/") + RFC8628Constants.DEVICE_AUTHORIZATION_ENDPOINT; // construct the device_authorization endpoint
+            }else{
+                serverName = serverName + (serverName.endsWith("/") ? "" : "/") + "token"; // construct the token endpoint
+            }
             if (!json.getString(AUDIENCE).equals(serverName)) {
                 throw new IllegalArgumentException("wrong " + AUDIENCE);
             }

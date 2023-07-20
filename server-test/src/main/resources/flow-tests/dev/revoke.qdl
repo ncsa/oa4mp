@@ -15,7 +15,8 @@ rc := script_load('driver.qdl', cfg.);
 if[rc!='ok'][return(rc);];
 
 tokens. := clc#access();
-⊨     ⊨ '---BEGIN CERTIFICATE-----'<clc#get_cert() : 'could not get a cert';
+// Tests that the start of the PEM format is a substring of the response.
+⊨    '---BEGIN CERTIFICATE-----'<clc#get_cert() : 'could not get a cert';
 
 ⊨ introspect().'active':'access token not active';
 ⊨ introspect('-rt').'active':'refresh token not active';
@@ -26,33 +27,22 @@ try[
   exchange();
   ⊨ false : 'token should be invalid.';
 ]catch[
-  say('caught TX exception');
 ];
 
 exchange('-at', '-x'); // Get a new access token for later before we invalidate the refresh token
-say('at exchange w/rt ok');
 // RT tests
 tokens. := exchange('-rt');
-say('rt exchange ok:' + to_string(tokens.'refresh_token'));
 ⊨ introspect('-rt').'active':'refresh token not active';
-say('1');
-
 ⊨ revoke('-rt'): 'refresh token not revoked';
-say('2');
 ⊨ !introspect('-rt').'active':'refresh token not active';
-say('3');
 try[
   exchange('-rt');
   ⊨ false : 'token should be invalid.';
 ]catch[
- say('caught TX  exception');
 ];
-say('4');
 
  exchange('-at'); // can still get an access token
- say('5');
 
 ⊨ introspect().'active':'access token not active';
-     say('6');
 
 say('ok');

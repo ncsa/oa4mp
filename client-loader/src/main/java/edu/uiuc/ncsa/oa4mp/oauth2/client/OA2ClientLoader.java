@@ -84,6 +84,7 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
                             Provider<Client> clientProvider,
                             HashMap<String, String> constants) {
         try {
+            myLogger.setClassName("oa4mp-client"); // so it has a default name.
             return (T) new OA2ClientEnvironment(
                     myLogger, constants,
                     getAccessTokenURI(),
@@ -392,7 +393,8 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
                             new RTServer2(createServiceClient(getAccessTokenURI()), getWellKnownURI(), isOIDCEnabled()), // as per spec, refresh token server is at same endpoint as access token server.
                             new RFC7009Server2(createServiceClient(getRFC7009Endpoint()), getWellKnownURI(), isOIDCEnabled()),
                             new RFC7662Server2(createServiceClient(getRFC7662Endpoint()), getWellKnownURI(), isOIDCEnabled()),
-                            new RFC7523Server(createServiceClient(getAccessTokenURI()), getWellKnownURI(), isOIDCEnabled())
+                            new RFC7523Server(createServiceClient(getAccessTokenURI()), getWellKnownURI(), isOIDCEnabled()),
+                            new RFC8623Server(createServiceClient(getDeviceAuthorizationURI()), getWellKnownURI(), isOIDCEnabled())
                     );
                 }
             };
