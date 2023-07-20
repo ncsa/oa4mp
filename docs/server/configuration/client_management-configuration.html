@@ -48,7 +48,7 @@
     
         
                     <div class="xleft">
-            Last Published: 2023-05-24
+            Last Published: 2023-07-20
                                 </div>
                 <div class="xright">            
     
@@ -58,7 +58,7 @@
                         
     
         
-                         Version: 5.3-SNAPSHOT
+                         Version: 5.3.4
             </div>
     <div class="clear">
         <hr/>
@@ -194,6 +194,21 @@
     
 <tr class="a">
         
+<td>anonymousAllowedDomains</td>
+        
+<td>N</td>
+        
+<td>*</td>
+        
+<td>(RFC 7591 protocol only). If anonymous registrations are allowed, then you may specify which are permitted
+        to make requests. This is a comma-separate list of hosts. The default is a &quot;*&quot; meaning
+        that if not set, all hosts are allowed to make anonymous requests.<br /><br />
+        E.g. anonymousAllowedDomains=&quot;localhost, ligo.bgsu.edu&quot;
+        </td>
+    </tr>
+    
+<tr class="b">
+        
 <td>autoApprove</td>
         
 <td>N</td>
@@ -205,6 +220,20 @@
             in highly automated systems with severely restricted access. Generally though setting
             it true is a terrible idea and a security risk.
         </td>
+    </tr>
+
+    
+<tr class="a">
+        
+<td>autoApproveAllowedDomains</td>
+        
+<td>N</td>
+        
+<td>*</td>
+        
+<td>(RFC 7591 protocol only). If auto approval is enabled, then you may specify which are permitted
+        to make requests. This is a comma-separate list of hosts. The default is a &quot;*&quot; meaning
+        that if not set, all requests are auto approved.</td>
     </tr>
     
 <tr class="b">

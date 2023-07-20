@@ -7,7 +7,7 @@
     <parent>
         <groupId>edu.uiuc.ncsa.myproxy</groupId>
         <artifactId>oa4mp</artifactId>
-        <version>5.3-SNAPSHOT</version>
+        <version>5.3.4</version>
     </parent>
 
     <artifactId>qdl</artifactId>
@@ -17,13 +17,13 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.qdl</groupId>
             <artifactId>language</artifactId>
-            <version>1.5-QDL-SNAPSHOT</version>
+            <version>1.5.4</version>
         </dependency>
 
         <dependency>
             <artifactId>server-admin</artifactId>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.3.4</version>
         </dependency>
 
     </dependencies>

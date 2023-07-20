@@ -7,7 +7,7 @@
     <parent>
         <groupId>edu.uiuc.ncsa.myproxy</groupId>
         <artifactId>oa4mp</artifactId>
-        <version>5.3-SNAPSHOT</version>
+        <version>5.3.4</version>
     </parent>
 
     <artifactId>server-test</artifactId>
@@ -17,7 +17,7 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>oa4mp-webapp</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.3.4</version>
             <type>war</type>
             <scope>runtime</scope>
         </dependency>
@@ -29,29 +29,29 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>server-api</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.3.4</version>
         </dependency>
 <!--        <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>oa4mp-server-loader-oauth2</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.3.4</version>
         </dependency>-->
         <dependency>
                 <groupId>edu.uiuc.ncsa.myproxy</groupId>
                 <artifactId>oauth2</artifactId>
-                <version>5.3-SNAPSHOT</version>
+                <version>5.3.4</version>
             </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>core</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.3.4</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>common</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.3.4</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
@@ -59,27 +59,27 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>oa4mp-server-test</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.3.4</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>util</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.3.4</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>servlet</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.3.4</version>
         </dependency>
 
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>myproxy-logon</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.3.4</version>
         </dependency>
 
         <dependency>
@@ -109,7 +109,7 @@
 <!--        <dependency>
             <groupId>edu.uiuc.ncsa.security.delegation</groupId>
             <artifactId>ncsa-security-oauth-1.0a</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.3.4</version>
         </dependency>-->
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -120,13 +120,13 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>server-loader</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.3.4</version>
         </dependency>
 <!--
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-qdl</artifactId>
-            <version>1.5-QDL-SNAPSHOT</version>
+            <version>1.5.4</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
@@ -134,7 +134,7 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.qdl</groupId>
             <artifactId>tests</artifactId>
-            <version>1.5-QDL-SNAPSHOT</version>
+            <version>1.5.4</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
@@ -142,13 +142,13 @@
 <!--        <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-qdl</artifactId>
-            <version>1.5-QDL-SNAPSHOT</version>
+            <version>1.5.4</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-qdl</artifactId>
-            <version>1.5-QDL-SNAPSHOT</version>
+            <version>1.5.4</version>
             <scope>test</scope>
         </dependency>-->
     </dependencies>
