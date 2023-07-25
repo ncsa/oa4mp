@@ -6,10 +6,6 @@
      access {
          audience="https://wlcg.cern.ch/jwt/v1/any"
          qdl {
-             args=[
-                 "uid=oa4mp_user,ou=system,o=Fermilab,o=CO,dc=cilogon,dc=org",
-                 NandTzbY20wG03u3lMHk
-             ]
              load="fts/v1/at.qdl"
              xmd {
                  "exec_phase"=[

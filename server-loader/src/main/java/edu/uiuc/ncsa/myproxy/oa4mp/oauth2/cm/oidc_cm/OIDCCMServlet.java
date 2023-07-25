@@ -855,13 +855,13 @@ public class OIDCCMServlet extends EnvServlet {
 
         // this adds the client to the list of clients managed by the admin
         if (!isAnonymous) {
-            debugger.trace(this, "Adding permissions for this client");
+            debugger.trace(this, "Adding permissions for client " + newClient.getIdentifierString());
             AddClientRequest addClientRequest = new AddClientRequest(adminClient, newClient);
             getPermissionServer().addClient(addClientRequest);
         }
         // Finally, approve it since it was created with and admin client, which is assumed to be trusted
 
-        debugger.trace(this, "Setting approval record for this client");
+        debugger.trace(this, "Setting approval record for client " + newClient.getIdentifierString());
         ClientApproval approval = new ClientApproval(newClient.getIdentifier());
         approval.setApprovalTimestamp(new Date());
         // https://github.com/ncsa/oa4mp/pull/81
