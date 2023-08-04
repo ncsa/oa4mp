@@ -13,23 +13,27 @@ scope_check(s., token.)->⊗∧⊙s.∈tokenize(token.'scope', ' '); // Define i
        cfg.'idp'  := 'LIGO Collaboration';
        cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
 cfg.'description' :=  'IGWN test';
-  cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
+  cfg.'flow_type' := 'df'; // Note to use df you need to set param for the token endpoint
 
-    params.'token':={'scope':'read:/frames gwdatafind.read gracedb.read dqsegdb.read'};
+    params.'token':={'scope':'read:/frames gwdatafind.read gracedb.read dqsegdb.read write:/staging'}; // CIL-1808 test
   params.'refresh':={'scope':'read:/virgo gracedb.read'};
- params.'exchange':={'scope':'read:/virgo dqsegdb.read read:/frames read:/frames read:/frames'};
+ params.'exchange':={'scope':'read:/virgo dqsegdb.read read:/frames read:/frames read:/frames write:/staging'};
 rc := script_load('driver.qdl', cfg., params.);
 if[rc!='ok'][return(rc);];
 
 tokens. := clc#access();
+say('tokens:' + print(tokens.));
 ⊨ tokens.'access_token'.'lifetime' == 900000 : 'wrong access token lifetime';
 ⊨ tokens.'refresh_token'.'lifetime' == 1000000000 : 'wrong refresh token lifetime';
-⊨ scope_check(['read:/frames', 'gwdatafind.read', 'gracedb.read', 'dqsegdb.read'], tokens.'access_token'.'jwt') : 'wrong at scope(1)';
+⊨ scope_check(['read:/frames', 'gwdatafind.read', 'write:/staging/jeffrey.gaynor', 'gracedb.read', 'dqsegdb.read'], tokens.'access_token'.'jwt') : 'wrong at scope(1)';
 ⊨ claims().'aud' == cfg.'id' : 'wrong audience';
 
 tokens. := clc#refresh();
+say('refresh tokens=' + print(tokens.));
 ⊨ tokens.'access_token'.'jwt'.'scope' == 'gracedb.read' : 'wrong access token scope'; // should be a single one
 ⊨ scope_check(['gracedb.read'], tokens.'access_token'.'jwt') : 'wrong at scope(2)';
 tokens. := clc#exchange();
-⊨ scope_check(['read:/frames', 'dqsegdb.read'], tokens.'access_token'.'jwt') : 'wrong at scope(3)';
+⊨ scope_check(['read:/frames', 'dqsegdb.read', 'write:/staging/jeffrey.gaynor'], tokens.'access_token'.'jwt') : 'wrong at scope(3)';
+
 say('IGWN configuration: ok');
+

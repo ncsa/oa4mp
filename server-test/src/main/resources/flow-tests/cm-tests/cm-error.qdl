@@ -11,7 +11,7 @@
 q := module_load('edu.uiuc.ncsa.qdl.extensions.http.QDLHTTPLoader','java');
 q := module_import(q);
 bearer_token(id, secret)-> encode(encode(id,1) + ':' + encode(secret,1)); // bearer token
-ini. := file_read('/home/ncsa/dev/csd/config/ini/cm-test.ini',2).'cm';
+ini. := file_read('/home/ncsa/dev/csd/config/ini/cm-test.ini',2).args(0);
 http#host(ini.'address') ;
 // Test is that there is a valid admin client ID, but the password is wrong.
 h. := {'Authorization': 'Bearer ' + bearer_token(ini.'id', 'bad secret'),

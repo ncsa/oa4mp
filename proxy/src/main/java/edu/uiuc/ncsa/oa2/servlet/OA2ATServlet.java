@@ -1032,7 +1032,17 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         // char type. We have to set it manually here.
         response.setContentType("application/json;charset=UTF-8");
         response.setCharacterEncoding("UTF-8");
+        /*
+        As per https://datatracker.ietf.org/doc/html/rfc6749#section-5.1
 
+         The authorization server MUST include the HTTP "Cache-Control"
+         response header field [RFC2616] with a value of "no-store" in any
+         response containing tokens, credentials, or other sensitive
+         information, as well as the "Pragma" response header field [RFC2616]
+         with a value of "no-cache".
+         */
+        response.setHeader("Cache-Control", "no-store");
+        response.setHeader("Pragma", "no-cache");
 
         if (newIDTX != null) {
             newIDTX.setValid(true);
@@ -1499,7 +1509,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             if (!t.getClient().getIdentifier().equals(client.getIdentifier())) {
                 debugger.trace(this, "transaction lists client id \"" + t.getClient().getIdentifierString()
                         + "\", but the client in the request is \"" + client.getIdentifierString() + "\". Request rejected.");
-                throw new OA2ATException(OA2Errors.INVALID_REQUEST,
+                throw new OA2ATException(OA2Errors.INVALID_GRANT, // fixes https://github.com/ncsa/oa4mp/issues/119
                         "wrong client",
                         HttpStatus.SC_BAD_REQUEST, null);
 
@@ -1689,6 +1699,18 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         oa2SE.getTxStore().save(txRT);
         debugger.trace(this, "transaction saved for " + t.getIdentifierString());
 
+        /*
+        As per https://datatracker.ietf.org/doc/html/rfc6749#section-5.1
+
+         The authorization server MUST include the HTTP "Cache-Control"
+         response header field [RFC2616] with a value of "no-store" in any
+         response containing tokens, credentials, or other sensitive
+         information, as well as the "Pragma" response header field [RFC2616]
+         with a value of "no-cache".
+         */
+        response.setHeader("Cache-Control", "no-store");
+        response.setHeader("Pragma", "no-cache");
+        debugger.trace(this, "setting response headers.");
         rtiResponse.write(response);
         IssuerTransactionState state = new IssuerTransactionState(
                 request,

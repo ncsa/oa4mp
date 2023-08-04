@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.oa4mp.delegation.oa2;
 
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClient;
+import net.sf.json.JSONObject;
 import org.apache.http.HttpStatus;
 
 import java.net.URI;
@@ -18,7 +19,7 @@ import java.net.URI;
  * on 9/14/16 at  12:26 PM
  */
 // This class is part of the fix for CIL-332.
-public class OA2ATException extends OA2GeneralError {
+public class OA2ATException extends OA2JSONException {
 
     public OA2ATException(OA2RedirectableError error) {
         super(error);
@@ -96,4 +97,13 @@ public class OA2ATException extends OA2GeneralError {
     }
 
     URI errorURI;
+
+    @Override
+    public JSONObject toJSON() {
+        JSONObject jsonObject = super.toJSON();
+        if(getErrorURI() != null){
+                jsonObject.put(OA2Constants.ERROR_URI, getErrorURI().toString());
+            }
+        return jsonObject;
+    }
 }

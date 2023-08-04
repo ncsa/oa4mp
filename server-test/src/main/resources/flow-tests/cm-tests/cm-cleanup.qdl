@@ -3,7 +3,7 @@
    This does a get for the test admin client and removes all clients for it. The admin
    client proper should have no clients ever since it is merely for testing.
 */
-script_load('init.qdl');
+script_load('init.qdl', args(0));
 
 resp. := http#get();
 clients. := resp.'content'.'clients';

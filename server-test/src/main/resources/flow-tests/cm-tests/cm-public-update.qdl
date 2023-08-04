@@ -4,11 +4,11 @@
    but not having it be a public client should let the scopes be updated.
    Scott in particular needs this case since clients upgrade their scopes in CoManage.
 */
-script_load('init.qdl');
+script_load('init.qdl', args(0));
 
 payload. := from_json(file_read(ini.'payloads' + 'create-openid.json'));
 resp. := http#post(payload.);
-⊨ resp.'status'.'code' == 201 : logger(4,say('incorrect returned status of ' + resp.'status'.'code'));
+⊨ resp.'status'.'code' == ini.'status' : logger(4,say('incorrect returned status of ' + resp.'status'.'code'));
 update. := from_json(file_read(ini.'payloads' + 'update.json'));
 update.'client_id' := resp.'content'.'client_id';  // has a lot mroe scopes in it.
 resp2. := http#put(update.);

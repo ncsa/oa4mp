@@ -42,6 +42,7 @@ trace('*** LIGO get_attributes, user=' + user);
            ligo_cfg.'password' := ini.'password';
       ligo_cfg.'fail_on_error' := true;
                 ligo_response. := get_claims(create_source(ligo_cfg.), uid);
+
                    say('ligo_response.==' + to_string(ligo_response., true));
 
              // now we integrate the responses.
@@ -49,7 +50,8 @@ trace('*** LIGO get_attributes, user=' + user);
 
  if [size(groups.) == 0]
 then[raise_error('Missing group information. Cannot determine scopes.', oa4mp_error,{'error_type':'access_denied'});];
-
+         groups. := groups. ~ [{'name':'Communities:LVC:LSC:LDG:CIT:LDGCITUsers'}];
+         say('groups: ' + print(groups.));
          response. := ligo_response.;
  response.'isMemberOf' := groups.;
   response.'uid' := uid;

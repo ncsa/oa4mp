@@ -1,10 +1,29 @@
 //say(debugger(1));
    if [!is_defined(claims.'eppn')]
  then [err('Missing EPPN. Cannot determine scopes.', 'invalid_request');];
+ debugger(1);
  requested_audience. := (size(tx_audience.) == 0)?audience.:tx_audience.;
-   access_token.aud. := (size(requested_audience.) == 0)?all_audience.:requested_audience.;
-   requested_scopes. := (0 < size(tx_scopes.))?tx_scopes.:scopes.;
-        permissions. := resolve_templates(original_scopes., requested_scopes., false); // Only grant scopes already granted
+ access_token.aud. := (size(requested_audience.) == 0)?all_audience.:requested_audience.;
+ requested_scopes. := (0 < size(tx_scopes.))?tx_scopes.:scopes.;
+ trace('IGWN', 'requested scopes = ' + to_string(requested_scopes.));
+ trace('IGWN', 'original scopes = ' + to_string(original_scopes.));
+ permissions. := resolve_templates(original_scopes., requested_scopes., false); // Only grant scopes already granted
+ // CIL-1808
+ /*
+   alternately , do the loop implicitly, since each element of ζ. is a list.
+   pp(x.)->pick((x)->'${'<x, x.);
+    templates. :=~ ⊢⊗pp∀[ζ.]; // apply pp to each element, turn into a set (gets unique values), turn back into a stem
+
+    or perhaps more directly even
+    templates. := ⊗~∀[⊢⊗pp∀[ζ.]]; // apply pp to each element, concatenate all the results.
+ */
+ templates. :=~pick((x)->'${'<x, ⊢ζ.); // unique set of templates
+ trace('IGWN', 'templates = ' + to_string(templates.));
+ t2. := template_substitution(templates., claims.);
+ t2. := resolve_templates(requested_scopes., t2., false); // if templates, by upscoping.
+ permissions. := permissions. ~ t2.;
+
+ trace('IGWN', 'permissions = ' + to_string(permissions.));
  requested_audience. := (size(tx_audience.) == 0)?(size(audience.)==0?all_audience.:audience.):tx_audience.;
-  access_token.'aud' := requested_audience.;
-  access_token.scope := detokenize(unique(permissions.), ' '); // turn in to string, omit duplications, trailing space
+ access_token.'aud' := requested_audience.;
+ access_token.scope := detokenize(unique(permissions.), ' '); // turn in to string, omit duplications, trailing space

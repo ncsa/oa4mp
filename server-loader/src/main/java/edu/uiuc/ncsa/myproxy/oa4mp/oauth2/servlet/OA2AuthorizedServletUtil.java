@@ -1,24 +1,14 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ExtendedParameters;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ScriptRuntimeEngineFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.UsernameFindable;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.AccessTokenConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.IssuerTransactionState;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
-import edu.uiuc.ncsa.security.core.exceptions.IllegalAccessException;
-import edu.uiuc.ncsa.security.core.exceptions.NFWException;
-import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
-import edu.uiuc.ncsa.security.core.util.StringUtils;
-import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
-import edu.uiuc.ncsa.oa4mp.delegation.server.UnapprovedClientException;
-import edu.uiuc.ncsa.oa4mp.delegation.server.request.AGResponse;
-import edu.uiuc.ncsa.oa4mp.delegation.server.request.IssuerResponse;
 import edu.uiuc.ncsa.oa4mp.delegation.common.servlet.TransactionState;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.*;
@@ -28,6 +18,16 @@ import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.AGRequest2;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC7636Util;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC8693Constants;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
+import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
+import edu.uiuc.ncsa.oa4mp.delegation.server.UnapprovedClientException;
+import edu.uiuc.ncsa.oa4mp.delegation.server.request.AGResponse;
+import edu.uiuc.ncsa.oa4mp.delegation.server.request.IssuerResponse;
+import edu.uiuc.ncsa.security.core.exceptions.IllegalAccessException;
+import edu.uiuc.ncsa.security.core.exceptions.NFWException;
+import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
@@ -43,8 +43,8 @@ import java.util.*;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet.createDebugger;
 import static edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet.getServiceEnvironment;
-import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 import static edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants.*;
+import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 
 /**
  * This is set of calls to replace the old Authorized Servlet.

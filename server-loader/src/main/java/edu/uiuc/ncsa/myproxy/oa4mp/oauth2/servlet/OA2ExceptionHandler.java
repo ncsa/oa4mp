@@ -14,7 +14,6 @@ import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.servlet.AbstractServlet;
 import edu.uiuc.ncsa.security.servlet.ExceptionHandler;
 import edu.uiuc.ncsa.security.servlet.ExceptionHandlerThingie;
-import net.sf.json.JSONObject;
 import org.apache.http.HttpStatus;
 
 import javax.servlet.ServletException;
@@ -41,43 +40,44 @@ public class OA2ExceptionHandler implements ExceptionHandler {
         this.logger = logger;
     }
 
-    protected void warn(String x){
-        if(getLogger()!=null){
+    protected void warn(String x) {
+        if (getLogger() != null) {
             getLogger().warn(x);
-        }else{
+        } else {
             System.err.println(x); // really bad, but not a lot we can do.
         }
     }
+
     @Override
     public void handleException(ExceptionHandlerThingie xh) throws IOException, ServletException {
         Throwable t = xh.throwable;
         HttpServletRequest request = xh.request;
         HttpServletResponse response = xh.response;
-        BaseClient baseClient=null;
-        if(t instanceof OA2GeneralError){
-            if(((OA2GeneralError)t).hasClient()){
-                baseClient = ((OA2GeneralError)t).getClient();
+        BaseClient baseClient = null;
+        if (t instanceof OA2GeneralError) {
+            if (((OA2GeneralError) t).hasClient()) {
+                baseClient = ((OA2GeneralError) t).getClient();
             }
-        }else{
-            if((xh instanceof OA2ExceptionHandlerThingie) && ((OA2ExceptionHandlerThingie) xh).hasClient()){
+        } else {
+            if ((xh instanceof OA2ExceptionHandlerThingie) && ((OA2ExceptionHandlerThingie) xh).hasClient()) {
                 baseClient = ((OA2ExceptionHandlerThingie) xh).client;
             }
         }
-   //     ServletDebugUtil.trace(this, "Error", t);
+        //     ServletDebugUtil.trace(this, "Error", t);
         if (t instanceof QDLExceptionWithTrace) {
             if (t.getCause() != null) {
                 t = t.getCause();
             }
 
         }
-        String message="";
-        if(baseClient!=null){
-               message = "[" + baseClient.getIdentifierString() + "]";
+        String message = "";
+        if (baseClient != null) {
+            message = "[" + baseClient.getIdentifierString() + "]";
         }
         String address = AbstractServlet.getRequestIPAddress(xh.request);
         message = message + "<" + address + "> error: " + t.getMessage();
-         warn(message); // Fixes CIL-1722
-        if(t instanceof MissingContentException){
+        warn(message); // Fixes CIL-1722
+        if (t instanceof MissingContentException) {
             // CIL-1582
             t = new OA2GeneralError(OA2Errors.SERVER_ERROR, t.getMessage(), HttpStatus.SC_BAD_REQUEST, null);
         }
@@ -106,7 +106,11 @@ public class OA2ExceptionHandler implements ExceptionHandler {
             throw (ServletException) t;
         }
 
-
+        // We explictly force where these are evaluated.
+        if (t instanceof OA2JSONException) {
+            handleOA2Error((OA2JSONException) t, response);
+            return;
+        }
         if (t instanceof OA2ATException) {
             handleOA2Error((OA2ATException) t, response);
             return;
@@ -151,26 +155,23 @@ public class OA2ExceptionHandler implements ExceptionHandler {
         writer.close();
     }
 
+    protected void handleOA2Error(OA2JSONException jsonException, HttpServletResponse response) throws IOException {
+        response.setStatus(jsonException.getHttpStatus());
+        response.setHeader("Content-Type", "application/json;charset=UTF-8");
+        PrintWriter writer = response.getWriter();
+        writer.write(jsonException.toJSON().toString());
+        writer.flush();
+        writer.close();
+    }
+
     // Fix for CIL-332: This should now send JSON with the correct http status.
     // Also note, that according to the spec (section 5.2) there is never a redirect to
     // the error endpoint. The body of the response is JSON.
     protected void handleOA2Error(OA2ATException oa2ATException, HttpServletResponse response) throws IOException {
         response.setStatus(oa2ATException.getHttpStatus());
         response.setHeader("Content-Type", "application/json;charset=UTF-8");
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put(OA2Constants.ERROR, oa2ATException.getError());
-        jsonObject.put(OA2Constants.ERROR_DESCRIPTION, oa2ATException.getDescription());
-        if(oa2ATException.getErrorURI() != null){
-            jsonObject.put(OA2Constants.ERROR_URI, oa2ATException.getErrorURI().toString());
-        }
-        if (oa2ATException.getState() != null) {
-            // not quite the spec., but clients may need this.
-            jsonObject.put(OA2Constants.STATE, oa2ATException.getState());
-        }
-
         PrintWriter writer = response.getWriter();
-
-        writer.write(jsonObject.toString());
+        writer.write(oa2ATException.toJSON().toString());
         writer.flush();
         writer.close();
     }

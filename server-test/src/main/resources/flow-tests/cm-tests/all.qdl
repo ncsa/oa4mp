@@ -1,4 +1,9 @@
 #! /usr/bin/env -S qdl-run
+/*
+   The main test suite for client management.
+   See readme.txt for details.
+
+*/
 path := '/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests/cm-tests/';
 script_path(path ~ script_path());
 test.:= path + ['cm-basic.qdl',
@@ -14,12 +19,14 @@ test.:= path + ['cm-basic.qdl',
                 'cm-cleanup.qdl'];
 say('Running all tests. ');
 logger(1);
+default_suite:='cm_local';
+suite := 0<size(args())?args(0):default_suite;
 say('logging to ' + info().'boot'.'log_file');
 counter.'pass' := 0;
 counter.'fail' := 0;
 while[x∈test.][
 try[
-  script_load(x);
+  script_load(x,suite);
   counter.'pass' += 1;
   ]catch[
      logger(4,say('error running script ' + x));

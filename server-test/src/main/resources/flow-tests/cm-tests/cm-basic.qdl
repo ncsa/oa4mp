@@ -1,15 +1,15 @@
 #! /usr/bin/env -S qdl-run  
 
-script_load('init.qdl');
+script_load('init.qdl', args(0));
 
 payload. := from_json(file_read(ini.'payloads' + 'create.json'));
+payload.'client_id' := custom_id();
 resp. := http#post(payload.);
 logger(2,'creating basic client');
-⊨ resp.'status'.'code' == 201 : 'incorrect returned status of ' + resp.'status'.'code';
+⊨ resp.'status'.'code' == ini.'status' : 'incorrect returned status of ' + resp.'status'.'code';
 logger(2,'got client id=' + resp.'content'.'client_id');
 ⊨ ini.'caput' < resp.'content'.'client_id' : 'failed to get custom generated client id';
 r. := http#get({'client_id':resp.'content'.'client_id'});
-say('got client ' + to_string(r.,2));
 // r. now contains the uploaded client
 script_load('cm-compare.qdl', r.'content', payload., {'application_type', 'token_endpoint_auth_method'});
 r. := http#delete({'client_id':resp.'content'.'client_id'});

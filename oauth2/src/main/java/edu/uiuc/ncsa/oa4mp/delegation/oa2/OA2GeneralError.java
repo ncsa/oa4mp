@@ -138,4 +138,7 @@ public class OA2GeneralError extends GeneralException {
                 ", state='" + state + '\'' +
                 '}';
     }
+    public boolean asJSON(){
+        return false;
+    }
 }

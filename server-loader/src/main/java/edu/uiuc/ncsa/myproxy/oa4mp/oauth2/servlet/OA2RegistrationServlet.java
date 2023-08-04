@@ -11,7 +11,6 @@ import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.core.exceptions.RetryException;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
-import edu.uiuc.ncsa.security.servlet.JSPUtil;
 import edu.uiuc.ncsa.security.servlet.PresentableState;
 import edu.uiuc.ncsa.security.util.crypto.KeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
@@ -22,7 +21,6 @@ import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
@@ -298,10 +296,5 @@ public class OA2RegistrationServlet extends AbstractRegistrationServlet {
         String[] scopes = new String[getOA2SE().getScopes().size()];
         getOA2SE().getScopes().toArray(scopes);
         request.setAttribute(SCOPES_NAME, scopes);
-    }
-
-    @Override
-    public void doPost(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws ServletException, IOException {
-        JSPUtil.fwd(httpServletRequest,httpServletResponse, "/oidc-cm");
     }
 }

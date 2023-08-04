@@ -1,10 +1,10 @@
 #! /usr/bin/env -S qdl-run  
 
-script_load('init.qdl');
+script_load('init.qdl', args(0));
 
 payload. := from_json(file_read(ini.'payloads' + 'create-public.json'));
 resp. := http#post(payload.);
-⊨ resp.'status'.'code' == 201 : 'incorrect returned status of ' + resp.'status'.'code';
+⊨ resp.'status'.'code' == ini.'status' : 'incorrect returned status of ' + resp.'status'.'code';
 ⊨ resp.'content'.'scope' == 'openid' : 'incorrect scope, expect openid got ' + resp.'content'.'scope';
 r. := http#get({'client_id':resp.'content'.'client_id'});
 // Note that if the create request has scopes that are a simple text string (like "openid") then the
