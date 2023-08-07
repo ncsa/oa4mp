@@ -21,6 +21,7 @@ say('Running all tests. ');
 logger(1);
 default_suite:='cm_local';
 suite := 0<size(args())?args(0):default_suite;
+say('suite=' + suite);
 say('logging to ' + info().'boot'.'log_file');
 counter.'pass' := 0;
 counter.'fail' := 0;

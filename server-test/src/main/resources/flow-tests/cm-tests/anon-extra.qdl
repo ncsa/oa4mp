@@ -9,7 +9,9 @@ script_load('anon-init.qdl', args(0));
 
 payload. := from_json(file_read(ini.'payloads' + 'create-extra.json'));
 resp. := http#post(payload.);
-⊨ resp.'status'.'code' == ini.'status' : 'incorrect returned status of ' + resp.'status'.'code';
+//⊨ resp.'status'.'code' == ini.'status' : 'incorrect returned status of ' + resp.'status'.'code';
+⊨ resp.'status'.'code' == ini.'status' : 'incorrect returned status: expected '+ ini.'status' +' but got ' + resp.'status'.'code';
+
 ⊨ reduce(@∧, resp.'content'.'scope' ∈ payload.'scope') : 'incorrect scopes, got ' + resp.'content'.'scope';
 
 client_id := resp.'content'.'client_id';

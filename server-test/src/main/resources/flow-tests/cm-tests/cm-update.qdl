@@ -4,7 +4,9 @@ script_load('init.qdl', args(0));
 
 payload. := from_json(file_read(ini.'payloads' + 'create.json'));
 resp. := http#post(payload.);
-⊨ resp.'status'.'code' == ini.'status' : logger(4,say('incorrect returned status of ' + resp.'status'.'code'));
+//⊨ resp.'status'.'code' == ini.'status' : logger(4,say('incorrect returned status of ' + resp.'status'.'code'));
+⊨ resp.'status'.'code' == ini.'status' : 'incorrect returned status: expected '+ ini.'status' +' but got ' + resp.'status'.'code';
+
 update. := from_json(file_read(ini.'payloads' + 'update.json'));
 update.'client_id' := resp.'content'.'client_id';
 resp2. := http#put(update.);

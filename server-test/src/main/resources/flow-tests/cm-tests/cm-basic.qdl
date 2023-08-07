@@ -6,7 +6,7 @@ payload. := from_json(file_read(ini.'payloads' + 'create.json'));
 payload.'client_id' := custom_id();
 resp. := http#post(payload.);
 logger(2,'creating basic client');
-⊨ resp.'status'.'code' == ini.'status' : 'incorrect returned status of ' + resp.'status'.'code';
+⊨ resp.'status'.'code' == ini.'status' : 'incorrect returned status: expected '+ ini.'status' +' but got ' + resp.'status'.'code';
 logger(2,'got client id=' + resp.'content'.'client_id');
 ⊨ ini.'caput' < resp.'content'.'client_id' : 'failed to get custom generated client id';
 r. := http#get({'client_id':resp.'content'.'client_id'});
