@@ -7,7 +7,7 @@
     <parent>
         <groupId>edu.uiuc.ncsa.myproxy</groupId>
         <artifactId>oa4mp</artifactId>
-        <version>5.3.4</version>
+        <version>5.3.5</version>
     </parent>
 
     <artifactId>oa4mp-server-test</artifactId>
@@ -18,7 +18,7 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>server</artifactId>
-            <version>5.3.4</version>
+            <version>5.3.5</version>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
@@ -30,7 +30,7 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>common</artifactId>
-            <version>5.3.4</version>
+            <version>5.3.5</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
@@ -50,13 +50,13 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>server-api</artifactId>
-            <version>5.3.4</version>
+            <version>5.3.5</version>
         </dependency>
 
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>myproxy-logon</artifactId>
-            <version>5.3.4</version>
+            <version>5.3.5</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>

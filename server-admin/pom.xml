@@ -7,7 +7,7 @@
     <parent>
         <groupId>edu.uiuc.ncsa.myproxy</groupId>
         <artifactId>oa4mp</artifactId>
-        <version>5.3.4</version>
+        <version>5.3.5</version>
     </parent>
 
     <artifactId>server-admin</artifactId>
@@ -18,7 +18,7 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>client-loader</artifactId>
-            <version>5.3.4</version>
+            <version>5.3.5</version>
         </dependency>
 
         <dependency>
@@ -29,12 +29,12 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>server-loader</artifactId>
-            <version>5.3.4</version>
+            <version>5.3.5</version>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>oauth2</artifactId>
-            <version>5.3.4</version>
+            <version>5.3.5</version>
         </dependency>
         <dependency>
             <groupId>com.sun.xml.bind</groupId>

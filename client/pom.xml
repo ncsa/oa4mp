@@ -5,7 +5,7 @@
     <parent>
         <artifactId>oa4mp</artifactId>
         <groupId>edu.uiuc.ncsa.myproxy</groupId>
-        <version>5.3.4</version>
+        <version>5.3.5</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -19,21 +19,15 @@
     <name>OA4MP delegation layer for OAuth 2 clients</name>
     <packaging>jar</packaging>
     <dependencies>
-<!--        <dependency>
-            <groupId>edu.uiuc.ncsa.myproxy</groupId>
-            <artifactId>common</artifactId>
-            <version>5.3.4</version>
-        </dependency>-->
+
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
-   <!--         <version>3.1.0</version>
-            <scope>provided</scope>-->
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>common</artifactId>
-            <version>5.3.4</version>
+            <version>5.3.5</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

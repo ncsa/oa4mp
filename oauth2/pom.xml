@@ -5,7 +5,7 @@
     <parent>
         <artifactId>oa4mp</artifactId>
         <groupId>edu.uiuc.ncsa.myproxy</groupId>
-        <version>5.3.4</version>
+        <version>5.3.5</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -16,26 +16,19 @@
         <maven.compiler.target>11</maven.compiler.target>
     </properties>
 
-    <!--
-               <dependency>
-            <groupId>edu.uiuc.ncsa.myproxy</groupId>
-            <artifactId>common</artifactId>
-            <version>5.3.4</version>
-        </dependency>
-    -->
     <packaging>jar</packaging>
     <name>OA4MP delegation support for OAuth 2</name>
     <dependencies>
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>server</artifactId>
-            <version>5.3.4</version>
+            <version>5.3.5</version>
         </dependency>
 
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>client</artifactId>
-            <version>5.3.4</version>
+            <version>5.3.5</version>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
@@ -52,8 +45,7 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
-          <!--  <version>2.5</version>
-            <scope>provided</scope>-->
+
         </dependency>
 
         <dependency>

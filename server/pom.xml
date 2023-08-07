@@ -5,7 +5,7 @@
     <parent>
         <artifactId>oa4mp</artifactId>
         <groupId>edu.uiuc.ncsa.myproxy</groupId>
-        <version>5.3.4</version>
+        <version>5.3.5</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -21,7 +21,7 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>common</artifactId>
-            <version>5.3.4</version>
+            <version>5.3.5</version>
         </dependency>
 
         <dependency>
