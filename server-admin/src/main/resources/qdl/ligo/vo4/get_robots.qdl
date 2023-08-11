@@ -10,12 +10,12 @@
  ldapsearch -LLL -H ldaps://ldap.cilogon.org  -x  -b 'ou=people,o=KAGRA-LIGO,o=CO,dc=gwastronomy-data,dc=cgca,dc=uwm,dc=edu'  '(eduPersonPrincipalName=duncan.meacher@shibbi.pki.itc.u-tokyo.ac.jp)'
  */
    SS(x)->say(x);
-     ini. := file_read('/home/ncsa/dev/csd/config/ini/ligo-ldap.ini',2).'ligo_prod';
+     ini. := file_read('/home/ncsa/dev/csd/config/ini/ligo-ldap.ini',2).'ligo_test';
      trace(to_string(ini.));
      //ini. := file_read('vfs#/scripts/ligo/ldap.ini',2).'ligo';
      user := args().0; // This is actually the EPPN for the user.
        uid := head(user, '@');
-     trace('user'+user);
+     trace('user: '+user);
 
             ligo_cfg.'address' := ini.'address';
                ligo_cfg.'port' := 636;
@@ -31,9 +31,9 @@
            ligo_cfg.'password' := ini.'password';
       ligo_cfg.'fail_on_error' := true;
                 ligo_response. := get_claims(create_source(ligo_cfg.), user);
-                   SS('ligo_response.==' + to_string(ligo_response., true));
+                   trace('get_robots:ligo_response.==' + to_string(ligo_response., true));
 
-  if [size(ligo_response.'isMemberOf') == 0]
+  if [size(ligo_response.) == 0 || size(ligo_response.'isMemberOf') == 0]
 then [err('Missing group information. Cannot determine scopes.','access_denied');];
 
 ligo_response.'uid':=uid;

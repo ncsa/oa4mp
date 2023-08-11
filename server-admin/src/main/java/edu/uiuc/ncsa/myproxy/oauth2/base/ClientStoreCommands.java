@@ -6,15 +6,9 @@ import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
-import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.util.cli.CommonCommands;
-import edu.uiuc.ncsa.security.util.crypto.KeyUtil;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 
 /**
@@ -30,7 +24,7 @@ public class ClientStoreCommands extends BaseClientStoreCommands {
     }
 
 
-    public ClientStoreCommands(MyLoggingFacade logger, Store store) throws Throwable{
+    public ClientStoreCommands(MyLoggingFacade logger, Store store) throws Throwable {
         super(logger, store);
         setSortable(new ClientSorter());
     }
@@ -45,36 +39,28 @@ public class ClientStoreCommands extends BaseClientStoreCommands {
         return longFormat(identifiable, false);
     }
 
-    @Override
-    public void extraUpdates(Identifiable identifiable, int magicNumber) throws IOException {
-        Client client = (Client) identifiable;
-/*        client.setErrorUri(getInput("enter error uri", client.getErrorUri()));
-        client.setHomeUri(getInput("enter home uri", client.getHomeUri()));
-        client.setProxyLimited(isOk(getInput("does this client require limited proxies?", client.isProxyLimited() ? "y" : "n")));*/
-        getPublicKeyFile((Client) identifiable);
-    }
 
     @Override
     public boolean update(Identifiable identifiable) throws IOException {
 
         Client client = (Client) identifiable;
-        ClientKeys keys = (ClientKeys)getMapConverter().getKeys();
+        ClientKeys keys = (ClientKeys) getMapConverter().getKeys();
 
         String newIdentifier = null;
 
         info("Starting client update for id = " + client.getIdentifierString());
         say("Update the values. A return accepts the existing or default value in []'s");
 
-        newIdentifier = getPropertyHelp(keys.identifier(),"enter the identifier", client.getIdentifierString());
+        newIdentifier = getPropertyHelp(keys.identifier(), "enter the identifier", client.getIdentifierString());
         boolean removeCurrentClient = false;
         Identifier oldID = client.getIdentifier();
 
         // no clean way to do this.
-        client.setName(getPropertyHelp(keys.name(),"enter the name", client.getName()));
-        client.setEmail(getPropertyHelp(keys.email(),"enter email", client.getEmail()));
-        client.setErrorUri(getPropertyHelp(keys.errorURL(),"enter error url", client.getErrorUri()));
-        client.setHomeUri(getPropertyHelp(keys.homeURL(),"enter home url", client.getHomeUri()));
-        client.setProxyLimited(isOk(getPropertyHelp(keys.proxyLimited(),"does this client require limited proxies?", client.isProxyLimited() ? "y" : "n")));
+        client.setName(getPropertyHelp(keys.name(), "enter the name", client.getName()));
+        client.setEmail(getPropertyHelp(keys.email(), "enter email", client.getEmail()));
+        client.setErrorUri(getPropertyHelp(keys.errorURL(), "enter error url", client.getErrorUri()));
+        client.setHomeUri(getPropertyHelp(keys.homeURL(), "enter home url", client.getHomeUri()));
+        client.setProxyLimited(isOk(getPropertyHelp(keys.proxyLimited(), "does this client require limited proxies?", client.isProxyLimited() ? "y" : "n")));
         // set file not found message.
         extraUpdates(client, DEFAULT_MAGIC_NUMBER);
         sayi("here is the complete client:");
@@ -102,58 +88,6 @@ public class ClientStoreCommands extends BaseClientStoreCommands {
         return false;
     }
 
-    protected void getPublicKeyFile(Client client) throws IOException {
-        String input;
-        String fileNotFoundMessage = CommonCommands.INDENT + "...uh-oh, I can't find that file. Please enter it again";
-        String secret = client.getSecret();
-
-        if (!isEmpty(secret)) {
-            secret = secret.substring(0, Math.min(25, secret.length())) + "...";
-        }
-        boolean askForFile = true;
-        while (askForFile) {
-            input = getInput("enter full path and file name of public key", secret);
-            if (isEmpty(input)) {
-                sayi("No file entered. Public key entry skipped");
-                break;
-            }
-            if (input.equals(secret)) {
-                sayi(" public key entry skipped.");
-                break;
-            }
-            // if this is not the default value, then this *should* be the name of a file.
-            if (input != null) {
-                File f = new File(input);
-                if (!f.exists()) {
-                    say(fileNotFoundMessage);
-                    continue;
-                }
-                try {
-                    FileReader fr = new FileReader(f);
-                    BufferedReader br = new BufferedReader(fr);
-                    StringBuffer sb = new StringBuffer();
-                    String x = br.readLine();
-                    while (x != null) {
-                        sb.append(x + "\n");
-                        x = br.readLine();
-                    }
-                    br.close();
-                    try {
-                        KeyUtil.fromX509PEM(sb.toString());
-                        askForFile = false;
-                    } catch (GeneralException gx) {
-                        gx.printStackTrace();
-                        sayi("This does not seem to be in the correct format:" + gx.getMessage());
-                        sayi("Please try again.");
-                        continue;
-                    }
-                    client.setSecret(sb.toString());
-                } catch (IOException e) {
-                    say(fileNotFoundMessage);
-                }
-            }
-        }
-    }
 
     @Override
     protected void doRename(Identifier srcID, Identifier targetID) {
@@ -173,8 +107,15 @@ public class ClientStoreCommands extends BaseClientStoreCommands {
 
     @Override
     protected Identifier doCopy(Identifiable source, Identifier targetId, boolean useRandomID) {
-       Identifier id = super.doCopy(source, targetId, useRandomID);
+        Identifier id = super.doCopy(source, targetId, useRandomID);
         cloneApproval(source.getIdentifier(), id);
         return id;
+    }
+
+    @Override
+    public void extraUpdates(Identifiable identifiable, int magicNumber) throws IOException {
+        super.extraUpdates(identifiable, magicNumber);
+        Client client = (Client)identifiable;
+        client.setHomeUri(getInput("enter home url", client.getHomeUri()));
     }
 }

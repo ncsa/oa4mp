@@ -20,7 +20,6 @@ import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.cli.ArgumentNotFoundException;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import net.sf.json.JSONObject;
-import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.IOException;
 import java.net.URI;
@@ -66,26 +65,7 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
     public void extraUpdates(Identifiable identifiable, int magicNumber) throws IOException {
         AdminClient client = (AdminClient) identifiable;
         AdminClientKeys keys = (AdminClientKeys) getMapConverter().getKeys();
-        String secret = client.getSecret();
-        String input;
-        boolean askForSecret = true;
-
-
-        while (askForSecret) {
-            input = getPropertyHelp(keys.secret(), "enter a new secret (this will be hashed, not stored) or return to skip.", secret);
-            if (isEmpty(input)) {
-                sayi("Nothing entered. Client secret entry skipped.");
-                break;
-            }
-            if (input.equals(secret)) {
-                sayi(" Client secret entry skipped.");
-                break;
-            }
-            // input is not empty.
-            secret = DigestUtils.sha1Hex(input);
-            client.setSecret(secret);
-            askForSecret = false;
-        }
+        super.extraUpdates(client, magicNumber);
         String issuer = getPropertyHelp(keys.issuer(), "Give the issuer", client.getIssuer());
         if (!isEmpty(issuer)) {
             client.setIssuer(issuer);
@@ -96,7 +76,6 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
         } else {
             voURI = getPropertyHelp(keys.voURI(), "Give the VO URI", client.getVirtualOrganization().toString());
         }
-
         if (!isEmpty(voURI)) {
             try {
                 URI z = URI.create(voURI);
@@ -112,7 +91,8 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
 
         String vo;
         if (client.getExternalVOName() == null) {
-            vo = getPropertyHelp(keys.vo(), "Give the VO", null);
+            String vvv = client.getVirtualOrganization().toString();
+            vo = getPropertyHelp(keys.vo(), "Give the VO", vvv); // offer the other VO (real one) as default
         } else {
             vo = getPropertyHelp(keys.vo(), "Give the VO", client.getExternalVOName().toString());
         }
@@ -120,18 +100,35 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
         if (!isEmpty(vo)) {
             client.setExternalVOName(vo);
         }
-
-
-        String max = getPropertyHelp(keys.maxClients(), "Enter new maximum number of clients allowed", Integer.toString(client.getMaxClients()));
-        if (!isEmpty(max)) {
-            client.setMaxClients(Integer.parseInt(max));
+        client.setAllowQDL(getPropertyHelp(keys.allowQDL(), "allow QDL?", "n").equalsIgnoreCase("y"));
+        if(client.isAllowQDL()){
+            client.setAllowQDLCodeBlocks(getPropertyHelp(keys.allowQDLCodeBlocks(), "  allow code blocks containing QDL (y/n)?", "n").equalsIgnoreCase("y"));
         }
 
-        JSONObject newConfig = (JSONObject) inputJSON(client.getConfig(), "client configuration");
-        if (newConfig != null) {
-            client.setConfig(newConfig);
-        }
 
+        if(getInput("configure advanced options (y/n)?", "n").equalsIgnoreCase("y")) {
+            JSONObject newConfig = (JSONObject) inputJSON(client.getConfig(), "client configuration");
+            String max = getPropertyHelp(keys.maxClients(), "Enter new maximum number of clients allowed", Integer.toString(client.getMaxClients()));
+            if (!isEmpty(max)) {
+                client.setMaxClients(Integer.parseInt(max));
+            }
+            if (newConfig != null) {
+                client.setConfig(newConfig);
+            }
+            if (getPropertyHelp(keys.allowCustomIDs(), "allow custom ids in client management (y/n)?", "n").equalsIgnoreCase("y")) {
+                client.setAllowCustomIDs(true);
+                if (getPropertyHelp(keys.generateIDs(), "  generate ids automatically (y/n)?", "y").equalsIgnoreCase("y")) {
+                    client.setGenerateIDs(true);
+                } else {
+                    client.setGenerateIDs(false);
+                    client.setUseTimestampInIDs(getPropertyHelp(keys.useTimestampsInIds(), "  use timestamps in IDs (y/n)?", "y").equalsIgnoreCase("y"));
+                    String head = getPropertyHelp(keys.idHead(), "  uri to use as start of custom ids (return only for system default)", "");
+                    if (!isEmpty(head)) {
+                        client.setIdHead(URI.create(head));
+                    }
+                }
+            }
+        }
     }
 
     protected void showListClientsHelp() {
@@ -474,10 +471,10 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
     }
 
     @Override
-    protected BaseClient approvalMods(InputLine inputLine, BaseClient client) throws IOException{
+    protected BaseClient approvalMods(InputLine inputLine, BaseClient client) throws IOException {
         // Fix https://github.com/ncsa/oa4mp/issues/109
-        AdminClient adminClient = (AdminClient)  client;
-        adminClient.setAllowQDL("y".equals(getInput("Allow QDL in scripts?(y/n)", adminClient.isAllowQDL()?"y":"n")));
+        AdminClient adminClient = (AdminClient) client;
+        adminClient.setAllowQDL("y".equals(getInput("Allow QDL in scripts?(y/n)", adminClient.isAllowQDL() ? "y" : "n")));
         return adminClient;
     }
 }

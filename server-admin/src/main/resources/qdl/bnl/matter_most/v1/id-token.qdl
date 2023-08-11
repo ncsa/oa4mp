@@ -21,6 +21,19 @@
                    isMemberOf
                    voPersonExternalID -> mattermostid
                    acr
+
+
+    Users that are denied authorization at the issuer should be redirected to the help page located at https://www.sdcc.bnl.gov/registry-login-error.php
+        The following get parameters should be sent (speech_balloon COMMENT from Scott Koranda, Mar 22, 2023: New requirements, not yet implemented in TEST (or PROD).)
+            error
+                Same as would normally go to client callback uri
+            error_description
+                Same as would normally go to client callback uri
+            serviceid
+                “mattermost” (speech_balloon COMMENT from Scott Koranda, Mar 22, 2023: This is a literal string with value "mattermost".)
+    The allowed IDP list for this client should only include:
+        All IDPs maintained by CILogon with exclusion of open IDPs like Google, Microsoft, ORCID, and State Sponsor of Terrorism (anything in Syria,Cuba,Iran, or North Korea)
+
 */
 /*
     Access token support for Jefferson Lab. Typical configuration for the client
@@ -31,7 +44,7 @@ tokens {
         qdl {
             load="bnl/matter_most/v1/id-token.qdl"
             xmd {
-                "exec_phase"=["post_all"]
+                "exec_phase"=["post_auth"]
             }
     }}}
 */

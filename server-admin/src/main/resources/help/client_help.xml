@@ -319,7 +319,7 @@ use successfully logged on to the system.]]>
     <entry id="public_key">
        <body>
 <![CDATA[Property: String. (--)
-This is the SHA-1 hash of the secret for this client. Note that you may has any
+This is the SHA-1 hash of the secret for this client. Note that you may have any
 string  using the create_hash command (invoke it with --help for more). If you create a client
 at the command line and are inputting all of the attributes, the system will allow you to pass
 in the actual secret you created and store the hash. Otherwise, this is just another attribute
@@ -328,6 +328,21 @@ and setting it will not invoke any processing.
 See also: create_hash, password
 ]]>
        </body>
+        <example>
+<![CDATA[How to update the public key manually.
+oa4mp>use clients
+  clients>set_id oa4mp:/client/234576A978
+  clients>create_hash "marizey doats and does eat stoates"
+  creating hash of "marizey doats and does eat stoates"
+  a0294000f6b2552634fdbc11da763019f7db5f3b
+  clients>update >public_key
+Enter new value for public_key [3d666f5664cdcb7375811f3311f91b42d0a840a9]:a0294000f6b2552634fdbc11da763019f7db5f3b
+  clients>
+
+This sets the working id, creates the hash (note that it must be in quotes if there are embedded blanks)
+and the public_key property is set. Outside of the initial creation, public_key is just like
+any other field and is directly updated.]]>
+        </example>
     </entry>
     <entry id="rt_lifetime">
        <body>
@@ -569,6 +584,15 @@ before setting this property true. Note that part of the specification is that t
 must use its key to authenticate as well as sign its grant request.
 
 See also: https://datatracker.ietf.org/doc/html/rfc7523#section-2.1 ]]>
+    </body>
+    </entry>
+    <entry id="jwk_uri">
+    <body>
+    <![CDATA[Property. String. --
+The URI that points to a set of JSON webkeys to use for signing requests and authentication. It must
+be resolvable at runtime.
+
+See also: jwks, public_key]]>
     </body>
     </entry>
 

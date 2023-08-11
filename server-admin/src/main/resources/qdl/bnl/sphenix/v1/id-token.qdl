@@ -1,4 +1,26 @@
 /*
+
+
+    * Use WLCG tokens
+    * Tokens can only be obtained by COPeople in group CO:COU:experiment_sphenix:members:active
+    * Audience for access token should be set to that requested by client or to
+      a default of OIDC Client ID if no audience is specified in the initial request.
+    * Can request any scope subset of openid, email, profile, org.cilogon.userinfo, storage.create:/ storage.read:/ storage.modify:/ compute.read, compute.cancel, compute.create (because the fine-grained scopes are managed in Vault initially.)
+    * Access token subject should be sha1sum of OIDC client ID.
+    * Set access token lifetime to 1 hour.
+    * Users that are denied authorization at the issuer should be redirected to the help page located at https://www.sdcc.bnl.gov/registry-login-error.php
+        The following get parameters should be sent (speech_balloon COMMENT from Scott Koranda, Mar 22, 2023: New requirements, not yet implemented in TEST (or PROD).)
+            error
+                Same as would normally go to client callback uri
+            error_description
+                Same as would normally go to client callback uri
+            serviceid
+                “harvester-sphnxpro”
+    * The allowed IDP list for this client should only include:
+        Brookhaven National Laboratory
+        Brookhaven National Laboratory - SDCC.BNL.GOV
+
+
     Access token support for Brookhaven Lab. Typical configuration for the client
     is
 
@@ -6,6 +28,7 @@
   "tokens": {
     "access": {
       "audience": "https://dcqosdoor.usatlas.bnl.gov",
+      "issuer": "https://cilogon.org/bnlsdcc",
       "lifetime": 3600000,
       "qdl": {
         "load": "bnl/sphenix/v1/access.qdl",
@@ -17,21 +40,21 @@
           ]
         }
       },
-      "type": "wlcg",
-      "issuer": "https://test.cilogon.org/bnlsdcc"
+      "type": "wlcg"
     },
     "identity": {
+      "issuer": "https://cilogon.org/bnlsdcc",
       "qdl": {
         "load": "bnl/sphenix/v1/id-token.qdl",
         "xmd": {
           "exec_phase": "post_auth"
         }
       },
-      "type": "identity",
-      "issuer": "https://test.cilogon.org/bnlsdcc"
+      "type": "identity"
     }
   }
 }
+
 */
 //script_load('bnl/acl.qdl');
 script_load('utils/init.qdl'); // set up stuff

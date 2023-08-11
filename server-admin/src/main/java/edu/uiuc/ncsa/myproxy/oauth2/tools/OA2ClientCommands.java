@@ -1,9 +1,9 @@
 package edu.uiuc.ncsa.myproxy.oauth2.tools;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2ClientUtils;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientKeys;
-import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.QDLJSONConfigUtil;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.Permission;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionList;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionsStore;
@@ -14,8 +14,6 @@ import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.BaseClientStore;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.UUCConfiguration;
-import edu.uiuc.ncsa.qdl.scripting.JSONScriptUtil;
-import edu.uiuc.ncsa.qdl.scripting.Scripts;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
@@ -24,22 +22,17 @@ import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.util.cli.BasicIO;
-import edu.uiuc.ncsa.security.util.cli.CLIDriver;
 import edu.uiuc.ncsa.security.util.cli.FormatUtil;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
-import edu.uiuc.ncsa.security.util.scripting.ScriptSet;
-import edu.uiuc.ncsa.security.util.scripting.ScriptingConstants;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.IOException;
 import java.net.URI;
 import java.util.*;
 
-import static edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.QDLRuntimeEngine.CONFIG_TAG;
-import static edu.uiuc.ncsa.qdl.scripting.JSONScriptUtil.SCRIPTS_TAG;
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client.USE_SERVER_DEFAULT;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -214,77 +207,128 @@ public class OA2ClientCommands extends ClientStoreCommands {
     /**
      * In this case, the secret has to be gotten and processed into a hash,
      * callback uris listed and the refresh token lifetime set.
-     * Do not call super on this method since the standard client tracks a public key file rather
-     * than the hash of a secret string.
+     * <p>Caveat: This is also called for mass updates, not just create so always
+     * check for existing values.</p>
      *
      * @param identifiable
      */
     @Override
     public void extraUpdates(Identifiable identifiable, int magicNumber) throws IOException {
         OA2ClientKeys keys = (OA2ClientKeys) getMapConverter().getKeys();
-        OA2Client client = (OA2Client) identifiable;
-        String secret = client.getSecret();
-        String input;
-        boolean askForSecret = true;
-
-        while (askForSecret) {
-            input = getPropertyHelp(keys.secret(), "enter a new secret or return to skip.", secret);
-            if (isEmpty(input)) {
-                sayi("Nothing entered. Client secret entry skipped.");
-                break;
-            }
-            if (input.equals(secret)) {
-                sayi(" Client secret entry skipped.");
-                break;
-            }
-            // input is not empty.
-            secret = DigestUtils.sha1Hex(input);
-            client.setSecret(secret);
-            askForSecret = false;
-        }
         OA2Client oa2Client = (OA2Client) identifiable;
+        super.extraUpdates(oa2Client, magicNumber);
+        final String DEFAULT_SERVER_VALUE = "default";
+        String rawAT = oa2Client.getAtLifetime() == USE_SERVER_DEFAULT ? DEFAULT_SERVER_VALUE : Long.toString(oa2Client.getAtLifetime());
+
+        rawAT = getPropertyHelp(keys.atLifetime(), "enter access token lifetime in seconds or " + DEFAULT_SERVER_VALUE, rawAT);
+        if (rawAT.equals(DEFAULT_SERVER_VALUE)) {
+            oa2Client.setAtLifetime(USE_SERVER_DEFAULT);
+        } else {
+            try {
+                oa2Client.setAtLifetime(Long.parseLong(rawAT) * 1000);
+            } catch (Throwable t) {
+                say("  could not parse " + rawAT + ", using server default");
+                oa2Client.setAtLifetime(USE_SERVER_DEFAULT);
+            }
+        }
+        rawAT = oa2Client.getMaxATLifetime() == USE_SERVER_DEFAULT ? DEFAULT_SERVER_VALUE : Long.toString(oa2Client.getMaxATLifetime());
+        rawAT = getPropertyHelp(keys.maxATLifetime(), "  enter max access token lifetime in seconds or " + DEFAULT_SERVER_VALUE, rawAT);
+        if (rawAT.equals(DEFAULT_SERVER_VALUE)) {
+            oa2Client.setMaxRTLifetime(USE_SERVER_DEFAULT);
+        } else {
+            try {
+                oa2Client.setMaxATLifetime(Long.parseLong(rawAT) * 1000);
+            } catch (Throwable tt) {
+                say("  could not parse " + rawAT + ", using server default");
+                oa2Client.setMaxATLifetime(USE_SERVER_DEFAULT); // negative value means use whatever the server max is.
+            }
+
+        }
         if (isRefreshTokensEnabled()) {
             // so at this point the server actually allows for refresh tokens
-            String NONE = "none";
-            String rtString = oa2Client.isRTLifetimeEnabled() ? Long.toString(oa2Client.getRtLifetime() / 1000) : NONE;
-            String rawLifetime = getPropertyHelp(keys.rtLifetime(), "enter the refresh lifetime in sec.", rtString);
-
-            if (rawLifetime == null || rawLifetime.length() == 0 || rawLifetime.toLowerCase().equals(NONE)) {
-                oa2Client.setRtLifetime(0);
+            // The next bit gives the user the option of "none" meaning they can disable refresh tokens too
+            // without having to know internal state values.
+            final String RT_DISABLED = "none";
+            String rtString;
+            // can't use switch on long values.
+            if (oa2Client.getRtLifetime() == USE_SERVER_DEFAULT) {
+                rtString = DEFAULT_SERVER_VALUE;
             } else {
-                try {
-                    oa2Client.setRtLifetime(Long.parseLong(rawLifetime) * 1000L);
-                } catch (Throwable t) {
-                    sayi("Sorry but \"" + rawLifetime + "\" is not a valid number. No change.");
+                if (oa2Client.getRtLifetime() == OA2Client.DISABLE_REFRESH_TOKENS) {
+                    rtString = RT_DISABLED;
+                } else {
+                    rtString = Long.toString(oa2Client.getMaxRTLifetime());
                 }
             }
-        }
-        boolean publicClient = oa2Client.isPublicClient();
-        String rawPC = getPropertyHelp(keys.publicClient(), "is this client public?", Boolean.toString(publicClient));
-        if (rawPC != null && rawPC.toLowerCase().equalsIgnoreCase("y") || rawPC.toLowerCase().equalsIgnoreCase("yes")) {
-            rawPC = "true";
-        }
-        try {
-            boolean x = Boolean.parseBoolean(rawPC);
-            oa2Client.setPublicClient(x);
-        } catch (Throwable t) {
-            sayi("Sorry, but unable to parse the response of \"" + rawPC + "\". No change.");
-        }
-
-        String issuer = getPropertyHelp(keys.issuer(), "enter the issuer (optional)", oa2Client.getIssuer());
-        if (!isEmpty(issuer)) {
-            oa2Client.setIssuer(issuer);
-        }
-
-        String signTokens = getPropertyHelp(keys.signTokens(), "Enable ID token signing (true/false)?", Boolean.toString(oa2Client.isSignTokens()));
-        if (!isEmpty(signTokens)) {
-            try {
-                oa2Client.setSignTokens(Boolean.parseBoolean(signTokens));
-            } catch (Throwable t) {
-                // do nothing.
-                sayi("Unknown response of \"" + signTokens + "\". Must be \"true\" or \"false\", ignoring.");
+            String rawLifetime = getPropertyHelp(keys.rtLifetime(), "enter the refresh lifetime in sec., " + RT_DISABLED + ", or " + DEFAULT_SERVER_VALUE, rtString);
+            switch (rawLifetime) {
+                case RT_DISABLED:
+                    oa2Client.setRtLifetime(OA2Client.DISABLE_REFRESH_TOKENS);
+                    break;
+                case DEFAULT_SERVER_VALUE:
+                    oa2Client.setRtLifetime(USE_SERVER_DEFAULT);
+                    break;
+                default:
+                    try {
+                        oa2Client.setRtLifetime(Long.parseLong(rawLifetime) * 1000L);
+                    } catch (Throwable t) {
+                        sayi("Could not parse \"" + rawLifetime + "\", no change.");
+                    }
+            }
+            if (oa2Client.getMaxRTLifetime() == USE_SERVER_DEFAULT) {
+                rawLifetime = DEFAULT_SERVER_VALUE;
+            } else {
+                rawLifetime = Long.toString(oa2Client.getMaxRTLifetime());
+            }
+            rawLifetime = getPropertyHelp(keys.maxRTLifetime(),
+                    "  enter max refresh token lifetime in seconds or " + DEFAULT_SERVER_VALUE,
+                    rawLifetime);
+            if (rawLifetime.equals(DEFAULT_SERVER_VALUE)) {
+                oa2Client.setMaxRTLifetime(USE_SERVER_DEFAULT);
+            } else {
+                try {
+                    oa2Client.setMaxRTLifetime(Long.parseLong(rawLifetime));
+                } catch (Throwable t) {
+                    say(" could not parse \"" + rawLifetime + "\", no change");
+                }
+            }
+            // now do grace periods. These are complex.
+            // Again, no switch for longs.
+            long rtGracePeriod = oa2Client.getRtGracePeriod();
+            if (rtGracePeriod == OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_DISABLED) {
+                rawLifetime = RT_DISABLED;
+            } else {
+                if (rtGracePeriod == OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_USE_SERVER_DEFAULT) {
+                    rawLifetime = DEFAULT_SERVER_VALUE;
+                } else {
+                    if (rtGracePeriod == OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_NOT_CONFIGURED) {
+                        // not configured means no action has been taken, so set to default
+                        rawLifetime = Long.toString(OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_DEFAULT);
+                    } else {
+                        rawLifetime = Long.toString(rtGracePeriod);
+                    }
+                }
+            }
+            rawLifetime = getPropertyHelp(keys.rtGracePeriod(), "  enter grace period in sec., " + RT_DISABLED + ", or " + DEFAULT_SERVER_VALUE, rawLifetime);
+            switch (rawLifetime) {
+                case RT_DISABLED:
+                    oa2Client.setRtGracePeriod(OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_DISABLED);
+                    break;
+                case DEFAULT_SERVER_VALUE:
+                    oa2Client.setRtGracePeriod(OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_USE_SERVER_DEFAULT);
+                    break;
+                default:
+                    try {
+                        oa2Client.setRtGracePeriod(Long.parseLong(rawLifetime));
+                    } catch (Throwable t) {
+                        say("could not parse \"" + rawLifetime + "\", no change");
+                    }
+                    break;
             }
         }
+        oa2Client.setPublicClient(getPropertyHelp(keys.publicClient(),
+                "is this client public (y/n)?",
+                Boolean.toString(oa2Client.isPublicClient())).equalsIgnoreCase("y"));
 
         String currentScopes = null;
         if (oa2Client.getScopes() != null) {
@@ -300,7 +344,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
         }
         //String scopes = getPropertyHelp(keys.scopes(),"enter a comma separated list of scopes. Scopes to this server will be rejected.", currentScopes);
         // https://github.com/rcauth-eu/OA4MP/commit/67141fd26ac001d8bc38be21219cbb72e2bdd011
-        String scopes = getInput("enter a comma separated list of scopes. Other scopes to this server will be rejected.", currentScopes);
+        String scopes = getPropertyHelp(keys.scopes(), "enter a comma separated list of scopes. Other scopes to this server will be rejected.", currentScopes);
         if (!(scopes == null || scopes.isEmpty())) {
             LinkedList<String> list = new LinkedList<>();
             StringTokenizer stringTokenizer = new StringTokenizer(scopes, ",");
@@ -314,6 +358,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
             }
             oa2Client.setScopes(list);
         }
+        oa2Client.setStrictscopes(getPropertyHelp(keys.strictScopes(), "strict scopes (y/n)", "y").equalsIgnoreCase("y"));
 
         // Now do much the same for the list of callback URIs
         String currentUris = null;
@@ -335,7 +380,6 @@ public class OA2ClientCommands extends ClientStoreCommands {
             LinkedList<String> rawCBs = new LinkedList<>();
             while (stringTokenizer.hasMoreTokens()) {
                 rawCBs.add(stringTokenizer.nextToken().trim());
-
             }
             LinkedList<String> dudURIs = new LinkedList<>();
             List<String> foundURIs = null;
@@ -358,146 +402,133 @@ public class OA2ClientCommands extends ClientStoreCommands {
             }
             oa2Client.setCallbackURIs(foundURIs);
         }
-        JSON currentLDAPs = null;
-        LDAPConfigurationUtil ldapConfigurationUtil = new LDAPConfigurationUtil();
-
-        if (client.getLdaps() == null || client.getLdaps().isEmpty()) {
-//            currentLDAPs = null;
-        } else {
-            // moving this here. If there are older LDAP configurations you can edit them, but can't add new ones.
-            // These are officially not supported any longer.
-            currentLDAPs = ldapConfigurationUtil.toJSON(client.getLdaps());
-            JSONArray newLDAPS = (JSONArray) inputJSON(currentLDAPs, "ldap configuration", true);
-            if (newLDAPS != null) {
-                client.setLdaps(ldapConfigurationUtil.fromJSON(newLDAPS));
+        if (getInput("do advanced options (y/n)?", "n").equalsIgnoreCase("y")) {
+            boolean isServiceClient = getPropertyHelp(keys.rfc7523Client(), "service client (y/n)?", "n").equalsIgnoreCase("y");
+            if (isServiceClient) {
+                oa2Client.setServiceClient(true);
+                oa2Client.setServiceClientUsers(processCommaSeparatedList(keys.rfc7523ClientUsers(), "allowed users", "*"));
+            }
+            // can't do getPropertyHelp in the next line since no single key for proxies.
+            boolean configProxies = isOk(getInput("configure proxies (y/n)?", "n"));
+            if (configProxies) {
+                oa2Client.setForwardScopesToProxy(isOk(keys.forwardScopesToProxy() + " (y/n)?"));
+                if (!oa2Client.isForwardScopesToProxy()) {
+                    oa2Client.setProxyRequestScopes(processCommaSeparatedList(keys.proxyRequestScopes(), "scopes", "*"));
+                }
+                oa2Client.setProxyClaimsList(processCommaSeparatedList(keys.proxyClaimsList(), "claims", "*"));
             }
 
-        }
+            String issuer = getPropertyHelp(keys.issuer(), "enter the issuer (optional)", oa2Client.getIssuer());
+            if (!isEmpty(issuer)) {
+                oa2Client.setIssuer(issuer);
+            }
+            if (getPropertyHelp(keys.ersatzClient(), "is ersatz client (y/n)?", "n").equalsIgnoreCase("y")) {
+                oa2Client.setErsatzClient(true);
+                oa2Client.setExtendsProvisioners(getPropertyHelp(keys.extendsProvisioners(), "  extends the provisioner (y/n)?", "y").equalsIgnoreCase("y"));
+                // naming the provisioners requirings setting permissions and is not done here.
+                say("  To link this client to its provisioners, use the ersatz command");
+            } else {
+                oa2Client.setErsatzClient(false);
+            }
+            List<String> prototypes = processCommaSeparatedList(keys.prototypes(), "prototypes", "");
+            if (!prototypes.isEmpty()) {
+                List<Identifier> identifiers = new ArrayList<>();
+                List<String> bad = new ArrayList<>();
+                for (String p : prototypes) {
+                    try {
+                        identifiers.add(BasicIdentifier.newID(p));
+                    } catch (Throwable t) {
+                        bad.add(p);
+                    }
+                }
+                oa2Client.setPrototypes(identifiers);
+                if (!bad.isEmpty()) {
+                    say("  rejected the following bad identifier(s):" + bad);
+                }
+            }
+            String signTokens = getPropertyHelp(keys.signTokens(), "Enable ID token signing (true/false)?", Boolean.toString(oa2Client.isSignTokens()));
+            if (!isEmpty(signTokens)) {
+                try {
+                    oa2Client.setSignTokens(Boolean.parseBoolean(signTokens));
+                } catch (Throwable t) {
+                    // do nothing.
+                    sayi("Unknown response of \"" + signTokens + "\". Must be \"true\" or \"false\", ignoring.");
+                }
+            }
+            JSON currentLDAPs = null;
+            LDAPConfigurationUtil ldapConfigurationUtil = new LDAPConfigurationUtil();
+
+            if (oa2Client.getLdaps() == null || oa2Client.getLdaps().isEmpty()) {
+                //            currentLDAPs = null;
+            } else {
+                // moving this here. If there are older LDAP configurations you can edit them, but can't add new ones.
+                // These are officially not supported any longer.
+                currentLDAPs = ldapConfigurationUtil.toJSON(oa2Client.getLdaps());
+                JSONArray newLDAPS = (JSONArray) inputJSON(currentLDAPs, "ldap configuration", true);
+                if (newLDAPS != null) {
+                    oa2Client.setLdaps(ldapConfigurationUtil.fromJSON(newLDAPS));
+                }
+
+            }
+
+        } // end advanced options
         // CIL-1507 simplify cfg entry
         boolean doCfg = getPropertyHelp(keys.cfg(), "edit \"" + keys.cfg() + "\" (as JSON)? (y/n)", "n").equalsIgnoreCase("y");
         if (doCfg) {
-            JSONObject newConfig = inputJSON(client.getConfig(), "client configuration");
+            JSONObject newConfig = inputJSON(oa2Client.getConfig(), "client configuration");
             if (newConfig != null) {
-                client.setConfig(newConfig);
+                oa2Client.setConfig(newConfig);
             }
         }
+    }
+
+    protected List<String> processCommaSeparatedList(String key, String moniker, String defaultValue) throws IOException {
+        return processCommaSeparatedList(key, null, moniker, defaultValue);
+    }
+
+    /**
+     * Prompt for a comma separated list, parse it an return it. The moniker identifies what goes on the list,
+     * the legalValues (if present) restrict the values to what is on that list.
+     *
+     * @param legalValues
+     * @param moniker
+     * @param defaultValue
+     * @return
+     * @throws IOException
+     */
+    protected List<String> processCommaSeparatedList(String key, List<String> legalValues, String moniker, String defaultValue) throws IOException {
+        String rawValues = getPropertyHelp(key, "enter a comma separated list of " + moniker + ".", defaultValue);
+        LinkedList<String> list = new LinkedList<>();
+        if (rawValues.equals(defaultValue)) {
+            list.add(defaultValue);
+            return list;
+        }
+        LinkedList<String> omitted = new LinkedList<>();
+        if (!(rawValues == null || rawValues.isEmpty())) {
+            StringTokenizer stringTokenizer = new StringTokenizer(rawValues, ",");
+            while (stringTokenizer.hasMoreTokens()) {
+                String raw = stringTokenizer.nextToken().trim();
+                if (legalValues != null) {
+                    if (legalValues.contains(raw)) {
+                        list.add(raw);
+                    } else {
+                        omitted.add(raw);
+                    }
+                } else {
+                    list.add(raw);
+                }
+            }
+        }
+        if (!omitted.isEmpty()) {
+            say("  omitted values:" + omitted);
+        }
+        return list;
     }
 
     @Override
     protected boolean supportsQDL() {
         return true;
     }
-
-    /**
-     * Attempt to let users construct qdl script references on the fly from components.
-     * This is turning into a bad idea (too complex and clunky to really bother with)
-     * vis-a-vis just pasting the thing.
-     *
-     * @param currentConfig
-     * @return
-     * @throws IOException
-     */
-    @Override
-    protected JSONObject loadQDLScript(JSONObject currentConfig) throws IOException {
-       /* The configuration is the entire qdl object , i.e.
-          {"qdl":{"scripts":[...]}}
-        */
-        say("select one of the following ways to do this:");
-        //  say("d - load a directory of scripts (advanced!)");
-        say("e - edit a script with the line editor");
-        say("f - read a script from a file");
-        say("p - paste a QDL configuration");
-//        say("w - start the QDL workspace");
-        String option = readline().trim().toLowerCase();
-        JSONObject result = null;
-        switch (option) {
-          /*  case "d":
-                say("Sorry, that is not quite ready");
-                break;*/
-            case "e":
-                ScriptSet scriptSet = QDLJSONConfigUtil.readScriptSet(currentConfig);
-                try {
-                    QDLCLICommands qdlcliCommands = new QDLCLICommands(logger, scriptSet);
-                    CLIDriver driver = new CLIDriver(qdlcliCommands);
-                    driver.start();
-                    result = QDLJSONConfigUtil.scriptSetToJSON(qdlcliCommands.getScriptSet());
-                } catch (Throwable t) {
-                    say("failed to start QDL CLI. This is deprecated too...");
-                }
-                break;
-            case "f":
-                say("Enter the name of a QDL script. Generally if the name is the same as the execution phase");
-                say("You don't have to do anything else");
-                say("phases are: " + ScriptingConstants.SRE_PHASES);
-                say("So a file named " + ScriptingConstants.SRE_EXEC_INIT + ".qdl would be automatically run at initialization.");
-                String fileName = getInput("Enter the file name", "");
-                if (fileName.equals("")) {
-                    say("Sorry, you did not enter a valid file name");
-                }
-                try {
-                    // This creates a completely new configuration with only this script in it.
-                    result = QDLJSONConfigUtil.createCfg(fileName);
-                } catch (Throwable throwable) {
-                    say("sorry, that didn't work:" + throwable.getMessage());
-                    return null;
-                }
-
-                break;
-            case "p":
-                result = inputJSON(currentConfig, "QDL script"); // This shows the QDL tag, which is probably better
-                break;
-            //return  inputJSON(currentConfig.getJSONObject(QDLRuntimeEngine.CONFIG_TAG), "QDL script");
-          /*  case "w":
-                QDLWorkspace workspace = new QDLWorkspace(new WorkspaceCommands()));
-                String args[] = new String[]{"-ext \"edu.uiuc.ncsa.myproxy.oa4mp.qdl.OA2QDLLoader\""};
-                workspace.main(args);
-*/
-            default:
-                say("sorry, i didn't understand that.");
-                return null;
-        }
-        // If nothing happened, just return the original.
-        if (result == null) {
-            return currentConfig;
-        }
-
-            /*
-            Now we process the result.
-            They can
-            * add a  single script, replaces  one or add if new
-            * add a scripts object, replaces whole thing
-            * paste a whole QDL configuration, replaces whole thing
-            This MUST return a complete QDL configuration objeft like
-            {"qdl":{.. lots of stuff ...}}
-            This is called in StoreCommands2 and all it will do is replace the entry in toto.
-            All decisions about what goes where are done here.
-            And don't forget that the JSON library we use tends to makes tons of copies of things,
-            so updating requires we reset the values. You cannot just get a JSON component and alter it.
-             */
-        if (result.containsKey(Scripts.SCRIPT)) {
-            // They entered a single script. Add it
-            JSONObject scripts = currentConfig.getJSONObject(CONFIG_TAG);
-            // {"scripts":[]}
-            scripts = JSONScriptUtil.addScript(scripts, result);
-            // So we have a single scripts entry. There may be others in the config, so don't change them
-            currentConfig.put(CONFIG_TAG, scripts);
-        }
-        if (result.containsKey(SCRIPTS_TAG)) {
-
-            // replace entire scripts entry.
-            currentConfig.put(CONFIG_TAG, result);
-
-        }
-        if (result.containsKey(CONFIG_TAG)) {
-            // integrate it
-            currentConfig.put(CONFIG_TAG, result.getJSONObject(CONFIG_TAG));
-        }
-
-
-        return currentConfig;
-
-    }
-
 
     @Override
     protected void showDeserializeHelp() {
@@ -744,7 +775,8 @@ public class OA2ClientCommands extends ClientStoreCommands {
     @Override
     protected BaseClient approvalMods(InputLine inputLine, BaseClient client) throws IOException {
         OA2Client oa2Client = (OA2Client) client;
-        oa2Client.setStrictscopes("y".equals(getInput("strict scopes?(y/n)", oa2Client.useStrictScopes() ? "y" : "n")));
+        OA2ClientKeys keys = (OA2ClientKeys) getMapConverter().getKeys();
+        oa2Client.setStrictscopes(getPropertyHelp(keys.strictScopes(), "strict scopes?(y/n)", oa2Client.useStrictScopes() ? "y" : "n").equalsIgnoreCase("y"));
         return oa2Client;
     }
 
@@ -852,6 +884,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
         boolean listClients = inputLine.hasArg(E_LIST_FLAG);
         inputLine.removeSwitch(E_LIST_FLAG);
         OA2Client provisioner = (OA2Client) findItem(inputLine);
+        inputLine.removeSwitch(provisioner.getIdentifierString()); // trick. Remove ID by value if there.
         if (provisioner == null) {
             say("could not find the provisioner...");
             return;
@@ -916,8 +949,15 @@ public class OA2ClientCommands extends ClientStoreCommands {
         }
         if (createClient) {
             OA2Client c = (OA2Client) getStore().create();
-            c = (OA2Client) setIDFromInputLine(c, inputLine);
+            if (0 < inputLine.getArgCount()) {
+                // There is still an unsed argument. By process of elimination it is the requested new
+                // id of the object. Reset it.
+                c = (OA2Client) setIDFromInputLine(c, inputLine);
+            }
             OA2Client createdClient = (OA2Client) create(c, ERSATZ_CREATE_MAGIC_NUMBER);
+            if (createdClient == null) {
+                return; // the user aborted the save.
+            }
             if (linkClient) {
                 linkList = new ArrayList<>();
                 linkList.add(createdClient.getIdentifier());

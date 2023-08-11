@@ -32,6 +32,7 @@ tokens. := clc#refresh();
 say('refresh tokens=' + print(tokens.));
 ⊨ tokens.'access_token'.'jwt'.'scope' == 'gracedb.read' : 'wrong access token scope'; // should be a single one
 ⊨ scope_check(['gracedb.read'], tokens.'access_token'.'jwt') : 'wrong at scope(2)';
+
 tokens. := clc#exchange();
 ⊨ scope_check(['read:/frames', 'dqsegdb.read', 'write:/staging/jeffrey.gaynor'], tokens.'access_token'.'jwt') : 'wrong at scope(3)';
 

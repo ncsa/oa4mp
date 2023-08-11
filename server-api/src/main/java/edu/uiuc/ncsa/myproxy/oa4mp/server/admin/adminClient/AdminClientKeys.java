@@ -105,6 +105,7 @@ public class AdminClientKeys extends BaseClientKeys {
         allKeys.add(vo());
         allKeys.add(voURI());
         allKeys.add(allowQDL());
+        allKeys.add(allowQDLCodeBlocks());
         allKeys.add(notifyOnNewClientCreate());
         allKeys.add(listUsers());
         allKeys.add(listUsersInOtherClients());

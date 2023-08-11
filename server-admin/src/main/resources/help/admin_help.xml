@@ -12,6 +12,17 @@ Can this admin client set calling QDL scripts in client configurations? (I.e. in
 property for the client). ]]>
     </body>
     </entry>
+    <entry id="allow_qdl_code_blocks">
+    <body>
+    <![CDATA[Property: Boolean (false)
+If this client is allowed to use QDL, should it also be allowed to put (raw) QDL in a client cfg property?
+Allowing this allows for single lines of QDl to be stashed in the configuration and run, but also makes
+debugging errors a lot harder and raises teh real prospect of just having spaghetti code. It is, however,
+very useful if you do indeed need to just run a line or two of QDL and don't want to deploy a
+full set of scripts to the server. Enable with caution.
+]]>
+    </body>
+    </entry>
     <entry id="config">
     <body>
     <![CDATA[Property: JSON (--)
@@ -226,7 +237,13 @@ bsu:physics:/client_id
 ]]>
 </body>
 </entry>
-
+    <entry id="config">
+    <body>
+    <![CDATA[Property. String. --
+A very optional configuration. It is possible to have code here, but in practice
+is never used.]]>
+    </body>
+    </entry>
 </html>
     <!--
 

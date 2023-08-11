@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oauth2.base;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenUtils;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Store;
@@ -28,7 +29,15 @@ public abstract class StoreCommands2 extends StoreCommands {
         super(logger, store);
     }
 
+    public OA2SE getOA2SE() {
+        return oa2SE;
+    }
 
+    public void setOA2SE(OA2SE oa2SE) {
+        this.oa2SE = oa2SE;
+    }
+
+    OA2SE oa2SE = null;
     static final String BASE_32_FLAG = "-32";
 
     public void encode(InputLine inputLine) throws Throwable {

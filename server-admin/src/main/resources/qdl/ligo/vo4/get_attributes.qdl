@@ -26,7 +26,7 @@ trace('*** LIGO get_attributes, user=' + user);
          kagra_cfg.'auth_type' := 'none';
      kagra_cfg.'fail_on_error' := true;
                kagra_response. := get_claims(create_source(kagra_cfg.), user);
-             trace('kagra_response.==' + to_string(kagra_response., true));
+             trace('get_attr kagra_response.==' + to_string(kagra_response., true));
             groups. :=  is_defined(kagra_response.'isMemberOf')?kagra_response.'isMemberOf':[];
 
             ligo_cfg.'address' := ini.'address';
@@ -43,7 +43,7 @@ trace('*** LIGO get_attributes, user=' + user);
       ligo_cfg.'fail_on_error' := true;
                 ligo_response. := get_claims(create_source(ligo_cfg.), uid);
 
-                   say('ligo_response.==' + to_string(ligo_response., true));
+                   trace('get_attr ligo_response.==' + to_string(ligo_response., true));
 
              // now we integrate the responses.
              groups. := groups. ~ (is_defined(ligo_response.'isMemberOf')?ligo_response.'isMemberOf':[]);
@@ -51,7 +51,7 @@ trace('*** LIGO get_attributes, user=' + user);
  if [size(groups.) == 0]
 then[raise_error('Missing group information. Cannot determine scopes.', oa4mp_error,{'error_type':'access_denied'});];
          groups. := groups. ~ [{'name':'Communities:LVC:LSC:LDG:CIT:LDGCITUsers'}];
-         say('groups: ' + print(groups.));
+         say('get_attr groups: ' + print(groups.));
          response. := ligo_response.;
  response.'isMemberOf' := groups.;
   response.'uid' := uid;

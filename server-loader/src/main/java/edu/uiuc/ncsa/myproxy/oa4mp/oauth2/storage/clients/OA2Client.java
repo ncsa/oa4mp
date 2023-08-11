@@ -37,6 +37,7 @@ import static edu.uiuc.ncsa.security.util.json.MyJPathUtil.*;
 public class OA2Client extends Client implements OA2ClientScopes {
     // CIL-1586. Have a default "use the server value" and explicitly use it.
     public static final long USE_SERVER_DEFAULT = -1L;
+    public static final long DISABLE_REFRESH_TOKENS = 0L;
     @Override
     public OA2Client clone() {
         OA2Client client = new OA2Client(getIdentifier());

@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oauth2.base;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClient;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClientKeys;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.ClientApprovalKeys;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.BaseClientStore;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
@@ -12,17 +12,21 @@ import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
+import edu.uiuc.ncsa.security.util.cli.CommonCommands;
 import edu.uiuc.ncsa.security.util.cli.ExitException;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.cli.Sortable;
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URI;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -658,9 +662,97 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
 
     @Override
     public void create(InputLine inputLine) throws IOException {
-        OA2Client client = (OA2Client) actualCreate(inputLine, DEFAULT_MAGIC_NUMBER);
+        BaseClient client = (BaseClient) actualCreate(inputLine, DEFAULT_MAGIC_NUMBER);
+        if(client == null){
+            return;
+        }
         if (isOk(readline("approve this client [y/n]?"))) {
             approve(client);
         }
     }
+
+    @Override
+      public void extraUpdates(Identifiable identifiable, int magicNumber) throws IOException {
+          BaseClient client = (BaseClient) identifiable;
+          BaseClientKeys keys = (BaseClientKeys) getMapConverter().getKeys();
+
+          client.setName(getInput("enter name", client.getName()));
+          client.setEmail(getInput("enter email", client.getEmail()));
+          String keyOrSecret = getPropertyHelp(keys.secret(), "enter a key, secret or URI (k|s|u) or return to skip", "");
+          switch (keyOrSecret) {
+              case "k":
+              case "K":
+                  getPublicKeyFile(client, keys);
+                  break;
+              case "s":
+              case "S":
+                  getSecret(client, keys);
+                  break;
+              case "u":
+              case "U":
+                  String rr = getPropertyHelp(keys.jwksURI(), "  enter JWKS uri", "");
+                  if(isEmpty(rr)){
+                      say("   skipped");
+                  }else {
+                      client.setJwksURI(URI.create(rr));
+                  }
+                  break;
+              case "":
+                  break;
+              default:
+                  say("unknown option \"" + keyOrSecret + "\"");
+                  // do nothing.
+          }
+
+      }
+
+      /**
+       * Prompt the user for a secret, hashing the result.
+       */
+      protected void getSecret(BaseClient client, BaseClientKeys keys) throws IOException {
+          String input = getPropertyHelp(keys.secret(), "  enter a new secret or return to skip.", client.getSecret());
+          if (isEmpty(input)) {
+              return;
+          }
+          // input is not empty.
+          String secret = DigestUtils.sha1Hex(input);
+          client.setSecret(secret);
+      }
+    protected void getPublicKeyFile(BaseClient client, BaseClientKeys keys) throws IOException {
+           String input;
+           String fileNotFoundMessage = CommonCommands.INDENT + "...uh-oh, I can't find that file. Please enter it again";
+           String secret = client.getSecret();
+
+           if (!isEmpty(secret)) {
+               secret = secret.substring(0, Math.min(25, secret.length())) + "...";
+           }
+           boolean askForFile = true;
+           while (askForFile) {
+               input = getPropertyHelp(keys.secret(), "  enter full path and file name of public key", secret);
+               if (isEmpty(input)) {
+                   return;
+               }
+               if (input.equals(secret)) {
+                   sayi(" public key entry skipped.");
+                   return;
+               }
+               // if this is not the default value, then this *should* be the name of a file.
+               File f;
+               if (input != null) {
+                   f = new File(input);
+                   if (!f.exists()) {
+                       say(fileNotFoundMessage);
+                       continue;
+                   }
+                   try {
+                       client.setJWKS(JSONWebKeyUtil.fromJSON(f));
+                       askForFile = false;
+                   } catch (Throwable e) {
+                       say("error reading file \"" + input + "\", try again");
+                       return;
+                   }
+               }
+           }
+       }
+
 }

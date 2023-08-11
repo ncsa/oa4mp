@@ -1,23 +1,27 @@
 /*
 Policy:
-Use WLCG tokens
-Refresh token 8,000,000 seconds - opaque string ok.
-Tokens can only be obtained by COPeople in group CO:COU:experiment_atlas:members:active
-Audience for access token should be set to “https://dcqosdoor.usatlas.bnl.gov”
-Can request any scope subset of openid, email, profile, org.cilogon.userinfo, storage.create:/ storage.read:/, storage.modify:/ (because the fine-grained scopes are managed in Vault initially.)
-Access token subject should be md5hash of OIDC client ID.
-Set access token lifetime to 1 hour.
-Users that are denied authorization at the issuer should be redirected to the help page located at https://www.sdcc.bnl.gov/registry-login-error.php
-The following get parameters should be sent
-error
-Same as would normally go to client callback uri
-error_description
-Same as would normally go to client callback uri
-serviceid
-“dcqos”
-The allowed IDP list for this client should only include:
-Brookhaven National Laboratory
-Brookhaven National Laboratory - SDCC.BNL.GOV
+* Use WLCG tokens
+* Refresh token 8,000,000 seconds - opaque string ok.
+* Tokens can only be obtained by COPeople in group CO:COU:experiment_atlas:members:active
+* Audience for access token should be set to “https://dcqosdoor.usatlas.bnl.gov”
+* Can request any scope subset of openid, email, profile, org.cilogon.userinfo,
+  storage.create:/ storage.read:/, storage.modify:/
+  (because the fine-grained scopes are managed in Vault initially.)
+* Access token subject should be sha1hash of OIDC client ID.
+* Set access token lifetime to 1 hour.
+* Users that are denied authorization at the issuer should be redirected to the help page located at https://www.sdcc.bnl.gov/registry-login-error.php
+* The following get parameters should be sent
+*   error
+      Same as would normally go to client callback uri
+    error_description
+      Same as would normally go to client callback uri
+    serviceid
+     “dcqos”
+* The allowed IDP list for this client should only include:
+* Brookhaven National Laboratory
+* Brookhaven National Laboratory - SDCC.BNL.GOV
+
+
 
  tokens{
   identity{

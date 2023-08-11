@@ -16,7 +16,7 @@
     }}}
 
 */
-
+ debugger(1);
 
  trace('IGWN','starting init.');
        all_audience. := ['ANY', 'LIGO', 'segments.ligo.org'];
@@ -79,6 +79,7 @@
     then [err('too many robots (' + size(robots.) +')','access_denied');];
 
     is_robot := 1 == size(robots.);
+    trace('is robot? ' + is_robot);
 
    // If there is no audience, use all_audience. Otherwise check if there is an override in tx_audience and use that.
     requested_audience. := (size(tx_audience.) == 0)?(size(audience.)==0?all_audience.:audience.):tx_audience.;
