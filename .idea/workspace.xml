@@ -11,29 +11,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="eb414374-02ed-40a4-9689-d382715049b9" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/bnl/drupal/v1/get_user.qdl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/bnl/drupal/v1/id-token.qdl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/base/BaseClientStoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/base/BaseClientStoreCommands.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/base/ClientStoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/base/ClientStoreCommands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/base/StoreCommands2.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/base/StoreCommands2.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2AdminClientCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2AdminClientCommands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2ClientCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2ClientCommands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2Commands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2Commands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/resources/help/admin_help.xml" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/resources/help/admin_help.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-admin/src/main/resources/help/client_help.xml" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/resources/help/client_help.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/bnl/dcqos/v1/id-token.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/bnl/dcqos/v1/id-token.qdl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/bnl/matter_most/v1/id-token.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/bnl/matter_most/v1/id-token.qdl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/bnl/sphenix/v1/id-token.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/bnl/sphenix/v1/id-token.qdl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/ligo/vo4/get_attributes.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/ligo/vo4/get_attributes.qdl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/ligo/vo4/get_robots.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/ligo/vo4/get_robots.qdl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/ligo/vo4/init.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/ligo/vo4/init.qdl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/admin/adminClient/AdminClientKeys.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/admin/adminClient/AdminClientKeys.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/clients/OA2Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/clients/OA2Client.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-test/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/local/igwn.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/local/igwn.qdl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -425,7 +409,7 @@
       <workItem from="1689966573361" duration="12622000" />
       <workItem from="1690287944900" duration="597000" />
       <workItem from="1690574418798" duration="34533000" />
-      <workItem from="1691423994488" duration="61834000" />
+      <workItem from="1691423994488" duration="66247000" />
     </task>
     <task id="LOCAL-00001" summary="Migrated a bunch of static utilities into classes.">
       <created>1675892170361</created>
@@ -742,7 +726,14 @@
       <option name="project" value="LOCAL" />
       <updated>1689617620885</updated>
     </task>
-    <option name="localTasksCounter" value="46" />
+    <task id="LOCAL-00046" summary="https://jira.ncsa.illinois.edu/browse/CIL-1815 including better help and now every property entry as per https://github.com/ncsa/oa4mp/issues/120.">
+      <created>1691788905756</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1691788905756</updated>
+    </task>
+    <option name="localTasksCounter" value="47" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -754,7 +745,6 @@
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="General build improvements" />
     <MESSAGE value="Website update" />
     <MESSAGE value="Website update. Style sheets, logo (new!) etc." />
     <MESSAGE value="Test of scripts that build everything." />
@@ -779,7 +769,8 @@
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/108 List ersatz clients" />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/108 List ersatz clients, part 2. Can create, link and unlink them." />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/108 List ersatz clients, part 3. Updated documentation, fixed edge case in permission store where missing admin client ID cause an NPE." />
-    <option name="LAST_COMMIT_MESSAGE" value="https://github.com/ncsa/oa4mp/issues/108 List ersatz clients, part 3. Updated documentation, fixed edge case in permission store where missing admin client ID cause an NPE." />
+    <MESSAGE value="https://jira.ncsa.illinois.edu/browse/CIL-1815 including better help and now every property entry as per https://github.com/ncsa/oa4mp/issues/120." />
+    <option name="LAST_COMMIT_MESSAGE" value="https://jira.ncsa.illinois.edu/browse/CIL-1815 including better help and now every property entry as per https://github.com/ncsa/oa4mp/issues/120." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">

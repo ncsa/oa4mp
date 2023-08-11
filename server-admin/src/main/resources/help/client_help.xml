@@ -65,10 +65,6 @@ once these are set, requests must match them exactly as strings, so that if a
 client sets one with parameters, it is possible their requests will fail if the
 parameters are shuffled.]]>
         </body>
-        <example>
-    <![CDATA[
-    ]]>
-         </example>
      </entry>
     <entry id="cfg">
        <body>
@@ -593,6 +589,43 @@ The URI that points to a set of JSON webkeys to use for signing requests and aut
 be resolvable at runtime.
 
 See also: jwks, public_key]]>
+    </body>
+    </entry>
+    <entry id="rfc7523_client_users">
+    <body>
+    <![CDATA[Property. List of strings.
+This is the users that the client may submit as the subject for an RFC 7523 request.
+This means that, since this request replaces the authorization phase, the user
+will be treated as the user's login name. Setting this list to * (default)
+accepts any user. Setting this list explicitly restricts requests to names on this
+list and will reject any name not on this list as an invalid user.]]>
+    </body>
+    </entry>
+    <entry id="at_max_Lifetime">
+    <body>
+    <![CDATA[Property. Integer. -1
+The maximum access token lifetime that the client may request. The default is to just use whatever the
+server uses.]]>
+    </body>
+    </entry>
+    <entry id="rt_max_Lifetime">
+    <body>
+    <![CDATA[Property. Integer. -1
+The maximum refresh token lifetime that the client may request. The default is to just use whatever the
+server uses.]]>
+    </body>
+    </entry>
+    <entry id="rt_grace_period">
+    <body>
+    <![CDATA[Property. Integer. -1
+The grace period a refresh token will be given when refreshed. Normally on refresh, the refresh token is
+invalidated. Setting this will reset the refresh token lifetime to this.
+
+E.g.
+This is set to 6 hours. if a refresh token has a lifetime of 30 days and is presented to the token
+endpoint for refresh, then it will be given a new lifetime of 6 hours and invalidated at the end of that
+time. This allows for latency in systems that may require a valid refresh token for a bit until
+the new one is pushed out. ]]>
     </body>
     </entry>
 

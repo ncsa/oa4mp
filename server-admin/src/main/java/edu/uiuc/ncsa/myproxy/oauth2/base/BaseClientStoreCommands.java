@@ -676,8 +676,8 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
           BaseClient client = (BaseClient) identifiable;
           BaseClientKeys keys = (BaseClientKeys) getMapConverter().getKeys();
 
-          client.setName(getInput("enter name", client.getName()));
-          client.setEmail(getInput("enter email", client.getEmail()));
+          client.setName(getPropertyHelp(keys.name( ),"enter name", client.getName()));
+          client.setEmail(getPropertyHelp(keys.email(),"enter email", client.getEmail()));
           String keyOrSecret = getPropertyHelp(keys.secret(), "enter a key, secret or URI (k|s|u) or return to skip", "");
           switch (keyOrSecret) {
               case "k":
@@ -728,7 +728,7 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
            }
            boolean askForFile = true;
            while (askForFile) {
-               input = getPropertyHelp(keys.secret(), "  enter full path and file name of public key", secret);
+               input = getPropertyHelp(keys.jwks(), "  enter full path and file name of public key", secret);
                if (isEmpty(input)) {
                    return;
                }
