@@ -12,11 +12,17 @@
   <component name="ChangeListManager">
     <list default="true" id="eb414374-02ed-40a4-9689-d382715049b9" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.sh" beforeDir="false" afterPath="$PROJECT_DIR$/build.sh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/base/BaseClientStoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/base/BaseClientStoreCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/base/ClientApprovalStoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/base/ClientApprovalStoreCommands.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/base/ClientStoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/base/ClientStoreCommands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/resources/help/client_help.xml" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/resources/help/client_help.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2AdminClientCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2AdminClientCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2ClientCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2ClientCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2PermissionCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2PermissionCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/VOCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/VOCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/vo/VOConverter.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/vo/VOConverter.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-test/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/buildNumber.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -409,7 +415,7 @@
       <workItem from="1689966573361" duration="12622000" />
       <workItem from="1690287944900" duration="597000" />
       <workItem from="1690574418798" duration="34533000" />
-      <workItem from="1691423994488" duration="66247000" />
+      <workItem from="1691423994488" duration="77259000" />
     </task>
     <task id="LOCAL-00001" summary="Migrated a bunch of static utilities into classes.">
       <created>1675892170361</created>
@@ -733,7 +739,14 @@
       <option name="project" value="LOCAL" />
       <updated>1691788905756</updated>
     </task>
-    <option name="localTasksCounter" value="47" />
+    <task id="LOCAL-00047" summary="Had a blindingly good idea for printing the online help.  https://jira.ncsa.illinois.edu/browse/CIL-1815 Also, found some missing help topics and added them.">
+      <created>1691793958637</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1691793958637</updated>
+    </task>
+    <option name="localTasksCounter" value="48" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -745,7 +758,6 @@
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="Website update" />
     <MESSAGE value="Website update. Style sheets, logo (new!) etc." />
     <MESSAGE value="Test of scripts that build everything." />
     <MESSAGE value="Brandind, method changed." />
@@ -770,7 +782,8 @@
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/108 List ersatz clients, part 2. Can create, link and unlink them." />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/108 List ersatz clients, part 3. Updated documentation, fixed edge case in permission store where missing admin client ID cause an NPE." />
     <MESSAGE value="https://jira.ncsa.illinois.edu/browse/CIL-1815 including better help and now every property entry as per https://github.com/ncsa/oa4mp/issues/120." />
-    <option name="LAST_COMMIT_MESSAGE" value="https://jira.ncsa.illinois.edu/browse/CIL-1815 including better help and now every property entry as per https://github.com/ncsa/oa4mp/issues/120." />
+    <MESSAGE value="Had a blindingly good idea for printing the online help.  https://jira.ncsa.illinois.edu/browse/CIL-1815 Also, found some missing help topics and added them." />
+    <option name="LAST_COMMIT_MESSAGE" value="Had a blindingly good idea for printing the online help.  https://jira.ncsa.illinois.edu/browse/CIL-1815 Also, found some missing help topics and added them." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
@@ -798,7 +811,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/vo/VOConverter.java</url>
-          <line>70</line>
+          <line>71</line>
           <option name="timeStamp" value="51" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -853,7 +866,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/5.3-SNAPSHOT/storage-5.3-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>2313</line>
+          <line>2327</line>
           <option name="timeStamp" value="156" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -893,7 +906,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/5.3-SNAPSHOT/storage-5.3-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>827</line>
+          <line>820</line>
           <option name="timeStamp" value="320" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">

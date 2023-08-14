@@ -674,7 +674,7 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
     @Override
       public void extraUpdates(Identifiable identifiable, int magicNumber) throws IOException {
           BaseClient client = (BaseClient) identifiable;
-          BaseClientKeys keys = (BaseClientKeys) getMapConverter().getKeys();
+          BaseClientKeys keys = (BaseClientKeys) getSerializationKeys();
 
           client.setName(getPropertyHelp(keys.name( ),"enter name", client.getName()));
           client.setEmail(getPropertyHelp(keys.email(),"enter email", client.getEmail()));

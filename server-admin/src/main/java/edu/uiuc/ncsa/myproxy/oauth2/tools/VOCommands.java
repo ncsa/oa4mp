@@ -6,9 +6,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VirtualOrganization;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.util.SigningCommands;
 import edu.uiuc.ncsa.myproxy.oauth2.base.StoreCommands2;
 import edu.uiuc.ncsa.security.core.Identifiable;
-import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
-import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
@@ -47,19 +45,18 @@ public class VOCommands extends StoreCommands2 {
     }
 
     @Override
-    public boolean update(Identifiable identifiable) throws IOException {
+    public void extraUpdates(Identifiable identifiable, int magicNumber) throws IOException {
+        super.extraUpdates(identifiable, magicNumber);
         VirtualOrganization vo = (VirtualOrganization) identifiable;
-        VOSerializationKeys keys = (VOSerializationKeys) getMapConverter().getKeys();
-        String newIdentifier = null;
-        info("Starting VO update for id = " + vo.getIdentifierString());
-        say("Update the values. A return accepts the existing or default value in []'s");
-        newIdentifier = getPropertyHelp(keys.identifier(),"enter the identifier", vo.getIdentifierString());
-        boolean removeCurrentVO = false;
-        Identifier oldID = vo.getIdentifier();
-
+        VOSerializationKeys keys = (VOSerializationKeys) getSerializationKeys();
         vo.setTitle(getPropertyHelp(keys.title(),"enter the title", vo.getTitle()));
         vo.setIssuer(getPropertyHelp(keys.issuer(),"enter the issuer", vo.getIssuer()));
-        vo.setAtIssuer(getPropertyHelp(keys.atIssuer(),"enter the access token issuer (if different)", vo.getAtIssuer()));
+        vo.setValid(getPropertyHelp(keys.valid(),"is this valid?", Boolean.toString(vo.isValid())).equalsIgnoreCase("y"));
+        String iss = vo.getAtIssuer();
+        if(iss == null){
+            iss=vo.getIssuer(); //default is they are equal
+        }
+        vo.setAtIssuer(getPropertyHelp(keys.atIssuer(),"enter the access token issuer", iss));
         vo.setDiscoveryPath(getPropertyHelp(keys.discoveryPath(), "enter the discovery path. NOTE this should be of the form host/path e.g.cilogon.org/ligo:", vo.getDiscoveryPath()));
         String ok = getInput("Did you want to specify a file with the JSON web keys(y/n)", "n");
         if (!isTrivial(ok)) {
@@ -113,30 +110,6 @@ public class VOCommands extends StoreCommands2 {
             }
         }
         vo.setDefaultKeyID(getPropertyHelp(keys.defaultKeyID(),"enter the default key id", defaultKey));
-        extraUpdates(vo, DEFAULT_MAGIC_NUMBER);
-        sayi("here is the complete virtual organization (VO):");
-        longFormat(vo);
-        if (!newIdentifier.equals(vo.getIdentifierString())) {
-            //  sayi2(" remove client with id=\"" + client.getIdentifier() + "\" [y/n]? ");
-            removeCurrentVO = isOk(readline(" remove VO with id=\"" + vo.getIdentifier() + "\" [y/n]? "));
-            vo.setIdentifier(BasicIdentifier.newID(newIdentifier));
-        }
-        //  sayi2("save [y/n]?");
-        if (isOk(readline("save [y/n]?"))) {
-            //getStore().save(client);
-            if (removeCurrentVO) {
-                info("removing VO with id = " + oldID);
-                getStore().remove(vo.getIdentifier());
-                sayi("VO with id " + oldID + " removed. Be sure to save any changes.");
-            }
-            sayi("VO updated.");
-            info("VO with id " + vo.getIdentifierString() + " saving...");
-
-            return true;
-        }
-        sayi("VO not updated, losing changes...");
-        info("User terminated updates for VO with id " + vo.getIdentifierString());
-        return false;
 
     }
 

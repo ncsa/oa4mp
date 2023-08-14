@@ -46,7 +46,7 @@ public class OA2PermissionCommands extends StoreCommands2 {
     @Override
     public boolean update(Identifiable identifiable) throws IOException {
         Permission p = (Permission) identifiable;
-        PermissionKeys keys = (PermissionKeys)getMapConverter().getKeys();
+        PermissionKeys keys = (PermissionKeys)getSerializationKeys();
         String input;
         if (p.getClientID() == null) {
             input = getPropertyHelp(keys.clientID(),"Enter new client id", "");

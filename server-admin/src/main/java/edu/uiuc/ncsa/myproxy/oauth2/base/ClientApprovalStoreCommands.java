@@ -62,7 +62,7 @@ public class ClientApprovalStoreCommands extends StoreCommands2 {
     @Override
     public boolean update(Identifiable identifiable) throws IOException {
         ClientApproval clientApproval = (ClientApproval) identifiable;
-        ClientApprovalKeys keys = (ClientApprovalKeys)getMapConverter().getKeys();
+        ClientApprovalKeys keys = (ClientApprovalKeys)getSerializationKeys();
         info("Starting update for client approval id=" + identifiable.getIdentifierString());
         sayi("Enter the information for the client approval");
         clientApproval.setApprover(getPropertyHelp(keys.approver(),"name of the approver", clientApproval.getApprover()));

@@ -64,7 +64,7 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
     @Override
     public void extraUpdates(Identifiable identifiable, int magicNumber) throws IOException {
         AdminClient client = (AdminClient) identifiable;
-        AdminClientKeys keys = (AdminClientKeys) getMapConverter().getKeys();
+        AdminClientKeys keys = (AdminClientKeys) getSerializationKeys();
         super.extraUpdates(client, magicNumber);
         String issuer = getPropertyHelp(keys.issuer(), "Give the issuer", client.getIssuer());
         if (!isEmpty(issuer)) {

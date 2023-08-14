@@ -117,6 +117,6 @@ public class ClientStoreCommands extends BaseClientStoreCommands {
         super.extraUpdates(identifiable, magicNumber);
         Client client = (Client)identifiable;
         ClientKeys keys = (ClientKeys) getMapConverter().getKeys();
-        client.setHomeUri(getPropertyHelp(keys.homeURL(), "enter home url", client.getHomeUri()==null?"":client.getHomeUri()));
+        client.setHomeUri(getPropertyHelp(keys.homeURL(), "enter home url", client.getHomeUri()));
     }
 }

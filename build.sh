@@ -1,6 +1,6 @@
 # Main script to build OA4MP
 
-# Next coupld of directories are to let this script update all my
+# Next couple of directories are to let this script update all my
 # local installs of these tools, so I have the latest version after each build
 
 QDL_LOCAL_INSTALL=/home/ncsa/apps/qdl

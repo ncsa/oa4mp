@@ -214,7 +214,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
      */
     @Override
     public void extraUpdates(Identifiable identifiable, int magicNumber) throws IOException {
-        OA2ClientKeys keys = (OA2ClientKeys) getMapConverter().getKeys();
+        OA2ClientKeys keys = (OA2ClientKeys) getSerializationKeys();
         OA2Client oa2Client = (OA2Client) identifiable;
         super.extraUpdates(oa2Client, magicNumber);
         final String DEFAULT_SERVER_VALUE = "default";
@@ -546,7 +546,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
         // Fixes CIL-1025 -- recognize config attribute as JSON at all times,
         // especially when it is null.
         String currentValue = map.getString(key);
-        OA2ClientKeys keys = (OA2ClientKeys) getMapConverter().getKeys();
+        OA2ClientKeys keys = (OA2ClientKeys) getSerializationKeys();
         if (currentValue == null && key.equals(keys.cfg())) {
             map.put(key, "{}"); // empty JSON is still JSON.
         }
@@ -775,7 +775,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
     @Override
     protected BaseClient approvalMods(InputLine inputLine, BaseClient client) throws IOException {
         OA2Client oa2Client = (OA2Client) client;
-        OA2ClientKeys keys = (OA2ClientKeys) getMapConverter().getKeys();
+        OA2ClientKeys keys = (OA2ClientKeys) getSerializationKeys();
         oa2Client.setStrictscopes(getPropertyHelp(keys.strictScopes(), "strict scopes?(y/n)", oa2Client.useStrictScopes() ? "y" : "n").equalsIgnoreCase("y"));
         return oa2Client;
     }

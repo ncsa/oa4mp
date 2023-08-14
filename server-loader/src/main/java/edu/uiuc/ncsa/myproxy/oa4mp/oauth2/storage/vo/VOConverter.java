@@ -68,7 +68,9 @@ public class VOConverter<V extends VirtualOrganization> extends MapConverter<V> 
         data.put(vok().valid(), value.isValid());
         data.put(vok().creationTS(), value.getCreationTS());
         data.put(vok().lastModifiedTS(), value.getLastModifiedTS());
-        data.put(vok().lastAccessed(), value.getLastAccessed().getTime());
+        if(value.getLastAccessed()!=null) {
+            data.put(vok().lastAccessed(), value.getLastAccessed().getTime());
+        }
         if(!isTrivial(value.getIssuer())){
             data.put(vok().issuer(), value.getIssuer());
         }
