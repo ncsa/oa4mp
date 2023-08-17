@@ -12,7 +12,7 @@ cfg. := new_template('file');
 */
 path := 'vfs#/scripts/ui-test/ui-test.json';
 
-//cfg.file_path := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-admin-oauth2/src/main/resources/qdl/ui-test/ui-test.json';
+//cfg.file_path := os_env('NCSA_DEV_INPUT')+'/oa4mp/oa4mp-server-admin-oauth2/src/main/resources/qdl/ui-test/ui-test.json';
 cfg.file_path := 'vfs#/scripts/ui-test/ui-test.json';
 at_claims. := get_claims(create_source(cfg.));
     requested_scopes. := (0 < size(tx_scopes.))?tx_scopes.:scopes.;

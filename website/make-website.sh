@@ -1,13 +1,9 @@
 #
 # Run this AFTER build.sh or it will fail.
 #
-export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
-OA4MP_ROOT=/home/ncsa/dev/ncsa-git/oa4mp
+OA4MP_ROOT=$NCSA_DEV_INPUT/oa4mp
 
-#WEBSITE_ROOT=$OA4MP_ROOT/docs
-#cd $WEBSITE_ROOT/pdf
-# OLD location for now so the website updates
-GITHUB_ROOT=/home/ncsa/dev/ncsa-git/oa4mp/docs
+GITHUB_ROOT=$OA4MP_ROOT/docs
 cd $GITHUB_ROOT/pdf
 
 echo "converting docs to PDF"

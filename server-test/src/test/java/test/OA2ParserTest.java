@@ -2,6 +2,7 @@ package test;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.claims.FunctorClaimsType;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.claims.OA2FunctorFactory;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.util.FunctorParserTest;
 import edu.uiuc.ncsa.security.util.functor.JFunctorFactory;
 import edu.uiuc.ncsa.security.util.functor.parser.AbstractHandler;
@@ -131,7 +132,7 @@ public class OA2ParserTest extends FunctorParserTest {
 
     @Test
     public void testVOPersonScript() throws Exception {
-        String fileName = "/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/vop-test.cmd";
+        String fileName = DebugUtil.getDevPath()+"/oa4mp/server-test/src/main/resources/vop-test.cmd";
         FileReader fileReader = new FileReader(fileName);
             Map<String, Object> claims = createClaims();
             JFunctorFactory functorFactory = createFunctorFactory(claims);

@@ -3,7 +3,7 @@
 /*
    Starts a bunch of flows, saves them and waits for restart.qdl
 */
-path := '/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests';
+path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests';
 script_path(path ~ script_path());
 ids. := script_load(path + '/test/ids.qdl');
 say('ids=' + to_string(ids.));

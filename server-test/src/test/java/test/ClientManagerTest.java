@@ -189,7 +189,7 @@ public class ClientManagerTest extends DDServerTests implements SAT {
         SSLConfiguration ssl = new SSLConfiguration();
         ssl.setKeystorePassword("changeme");
         ssl.setKeystoreType("JKS");
-        ssl.setKeystore("/home/ncsa/dev/csd/config/cacerts2");
+        ssl.setKeystore(DebugUtil.getConfigPath()+"/cacerts2");
         ldap.setSslConfiguration(ssl);
         System.out.println(DD);
         System.out.println("LDAP from config serializer:");

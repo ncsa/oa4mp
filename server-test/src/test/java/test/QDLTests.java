@@ -14,6 +14,7 @@ import edu.uiuc.ncsa.qdl.exceptions.QDLExceptionWithTrace;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import net.sf.json.JSONObject;
 
 import javax.xml.stream.XMLEventReader;
@@ -90,7 +91,7 @@ public class QDLTests extends AbstractQDLTester {
         OA2State state = (OA2State) getTestUtils().getNewState();
         StringBuffer script = new StringBuffer();
         // tests absolute path, not in server mode.
-        String realPath = "/home/ncsa/dev/ncsa-git/oa4mp/server-admin/src/main/resources/qdl/ui-test/test-claims.json";
+        String realPath = DebugUtil.getDevPath()+"/oa4mp/server-admin/src/main/resources/qdl/ui-test/test-claims.json";
         addLine(script, "module_load('edu.uiuc.ncsa.myproxy.oa4mp.qdl.OA2QDLLoader', 'java');");
         addLine(script, "module_import('oa2:/qdl/oidc/claims');");
         addLine(script, "cfg. := new_template('file');");
@@ -112,7 +113,7 @@ public class QDLTests extends AbstractQDLTester {
         OA2State state = (OA2State) getTestUtils().getNewState();
         StringBuffer script = new StringBuffer();
         // tests absolute path, not in server mode.
-        String testClaimsFile = "/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/test-claims.json";
+        String testClaimsFile = DebugUtil.getDevPath()+"/oa4mp/server-test/src/main/resources/test-claims.json";
         addLine(script, "module_load('edu.uiuc.ncsa.myproxy.oa4mp.qdl.OA2QDLLoader', 'java');");
         addLine(script, "module_import('oa2:/qdl/oidc/claims');");
         addLine(script, "cfg. := new_template('file');");
@@ -221,7 +222,7 @@ public class QDLTests extends AbstractQDLTester {
     protected void setFakeState(OA2State oa2State) {
         OA2ServiceTransaction oa2ServiceTransaction = new OA2ServiceTransaction(BasicIdentifier.randomID());
         OA2Client oa2Client = new OA2Client(BasicIdentifier.randomID());
-        OA2ConfigurationLoader loader = new OA2ConfigurationLoader(findConfigNode("/home/ncsa/dev/csd/config/server-oa2.xml", "localhost:oa4mp.oa2.mariadb"));
+        OA2ConfigurationLoader loader = new OA2ConfigurationLoader(findConfigNode(DebugUtil.getConfigPath()+"/server-oa2.xml", "localhost:oa4mp.oa2.mariadb"));
         OA2SE oa2SE = (OA2SE) loader.load();
         oa2State.setOa2se(oa2SE);
         oa2Client.setConfig(new JSONObject());

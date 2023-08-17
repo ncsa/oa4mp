@@ -5,7 +5,7 @@
    and then attempt to get some different scopes. Downscoping is allowed, but that's it.
 
 */
-path := '/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests';
+path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests';
 if[path∉script_path()][script_path(path ~ script_path());];
 scope_check(s., token.)->⊗∧⊙s.∈tokenize(token.'scope', ' '); // Define it here. Checks all the expected scopes are in the token
 

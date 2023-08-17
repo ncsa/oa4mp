@@ -1,7 +1,7 @@
 #! /usr/bin/env -S qdl-run
 /*
  say('args=' + args());
-path := '/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests/cm-tests/';
+path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests/cm-tests/';
 script_path(path ~ script_path());
 */
 script_load('anon-init.qdl', args(0));

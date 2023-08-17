@@ -1,6 +1,7 @@
 package test;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.*;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.HTTPHeaderClaimsSource;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.LDAPClaimsSource;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.jSetClaimSource;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.claims.FunctorClaimsType;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.claims.OA2FunctorFactory;
@@ -11,6 +12,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientFunctorScriptsFactory;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSource;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfiguration;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfigurationUtil;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.util.TestBase;
 import edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl;
 import edu.uiuc.ncsa.security.util.functor.logic.jContains;
@@ -322,7 +324,7 @@ public class ClientConfigurationTest extends TestBase {
 
     @Test
     public void testNewScripting() throws Exception {
-        File testFile = new File("/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-admin-oauth2/src/main/resources/script-test.json");
+        File testFile = new File(DebugUtil.getDevPath()+"/oa4mp/oa4mp-server-admin-oauth2/src/main/resources/script-test.json");
         if (!testFile.exists()) {
             System.out.println("Could not find test file for scripting. Skipping test...");
             return;

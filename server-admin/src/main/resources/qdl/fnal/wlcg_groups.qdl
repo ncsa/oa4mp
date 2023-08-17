@@ -49,7 +49,7 @@
      g. := ['wlcg.groups', '/cms/uscms', '/cms/ALARM','/cms/users']
      w  := 'wlcg.groups'
      s. := 'openid' ~ 'email' ~ 'profile' ~ 'wlcg.groups:/cms/uscms'.
-     ss := '/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-admin-oauth2/src/main/resources/qdl/fnal/wlcg_groups.qdl';
+     ss := os_env('NCSA_DEV_INPUT')+'/oa4mp/oa4mp-server-admin-oauth2/src/main/resources/qdl/fnal/wlcg_groups.qdl';
 
      script_run(ss, s., g.); // request a subset
 [/cms/uscms]

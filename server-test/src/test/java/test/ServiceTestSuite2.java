@@ -10,9 +10,10 @@ import edu.uiuc.ncsa.myproxy.oa4mp.NewClientStoreTest;
 import edu.uiuc.ncsa.myproxy.oa4mp.NewTransactionTest;
 import edu.uiuc.ncsa.myproxy.oa4mp.ServiceConfigTest;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2Bootstrapper;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.FileStoreTest;
 import edu.uiuc.ncsa.security.core.configuration.ConfigInheritanceTest;
 import edu.uiuc.ncsa.security.core.configuration.MultipleInheritanceTest;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.FileStoreTest;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.util.*;
 import edu.uiuc.ncsa.security.util.cache.CacheTest;
 import junit.framework.TestSuite;
@@ -60,7 +61,7 @@ public class ServiceTestSuite2 extends TestSuite {
 
     @BeforeClass
     public static void initialize() {
-        System.setProperty(OA2Bootstrapper.OA2_CONFIG_FILE_KEY, "/home/ncsa/dev/csd/config/servers.xml");
+        System.setProperty(OA2Bootstrapper.OA2_CONFIG_FILE_KEY, DebugUtil.getConfigPath()+"/servers.xml");
         TestSuiteInitializer testSuiteInitializer = new TestSuiteInitializer(new OA2Bootstrapper());
         testSuiteInitializer.init();
     }

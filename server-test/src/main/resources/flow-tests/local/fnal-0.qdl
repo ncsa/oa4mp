@@ -1,7 +1,7 @@
 #! /usr/bin/env -S qdl-run
 
 
-path := '/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests';
+path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests';
 if[path∉script_path()][script_path(path ~ script_path());];
 
 cfg.'id'  := 'localhost:test/fnal';

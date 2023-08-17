@@ -4,9 +4,9 @@
    Tests the revocation (and introspection) machinery for a client.
    This creates a flow, then
 */
-path := '/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests';
+path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests';
 if[path∉script_path()][script_path(path ~ script_path());];
-// script_path('/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests:vfs#/scripts/:vfs#/mysql/:vfs#/pt/temp:vfs#/pt');
+// script_path(os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests:vfs#/scripts/:vfs#/mysql/:vfs#/pt/temp:vfs#/pt');
 /* Alternate with login
 cfg.'id'  := 'localhost:test/no_cfg';
 cfg.'idp'  := 'ANY';

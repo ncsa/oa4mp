@@ -5,7 +5,7 @@
 # This is a work in progress and not ready at all for use yet.
 #
 
-DEFAULT_OA4MP_ROOT="/home/ncsa/dev/ncsa-git/oa4mp"
+DEFAULT_OA4MP_ROOT=$NCSA_DEV_INPUT/oa4mp
 DEFAULT_TARGET_ROOT="/home/ncsa/dev/temp-deploy/server/install"
 DEFAULT_JAR_NAME="oa4mp-installer.jar"
 
@@ -40,9 +40,9 @@ mkdir edu/uiuc/ncsa/qdl/install
 
 
 cd $TARGET_ROOT
-cp /home/ncsa/dev/ncsa-git/qdl/language/src/main/scripts/installer.mf .
-cp /home/ncsa/dev/ncsa-git/qdl/language/src/main/scripts/version.txt .
-cp /home/ncsa/dev/ncsa-git/qdl/language/target/classes/edu/uiuc/ncsa/qdl/install/Installer.class edu/uiuc/ncsa/qdl/install
+cp $NCSA_DEV_INPUT/qdl/language/src/main/scripts/installer.mf .
+cp $NCSA_DEV_INPUT/qdl/language/src/main/scripts/version.txt .
+cp $NCSA_DEV_INPUT/qdl/language/target/classes/edu/uiuc/ncsa/qdl/install/Installer.class edu/uiuc/ncsa/qdl/install
 
 # Now make the directories
 mkdir "bin"

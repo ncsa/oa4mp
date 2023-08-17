@@ -72,5 +72,5 @@ if[
      return(~values(mask(ζ., in_group2(keys(ζ.),γ.))));
 
      /*
-g. := script_load('/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-admin-oauth2/src/main/resources/qdl/ligo/vo2/get_user.qdl', 'duncan.meacher@shibbi.pki.itc.u-tokyo.ac.jp')
+g. := script_load(os_env('NCSA_DEV_INPUT')+'/oa4mp/oa4mp-server-admin-oauth2/src/main/resources/qdl/ligo/vo2/get_user.qdl', 'duncan.meacher@shibbi.pki.itc.u-tokyo.ac.jp')
      */

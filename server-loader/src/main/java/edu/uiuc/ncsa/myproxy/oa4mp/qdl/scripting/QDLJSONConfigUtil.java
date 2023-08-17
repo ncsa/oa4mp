@@ -8,6 +8,7 @@ import edu.uiuc.ncsa.qdl.scripting.Scripts;
 import edu.uiuc.ncsa.qdl.util.QDLVersion;
 import edu.uiuc.ncsa.qdl.vfs.FileEntries;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.FileUtil;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.util.scripting.ScriptSet;
@@ -356,7 +357,7 @@ public class QDLJSONConfigUtil implements ScriptingConstants {
 
     protected static void testLoadDir() {
         try {
-            String directory = "/home/ncsa/dev/ncsa-git/oa4mp/qdl/src/main/resources/scripts";
+            String directory = DebugUtil.getDevPath()+"/oa4mp/qdl/src/main/resources/scripts";
             JSONObject j = readDir(directory);
             JSONObject jsonObject = new JSONObject();
 

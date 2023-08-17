@@ -6,7 +6,7 @@
    enabled in the CLI (using the ea_support command). This should return
    a string of two values that can be parsed. 
 */
-path := '/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests';
+path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests';
 if[path∉script_path()][script_path(path ~ script_path());];
 debugger(1);
 params. ≔ {'sub':'jeff',

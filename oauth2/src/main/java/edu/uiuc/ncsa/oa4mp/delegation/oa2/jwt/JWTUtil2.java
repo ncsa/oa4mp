@@ -398,7 +398,7 @@ public class JWTUtil2 {
        public static String rawKey = "{\"keys\":[{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"alg\":\"RS256\",\"n\":\"jd9bK0aMoFyj1SzbkGgLDwrsV-YqcbTYLjAep2w4Z-K6DlhIznxZBVi7sY2XDFiebJh4dRe453S3ulQHC_bDx8SspzlgBgsL4S4JrSIXSj9pur-CKEAMfYJuvoDG4-j9ILeuRJMUHFv5sA_6_vo3ZwUKU1x-6L-uvnKuuRU8H2O0-YfmbdYG2y3fnT8dgXTJ3s5vhGMAngiJd1iPjJwV37CtraJ4MDtaC_5foifME6TgOfcFc887h6jZtlF8qrQn9pUpXXFBBu-wqjGOSgqpfqpeQueQD1TXN2z9ccNg3I9r7omrs80aSc-3YfreIfxB5qwyOB7S66bRdTOWtealYw\"}]}";
 
     public static void otherTest() throws Exception {
-        JSONWebKeys keys = JSONWebKeyUtil.fromJSON(new File("/home/ncsa/dev/csd/config/keys.jwk"));
+        JSONWebKeys keys = JSONWebKeyUtil.fromJSON(new File(DebugUtil.getConfigPath()+"/keys.jwk"));
         JSONObject claims = verifyAndReadJWT(ID_TOKKEN, keys);
         System.out.println("claims=" + claims);
 
@@ -414,7 +414,7 @@ public class JWTUtil2 {
         System.out.println("base 64=" + concat(header, payload));
         //String keyID = "9k0HPG3moXENne";
         String keyID = "244B235F6B28E34108D101EAC7362C4E";
-        JSONWebKeys keys = JSONWebKeyUtil.fromJSON(new File("/home/ncsa/dev/csd/config/polo-keys.jwk"));
+        JSONWebKeys keys = JSONWebKeyUtil.fromJSON(new File(DebugUtil.getConfigPath()+"/polo-keys.jwk"));
 
         String idTokken = createJWT(payload, keys.get(keyID));
         System.out.println(idTokken);
@@ -549,7 +549,7 @@ public class JWTUtil2 {
 
     public static void firstTestB() throws Exception {
         String keyID = "9k0HPG3moXENne";
-        JSONWebKeys keys = JSONWebKeyUtil.fromJSON(new File("/home/ncsa/dev/csd/config/keys.jwk"));
+        JSONWebKeys keys = JSONWebKeyUtil.fromJSON(new File(DebugUtil.getConfigPath()+"/keys.jwk"));
 
         JSONObject payload = new JSONObject();
         payload.put("name", "jeff");
@@ -576,7 +576,7 @@ public class JWTUtil2 {
 
     public static void testSigningDirectly() throws Exception {
         String keyID = "9k0HPG3moXENne";
-        JSONWebKeys keys = JSONWebKeyUtil.fromJSON(new File("/home/ncsa/dev/csd/config/keys.jwk"));
+        JSONWebKeys keys = JSONWebKeyUtil.fromJSON(new File(DebugUtil.getConfigPath()+"/keys.jwk"));
 
         JSONWebKey jsonWebKey = keys.get(keyID);
 
@@ -633,7 +633,7 @@ public class JWTUtil2 {
                 "  \"auth_time\": \"1484763843\"" +
                 "}";
         String keyID = "9k0HPG3moXENne";
-        JSONWebKeys keys = JSONWebKeyUtil.fromJSON(new File("/home/ncsa/dev/csd/config/keys.jwk"));
+        JSONWebKeys keys = JSONWebKeyUtil.fromJSON(new File(DebugUtil.getConfigPath()+"/keys.jwk"));
 
         JSONWebKey jsonWebKey = keys.get(keyID);
         JSONObject h = JSONObject.fromObject(header);
