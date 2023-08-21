@@ -16,3 +16,7 @@ for science gateways. Initially deployed in 2011, it is a mature, stable and ext
 ## Docs
 
 https://oa4mp.org
+                 
+# Building from sources
+
+You may check out the source from [GitHub](https://github.com/ncsa/oa4mp)  
