@@ -12,35 +12,11 @@
   <component name="ChangeListManager">
     <list default="true" id="eb414374-02ed-40a4-9689-d382715049b9" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-api/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/client-api/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client-loader/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/client-loader/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-oauth2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/client-oauth2/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-test/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/client-test/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-webapp/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/client-webapp/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/client/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/common/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/myproxy-logon/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/myproxy-logon/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/myproxy-website/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/myproxy-website/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-test/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-webapp/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-webapp/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oauth2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oauth2/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proxy/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qdl/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-api/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-loader/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/cm/oidc_cm/OIDCCMServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/cm/oidc_cm/OIDCCMServlet.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-test/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/server/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/skin/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/skin/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/website/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/website/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/website/src/site/site.xml" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/site.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/website/src/site/xhtml/client/manuals/api-reference.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/xhtml/client/manuals/api-reference.xhtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/website/src/site/xhtml/client/manuals/getting-started.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/xhtml/client/manuals/getting-started.xhtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/website/src/site/xhtml/server/dtd/server-dtd-content-tags.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/xhtml/server/dtd/server-dtd-content-tags.xhtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/website/src/site/xhtml/server/manuals/cli.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/xhtml/server/manuals/cli.xhtml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

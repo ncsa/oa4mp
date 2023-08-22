@@ -79,7 +79,4 @@
         </dependency>
     </dependencies>
 
-    <build>
-       <finalName>client2</finalName>
-    </build>
 </project>

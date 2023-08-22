@@ -9,7 +9,6 @@
     <version>5.3.5</version>
 
     <artifactId>myproxy-website</artifactId>
-    <packaging>jar</packaging>
     <description>MyProxy Logon website</description>
     <name>MyProxy Logon</name>
     <url>http://grid.ncsa.illinois.edu/myproxy/MyProxyLogon/</url>

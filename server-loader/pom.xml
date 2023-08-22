@@ -52,7 +52,7 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
-         <!--   <version>3.1.0</version>-->
+            <!--   <version>3.1.0</version>-->
         </dependency>
 
         <dependency>
@@ -84,7 +84,7 @@
     <build>
         <plugins>
 
-            <plugin>
+ <!--           <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0-M7</version>
@@ -99,7 +99,6 @@
                     <reuseForks>false</reuseForks>
                 </configuration>
             </plugin>
-        </plugins>
-        <finalName>oauth2</finalName>
+ -->       </plugins>
     </build>
 </project>

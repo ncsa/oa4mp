@@ -21,57 +21,57 @@
     <name>Top level OA4MP</name>
     <description>Top level OAuth client and server code for MyProxy</description>
     <licenses>
-          <license>
-              <name>Apache license</name>
-              <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-              <distribution>repo</distribution>
-          </license>
-      </licenses>
-      <scm>
-          <developerConnection>scm:git:https://github.com/ncsa/oa4mp.git</developerConnection>
-          <connection>scm:git:https://github.com/ncsa/oa4mp.git</connection>
-          <url>https://github.com/ncsa/oa4mp</url>
-      </scm>
-      <issueManagement>
-          <system>GitHub</system>
-          <url>https://github.com/ncsa/oa4mp/issues</url>
-      </issueManagement>
-      <developers>
-          <developer>
-              <name>Jeff Gaynor</name>
-              <email>gaynor@illinois.edu</email>
-          </developer>
-          <developer>
-              <name>Jim Basney</name>
-              <email>jbasney@illinois.edu</email>
-          </developer>
-      </developers>
+        <license>
+            <name>Apache license</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <scm>
+        <developerConnection>scm:git:https://github.com/ncsa/oa4mp.git</developerConnection>
+        <connection>scm:git:https://github.com/ncsa/oa4mp.git</connection>
+        <url>https://github.com/ncsa/oa4mp</url>
+    </scm>
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/ncsa/oa4mp/issues</url>
+    </issueManagement>
+    <developers>
+        <developer>
+            <name>Jeff Gaynor</name>
+            <email>gaynor@illinois.edu</email>
+        </developer>
+        <developer>
+            <name>Jim Basney</name>
+            <email>jbasney@illinois.edu</email>
+        </developer>
+    </developers>
 
-      <mailingLists>
-          <mailingList>
-              <name>MyProxy User List</name>
-              <subscribe>myproxy-user-request@lists.globus.org?subject=subscribe</subscribe>
-              <unsubscribe>myproxy-user-request@lists.globus.org?subject=unsubscribe</unsubscribe>
-              <archive>http://lists.globus.org/pipermail/myproxy-user/</archive>
-              <post>myproxy-user@lists.globus.org</post>
-              <otherArchives/>
-          </mailingList>
-      </mailingLists>
+    <mailingLists>
+        <mailingList>
+            <name>MyProxy User List</name>
+            <subscribe>myproxy-user-request@lists.globus.org?subject=subscribe</subscribe>
+            <unsubscribe>myproxy-user-request@lists.globus.org?subject=unsubscribe</unsubscribe>
+            <archive>http://lists.globus.org/pipermail/myproxy-user/</archive>
+            <post>myproxy-user@lists.globus.org</post>
+            <otherArchives/>
+        </mailingList>
+    </mailingLists>
 
-      <distributionManagement>
-          <repository>
-              <id>sonatype-nexus-staging</id>
-              <name>sonatype</name>
-              <url>https://oss.sonatype.org/service/local/staging/deploy/maven2
-              </url>
-          </repository>
-          <snapshotRepository>
-              <id>sonatype-nexus-snapshots</id>
-              <name>sonatype</name>
-              <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-              <uniqueVersion>false</uniqueVersion>
-          </snapshotRepository>
-      </distributionManagement>
+    <distributionManagement>
+        <repository>
+            <id>sonatype-nexus-staging</id>
+            <name>sonatype</name>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2
+            </url>
+        </repository>
+        <snapshotRepository>
+            <id>sonatype-nexus-snapshots</id>
+            <name>sonatype</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+    </distributionManagement>
     <modules>
         <module>myproxy-logon</module>
         <module>server-api</module>
@@ -108,15 +108,15 @@
         CIL-1607, centralize dependency management, use javax.servlet 3.1+
     -->
     <dependencyManagement>
-         <dependencies>
-             <dependency>
-                 <groupId>javax.servlet</groupId>
-                 <artifactId>javax.servlet-api</artifactId>
-                 <version>3.1.0</version>
-                 <scope>provided</scope>
-             </dependency>
-         </dependencies>
-     </dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>javax.servlet-api</artifactId>
+                <version>3.1.0</version>
+                <scope>provided</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     <build>
         <plugins>
             <plugin>
@@ -124,7 +124,7 @@
                 <artifactId>maven-gpg-plugin</artifactId>
                 <version>1.6</version>
                 <configuration>
-                    <skip>true</skip>
+                    <skip>false</skip>
                 </configuration>
                 <executions>
                     <execution>
@@ -137,14 +137,25 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
                 <version>3.2.1</version>
                 <executions>
+                    <execution>
+                        <id>bundle-sources</id>
+                        <phase>package</phase>
+                        <goals>
+                            <!-- produce source artifact for main project sources -->
+                            <goal>jar</goal>
+                            <!-- produce source artifact for project test sources -->
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
                     <execution>
                         <id>attach-sources</id>
                         <goals>
                             <goal>jar</goal>
+                            <goal>test-jar</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -153,6 +164,14 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.5.0</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>

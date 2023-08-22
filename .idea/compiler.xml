@@ -19,7 +19,6 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="server" />
-        <module name="website" />
         <module name="oa4mp-server-oauth2" />
         <module name="myproxy-logon" />
         <module name="skin" />
