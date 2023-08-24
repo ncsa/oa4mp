@@ -10,7 +10,7 @@ for science gateways. Initially deployed in 2011, it is a mature, stable and ext
 ## Prerequisites
 
 * Java 11
-* [Maven](https://maven.apache.org/) 3.5+
+* [Maven](https://maven.apache.org/) 3.9+
 * [Tomcat 9](https://tomcat.apache.org/download-90.cgi)
 
 ## Docs
@@ -19,4 +19,12 @@ https://oa4mp.org
                  
 # Building from sources
 
-You may check out the source from [GitHub](https://github.com/ncsa/oa4mp)  
+There are a couple of ways todo this. You can 
+* compile and install OA4MP locally using maven
+* do the entire build with artifacts which may then be released (typically on GitHub)
+* compile and install with maven, then deploy to Sonatype to be used as depedencies by other prjects
+
+## Gettign the source
+
+You may check out the source from [GitHub](https://github.com/ncsa/oa4mp). This is
+cloned into a source directory
