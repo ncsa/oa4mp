@@ -11,16 +11,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="eb414374-02ed-40a4-9689-d382715049b9" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/build-all.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build-tools.sh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build.sh" beforeDir="false" afterPath="$PROJECT_DIR$/build.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-oauth2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/client-oauth2/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/myproxy-logon/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/myproxy-logon/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-test/src/test/java/test/ClientManagerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/test/java/test/ClientManagerTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -417,13 +410,6 @@
       <workItem from="1692306584723" duration="4457000" />
       <workItem from="1692377277819" duration="1418000" />
     </task>
-    <task id="LOCAL-00001" summary="Migrated a bunch of static utilities into classes.">
-      <created>1675892170361</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1675892170361</updated>
-    </task>
     <task id="LOCAL-00002" summary="CIL-1389 (updated documentation) and CIL-1266 testing improvements. Addressed a few niggling point.">
       <created>1677542348075</created>
       <option name="number" value="00002" />
@@ -760,7 +746,14 @@
       <option name="project" value="LOCAL" />
       <updated>1692307159819</updated>
     </task>
-    <option name="localTasksCounter" value="50" />
+    <task id="LOCAL-00050" summary="https://github.com/ncsa/oa4mp/issues/121">
+      <created>1692881565294</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1692881565294</updated>
+    </task>
+    <option name="localTasksCounter" value="51" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -772,7 +765,6 @@
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="Brandind, method changed." />
     <MESSAGE value="Weirdly, a bunch of files seem to have removed themselves from GIT. Recommitting." />
     <MESSAGE value="Issue with master. Creating new branch to make sure nothing gets lost." />
     <MESSAGE value="More updates to documentation." />
@@ -797,7 +789,8 @@
     <MESSAGE value="Had a blindingly good idea for printing the online help.  https://jira.ncsa.illinois.edu/browse/CIL-1815 Also, found some missing help topics and added them." />
     <MESSAGE value="More improvements related to  https://jira.ncsa.illinois.edu/browse/CIL-1815" />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/121 first cut" />
-    <option name="LAST_COMMIT_MESSAGE" value="https://github.com/ncsa/oa4mp/issues/121 first cut" />
+    <MESSAGE value="https://github.com/ncsa/oa4mp/issues/121" />
+    <option name="LAST_COMMIT_MESSAGE" value="https://github.com/ncsa/oa4mp/issues/121" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
