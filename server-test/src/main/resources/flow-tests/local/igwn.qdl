@@ -17,7 +17,7 @@ cfg.'description' :=  'IGWN test';
 
     params.'token':={'scope':'read:/frames gwdatafind.read gracedb.read dqsegdb.read write:/staging'}; // CIL-1808 test
   params.'refresh':={'scope':'read:/virgo gracedb.read'};
- params.'exchange':={'scope':'read:/virgo dqsegdb.read read:/frames read:/frames read:/frames write:/staging'};
+ params.'exchange':={'scope':'read:/virgo dqsegdb.read read:/frames read:/frames read:/frames write:/staging write:/staging/bob write:/staging/ralph.foo'};
 rc := script_load('driver.qdl', cfg., params.);
 if[rc!='ok'][return(rc);];
 
@@ -32,9 +32,14 @@ tokens. := clc#refresh();
 say('refresh tokens=' + print(tokens.));
 ⊨ tokens.'access_token'.'jwt'.'scope' == 'gracedb.read' : 'wrong access token scope'; // should be a single one
 ⊨ scope_check(['gracedb.read'], tokens.'access_token'.'jwt') : 'wrong at scope(2)';
+⊨ 'write:/staging' ∉  tokens.'access_token'.'jwt'.'scope' : 'had extra write staging scope (2.5)';
+
 
 tokens. := clc#exchange();
 ⊨ scope_check(['read:/frames', 'dqsegdb.read', 'write:/staging/jeffrey.gaynor'], tokens.'access_token'.'jwt') : 'wrong at scope(3)';
+⊨ 'write:/staging/ralph.foo' ∉  tokens.'access_token'.'jwt'.'scope' : 'had extra write staging scope 1';
+⊨ 'write:/staging/bob' ∉  tokens.'access_token'.'jwt'.'scope' : 'had extra write staging scope 2';
+⊨ 'write:/staging' ∉  tokens.'access_token'.'jwt'.'scope' : 'had extra write staging scope 3';
 
 say('IGWN configuration: ok');
 

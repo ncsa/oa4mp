@@ -8,6 +8,9 @@
  trace('IGWN', 'requested scopes = ' + to_string(requested_scopes.));
  trace('IGWN', 'original scopes = ' + to_string(original_scopes.));
  permissions. := resolve_templates(scopes., requested_scopes., false); // Only grant scopes already granted
+ trace('IGWN', 'permissions = ' + to_string(permissions.));
+ permissions. := ~mask(permissions., !'write:/staging.*' =~ permissions.);
+ trace('IGWN', 'permissions #2 = ' + to_string(permissions.));
  // CIL-1808
  /*
    alternately , do the loop implicitly, since each element of ζ. is a list.
@@ -23,7 +26,7 @@
  t2. := resolve_templates(requested_scopes., t2., false); // if templates, by upscoping.
  permissions. := permissions. ~ t2.;
  //permissions. := (⊗∧⊙⊗!=∀[templates., permissions.])⌆permissions. // gets rid of the templates
- permissions. := mask(permissions., permissions. != 'write:/staging'); // manually yank this one template. 8/17/2023
+ //permissions. := mask(permissions., permissions. != 'write:/staging'); // manually yank this one template. 8/17/2023
 
  trace('IGWN', 'permissions = ' + to_string(permissions.));
  requested_audience. := (size(tx_audience.) == 0)?(size(audience.)==0?all_audience.:audience.):tx_audience.;

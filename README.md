@@ -16,13 +16,25 @@ for science gateways. Initially deployed in 2011, it is a mature, stable and ext
 ## Docs
 
 https://oa4mp.org
+
+# License
+
+Please see the [NCSA license](https://github.com/cilogon/oauth2-cilogon/blob/master/LICENSE) for details
+
                  
 # Building from sources
 
 ## Getting the sources
 
 You may check out the source from [GitHub](https://github.com/ncsa/oa4mp). This is
-cloned into `$NCSA_DEV_INPUT`. At the end of the cloning, you should have `$NCSA_DEV_INPUT/oa4mp`
+cloned into `$NCSA_DEV_INPUT`. At the end of the cloning, you should have `$NCSA_DEV_INPUT/oa4mp`.
+A typical sequence would be
+```
+$>export NCSA_DEV_INPUT=/path/to/ncsa/git
+$>cd $NCSA_DEV_INPUT
+$>git clone (whatever you want)
+$>cd oa4mp
+```
 
 ## How to compile, deploy etc.
 
@@ -30,15 +42,15 @@ There are a couple of ways todo this. You can
 
 1. compile and install OA4MP locally using just maven
 2. do the entire build with artifacts which may then be released (typically on GitHub)
-3. compile and install with maven, then deploy to Sonatype to be used as depedencies by other prjects
+3. compile and install with maven, then deploy to Sonatype to be used as depedencies by other projects
                                                                                                        
 ## Required environment variables
 
-There are a few environment variables youo should define before doing anything. These are used everywhere.
+There are a few environment variables you should define before doing anything. These are used everywhere.
 
 * NCSA_DEV_INPUT - the root for the sources
-* NCSA_DEV_OUTPUT - where any created artifacts gor
-* JAVA_HOME - this is required by maven or it won't know where to find teh javadoc tools
+* NCSA_DEV_OUTPUT - where any created artifacts go
+* JAVA_HOME - this is required by maven or it won't know where to find the javadoc tools
 
 # Building by the numbers
 
@@ -75,25 +87,25 @@ follows.
 
 ### Client artifacts
 
-| Name         | Description                                            |
-|--------------|--------------------------------------------------------|
-| client2.war  | The client war to be deployed under Tomcat |
- | client-X.sql | The SQL creation script for database X, e.g. MySQL, Derby, Postgres|
+| Name         | Description                                                         |
+|--------------|---------------------------------------------------------------------|
+| client2.war  | The client war to be deployed under Tomcat                          |
+ | client-X.sql | The SQL creation script for database X, e.g. MySQL, Derby, Postgres |
 
 ### Server artifacts
 
-| Name           | Description                                                                    |
-|----------------|--------------------------------------------------------------------------------|
-| clc | script to run the CLC (command line client)                                    |
-|clc.jar | runnable jar for the Command Line Client                                       | 
-|cli | script to run the CLI (command line interface, the chief admin tool for OA4MP) |
-|cli.jar | runnable jar for the CLI |
-| jwt.jar | runnable jar for JSON web keys |
-| jwt-scripts.tar| scripts for the JSON web keys utility |
- | oa4mp-X.sql | SQL creation scripts for database X, e.g., mysql, derby, etc.|
- | oa4mp-X.template | sample subject and message templates for email notifications under OA4MP |
-| oauth2.war | the deployable war for Tomcat. This is actually OA4MP. |
- | oidc-cm-scripts.tar | command line utilities and sample scripts for using the client management API |
+| Name                | Description                                                                    |
+|---------------------|--------------------------------------------------------------------------------|
+| clc                 | script to run the CLC (command line client)                                    |
+| clc.jar             | runnable jar for the Command Line Client                                       | 
+| cli                 | script to run the CLI (command line interface, the chief admin tool for OA4MP) |
+| cli.jar             | runnable jar for the CLI                                                       |
+| jwt.jar             | runnable jar for JSON web keys                                                 |
+| jwt-scripts.tar     | scripts for the JSON web keys utility                                          |
+ | oa4mp-X.sql         | SQL creation scripts for database X, e.g., mysql, derby, etc.                  |
+ | oa4mp-X.template    | sample subject and message templates for email notifications under OA4MP       |
+| oauth2.war          | the deployable war for Tomcat. This is actually OA4MP.                         |
+ | oidc-cm-scripts.tar | command line utilities and sample scripts for using the client management API  |
 
 You may or may not want to commit these to GitHub. If so, you must have commit privileges. 
 You should create a release in GitHub and upload these files. 
