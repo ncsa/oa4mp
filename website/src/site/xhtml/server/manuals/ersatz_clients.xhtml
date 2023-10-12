@@ -28,14 +28,15 @@
     in OA4MP and may be confidential or public.</p>
 
 <p><b><i>Definition:</i></b>If A is the provisioning client and α is an ersatz client
-    we say write <b><i>A ≻ α</i></b> read <i>A provisions α</i> or <i>α can substitute for A</i></p>
+    we say write <b><i>A ≻ α</i></b> read <i>A provisions α</i> or <i>α can substitute for A</i>.
+   When A provisions α, we say the flow has <i>forked</i> to α.</p>
 
 <h3>Ersatz Client Properties</h3>
 <ul>
-    <li>All substitution relations are explicit and must be set.</li>
+    <li>All ersatz relations are explicit and must be set out of band.</li>
     <li>Ersatz clients cannot start a flow.</li>
     <li>Ersatz clients can only be substituted at the token exchange (RFC 8693) endpoint.</li>
-    <li>once provisioned, are simply clients can be used at the
+    <li>once provisioned, they are simply clients can be used at the
         refresh endpoint, revoked, introspected etc.
     </li>
     <li>Ersatz clients are restricted in their scopes to whatever the provisioning client has and may only downscope.
@@ -80,7 +81,7 @@
     A (unless that relation is made explicit). This allows for chains of substitution. We may write this chain
     more compactly as A ≻ α ≻ β  ≻ γ
 </p>
-<h2>Creation</h2>
+<h2>Creation of Ersatz Clients</h2>
 <p>Ersatz clients may be created by an admin client, just like any other.
     In order to set up the provisioners, you set the property <code>org.oa4mp:/ersatz/provisioners</code>
     to be either the provisioner ID (i.e., the client ID of the client that an start the flow) or

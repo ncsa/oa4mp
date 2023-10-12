@@ -1,0 +1,13 @@
+----------------------------------------------------------------
+Thu Oct 12 14:24:09 CDT 2023:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.2.0 - (1828579): instance a816c00e-018b-2558-a3fa-000019984be8 
+on database directory /home/ncsa/dev/derby/client_oa4mp with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@55054057 
+Loaded from file:/home/ncsa/apps/qdl/lib/qdl.jar
+java.vendor=Ubuntu
+java.runtime.version=11.0.20.1+1-post-Ubuntu-0ubuntu120.04
+user.dir=/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests/local
+os.name=Linux
+os.arch=amd64
+os.version=5.4.0-163-generic
+derby.system.home=null
+Database Class Loader started - derby.database.classpath=''

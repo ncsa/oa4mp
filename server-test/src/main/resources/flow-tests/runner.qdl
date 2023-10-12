@@ -4,38 +4,19 @@
 path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests';
 script_path(path ~ script_path());
 test. := args().0;
-say('**** Flow test suite for OA4MP. ****');
-say('This will do several local tests for various modes of operation.');
-say('In each case, read carefully what is on the screen and do what it says.');
-say('Have your browser handy, since you will need to log in with the requested IDP repeatedly. ');
-say('This suite does take a bit to run, but it is quite a thorough test. If testing for an OA4MP release,');
-say('all tests MUST pass');
-say('There are also client management tests in the cm-tests directory to run.');
-say('****\n');
-/*test.:=(path + '/local/') + ['cil1550.qdl',
-                             'file_claims.qdl',
-                             'fnal-0.qdl',
-                             'fnal-1.qdl',
-                             'fnal-2.qdl',
-                             'fnal-3.qdl',
-                             'no_config.qdl',
-                             'test-template.qdl',
-                             'prototype.qdl',
-                             'rtx_refreshes.qdl',
-                             'rtx_exchanges.qdl',
-                             'rtx.qdl',
-                             'scitokens.qdl',
-                             'scitokens2.qdl',
-                             'test_ncsa.qdl',
-                             'test_qdl.qdl',
-                             'vo_test.qdl'];*/
+
+
 counter.'pass' := 0;
 counter.'fail' := 0;
 counter.'skipped' := 0;
 failures. := [];
+rc := null;// set scope for it
 while[x∈test.][
 try[
-  rc := script_load(x);
+  if  [var_type(x) == 4]
+  then[zzz.:=x;rc:=script_load(zzz.0, sublist(zzz., 1));]
+  else[rc := script_load(x);];
+
   if[rc == 'q'][break();]; // exit app
   if[rc=='s'][counter.'skipped'+=1;continue();]; // skip this test
   say(''); // blank line for clean display.

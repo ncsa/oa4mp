@@ -1,0 +1,28 @@
+#! /usr/bin/env -S qdl-run
+
+path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests/local/rfc8693';
+if[path∉script_path()][script_path(path ~ script_path());];
+args. := (0<size(args()))?args().0:[true]; // default is to use access token for exchange.
+params. ≔ {'sub':'jeff',
+         'scope':['openid', 'read:/X', 'read:/Y/Q', 'p.q'] // should be able to pass in scopes as a simple list
+         };
+clc#init('/home/ncsa/dev/csd/config/client-oa2.xml', 'localhost:p1');
+tokens. := clc#rfc7523(params.);
+claims. := claims();
+// Now go and do the exchanges for rt and at ASAP.
+// If args.0 is true, use access token, otherwise, use refresh token
+at. := (args.0?exchange('-at'):exchange('-at', '-x')).'access_token';
+rt. := (args.0?exchange('-rt'):exchange('-rt', '-x')).'refresh_token';
+id. := (args.0?exchange('-id'):exchange('-id', '-x'));
+⊨ at.'jti' != tokens.'access_token'.'jti' : 'access token not updated';
+⊨ rt.'jti' != tokens.'refresh_token'.'jti' : 'refresh token not updated';
+
+⊨ at.'lifetime' == 750000 : 'wrong access token lifetime';
+⊨ at.'jwt'.'iss' == 'https://localhost:9443/oauth2' : 'wrong access token issuer';
+⊨ at.'jwt'.'aud'.0 == 'https://wlcg.cern.ch/jwt/v1/access' : 'wrong access token audience';
+⊨ rt.'lifetime' == 3600000 : 'wrong refresh token lifetime';
+⊨ claims().'sub' == 'jeff' : 'IDT wrong subject';
+⊨ claims().'iss' == 'https://localhost:9443/oauth2' : 'IDT wrong issuer';
+⊨ claims().'aud' == 'localhost:p1' : 'IDT wrong audience';
+⊨ claims().'iat' != claims.'iat' : 'IDT issued at time not updated';
+say('𝕰𝖗s𝖆𝖙𝖟 client test: ok');

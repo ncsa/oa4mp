@@ -141,8 +141,8 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
             getClaims().put(EXPIRATION, (System.currentTimeMillis() + oa2se.getIdTokenLifetime()) / 1000); // expiration is in SECONDS from the epoch.
         }
         getClaims().put(ISSUED_AT, System.currentTimeMillis() / 1000); // issued at = current time in seconds.
-        trace(this, "saving the transaction with claims.");
-        transaction.setUserMetaData(getClaims());
+        trace(this, "saving the transaction with claims:\n" + getClaims().toString(1));
+        //transaction.setUserMetaData(getClaims());
         oa2se.getTransactionStore().save(transaction);
     }
 
@@ -236,7 +236,7 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
         if (oa2se.isOIDCEnabled()) {
             checkClaim(getClaims(), SUBJECT); // checks they requested it and it exists. Throws exception if not
         }
-
+        refreshAccountingInformation();
         if (transaction.getScopes().contains(OA2Scopes.SCOPE_CILOGON_INFO) || !((OA2Client) transaction.getClient()).useStrictScopes()) {
             permissiveFinish(execPhase);
             return;

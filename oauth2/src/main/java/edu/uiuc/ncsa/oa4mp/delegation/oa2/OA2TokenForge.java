@@ -160,9 +160,31 @@ public class OA2TokenForge implements TokenForge {
     public static final int TYPE_AUTH_GRANT = 1;
     public static final int TYPE_ACCESS_TOKEN = 10;
     public static final int TYPE_REFRESH_TOKEN = 100;
+    public static final int TYPE_ID_TOKEN = 200;
     public static final int TYPE_UNKNOWN = 0;
 
 
+    /**
+     * Takes a token (as a string) and returns a human-readable type of token.
+     * This is intended to be used in, e.g., logging applications.
+     * @param x
+     * @return
+     */
+    public String getStringType(String x) {
+        switch (getType(x)){
+            case TYPE_ACCESS_TOKEN:
+                return "access token";
+            case TYPE_REFRESH_TOKEN:
+                return "refresh token";
+            case TYPE_AUTH_GRANT:
+                return "authz grant";
+            case TYPE_ID_TOKEN:
+                return "id token";
+            default:
+            case TYPE_UNKNOWN:
+                return "unknown token";
+        }
+    }
     public int getType(String x) {
         String s = getServer();
         if (!s.endsWith("/")) {
@@ -182,6 +204,7 @@ public class OA2TokenForge implements TokenForge {
         if (x.startsWith(accessToken() + "/")) return TYPE_ACCESS_TOKEN;
         if (x.startsWith(authzGrant() + "/")) return TYPE_AUTH_GRANT;
         if (x.startsWith(refreshToken() + "/")) return TYPE_REFRESH_TOKEN;
+        if (x.startsWith(idToken() + "/")) return TYPE_ID_TOKEN;
         return TYPE_UNKNOWN; // booby prize.
 
     }

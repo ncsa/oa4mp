@@ -77,6 +77,10 @@ public class OA2ExceptionHandler implements ExceptionHandler {
         String address = AbstractServlet.getRequestIPAddress(xh.request);
         message = message + "<" + address + "> error: " + t.getMessage();
         warn(message); // Fixes CIL-1722
+        if (t == null) {
+            // really messed up, should never ever happen
+            t = new OA2GeneralError(OA2Errors.SERVER_ERROR, "Internal error", HttpStatus.SC_INTERNAL_SERVER_ERROR, null);
+        }
         if (t instanceof MissingContentException) {
             // CIL-1582
             t = new OA2GeneralError(OA2Errors.SERVER_ERROR, t.getMessage(), HttpStatus.SC_BAD_REQUEST, null);
@@ -84,8 +88,9 @@ public class OA2ExceptionHandler implements ExceptionHandler {
         if (t instanceof LDAPException) {
             t = new OA2GeneralError(OA2Errors.SERVER_ERROR, "LDAP error", HttpStatus.SC_INTERNAL_SERVER_ERROR, null);
         }
-        if ((t instanceof NullPointerException)) {
-            getLogger().error("Null pointer", t);
+        if ((t instanceof NullPointerException) || (t.getCause()!=null && t.getCause() instanceof NullPointerException)) {
+            getLogger().error("Null pointer", t); // *should* log it with the stack trace
+            t.printStackTrace();
             t = new OA2GeneralError(OA2Errors.SERVER_ERROR, "Null pointer", HttpStatus.SC_INTERNAL_SERVER_ERROR, null);
         }
 
@@ -94,10 +99,7 @@ public class OA2ExceptionHandler implements ExceptionHandler {
             t = t.getCause();
         }
 
-        if (t == null) {
-            // really messed up, should never ever happen
-            t = new OA2GeneralError(OA2Errors.SERVER_ERROR, "Internal error", HttpStatus.SC_INTERNAL_SERVER_ERROR, null);
-        }
+
         // If there is really a servlet exception (defined as a bonafide unrecoverable state, like storage is down or
         // no client_id, e.g.) then pass back the servlet exception and let the container handle it. At some point we might just
         // want to have a pretty page for this.

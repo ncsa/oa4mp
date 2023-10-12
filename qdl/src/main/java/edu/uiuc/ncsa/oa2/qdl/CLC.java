@@ -17,6 +17,7 @@ import edu.uiuc.ncsa.qdl.variables.QDLList;
 import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.DateUtils;
+import edu.uiuc.ncsa.security.core.util.DebugConstants;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import net.sf.json.JSONArray;
@@ -88,9 +89,11 @@ public class CLC implements QDLModuleMetaClass {
                 DebugUtil.setEnabled(true);
                 clcCommands = new OA2CLCCommands(true, state.getLogger(), new OA2CommandLineClient(state.getLogger()));
                 // note that the order of the arguments swaps.
-                clcCommands.load(new InputLine(DUMMY_ARG + " " + objects[1].toString() + "  " + objects[0].toString()));
+                InputLine inputLine = new InputLine(DUMMY_ARG + " " + objects[1].toString() + "  " + objects[0].toString());
+                clcCommands.load(inputLine);
                 initCalled = true;
             } catch (Throwable e) {
+                e.printStackTrace();
                 state.getLogger().error("error initializing client", e);
                 initCalled = false;
                 clcCommands = null;
@@ -338,18 +341,25 @@ public class CLC implements QDLModuleMetaClass {
         public Object evaluate(Object[] objects, State state) throws Throwable {
             checkInit();
             clcCommands.exchange(argsToInputLine(getName(), objects));
+            if (Arrays.asList(objects).contains("-id")) {
+                // if they request an id token, return it.
+                QDLStem x = new QDLStem();
+                x.fromJSON(clcCommands.getClaims());
+                return x;
+            }
             return getTokens();
         }
 
         @Override
         public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
-            doxx.add(getName() + "([-rt | [-at ]] [-x] Do the token exchange.");
+            doxx.add(getName() + "([-rt | -at | -none] [-x] Do the token exchange.");
             doxx.add("returns: Both tokens, but the requested token is updated.");
             doxx.add("Arguments:");
             doxx.add("(None) = exchange the access token using the access token as the bearer token. Make sure it has not expired.");
-            doxx.add("-at = same as no arguments");
+            doxx.add("-at = explicitly request an access token");
             doxx.add("-rt = exchange refresh token, using the refresh token as the bearer token");
+            doxx.add("-none = do not request the return type, let the server use its default");
             doxx.add("-x = force using the refresh token as the bearer token");
             doxx.add("E.g.");
             doxx.add("exchange('-at', 'x');");
@@ -379,7 +389,8 @@ public class CLC implements QDLModuleMetaClass {
         }
         String[] strings = new String[]{};
         strings = args.toArray(strings);
-        return new InputLine(strings);
+        InputLine inputLine = new InputLine(strings);
+        return inputLine;
     }
 
     protected void handleException(Throwable t) {
@@ -407,7 +418,7 @@ public class CLC implements QDLModuleMetaClass {
 
         @Override
         public Object evaluate(Object[] objects, State state) throws Throwable {
-           checkInit();
+            checkInit();
             clcCommands.revoke(argsToInputLine(getName(), objects));
             return Boolean.TRUE;
         }
@@ -521,17 +532,17 @@ public class CLC implements QDLModuleMetaClass {
 
         @Override
         public int[] getArgCount() {
-            return new int[]{0,1};
+            return new int[]{0, 1};
         }
 
         @Override
         public Object evaluate(Object[] objects, State state) {
             checkInit();
-            if(objects.length == 0) {
+            if (objects.length == 0) {
                 return getTokens();
             }
-            if(!(objects[0] instanceof QDLStem)){
-               throw new IllegalArgumentException("the argument to " + getName() + " must be a stem");
+            if (!(objects[0] instanceof QDLStem)) {
+                throw new IllegalArgumentException("the argument to " + getName() + " must be a stem");
             }
             setTokens((QDLStem) objects[0]);
             return Boolean.TRUE;
@@ -540,15 +551,15 @@ public class CLC implements QDLModuleMetaClass {
         @Override
         public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
-            if(argCount == 0) {
+            if (argCount == 0) {
                 doxx.add(getName() + "() - return the current tokens.");
             }
-            if(argCount == 1){
+            if (argCount == 1) {
                 doxx.add(getName() + "(new_tokens.) - set the current access and refresh tokens");
                 doxx.add("Note that the stem has keys access_token and refresh_token and these entries");
                 doxx.add("are identical to the values returned by various calls. The output is true if successful.");
             }
-            doxx.add("note that "+getName() + "("+ getName() + ") will set the tokens to the current tokens.");
+            doxx.add("note that " + getName() + "(" + getName() + ") will set the tokens to the current tokens.");
             doxx.add("so this shows what the argument can be. A common construct is along the lines of");
             doxx.add("E.g.");
             doxx.add("old. := " + getName() + "();");
@@ -616,7 +627,9 @@ public class CLC implements QDLModuleMetaClass {
 
         @Override
         public Object evaluate(Object[] objects, State state) throws Throwable {
-            clcCommands = new OA2CLCCommands(true, state.getLogger(), new OA2CommandLineClient(state.getLogger()));
+            checkInit();
+            // Assume that the clc has been initialized first since otherwise it is impossible to load
+            // the file (e.g. assetStore is missing, debugger is missing etc.)
             clcCommands.read(argsToInputLine(getName(), objects));
             initCalled = true;
             return Boolean.TRUE;
@@ -625,8 +638,16 @@ public class CLC implements QDLModuleMetaClass {
         @Override
         public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
-            doxx.add(getName() + "(file) - read state previously saved by this client.");
-            doxx.add(getName() + "(file, '-p') - provision current client from this saved state (used by ersatz clients).");
+            switch (argCount) {
+                case 1:
+                    doxx.add(getName() + "(file) - read state previously saved by this client.");
+                    break;
+                case 2:
+                    doxx.add(getName() + "(file, '-p') - provision current client from this saved state (used by ersatz clients).");
+                    break;
+            }
+            doxx.add("NOTE: If you are going to read a configuration, make sure you initialize it first so that");
+            doxx.add("the asset store etc. are all found.");
             doxx.add(checkInitMessage);
             return doxx;
         }
@@ -1130,6 +1151,97 @@ public class CLC implements QDLModuleMetaClass {
                     break;
             }
 
+            return dd;
+        }
+    }
+
+    public static String VERBOSE_ON = "verbose_on";
+
+    public class VerboseOn implements QDLFunction {
+        @Override
+        public String getName() {
+            return VERBOSE_ON;
+        }
+
+        @Override
+        public int[] getArgCount() {
+            return new int[]{0, 1};
+        }
+
+        @Override
+        public Object evaluate(Object[] objects, State state) throws Throwable {
+            checkInit();
+            if (objects.length == 0) {
+                return clcCommands.isVerbose();
+            }
+            boolean oldValue = clcCommands.isVerbose();
+            if (objects[0] instanceof Boolean) {
+                clcCommands.set_verbose_on(new InputLine(((Boolean) objects[0]) ? "true" : "false"));
+                return oldValue;
+            }
+            throw new IllegalArgumentException("unknown argument for " + getName() + " of type " + (objects[0].getClass().getSimpleName()));
+        }
+
+        @Override
+        public List<String> getDocumentation(int argCount) {
+            List<String> dd = new ArrayList<>();
+            if (argCount == 0) {
+                dd.add(getName() + "() = query if verbose is on or not");
+            }
+            if (argCount == 1) {
+                dd.add(getName() + "(true|false) = toggle if verbose is on or not");
+            }
+            dd.add("verbose refers to printing a great deal of internal information of the workings ");
+            dd.add("of the CLC. Use it only if there is an issue that requires it");
+            return dd;
+        }
+    }
+
+    public static String JAVA_TRACE = "java_trace";
+
+    public class JavaTrace implements QDLFunction {
+        @Override
+        public String getName() {
+            return JAVA_TRACE;
+        }
+
+        @Override
+        public int[] getArgCount() {
+            return new int[]{0, 1};
+        }
+
+        @Override
+        public Object evaluate(Object[] objects, State state) throws Throwable {
+            checkInit();
+            boolean oldValue = DebugUtil.isEnabled() && DebugUtil.getDebugLevel() == DebugConstants.DEBUG_LEVEL_TRACE;
+            if (objects.length == 0) {
+                return oldValue;
+            }
+            if (objects[0] instanceof Boolean) {
+                if ((Boolean) objects[0]) {
+                    DebugUtil.setEnabled(true);
+                    DebugUtil.setDebugLevel(DebugUtil.DEBUG_LEVEL_TRACE);
+                } else {
+                    DebugUtil.setEnabled(false);
+                    DebugUtil.setDebugLevel(DebugUtil.DEBUG_LEVEL_OFF);
+                }
+                return oldValue;
+            }
+            throw new IllegalArgumentException("unknown argument for " + getName() + " of type " + (objects[0].getClass().getSimpleName()));
+
+        }
+
+        @Override
+        public List<String> getDocumentation(int argCount) {
+            List<String> dd = new ArrayList<>();
+            if (argCount == 0) {
+                dd.add(getName() + "() = query if java stack trace is on or not");
+            }
+            if (argCount == 1) {
+                dd.add(getName() + "(true|false) = toggle java stack traces");
+            }
+            dd.add("This is used for low-level debugging of Java, such as module development.");
+            dd.add("Unless you are a Java developer enabling it might result in out that does not make a lot of sense");
             return dd;
         }
     }

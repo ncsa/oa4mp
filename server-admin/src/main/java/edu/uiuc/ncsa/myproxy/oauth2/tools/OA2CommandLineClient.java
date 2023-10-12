@@ -40,7 +40,7 @@ public class OA2CommandLineClient extends CommandLineClient {
 
     @Override
     public ConfigurationLoader<? extends AbstractEnvironment> getLoader() {
-        return new OA2ClientLoader<>(getConfigurationNode());
+        return new OA2ClientLoader<>(getConfigurationNode(), getMyLogger());
     }
 
     public static void main(String[] args) {

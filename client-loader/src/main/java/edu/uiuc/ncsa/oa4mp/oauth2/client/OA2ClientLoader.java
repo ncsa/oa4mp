@@ -18,6 +18,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2ConfigurationLoaderUtils;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2TokenForge;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.client.*;
+import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
@@ -43,6 +44,15 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
 
     public OA2ClientLoader(ConfigurationNode node) {
         super(node);
+    }
+
+    /**
+     * Constructor to inject a logger. 
+     * @param node
+     * @param logger
+     */
+    public OA2ClientLoader(ConfigurationNode node, MyLoggingFacade logger ) {
+        super(node, logger);
     }
 
     @Override
@@ -84,7 +94,9 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
                             Provider<Client> clientProvider,
                             HashMap<String, String> constants) {
         try {
-            myLogger.setClassName("oa4mp-client"); // so it has a default name.
+            if(StringUtils.isTrivial(myLogger.getClassName())) {
+                myLogger.setClassName("oa4mp-client"); // so it has a default name.
+            }
             return (T) new OA2ClientEnvironment(
                     myLogger, constants,
                     getAccessTokenURI(),

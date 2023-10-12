@@ -1,0 +1,57 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   Tests an ersatz client for basic behavior on the fork. The clients
+   are
+   localhost:p1 = the provisioner
+   localhost:e1 = ersatz client #1
+
+   The provisioner uses keys to make its request as do the ersatz clients. This allows
+   hands off testing.
+
+   Note that the clients are configured with templates, not scripts and changing those
+   will strongly impact the tests.
+*/
+/* for running in the QDL workspace manually
+path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests';
+script_path(path ~ script_path());
+saved_cfg := '/tmp/ersatz1-test.json';
+script_load('local/rfc8693/provisioner.qdl', saved_cfg);
+clc#init('/home/ncsa/dev/csd/config/client-oa2.xml', 'localhost:e1');
+clc#read(saved_cfg , '-p'); // -p switch tell client that this is an ersatz client
+
+tokens. := clc#exchange(); // does fork
+
+*/
+path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests/';
+if[path∉script_path()][script_path(path ~ script_path());];
+saved_cfg := '/tmp/ersatz1-test.json';
+script_load('local/rfc8693/provisioner.qdl', saved_cfg);
+clc#init('/home/ncsa/dev/csd/config/client-oa2.xml', 'localhost:e1');
+clc#read(saved_cfg , '-p'); // -p switch tell client that this is an ersatz client
+old_tokens. := clc#tokens();
+
+old_id. := clc#claims();
+tokens. := clc#exchange('-none'); // forks flow
+at. := tokens.'access_token';
+rt. := tokens.'refresh_token';
+/*
+say('NEW at=\n' + print(at.));
+say('OLD at=\n' + print(old_tokens.'access_token'));
+say('NEW rt=\n' + print(rt.));
+say('OLD rt=\n' + print(old_tokens.'refresh_token'));
+*/
+⊨ at.'jti' != old_tokens.'access_token'.'jti' : 'Access token not swapped';
+⊨ rt.'jti' != old_tokens.'refresh_token'.'jti' : 'refresh token not swapped';
+⊨ at.'jwt'.'aud' == 'https://wlcg.cern.ch/jwt/v1/access1' : ' AT wrong audience';
+⊨ ∃ at.'jwt'.'scope' : 'AT missing scope claim';
+scopes. := tokenize(at.'jwt'.'scope', ' ');
+⊨ size(scopes.) == 2 : 'AT wrong number of scopes. Expected 2, got ' + size(scopes.);
+⊨ 'p.q' ∈ scopes. : 'AT missing capability scope';
+⊨ 'read:/Y/Q' ∈ scopes. : 'AT missing permission';
+⊨ at.'jwt'.'client_id' == 'localhost:e1' : ' AT wrong client id';
+
+id. := clc#exchange('-id');
+⊨ id.'sub' == 'jeff' : 'IDT wrong subject';
+⊨ id.'iat' != old_id.'iat' : 'IDT issued at not updated';
+say('Ersatz fork ok');

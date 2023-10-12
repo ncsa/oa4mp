@@ -73,6 +73,7 @@ public class TokenImpl implements NewToken {
         init(jti);
     }
 
+
     public TokenImpl(URI token) {
         this.token = token;
         this.jti = token;

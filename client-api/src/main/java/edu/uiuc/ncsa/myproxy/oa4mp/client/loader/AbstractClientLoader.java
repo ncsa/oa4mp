@@ -224,14 +224,16 @@ public abstract class AbstractClientLoader<T extends ClientEnvironment> extends 
             throw new IllegalArgumentException("Error: the " + ClientXMLTags.BASE_URI + " must be https. You have \"" + b + "\"");
         }
     }
-
+    String baseURI = null;
     protected String getBaseURI() {
-        String b = getCfgValue(ClientXMLTags.BASE_URI);
-        if (b == null || b.length() == 0) {
-            throw new IllegalArgumentException("Error: no " + ClientXMLTags.BASE_URI + " specified in the configuration file");
+        if(baseURI == null){
+            baseURI = getCfgValue(ClientXMLTags.BASE_URI);
+            if (baseURI == null || baseURI.length() == 0) {
+                throw new IllegalArgumentException("Error: no " + ClientXMLTags.BASE_URI + " specified in the configuration file");
+            }
+            checkProtocol(baseURI);
         }
-        checkProtocol(b);
-        return b;
+        return baseURI;
     }
 
     protected URI getAccessTokenURI() {

@@ -206,6 +206,10 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         return null;
     }
 
+    public boolean hasResource(){
+        return getState().containsKey(RESOURCE_KEY) && getState().get(RESOURCE_KEY)!=null;
+    }
+
     public void setResource(List<String> r) {
         getState().put(RESOURCE_KEY, r);
     }

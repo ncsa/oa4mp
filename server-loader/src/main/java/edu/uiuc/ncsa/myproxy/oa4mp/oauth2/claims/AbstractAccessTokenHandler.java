@@ -170,9 +170,15 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
 
                 JSONArray array = (JSONArray) claim;
                 for (int i = 0; i < array.size(); i++) {
-                    JSONObject jo = array.getJSONObject(i);
-                    if (jo.containsKey(Groups.GROUP_ENTRY_NAME)) {
-                        groupKeys.add(jo.getString(Groups.GROUP_ENTRY_NAME));
+                    // Fixes https://github.com/ncsa/oa4mp/issues/125
+                    // We may get back an entry of groups. Check it is aa JSON Object,
+                    // then check if it has the right structure
+                    Object unknownThingie = array.get(i);
+                    if(unknownThingie instanceof JSONObject) {
+                        JSONObject jo = (JSONObject) unknownThingie;
+                        if (jo.containsKey(Groups.GROUP_ENTRY_NAME)) {
+                            groupKeys.add(jo.getString(Groups.GROUP_ENTRY_NAME));
+                        }
                     }
                 }
                 if (!groupKeys.isEmpty()) {

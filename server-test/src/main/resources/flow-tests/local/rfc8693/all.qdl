@@ -1,0 +1,17 @@
+#! /usr/bin/env -S qdl-run
+// If you want to run an individual test, add the next two lines to it or none of the utilities
+// will be found.
+path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests';
+script_path(path ~ script_path());
+
+/*
+test.:=(path + '/local/rfc8693/') + ['ersatz1.qdl',
+                                    'ersatz.qdl'];
+*/
+test.:=[(path + '/local/rfc8693/') + 'ersatz1.qdl',
+        [(path + '/local/rfc8693/') +   'ersatz.qdl',true], // do exchange with access token
+        [(path + '/local/rfc8693/') +   'ersatz.qdl',false] // do exchange with refresh tokens
+        ];
+
+say('RFC 8693 (token exchange) and 𝕰𝖗s𝖆𝖙𝖟 client tests. These should run automated and require no manual input.');
+script_load('runner.qdl', test.);

@@ -7,15 +7,12 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.PayloadHandlerConfigImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ScriptRuntimeEngineFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.UITokenUtils;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.*;
 import edu.uiuc.ncsa.qdl.exceptions.AssertionException;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.oa4mp.delegation.server.request.IssuerResponse;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2ATException;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Errors;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2RedirectableError;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Scopes;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.JWTRunner;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.ScriptRuntimeException;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.UII2;
@@ -53,7 +50,12 @@ public class UserInfoServlet extends BearerTokenServlet {
             return;
         }
         TokenManagerServlet.State state = new TokenManagerServlet.State();
-        OA2ServiceTransaction transaction = findTransaction(at, state);
+        OA2ServiceTransaction transaction = null;
+        try {
+            transaction = findTransaction(at, state);
+        }catch(OA2GeneralError e){
+            e.setForensicMessage(e.getForensicMessage() + "\nerror in user info endpoint.");
+        }
         // Fix for CIL-1124
         if(!transaction.isAccessTokenValid()){
             // CIL-1638, https://www.rfc-editor.org/rfc/rfc6750 Errors relating to the bearer token require this header.

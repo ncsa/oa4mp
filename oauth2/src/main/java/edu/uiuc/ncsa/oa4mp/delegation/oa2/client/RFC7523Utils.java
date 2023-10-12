@@ -12,11 +12,13 @@ import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -40,6 +42,28 @@ public class RFC7523Utils implements RFC7523Constants {
         try {
 
             Map<String, Object> map = new HashMap<>();
+            // Scopes require a bit of surgery. It is possible they are sent as an
+            // unparsed string, but should be turned into a JSON array of strings.
+            if(parameters.containsKey(OA2Constants.SCOPE)){
+                Object obj = parameters.get(OA2Constants.SCOPE);
+                parameters.remove(OA2Constants.SCOPE);
+                JSONArray array;
+                if(obj instanceof JSONArray){
+                    array = (JSONArray) obj;
+                }
+                else{
+                   if(obj instanceof String){
+                       array = new JSONArray();
+                       StringTokenizer stringTokenizer = new StringTokenizer((String)obj, " ");
+                       while(stringTokenizer.hasMoreTokens()){
+                           array.add(stringTokenizer.nextToken());
+                       }
+                   }else{
+                       throw new IllegalArgumentException("unknown scope type of " + obj.getClass() + ": \"" + obj + "\"");
+                   }
+                }
+                map.put(OA2Constants.SCOPE, array);
+            }
             map.putAll(parameters);
             JSONWebKey key = findKey(oa2Client, keyID);
             if (key == null) {
@@ -69,11 +93,12 @@ public class RFC7523Utils implements RFC7523Constants {
 
 
          */
+
             request.put(OA2Claims.AUDIENCE, accessTokenEndpoint.toString()); // token endpoint.
             String payload = JWTUtil2.createJWT(request, key);
-            parameters.put(CILENT_ASSERTION, payload);
-            parameters.put(CILENT_ASSERTION_TYPE, ASSERTION_JWT_BEARER);
-            return serviceClient.doPost(parameters);
+            map.put(CILENT_ASSERTION, payload);
+            map.put(CILENT_ASSERTION_TYPE, ASSERTION_JWT_BEARER);
+            return serviceClient.doPost(map);
         } catch (Throwable t) {
             if (DebugUtil.isEnabled()) {
                 t.printStackTrace();

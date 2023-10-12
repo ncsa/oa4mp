@@ -102,7 +102,7 @@ follows.
 | cli.jar             | runnable jar for the CLI                                                       |
 | jwt.jar             | runnable jar for JSON web keys                                                 |
 | jwt-scripts.tar     | scripts for the JSON web keys utility                                          |
- | oa4mp-X.sql         | SQL creation scripts for database X, e.g., mysql, derby, etc.                  |
+| oa4mp-X.sql         | SQL creation scripts for database X, e.g., mysql, derby, etc.                  |
  | oa4mp-X.template    | sample subject and message templates for email notifications under OA4MP       |
 | oauth2.war          | the deployable war for Tomcat. This is actually OA4MP.                         |
  | oidc-cm-scripts.tar | command line utilities and sample scripts for using the client management API  |

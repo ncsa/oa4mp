@@ -1,0 +1,25 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   Provisions from the client with ID
+
+   localhost:p1
+
+   for sesatz tests. This takes a single argument, the file to write the state to.
+   Normally this is called by a test to do the provisioning, passing in the filename.
+
+*/
+path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests/local/rfc8693';
+if[path∉script_path()][script_path(path ~ script_path());];
+
+⊨ 0 < size(args()) : 'Missing file name';
+
+saved_cfg := args().0;
+params. ≔ {'sub':'jeff',
+         'scope':['openid', 'read:/X', 'read:/Y/Q', 'p.q'] // should be able to pass in scopes as a simple list
+         };
+clc#init('/home/ncsa/dev/csd/config/client-oa2.xml', 'localhost:p1');
+tokens. := clc#rfc7523(params.);
+rm(saved_cfg); // just in case
+clc#write(saved_cfg); // for reference later
+return(true);

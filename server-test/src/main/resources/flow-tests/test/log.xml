@@ -1,0 +1,32 @@
+Mar 07, 2023 8:16:53 AM edu.uiuc.ncsa.security.core.util.MyLoggingFacade info
+INFO: cli logger:Logging to file log.xml
+Mar 07, 2023 8:16:53 AM edu.uiuc.ncsa.security.core.util.MyLoggingFacade info
+INFO: cli logger:Config name = localhost:oa4mp.oa2.mariadb
+Mar 07, 2023 8:16:53 AM edu.uiuc.ncsa.security.core.util.MyLoggingFacade info
+INFO: cli logger:getting named configuration "localhost:oa4mp.oa2.mariadb"
+Mar 07, 2023 8:16:53 AM edu.uiuc.ncsa.security.core.util.MyLoggingFacade info
+INFO: cli logger:OAuth 2 for MyProxy, version 5.3.0 startup on Tue Mar 07 08:16:53 CST 2023
+Mar 07, 2023 8:16:53 AM edu.uiuc.ncsa.security.core.util.MyLoggingFacade info
+INFO: cli logger:loading configuration.
+Mar 07, 2023 8:16:54 AM edu.uiuc.ncsa.security.core.util.MyLoggingFacade info
+INFO: cli logger:ping enabled
+Mar 07, 2023 8:16:54 AM edu.uiuc.ncsa.security.core.util.MyLoggingFacade info
+INFO: cli logger:No claim source configuration found.
+Mar 07, 2023 8:16:54 AM edu.uiuc.ncsa.security.core.util.MyLoggingFacade info
+INFO: cli logger:Starting to load LDAP configuration.
+Mar 07, 2023 8:16:54 AM edu.uiuc.ncsa.security.core.util.MyLoggingFacade info
+INFO: cli logger:loaded JSON web keys from file "/home/ncsa/dev/csd/config/keys.jwk"
+Mar 07, 2023 8:16:54 AM edu.uiuc.ncsa.security.core.util.MyLoggingFacade info
+INFO: cli logger:1.4-QDL_SNAPSHOT startup on Tue Mar 07 08:16:54 CST 2023
+Mar 07, 2023 8:16:54 AM edu.uiuc.ncsa.security.core.util.MyLoggingFacade info
+INFO: cli logger:Refresh token support enabled
+Mar 07, 2023 8:16:54 AM edu.uiuc.ncsa.security.core.util.MyLoggingFacade info
+INFO: cli logger:Debugging is on
+Mar 07, 2023 8:16:54 AM edu.uiuc.ncsa.security.core.util.MyLoggingFacade info
+INFO: cli logger:No polling configured.
+Mar 07, 2023 8:16:54 AM edu.uiuc.ncsa.security.core.util.MyLoggingFacade info
+INFO: cli logger:Debug mode enabled.
+Mar 07, 2023 8:16:54 AM edu.uiuc.ncsa.security.core.util.MyLoggingFacade debug
+FINEST: cli logger:loaded myproxy configuration for tfcadev.ncsa.illinois.edu:7512
+Mar 07, 2023 8:16:54 AM edu.uiuc.ncsa.security.core.util.MyLoggingFacade debug
+FINEST: cli logger:loaded myproxy configuration for tfca2.ncsa.illinois.edu:7512

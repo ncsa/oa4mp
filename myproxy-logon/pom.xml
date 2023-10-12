@@ -17,7 +17,9 @@
         <additionalparam>-Xdoclint:none</additionalparam>
         <maven.javadoc.skip>true</maven.javadoc.skip>
     </properties>
-    <build>
+<!-- Removed from build 10/10/2023. After Java update this was mysteriously was taking many minutes to do.
+
+     <build>
         <plugins>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -47,7 +49,7 @@
 
 
         </plugins>
-    </build>
+    </build>-->
     <dependencies>
         <dependency>
             <groupId>commons-codec</groupId>

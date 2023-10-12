@@ -352,24 +352,34 @@ public class OA2MPService extends OA4MPService {
      * @param asset
      * @param subjectToken
      * @param additionalParameters
-     * @param getAT
+     * @param requestedTokenType
      * @return
      */
     public JSONObject exchangeRefreshToken(OA2Asset asset, TokenImpl subjectToken,
                                            Map additionalParameters,
-                                           boolean getAT,
+                                           int requestedTokenType,
                                            boolean subjectTokenIsAT) {
         HashMap<String, String> parameterMap = new HashMap<>();
         parameterMap.put(SUBJECT_TOKEN, subjectToken.getToken());
+
         if (subjectTokenIsAT) {
             parameterMap.put(SUBJECT_TOKEN_TYPE, ACCESS_TOKEN_TYPE);
         } else {
             parameterMap.put(SUBJECT_TOKEN_TYPE, REFRESH_TOKEN_TYPE);
         }
-        if (getAT) {
-            parameterMap.put(REQUESTED_TOKEN_TYPE, ACCESS_TOKEN_TYPE);
-        } else {
-            parameterMap.put(REQUESTED_TOKEN_TYPE, REFRESH_TOKEN_TYPE);
+        switch (requestedTokenType) {
+            case EXCHANGE_ACCESS_TOKEN:
+                parameterMap.put(REQUESTED_TOKEN_TYPE, ACCESS_TOKEN_TYPE);
+                break;
+            case EXCHANGE_REFRESH_TOKEN:
+                parameterMap.put(REQUESTED_TOKEN_TYPE, REFRESH_TOKEN_TYPE);
+                break;
+            case EXCHANGE_ID_TOKEN:
+                parameterMap.put(REQUESTED_TOKEN_TYPE, ID_TOKEN_TYPE);
+                break;
+            default:
+            case EXCHANGE_DEFAULT:
+                // do not set it
         }
 
         if (additionalParameters != null) {
@@ -377,6 +387,11 @@ public class OA2MPService extends OA4MPService {
         }
         return exchangeIt(asset, parameterMap);
     }
+
+    public final static int EXCHANGE_ID_TOKEN = 100;
+    public final static int EXCHANGE_ACCESS_TOKEN = 50;
+    public final static int EXCHANGE_REFRESH_TOKEN = 10;
+    public final static int EXCHANGE_DEFAULT = 0;
 
     /**
      * Use the access token to get another access token. This is certainly a supported case, but
@@ -432,14 +447,22 @@ public class OA2MPService extends OA4MPService {
         JSONWebKeys keys = JWTUtil2.getJsonWebKeys(serviceClient, ((OA2ClientEnvironment) getEnvironment()).getWellKnownURI());
         JSONObject j = null;
         try {
-            // See if its a SciToken
+            // See if it's a SciToken
             j = JWTUtil2.verifyAndReadJWT(rawToken, keys);
         } catch (Throwable t) {
             j = new JSONObject();
-            if (json.getString(ISSUED_TOKEN_TYPE).equals(REFRESH_TOKEN_TYPE)) {
-                j.put(REFRESH_TOKEN, rawToken);
-            } else {
-                j.put(OA2Constants.ACCESS_TOKEN, rawToken);
+            switch (json.getString(ISSUED_TOKEN_TYPE)) {
+                case REFRESH_TOKEN_TYPE:
+                    j.put(REFRESH_TOKEN, rawToken);
+                    break;
+                case ACCESS_TOKEN_TYPE:
+                    j.put(OA2Constants.ACCESS_TOKEN, rawToken);
+                    break;
+                case ID_TOKEN_TYPE:
+                    j.put(ID_TOKEN, rawToken);
+                    break;
+                default:
+                    throw new IllegalArgumentException("unknown token type \"" + json.getString(ISSUED_TOKEN_TYPE) + "\"");
             }
         }
         return j;
@@ -451,12 +474,76 @@ public class OA2MPService extends OA4MPService {
         ATServer2 atServer2 = (ATServer2) getEnvironment().getDelegationService().getAtServer();
         return atServer2.getServiceClient();
     }
+
     public ServiceClient getRFC8623ServiceClient() {
-        DS2 ds2 = (DS2)getEnvironment().getDelegationService();
+        DS2 ds2 = (DS2) getEnvironment().getDelegationService();
         return ds2.getRfc8623Server().getServiceClient();
     }
 
     protected void updateExchangedAsset(OA2Asset asset, JSONObject claims) {
+        NEWupdateExchangedAsset(asset, claims);
+    }
+
+    /**
+     * Note that NO verification is done for this! It will take a raw string and a flag and return
+     * a token (access or refresh)
+     *
+     * @param rawToken
+     * @param isRT
+     * @return
+     */
+    protected TokenImpl figureOutToken(String rawToken, boolean isRT) {
+        try {
+            JSONObject[] json = JWTUtil2.readJWT(rawToken);
+            URI jti = URI.create(json[JWTUtil2.PAYLOAD_INDEX].getString(OA2Claims.JWT_ID));
+            if (isRT) {
+                return new RefreshTokenImpl(rawToken, jti);
+            }
+            return new AccessTokenImpl(rawToken, jti);
+        } catch (IllegalArgumentException iax) {
+            // so this is not a JWT.
+        }
+        if (isRT) {
+            return new RefreshTokenImpl(URI.create(rawToken));
+        }
+        return new AccessTokenImpl(URI.create(rawToken));
+    }
+
+    protected void NEWupdateExchangedAsset(OA2Asset asset, JSONObject claims) {
+        boolean saveAsset = false;
+        if (claims.containsKey(ISSUED_TOKEN_TYPE)) {
+            String accessToken = claims.getString(ACCESS_TOKEN);
+            String refreshToken = null;
+            if (claims.containsKey(REFRESH_TOKEN)) {
+                refreshToken = claims.getString(REFRESH_TOKEN);
+            }
+            JSONObject idToken = null;
+            if (claims.get(ISSUED_TOKEN_TYPE).equals(ID_TOKEN_TYPE)) {
+                idToken = claims.getJSONObject(ACCESS_TOKEN); // This is re-used for ID token as per spec.
+                accessToken = ""; // zero it out so it is not mis-identified later
+            }
+            if (idToken != null && !idToken.isEmpty()) {
+                asset.setIdToken(idToken);
+                saveAsset = true;
+            }
+            if (accessToken != null && !accessToken.isEmpty()) {
+                asset.setAccessToken((AccessTokenImpl) figureOutToken(accessToken, false));
+                saveAsset = true;
+            }
+
+            // Then the returned token is a refresh token, as per spec.
+            if (refreshToken != null && !refreshToken.isEmpty()) {
+                asset.setRefreshToken((RefreshTokenImpl) figureOutToken(refreshToken, true));
+                saveAsset = true;
+            }
+        }
+
+        if (saveAsset) {
+            getEnvironment().getAssetStore().save(asset);
+        }
+    }
+
+    protected void OLDupdateExchangedAsset(OA2Asset asset, JSONObject claims) {
         boolean saveAsset = false;
         if (claims.containsKey(ISSUED_TOKEN_TYPE)) {
             String token = claims.getString(ACCESS_TOKEN);
@@ -526,7 +613,8 @@ public class OA2MPService extends OA4MPService {
         RFC7523Request request = new RFC7523Request();
         request.setKeyID(getEnvironment().getKid());
         request.setClient(getEnvironment().getClient());
-        request.setParameters(parameters);;
+        request.setParameters(parameters);
+        ;
         DS2 ds2 = (DS2) getEnvironment().getDelegationService();
         RFC7523Response response = ds2.rfc7523(request);
         JSONObject json = response.getResponse();

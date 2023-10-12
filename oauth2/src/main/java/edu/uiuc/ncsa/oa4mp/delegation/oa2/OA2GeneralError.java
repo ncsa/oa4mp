@@ -3,6 +3,9 @@ package edu.uiuc.ncsa.oa4mp.delegation.oa2;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClient;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 /**
  * This is for use places where there is no redirect url available. Examples are the userInfo and getCert endpoints for OA4MP.
  * It has an error and description but will be turned into a standard
@@ -138,7 +141,53 @@ public class OA2GeneralError extends GeneralException {
                 ", state='" + state + '\'' +
                 '}';
     }
-    public boolean asJSON(){
+
+    public boolean asJSON() {
         return false;
+    }
+
+    /**
+     * This is designed for a specific log message if there is an error. It will simply be
+     * printed as is. In many cases, constructing a message for the logs can really only
+     * sensibly be done locally and propagating the exception will not allow for a good
+     * message. One issue we find repeatedly is that misbehaving clients cause errors
+     * hence a good deal of state needs to be encoded to help track these down.<br/><br/>
+     * <p>A good forensic message should capture all that is needed to conclusively track down
+     * whatever the error is.</p>
+     *
+     * @return
+     */
+    public String getForensicMessage() {
+        return forensicMessage;
+    }
+
+    public void setForensicMessage(String forensicMessage) {
+        this.forensicMessage = forensicMessage;
+    }
+
+    String forensicMessage = null;
+
+    /**
+     * Appends the stack trace of this exception to the current {@link #forensicMessage}.
+     */
+    public void addStackTraceToFM() {
+        addStackTraceToFM(this);
+    }
+
+    /**
+     * Appends the stack trace of the given {@link Throwable} to the current {@link #forensicMessage}.
+     * @param t
+     */
+    public void addStackTraceToFM(Throwable t) {
+        StringWriter sw = new StringWriter();
+        t.printStackTrace(new PrintWriter(sw));
+        if (!hasForensicMessage()) {
+            forensicMessage = "";
+        }
+        forensicMessage = forensicMessage + "\n" + sw.toString();
+    }
+
+    public boolean hasForensicMessage() {
+        return forensicMessage != null;
     }
 }

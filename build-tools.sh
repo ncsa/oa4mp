@@ -3,7 +3,7 @@
 # If you have local installs of QDL and OA4MP, this will update them.
 #
 # The normal lifecycle is to invoke build.sh from this directory, then
-# if you want the tools, invoke this. Nothign will run unless try {
+# if you want the tools, invoke this. Nothing will run unless try {
 # detects various environment variables:
 # QDL_HOME
 # OA4MP_HOME

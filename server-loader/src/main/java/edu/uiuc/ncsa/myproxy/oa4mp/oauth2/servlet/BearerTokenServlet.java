@@ -28,12 +28,20 @@ import java.io.IOException;
  */
 public abstract class BearerTokenServlet extends MyProxyDelegationServlet {
 
+    /**
+     * Find the transaction associated with the access token. Note that this will not return
+     * a null, but will throw a general error that the token was not found.
+     * @param at
+     * @param state
+     * @return
+     * @throws IOException
+     */
     protected OA2ServiceTransaction findTransaction(AccessTokenImpl at, TokenManagerServlet.State state) throws IOException {
         // The access token is sent in the authorization header and should look like
            // Bearer oa4mp:...
 
 
-           // Need to look this up by its jti if its not a basic access token.
+           // Need to look this up by its jti if it's not a basic access token.
            OA2ServiceTransaction transaction = (OA2ServiceTransaction) getTransactionStore().get(new AccessTokenImpl(at.getJti()));
            OA2SE oa2SE = (OA2SE) getServiceEnvironment();
            // See if this is an exchanged token
@@ -42,10 +50,12 @@ public abstract class BearerTokenServlet extends MyProxyDelegationServlet {
                TXRecord oldTXR = (TXRecord) oa2SE.getTxStore().get(BasicIdentifier.newID(at.getJti()));
                if (oldTXR == null) {
                    ServletDebugUtil.trace(this, "No transaction found, no TXRecord found for access token = " + at);
-                   throw new OA2GeneralError(OA2Errors.INVALID_TOKEN,
+                   OA2GeneralError ge = new OA2GeneralError(OA2Errors.INVALID_TOKEN,
                            "token not found",
                            HttpStatus.SC_UNAUTHORIZED,
                            null);
+                   ge.setForensicMessage("Error getting exchange record for the access token \"" + at.getJti() + "\"");
+                   throw ge;
                }
                transaction = (OA2ServiceTransaction) getTransactionStore().get(oldTXR.getParentID());
 

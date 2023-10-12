@@ -1,6 +1,8 @@
 package edu.uiuc.ncsa.oa4mp.delegation.oa2;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.StringTokenizer;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -25,8 +27,8 @@ public interface OA2Scopes {
     /**
      * These are the basic scopes supported by the OA4MP OIDC protocol.
      */
-    String[] basicScopes = {SCOPE_EMAIL,SCOPE_MYPROXY, SCOPE_USER_INFO, SCOPE_CILOGON_INFO, SCOPE_OPENID, SCOPE_PROFILE};
-    String[] nonPublicScopes = {SCOPE_EMAIL,SCOPE_MYPROXY, SCOPE_CILOGON_INFO, SCOPE_PROFILE};
+    String[] basicScopes = {SCOPE_EMAIL, SCOPE_MYPROXY, SCOPE_USER_INFO, SCOPE_CILOGON_INFO, SCOPE_OPENID, SCOPE_PROFILE};
+    String[] nonPublicScopes = {SCOPE_EMAIL, SCOPE_MYPROXY, SCOPE_CILOGON_INFO, SCOPE_PROFILE};
 
 
     /**
@@ -45,12 +47,30 @@ public interface OA2Scopes {
 
         static Collection<String> scopes;
 
-        public static boolean hasScope(String targetScope){
-            for(String x : getScopes()){
-                if(x.equals(targetScope)) return true;
+        public static boolean hasScope(String targetScope) {
+            for (String x : getScopes()) {
+                if (x.equals(targetScope)) return true;
             }
             return false;
         }
 
+        /**
+         * return a collection from the given string of scopes. note that this applies the specification to
+         * parse the string, so all scopes are blank delimited.
+         *
+         * @param x
+         * @return
+         */
+        public static Collection<String> toScopes(String x) {
+            HashSet<String> out = new HashSet<>(); // ensures uniqueness
+            StringTokenizer st = new StringTokenizer(x, " ");
+            while (st.hasMoreTokens()) {
+                out.add(st.nextToken());
+            }
+            return out;
+
+        }
     }
+
+
 }

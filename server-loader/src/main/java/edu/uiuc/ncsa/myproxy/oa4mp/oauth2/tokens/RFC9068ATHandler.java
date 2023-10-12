@@ -43,7 +43,7 @@ public class RFC9068ATHandler extends AbstractAccessTokenHandler implements RFC9
             accessToken.put(AUTHENTICATION_TIME, transaction.getAuthTime().getTime() / 1000); // Must be in seconds.
         }
         // According to the spec., if there is a resource in the request, it should be used as the audience
-        if(!transaction.getResource().isEmpty()){
+        if(transaction.hasResource() && !transaction.getResource().isEmpty()){
             if(transaction.getResource().size()==1) {
                 accessToken.put(OA2Claims.AUDIENCE, transaction.getResource().get(0));
             }else{

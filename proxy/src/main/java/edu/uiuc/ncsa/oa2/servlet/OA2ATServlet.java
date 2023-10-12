@@ -215,12 +215,12 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             if (StringUtils.isTrivial(raw)) {
                 throw new OA2ATException(OA2Errors.INVALID_REQUEST, "missing json assertion");
             }
-            if(client.hasJWKS()) {
+            if (client.hasJWKS()) {
                 jsonRequest = JWTUtil2.verifyAndReadJWT(raw, client.getJWKS());
-            }else{
-                if(client.hasJWKSURI()){
+            } else {
+                if (client.hasJWKSURI()) {
                     jsonRequest = JWTUtil2.verifyAndReadJWT(raw, client.getJwksURI());
-                }else{
+                } else {
                     throw new OA2ATException(OA2Errors.INVALID_REQUEST, "missing JSON web key. Cannot verify signature."); // Not a JWT
                 }
             }
@@ -249,7 +249,10 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 scopes = (JSONArray) ss;
             } else {
                 scopes = new ArrayList<>();
-                scopes.add(ss.toString());
+                StringTokenizer stringTokenizer = new StringTokenizer(ss.toString(), " ");
+                while(stringTokenizer.hasMoreTokens()){
+                    scopes.add(stringTokenizer.nextToken());
+                }
             }
         } else {
             scopes = new ArrayList<>();
@@ -263,12 +266,12 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         serviceTransaction.setClient(client);
         serviceTransaction.setAuthTime(new Date()); // auth time is now.
         String user = jsonRequest.getString(OA2Claims.SUBJECT);
-        if(client.getServiceClientUsers().contains("*")){
+        if (client.getServiceClientUsers().contains("*")) {
             serviceTransaction.setUsername(user);
-        }else{
-            if(client.getServiceClientUsers().contains(user)){
+        } else {
+            if (client.getServiceClientUsers().contains(user)) {
                 serviceTransaction.setUsername(user);
-            }else{
+            } else {
                 throw new OA2ATException(OA2Errors.INVALID_REQUEST, "user \"" + user + "\" does not have permission");
             }
         }
@@ -309,7 +312,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         }
 
         serviceTransaction.setAccessTokenLifetime(ClientUtils.computeATLifetime(serviceTransaction, client, getOA2SE()));
-        if(jsonRequest.containsKey(OA2Constants.REFRESH_LIFETIME)){
+        if (jsonRequest.containsKey(OA2Constants.REFRESH_LIFETIME)) {
             String rawRTLifetime = jsonRequest.getString(OA2Constants.REFRESH_LIFETIME);
             try {
                 long at = ConfigUtil.getValueSecsOrMillis(rawRTLifetime);
@@ -687,12 +690,10 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
          */
         /*
         Topography of the store. Auth grants (called temp_token for historical reasons) are
-        unique identifiers. If there are for a flow with AG == A, then the new flow has
-        AG A&eid=hash where the has is a hash of the ersatz client ID (ensuring that the identifier
-        is unique and not too long to hit database limits for primary keys). Access tokens
-        and refresh tokens, however, are NOT unique in the database
+        unique identifiers. If there are for a flow with AG == A, then the new flow a
+        completely new AG. Access tokens and refresh tokens, however, are NOT unique in the database
          */
-
+        boolean isInitialErsatzExchange = false; // set true ONLY if this is an initial swap of a provisioner to ersats client.
         if (t == null) {
             debugger.trace(this, "transaction not found from credentials for client \""
                     + client.getIdentifierString() + "\", attempting to get transaction from the token itself");
@@ -710,6 +711,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                     }
                     break;
             }
+
             if (t != null) {
 
                 debugger.trace(this, "transaction found, checking for ersatz client:" + t.summary());
@@ -721,15 +723,15 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 Identifier pAdminID = null;
                 List<Identifier> pAdminIDS = pStore.getAdmins(t.getOA2Client().getIdentifier());
                 if (eAdminIDS.isEmpty()) {
-                    if(!pAdminIDS.isEmpty()){
+                    if (!pAdminIDS.isEmpty()) {
                         debugger.trace(this, "ersatz client is not managed, any place");
                         throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
                                 "no substitutions allowed for unmanaged clients",
                                 HttpStatus.SC_UNAUTHORIZED, null, t.getClient());
                     }
                 }
-                if(1 == eAdminIDS.size()){
-                    if(!pAdminIDS.contains(eAdminIDS.get(0))){ // we only care that the admin for the E client is also one for the P client
+                if (1 == eAdminIDS.size()) {
+                    if (!pAdminIDS.contains(eAdminIDS.get(0))) { // we only care that the admin for the E client is also one for the P client
                         throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
                                 "clients must be managed by same admin",
                                 HttpStatus.SC_UNAUTHORIZED, null, t.getClient());
@@ -762,12 +764,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 debugger.trace(this, "cloning transaction, setting up new flow");
 
                 OA2ServiceTransaction t2 = (OA2ServiceTransaction) getTransactionStore().getXMLConverter().fromMap(map, null);
-                //Identifier id = t2.getIdentifier();
-                //id = BasicIdentifier.newID(id.toString() + "&eid=" + DigestUtils.sha1Hex(client.getIdentifierString()));
-                //t2.setIdentifier(id);
-                // These must be unique to go into the store, but are immediately replaced below with a TX record.
-                // All that matters is they exist and be different from anything else present.
-                AuthorizationGrantImpl ag = (AuthorizationGrantImpl) getTF2().getAuthorizationGrant();
+                // now create a new AG
+                AuthorizationGrantImpl ag = (AuthorizationGrantImpl) getTF2().getAuthorizationGrant(); // new grant
                 AccessTokenImpl at = getTF2().getAccessToken();
                 RefreshTokenImpl rt = getTF2().getRefreshToken();
                 t2.setIdentifier(BasicIdentifier.newID(ag.getJti()));
@@ -789,11 +787,22 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 t2.setProvisioningAdminID(pAdminID);
                 t2.setClient(client);
                 t2.getUserMetaData().put(OA2Claims.AUDIENCE, client.getIdentifierString()); // so id token has right audience
-
+                if (client.isRTLifetimeEnabled()) {
+                    t2.setRefreshTokenLifetime(ClientUtils.computeRefreshLifetime(t2, client, getOA2SE()));
+                } else {
+                    t2.setRefreshTokenLifetime(0L);
+                }
+                JSONObject atData = t2.getATData();
+                if(atData.containsKey("client_id")){
+                    atData.put("client_id", client.getIdentifierString());
+                }
+                t2.setATData(atData);
+                t2.setAccessTokenLifetime(ClientUtils.computeATLifetime(t2, client, getOA2SE()));
                 debugger = MyProxyDelegationServlet.createDebugger(client); // switch over to logging for the 𝕰𝖗s𝖆𝖙𝖟 client.
                 getTransactionStore().save(t2);
                 // rock on. A new transaction has been created for this and the flow from the original may now diverge.
                 t = t2;
+                isInitialErsatzExchange = true; // Marks that the exchange was made here. This is needed later.
             }
         }
 
@@ -858,13 +867,13 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
          */
         XMLMap tBackup = GenericStoreUtils.toXML(getTransactionStore(), t);
         if (client.hasExtendedAttributeSupport()) {
-                ExtendedParameters xp = new ExtendedParameters();
-                // Take the parameters and parse them into configuration objects,
-                JSONObject extAttr = xp.snoopParameters(request.getParameterMap());
-                if (extAttr != null && !extAttr.isEmpty()) {
-                    t.setExtendedAttributes(extAttr);
-                }
+            ExtendedParameters xp = new ExtendedParameters();
+            // Take the parameters and parse them into configuration objects,
+            JSONObject extAttr = xp.snoopParameters(request.getParameterMap());
+            if (extAttr != null && !extAttr.isEmpty()) {
+                t.setExtendedAttributes(extAttr);
             }
+        }
         // In practice exactly one of these is active at any given time
         TXRecord newIDTX = null;
         TXRecord newATTX = null;
@@ -945,7 +954,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                      ersatzTXR.setLifetime(t.getRefreshTokenLifetime());
                      ersatzTXR.setIdentifier(BasicIdentifier.newID(rtiResponse.getAccessToken().getToken()));
                 }*/
-                rtiResponse.setRefreshToken(null); // no refresh token should get processed except in Ersatz case.
+                if (!isInitialErsatzExchange) {
+                    rtiResponse.setRefreshToken(null); // no refresh token should get processed except in Ersatz case.
+                }
                 debugger.trace(this, "Processed access token return type");
                 break;
             case RFC8693Constants.REFRESH_TOKEN_TYPE:
@@ -978,6 +989,22 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                         t.getRequestState());
         }
         activeTX.setExpiresAt(activeTX.getIssuedAt() + activeTX.getLifetime());
+        if (isInitialErsatzExchange) {
+            // Create TX record for refresh token
+            newRTTX = (TXRecord) oa2se.getTxStore().create();
+            newRTTX.setTokenType(RFC8693Constants.REFRESH_TOKEN_TYPE);
+            newRTTX.setParentID(t.getIdentifier());
+            newRTTX.setIssuedAt(System.currentTimeMillis());
+            newRTTX.setIdentifier(BasicIdentifier.newID(rtiResponse.getRefreshToken().getJti()));
+            t.setRefreshToken(rtiResponse.getRefreshToken()); // make sure it is not the ersatz client refresh token.
+            if (rtiResponse.getRefreshToken().isJWT()) {
+                rfcClaims.put(OA2Constants.REFRESH_TOKEN, rtiResponse.getRefreshToken().getToken());
+                newRTTX.setStoredToken(rtiResponse.getRefreshToken().getToken());
+            } else {
+                rfcClaims.put(OA2Constants.REFRESH_TOKEN, rtiResponse.getRefreshToken().encodeToken());
+            }
+            getOA2SE().getTxStore().save(newRTTX);
+        }
         JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2se, t, activeTX, t.getOA2Client().getConfig()));
         try {
             OA2ClientUtils.setupHandlers(jwtRunner, oa2se, t, client, newIDTX, newATTX, newRTTX, request);
@@ -1016,6 +1043,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             case RFC8693Constants.ID_TOKEN_TYPE:
                 rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getClaims());
         }
+
         debugger.trace(this, "rfc claims returned:" + rfcClaims.toString(1));
         /*
 
@@ -1026,6 +1054,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
          Our policy: access_token contains whatever the requested token is. Look at the returned_token_type
          to see what they got. As a convenience, if there is a refresh token, that will be returned as the
          refresh_token claim.
+
+         Ersatz clients should return both the access token and a new refresh token.
          */
 
         // The other components (access, refresh token) have responses that handle setting the encoding and
@@ -1055,6 +1085,18 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         if (newRTTX != null) {
             newRTTX.setValid(true);
             oa2se.getTxStore().save(newRTTX);
+        }
+        if (isInitialErsatzExchange) {
+            // TODO -- set the base scopes to be whatever was returned by any script and is currently in ATData.
+            HashSet<String> allowedScopes = new HashSet<>();
+            HashSet<String> newScopeSet = new HashSet<>();
+            allowedScopes.addAll(((OA2Client) t.getClient()).getScopes()); // Scopes the ersatz client is actually allowed
+            newScopeSet.addAll(t.getScopes()); // scopes that the provisioning client requested
+            newScopeSet.retainAll(allowedScopes);
+            t.setScopes(newScopeSet);
+            newScopeSet.addAll(OA2Scopes.ScopeUtil.toScopes(t.getATData().getString(OA2Constants.SCOPE)));
+            t.setScopes(newScopeSet); // ???? Is this right?  Does this ignore OIDC scopes, e.g. openid?
+            debugger.trace(this, "setting ersatz client scopes to " + newScopeSet);
         }
         getTransactionStore().save(t);
         PrintWriter osw = response.getWriter();
@@ -1540,13 +1582,13 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                     t.getRequestState());
         }
         if (client.hasExtendedAttributeSupport()) {
-                ExtendedParameters xp = new ExtendedParameters();
-                // Take the parameters and parse them into configuration objects,
-                JSONObject extAttr = xp.snoopParameters(request.getParameterMap());
-                if (extAttr != null && !extAttr.isEmpty()) {
-                    t.setExtendedAttributes(extAttr);
-                }
+            ExtendedParameters xp = new ExtendedParameters();
+            // Take the parameters and parse them into configuration objects,
+            JSONObject extAttr = xp.snoopParameters(request.getParameterMap());
+            if (extAttr != null && !extAttr.isEmpty()) {
+                t.setExtendedAttributes(extAttr);
             }
+        }
         AccessTokenImpl at = (AccessTokenImpl) t.getAccessToken();
         debugger.trace(this, "old access token = " + at.getToken());
         List<String> scopes = convertToList(request, OA2Constants.SCOPE);
@@ -1954,13 +1996,13 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         }
         checkSentScopes(request, response, transaction);
         if (client.hasExtendedAttributeSupport()) {
-                ExtendedParameters xp = new ExtendedParameters();
-                // Take the parameters and parse them into configuration objects,
-                JSONObject extAttr = xp.snoopParameters(request.getParameterMap());
-                if (extAttr != null && !extAttr.isEmpty()) {
-                    transaction.setExtendedAttributes(extAttr);
-                }
+            ExtendedParameters xp = new ExtendedParameters();
+            // Take the parameters and parse them into configuration objects,
+            JSONObject extAttr = xp.snoopParameters(request.getParameterMap());
+            if (extAttr != null && !extAttr.isEmpty()) {
+                transaction.setExtendedAttributes(extAttr);
             }
+        }
         // Logic is simple. If proxy, farm it out to the proxy and it works or doesn't.
         // otherwise, manage all the state for retries.
         if (getOA2SE().getAuthorizationServletConfig().isUseProxy()) {

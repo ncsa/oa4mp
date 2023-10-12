@@ -102,8 +102,23 @@ public class OA2CLCCommands extends CommonCommands {
         oa2CommandLineClient.setVerbose(!silentMode);
     }
 
-    protected MetaDebugUtil getDebugger() throws Exception {
-        return ((OA2ClientEnvironment) oa2CommandLineClient.getEnvironment()).getMetaDebugUtil();
+    MetaDebugUtil debugUtil = null;
+
+    public MetaDebugUtil getDebugger() throws Exception {
+        if (debugUtil == null) {
+            debugUtil = ((OA2ClientEnvironment) oa2CommandLineClient.getEnvironment()).getMetaDebugUtil();
+        }
+        return debugUtil;
+    }
+
+    /**
+     * Use this to explicitly override the debugger in the environment. This is needed if, e.g.
+     * QDL is running this as a utility and you want o have the same debugger.
+     *
+     * @param metaDebugUtil
+     */
+    public void setDebugUtil(MetaDebugUtil metaDebugUtil) {
+        debugUtil = metaDebugUtil;
     }
 
     public OA2CLCCommands(MyLoggingFacade logger,
@@ -218,16 +233,16 @@ public class OA2CLCCommands extends CommonCommands {
         }
         dummyAsset = (OA2Asset) getCe().getAssetStore().create();
 
-        OA2ClientEnvironment oa2ce =  getCe();
-        String rawResponse=null;
-        if(oa2ce.getClient().hasJWKS()){
+        OA2ClientEnvironment oa2ce = getCe();
+        String rawResponse = null;
+        if (oa2ce.getClient().hasJWKS()) {
             Map map = new HashMap();
             map.put(OA2Constants.SCOPE, oa2ce.scopesToString());
             rawResponse = RFC7523Utils.doPost(getService().getRFC8623ServiceClient(),
                     oa2ce.getClient(), oa2ce.getDeviceAuthorizationUri(),
-                    oa2ce.getKid(),map);
+                    oa2ce.getKid(), map);
 
-        }else{
+        } else {
             rawResponse = getService().getServiceClient().doGet(getRequestString(oa2ce),
                     oa2ce.getClient().getIdentifierString(),
                     oa2ce.getClient().getSecret());
@@ -748,7 +763,7 @@ public class OA2CLCCommands extends CommonCommands {
     }
 
     public void claims(InputLine inputLine) throws Exception {
-        if ( showHelp(inputLine)) {
+        if (showHelp(inputLine)) {
             showClaimsHelp();
             return;
         }
@@ -1273,9 +1288,11 @@ public class OA2CLCCommands extends CommonCommands {
 
 
     protected void exchangeHelp() {
-        sayi("exchange [-at|-rt] [-x]");
+        sayi("exchange [-at|-rt|-id|-none] [-x]");
         sayi("Usage: This will exchange the current access token (so you need to");
         sayi("   have gotten that far first) for a secure token.");
+        sayi("-at | -rt | -id | -none = explicitly request an access token, refresh token id token or do not specify a ");
+        sayi("     return token type, taking whatever the system uses for defaults (usually same as -at).");
         sayi("-x = use the refresh token as the subject token in the exchange. Default is to use ");
         sayi("     the same type as the requested token. This will fail if requesting an access token");
         sayi("     with one that has expired.");
@@ -1301,22 +1318,28 @@ public class OA2CLCCommands extends CommonCommands {
         }
         lastException = null;
         try {
-            boolean requestAT = 1 == inputLine.size() || inputLine.hasArg("-at"); // if default or no args
-
-            boolean subjectTokenIsAT = true;
-            if (inputLine.hasArg("-x")) {
-                subjectTokenIsAT = false;
-            } else {
-                subjectTokenIsAT = requestAT;
+            int requestedTokenType = OA2MPService.EXCHANGE_DEFAULT;
+            if (0 < inputLine.size()) {
+                if (inputLine.hasArg("-at")) {
+                    requestedTokenType = OA2MPService.EXCHANGE_ACCESS_TOKEN;
+                }
+                if (inputLine.hasArg("-rt")) {
+                    requestedTokenType = OA2MPService.EXCHANGE_REFRESH_TOKEN;
+                }
+                if (inputLine.hasArg("-none")) {
+                    requestedTokenType = OA2MPService.EXCHANGE_DEFAULT;
+                }
+                if (inputLine.hasArg("-id")) {
+                    requestedTokenType = OA2MPService.EXCHANGE_ID_TOKEN ;
+                }
             }
+
+            boolean subjectTokenIsAT = !inputLine.hasArg("-x"); // so true if no -x
             TokenImpl subjectToken = null;
             // NOTE ATServer2 class is slightly broken in that it sets the JTI to be the token
             // This fixes it, but this code should be moved there, along with the resolveFromToken method
             // Since it only really affects the CLC, it has a low priority though.
             if (subjectTokenIsAT) {
-                //          subjectToken = getDummyAsset().getAccessToken();
-
-
                 JSONObject token = resolveFromToken(getDummyAsset().getAccessToken(), true);
                 if (token == null) {
                     subjectToken = getDummyAsset().getAccessToken();
@@ -1336,16 +1359,24 @@ public class OA2CLCCommands extends CommonCommands {
                 }
             }
 
-            getService().exchangeRefreshToken(getDummyAsset(),
+           JSONObject json = getService().exchangeRefreshToken(getDummyAsset(),
                     subjectToken,
                     exchangeParameters,
-                    requestAT, subjectTokenIsAT);
+                    requestedTokenType,
+                    subjectTokenIsAT);
             // Note that the call updates the asset, so we don't need to look at the response,
             // just print th right thing.
-            if (requestAT) {
-                printToken(getDummyAsset().getAccessToken(), false, true);
-            } else {
-                printToken(getDummyAsset().getRefreshToken(), false, true);
+            switch (requestedTokenType) {
+                case OA2MPService.EXCHANGE_REFRESH_TOKEN:
+                    printToken(getDummyAsset().getRefreshToken(), false, true);
+                    break;
+                case OA2MPService.EXCHANGE_ACCESS_TOKEN:
+                case OA2MPService.EXCHANGE_DEFAULT:
+                    printToken(getDummyAsset().getAccessToken(), false, true);
+                    break;
+                case OA2MPService.EXCHANGE_ID_TOKEN:
+                    claims = json.getJSONObject(ID_TOKEN); // update the claims we got back.
+                    claims(new InputLine("claims"));
             }
         } catch (Throwable t) {
             lastException = t;
@@ -1933,7 +1964,7 @@ public class OA2CLCCommands extends CommonCommands {
     String shortSwitchBlurb = "Short values of switches are allowed: " +
             SHORT_REQ_PARAM_SWITCH + " | " +
             SHORT_TOKEN_PARAM_SWITCH + " | " +
-            SHORT_REFRESH_PARAM_SWITCH +" | " +
+            SHORT_REFRESH_PARAM_SWITCH + " | " +
             SHORT_EXCHANGE_PARAM_SWITCH;
 
     public void rm_param(InputLine inputLine) throws Exception {
@@ -2011,25 +2042,37 @@ public class OA2CLCCommands extends CommonCommands {
     public void user_info(InputLine inputLine) throws Exception {
         get_user_info(inputLine);
     }
-    public String USERNAME_FLAG = "-user" ;
+
+    public String USERNAME_FLAG = "-user";
+
     public JSONObject rfc7523(Map parameters) throws Exception {
         clear(new InputLine(), false); // start by clearing everything but current parameters,
         dummyAsset = (OA2Asset) getCe().getAssetStore().create();
         JSONArray array = new JSONArray();
         array.addAll(getCe().getScopes());
-        if(!parameters.containsKey(SCOPE)){parameters.put(SCOPE, array);}
-        if(!parameters.containsKey(REDIRECT_URI)){parameters.put(REDIRECT_URI, getCe().getCallback().toString());}
-        if(!parameters.containsKey(NONCE)){parameters.put(NONCE, NonceHerder.createNonce());}
-        if(!parameters.containsKey(OA2Claims.SUBJECT)){parameters.put(OA2Claims.SUBJECT, getCe().getClient().getIdentifierString());}
+        if (!parameters.containsKey(SCOPE)) {
+            parameters.put(SCOPE, array);
+        }
+        if (!parameters.containsKey(REDIRECT_URI)) {
+            parameters.put(REDIRECT_URI, getCe().getCallback().toString());
+        }
+        if (!parameters.containsKey(NONCE)) {
+            parameters.put(NONCE, NonceHerder.createNonce());
+        }
+        if (!parameters.containsKey(OA2Claims.SUBJECT)) {
+            parameters.put(OA2Claims.SUBJECT, getCe().getClient().getIdentifierString());
+        }
         JSONObject jsonObject = getService().rfc7523(getDummyAsset(), parameters);
         rawIdToken = jsonObject.getString(ID_TOKEN);
         claims = JWTUtil.readJWT(rawIdToken)[1]; // just read it.
         return jsonObject;
     }
+
     public void rfc7523(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
-            say("rfc7523 [" + USERNAME_FLAG + "user_name]- make and RFC 7523 request to the service.");
+            say("rfc7523 [" + USERNAME_FLAG + " user_name]- make an RFC 7523 request to the service.");
             say("This is compliant with section 2.1, and is in effect an authorization grant.");
+            say("Note that parameters set with the -a flag are passed along.");
             say(USERNAME_FLAG + " - if present, set the subject of the request (hence the username) to this,");
             say("   If missing, the default subject will be the client ID.");
             return;
@@ -2040,10 +2083,13 @@ public class OA2CLCCommands extends CommonCommands {
         }
         Map parameters = new HashMap();
         String username = null;
-        if(inputLine.hasArg(USERNAME_FLAG)){
+        if (inputLine.hasArg(USERNAME_FLAG)) {
             username = inputLine.getNextArgFor(USERNAME_FLAG);
             inputLine.removeSwitchAndValue(USERNAME_FLAG);
-            parameters.put(SCOPE, username);
+            parameters.put(OA2Claims.SUBJECT, username);
+        }
+        for (String x : getRequestParameters().keySet()) {
+            parameters.put(x, getRequestParameters().get(x));
         }
         rfc7523(parameters);
         if (isPrintOuput()) {
