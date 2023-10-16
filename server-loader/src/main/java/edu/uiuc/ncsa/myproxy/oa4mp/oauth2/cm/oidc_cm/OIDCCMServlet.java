@@ -327,6 +327,7 @@ public class OIDCCMServlet extends EnvServlet {
         OA2ClientKeys clientKeys = (OA2ClientKeys) getOA2SE().getClientStore().getMapConverter().getKeys();
         json.put(clientKeys.extendsProvisioners(), client.isExtendsProvisioners());
         json.put(clientKeys.ersatzClient(), client.isErsatzClient());
+        json.put(clientKeys.ersatzInheritIDToken(), client.isErsatzInheritIDToken());
         //CIL-1321 inheritance
         if (client.hasPrototypes()) {
             JSONArray jsonArray = new JSONArray();
@@ -1227,6 +1228,9 @@ public class OIDCCMServlet extends EnvServlet {
             }
             if (jsonRequest.containsKey(clientKeys.ersatzClient())) {
                 client.setErsatzClient(jsonRequest.getBoolean(clientKeys.ersatzClient()));
+            }
+            if(jsonRequest.containsKey(clientKeys.ersatzInheritIDToken())){
+                client.setErsatzInheritIDToken(jsonRequest.getBoolean(clientKeys.ersatzInheritIDToken()));
             }
             if(jsonRequest.containsKey(ERSATZ_CLIENT_PROVISIONERS)){
                 JSONArray array;

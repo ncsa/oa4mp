@@ -59,13 +59,26 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
      * @return
      */
     public JSONObject getAtData() {
-        return transaction.getATData();
+        if (atData == null) {
+            if (getPhCfg().hasTXRecord() && getPhCfg().getTxRecord().hasToken()) {
+                atData = getPhCfg().getTxRecord().getToken();
+            } else {
+                atData = transaction.getATData();
+            }
+            if (atData == null) {
+                // Edge case
+                atData = new JSONObject();
+            }
+        }
+        //return transaction.getATData();
+        return atData;
     }
 
-    JSONObject atData;
+    JSONObject atData = null;
 
     public void setAtData(JSONObject atData) {
-        transaction.setATData(atData);
+        this.atData = atData;
+        //transaction.setATData(atData);
     }
 
     @Override
@@ -174,7 +187,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
                     // We may get back an entry of groups. Check it is aa JSON Object,
                     // then check if it has the right structure
                     Object unknownThingie = array.get(i);
-                    if(unknownThingie instanceof JSONObject) {
+                    if (unknownThingie instanceof JSONObject) {
                         JSONObject jo = (JSONObject) unknownThingie;
                         if (jo.containsKey(Groups.GROUP_ENTRY_NAME)) {
                             groupKeys.add(jo.getString(Groups.GROUP_ENTRY_NAME));
@@ -302,8 +315,8 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
         debugger.trace(this, "starting AT handler finish with transaction =" + transaction.summary());
         JSONObject atData = getAtData();
         if (getPhCfg().hasTXRecord()) {
-            // Fixes CIL-971
             TXRecord txRecord = getPhCfg().getTxRecord();
+            // Fixes CIL-971
             if (RFC8693Constants.ACCESS_TOKEN_TYPE.equals(txRecord.getTokenType())) {
                 atData.put(JWT_ID, txRecord.getIdentifierString());
             }
@@ -345,9 +358,13 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
                 atData.put(SUBJECT, transaction.getUserMetaData().getString(SUBJECT));
             }
         }
-        
+
         doServerVariables(atData);
-        setAtData(atData);
+        setAtData(atData); // If these are updated by the server variable, update.
+        if (getPhCfg().hasTXRecord()) {
+            getPhCfg().getTxRecord().setToken(getAtData());
+            getPhCfg().getTxRecord().setLifetime(proposedLifetime);
+        }
         transaction.setAccessTokenLifetime(proposedLifetime);
     }
 

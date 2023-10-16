@@ -50,5 +50,8 @@ public interface OIDCServiceTransactionInterface {
     public JSONObject getProxyState();
 
     public void setProxyState(JSONObject proxyState);
+    
+    public String getIDTokenIdentifier();
+    public void setIDTokenIdentifier(String idTokenIdentifier);
 }
 

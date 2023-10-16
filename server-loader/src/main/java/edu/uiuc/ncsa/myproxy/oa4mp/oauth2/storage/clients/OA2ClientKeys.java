@@ -22,6 +22,7 @@ public class OA2ClientKeys extends ClientKeys {
     String dfInterval="df_interval";
     String dfLifetime="df_lifetime";
     String ersatzClient="ersatz_client";
+    String ersatzInheritIDToken = "ersatz_inherit_id_token";
     String extended_attributes = "extended_attributes";
     String extendsProvisioners = "extends_provisioners";
     String forwardScopesToProxy = "forward_scopes_to_proxy";
@@ -51,6 +52,11 @@ public class OA2ClientKeys extends ClientKeys {
     public String proxyRequestScopes(String... x) {
            if (0 < x.length) proxyRequestScopes = x[0];
            return proxyRequestScopes;
+       }
+
+    public String ersatzInheritIDToken(String... x) {
+           if (0 < x.length) ersatzInheritIDToken = x[0];
+           return ersatzInheritIDToken;
        }
 
     public String forwardScopesToProxy(String... x) {

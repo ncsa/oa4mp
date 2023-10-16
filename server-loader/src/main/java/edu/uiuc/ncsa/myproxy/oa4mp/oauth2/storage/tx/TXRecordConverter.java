@@ -1,14 +1,16 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
+import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.storage.data.ConversionMap;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
 import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -20,15 +22,25 @@ import java.util.ArrayList;
 public class TXRecordConverter<V extends TXRecord> extends MapConverter<V> {
     public TXRecordConverter(SerializationKeys keys,
                              IdentifiableProvider<V> provider,
+                             TXStore txStore,
                              ClientStore<? extends OA2Client> clientStore) {
         super(keys, provider);
         this.clientStore = clientStore;
+        this.txStore = txStore;
     }
+
+    TXStore<? extends TXRecord> txStore;
 
     protected TXRecordSerializationKeys tkeys() {
         return (TXRecordSerializationKeys) getKeys();
     }
+
     ClientStore<? extends OA2Client> clientStore;
+
+    @Override
+    public TXRecordSerializationKeys getKeys() {
+        return (TXRecordSerializationKeys) super.getKeys();
+    }
 
     @Override
     public V fromMap(ConversionMap<String, Object> map, V v) {
@@ -39,14 +51,21 @@ public class TXRecordConverter<V extends TXRecord> extends MapConverter<V> {
             txr.setAudience(a);
         }
         txr.setParentID(map.getIdentifier(tkeys().parentID()));
-        if(map.containsKey(tkeys().ersatzID())){
+        if (map.containsKey(tkeys().ersatzID())) {
             txr.setErsatzClient(clientStore.get(BasicIdentifier.newID(map.getString(tkeys().ersatzID()))));
+        }
+        if (map.containsKey(getKeys().previousTXRecord)) {
+            Identifier previousID = BasicIdentifier.newID(map.getString(tkeys().previousTXRecord()));
+            txr.setPreviousTXR(txStore.get(previousID));
+        }
+        if(map.containsKey(getKeys().token())){
+            txr.setToken(JSONObject.fromObject(map.getString(getKeys().token())));
         }
         txr.setExpiresAt(map.getLong(tkeys().expiresAt()));
         txr.setLifetime(map.getLong(tkeys().lifetime()));
         txr.setIssuedAt(map.getLong(tkeys().issuedAt()));
         txr.setTokenType(map.getString(tkeys().tokenType()));
-        if(map.containsKey(tkeys().storedToken())){
+        if (map.containsKey(tkeys().storedToken())) {
             txr.setStoredToken(map.getString(tkeys().storedToken()));
         }
         if (map.containsKey(tkeys().issuer()) && map.get(tkeys().issuer()) != null) {
@@ -84,12 +103,18 @@ public class TXRecordConverter<V extends TXRecord> extends MapConverter<V> {
         data.put(tkeys().expiresAt(), value.getExpiresAt());
         data.put(tkeys().isValid(), value.isValid());
         data.put(tkeys().tokenType(), value.getTokenType());
-        if(value.getErsatzClient()!=null){
+        if (value.getErsatzClient() != null) {
             data.put(tkeys().ersatzID(), value.getErsatzClient().getIdentifierString());
         }
-       if(value.getStoredToken()!=null){
-           data.put(tkeys().storedToken(), value.getStoredToken());
-       }
+        if(value.getPreviousTXR() != null){
+            data.put(tkeys().previousTXRecord(), value.getPreviousTXR().getIdentifierString());
+        }
+        if(value.getToken()!= null){
+            data.put(tkeys().token(), value.getToken().toString());
+        }
+        if (value.getStoredToken() != null) {
+            data.put(tkeys().storedToken(), value.getStoredToken());
+        }
         if (value.hasScopes()) {
             JSONArray array;
             if (value.getScopes() instanceof JSONArray) {
@@ -115,7 +140,7 @@ public class TXRecordConverter<V extends TXRecord> extends MapConverter<V> {
             // Have to convert or the JSON library serializes uris into complex JSON objects which
             // are not interoperable with other JSON libraries.  This way if we ever change libraries,
             // the system does not break.
-            for(URI uri : value.getResource()){
+            for (URI uri : value.getResource()) {
                 array.add(uri.toString());
             }
             data.put(tkeys().resource(), array.toString());

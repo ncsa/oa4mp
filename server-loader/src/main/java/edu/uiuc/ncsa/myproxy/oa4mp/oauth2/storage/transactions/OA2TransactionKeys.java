@@ -19,6 +19,8 @@ public class OA2TransactionKeys extends DSTransactionKeys {
     protected String atJWT = "at_jwt";
     protected String authzGrantLifetime = "authz_grant_lifetime";
     protected String expiresIn = "expires_in";
+    // https://github.com/ncsa/oa4mp/issues/128
+    protected String idTokenIdentifier  = "id_token_identifier";
     protected String isRFC8628  = "is_rfc_8628";
     protected String proxyID  = "proxy_id";
     protected String refreshToken = "refresh_token";
@@ -33,6 +35,11 @@ public class OA2TransactionKeys extends DSTransactionKeys {
     /*
      If you add keys or change these, you need to update TransactionStemMC or QDL support will break
      */
+    public String idTokenIdentifier(String... x) {
+        if (0 < x.length) idTokenIdentifier = x[0];
+        return idTokenIdentifier;
+    }
+
     public String rtJWT(String... x) {
         if (0 < x.length) rtJWT = x[0];
         return rtJWT;

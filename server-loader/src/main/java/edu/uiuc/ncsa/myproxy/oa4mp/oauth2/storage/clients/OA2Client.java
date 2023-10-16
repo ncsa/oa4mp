@@ -750,5 +750,24 @@ public class OA2Client extends Client implements OA2ClientScopes {
 
     long rtGracePeriod = OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_USE_SERVER_DEFAULT;
 
+    /**
+     * If this is an ersatz client, should it inherit the id token of its provisioner
+     * when forking the flow? If true, then yes, if false, then no.
+     * <p>There are many times when the ersatz client needs some information in the
+     * id token of the provisioner (such as job id or other accounting information) and
+     * times when no information should be shared. Since this is generally undecideable,
+     * a flag si supplied.</p>
+     * @return
+     */
+    public boolean isErsatzInheritIDToken() {
+        return ersatzInheritIDToken;
+    }
+
+    public void setErsatzInheritIDToken(boolean ersatzInheritIDToken) {
+        this.ersatzInheritIDToken = ersatzInheritIDToken;
+    }
+
+    boolean ersatzInheritIDToken = true;
+
 }
 

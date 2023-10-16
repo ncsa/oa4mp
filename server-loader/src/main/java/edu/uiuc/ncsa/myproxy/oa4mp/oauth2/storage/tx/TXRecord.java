@@ -4,11 +4,13 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.qdl.xml.XMLConstants;
 import edu.uiuc.ncsa.qdl.xml.XMLUtilsV2;
 import edu.uiuc.ncsa.security.core.DateComparable;
+import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.IdentifiableImpl;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
@@ -25,7 +27,7 @@ import static edu.uiuc.ncsa.qdl.xml.XMLUtils.readStemAsStrings;
  * <p>Created by Jeff Gaynor<br>
  * on 12/14/20 at  8:54 AM
  */
-public class TXRecord extends IdentifiableImpl implements DateComparable {
+public class TXRecord extends IdentifiableImpl implements Identifiable, Cloneable, DateComparable {
     /*
     Note that this should not be serialized since it is really just the date form of the issued at attribute
      */
@@ -57,6 +59,42 @@ public class TXRecord extends IdentifiableImpl implements DateComparable {
     }
 
     String storedToken = null;
+
+    /**
+     * The TXRecord that was this TXRecord updates. In a token exchange, this is the TXRecord
+     * of the last token. If this is null, the token was updated directly from the transaction
+     * and that should be used.
+     * @return
+     */
+    public TXRecord getPreviousTXR() {
+        return previousTXR;
+    }
+
+    public void setPreviousTXR(TXRecord previousTXR) {
+        this.previousTXR = previousTXR;
+    }
+
+    TXRecord previousTXR = null;
+
+    /**
+     * The un-encoded token {@link #getStoredToken()}. In JWTs this is the payload (for header.payload.signature).
+     * @return
+     */
+    public JSONObject getToken() {
+        return token;
+    }
+
+    public void setToken(JSONObject token) {
+        this.token = token;
+    }
+
+    JSONObject token = null;
+    public boolean hasToken(){
+        return token!=null;
+    }
+    public boolean hasPreviousTX(){
+        return previousTXR!=null;
+    }
 
     public Identifier getParentID() {
         return parentID;

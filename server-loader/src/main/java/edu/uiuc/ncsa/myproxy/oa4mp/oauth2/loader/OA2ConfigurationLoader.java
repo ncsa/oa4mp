@@ -1516,7 +1516,8 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
 
     protected Provider<TXStore> getTXStoreProvider() {
         TXRecordProvider txRecordProvider = new TXRecordProvider(null, (OA2TokenForge) getTokenForgeProvider().get());
-        TXRecordConverter txRecordConverter = new TXRecordConverter(new TXRecordSerializationKeys(), txRecordProvider, getClientStoreProvider().get());
+        TXRecordConverter txRecordConverter = new TXRecordConverter(new TXRecordSerializationKeys(), txRecordProvider,
+                getTXStoreProvider().get(), getClientStoreProvider().get());
         return getTXStoreProvider(txRecordProvider, txRecordConverter);
     }
 

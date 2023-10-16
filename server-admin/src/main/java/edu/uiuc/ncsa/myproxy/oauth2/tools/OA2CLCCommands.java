@@ -1288,12 +1288,14 @@ public class OA2CLCCommands extends CommonCommands {
 
 
     protected void exchangeHelp() {
-        sayi("exchange [-at|-rt|-id|-none] [-x]");
+        sayi("exchange [-at|-rt|-id|-none] [-subject at | rt | id]");
         sayi("Usage: This will exchange the current access token (so you need to");
         sayi("   have gotten that far first) for a secure token.");
         sayi("-at | -rt | -id | -none = explicitly request an access token, refresh token id token or do not specify a ");
         sayi("     return token type, taking whatever the system uses for defaults (usually same as -at).");
-        sayi("-x = use the refresh token as the subject token in the exchange. Default is to use ");
+        sayi("-subject at|rt|id = which type of token to use as the subject. Access, Refresh or ID.");
+        sayi("     NOTE: The default is to use the access token. If that has expired, the request fails.");
+        sayi("-x = (deprected, use -subject rt) use the refresh token as the subject token in the exchange. Default is to use ");
         sayi("     the same type as the requested token. This will fail if requesting an access token");
         sayi("     with one that has expired.");
         sayi("The response will contain other information that will be displayed.");
@@ -1306,12 +1308,17 @@ public class OA2CLCCommands extends CommonCommands {
     }
 
     JSONObject sciToken = null;
-
+    /*
+    Testing for exchange:
+    load localhost:p1
+    set_param -a scope "read:/X read:/Y/Q p.q"
+     */
     public void exchange(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             exchangeHelp();
             return;
         }
+
         if (getCe() == null) {
             say("Oops! No configuration has been loaded.");
             return;
@@ -1322,48 +1329,92 @@ public class OA2CLCCommands extends CommonCommands {
             if (0 < inputLine.size()) {
                 if (inputLine.hasArg("-at")) {
                     requestedTokenType = OA2MPService.EXCHANGE_ACCESS_TOKEN;
+                    inputLine.removeSwitch("-at");
                 }
                 if (inputLine.hasArg("-rt")) {
                     requestedTokenType = OA2MPService.EXCHANGE_REFRESH_TOKEN;
+                    inputLine.removeSwitch("-tt");
                 }
                 if (inputLine.hasArg("-none")) {
                     requestedTokenType = OA2MPService.EXCHANGE_DEFAULT;
+                    inputLine.removeSwitch("-none");
                 }
                 if (inputLine.hasArg("-id")) {
-                    requestedTokenType = OA2MPService.EXCHANGE_ID_TOKEN ;
+                    requestedTokenType = OA2MPService.EXCHANGE_ID_TOKEN;
+                    inputLine.removeSwitch("-id");
                 }
             }
 
-            boolean subjectTokenIsAT = !inputLine.hasArg("-x"); // so true if no -x
+            String subjectTokenType = null; // default, use the access token as the subject
             TokenImpl subjectToken = null;
+            JSONObject token = null;
+            String tt = null; // subject token type used in switch below.
+            if (inputLine.hasArg("-subject")) {
+                tt = inputLine.getNextArgFor("-subject");
+                inputLine.removeSwitchAndValue("-subject");
+            } else {
+                // legacy
+                if (inputLine.hasArg("-x")) {
+                    tt = "rt";
+                } else {
+                    // Contract is that no specified subject token means use the one requested
+                    switch(requestedTokenType){
+                        default:
+                        case OA2MPService.EXCHANGE_ACCESS_TOKEN:
+                            tt = "at";
+                            break;
+                        case OA2MPService.EXCHANGE_REFRESH_TOKEN:
+                            tt = "rt";
+                            break;
+                        case OA2MPService.EXCHANGE_ID_TOKEN:
+                            tt = "id";
+                            break;
+                    }
+                }
+            }
+
+            switch (tt) {
+                case "at":
+                    subjectTokenType = ACCESS_TOKEN;
+                    token = resolveFromToken(getDummyAsset().getAccessToken(), true);
+                    if (token == null) {
+                        subjectToken = getDummyAsset().getAccessToken();
+                    } else {
+                        subjectToken = new AccessTokenImpl(getDummyAsset().getAccessToken().getToken(),
+                                URI.create(token.getString(OA2Claims.JWT_ID)));
+                    }
+                    break;
+                case "rt":
+                    subjectTokenType = REFRESH_TOKEN;
+                    token = resolveFromToken(getDummyAsset().getRefreshToken(), true);
+                    if (token == null) {
+                        subjectToken = getDummyAsset().getRefreshToken();
+                    } else {
+                        subjectToken = new RefreshTokenImpl(getDummyAsset().getRefreshToken().getToken(),
+                                URI.create(token.getString(OA2Claims.JWT_ID)));
+                    }
+                    break;
+                case "id":
+                    subjectTokenType = ID_TOKEN;
+                    subjectToken = new IDTokenImpl(rawIdToken, URI.create(claims.getString(OA2Claims.JWT_ID)));
+                    break;
+                default:
+                    throw new IllegalArgumentException("unknown token type \"" + tt + "\"");
+
+            }
+            if(subjectToken == null){
+                say("missing subject token -- did you get an access token first?");
+                return;
+            }
             // NOTE ATServer2 class is slightly broken in that it sets the JTI to be the token
             // This fixes it, but this code should be moved there, along with the resolveFromToken method
             // Since it only really affects the CLC, it has a low priority though.
-            if (subjectTokenIsAT) {
-                JSONObject token = resolveFromToken(getDummyAsset().getAccessToken(), true);
-                if (token == null) {
-                    subjectToken = getDummyAsset().getAccessToken();
-                } else {
-                    subjectToken = new AccessTokenImpl(getDummyAsset().getAccessToken().getToken(),
-                            URI.create(token.getString(OA2Claims.JWT_ID)));
-                }
 
-            } else {
-
-                JSONObject token = resolveFromToken(getDummyAsset().getRefreshToken(), true);
-                if (token == null) {
-                    subjectToken = getDummyAsset().getRefreshToken();
-                } else {
-                    subjectToken = new RefreshTokenImpl(getDummyAsset().getRefreshToken().getToken(),
-                            URI.create(token.getString(OA2Claims.JWT_ID)));
-                }
-            }
-
-           JSONObject json = getService().exchangeRefreshToken(getDummyAsset(),
+            JSONObject json = getService().exchangeRefreshToken(getDummyAsset(),
                     subjectToken,
                     exchangeParameters,
                     requestedTokenType,
-                    subjectTokenIsAT);
+                    subjectTokenType);
             // Note that the call updates the asset, so we don't need to look at the response,
             // just print th right thing.
             switch (requestedTokenType) {

@@ -133,15 +133,19 @@ OAuth 1, deprecated.
 formerly used in cases of error.]]>
        </body>
     </entry>
-    <entry id="ersatz_client">
-       <body>
-<![CDATA[Property: Boolean. (false)
-This denotes that this client is an ersatz client and may be used
-to take over a flow from a provisioning client. Note that if this is set true, then
-attempts to start a flow with this client will fail. Ersatz clients cannot start flows.
-  ]]>
-       </body>
-    </entry>
+
+    <entry id="ersatz_inherit_id_token">
+          <body>
+<![CDATA[Property: Boolean. (true)
+On provisioning the ersatz client (i.e. when forking), should the provisioner's
+ID token be inherited by the ersatz client? Since sometimes this is necessary
+(e.g. the id token contains job submission information) and other times
+not (e.g. the id token contains personal information about the person
+who is provisioning the flow) this is always undecideable and must be
+set. The default is true, so the ersatz client does inherit.
+]]>
+          </body>
+       </entry>
 <entry id="XAs">
 <body>
 <![CDATA[Extended Attributes.

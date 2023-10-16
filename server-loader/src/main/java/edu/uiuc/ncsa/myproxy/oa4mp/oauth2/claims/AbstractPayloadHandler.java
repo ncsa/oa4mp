@@ -32,7 +32,6 @@ import static edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse.RC_NOT_RUN
 public abstract class AbstractPayloadHandler implements PayloadHandler, OA2Scopes {
     protected OA2ServiceTransaction transaction;
     protected OA2SE oa2se;
-    protected JSONObject claims;
     protected HttpServletRequest request;
 
     public PayloadHandlerConfigImpl getPhCfg() {
@@ -56,7 +55,6 @@ public abstract class AbstractPayloadHandler implements PayloadHandler, OA2Scope
         ServletDebugUtil.trace(this, "payload handler cfg=" + phCfg);
         ServletDebugUtil.trace(this, "transaction =" + transaction.summary());
         ServletDebugUtil.trace(this, "has OA2SE? " + (oa2se != null));
-        claims = null; // use lazy initialization
     }
 
     @Override

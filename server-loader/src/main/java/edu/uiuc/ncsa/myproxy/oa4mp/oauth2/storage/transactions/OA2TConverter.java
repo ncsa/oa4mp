@@ -48,7 +48,7 @@ public class OA2TConverter<V extends OA2ServiceTransaction> extends TransactionC
 
         if (refreshToken == null) {
             st.setRefreshToken(null);
-        }else{
+        } else {
             if (refreshToken instanceof RefreshToken) {
                 st.setRefreshToken((RefreshToken) refreshToken);
             } else {
@@ -70,15 +70,16 @@ public class OA2TConverter<V extends OA2ServiceTransaction> extends TransactionC
                 st.setAuthorizationGrant(ag);
             }
         }
-        if(map.containsKey(getTCK().atJWT())){
+        if (map.containsKey(getTCK().atJWT())) {
             st.setATJWT(map.getString(getTCK().atJWT()));
         }
-        if(map.containsKey(getTCK().rtJWT())){
+        if (map.containsKey(getTCK().rtJWT())) {
             st.setRTJWT(map.getString(getTCK().rtJWT()));
         }
 
         st.setUserCode(map.getString(getTCK().userCode()));
         st.setRFC8628Request(map.getBoolean(getTCK().isRFC8628()));
+        st.setIDTokenIdentifier(map.getString(getTCK().idTokenIdentifier()));
         st.setProxyId(map.getString(getTCK().proxyID()));
         st.setAuthGrantLifetime(map.getLong(getTCK().authzGrantLifetime()));
         st.setRefreshTokenValid(map.getBoolean(getTCK().refreshTokenValid()));
@@ -88,7 +89,7 @@ public class OA2TConverter<V extends OA2ServiceTransaction> extends TransactionC
         st.setNonce(map.getString(getTCK().nonce()));
         st.setRequestState(map.getString(getTCK().reqState()));
         // https://github.com/rcauth-eu/OA4MP/commit/9dc129a679d7d701fdbba7173363e4aa82adcd2a
-        if(map.get(getTCK().validatedScopes())!=null){
+        if (map.get(getTCK().validatedScopes()) != null) {
             JSONArray json = (JSONArray) JSONSerializer.toJSON(map.get(getTCK().validatedScopes()));
             Collection<String> zzz = (Collection<String>) JSONSerializer.toJava(json);
             st.setValidatedScopes(zzz);
@@ -155,10 +156,10 @@ public class OA2TConverter<V extends OA2ServiceTransaction> extends TransactionC
         if (t.getCallback() != null) {
             map.put(getTCK().callbackUri(), t.getCallback().toString());
         }
-        if(!StringUtils.isTrivial(t.getATJWT())){
+        if (!StringUtils.isTrivial(t.getATJWT())) {
             map.put(getTCK().atJWT(), t.getATJWT());
         }
-        if(!StringUtils.isTrivial(t.getRTJWT())){
+        if (!StringUtils.isTrivial(t.getRTJWT())) {
             map.put(getTCK().rtJWT(), t.getRTJWT());
         }
 
@@ -166,13 +167,16 @@ public class OA2TConverter<V extends OA2ServiceTransaction> extends TransactionC
         map.put(getTCK().expiresIn(), t.getAccessTokenLifetime());
         map.put(getTCK().refreshTokenLifetime(), t.getRefreshTokenLifetime());
         map.put(getTCK().isRFC8628(), t.isRFC8628Request());
-        if(!isTrivial(t.getProxyId())){
+        if (!isTrivial(t.getIDTokenIdentifier())) {
+            map.put(getTCK().idTokenIdentifier(), t.getIDTokenIdentifier());
+        }
+        if (!isTrivial(t.getProxyId())) {
             map.put(getTCK().proxyID(), t.getProxyId());
         }
         if (!isTrivial(t.getUserCode())) {
             map.put(getTCK().userCode(), t.getUserCode());
         }
-        if(!t.getValidatedScopes().isEmpty()){
+        if (!t.getValidatedScopes().isEmpty()) {
             JSONArray jsonArray = new JSONArray();
             jsonArray.addAll(t.getValidatedScopes());
             map.put(getTCK().validatedScopes(), jsonArray.toString());
@@ -180,7 +184,7 @@ public class OA2TConverter<V extends OA2ServiceTransaction> extends TransactionC
         if (!isTrivial(t.getNonce())) {
             map.put(getTCK().nonce(), t.getNonce());
         }
-        if(!isTrivial(t.getRequestState())){
+        if (!isTrivial(t.getRequestState())) {
             map.put(getTCK().reqState(), t.getRequestState());
         }
         JSONArray jsonArray = new JSONArray();

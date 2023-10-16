@@ -55,7 +55,7 @@ clc#tokens(tokens.);
 clc#refresh();
 // RT tests
 tt1. := exchange('-rt'); // refresh_token has new RT
-tt2. := exchange('-at', '-x'); // access_token has new RT
+tt2. := exchange('-at', '-subject', 'rt'); // access_token has new RT
 tokens.'access_token' := tt2.'access_token';
 tokens.'refresh_token' := tt1.'refresh_token';
 clc#tokens(tokens.);

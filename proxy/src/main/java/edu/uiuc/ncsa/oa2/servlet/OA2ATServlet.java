@@ -250,7 +250,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             } else {
                 scopes = new ArrayList<>();
                 StringTokenizer stringTokenizer = new StringTokenizer(ss.toString(), " ");
-                while(stringTokenizer.hasMoreTokens()){
+                while (stringTokenizer.hasMoreTokens()) {
                     scopes.add(stringTokenizer.nextToken());
                 }
             }
@@ -666,7 +666,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         //CIL-974
         JSONWebKeys keys = OA2TokenUtils.getKeys(oa2se, client);
         debugger.trace(this, "got web keys, getting transaction from the client id in the request");
-
+        IDTokenImpl idToken = null;
         switch (subjectTokenType) {
             case RFC8693Constants.ACCESS_TOKEN_TYPE:
                 accessToken = OA2TokenUtils.getAT(subjectToken, oa2se, keys, debugger);
@@ -678,7 +678,11 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 t = (OA2ServiceTransaction) rts.get(refreshToken, client.getIdentifier());
                 break;
             case RFC8693Constants.ID_TOKEN_TYPE:
-                throw new OA2ATException(OA2Errors.INVALID_GRANT, "ID token exchange not supported", t.getRequestState());
+                idToken = OA2TokenUtils.getIDToken(subjectToken, oa2se, keys, debugger);
+                t = ((OA2TStoreInterface) getTransactionStore()).getByIDTokenID(BasicIdentifier.newID(idToken.getJti()));
+                break;
+            default:
+                throw new NFWException("unknown subject type \"" + subjectTokenType + "\"");
         }
         /*
          New 𝕰𝖗s𝖆𝖙𝖟 clients: It is possible that if there is no transaction at this point, a substitution
@@ -793,7 +797,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                     t2.setRefreshTokenLifetime(0L);
                 }
                 JSONObject atData = t2.getATData();
-                if(atData.containsKey("client_id")){
+                if (atData.containsKey("client_id")) {
                     atData.put("client_id", client.getIdentifierString());
                 }
                 t2.setATData(atData);
@@ -815,6 +819,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 }
                 if (refreshToken != null) {
                     t = OA2TokenUtils.getTransactionFromTX(oa2se, refreshToken, debugger);
+                }
+                if (idToken != null) {
+                    t = OA2TokenUtils.getTransactionFromTX(oa2se, idToken, debugger);
                 }
             } catch (OA2GeneralError oa2GeneralError) {
                 if (!(debugger instanceof ClientDebugUtil)) {
@@ -882,6 +889,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         switch (requestedTokenType) {
             case RFC8693Constants.ID_TOKEN_TYPE:
                 newIDTX = (TXRecord) oa2se.getTxStore().create();
+                newIDTX.setIdentifier(((OA2TokenForge) oa2se.getTokenForge()).getIDTokenProvider().get());
                 newIDTX.setTokenType(requestedTokenType);
                 newIDTX.setParentID(t.getIdentifier());
                 newIDTX.setIssuedAt(System.currentTimeMillis());
@@ -974,14 +982,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             case RFC8693Constants.ID_TOKEN_TYPE:
                 rfcClaims.put(RFC8693Constants.ISSUED_TOKEN_TYPE, RFC8693Constants.ID_TOKEN_TYPE); // Required. This is the type of token issued (mostly access tokens). Must be as per TX spec.
                 rfcClaims.put(OA2Constants.TOKEN_TYPE, RFC8693Constants.TOKEN_TYPE_N_A); // Required. This is how the issued token can be used, mostly. BY RFC 6750 spec.
-                JSONObject md = t.getUserMetaData();
-                if (md.containsKey(OA2Claims.EXPIRATION) && md.containsKey(OA2Claims.ISSUED_AT)) {
-                    long exp = md.getLong(OA2Claims.EXPIRATION) - md.getLong(OA2Claims.ISSUED_AT);
-                    rfcClaims.put(OA2Constants.EXPIRES_IN, exp / 1000); // internal in ms., external in sec.
-                    activeTX.setLifetime(exp); // in ms.
-                }
-                activeTX.setIdentifier(BasicIdentifier.newID(md.getString(OA2Claims.JWT_ID)));
-                debugger.trace(this, "Processed id token return type");
+                // Have to run handlers to update ID token.
                 break;
             default:
                 throw new OA2ATException(OA2Errors.INVALID_REQUEST,
@@ -1041,6 +1042,16 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 }
                 break;
             case RFC8693Constants.ID_TOKEN_TYPE:
+                JSONObject md = rtiResponse.getClaims();
+                activeTX.setStoredToken(md.toString());
+                md.put(OA2Claims.JWT_ID, activeTX.getIdentifier().toString()); // reset the returned ID.
+                if (md.containsKey(OA2Claims.EXPIRATION) && md.containsKey(OA2Claims.ISSUED_AT)) {
+                    long exp = md.getLong(OA2Claims.EXPIRATION) - md.getLong(OA2Claims.ISSUED_AT);
+                    rfcClaims.put(OA2Constants.EXPIRES_IN, exp / 1000); // internal in ms., external in sec.
+                    activeTX.setLifetime(exp); // in ms.
+                }
+
+                debugger.trace(this, "Processed id token return type");
                 rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getClaims());
         }
 
@@ -1388,6 +1399,10 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         debugger.trace(this, "got access token for transaction=" + st2.summary());
         // only do this before last save, so if the whole thing bombs, they can try again
         st2.setAuthGrantValid(false);
+        // https://github.com/ncsa/oa4mp/issues/128
+        if (st2.getUserMetaData().containsKey(OA2Claims.JWT_ID)) {
+            st2.setIDTokenIdentifier(st2.getUserMetaData().getString(OA2Claims.JWT_ID));
+        }
         getTransactionStore().save(st2);
         // Check again after doing token claims in case a script changed it.
         // If they fail at this point, access it denied and the tokens are invalidated.
@@ -1607,6 +1622,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                     "Refresh tokens are not supported on this server.",
                     t.getRequestState());
         }
+
         RTIRequest rtiRequest = new RTIRequest(request, t, at, oa2SE.isOIDCEnabled());
         RTI2 rtIssuer = new RTI2(getTF2(), MyProxyDelegationServlet.getServiceEnvironment().getServiceAddress());
 
@@ -1652,6 +1668,11 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         txRT.setIdentifier(BasicIdentifier.newID(t.getRefreshToken().getToken()));
         txRT.setValid(0 != oa2SE.getRtGracePeriod()); // Zero means invalidate
         long actualRTExpiration = t.getRefreshToken().getIssuedAt() + t.getRefreshTokenLifetime();
+
+        TXRecord txIDT = (TXRecord) oa2SE.getTxStore().create();
+        txIDT.setTokenType(RFC8693Constants.ID_TOKEN_TYPE);
+        txIDT.setParentID(t.getIdentifier());
+        txIDT.setIdentifier(((OA2TokenForge) getOA2SE().getTokenForge()).getIDTokenProvider().get()); // new ID
 
         if (0 <= oa2SE.getRtGracePeriod()) {
             // If this is non-negative, then it has been configured. Not configured = let everything expire normally.
@@ -1735,10 +1756,23 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             t.setATJWT(rtiResponse.getAccessToken().getToken());
             txAT.setStoredToken(rtiResponse.getAccessToken().getToken());
         }
-
+        // https://github.com/ncsa/oa4mp/issues/128
+        // Using a new identifier for the ID token means that it is stored in a TX
+        // record. We do this here.
+        JSONObject newIDToken = rtiResponse.getClaims();
+        newIDToken.put(OA2Claims.JWT_ID, txIDT.getIdentifier().toString());
+        t.setIDTokenIdentifier(txIDT.getIdentifier().toString()); // make sure this gets updated.
+        txIDT.setValid(true);
+        txIDT.setStoredToken(newIDToken.toString());
+        txIDT.setExpiresAt(newIDToken.getLong(OA2Claims.EXPIRATION) * 1000); // stored in claim as seconds
+        txIDT.setIssuedAt(System.currentTimeMillis());
+        txIDT.setScopes(t.getValidatedScopes());
+        txIDT.setToken(rtiResponse.getClaims());
+        t.setUserMetaData(newIDToken);
         getTransactionStore().save(t);
         oa2SE.getTxStore().save(txAT);
         oa2SE.getTxStore().save(txRT);
+        oa2SE.getTxStore().save(txIDT);
         debugger.trace(this, "transaction saved for " + t.getIdentifierString());
 
         /*

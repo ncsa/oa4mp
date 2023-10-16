@@ -355,17 +355,25 @@ public class OA2MPService extends OA4MPService {
      * @param requestedTokenType
      * @return
      */
-    public JSONObject exchangeRefreshToken(OA2Asset asset, TokenImpl subjectToken,
+    public JSONObject exchangeRefreshToken(OA2Asset asset,
+                                           TokenImpl subjectToken,
                                            Map additionalParameters,
                                            int requestedTokenType,
-                                           boolean subjectTokenIsAT) {
+                                           String subjectType) {
         HashMap<String, String> parameterMap = new HashMap<>();
         parameterMap.put(SUBJECT_TOKEN, subjectToken.getToken());
-
-        if (subjectTokenIsAT) {
-            parameterMap.put(SUBJECT_TOKEN_TYPE, ACCESS_TOKEN_TYPE);
-        } else {
-            parameterMap.put(SUBJECT_TOKEN_TYPE, REFRESH_TOKEN_TYPE);
+        switch (subjectType){
+            case ACCESS_TOKEN:
+                parameterMap.put(SUBJECT_TOKEN_TYPE, ACCESS_TOKEN_TYPE);
+                break;
+            case REFRESH_TOKEN:
+                parameterMap.put(SUBJECT_TOKEN_TYPE, REFRESH_TOKEN_TYPE);
+                break;
+            case ID_TOKEN:
+                parameterMap.put(SUBJECT_TOKEN_TYPE, ID_TOKEN_TYPE);
+                break;
+            default:
+                throw new IllegalArgumentException("unknown subject type \"" + subjectType + "\"");
         }
         switch (requestedTokenType) {
             case EXCHANGE_ACCESS_TOKEN:

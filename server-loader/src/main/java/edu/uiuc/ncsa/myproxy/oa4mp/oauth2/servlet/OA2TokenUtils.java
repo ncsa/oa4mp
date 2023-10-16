@@ -9,6 +9,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VirtualOrganization;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.ClientDebugUtil;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClient;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.IDTokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenUtils;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.*;
@@ -82,7 +83,7 @@ public class OA2TokenUtils {
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
                     "invalid access token",
                     HttpStatus.SC_BAD_REQUEST,
-                    null, (debugger instanceof ClientDebugUtil?((ClientDebugUtil)debugger).getClient():null));
+                    null, (debugger instanceof ClientDebugUtil ? ((ClientDebugUtil) debugger).getClient() : null));
         }
         debugger.trace(OA2TokenUtils.class, "access token from subject token = " + accessToken);
 
@@ -92,12 +93,12 @@ public class OA2TokenUtils {
         t = (OA2ServiceTransaction) oa2se.getTransactionStore().get(accessToken);
         if (t == null) {
             t = getTransactionFromTX(oa2se, accessToken.getJti(), debugger);
-            if(t!=null){
+            if (t != null) {
                 TXRecord txRecord = (TXRecord) oa2se.getTxStore().get(BasicIdentifier.newID(accessToken.getJti()));
                 isAtValid = txRecord.isValid();
                 isATExpired = txRecord.getExpiresAt() < System.currentTimeMillis();
             }
-        }else{
+        } else {
             isAtValid = t.isAccessTokenValid();
             isATExpired = accessToken.isExpired();
         }
@@ -136,6 +137,38 @@ public class OA2TokenUtils {
     }
 
     /**
+     * Given the raw token (which is <b>only</b> a JWT), recover the ID token.
+     *
+     * @param subjectToken
+     * @param oa2SE
+     * @param keys
+     * @param debugger
+     * @return
+     */
+    public static IDTokenImpl getIDToken(String subjectToken, OA2SE oa2SE, JSONWebKeys keys, MetaDebugUtil debugger) {
+        IDTokenImpl idToken;
+        try {
+            JSONObject tt = JWTUtil.verifyAndReadJWT(subjectToken, keys);
+            idToken = new IDTokenImpl(subjectToken, URI.create(tt.getString(JWT_ID)));
+            debugger.trace(OA2TokenUtils.class, "created ID token with id = " + idToken.getJti());
+            return idToken;
+        } catch (JSONException | IllegalArgumentException tt) {
+            debugger.trace(OA2TokenUtils.class, "Failed to parse ID token as JWT:" + tt.getMessage());
+            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                    "Unable to parse JSON object:" + tt.getMessage(),
+                    HttpStatus.SC_BAD_REQUEST,
+                    null);
+        } catch (InvalidSignatureException | InvalidAlgorithmException | UnsupportedJWTTypeException tt) {
+            // This is benign and may just mean that the format of the token is not a JWT. Only flog it on debug
+            debugger.trace(OA2TokenUtils.class, "Failed to verify refresh token JWT: \"" + tt.getMessage());
+            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                    "invalid refresh token:" + tt.getMessage(),
+                    HttpStatus.SC_BAD_REQUEST,
+                    null);
+        }
+    }
+
+    /**
      * Takes the subjectToken from the raw input (performing a base 32 decoding if needed)
      * and returns the refresh token.
      *
@@ -165,7 +198,7 @@ public class OA2TokenUtils {
                     null);
         }
         debugger.trace(OA2TokenUtils.class, "refresh token from subject token = " + refreshToken);
-        OA2ServiceTransaction t=null;
+        OA2ServiceTransaction t = null;
         boolean isRTValid = false;
         boolean isRTExpired = true;
         try {
@@ -183,7 +216,7 @@ public class OA2TokenUtils {
         } catch (Throwable tt) {
             // This is serious. It means that there was a problem getting the transaction vs. the transaction did not exist.
             debugger.error(OA2TokenUtils.class, "error getting refresh token:" + refreshToken.getJti() + " message:" + tt.getMessage());
-            throw new OA2ATException(OA2Errors.INVALID_GRANT, "invalid refresh token", (t== null?(BaseClient)null:t.getClient()));
+            throw new OA2ATException(OA2Errors.INVALID_GRANT, "invalid refresh token", (t == null ? (BaseClient) null : t.getClient()));
         }
         if (t == null) {
             BaseClient ccc = null;
@@ -197,7 +230,7 @@ public class OA2TokenUtils {
                 oa2SE.getMyLogger().info("client " + clientDebugUtil.getClient().getIdentifierString() + ",  transaction not found for \"" + refreshToken + "\"");
             }
             debugger.trace(OA2TokenUtils.class, "Transaction not found for \"" + refreshToken.getJti() + "\"");
-            throw new OA2ATException(OA2Errors.INVALID_GRANT, "invalid refresh token",ccc==null?(BaseClient)null:ccc);
+            throw new OA2ATException(OA2Errors.INVALID_GRANT, "invalid refresh token", ccc == null ? (BaseClient) null : ccc);
 
         } else {
 
@@ -242,6 +275,10 @@ public class OA2TokenUtils {
         return getTransactionFromTX(oa2se, refreshToken.getJti(), debugger);
     }
 
+    public static OA2ServiceTransaction getTransactionFromTX(OA2SE oa2se, IDTokenImpl idToken, MetaDebugUtil debugger) throws IOException {
+        return getTransactionFromTX(oa2se, idToken.getJti(), debugger);
+    }
+
     protected static OA2ServiceTransaction getTransactionFromTX(OA2SE oa2se, URI jti, MetaDebugUtil debugger) {
         TXRecord txRecord = (TXRecord) oa2se.getTxStore().get(BasicIdentifier.newID(jti));
         if (txRecord == null) {
@@ -261,7 +298,7 @@ public class OA2TokenUtils {
             }
             throw new OA2ATException(OA2Errors.INVALID_TOKEN,
                     "invalid token",
-                    (String)null);
+                    (String) null);
         }
         if (txRecord.getExpiresAt() < System.currentTimeMillis()) {
             if (debugger != null) {
@@ -269,7 +306,7 @@ public class OA2TokenUtils {
             }
             throw new OA2ATException(OA2Errors.INVALID_TOKEN,
                     "token expired",
-                    (String)null);
+                    (String) null);
         }
         return (OA2ServiceTransaction) oa2se.getTransactionStore().get(txRecord.getParentID());
     }

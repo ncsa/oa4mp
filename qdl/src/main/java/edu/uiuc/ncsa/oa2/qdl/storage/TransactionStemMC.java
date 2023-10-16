@@ -148,6 +148,7 @@ public class TransactionStemMC<V extends OA2ServiceTransaction> extends StemConv
         protected String authTime = "auth_time";
         protected String authzGrantLifetime = "authz_grant_lifetime";
         protected String expiresIn = "expires_in";
+        protected String idTokenIdentifier  = "id_token_identifier";
         protected String isRFC8628  = "is_rfc_8628";
         protected String refreshToken = "refresh_token";
         protected String refreshTokenLifetime = "refresh_token_lifetime";
@@ -166,6 +167,7 @@ public class TransactionStemMC<V extends OA2ServiceTransaction> extends StemConv
         if (stem.containsKey(kk().atJWT())) {v.setATJWT(stem.getString(kk().atJWT()));}
         if (stem.containsKey(kk().authzGrantLifetime())) {v.setAuthGrantLifetime(stem.getLong(kk().authzGrantLifetime()));}
         if (stem.containsKey(kk().expiresIn())) {v.setAccessTokenLifetime(stem.getLong(kk().expiresIn()));}
+        if(stem.containsKey(kk().idTokenIdentifier())){v.setIDTokenIdentifier(stem.getString(kk().idTokenIdentifier()));        }
         if(stem.containsKey(kk().isRFC8628())){v.setRFC8628Request(stem.getBoolean(kk().isRFC8628()));        }
         if(stem.containsKey(kk().proxyID())){v.setProxyId(stem.getString(kk().proxyID()));        }
         if (stem.containsKey(kk().refreshToken())) {v.setRefreshToken(new RefreshTokenImpl(URI.create(stem.getString(kk().refreshToken()))));}
@@ -238,6 +240,7 @@ public class TransactionStemMC<V extends OA2ServiceTransaction> extends StemConv
         stem.put(kk().expiresIn(), v.getAccessTokenLifetime());
         stem.put(kk().isRFC8628(), v.isRFC8628Request());
 
+        setNonNullStemValue(stem, kk().idTokenIdentifier(), v.getIDTokenIdentifier());
         setNonNullStemValue(stem, kk().proxyID(), v.getProxyId());
         setNonNullStemValue(stem, kk().atJWT(), v.getATJWT());
         setNonNullStemValue(stem, kk().rtJWT(), v.getRTJWT());

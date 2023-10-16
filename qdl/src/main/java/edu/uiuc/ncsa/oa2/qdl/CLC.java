@@ -334,7 +334,7 @@ public class CLC implements QDLModuleMetaClass {
 
         @Override
         public int[] getArgCount() {
-            return new int[]{0, 1, 2};
+            return new int[]{0, 1, 2,3,4,5,6,7}; // just ion case we need to pass lots
         }
 
         @Override
@@ -353,19 +353,17 @@ public class CLC implements QDLModuleMetaClass {
         @Override
         public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
-            doxx.add(getName() + "([-rt | -at | -none] [-x] Do the token exchange.");
+            doxx.add(getName() + "([-rt | -at | -none] [-subject at|rt|id] Do the token exchange.");
             doxx.add("returns: Both tokens, but the requested token is updated.");
             doxx.add("Arguments:");
             doxx.add("(None) = exchange the access token using the access token as the bearer token. Make sure it has not expired.");
             doxx.add("-at = explicitly request an access token");
             doxx.add("-rt = exchange refresh token, using the refresh token as the bearer token");
             doxx.add("-none = do not request the return type, let the server use its default");
-            doxx.add("-x = force using the refresh token as the bearer token");
+            doxx.add("-subject = Use the indicated token as the subject. The default is to use the requested type.");
             doxx.add("E.g.");
-            doxx.add("exchange('-at', 'x');");
+            doxx.add("exchange('-at', '-subject', 'rt');");
             doxx.add("would exchange the access token (possibly expired) using the (valid) refresh token.");
-            doxx.add("The result contains both access_token and refresh_token, but note that only the access token");
-            doxx.add("has changed.");
             doxx.add(checkInitMessage);
             return doxx;
         }

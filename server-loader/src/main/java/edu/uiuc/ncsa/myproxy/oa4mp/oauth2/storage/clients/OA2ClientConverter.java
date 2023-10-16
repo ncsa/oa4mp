@@ -60,6 +60,9 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         if (map.get(getCK2().proxyClaimsList()) != null) {
             otherV.setProxyClaimsList(jsonArrayToCollection(map, getCK2().proxyClaimsList()));
         }
+        if(map.containsKey(getCK2().ersatzInheritIDToken())){
+            otherV.setErsatzInheritIDToken(map.getBoolean(getCK2().ersatzInheritIDToken()));
+        }
         if (map.get(getCK2().proxyRequestScopes()) == null) {
             JSONArray array = new JSONArray();
             array.add("*");
@@ -313,6 +316,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         if (client.getExtendedAttributes() != null && !client.getExtendedAttributes().isEmpty()) {
             map.put(getCK2().ea(), client.getExtendedAttributes().toString());
         }
+        map.put(getCK2().ersatzInheritIDToken(), client.isErsatzInheritIDToken());
     }
 
     @Override
@@ -325,6 +329,9 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         }
         if (json.containsKey(getCK2().dfLifetime())) {
             v.setDfLifetime(getJsonUtil().getJSONValueLong(json, getCK2().dfLifetime()));
+        }
+        if(json.containsKey(getCK2().ersatzInheritIDToken())){
+            v.setErsatzInheritIDToken(getJsonUtil().getJSONValueBoolean(json, getCK2().ersatzInheritIDToken()));
         }
         if (json.containsKey(getCK2().dfInterval())) {
             v.setDfInterval(getJsonUtil().getJSONValueLong(json, getCK2().dfInterval()));
@@ -419,7 +426,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         getJsonUtil().setJSONValue(json, getCK2().maxRTLifetime(), client.getMaxRTLifetime());
         getJsonUtil().setJSONValue(json, getCK2().forwardScopesToProxy(), client.isForwardScopesToProxy());
         getJsonUtil().setJSONValue(json, getCK2().proxyRequestScopes(), client.getProxyRequestScopes());
-
+        getJsonUtil().setJSONValue(json, getCK2().ersatzInheritIDToken(), client.isErsatzInheritIDToken());
         JSONArray callbacks = new JSONArray();
         Collection<String> callbackList = client.getCallbackURIs();
         for (String x : callbackList) {

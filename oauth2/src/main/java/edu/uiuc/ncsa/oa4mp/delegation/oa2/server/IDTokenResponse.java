@@ -1,12 +1,12 @@
 package edu.uiuc.ncsa.oa4mp.delegation.oa2.server;
 
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.JWTUtil;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
+import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import net.sf.json.JSONObject;
 
@@ -18,9 +18,11 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import static edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants.*;
+import static edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants.ID_TOKEN;
 
 /**
  * This is the superclass for responses that must include the ID token.
+ * Note that the ID token is in the {@link #getClaims()}.
  * <p>Created by Jeff Gaynor<br>
  * on 8/17/17 at  1:03 PM
  */

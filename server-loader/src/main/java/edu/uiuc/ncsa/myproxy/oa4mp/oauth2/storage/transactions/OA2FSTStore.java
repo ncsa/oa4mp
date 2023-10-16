@@ -49,9 +49,10 @@ public class OA2FSTStore<V extends OA2ServiceTransaction> extends DSFSTransactio
         return getIndexEntry(getSubIndexKey(refreshToken.getJti().toString(), clientID));
     }
 
-    protected String getSubIndexKey(String token, Identifier clientID){
+    protected String getSubIndexKey(String token, Identifier clientID) {
         return DigestUtils.sha1Hex(clientID + "#" + token);
     }
+
     @Override
     public V realRemove(V thingie) {
         super.realRemove(thingie);
@@ -64,10 +65,10 @@ public class OA2FSTStore<V extends OA2ServiceTransaction> extends DSFSTransactio
         if (thingie.getProxyId() != null) {
             removeIndexEntry(thingie.getProxyId());
         }
-        if(thingie.hasAccessToken()){
+        if (thingie.hasAccessToken()) {
             removeIndexEntry(getSubIndexKey(thingie.getAccessToken().getJti().toString(), thingie.getOA2Client().getIdentifier()));
         }
-        if(thingie.hasRefreshToken()){
+        if (thingie.hasRefreshToken()) {
             removeIndexEntry(getSubIndexKey(thingie.getRefreshToken().getJti().toString(), thingie.getOA2Client().getIdentifier()));
         }
 
@@ -158,6 +159,17 @@ public class OA2FSTStore<V extends OA2ServiceTransaction> extends DSFSTransactio
             V transaction = get(id);
             // Fix for https://github.com/ncsa/oa4mp/issues/110 check the passed in ID and return if matches.
             if (transaction != null && proxyID.toString().equals(transaction.getProxyId())) {
+                return transaction;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public V getByIDTokenID(Identifier idTokenIdentifier) {
+        for (Identifier id : keySet()) {
+            V transaction = get(id);
+            if (transaction != null && idTokenIdentifier.equals(transaction.getIDTokenIdentifier())) {
                 return transaction;
             }
         }

@@ -234,6 +234,12 @@ public class OA2SQLTStore<V extends OA2ServiceTransaction> extends DSSQLTransact
     }
 
     @Override
+    public V getByIDTokenID(Identifier idTokenIdentifier) {
+        OA2TransactionTable oa2TT = (OA2TransactionTable) getTable();
+        return getSingleValue(idTokenIdentifier.toString(), oa2TT.getByIDTokenID());
+    }
+
+    @Override
     public V getByUserCode(String userCode) {
         OA2TransactionTable oa2TT = (OA2TransactionTable) getTable();
         return getSingleValue(userCode, oa2TT.getByUserCode());

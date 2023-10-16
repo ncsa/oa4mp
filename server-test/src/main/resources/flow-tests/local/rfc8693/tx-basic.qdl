@@ -1,4 +1,7 @@
 #! /usr/bin/env -S qdl-run
+/*
+   Test to do token exchanges. This starts the flow then exchanges the
+*/
 
 path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests/local/rfc8693';
 if[path∉script_path()][script_path(path ~ script_path());];
@@ -11,9 +14,12 @@ tokens. := clc#rfc7523(params.);
 claims. := claims();
 // Now go and do the exchanges for rt and at ASAP.
 // If args.0 is true, use access token, otherwise, use refresh token
-at. := (args.0?exchange('-at'):exchange('-at', '-x')).'access_token';
+/*at. := (args.0?exchange('-at'):exchange('-at', '-x')).'access_token';
 rt. := (args.0?exchange('-rt'):exchange('-rt', '-x')).'refresh_token';
-id. := (args.0?exchange('-id'):exchange('-id', '-x'));
+id. := (args.0?exchange('-id'):exchange('-id', '-x'));*/
+at. := exchange('-at','-subject',args.0?'at':'rt').'access_token';
+rt. := exchange('-rt','-subject',args.0?'at':'rt').'refresh_token';
+id. := exchange('-id','-subject',args.0?'at':'rt');
 ⊨ at.'jti' != tokens.'access_token'.'jti' : 'access token not updated';
 ⊨ rt.'jti' != tokens.'refresh_token'.'jti' : 'refresh token not updated';
 
@@ -25,4 +31,4 @@ id. := (args.0?exchange('-id'):exchange('-id', '-x'));
 ⊨ claims().'iss' == 'https://localhost:9443/oauth2' : 'IDT wrong issuer';
 ⊨ claims().'aud' == 'localhost:p1' : 'IDT wrong audience';
 ⊨ claims().'iat' != claims.'iat' : 'IDT issued at time not updated';
-say('𝕰𝖗s𝖆𝖙𝖟 client test: ok');
+say('token exchange test using ' + (args.0?'access':'refresh') + ' token for subject: ok');

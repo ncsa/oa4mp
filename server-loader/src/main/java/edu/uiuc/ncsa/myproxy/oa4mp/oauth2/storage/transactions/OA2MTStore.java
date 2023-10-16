@@ -59,31 +59,32 @@ public class OA2MTStore<V extends OA2ServiceTransaction> extends TransactionMemo
         if (v.getUsername() != null) {
             getUserIndex().put(v.getUsername(), v);
         }
-        if(v.getProxyId()!=null){
+        if (v.getProxyId() != null) {
             getProxyIDIndex().put(v.getProxyId(), v);
         }
-        if(v.getAccessToken() != null){
+        if (v.getAccessToken() != null) {
             getAtIndex().put(getSubIndexKey(v.getAccessToken().getJti().toString(), v.getOA2Client().getIdentifier()), v);
         }
-        if(v.getRefreshToken() != null){
+        if (v.getRefreshToken() != null) {
             getRTIndex().put(getSubIndexKey(v.getRefreshToken().getJti().toString(), v.getOA2Client().getIdentifier()), v);
         }
 
     }
 
-    protected String getSubIndexKey(String token, Identifier clientID){
+    protected String getSubIndexKey(String token, Identifier clientID) {
         return DigestUtils.sha1Hex(clientID + "#" + token);
     }
+
     @Override
     protected void removeItem(V value) {
         super.removeItem(value);
         getRTIndex().remove(value.getRefreshToken());
         getUserIndex().remove(value.getUsername());
         getProxyIDIndex().remove(value.getProxyId());
-        if(value.hasAccessToken()) {
+        if (value.hasAccessToken()) {
             getAtIndex().remove(getSubIndexKey(value.getAccessToken().getJti().toString(), value.getOA2Client().getIdentifier()));
         }
-        if(value.hasRefreshToken()) {
+        if (value.hasRefreshToken()) {
             getAtIndex().remove(getSubIndexKey(value.getRefreshToken().getJti().toString(), value.getOA2Client().getIdentifier()));
         }
     }
@@ -104,12 +105,13 @@ public class OA2MTStore<V extends OA2ServiceTransaction> extends TransactionMemo
         }
         return list;
     }
+
     @Override
     public TokenInfoRecordMap getTokenInfo(String username) {
         TokenInfoRecordMap records = new TokenInfoRecordMap();
         for (Identifier id : keySet()) {
             V transaction = get(id);
-            if (transaction != null ) {
+            if (transaction != null) {
                 TokenInfoRecord tir = new TokenInfoRecord();
                 tir.fromTransaction(transaction);
                 records.put(tir);
@@ -135,6 +137,17 @@ public class OA2MTStore<V extends OA2ServiceTransaction> extends TransactionMemo
         for (Identifier id : keySet()) {
             V transaction = get(id);
             if (transaction != null && userCode.equals(transaction.getUserCode())) {
+                return transaction;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public V getByIDTokenID(Identifier idTokenIdentifier) {
+        for (Identifier id : keySet()) {
+            V transaction = get(id);
+            if (transaction != null && idTokenIdentifier.equals(transaction.getIDTokenIdentifier())) {
                 return transaction;
             }
         }

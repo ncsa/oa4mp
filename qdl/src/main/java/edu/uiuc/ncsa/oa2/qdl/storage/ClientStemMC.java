@@ -45,10 +45,14 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
          String name = "name";
          String proxyLimited = "proxy_limited";
          String secret = "oauth_client_pubkey";
+             String ersatzInheritIDToken = "ersatz_inherit_id_token";
 
          */
         if (isTimeOk(stem, kk().creationTS())) {
             v.setCreationTS(toDate(stem, kk().creationTS()));
+        }
+        if(stem.containsKey(kk().ersatzInheritIDToken())){
+            v.setErsatzInheritIDToken(stem.getBoolean(kk().ersatzInheritIDToken()));
         }
         if (stem.containsKey(kk().debugOn())) {
             v.setDebugOn(stem.getBoolean(kk().debugOn()));
@@ -238,6 +242,7 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
         // basic client attributes
         setNonNullStemValue(stem, kk().secret(), v.getSecret());
         setNonNullStemValue(stem, kk().debugOn(), v.isDebugOn());
+
         setNonNullStemValue(stem, kk().forwardScopesToProxy(), v.isForwardScopesToProxy());
         setNonNullStemValue(stem, kk().email(), v.getEmail());
         setNonNullStemValue(stem, kk().name(), v.getName());
@@ -289,6 +294,7 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
         stem.put(kk().maxRTLifetime(), v.getMaxRTLifetime());
         stem.put(kk().rtGracePeriod(), v.getRtGracePeriod());
         stem.put(kk().ersatzClient(), v.isErsatzClient());
+        setNonNullStemValue(stem, kk().ersatzInheritIDToken(), v.isErsatzInheritIDToken());
 
         setNonNullStemValue(stem, kk().issuer(), v.getIssuer());
         if (v.getLdaps() != null && !v.getLdaps().isEmpty()) {

@@ -278,7 +278,9 @@ public class StoreFacade implements QDLModuleMetaClass {
                 break;
             case STORE_TYPE_TX_STORE:
                 storeAccessor = new QDLStoreAccessor(storeType, getEnvironment().getTxStore(), getEnvironment().getMyLogger());
-                storeAccessor.setMapConverter(new TXRStemMC(getEnvironment().getTxStore().getMapConverter(), getEnvironment().getClientStore()));
+                storeAccessor.setMapConverter(new TXRStemMC(getEnvironment().getTxStore().getMapConverter(),
+                        getEnvironment().getTxStore(),
+                        getEnvironment().getClientStore()));
                 break;
             default:
                 throw new IllegalArgumentException("unsupported store '" + storeType + "'");

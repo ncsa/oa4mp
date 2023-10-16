@@ -79,6 +79,16 @@ public class TF2Test extends TestBase {
         public void setUserMetaData(JSONObject claims) {
 
         }
+        String idtID = null;
+        @Override
+        public String getIDTokenIdentifier() {
+            return idtID;
+        }
+
+        @Override
+        public void setIDTokenIdentifier(String idTokenIdentifier) {
+            idtID = idTokenIdentifier;
+        }
 
         @Override
         public Collection<String> getScopes() {

@@ -34,6 +34,7 @@ fi
 cd $OA4MP_ROOT/qdl
 mvn -P qdl package
 mv target/oa2-qdl-jar-with-dependencies.jar target/qdl.jar
+cp target/qdl.jar $OA4MP_QDL_DEPLOY
 
 # If the user has the sources to QDL, build the installer.
 # /home/ncsa/dev/ncsa-git/qdl/language/src/main/scripts/create_installer.sh $OA4MP_ROOT/qdl $DEPLOY_ROOT/oa2-qdl oa2-qdl-installer.jar

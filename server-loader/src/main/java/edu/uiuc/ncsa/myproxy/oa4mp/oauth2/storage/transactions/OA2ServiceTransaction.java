@@ -802,6 +802,19 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         return id.toString();
     }
 
+    String idTokenIdentifier = null;
+
+    // https://github.com/ncsa/oa4mp/issues/128
+    @Override
+    public String getIDTokenIdentifier() {
+        return idTokenIdentifier;
+    }
+
+    @Override
+    public void setIDTokenIdentifier(String idTokenIdentifier) {
+        this.idTokenIdentifier = idTokenIdentifier;
+    }
+
     /**
      * Summary for debugging.
      *

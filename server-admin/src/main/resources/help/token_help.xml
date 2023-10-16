@@ -55,6 +55,22 @@ The list of resources that were in the request for this exchange.]]>
 The list of scopes in the request for this exchange, if any.]]>
     </body>
     </entry>
+    <entry id="token">
+     <body>
+     <![CDATA[Property: JSON (--)
+ The actual token that is returned as the result of a refresh or exhange. It is in the
+payload of the stored_token.]]>
+     </body>
+     </entry>
+    <entry id="previous_tx_record">
+     <body>
+     <![CDATA[Property: Identifier (--)
+ On refresh or exchange, if this is extending an existing TX record, this is the id
+of the current TX record before the refresh/exchange a starts. This allows for, e.g.
+an audit chain of the issued tokens. Note that if this is missing, then this is the
+first refresh/exchange and the transaction is the source. ]]>
+     </body>
+     </entry>
     <entry id="token_id">
     <body>
     <![CDATA[Property: Identifier (**)

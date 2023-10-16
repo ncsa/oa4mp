@@ -425,6 +425,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
             if (getPropertyHelp(keys.ersatzClient(), "is ersatz client (y/n)?", "n").equalsIgnoreCase("y")) {
                 oa2Client.setErsatzClient(true);
                 oa2Client.setExtendsProvisioners(getPropertyHelp(keys.extendsProvisioners(), "  extends the provisioner (y/n)?", "y").equalsIgnoreCase("y"));
+                oa2Client.setErsatzInheritIDToken(getPropertyHelp(keys.ersatzInheritIDToken(), "  inherit the ID token from the provisioner on fork(y/n)?", "y").equalsIgnoreCase("y"));
                 // naming the provisioners requirings setting permissions and is not done here.
                 say("  To link this client to its provisioners, use the ersatz command");
             } else {
