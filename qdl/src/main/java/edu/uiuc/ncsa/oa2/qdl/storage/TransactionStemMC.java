@@ -112,6 +112,7 @@ public class TransactionStemMC<V extends OA2ServiceTransaction> extends StemConv
          */
         if (stem.containsKey(kk().accessTokenValid())) {v.setAccessTokenValid(stem.getBoolean(kk().accessTokenValid()));}
         if (stem.containsKey(kk().lifetime())) {v.setLifetime(stem.getLong(kk().lifetime()));}
+        if (stem.containsKey(kk().idTokenLifetime())) {v.setIDTokenLifetime(stem.getLong(kk().idTokenLifetime()));}
         if(stem.containsKey(kk().callbackUri())){v.setCallback(URI.create(stem.getString(kk().callbackUri())));}
         if(isStringKeyOK(stem, kk().nonce())){v.setNonce(stem.getString(kk().nonce()));}
         if (stem.containsKey(kk().tempCredValid())) {v.setAuthGrantValid(stem.getBoolean(kk().tempCredValid()));}
@@ -174,6 +175,7 @@ public class TransactionStemMC<V extends OA2ServiceTransaction> extends StemConv
         if (stem.containsKey(kk().rtJWT())) {v.setRTJWT(stem.getString(kk().rtJWT()));}
         // 5
         if (stem.containsKey(kk().refreshTokenLifetime())) {v.setRefreshTokenLifetime(stem.getLong(kk().refreshTokenLifetime()));}
+        if (stem.containsKey(kk().refreshTokenExpiresAt())) {v.setRefreshTokenExpiresAt(stem.getLong(kk().refreshTokenExpiresAt()));}
         if (stem.containsKey(kk().refreshTokenValid())) {v.setRefreshTokenValid(stem.getBoolean(kk().refreshTokenValid()));}
         if(stem.containsKey(kk().reqState())){v.setRequestState(stem.getString(kk().reqState()));}
         if(stem.containsKey(kk().scopes())){v.setScopes(toList(stem,kk().scopes()));}
@@ -248,7 +250,9 @@ public class TransactionStemMC<V extends OA2ServiceTransaction> extends StemConv
             stem.put(kk().refreshToken(), v.getRefreshToken().getToken());
         }
         // 5 attributes
+        stem.put(kk().idTokenLifetime(), v.getIDTokenLifetime());
         stem.put(kk().refreshTokenLifetime(), v.getRefreshTokenLifetime());
+        stem.put(kk().refreshTokenExpiresAt(), v.getRefreshTokenExpiresAt());
         stem.put(kk().refreshTokenValid(), v.isRefreshTokenValid());
         setNonNullStemValue(stem, kk().reqState(), v.getRequestState());
         fromList(v.getScopes(), stem, kk().scopes());

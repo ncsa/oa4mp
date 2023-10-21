@@ -27,7 +27,7 @@ public class TXRecordSerializationKeys extends SerializationKeys {
     String storedToken = "stored_token";
     String tokenType = "token_type";
     String token = "token";
-    String previousTXRecord = "previous_tx_record";
+   // String previousTXRecord = "previous_tx_record";
 
     // If attributes get added or deleted, update TXRStemMC or you will break QDL support.
 
@@ -66,10 +66,10 @@ public class TXRecordSerializationKeys extends SerializationKeys {
         return parentID;
     }
 
-    public String previousTXRecord(String... x) {
+/*    public String previousTXRecord(String... x) {
         if (0 < x.length) previousTXRecord = x[0];
         return previousTXRecord;
-    }
+    }*/
     public String resource(String... x) {
         if (0 < x.length) resource = x[0];
         return resource;
@@ -96,16 +96,18 @@ public class TXRecordSerializationKeys extends SerializationKeys {
     public List<String> allKeys() {
         List<String> allKeys =  super.allKeys();
         allKeys.add(audience());
+        allKeys.add(ersatzID());
         allKeys.add(expiresAt());
-        allKeys.add(lifetime());
         allKeys.add(issuedAt());
         allKeys.add(issuer());
         allKeys.add(isValid());
+        allKeys.add(lifetime());
+        allKeys.add(parentID());
         allKeys.add(resource());
         allKeys.add(scopes());
-        allKeys.add(parentID());
+        allKeys.add(storedToken());
+        allKeys.add(token());
         allKeys.add(tokenType());
-
         return allKeys;
     }
 }

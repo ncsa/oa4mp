@@ -17,7 +17,9 @@ public interface OA2Constants {
      */
     public static String AUTHORIZATION_CODE = "code";
     public static String REFRESH_LIFETIME = "rt_lifetime";
+    public static String MAX_REFRESH_LIFETIME = "max_rt_lifetime";
     public static String ACCESS_TOKEN_LIFETIME = "at_lifetime";
+    public static String MAX_ACCESS_TOKEN_LIFETIME = "max_at_lifetime";
     public static String STRICT_SCOPES = "strict_scopes";
     public static String DESCRIPTION = "description";
     public static String SKIP_SERVER_SCRIPTS = "skip_server_scripts";
@@ -58,6 +60,8 @@ public interface OA2Constants {
     public static String MAX_AGE = "max_age";
     public static String ID_TOKEN_HINT = "id_token_hint";
     public static String ID_TOKEN = "id_token";
+    public static String ID_TOKEN_LIFETIME = "id_token_lifetime";
+    public static String MAX_ID_TOKEN_LIFETIME = "max_id_token_lifetime";
     public static String ID_TOKEN_IDENTIFIER = "jti"; // was token_id
     public static String RAW_ID_TOKEN = "raw_id_token";
     public static String REQUEST = "request";

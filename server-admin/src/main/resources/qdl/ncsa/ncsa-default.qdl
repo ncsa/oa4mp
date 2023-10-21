@@ -46,8 +46,8 @@ if[
      debugger('*** NCSA claims=' + to_string(claims.,1));
      claims.uid := head(claims.eppn, '@'); // set search key
      claim_sources. := claim_sources. ~ [create_source(cfg.)]; // add it to any claims
-     debugger('*** NCSA set claim_sources. # ' + size(claim_sources.));
-     debugger('*** NCSA updated claims=' + to_string(claims., 1));
+     debugger('*** NCSA set claim_sources. ' + size(claim_sources.));
+     debugger('*** NCSA updated claims #1 =' + print(claims.));
 ]; //end if
 
  debugger('*** ncsa-default claims=' + to_string(claims.,1));
@@ -88,3 +88,6 @@ if[
     ]; // end while
     claims.isMemberOf. := s.;
 ];
+
+     debugger('*** NCSA updated claims #2 =' + print(claims.));
+

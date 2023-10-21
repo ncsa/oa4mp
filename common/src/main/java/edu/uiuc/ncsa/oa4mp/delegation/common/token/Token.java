@@ -16,5 +16,4 @@ public interface Token extends Serializable {
      */
     String getToken();
 
-
 }

@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.client.servlet.ClientServlet;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AuthorizationGrantImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.IDTokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.*;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.client.ATResponse2;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.client.ATServer2;
@@ -149,17 +150,12 @@ public class OA2ReadyServlet extends ClientServlet {
 
             JSONWebKeys jsonWebKeys = atServer2.getJsonWebKeys();
             ServletDebugUtil.trace(this, "JSON webkeys = " + jsonWebKeys);
-            // So this client is to show the information for the ID Token. Since this is extra, we have to recover it.
+            // The store is needed in the servlet if the user wants to display
+            // the ID token. We will only have the access token later so we have
+            // to key off that.
+            IDTokenImpl idToken = ATServer2.getIDTokenStore().get(accessToken.getJti());
 
-            ServletDebugUtil.trace(this, "ID Token store = " + ATServer2.getIDTokenStore());
-            ServletDebugUtil.trace(this, "ID Token store size = " + ATServer2.getIDTokenStore().size());
-            ServletDebugUtil.trace(this, "ID Token store contains key \"" + rawAT + "\"? " + ATServer2.getIDTokenStore().containsKey(rawAT));
-
-
-            ATServer2.IDTokenEntry tokenEntry = ATServer2.getIDTokenStore().get(rawAT);
-            ServletDebugUtil.trace(this, "TokenEntry = " + tokenEntry);
-
-            setIDTInfo(request, tokenEntry.rawToken, jsonWebKeys);
+            setIDTInfo(request, idToken.getToken(), jsonWebKeys);
 
         } else {
             setIDTInfo(request, null, null); // sets the fields to "(none)"

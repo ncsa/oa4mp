@@ -157,6 +157,17 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
 
     long access_token_lifetime = 0L;
 
+    public long getIDTokenLifetime() {
+        return idTokenLifetime;
+    }
+
+    public void setIDTokenLifetime(long idTokenLifetime) {
+        this.idTokenLifetime = idTokenLifetime;
+    }
+
+    long idTokenLifetime = 0L;
+
+
     /**
      * Clients may send an audience which is used by some components (notable SciTokens) but
      * is generally optional. This is a list of them. This is returned as the
@@ -180,6 +191,20 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         getState().put(AUDIENCE_KEY, audience);
     }
 
+    /**
+     * The actual time the refresh token in the transaction expires.
+     * @return
+     */
+    public long getRefreshTokenExpiresAt() {
+        // Fixes https://github.com/ncsa/oa4mp/issues/129
+        return refreshTokenExpiresAt;
+    }
+
+    public void setRefreshTokenExpiresAt(long refreshTokenExpiresAt) {
+        this.refreshTokenExpiresAt = refreshTokenExpiresAt;
+    }
+
+    long refreshTokenExpiresAt = 0L;
     boolean isRFC8628 = false;
 
     public boolean isRFC8628Request() {
@@ -495,7 +520,9 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
     }
 
     String MAX_AT_LIFETIME_KEY = "maxATLifetime";
+    String MAX_IDT_LIFETIME_KEY = "maxIDLifetime";
     String REQUESTED_AT_LIFETIME_KEY = "requestedATLifetime";
+    String REQUESTED_IDT_LIFETIME_KEY = "requestedIDTLifetime";
     String MAX_RT_LIFETIME_KEY = "maxRTLifetime";
     String REQUESTED_RT_LIFETIME_KEY = "requestedRTLifetime";
 
@@ -505,9 +532,23 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         }
         return -1L;
     }
+    public long getRequestedIDTLifetime() {
+        if (hasRequestedIDTLifetime()) {
+            return getState().getLong(REQUESTED_IDT_LIFETIME_KEY);
+        }
+        return -1L;
+    }
+
+    public void setRequestedIDTLifetime(long idtLifetime) {
+        getState().put(REQUESTED_IDT_LIFETIME_KEY, idtLifetime);
+    }
 
     public boolean hasRequestedATLifetime() {
         return getState().containsKey(REQUESTED_AT_LIFETIME_KEY);
+    }
+
+    public boolean hasRequestedIDTLifetime() {
+        return getState().containsKey(REQUESTED_IDT_LIFETIME_KEY);
     }
 
     public void setRequestedATLifetime(long atLifetime) {
@@ -543,8 +584,25 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         getState().put(MAX_AT_LIFETIME_KEY, ll);
     }
 
+    public long getMaxIDTLifetime() {
+        if (hasMaxIDTLifetime()) {
+            return getState().getLong(MAX_IDT_LIFETIME_KEY);
+        }
+        return -1L;
+    }
+
+    public void setMaxIDTLifetime(long max) {
+        Long ll = new Long(max);
+        // weirdly enough, the JSON library converts it to an integer at times
+        // which then fails later on the getMaxLifetime.
+        getState().put(MAX_IDT_LIFETIME_KEY, ll);
+    }
+
     public boolean hasMaxATLifetime() {
         return getState().containsKey(MAX_AT_LIFETIME_KEY);
+    }
+    public boolean hasMaxIDTLifetime() {
+        return getState().containsKey(MAX_IDT_LIFETIME_KEY);
     }
 
     public long getMaxRtLifetime() {
@@ -654,6 +712,13 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
 
     boolean refreshTokenValid = false;
 
+    /**
+     * This is, unfortunately, overloaded. It is the initial lifetime allowed by the
+     * client and may be set in the registration. If &lt;=0 then refresh tokens are
+     * disabled. The actual expiration for the refresh token in the transaction is
+     * found in {@link #refreshTokenExpiresAt}.
+     * @return
+     */
     public long getRefreshTokenLifetime() {
         return refreshTokenLifetime;
     }
@@ -661,7 +726,6 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
     public void setRefreshTokenLifetime(long refreshTokenLifetime) {
         this.refreshTokenLifetime = refreshTokenLifetime;
     }
-
     /**
      * This is the state parameter in the initial request, if present
      *

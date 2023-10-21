@@ -76,18 +76,45 @@ public class OA2TConverter<V extends OA2ServiceTransaction> extends TransactionC
         if (map.containsKey(getTCK().rtJWT())) {
             st.setRTJWT(map.getString(getTCK().rtJWT()));
         }
-
-        st.setUserCode(map.getString(getTCK().userCode()));
-        st.setRFC8628Request(map.getBoolean(getTCK().isRFC8628()));
-        st.setIDTokenIdentifier(map.getString(getTCK().idTokenIdentifier()));
-        st.setProxyId(map.getString(getTCK().proxyID()));
-        st.setAuthGrantLifetime(map.getLong(getTCK().authzGrantLifetime()));
-        st.setRefreshTokenValid(map.getBoolean(getTCK().refreshTokenValid()));
-        st.setRefreshTokenLifetime(map.getLong(getTCK().refreshTokenLifetime()));
-        st.setAccessTokenLifetime(map.getLong(getTCK().expiresIn()));
-        st.setCallback(map.getURI(getTCK().callbackUri()));
-        st.setNonce(map.getString(getTCK().nonce()));
-        st.setRequestState(map.getString(getTCK().reqState()));
+       if(map.containsKey(getTCK().userCode())) {
+            st.setUserCode(map.getString(getTCK().userCode()));
+        }
+        if(map.containsKey(getTCK().isRFC8628())) {
+            st.setRFC8628Request(map.getBoolean(getTCK().isRFC8628()));
+        }
+        if(map.containsKey(getTCK().idTokenIdentifier())) {
+            st.setIDTokenIdentifier(map.getString(getTCK().idTokenIdentifier()));
+        }
+        if(map.containsKey(getTCK().proxyID())){
+            st.setProxyId(map.getString(getTCK().proxyID()));
+        }
+        if(map.containsKey(getTCK().authzGrantLifetime())){
+            st.setAuthGrantLifetime(map.getLong(getTCK().authzGrantLifetime()));
+        }
+        if(map.containsKey(getTCK().refreshTokenValid())) {
+            st.setRefreshTokenValid(map.getBoolean(getTCK().refreshTokenValid()));
+        }
+        if(map.containsKey(getTCK().refreshTokenLifetime())) { // again, getLong returns 0 if the entry is null
+            st.setRefreshTokenLifetime(map.getLong(getTCK().refreshTokenLifetime()));
+        }
+        if(map.containsKey(getTCK().refreshTokenExpiresAt())) {
+            st.setRefreshTokenExpiresAt(map.getLong(getTCK().refreshTokenExpiresAt()));
+        }
+        if(map.containsKey(getTCK().idTokenLifetime())) {
+            st.setIDTokenLifetime(map.getLong(getTCK().idTokenLifetime()));
+        }
+        if(map.containsKey(getTCK().expiresIn())) {
+            st.setAccessTokenLifetime(map.getLong(getTCK().expiresIn()));
+        }
+        if(map.containsKey(getTCK().callbackUri())) {
+            st.setCallback(map.getURI(getTCK().callbackUri()));
+        }
+        if(map.containsKey(getTCK().nonce())){
+            st.setNonce(map.getString(getTCK().nonce()));
+        }
+        if(map.containsKey(getTCK().reqState())){
+            st.setRequestState(map.getString(getTCK().reqState()));
+        }
         // https://github.com/rcauth-eu/OA4MP/commit/9dc129a679d7d701fdbba7173363e4aa82adcd2a
         if (map.get(getTCK().validatedScopes()) != null) {
             JSONArray json = (JSONArray) JSONSerializer.toJSON(map.get(getTCK().validatedScopes()));
@@ -166,6 +193,8 @@ public class OA2TConverter<V extends OA2ServiceTransaction> extends TransactionC
         map.put(getTCK().authzGrantLifetime(), t.getAuthzGrantLifetime());
         map.put(getTCK().expiresIn(), t.getAccessTokenLifetime());
         map.put(getTCK().refreshTokenLifetime(), t.getRefreshTokenLifetime());
+        map.put(getTCK().refreshTokenExpiresAt(), t.getRefreshTokenExpiresAt());
+        map.put(getTCK().idTokenLifetime(), t.getIDTokenLifetime());
         map.put(getTCK().isRFC8628(), t.isRFC8628Request());
         if (!isTrivial(t.getIDTokenIdentifier())) {
             map.put(getTCK().idTokenIdentifier(), t.getIDTokenIdentifier());

@@ -25,6 +25,8 @@ public class OA2TransactionKeys extends DSTransactionKeys {
     protected String proxyID  = "proxy_id";
     protected String refreshToken = "refresh_token";
     protected String refreshTokenLifetime = "refresh_token_lifetime";
+    protected String refreshTokenExpiresAt = "refresh_token_expires_at";
+    protected String idTokenLifetime = "id_token_lifetime";
     protected String refreshTokenValid = "refresh_token_valid";
     protected String reqState = "req_state";
     protected String rtJWT = "rt_jwt";
@@ -38,6 +40,11 @@ public class OA2TransactionKeys extends DSTransactionKeys {
     public String idTokenIdentifier(String... x) {
         if (0 < x.length) idTokenIdentifier = x[0];
         return idTokenIdentifier;
+    }
+
+    public String idTokenLifetime(String... x) {
+        if (0 < x.length) idTokenLifetime = x[0];
+        return idTokenLifetime;
     }
 
     public String rtJWT(String... x) {
@@ -84,6 +91,11 @@ public class OA2TransactionKeys extends DSTransactionKeys {
         return refreshTokenLifetime;
     }
 
+    public String refreshTokenExpiresAt(String... x) {
+        if (0 < x.length) refreshTokenExpiresAt = x[0];
+        return refreshTokenExpiresAt;
+    }
+
     public String refreshToken(String... x) {
         if (0 < x.length) refreshToken = x[0];
         return refreshToken;
@@ -117,19 +129,24 @@ public class OA2TransactionKeys extends DSTransactionKeys {
     @Override
     public List<String> allKeys() {
         List<String> allKeys =  super.allKeys();
+        allKeys.add(atJWT());
         allKeys.add(authTime());
         allKeys.add(authzGrantLifetime());
         allKeys.add(expiresIn());
+        allKeys.add(idTokenIdentifier());
+        allKeys.add(idTokenLifetime());
         allKeys.add(isRFC8628());
+        allKeys.add(proxyID());
         allKeys.add(refreshToken());
+        allKeys.add(refreshTokenExpiresAt());
         allKeys.add(refreshTokenLifetime());
         allKeys.add(refreshTokenValid());
         allKeys.add(reqState());
-        allKeys.add(states());
+        allKeys.add(rtJWT());
         allKeys.add(scopes());
+        allKeys.add(states());
         allKeys.add(userCode());
         allKeys.add(validatedScopes());
-        allKeys.add(proxyID());
         return allKeys;
 
     }

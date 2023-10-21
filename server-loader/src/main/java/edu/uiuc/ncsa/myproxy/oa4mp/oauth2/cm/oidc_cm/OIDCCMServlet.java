@@ -136,7 +136,7 @@ public class OIDCCMServlet extends EnvServlet {
                 debugger = MyProxyDelegationServlet.createDebugger(adminClient);
             }
             debugger.trace(this, "Starting get");
-            if(debugger.getDebugLevel() == MetaDebugUtil.DEBUG_LEVEL_TRACE){
+            if (debugger.getDebugLevel() == MetaDebugUtil.DEBUG_LEVEL_TRACE) {
                 printAllParameters(httpServletRequest);
             }
             String rawID = getFirstParameterValue(httpServletRequest, OA2Constants.CLIENT_ID);
@@ -463,7 +463,7 @@ public class OIDCCMServlet extends EnvServlet {
 
             adminClient = getAndCheckAdminClient(req);
             MetaDebugUtil adminDebugger = MyProxyDelegationServlet.createDebugger(adminClient);
-            if(adminDebugger.getDebugLevel() == MetaDebugUtil.DEBUG_LEVEL_TRACE){
+            if (adminDebugger.getDebugLevel() == MetaDebugUtil.DEBUG_LEVEL_TRACE) {
                 printAllParameters(req);
 
             }
@@ -474,12 +474,12 @@ public class OIDCCMServlet extends EnvServlet {
             }
             JSONObject jsonRequest = (JSONObject) rawJSON;
             // can send the client id as either a parameter or in the JSON blob.
-            if(jsonRequest.containsKey(OA2Constants.CLIENT_ID)){
+            if (jsonRequest.containsKey(OA2Constants.CLIENT_ID)) {
                 client = (OA2Client) getOA2SE().getClientStore().get(BasicIdentifier.newID(jsonRequest.getString(OA2Constants.CLIENT_ID)));
-            }else{
+            } else {
                 client = getClient(req);
             }
-            if(client == null){
+            if (client == null) {
                 throw new OA2JSONException(OA2Errors.UNAUTHORIZED_CLIENT,
                         "unknown client",
                         HttpStatus.SC_BAD_REQUEST,
@@ -747,12 +747,12 @@ public class OIDCCMServlet extends EnvServlet {
             }
             DebugUtil.trace(this, "anonymous ok");
             isAnonymous = true;
-        }catch(UnknownClientException | WrongPasswordException | UnapprovedClientException zzz){
+        } catch (UnknownClientException | WrongPasswordException | UnapprovedClientException zzz) {
             throw new GeneralException("Bad admin client " + host + ":" + zzz.getMessage());
         }
 
         MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(adminClient);
-        if(debugger.getDebugLevel() == MetaDebugUtil.DEBUG_LEVEL_TRACE){
+        if (debugger.getDebugLevel() == MetaDebugUtil.DEBUG_LEVEL_TRACE) {
             printAllParameters(httpServletRequest);
         }
         debugger.trace(this, "Starting to process " + httpServletRequest.getMethod());
@@ -887,7 +887,7 @@ public class OIDCCMServlet extends EnvServlet {
         writeCreateOK(httpServletResponse, jsonResp);
         logOK(httpServletRequest); // CIL-1722
 
-      //  writeOK(httpServletResponse, jsonResp);
+        //  writeOK(httpServletResponse, jsonResp);
     }
 
 
@@ -1144,7 +1144,7 @@ public class OIDCCMServlet extends EnvServlet {
             // Todo: Really check these and allow for multiple values
             // Todo: This takes only the very first.
             JSONArray emails = toJA(jsonRequest, OIDCCMConstants.CONTACTS);
-            if(1 < emails.size()) {
+            if (1 < emails.size()) {
                 ServletDebugUtil.info(this, "Multiple contacts addresses found " + emails + "\n Only the first is used currently.");
             }
             if (!emails.isEmpty()) {
@@ -1207,11 +1207,33 @@ public class OIDCCMServlet extends EnvServlet {
             client.setRtLifetime(jsonRequest.getLong(REFRESH_LIFETIME) * 1000);
             jsonRequest.remove(REFRESH_LIFETIME);
         }
+        if (jsonRequest.containsKey(MAX_REFRESH_LIFETIME)) {
+            // NOTE this is sent in seconds but is recorded as ms., so convert to milliseconds here.
+            client.setMaxRTLifetime(jsonRequest.getLong(MAX_REFRESH_LIFETIME) * 1000);
+            jsonRequest.remove(MAX_REFRESH_LIFETIME);
+        }
         if (jsonRequest.containsKey(ACCESS_TOKEN_LIFETIME)) {
             // NOTE this is sent in seconds but is recorded as ms., so convert to milliseconds here.
             client.setAtLifetime(jsonRequest.getLong(ACCESS_TOKEN_LIFETIME) * 1000);
             jsonRequest.remove(ACCESS_TOKEN_LIFETIME);
         }
+        if (jsonRequest.containsKey(MAX_ACCESS_TOKEN_LIFETIME)) {
+            // NOTE this is sent in seconds but is recorded as ms., so convert to milliseconds here.
+            client.setAtLifetime(jsonRequest.getLong(MAX_ACCESS_TOKEN_LIFETIME) * 1000);
+            jsonRequest.remove(MAX_ACCESS_TOKEN_LIFETIME);
+        }
+
+        if (jsonRequest.containsKey(ID_TOKEN_LIFETIME)) {
+            // NOTE this is sent in seconds but is recorded as ms., so convert to milliseconds here.
+            client.setAtLifetime(jsonRequest.getLong(ID_TOKEN_LIFETIME) * 1000);
+            jsonRequest.remove(ID_TOKEN_LIFETIME);
+        }
+        if (jsonRequest.containsKey(MAX_ID_TOKEN_LIFETIME)) {
+            // NOTE this is sent in seconds but is recorded as ms., so convert to milliseconds here.
+            client.setAtLifetime(jsonRequest.getLong(MAX_ID_TOKEN_LIFETIME) * 1000);
+            jsonRequest.remove(MAX_ID_TOKEN_LIFETIME);
+        }
+
         // Remember that for updates (via PUT) there is no anonymous mode.
         if (!isAnonymous) {
             if (jsonRequest.containsKey(clientKeys.prototypes())) {
@@ -1229,14 +1251,14 @@ public class OIDCCMServlet extends EnvServlet {
             if (jsonRequest.containsKey(clientKeys.ersatzClient())) {
                 client.setErsatzClient(jsonRequest.getBoolean(clientKeys.ersatzClient()));
             }
-            if(jsonRequest.containsKey(clientKeys.ersatzInheritIDToken())){
+            if (jsonRequest.containsKey(clientKeys.ersatzInheritIDToken())) {
                 client.setErsatzInheritIDToken(jsonRequest.getBoolean(clientKeys.ersatzInheritIDToken()));
             }
-            if(jsonRequest.containsKey(ERSATZ_CLIENT_PROVISIONERS)){
+            if (jsonRequest.containsKey(ERSATZ_CLIENT_PROVISIONERS)) {
                 JSONArray array;
                 try {
-                     array = jsonRequest.getJSONArray(ERSATZ_CLIENT_PROVISIONERS);
-                }catch(Throwable t){
+                    array = jsonRequest.getJSONArray(ERSATZ_CLIENT_PROVISIONERS);
+                } catch (Throwable t) {
                     array = new JSONArray();
                     array.add(jsonRequest.getString(ERSATZ_CLIENT_PROVISIONERS));
                 }
@@ -1245,14 +1267,14 @@ public class OIDCCMServlet extends EnvServlet {
                         adminClient.getIdentifier(),
                         provisionerID,
                         client.getIdentifier());
-                if(permission == null){
+                if (permission == null) {
                     // new clients this is null, but it may exist from a previous attempt.
                     permission = getOA2SE().getPermissionStore().create();
                     permission.setSubstitute(true);
                     permission.setAdminID(adminClient.getIdentifier());
                     permission.setClientID(provisionerID);
                     permission.setErsatzChain(array);
-                }else{
+                } else {
                     // check that this has the right information, so treat this as an update
                     permission.setErsatzChain(array);
                 }

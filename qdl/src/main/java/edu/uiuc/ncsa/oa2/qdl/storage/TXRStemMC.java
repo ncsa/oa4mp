@@ -45,7 +45,6 @@ public class TXRStemMC<V extends TXRecord> extends StemConverter<V> {
       String scopes = "scopes";
       String tokenType = "token_type";
       String tokenType = "token";
-      String previousTXRecord = previous_tx_record;
          */
     @Override
     public V fromMap(QDLStem stem, V v) {
@@ -53,7 +52,7 @@ public class TXRStemMC<V extends TXRecord> extends StemConverter<V> {
         if (stem.containsKey(kk().audience())) {v.setAudience(toList(stem, kk().audience()));}
         if(stem.containsKey(kk().expiresAt())){v.setExpiresAt(stem.getLong(kk().expiresAt()));}
         if(stem.containsKey(kk().ersatzID())){v.setErsatzClient((OA2Client) clientStore.get(BasicIdentifier.newID(stem.getString(kk().ersatzID()))));}
-        if(stem.containsKey(kk().previousTXRecord())){v.setPreviousTXR((TXRecord)txStore.get(BasicIdentifier.newID(stem.getString(kk().previousTXRecord()))));};
+   //     if(stem.containsKey(kk().previousTXRecord())){v.setPreviousTXR((TXRecord)txStore.get(BasicIdentifier.newID(stem.getString(kk().previousTXRecord()))));};
         if(stem.containsKey(kk().token())){v.setToken((JSONObject) stem.getStem(kk().token()).toJSON());};
         if(stem.containsKey(kk().lifetime())){v.setLifetime(stem.getLong(kk().lifetime()));}
         if(stem.containsKey(kk().issuedAt())){v.setIssuedAt(stem.getLong(kk().issuedAt()));}
@@ -79,7 +78,6 @@ public class TXRStemMC<V extends TXRecord> extends StemConverter<V> {
             stem.put(kk().issuer(), v.getIssuer());
         }
         if(v.getErsatzClient()!=null) {setNonNullStemValue(stem, kk().ersatzID(), v.getErsatzClient().getIdentifierString());}
-        if(v.getPreviousTXR()!=null){}
         // 5
         stem.put(kk().isValid(), v.isValid());
         if (v.getParentID() != null) {

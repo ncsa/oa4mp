@@ -7,7 +7,7 @@
 path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests';
 if[path∉script_path()][script_path(path ~ script_path());];
 
-cfg.'id'  := 'localhost:test/rfc9068'; // name of the configuration, not the id
+cfg.'id'  := 'localhost:test/rfc9068'; // name of the configuration, not the id!!
 cfg.'idp'  := 'GitHub';
 cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
 cfg.'description' :=  'RFC9068 access token test. This checks the format of this token';
@@ -21,8 +21,8 @@ define[test(access_token., refresh_token., params.)]
   body[
         at. := access_token.'jwt'; // actual token
         rt. := refresh_token.'jwt';
-        ⊨ access_token.'lifetime' == 300000 : 'wrong access token lifetime';
-        ⊨ refresh_token.'lifetime' == 900000 : 'wrong refresh token lifetime';
+        ⊨ access_token.'lifetime' == 300000 : 'wrong access token lifetime, got ' + (access_token.'lifetime');
+        ⊨ refresh_token.'lifetime' == 900000 : 'wrong refresh token lifetime, got ' + (refresh_token.'lifetime');
         ⊨ at.'aud' == params.'a'.'resource' : 'wrong audience';  // Audience is a little different than usual.
         ⊨ at.'client_id' == 'localhost:test/rfc9086';  // wrong client_id.
         ⊨ ∃at.'exp' : 'missing expiration';
@@ -34,12 +34,15 @@ define[test(access_token., refresh_token., params.)]
       ];
 
 tokens. := clc#access();
+say('tokens after access:\n' + print(tokens.));
 test(tokens.'access_token', tokens.'refresh_token', params.);
 
 tokens. := clc#refresh();
+say('tokens after refresh:\n' + print(tokens.));
 test(tokens.'access_token', tokens.'refresh_token', params.);
 // Need to get a new access token, then a new refresh token each, then test.
 t1. := clc#exchange();
 t2. := clc#exchange('-rt');
+say('rt post TX:\n' + print(t2.));
 test(t1.'access_token', t2.'refresh_token', params.);
 say('RFC 9068 test: ok');

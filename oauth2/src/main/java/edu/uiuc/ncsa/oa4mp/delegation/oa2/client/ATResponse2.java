@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.oa4mp.delegation.oa2.client;
 
 import edu.uiuc.ncsa.oa4mp.delegation.client.request.RTResponse;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.IDTokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
 
 /**
@@ -11,8 +12,12 @@ import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
  * on 3/12/14 at  12:05 PM
  */
 public class ATResponse2 extends RTResponse {
-    public ATResponse2(AccessTokenImpl accessToken, RefreshTokenImpl refreshToken) {
-        super(accessToken,refreshToken);
+    public ATResponse2(AccessTokenImpl accessToken) {
+        super(accessToken);
+    }
+
+    public ATResponse2(AccessTokenImpl accessToken, RefreshTokenImpl refreshToken, IDTokenImpl idToken) {
+        super(accessToken,refreshToken, idToken);
     }
    // Note this is now mostly legacy since access tokens and refresh tokens may be returned
     // from a server. Unfortunately, Java package and inheritance restrictions make it hard

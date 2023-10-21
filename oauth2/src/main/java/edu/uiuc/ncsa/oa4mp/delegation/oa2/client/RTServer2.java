@@ -7,7 +7,9 @@ import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.RefreshToken;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.IDTokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenFactory;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
@@ -36,6 +38,7 @@ public class RTServer2 extends TokenAwareServer implements RTServer {
         String raw = getRTResponse(getAddress(), rtRequest);
         JSONObject json = getAndCheckResponse(raw);
         String returnedAT = json.getString(OA2Constants.ACCESS_TOKEN);
+
         if (accessToken.getToken().equals(returnedAT)) {
             throw new IllegalArgumentException("Error: The returned access token from the server should not match the one in the request.");
         }
@@ -43,16 +46,13 @@ public class RTServer2 extends TokenAwareServer implements RTServer {
         if (exp == null || exp.length() == 0) {
             throw new IllegalArgumentException("Error: missing expires_in field from server");
         }
-        long expiresIn = Long.parseLong(exp) * 1000;
-
-        RefreshTokenImpl refreshTokenImpl2 = new RefreshTokenImpl(URI.create(json.getString(OA2Constants.REFRESH_TOKEN)));
-        AccessTokenImpl newAT = new AccessTokenImpl(URI.create(returnedAT));
-        //refreshTokenImpl2.setLifetime(expiresIn);
-        RTResponse rtResponse = createResponse(newAT, refreshTokenImpl2);
+        RefreshTokenImpl refreshTokenImpl2 = TokenFactory.createRT(json.getString(OA2Constants.REFRESH_TOKEN));
+        AccessTokenImpl newAT = TokenFactory.createAT(returnedAT);
+        IDTokenImpl idToken = null;
         if (oidcEnabled) {
-            JSONObject idToken = getAndCheckIDToken(json, rtRequest);
-            rtResponse.setParameters(idToken);
+            idToken = getAndCheckIDToken(json, rtRequest);
         }
+        RTResponse rtResponse = createResponse(newAT, refreshTokenImpl2, idToken);
         return rtResponse;
     }
 
@@ -73,7 +73,7 @@ public class RTServer2 extends TokenAwareServer implements RTServer {
         return response;
     }
 
-    public RTResponse createResponse(AccessTokenImpl at, RefreshTokenImpl rt) {
-        return new RTResponse(at, rt);
+    public RTResponse createResponse(AccessTokenImpl at, RefreshTokenImpl rt, IDTokenImpl idToken) {
+        return new RTResponse(at, rt, idToken);
     }
 }

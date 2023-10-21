@@ -44,16 +44,16 @@ public class AccessTokenInitializer implements QDLModuleMetaClass {
             QDLStem at = checkArg(objects, getName(), 1);
             setupHandler(objects);
             JSONObject j = (JSONObject) at.toJSON();
-            getAtHandler().setAtData(new JSONObject()); // handler won't set accounting info unless this is empty.
+            getAtHandler().setPayload(new JSONObject()); // handler won't set accounting info unless this is empty.
             try {
                 doMethod();
             } catch (Throwable throwable) {
                 handleException(throwable);
             }
             QDLStem newAT = new QDLStem();
-            JSONObject newToken = getAtHandler().getAtData();
+            JSONObject newToken = getAtHandler().getPayload();
             newToken.putAll(j);
-            getAtHandler().setAtData(newToken);
+            getAtHandler().setPayload(newToken);
             newAT.fromJSON(newToken);
             return newAT;
         }
@@ -220,14 +220,14 @@ public class AccessTokenInitializer implements QDLModuleMetaClass {
                 }
             }
 
-            getAtHandler().setAtData((JSONObject) at.toJSON());
+            getAtHandler().setPayload((JSONObject) at.toJSON());
             try {
                 getAtHandler().finish(doTemplates, isQuery);
             } catch (Throwable throwable) {
                 handleException(throwable);
             }
 
-            output.fromJSON(getAtHandler().getAtData());
+            output.fromJSON(getAtHandler().getPayload());
             return output;
         }
 

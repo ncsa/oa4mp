@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.oa4mp.delegation.oa2.server;
 
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.FlowStates;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSource;
 import net.sf.json.JSONObject;
 
 import java.util.Collection;
@@ -18,6 +19,7 @@ public interface OIDCServiceTransactionInterface {
     void setFlowStates(FlowStates flowStates);
 
     Collection<String> getScopes();
+    void setClaimsSources(List<ClaimSource> sources);
 
     void setScopes(Collection<String> scopes);
 

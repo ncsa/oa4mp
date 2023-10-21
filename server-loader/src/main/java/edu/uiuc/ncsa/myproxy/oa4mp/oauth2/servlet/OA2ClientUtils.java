@@ -393,6 +393,7 @@ public class OA2ClientUtils {
                     debugger.trace(OA2ClientUtils.class, "unknown handler of type \"" + client.getAccessTokensConfig().getType() + "\" requested.");
                     throw new IllegalArgumentException("unknown access token handler type");
             }
+            sth.setUserMetaData(idTokenHandler.getUserMetaData());
             jwtRunner.setAccessTokenHandler(sth);
         }
         if (client.hasRefreshTokenConfig()) {

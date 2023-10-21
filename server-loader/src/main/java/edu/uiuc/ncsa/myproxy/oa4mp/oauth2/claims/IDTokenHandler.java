@@ -1,27 +1,33 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.ClientUtils;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2DiscoveryServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VirtualOrganization;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.IDTokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.*;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.IDTokenHandlerInterface;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSource;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunRequest;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse;
 import net.sf.json.JSONObject;
 import org.apache.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
+import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-import static edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants.AUTHORIZATION_TIME;
-import static edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants.NONCE;
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client.USE_SERVER_DEFAULT;
+import static edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants.*;
 import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims.*;
 import static edu.uiuc.ncsa.security.core.util.DebugUtil.trace;
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
@@ -43,6 +49,26 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
         if (payloadHandlerConfig.getRequest() != null) {
             setIssuer(payloadHandlerConfig.getRequest());
         }
+    }
+
+    @Override
+    public JSONObject getPayload() {
+        if (payload == null) {
+            payload = transaction.getUserMetaData();
+            if (payload == null) {
+                payload = new JSONObject();
+            }
+        }
+        return payload;
+
+    }
+
+    public JSONObject getUserMetaData() {
+        return getPayload();
+    }
+
+    public void setUserMetaData(JSONObject userMetaData) {
+        setPayload(userMetaData);
     }
 
 
@@ -93,7 +119,7 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
 
     @Override
     public void init() throws Throwable {
-        JSONObject claims = getClaims();
+        JSONObject claims = getUserMetaData();
         trace(this, "Starting to process basic claims");
         // It is possible that the claims are already somewhat populated. Only initialize
         // claims that have not been set.
@@ -107,7 +133,7 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
         checkRequiredScopes(transaction);
         if (transaction.getOA2Client().isPublicClient()) {
             // Public clients do not get more than basic claims.
-            transaction.setUserMetaData(claims); // make sure this is available to the next handler
+            //   transaction.setUserMetaData(claims); // make sure this is available to the next handler
             return;
         }
 
@@ -132,18 +158,49 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
 
     @Override
     public void refreshAccountingInformation() {
+        NEWrefreshAccountingInformation();
+    }
+
+    protected void NEWrefreshAccountingInformation() {
+        trace(this, "Refreshing the accounting information for the claims");
+        getUserMetaData().put(ISSUED_AT, System.currentTimeMillis() / 1000);
+        getUserMetaData().put(NOT_VALID_BEFORE, System.currentTimeMillis() / 1000);
+        long idtLifetime = ClientUtils.computeIDTLifetime(transaction, oa2se);
+        long expiresAt = System.currentTimeMillis() + idtLifetime;
+        getUserMetaData().put(EXPIRATION, expiresAt / 1000); // expiration is in SECONDS from the epoch.
+/*        if(hasTXRecord()){
+            getTXRecord().setLifetime(idtLifetime);
+            getTXRecord().setExpiresAt(expiresAt);
+        }*/
+        trace(this, "saving the transaction with claims:\n" + getUserMetaData().toString(1));
+    }
+
+
+    protected void OLDrefreshAccountingInformation() {
         trace(this, "Refreshing the accounting information for the claims");
         if (0 < getPhCfg().getPayloadConfig().getLifetime()) {
             // CIL-708 fix: Make sure the refresh endpoint hands back the right expiration.
-            long actualAllowedLifetime = Math.min(getPhCfg().getPayloadConfig().getLifetime(), oa2se.getMaxIdTokenLifetime());
-            getClaims().put(EXPIRATION, (actualAllowedLifetime + System.currentTimeMillis()) / 1000); // expiration is in SECONDS from the epoch.
+            long max = oa2se.getMaxIdTokenLifetime();
+            if (transaction.getOA2Client().getMaxIDTLifetime() != USE_SERVER_DEFAULT) {
+                max = Math.min(max, transaction.getOA2Client().getMaxIDTLifetime());
+            }
+            long actualAllowedLifetime = Math.min(getPhCfg().getPayloadConfig().getLifetime(), max);
+            getUserMetaData().put(EXPIRATION, (actualAllowedLifetime + System.currentTimeMillis()) / 1000); // expiration is in SECONDS from the epoch.
         } else {
-            getClaims().put(EXPIRATION, (System.currentTimeMillis() + oa2se.getIdTokenLifetime()) / 1000); // expiration is in SECONDS from the epoch.
+            if (transaction.getIDTokenLifetime() == USE_SERVER_DEFAULT) {
+                getUserMetaData().put(EXPIRATION, System.currentTimeMillis() + OA2ConfigurationLoader.ID_TOKEN_LIFETIME_DEFAULT / 1000);
+            } else {
+                if (transaction.getOA2Client().getMaxIDTLifetime() == USE_SERVER_DEFAULT) {
+                    getUserMetaData().put(EXPIRATION, (System.currentTimeMillis() + oa2se.getIdTokenLifetime()) / 1000); // expiration is in SECONDS from the epoch.
+                } else {
+                    long ll = Math.min(oa2se.getMaxIdTokenLifetime(), transaction.getOA2Client().getIdTokenLifetime());
+                    getUserMetaData().put(EXPIRATION, (System.currentTimeMillis() + ll) / 1000); // expiration is in SECONDS from the epoch.
+
+                }
+            }
         }
-        getClaims().put(ISSUED_AT, System.currentTimeMillis() / 1000); // issued at = current time in seconds.
-        trace(this, "saving the transaction with claims:\n" + getClaims().toString(1));
-        //transaction.setUserMetaData(getClaims());
-        oa2se.getTransactionStore().save(transaction);
+        getUserMetaData().put(ISSUED_AT, System.currentTimeMillis() / 1000); // issued at = current time in seconds.
+        trace(this, "saving the transaction with claims:\n" + getUserMetaData().toString(1));
     }
 
 
@@ -151,12 +208,12 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
     public void setAccountingInformation() {
         trace(this, "Setting the accounting information for the claims");
         if (transaction.getNonce() != null && 0 < transaction.getNonce().length()) {
-            getClaims().put(NONCE, transaction.getNonce());
+            getUserMetaData().put(NONCE, transaction.getNonce());
         }
         if (transaction.hasAuthTime()) {
             // convert the date to a time if needed.
             // Fix CIL-906
-            getClaims().put(AUTHORIZATION_TIME, transaction.getAuthTime().getTime() / 1000); // spec says this is an integer
+            getUserMetaData().put(AUTHORIZATION_TIME, transaction.getAuthTime().getTime() / 1000); // spec says this is an integer
         }
         refreshAccountingInformation();
     }
@@ -164,9 +221,10 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
 
     @Override
     public void addRequestState(ScriptRunRequest req) throws Throwable {
-        req.getArgs().put(SRE_REQ_CLAIMS, getClaims());
-        req.getArgs().put(SRE_REQ_CLAIM_SOURCES, getSources()); // so its a map
-        req.getArgs().put(SRE_REQ_EXTENDED_ATTRIBUTES, getExtendedAttributes()); // so its a map
+        req.getArgs().put(SRE_REQ_CLAIM_SOURCES, getSources());
+        req.getArgs().put(SRE_REQ_CLAIMS, getUserMetaData());
+/*
+        req.getArgs().put(SRE_REQ_EXTENDED_ATTRIBUTES, getExtendedAttributes()); // so its a map*/
     }
 
     @Override
@@ -179,8 +237,8 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
                 // to make them accessible to their machinery, then convert them back.
                 // Update the transaction here because if you do not, then values don't chain between
                 // handlers. The transaction is the medium of communication.
-                setClaims((JSONObject) resp.getReturnedValues().get(SRE_REQ_CLAIMS));
-                sources = (List<ClaimSource>) resp.getReturnedValues().get(SRE_REQ_CLAIM_SOURCES);
+                setUserMetaData((JSONObject) resp.getReturnedValues().get(SRE_REQ_CLAIMS));
+                List<ClaimSource> sources = (List<ClaimSource>) resp.getReturnedValues().get(SRE_REQ_CLAIM_SOURCES);
                 transaction.setClaimsSources(sources);
                 return;
             case RC_NOT_RUN:
@@ -192,12 +250,12 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
     @Override
     public void checkClaims() throws Throwable {
         if (oa2se.isOIDCEnabled()) {
-            checkClaim(getClaims(), SUBJECT);
+            checkClaim(getUserMetaData(), SUBJECT);
         }
         // Remove empty claims. One should not assert empty claims.
         // Get the keys to remove then remove them or you get a concurrent modification exception.
         ArrayList<String> keysToRemove = new ArrayList<>();
-        JSONObject claims = getClaims();
+        JSONObject claims = getUserMetaData();
 
         for (Object key : claims.keySet()) {
             if (key == null) {
@@ -217,7 +275,6 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
         }
     }
 
-    List<ClaimSource> sources = null;
 
     @Override
     public List<ClaimSource> getSources() throws Throwable {
@@ -234,35 +291,50 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
         // only required one by the spec. and only if the server is OIDC.
 
         if (oa2se.isOIDCEnabled()) {
-            checkClaim(getClaims(), SUBJECT); // checks they requested it and it exists. Throws exception if not
+            checkClaim(getUserMetaData(), SUBJECT); // checks they requested it and it exists. Throws exception if not
         }
         refreshAccountingInformation();
-        if (transaction.getScopes().contains(OA2Scopes.SCOPE_CILOGON_INFO) || !((OA2Client) transaction.getClient()).useStrictScopes()) {
+        if (getScopes().contains(OA2Scopes.SCOPE_CILOGON_INFO) || !((OA2Client) transaction.getClient()).useStrictScopes()) {
             permissiveFinish(execPhase);
             return;
         }
         restrictiveFinish(execPhase);
     }
 
+    Collection<String> scopes = null;
+
+    public Collection<String> getScopes() {
+        if (scopes == null) {
+            if (hasTXRecord() && getTXRecord().getScopes()!=null) {
+                scopes = getTXRecord().getScopes();
+            } else {
+                scopes = transaction.getScopes();
+            }
+        }
+        return scopes;
+    }
+
     /**
      * Restrictive finish = user must explicitly request things and will be limited to them.
      * The model here is that the claim source gets whatever, but the results are filtered
      * to a restricted subset.
+     *
      * @param execPhase
      * @throws Throwable
      */
     protected void restrictiveFinish(String execPhase) throws Throwable {
         JSONObject finalClaims = new JSONObject();
         JSONObject c = new JSONObject();
-        c.putAll(getClaims());
+        Collection<String> scopes = getScopes();
+        c.putAll(getUserMetaData());
         // These are to present in every ID token.
-        String[] requiredClaims = new String[]{ISSUER,AUDIENCE,EXPIRATION,ISSUED_AT,JWT_ID,NONCE,AUTHORIZATION_TIME};
-        for(String r : requiredClaims){
+        String[] requiredClaims = new String[]{ISSUER, AUDIENCE, EXPIRATION, ISSUED_AT, JWT_ID, NONCE, AUTHORIZATION_TIME};
+        for (String r : requiredClaims) {
             setCurrentClaim(c, finalClaims, r);
         }
         // As per OIDC spec, if present MUST contain the identifier for the client
-        finalClaims.put(AUTHORIZED_PARTY,transaction.getClient().getIdentifierString());
-        if (transaction.getScopes().contains(OA2Scopes.SCOPE_OPENID)) {
+        finalClaims.put(AUTHORIZED_PARTY, transaction.getClient().getIdentifierString());
+        if (scopes.contains(OA2Scopes.SCOPE_OPENID)) {
             setCurrentClaim(c, finalClaims, SUBJECT);
             setCurrentClaim(c, finalClaims, AUTHENTICATION_CLASS_REFERENCE);
             setCurrentClaim(c, finalClaims, AUTHENTICATION_METHOD_REFERENCE);
@@ -270,28 +342,28 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
         // CIL-1411 -- remove any claims not specifically requested by the user.
         // We need this here since a policy set  may add claims that the user
         // did not request.
-        if (transaction.getScopes().contains(SCOPE_EMAIL)) {
+        if (scopes.contains(SCOPE_EMAIL)) {
             setCurrentClaim(c, finalClaims, EMAIL);
             setCurrentClaim(c, finalClaims, EMAIL_VERIFIED); // we usually don't do this though.
         }
-        if (transaction.getScopes().contains(SCOPE_PHONE)) {
+        if (scopes.contains(SCOPE_PHONE)) {
             setCurrentClaim(c, finalClaims, PHONE_NUMBER);
             setCurrentClaim(c, finalClaims, PHONE_NUMBER_VERIFIED);
         }
 
-        if (transaction.getScopes().contains(OA2Scopes.SCOPE_PROFILE)) {
+        if (scopes.contains(OA2Scopes.SCOPE_PROFILE)) {
             setCurrentClaim(c, finalClaims, NAME);
             setCurrentClaim(c, finalClaims, GIVEN_NAME);
             setCurrentClaim(c, finalClaims, FAMILY_NAME);
             setCurrentClaim(c, finalClaims, PREFERRED_USERNAME);
         }
-        if (transaction.getScopes().contains(OA2Scopes.SCOPE_ADDRESS)) {
+        if (scopes.contains(OA2Scopes.SCOPE_ADDRESS)) {
             setCurrentClaim(c, finalClaims, ADDRESS);
         }
 
         // these are things that may be returned as user information
         // Fix for https://github.com/ncsa/oa4mp/issues/112
-        if (transaction.getScopes().contains(OA2Scopes.SCOPE_USER_INFO)) {
+        if (scopes.contains(OA2Scopes.SCOPE_USER_INFO)) {
             setCurrentClaim(c, finalClaims, IDP);
             setCurrentClaim(c, finalClaims, IDP_NAME);
             setCurrentClaim(c, finalClaims, EPPN);
@@ -304,7 +376,7 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
             setCurrentClaim(c, finalClaims, AFFILIATION);
             setCurrentClaim(c, finalClaims, IS_MEMBER_OF);
         }
-        transaction.setUserMetaData(finalClaims);
+        //transaction.setUserMetaData(finalClaims);
     }
 
     /**
@@ -313,30 +385,32 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
      * be simply added. If a client is set to strict scopes, adding claims in a script
      * will have them stripped off.
      * CILogon uses this by default since the scopes they get come from SAML assertions
+     *
      * @param execPhase
      * @throws Throwable
      */
     protected void permissiveFinish(String execPhase) throws Throwable {
         // only required one by the spec. and only if the server is OIDC.
         if (oa2se.isOIDCEnabled()) {
-            checkClaim(getClaims(), SUBJECT);
+            checkClaim(getUserMetaData(), SUBJECT);
         }
+        Collection<String> scopes = getScopes();
         // CIL-1411 -- remove any claims not specifically requested by the user.
         // We need this here since a policy set  may add claims that the user
         // did not request.
-        if (!transaction.getScopes().contains(OA2Scopes.SCOPE_EMAIL)) {
-            getClaims().remove(EMAIL);
-            getClaims().remove(EMAIL_VERIFIED);
+        if (!scopes.contains(OA2Scopes.SCOPE_EMAIL)) {
+            getUserMetaData().remove(EMAIL);
+            getUserMetaData().remove(EMAIL_VERIFIED);
         }
-        if (!transaction.getScopes().contains(SCOPE_PHONE)) {
-            getClaims().remove(PHONE_NUMBER);
-            getClaims().remove(PHONE_NUMBER_VERIFIED);
+        if (!scopes.contains(SCOPE_PHONE)) {
+            getUserMetaData().remove(PHONE_NUMBER);
+            getUserMetaData().remove(PHONE_NUMBER_VERIFIED);
         }
-        if (!transaction.getScopes().contains(OA2Scopes.SCOPE_PROFILE)) {
-            getClaims().remove(NAME);
-            getClaims().remove(GIVEN_NAME);
-            getClaims().remove(FAMILY_NAME);
-            getClaims().remove(PREFERRED_USERNAME);
+        if (!scopes.contains(OA2Scopes.SCOPE_PROFILE)) {
+            getUserMetaData().remove(NAME);
+            getUserMetaData().remove(GIVEN_NAME);
+            getUserMetaData().remove(FAMILY_NAME);
+            getUserMetaData().remove(PREFERRED_USERNAME);
         }
 
         // everything else gets passed back.
@@ -349,8 +423,11 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
     }
 
     @Override
-    public void saveState() throws Throwable {
-
+    public void saveState(String execPhase) throws Throwable {
+        if (execPhase.equals(SRE_POST_AUTH)) {
+            transaction.setUserMetaData(getUserMetaData());
+        }
+        super.saveState(execPhase);
     }
 
 
@@ -416,5 +493,24 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
         return super.execute(source, claims);
     }
 
+    @Override
+    public IDTokenImpl getSignedPayload(JSONWebKey key) {
+        return getSignedPayload(key, null);
+    }
 
+    @Override
+    public IDTokenImpl getSignedPayload(JSONWebKey key, String headerType) {
+        String idTokken = null;
+        try {
+            if (transaction.getOA2Client().isSignTokens()) {
+                idTokken = JWTUtil.createJWT(getPayload(), key);
+            } else {
+                idTokken = JWTUtil.createJWT(getPayload());
+            }
+            return new IDTokenImpl(idTokken, URI.create(getPayload().getString(JWT_ID)));
+        } catch (Throwable e) {
+            throw new IllegalStateException("Error: cannot create ID token", e);
+        }
+
+    }
 }

@@ -227,6 +227,26 @@ public class OA2Client extends Client implements OA2ClientScopes {
 
     long atLifetime = USE_SERVER_DEFAULT;
 
+    public long getIdTokenLifetime() {
+        return idTokenLifetime;
+    }
+
+    public void setIdTokenLifetime(long idTokenLifetime) {
+        this.idTokenLifetime = idTokenLifetime;
+    }
+
+    long idTokenLifetime = USE_SERVER_DEFAULT;
+
+    public long getMaxIDTLifetime() {
+        return maxIDTLifetime;
+    }
+
+    public void setMaxIDTLifetime(long maxIDTLifetime) {
+        this.maxIDTLifetime = maxIDTLifetime;
+    }
+
+    long maxIDTLifetime = USE_SERVER_DEFAULT;
+
     /**
      * This returns whether or not this client is configured to return refresh tokens.
      * Zero means no refresh tokens, positive is the lifetime, negative {@link #USE_SERVER_DEFAULT}

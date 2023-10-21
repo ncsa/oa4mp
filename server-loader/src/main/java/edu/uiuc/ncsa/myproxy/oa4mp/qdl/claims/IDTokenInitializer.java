@@ -73,14 +73,14 @@ public class IDTokenInitializer implements QDLModuleMetaClass {
 
             }
             String execPhase = (String) objects[1];
-            getidTokenHandler().setClaims((JSONObject) idtoken.toJSON());
+            getidTokenHandler().setUserMetaData((JSONObject) idtoken.toJSON());
             try {
                 doMethod(execPhase);
             } catch (Throwable throwable) {
                 handleException(throwable);
             }
 
-            output.fromJSON(getidTokenHandler().getClaims());
+            output.fromJSON(getidTokenHandler().getUserMetaData());
             return output;
         }
 

@@ -52,22 +52,22 @@ claims. := claims();
 ⊨ claims.'sub' == 'http://cilogon.org/serverT/users/21340363' : 'incorrect subject' ;
 ⊨ claims.'aud' == cfg.'id' : 'wrong audience';
 ⊨ claims.'iss' == 'https://localhost:9443/oauth2/fermilab' : 'wrong issuer';
-⊨ claims.'test_claim' == 'my test claim42' : 'wrong test_claim assertion';
+⊨ claims.'test_claim' == 'my test claim42' : 'wrong test_claim assertion #1, got ' + (claims.'test_claim');
 
  new_claims. := {'isMemberOf':[{'id':1200, 'name':'org_xxx'},{'id':1400, 'name':'all_ncsa_employees'},{'id':1363, 'name':'jira-users'}],
      'test_claim':'m3y o3t3h3e3r test cl33aim 41'};
  file_write(claims_file, to_json({'jgaynor@foo.bar':new_claims.}) );
 
 tokens. := refresh();
-⊨ tokens.'access_token'.'lifetime' == 900000 : 'wrong access token lifetime';
-⊨ tokens.'refresh_token'.'lifetime' == 1800000 : 'wrong refresh token lifetime';
+⊨ tokens.'access_token'.'lifetime' == 1009000 : 'wrong access token lifetime, got ' + (tokens.'access_token'.'lifetime');
+⊨ tokens.'refresh_token'.'lifetime' == 1800000 : 'wrong refresh token lifetime, got ' + (tokens.'refresh_token'.'lifetime');
 claims. := claims();
 ⊨ reduce(@∧, [1200,1400,1363] ∈ claims.'isMemberOf'\*\'id') : 'incorrect group id number(s), got ' + to_string(claims.'isMemberOf'\*\'id');
 ⊨ reduce(@∧, ['org_xxx','all_ncsa_employees','jira-users' ] ∈ claims.'isMemberOf'\*\'name') : 'incorrect group name(s)';
 ⊨ claims.'sub' == 'http://cilogon.org/serverT/users/21340363' : 'incorrect subject' ;
 ⊨ claims.'aud' == cfg.'id' : 'wrong audience';
 ⊨ claims.'iss' == 'https://localhost:9443/oauth2/fermilab' : 'wrong issuer';
-⊨ claims.'test_claim' == new_claims.'test_claim'-'3' : 'wrong test_claim assertion';
+⊨ claims.'test_claim' == new_claims.'test_claim'-'3' : 'wrong test_claim assertion #2, got ' + (claims.'test_claim');
 
 
 new_claims. := {'isMemberOf':[{'id':100, 'name':'org_yyy'},{'id':200, 'name':'all_ncsa_staff'},{'id':300, 'name':'ldap-users'}],

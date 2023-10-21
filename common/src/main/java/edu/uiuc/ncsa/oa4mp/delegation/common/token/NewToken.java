@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.oa4mp.delegation.common.token;
 
+import edu.uiuc.ncsa.security.core.Identifier;
 import net.sf.json.JSONObject;
 
 import java.net.URI;
@@ -20,4 +21,5 @@ public interface NewToken extends Token{
      String encodeToken();
     long OLD_SYSTEM_DEFAULT_LIFETIME = 1000L*60L*15L; // 15 minutes.
     URI getJti();
+    Identifier getJTIAsIdentifier();
 }

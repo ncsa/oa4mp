@@ -17,7 +17,7 @@ public interface OA2ConfigTags {
     public String DEFAULT_ACCESS_TOKEN_LIFETIME = "defaultAccessTokenLifetime"; // in seconds, convert to ms.
     public String MAX_ACCESS_TOKEN_LIFETIME = "maxAccessTokenLifetime"; // in seconds, convert to ms.
     public String DEFAULT_ID_TOKEN_LIFETIME = "defaultIDTokenLifetime"; // in seconds, convert to ms.
-    public String MAX_ID_TOKEN_LIFETIME = "maxIDTokenLifetime"; // in seconds, convert to ms.
+    public String MAX_ID_TOKEN_LFIFETIME = "maxIDTokenLifetime"; // in seconds, convert to ms.
     public String REFRESH_TOKEN_ENABLED = "refreshTokenEnabled"; // Enable or disable refresh tokens for this server.
     public String REFRESH_TOKEN_LIFETIME = "refreshTokenLifetime"; // in seconds, convert to ms.
     public String MAX_REFRESH_TOKEN_LIFETIME = "maxRefreshTokenLifetime"; // in seconds, convert to ms.

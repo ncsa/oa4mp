@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.ClientUtils;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2DiscoveryServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VirtualOrganization;
@@ -9,15 +9,16 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.AuthorizationPath;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.AuthorizationTemplate;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.AuthorizationTemplates;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
-import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
-import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.AccessTokenHandlerInterface;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.IDTokenHandlerInterface;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.JWTUtil2;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC8693Constants;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSource;
+import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunRequest;
@@ -30,8 +31,8 @@ import java.util.*;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.ScopeTemplateUtil.doCompareTemplates;
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.ScopeTemplateUtil.replaceTemplate;
-import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims.*;
+import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 import static edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse.RC_NOT_RUN;
 import static edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse.RC_OK;
 import static edu.uiuc.ncsa.security.util.scripting.ScriptingConstants.*;
@@ -42,7 +43,7 @@ import static edu.uiuc.ncsa.security.util.scripting.ScriptingConstants.*;
  * <p>Created by Jeff Gaynor<br>
  * on 7/21/20 at  2:50 PM
  */
-public class AbstractAccessTokenHandler extends AbstractPayloadHandler implements AccessTokenHandlerInterface {
+public class AbstractAccessTokenHandler extends AbstractPayloadHandler implements AccessTokenHandlerInterface, IDTokenHandlerInterface {
     public static final String AT_DEFAULT_HANDLER_TYPE = "default";
     public static final String AT_BASIC_HANDLER_TYPE = "access";
 
@@ -53,45 +54,49 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
 
     /**
      * The underlying {@link JSONObject} that contains the claims that go in to this access token.
-     * Note that the {@link #getClaims()} call will retrieve the user metadata and is not the same as
+     * Note that the {@link #getUserMetaData()} call will retrieve the user metadata and is not the same as
      * the access token contents!
      *
      * @return
      */
-    public JSONObject getAtData() {
-        if (atData == null) {
-            if (getPhCfg().hasTXRecord() && getPhCfg().getTxRecord().hasToken()) {
-                atData = getPhCfg().getTxRecord().getToken();
-            } else {
-                atData = transaction.getATData();
-            }
-            if (atData == null) {
-                // Edge case
-                atData = new JSONObject();
+    public JSONObject getPayload() {
+        if (payload == null) {
+            payload = transaction.getATData();
+            if (payload == null) {
+                payload = new JSONObject();
             }
         }
-        //return transaction.getATData();
-        return atData;
+        return payload;
     }
 
-    JSONObject atData = null;
+    JSONObject userMetaData;
 
-    public void setAtData(JSONObject atData) {
-        this.atData = atData;
-        //transaction.setATData(atData);
+    /**
+     * generally for this class you will need to inject the user meta data.
+     *
+     * @return
+     */
+    public JSONObject getUserMetaData() {
+        return userMetaData;
     }
+
+    public void setUserMetaData(JSONObject userMetaData) {
+        this.userMetaData = userMetaData;
+    }
+
 
     @Override
     public void init() throws Throwable {
         // set some standard claims.
-        if (getAtData().isEmpty()) {
+        if (getPayload().isEmpty()) {
             setAccountingInformation();
         }
     }
 
     @Override
     public void addRequestState(ScriptRunRequest req) throws Throwable {
-        req.getArgs().put(SRE_REQ_ACCESS_TOKEN, getAtData());
+        req.getArgs().put(SRE_REQ_ACCESS_TOKEN, getPayload());
+        req.getArgs().put(SRE_REQ_CLAIMS, getUserMetaData());
     }
 
 
@@ -103,9 +108,11 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
                 // Note that the returned values from a script are very unlikely to be the same object we sent
                 // even if the contents are the same, since scripts may have to change these in to other data structures
                 // to make them accessible to their machinery, then convert them back.
-                setClaims((JSONObject) resp.getReturnedValues().get(SRE_REQ_CLAIMS));
+                setUserMetaData((JSONObject) resp.getReturnedValues().get(SRE_REQ_CLAIMS));
                 setExtendedAttributes((JSONObject) resp.getReturnedValues().get(SRE_REQ_EXTENDED_ATTRIBUTES));
-                setAtData((JSONObject) resp.getReturnedValues().get(SRE_REQ_ACCESS_TOKEN));
+                setPayload((JSONObject) resp.getReturnedValues().get(SRE_REQ_ACCESS_TOKEN));
+                List<ClaimSource> sources = (List<ClaimSource>) resp.getReturnedValues().get(SRE_REQ_CLAIM_SOURCES);
+                transaction.setClaimsSources(sources);
                 return;
             case RC_NOT_RUN:
                 return;
@@ -175,8 +182,8 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
         getClaims().put("otherMemberOf", gg.toJSON());
         */
         Map claimsNoGroups = new HashMap();
-        for (Object claimKey : getClaims().keySet()) {
-            Object claim = getClaims().get(claimKey);
+        for (Object claimKey : getUserMetaData().keySet()) {
+            Object claim = getUserMetaData().get(claimKey);
             // Only groups are allowed to be embedded arrays in claims.
             if (claim instanceof JSONArray) {
                 List<String> groupKeys = new ArrayList<>();  // list of groups in the current claims for this user
@@ -304,7 +311,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
 
     @Override
     public List<ClaimSource> getSources() throws Throwable {
-        return new ArrayList<>();
+        return transaction.getClaimSources(oa2se);
     }
 
     public void finish(boolean doTemplates, boolean isQuery) throws Throwable {
@@ -313,7 +320,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
          */
         MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(transaction.getOA2Client());
         debugger.trace(this, "starting AT handler finish with transaction =" + transaction.summary());
-        JSONObject atData = getAtData();
+        JSONObject atData = getPayload();
         if (getPhCfg().hasTXRecord()) {
             TXRecord txRecord = getPhCfg().getTxRecord();
             // Fixes CIL-971
@@ -359,13 +366,13 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
             }
         }
 
-        doServerVariables(atData);
-        setAtData(atData); // If these are updated by the server variable, update.
+        doServerVariables(atData, getUserMetaData());
+        setPayload(atData); // If these are updated by the server variable, update.
         if (getPhCfg().hasTXRecord()) {
-            getPhCfg().getTxRecord().setToken(getAtData());
+            getPhCfg().getTxRecord().setToken(getPayload());
             getPhCfg().getTxRecord().setLifetime(proposedLifetime);
         }
-        transaction.setAccessTokenLifetime(proposedLifetime);
+        //   transaction.setAccessTokenLifetime(proposedLifetime);
     }
 
 
@@ -387,44 +394,39 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
         finish(true, isQuery);
     }
 
-    public AccessToken getSignedAT(JSONWebKey key) {
-        return getSignedAT(key, JWTUtil2.DEFAULT_TYPE);
+
+    @Override
+    public AccessTokenImpl getSignedPayload(JSONWebKey key) {
+        return getSignedPayload(key, JWTUtil2.DEFAULT_TYPE);
     }
 
-    /**
-     * Gets the AT data object (which has all the claims in it) and returns a signed access token.
-     * This does <b>not</b> set the access token in the transaction but leaves up to the calling
-     * application what to do, since different tokens have different contracts.
-     *
-     * @return
-     */
     @Override
-    public AccessToken getSignedAT(JSONWebKey key, String headerType) {
+    public AccessTokenImpl getSignedPayload(JSONWebKey key, String headerType) {
         if (key == null) {
             oa2se.warn("Error: Null or missing key for signing encountered processing client \"" + transaction.getOA2Client().getIdentifierString() + "\"");
             throw new IllegalArgumentException("Error: Missing JSON web key. Cannto sign access token.");
         }
-        if (getAtData().isEmpty()) return null;
-        /*
-         Special case: If the claim has a single entry then that is the raw token. Return that. This allows
-         handlers in QDL to decide not to return a JWT and just return a standard identifier.
-          */
-        if (getAtData().size() == 1) {
-            String k = String.valueOf(getAtData().keySet().iterator().next());
-            String v = String.valueOf(getAtData().get(k));
+        if (getPayload().isEmpty()) return null;
+           /*
+            Special case: If the claim has a single entry then that is the raw token. Return that. This allows
+            handlers in QDL to decide not to return a JWT and just return a standard identifier.
+             */
+        if (getPayload().size() == 1) {
+            String k = String.valueOf(getPayload().keySet().iterator().next());
+            String v = String.valueOf(getPayload().get(k));
             oa2se.info("Single value access token for client \"" + transaction.getOA2Client().getIdentifierString() + "\" found. Setting token value to " + v);
             AccessTokenImpl accessToken = new AccessTokenImpl(URI.create(v));
             return accessToken;
         }
-        if (!getAtData().containsKey(JWT_ID)) {
+        if (!getPayload().containsKey(JWT_ID)) {
             // There is something wrong. This is required.
             throw new IllegalStateException("Error: no JTI. Cannot create access token");
         }
         try {
-            String at = JWTUtil2.createJWT(getAtData(), key, headerType);
-            URI jti = URI.create(getAtData().getString(JWT_ID));
+            String at = JWTUtil2.createJWT(getPayload(), key, headerType);
+            URI jti = URI.create(getPayload().getString(JWT_ID));
             AccessTokenImpl at0 = new AccessTokenImpl(at, jti);
-            at0.setLifetime(1000 * (getAtData().getLong(EXPIRATION) - getAtData().getLong(ISSUED_AT)));
+            at0.setLifetime(1000 * (getPayload().getLong(EXPIRATION) - getPayload().getLong(ISSUED_AT)));
             return at0;
         } catch (Throwable e) {
             if (e instanceof RuntimeException) {
@@ -436,15 +438,20 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
         }
     }
 
-    @Override
-    public void saveState() throws Throwable {
 
+    @Override
+    public void saveState(String execPhase) throws Throwable {
+        if (execPhase.equals(SRE_POST_AUTH)) {
+            transaction.setATData(getPayload());
+            transaction.setAccessTokenLifetime(getPayload().getLong(EXPIRATION) * 1000);
+        }
+        super.saveState(execPhase);
     }
 
 
     @Override
     public void setAccountingInformation() {
-        JSONObject atData = getAtData();
+        JSONObject atData = getPayload();
         // Figure out issuer. If in config, that wins. If not, if the client is
         // in a vo, use the designated at issuer. If that is not set, use the
         // VO issuer. If that fails, get the server issuer from the discovery servlet.
@@ -480,15 +487,17 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
             String newSubject = TemplateUtil.replaceAll(getATConfig().getSubject(), atData);
             atData.put(SUBJECT, newSubject);
         }
-        if (0 < getATConfig().getLifetime()) {
-            atData.put(EXPIRATION, (System.currentTimeMillis() + getATConfig().getLifetime()) / 1000L);
-        } else {
-            atData.put(EXPIRATION, (System.currentTimeMillis() + OA2ConfigurationLoader.ACCESS_TOKEN_LIFETIME_DEFAULT) / 1000L); // 15 minutes.
+        long lifetime = ClientUtils.computeATLifetime(transaction, oa2se);
+        long expiresAt = System.currentTimeMillis() + lifetime;
+        atData.put(EXPIRATION, expiresAt / 1000L);
+        if (hasTXRecord()) {
+            getTXRecord().setLifetime(lifetime);
+            getTXRecord().setExpiresAt(expiresAt);
         }
         atData.put(NOT_VALID_BEFORE, (System.currentTimeMillis() - 5000L) / 1000L); // not before is 5 minutes before current
         atData.put(ISSUED_AT, System.currentTimeMillis() / 1000L);
 
-        setAtData(atData);
+        setPayload(atData);
     }
 
     @Override

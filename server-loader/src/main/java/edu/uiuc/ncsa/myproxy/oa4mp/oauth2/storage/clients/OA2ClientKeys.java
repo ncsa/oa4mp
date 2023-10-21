@@ -16,6 +16,7 @@ public class OA2ClientKeys extends ClientKeys {
         secret("public_key");
     }
     String atLifetime = "at_lifetime";
+    String idTokenLifetime = "idt_lifetime";
     String audience="audience";
     String callback_uri = "callback_uri";
     String config = "cfg";
@@ -30,6 +31,7 @@ public class OA2ClientKeys extends ClientKeys {
     String ldap = "ldap";
     String maxATLifetime = "at_max_Lifetime";
     String maxRTLifetime = "rt_max_Lifetime";
+    String maxIDTLifetime = "idt_max_Lifetime";
     String proxyClaimsList ="proxy_claims_list";
     String proxyRequestScopes ="proxy_request_scopes";
     String publicClient="public_client";
@@ -48,6 +50,16 @@ public class OA2ClientKeys extends ClientKeys {
            (in  oa4mp-qdl)
       or you may break the QDL module that handles clients.
      */
+
+    public String idtLifetime(String... x) {
+           if (0 < x.length) idTokenLifetime = x[0];
+           return idTokenLifetime;
+       }
+    public String maxIDTLifetime(String... x) {
+           if (0 < x.length) maxIDTLifetime = x[0];
+           return maxIDTLifetime;
+       }
+
 
     public String proxyRequestScopes(String... x) {
            if (0 < x.length) proxyRequestScopes = x[0];
@@ -189,30 +201,34 @@ public class OA2ClientKeys extends ClientKeys {
     @Override
     public List<String> allKeys() {
         List<String> allKeys = super.allKeys();
+        allKeys.add(atLifetime());
+        allKeys.add(audience());
         allKeys.add(callbackUri());
         allKeys.add(cfg());
+        allKeys.add(dfInterval());
+        allKeys.add(dfLifetime());
+        allKeys.add(ea());
+        allKeys.add(ersatzClient());
+        allKeys.add(ersatzInheritIDToken());
+        allKeys.add(extendsProvisioners());
+        allKeys.add(forwardScopesToProxy());
+        allKeys.add(idtLifetime());
         allKeys.add(issuer());
         allKeys.add(ldap());
-        allKeys.add(publicClient());
+        allKeys.add(maxATLifetime());
+        allKeys.add(maxIDTLifetime());
+        allKeys.add(maxRTLifetime());
+        allKeys.add(prototypes());
         allKeys.add(proxyClaimsList());
         allKeys.add(proxyRequestScopes());
-        allKeys.add(forwardScopesToProxy());
+        allKeys.add(publicClient());
+        allKeys.add(rtGracePeriod());
+        allKeys.add(resource());
         allKeys.add(rtLifetime());
-        allKeys.add(atLifetime());
         allKeys.add(scopes());
         allKeys.add(signTokens());
-        allKeys.add(ea());
-        allKeys.add(strictScopes());
-        allKeys.add(dfLifetime());
-        allKeys.add(dfInterval());
-        allKeys.add(dfInterval());
-        allKeys.add(maxATLifetime());
-        allKeys.add(maxRTLifetime());
-        allKeys.add(ersatzClient());
-        allKeys.add(prototypes());
-        allKeys.add(extendsProvisioners());
         allKeys.add(skipServerScripts());
-        allKeys.add(rtGracePeriod());
+        allKeys.add(strictScopes());
         return allKeys;
     }
 }

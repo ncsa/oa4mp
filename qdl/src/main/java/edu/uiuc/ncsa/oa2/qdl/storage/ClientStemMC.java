@@ -207,6 +207,13 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
         if (stem.containsKey(kk().rtLifetime())) {
             v.setRtLifetime(stem.getLong(kk().rtLifetime()));
         }
+        if (stem.containsKey(kk().idtLifetime())) {
+            v.setIdTokenLifetime(stem.getLong(kk().idtLifetime()));
+        }
+        if (stem.containsKey(kk().maxIDTLifetime())) {
+            v.setMaxIDTLifetime(stem.getLong(kk().maxIDTLifetime()));
+        }
+
         if (stem.containsKey(kk().maxATLifetime())) {
             v.setMaxATLifetime(stem.getLong(kk().maxATLifetime()));
         }
@@ -264,6 +271,7 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
 
         // OA2 client attributes
         setNonNullStemValue(stem, kk().atLifetime(), v.getAtLifetime());
+        setNonNullStemValue(stem, kk().idtLifetime(), v.getIdTokenLifetime());
         if (v.getAudience() != null && !v.getAudience().isEmpty()) {
             fromList(v.getAudience(), stem, kk().audience());
         }
@@ -290,6 +298,7 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
             ea.fromJSON(v.getExtendedAttributes());
             stem.put(kk().ea(), ea);
         }
+        stem.put(kk().maxIDTLifetime(), v.getMaxIDTLifetime());
         stem.put(kk().maxATLifetime(), v.getMaxATLifetime());
         stem.put(kk().maxRTLifetime(), v.getMaxRTLifetime());
         stem.put(kk().rtGracePeriod(), v.getRtGracePeriod());

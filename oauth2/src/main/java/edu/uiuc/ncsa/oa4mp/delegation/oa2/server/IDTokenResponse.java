@@ -2,8 +2,8 @@ package edu.uiuc.ncsa.oa4mp.delegation.oa2.server;
 
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.IDTokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.JWTUtil;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
 import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
@@ -18,11 +18,10 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import static edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants.*;
-import static edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants.ID_TOKEN;
 
 /**
  * This is the superclass for responses that must include the ID token.
- * Note that the ID token is in the {@link #getClaims()}.
+ * Note that the ID token is in the {@link #getUserMetadata()}.
  * <p>Created by Jeff Gaynor<br>
  * on 8/17/17 at  1:03 PM
  */
@@ -46,6 +45,15 @@ public abstract class IDTokenResponse extends IResponse2 {
     AccessToken accessToken;
     RefreshTokenImpl refreshToken;
 
+    public IDTokenImpl getIdToken() {
+        return idToken;
+    }
+
+    public void setIdToken(IDTokenImpl idToken) {
+        this.idToken = idToken;
+    }
+
+    IDTokenImpl idToken;
     public boolean hasRefreshToken() {
         return refreshToken != null;
     }
@@ -88,17 +96,17 @@ public abstract class IDTokenResponse extends IResponse2 {
 
     boolean signToken = false;
 
-    JSONObject claims;
+    JSONObject userMetadata;
 
-    public JSONObject getClaims() {
-        if (claims == null) {
-            claims = new JSONObject();
+    public JSONObject getUserMetadata() {
+        if (userMetadata == null) {
+            userMetadata = new JSONObject();
         }
-        return claims;
+        return userMetadata;
     }
 
-    public void setClaims(JSONObject claims) {
-        this.claims = claims;
+    public void setUserMetadata(JSONObject userMetadata) {
+        this.userMetadata = userMetadata;
     }
 
     /**
@@ -158,19 +166,7 @@ public abstract class IDTokenResponse extends IResponse2 {
         }
 
         if (isOIDC()) {
-            JSONObject claims = getClaims();
-            try {
-                String idTokken = null;
-                if (isSignToken()) {
-                    idTokken = JWTUtil.createJWT(claims, getJsonWebKey());
-                } else {
-                    idTokken = JWTUtil.createJWT(claims);
-                }
-                m.put(ID_TOKEN, idTokken);
-            } catch (Throwable e) {
-                throw new IllegalStateException("Error: cannot create ID token", e);
-            }
-
+            m.put(ID_TOKEN, getIdToken().getToken());
         }
 
         JSONObject json = JSONObject.fromObject(m);
@@ -191,7 +187,7 @@ public abstract class IDTokenResponse extends IResponse2 {
                 "accessToken=" + accessToken +
                 ", refreshToken=" + refreshToken +
                 ", signToken=" + signToken +
-                ", claims=" + claims +
+                ", claims=" + userMetadata +
                 ", supportedScopes=" + supportedScopes +
                 '}';
     }

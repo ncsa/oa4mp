@@ -63,6 +63,10 @@ public class ClientUtils {
         return computeATLifetimeOLD(st2, client, oa2SE);
     }
 
+    public static long computeATLifetime(OA2ServiceTransaction st2, OA2SE oa2SE) {
+               return computeATLifetime(st2, st2.getOA2Client(), oa2SE);
+    }
+
     protected static long computeATLifetimeOLD(OA2ServiceTransaction st2, OA2Client client, OA2SE oa2SE) {
 //        OA2SE oa2SE = (OA2SE) getServiceEnvironment();
         // If the server default is <= 0 that implies there is some misconfiguration. Better to find that out here than
@@ -92,6 +96,48 @@ public class ClientUtils {
             // IF they specified an  access token lifetime in the request, take the minimum of that
             // and whatever they client is allowed.
             lifetime = Math.min(st2.getRequestedATLifetime(), lifetime);
+        }
+        return lifetime;
+
+    }
+    public static long computeRTGracePeriod(OA2ServiceTransaction st2, OA2Client client, OA2SE oa2SE){
+        if(!oa2SE.isRTGracePeriodEnabled()){
+            return 0L; // means no grace period.
+        }
+        if(client.getRtGracePeriod() == OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_USE_SERVER_DEFAULT){
+            return oa2SE.getRtGracePeriod();
+        }
+        return client.getRtGracePeriod();
+    }
+    public static long computeIDTLifetime(OA2ServiceTransaction st2, OA2SE oa2SE) {
+                return computeIDTLifetime(st2, st2.getOA2Client(), oa2SE);
+    }
+    public static long computeIDTLifetime(OA2ServiceTransaction st2, OA2Client client, OA2SE oa2SE) {
+        if (oa2SE.getMaxIdTokenLifetime() <= 0) {
+            throw new NFWException("Internal error: the server-wide default for the IDToken token lifetime has not been set.");
+        }
+        st2.setMaxIDTLifetime(oa2SE.getMaxIdTokenLifetime()); // absolute max allowed on this server for this request
+
+//        OA2Client client = (OA2Client) st2.getClient();
+        long lifetime = -1L;
+        if (0 < client.getIdTokenLifetime()) {
+            lifetime = Math.min(client.getIdTokenLifetime(), oa2SE.getMaxIdTokenLifetime());
+        } else {
+            // client lifetime <= 0
+            lifetime = OA2ConfigurationLoader.ID_TOKEN_LIFETIME_DEFAULT;
+        }
+
+        if (client.hasIDTokenConfig()) {
+            if (0 < client.getIDTokenConfig().getLifetime()) {
+                lifetime = Math.min(client.getIDTokenConfig().getLifetime(), lifetime);
+            }
+        }
+
+        // If the transaction has a specific request, take it in to account.
+        if (0 < st2.getRequestedIDTLifetime()) {
+            // IF they specified an  access token lifetime in the request, take the minimum of that
+            // and whatever they client is allowed.
+            lifetime = Math.min(st2.getRequestedIDTLifetime(), lifetime);
         }
         return lifetime;
 
@@ -142,6 +188,9 @@ public class ClientUtils {
     public static long computeRefreshLifetime(OA2ServiceTransaction st2, OA2Client client, OA2SE oa2SE) {
         return computeRefreshLifetimeNEW(st2, client, oa2SE);
         //return computeRefreshLifetimeOLD(st2, oa2SE);
+    }
+    public static long computeRefreshLifetime(OA2ServiceTransaction st2, OA2SE oa2SE) {
+       return computeRefreshLifetime(st2, st2.getOA2Client(), oa2SE);
     }
 
     public static long computeRefreshLifetimeOLD(OA2ServiceTransaction st2, OA2SE oa2SE) {
@@ -317,6 +366,9 @@ public class ClientUtils {
         return resolveScopes(transactionState, oa2Client, false, isRFC8628);
     }
 
+    public static Collection<String> resolveScopes(OA2ServiceTransaction t) {
+        return resolveScopes(null, t, t.getOA2Client(), false, false);
+    }
     public static Collection<String> resolveScopes(HttpServletRequest request,
                                                    OA2ServiceTransaction st,
                                                    OA2Client oa2Client,

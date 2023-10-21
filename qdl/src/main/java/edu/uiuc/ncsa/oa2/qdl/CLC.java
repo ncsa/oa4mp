@@ -2,7 +2,6 @@ package edu.uiuc.ncsa.oa2.qdl;
 
 import edu.uiuc.ncsa.myproxy.oauth2.tools.OA2CLCCommands;
 import edu.uiuc.ncsa.myproxy.oauth2.tools.OA2CommandLineClient;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenImpl;
@@ -133,7 +132,7 @@ public class CLC implements QDLModuleMetaClass {
         public Object evaluate(Object[] objects, State state) throws Throwable {
             QDLStem claims = new QDLStem();
             if (objects.length == 0) {
-                JSONObject jsonObject = clcCommands.getClaims();
+                JSONObject jsonObject = clcCommands.getIdToken().getPayload();
                 claims.fromJSON(jsonObject);
             }
             return claims;
@@ -344,7 +343,7 @@ public class CLC implements QDLModuleMetaClass {
             if (Arrays.asList(objects).contains("-id")) {
                 // if they request an id token, return it.
                 QDLStem x = new QDLStem();
-                x.fromJSON(clcCommands.getClaims());
+                x.fromJSON(clcCommands.getIdToken().getPayload());
                 return x;
             }
             return getTokens();
@@ -507,7 +506,7 @@ public class CLC implements QDLModuleMetaClass {
             checkInit();
             QDLStem out = new QDLStem();
             clcCommands.user_info(argsToInputLine(getName(), objects));
-            out.fromJSON(clcCommands.getClaims());
+            out.fromJSON(clcCommands.getIdToken().getPayload());
             return out;
         }
 
@@ -871,7 +870,7 @@ public class CLC implements QDLModuleMetaClass {
     }
 
     /**
-     * This is rather similar to the {@link OA2CLCCommands#printToken(AccessToken, boolean, boolean)} and similar
+     * This is rather similar to the {@link OA2CLCCommands#printToken(TokenImpl, boolean, boolean)}  and similar
      * commands, except rather than spitting it all out as print statements, the information about the token
      * is organized into a stem for further processing.
      *

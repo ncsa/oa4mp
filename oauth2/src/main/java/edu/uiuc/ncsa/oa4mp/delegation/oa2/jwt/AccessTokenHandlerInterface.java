@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt;
 
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
+import net.sf.json.JSONObject;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -10,11 +11,12 @@ import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 public interface AccessTokenHandlerInterface extends PayloadHandler {
     /**
      * The actual simple access token (usually used as the identifier for the claims-based AT.
-     * To get the signed claims, invoke {@link #getSignedAT(JSONWebKey)}.
+     * To get the signed claims, invoke {@link #getSignedPayload(JSONWebKey, String)} (JSONWebKey)}.
      * @return
      */
     AccessToken getAccessToken();
     void setAccessToken(AccessToken accessToken);
-    AccessToken getSignedAT(JSONWebKey key);
-    AccessToken getSignedAT(JSONWebKey key, String headerType); // CIL-1112, support for RFC9068
+    JSONObject getUserMetaData();
+
+    JSONObject getPayload();
 }

@@ -41,7 +41,7 @@ public class ScitokenHandler extends AbstractAccessTokenHandler {
     @Override
     public void init() throws Throwable {
         super.init();
-        JSONObject sciTokens = getAtData();
+        JSONObject sciTokens = getPayload();
 
         // subject is optional
         sciTokens.put(SUBJECT, transaction.getUsername());
@@ -75,10 +75,10 @@ public class ScitokenHandler extends AbstractAccessTokenHandler {
         // Update 3/29/2022 -- in practice, a lot of SciToken clients that send a long a string as the audience
         // will only process a simple string in the response. They are supposed to accept an array
         // of them, but do not. If it's a singleton, convert it to a string.
-        if (getAtData().get(AUDIENCE) instanceof JSONArray) {
-            JSONArray audience = getAtData().getJSONArray(AUDIENCE);
+        if (getPayload().get(AUDIENCE) instanceof JSONArray) {
+            JSONArray audience = getPayload().getJSONArray(AUDIENCE);
             if(audience.size() == 1){
-                getAtData().put(AUDIENCE, audience.get(0));
+                getPayload().put(AUDIENCE, audience.get(0));
             }
 /*
             if (audience.size() == 1 && audience.getString(0).equals("ANY")) {

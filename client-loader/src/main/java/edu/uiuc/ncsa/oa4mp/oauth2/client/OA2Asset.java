@@ -1,14 +1,15 @@
 package edu.uiuc.ncsa.oa4mp.oauth2.client;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.client.Asset;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.IDTokenImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenFactory;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
 import net.sf.json.JSONObject;
 
-import java.net.URI;
 import java.text.ParseException;
 import java.util.Date;
 
@@ -81,15 +82,15 @@ public class OA2Asset extends Asset {
 
     protected String ID_TOKEN_KEY = "id_token";
 
-    public JSONObject getIdToken() {
+    public IDTokenImpl getIdToken() {
         return idToken;
     }
 
-    public void setIdToken(JSONObject idToken) {
+    public void setIdToken(IDTokenImpl idToken) {
         this.idToken = idToken;
     }
 
-    JSONObject idToken;
+    IDTokenImpl idToken;
     @Override
     public JSONObject toJSON() {
         JSONObject json = super.toJSON();
@@ -99,6 +100,9 @@ public class OA2Asset extends Asset {
         if (!StringUtils.isTrivial(getState())) {
             json.put(STATE_KEY, getState());
         }
+        if(getIdToken() != null){
+            json.put(ID_TOKEN_KEY, getIdToken().toJSON());
+        }
         if (getAccessToken() != null) {
             json.put(ACCESS_TOKEN_KEY, getAccessToken().toJSON());
         }
@@ -107,9 +111,6 @@ public class OA2Asset extends Asset {
         }
         if (getIssuedAt() != null) {
             json.put(ISSUED_AT_KEY, Iso8601.date2String(getIssuedAt()));
-        }
-        if(idToken != null){
-            json.put(ID_TOKEN_KEY, idToken);
         }
         return json;
     }
@@ -125,28 +126,30 @@ public class OA2Asset extends Asset {
         }
         if (jsonObject.containsKey(ACCESS_TOKEN_KEY)) {
             AccessTokenImpl at = null;
-            try {
-                // Old token format
-                 at = new AccessTokenImpl(URI.create(jsonObject.getString(ACCESS_TOKEN_KEY)));
-            }catch(Throwable t){
-                at = new AccessTokenImpl(URI.create("a"));// dummy
-                 at.fromJSON(jsonObject.getJSONObject(ACCESS_TOKEN_KEY));
+            JSONObject temp = jsonObject.getJSONObject(ACCESS_TOKEN_KEY);
+            if(temp.containsKey(IDTokenImpl.TOKEN_TYPE)){
+                // good bet it is a new serialization for TokenImpl
+                at = TokenFactory.createAT(temp);
+            }else{
+                // Old format, but it should have the information in the token field
+                at = TokenFactory.createAT(temp.getString("token"));// dummy
             }
-            //at.fromJSON(jsonObject.getJSONObject(ACCESS_TOKEN_KEY));
             setAccessToken(at);
         }
         if(jsonObject.containsKey(ID_TOKEN_KEY)){
-            setIdToken(jsonObject.getJSONObject(ID_TOKEN_KEY));
+            IDTokenImpl  idToken1 = TokenFactory.createIDT(jsonObject.getJSONObject(ID_TOKEN_KEY));
+            setIdToken(idToken1);
         }
         if (jsonObject.containsKey(REFRESH_TOKEN_KEY)) {
             RefreshTokenImpl rt = null;
-            try {
-                rt = new RefreshTokenImpl(URI.create(jsonObject.getString(REFRESH_TOKEN_KEY)));
-            }catch(Throwable t){
-                rt = new RefreshTokenImpl(URI.create("a")); // dummy
-                rt.fromJSON(jsonObject.getJSONObject(REFRESH_TOKEN_KEY));
+            JSONObject temp = jsonObject.getJSONObject(REFRESH_TOKEN_KEY);
+            if(temp.containsKey(IDTokenImpl.TOKEN_TYPE)){
+                // good bet it is a new serialization for TokenImpl
+                rt = TokenFactory.createRT(temp);
+            }else{
+                // Old format, but it should have the information in the token field
+                rt = TokenFactory.createRT(temp.getString("token"));// dummy
             }
-           // rt.fromJSON(jsonObject.getJSONObject(REFRESH_TOKEN_KEY));
             setRefreshToken(rt);
         }
         if (jsonObject.containsKey(ISSUED_AT_KEY)) {

@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt;
 
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunRequest;
@@ -67,7 +68,7 @@ public interface PayloadHandler extends Serializable {
     JSONObject execute(ClaimSource source, JSONObject claims)  throws Throwable;
     /**
      * Called at the very end of all processing, this lets the handler, clean up or whatever it needs to do.
-     * It is called before {@link #saveState()}.
+     * It is called before {@link #saveState(String)} ()}.
      * @param execPhase - the current execution phase.
      */
     void finish(String execPhase)  throws Throwable;
@@ -77,12 +78,12 @@ public interface PayloadHandler extends Serializable {
      * put actual save code in here if needed, since it is apt to get called a lot.
      */
 
-    void saveState()  throws Throwable;
+    void saveState(String execPhase)  throws Throwable;
     /**
      * Get the claims (the actual payload).
      * @return
      */
-    JSONObject getClaims()  throws Throwable;
+    //JSONObject getUserMetaData()  throws Throwable;
 
     JSONObject getExtendedAttributes() throws Throwable;
 
@@ -106,12 +107,29 @@ public interface PayloadHandler extends Serializable {
 
     boolean hasScript();
 
-    /**
+    /*
      * Returns the payload from this handler encoded with a key, if applicable.
      * @param key
      * @return
      */
-    public String getToken(JSONWebKey key);
+  //  public String getToken(JSONWebKey key);
     public void setResponseCode(int responseCode);
     public int getResponseCode();
+
+    /**
+     * The payload for this is the actual token created (payload is the middle of a JWT, e.g.)
+     * @return
+     */
+    JSONObject getPayload();
+    void setPayload(JSONObject payload);
+
+    TokenImpl getSignedPayload(JSONWebKey key);
+
+    /**
+     * Take the payload of this and sign it with the given key, using the header as needed.
+     * @param key
+     * @param headerType
+     * @return
+     */
+    TokenImpl getSignedPayload(JSONWebKey key, String headerType); // CIL-1112, support for RFC9068
 }

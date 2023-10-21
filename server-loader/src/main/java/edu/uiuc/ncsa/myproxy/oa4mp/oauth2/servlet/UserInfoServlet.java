@@ -55,6 +55,7 @@ public class UserInfoServlet extends BearerTokenServlet {
             transaction = findTransaction(at, state);
         }catch(OA2GeneralError e){
             e.setForensicMessage(e.getForensicMessage() + "\nerror in user info endpoint.");
+            throw e;
         }
         // Fix for CIL-1124
         if(!transaction.isAccessTokenValid()){
@@ -130,10 +131,10 @@ public class UserInfoServlet extends BearerTokenServlet {
         debugger.trace(this, "finished processing claims.");
 
         if (jwtRunner.hasATHandler()) {
-            transaction.setUserMetaData(jwtRunner.getAccessTokenHandler().getClaims());
+            transaction.setUserMetaData(jwtRunner.getAccessTokenHandler().getUserMetaData());
         } else {
             if (jwtRunner.hasIDTokenHander()) {
-                transaction.setUserMetaData(jwtRunner.getIdTokenHandlerInterface().getClaims());
+                transaction.setUserMetaData(jwtRunner.getIdTokenHandlerInterface().getUserMetaData());
             }
         }
 

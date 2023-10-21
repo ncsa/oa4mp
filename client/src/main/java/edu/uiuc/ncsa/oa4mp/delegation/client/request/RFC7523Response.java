@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.oa4mp.delegation.client.request;
 
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.IDTokenImpl;
 import net.sf.json.JSONObject;
 
 import java.util.HashMap;
@@ -26,14 +27,14 @@ public class RFC7523Response extends BasicResponse{
 
     JSONObject response;
 
-    public JSONObject getIdToken() {
+    public IDTokenImpl getIdToken() {
         return idToken;
     }
 
-    public void setIdToken(JSONObject idToken) {
+    public void setIdToken(IDTokenImpl idToken) {
         this.idToken = idToken;
     }
 
-    JSONObject idToken;
+    IDTokenImpl idToken;
 }
 

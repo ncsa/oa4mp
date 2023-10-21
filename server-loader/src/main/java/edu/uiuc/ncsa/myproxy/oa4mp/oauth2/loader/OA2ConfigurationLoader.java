@@ -37,6 +37,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.ClientApprovalKeys;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.TransactionStore;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.TokenForge;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2ConfigTags;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2ConfigurationLoaderUtils;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2TokenForge;
@@ -132,6 +133,8 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     public static long ACCESS_TOKEN_LIFETIME_DEFAULT = 15 * 60 * 1000L; // 15 minutes
     public static long MAX_ACCESS_TOKEN_LIFETIME_DEFAULT = 2 * ACCESS_TOKEN_LIFETIME_DEFAULT; // 30 minutes
 
+    // remember that ID token lifetimes are by default tied to the access token lifetime, so use
+    // that as a basis.
     public static long ID_TOKEN_LIFETIME_DEFAULT = 15 * 60 * 1000L; // 15 minutes
     public static long MAX_ID_TOKEN_LIFETIME_DEFAULT = MAX_ACCESS_TOKEN_LIFETIME_DEFAULT; // 30 minutes
 
@@ -152,8 +155,8 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     public static boolean CLEANUP_LOCKING_ENABLED_DEFAULT = false; // Don't lock tables by default
     public static boolean MONITOR_ENABLED_DEFAULT = false; // Don't enabled monitoring by default
     public static boolean UUC_ENABLED_DEFAULT = false; // Don't just clean up clients
-    public static long UUC_INTERVAL_DEFAULT = 6*60 * 60 * 1000L; // 6 hours minutes
-    public static long UUC_GRACE_PERIOD_DEFAULT = 6*60 * 60 * 1000L; // 6 hours minutes
+    public static long UUC_INTERVAL_DEFAULT = 6 * 60 * 60 * 1000L; // 6 hours minutes
+    public static long UUC_GRACE_PERIOD_DEFAULT = 6 * 60 * 60 * 1000L; // 6 hours minutes
     public static long MONITOR_INTERVAL_DEFAULT = 120 * 60 * 1000L; // 2 hours minutes
 
     public OA2ConfigurationLoader(ConfigurationNode node) {
@@ -246,6 +249,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
 
     /**
      * Get alarms that are in a given tag. returns null if no alarms are set
+     *
      * @param node
      * @param tag
      * @return
@@ -273,6 +277,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
 
     /**
      * Get alarms that are in the main service tag.
+     *
      * @param tag
      * @return
      */
@@ -492,12 +497,13 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     }
 
     UUCConfiguration uucConfiguration = null;
-    public UUCConfiguration getUucConfiguration(){
-        if(uucConfiguration == null){
+
+    public UUCConfiguration getUucConfiguration() {
+        if (uucConfiguration == null) {
             uucConfiguration = new UUCConfiguration();
 
             ConfigurationNode node = getFirstNode(cn, UUC_TAG);
-            if(node == null){
+            if (node == null) {
                 uucConfiguration.enabled = false;
                 return uucConfiguration;
             }
@@ -510,7 +516,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
             } else {
                 uucConfiguration.gracePeriod = ConfigUtil.getValueSecsOrMillis(raw, true);
             }
-             raw = getFirstAttribute(node, UUC_INTERVAL);
+            raw = getFirstAttribute(node, UUC_INTERVAL);
             if (StringUtils.isTrivial(raw)) {
                 uucConfiguration.interval = UUC_INTERVAL_DEFAULT;
             } else {
@@ -521,34 +527,36 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
             uucConfiguration.testMode = Configurations.getFirstBooleanValue(node, UUC_TEST_MODE_ON, false);
             uucConfiguration.alarms = getAlarms(node, UUC_ALARMS);
             String x = Configurations.getFirstAttribute(node, UUC_LAST_ACCESSED);
-            if(StringUtils.isTrivial(x) || x.equalsIgnoreCase(UUC_LAST_ACCESSED_NEVER)){
+            if (StringUtils.isTrivial(x) || x.equalsIgnoreCase(UUC_LAST_ACCESSED_NEVER)) {
                 uucConfiguration.lastAccessed = UUCConfiguration.UUC_LAST_ACCESSED_NEVER_VALUE;
-            }else{
+            } else {
                 try {
                     uucConfiguration.lastAccessed = Iso8601.string2Date(x).getTimeInMillis();
-                    if(uucConfiguration.lastAccessed<0L){
+                    if (uucConfiguration.lastAccessed < 0L) {
                         throw new IllegalArgumentException("error processing last access date for unused client cleanup. Illegal date '" + x + "'");
                     }
                 } catch (ParseException e) {
-                    warn("unable to interpret date "+x+" for last accessed in unused client cleanup. Cleanup disabled!!.\n" +
-                            "parsing failed at position " + e.getErrorOffset() + ": '" + e.getMessage() + "'");;
+                    warn("unable to interpret date " + x + " for last accessed in unused client cleanup. Cleanup disabled!!.\n" +
+                            "parsing failed at position " + e.getErrorOffset() + ": '" + e.getMessage() + "'");
+                    ;
                     uucConfiguration.enabled = false;
-                    if(DebugUtil.isEnabled()) {
+                    if (DebugUtil.isEnabled()) {
                         e.printStackTrace();
                     }
                     return uucConfiguration;
                 }
             }
-             x = Configurations.getFirstAttribute(node, UUC_LAST_ACCESSED_AFTER);
-            if(!StringUtils.isTrivial(x)){
+            x = Configurations.getFirstAttribute(node, UUC_LAST_ACCESSED_AFTER);
+            if (!StringUtils.isTrivial(x)) {
                 // only do something if you need to. No default for this attribute
-                try{
+                try {
                     uucConfiguration.lastAccessedAfter = Iso8601.string2Date(x).getTimeInMillis();
-                }catch(ParseException e){
-                    warn("unable to interpret date "+x+" for last accessed after in unused client cleanup. Cleanup disabled!!.\n" +
-                            "parsing failed at position " + e.getErrorOffset() + ": '" + e.getMessage() + "'");;
+                } catch (ParseException e) {
+                    warn("unable to interpret date " + x + " for last accessed after in unused client cleanup. Cleanup disabled!!.\n" +
+                            "parsing failed at position " + e.getErrorOffset() + ": '" + e.getMessage() + "'");
+                    ;
                     uucConfiguration.enabled = false;
-                    if(DebugUtil.isEnabled()) {
+                    if (DebugUtil.isEnabled()) {
                         e.printStackTrace();
                     }
                     return uucConfiguration;
@@ -565,25 +573,26 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         }
         return uucConfiguration;
     }
-     protected List[] processUUCList(ConfigurationNode node){
+
+    protected List[] processUUCList(ConfigurationNode node) {
         List<ConfigurationNode> kids = node.getChildren(UUC_LIST_ITEM);
         List<Identifier> ids = null;
         List<String> regex = null;
-        if(kids !=null && !kids.isEmpty()){
+        if (kids != null && !kids.isEmpty()) {
             ids = new ArrayList<>();
-            for(ConfigurationNode kidNode : kids){
-                 ids.add(BasicIdentifier.newID(kidNode.getValue().toString()));
+            for (ConfigurationNode kidNode : kids) {
+                ids.add(BasicIdentifier.newID(kidNode.getValue().toString()));
             }
         }
-         List<ConfigurationNode> kidRegex = node.getChildren(UUC_LIST_REGEX);
-         if(kidRegex !=null && !kidRegex.isEmpty()){
-                regex = new ArrayList<>();
-                for(ConfigurationNode kidNode : kidRegex){
-                    regex.add(kidNode.getValue().toString());
-                }
-         }
+        List<ConfigurationNode> kidRegex = node.getChildren(UUC_LIST_REGEX);
+        if (kidRegex != null && !kidRegex.isEmpty()) {
+            regex = new ArrayList<>();
+            for (ConfigurationNode kidNode : kidRegex) {
+                regex.add(kidNode.getValue().toString());
+            }
+        }
         return new List[]{ids, regex};
-     }
+    }
 
     public long getInterval(String tag, long defaultInterval) {
         long interval = defaultInterval;
@@ -815,30 +824,30 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                                 getFirstAttribute(sn, ClientManagementConstants.RFC_7591_AUTO_APPROVE),
                                 getFirstAttribute(sn, ClientManagementConstants.RFC_7591_AUTO_APPROVER_NAME)
                         );
-                        if(cfg instanceof CM7591Config){
+                        if (cfg instanceof CM7591Config) {
                             CM7591Config ccc = (CM7591Config) cfg;
                             String allowed = getFirstAttribute(sn, ClientManagementConstants.RFC_7591_AUTO_APPROVE_ALLOWED_DOMAINS);
-                            if(ccc.autoApprove ){
-                                if(allowed == null){
+                            if (ccc.autoApprove) {
+                                if (allowed == null) {
                                     ccc.getAllowedAutoApproveDomains().add("*"); // default
-                                } else{
-                                   StringTokenizer st = new StringTokenizer(allowed, ",");
-                                   while(st.hasMoreTokens()){
-                                       ccc.getAllowedAutoApproveDomains().add(st.nextToken().trim());
-                                   }
+                                } else {
+                                    StringTokenizer st = new StringTokenizer(allowed, ",");
+                                    while (st.hasMoreTokens()) {
+                                        ccc.getAllowedAutoApproveDomains().add(st.nextToken().trim());
+                                    }
                                 }
                             }
-                             allowed = getFirstAttribute(sn, ClientManagementConstants.RFC_7591_ANONYMOUS_ALLOWED_DOMAINS);
-                             if(ccc.anonymousOK){
-                                 if(allowed == null){
+                            allowed = getFirstAttribute(sn, ClientManagementConstants.RFC_7591_ANONYMOUS_ALLOWED_DOMAINS);
+                            if (ccc.anonymousOK) {
+                                if (allowed == null) {
                                     ccc.getAllowedAnonymousDomains().add("*");
-                                 }else{
-                                     StringTokenizer st = new StringTokenizer(allowed, ",");
-                                     while(st.hasMoreTokens()){
-                                         ccc.getAllowedAnonymousDomains().add(st.nextToken().trim());
-                                     }
-                                 }
-                             }
+                                } else {
+                                    StringTokenizer st = new StringTokenizer(allowed, ",");
+                                    while (st.hasMoreTokens()) {
+                                        ccc.getAllowedAnonymousDomains().add(st.nextToken().trim());
+                                    }
+                                }
+                            }
 
                         }
                         cmConfigs.put(cfg);
@@ -1134,7 +1143,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
 
     public long getMaxATLifetime() {
         if (maxATLifetime < 0) {
-            String x = getFirstAttribute(cn, MAX_ACCESS_TOKEN_LIFETIME);
+            String x = getFirstAttribute(cn, OA2ConfigTags.MAX_ACCESS_TOKEN_LIFETIME);
             if (isTrivial(x)) {
                 maxATLifetime = MAX_ACCESS_TOKEN_LIFETIME_DEFAULT;
             } else {
@@ -1516,8 +1525,9 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
 
     protected Provider<TXStore> getTXStoreProvider() {
         TXRecordProvider txRecordProvider = new TXRecordProvider(null, (OA2TokenForge) getTokenForgeProvider().get());
-        TXRecordConverter txRecordConverter = new TXRecordConverter(new TXRecordSerializationKeys(), txRecordProvider,
-                getTXStoreProvider().get(), getClientStoreProvider().get());
+        TXRecordConverter txRecordConverter = new TXRecordConverter(new TXRecordSerializationKeys(),
+                txRecordProvider,
+                getClientStoreProvider().get());
         return getTXStoreProvider(txRecordProvider, txRecordConverter);
     }
 

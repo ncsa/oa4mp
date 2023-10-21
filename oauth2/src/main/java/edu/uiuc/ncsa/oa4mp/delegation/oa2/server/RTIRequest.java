@@ -36,7 +36,6 @@ public class RTIRequest extends IssuerRequest {
     }
 
     public AccessToken getAccessToken() {
-
         return accessToken;
     }
 

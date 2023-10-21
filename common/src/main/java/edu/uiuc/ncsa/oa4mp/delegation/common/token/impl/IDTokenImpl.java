@@ -17,4 +17,13 @@ public class IDTokenImpl extends TokenImpl{
     public IDTokenImpl(URI token) {
         super(token);
     }
+
+    public IDTokenImpl() {
+    }
+
+
+    @Override
+    protected String getTokenType() {
+        return "id_token";
+    }
 }

@@ -90,7 +90,7 @@ public class ProxyCallbackServlet extends OA2AuthorizationServer {
         debugger.trace(this, "getting claims from proxy");
         clcCommands.access(new InputLine("access")); // This gets the
         // At the least, do this
-        JSONObject proxyClaims = clcCommands.getClaims();
+        JSONObject proxyClaims = clcCommands.getIdToken().getPayload();
         t.setProxyState(clcCommands.toJSON());
 
         setClaimsFromProxy(t, proxyClaims, debugger);

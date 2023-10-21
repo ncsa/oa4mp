@@ -82,7 +82,7 @@ public class RefreshTokenInitializer implements QDLModuleMetaClass {
             } catch (Throwable throwable) {
                 handleException(throwable);
             }
-            output.fromJSON(getRtHandler().getRTData());
+            output.fromJSON(getRtHandler().getPayload());
             return output;
         }
 

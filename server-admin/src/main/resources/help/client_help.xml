@@ -632,6 +632,46 @@ time. This allows for latency in systems that may require a valid refresh token 
 the new one is pushed out. ]]>
     </body>
     </entry>
+    <entry id="ersatz_inherit_id_token">
+    <body>
+    <![CDATA[Property. Boolean. true
+If on forking, the ersatz client should inherit the id token, aka user metadata
+of the provisioner. This is fundamentally undecideable by OA4MP, in that some
+provisioners will have information such as job or grant ID in the id token
+that must be included in every job, while others may not and do not want
+to expose any metadata about the provisioner. Set it as needed.
+]]>
+    </body>
+    </entry>
+    <entry id="idt_lifetime">
+    <body>
+    <![CDATA[Property. Long. --
+The lifetime of any id token created by this client. This overrides the system
+default (though cannot exceed the system and client maximum). It may be overridden in
+specific configuration for the handler.]]>
+    </body>
+    </entry>
+    <entry id="idt_max_Lifetime">
+    <body>
+    <![CDATA[Property. Long. -2 (use system max.)
+The maximum lifetime allowed for id tokens issued by this client. It must be
+less than the system maximum. This is used in cases, e.g., where configurations
+may change or requests may be made for different id token lifetimes, but the
+client has a specific need to limit all cases. ]]>
+    </body>
+    </entry>
+    <entry id="audience">
+    <body>
+    <![CDATA[Property. List of string. (--)
+An optional list of audiences that this client is restricted to. ]]>
+    </body>
+    </entry>
+    <entry id="resource">
+    <body>
+    <![CDATA[Property. List of string. (--)
+An optional list of resources that this client is restricted to. ]]>
+    </body>
+    </entry>
 
     <!--
 at_lifetime           description           extended_attributes   maxATLifetime         public_client         strict_scopes

@@ -2,7 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.AbstractAccessTokenHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.PayloadHandlerConfigImpl;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC8693Constants;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC9068Constants;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
@@ -27,15 +27,15 @@ public class RFC9068ATHandler extends AbstractAccessTokenHandler implements RFC9
     @Override
     public void init() throws Throwable {
         super.init();
-        JSONObject accessToken = getAtData();
+        JSONObject accessToken = getPayload();
 
         accessToken.put(SUBJECT, transaction.getUsername());
         accessToken.put(RFC8693Constants.CLIENT_ID, transaction.getOA2Client().getIdentifierString());
-        if(getClaims().containsKey(AUTHENTICATION_CLASS_REFERENCE)){
-            accessToken.put(AUTHENTICATION_CLASS_REFERENCE, getClaims().get(AUTHENTICATION_CLASS_REFERENCE));
+        if(getUserMetaData().containsKey(AUTHENTICATION_CLASS_REFERENCE)){
+            accessToken.put(AUTHENTICATION_CLASS_REFERENCE, getUserMetaData().get(AUTHENTICATION_CLASS_REFERENCE));
         }
-        if(getClaims().containsKey(AUTHENTICATION_METHOD_REFERENCE)){
-            accessToken.put(AUTHENTICATION_METHOD_REFERENCE, getClaims().get(AUTHENTICATION_METHOD_REFERENCE));
+        if(getUserMetaData().containsKey(AUTHENTICATION_METHOD_REFERENCE)){
+            accessToken.put(AUTHENTICATION_METHOD_REFERENCE, getUserMetaData().get(AUTHENTICATION_METHOD_REFERENCE));
         }
 
         if(transaction.getAuthTime()!=null) {
@@ -59,7 +59,7 @@ public class RFC9068ATHandler extends AbstractAccessTokenHandler implements RFC9
     }
 
     @Override
-    public AccessToken getSignedAT(JSONWebKey key) {
-        return getSignedAT(key, HEADER_TYPE);
+    public AccessTokenImpl getSignedPayload(JSONWebKey key) {
+        return getSignedPayload(key, HEADER_TYPE);
     }
 }

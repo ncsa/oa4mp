@@ -1,25 +1,24 @@
 package edu.uiuc.ncsa.oa4mp.delegation.oa2.client;
 
-import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.oa4mp.delegation.client.request.ATRequest;
 import edu.uiuc.ncsa.oa4mp.delegation.client.request.ATResponse;
 import edu.uiuc.ncsa.oa4mp.delegation.client.server.ATServer;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.IDTokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenFactory;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC8628Constants;
+import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import net.sf.json.JSONObject;
 
 import java.net.URI;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import static edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants.*;
-import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims.ISSUED_AT;
-import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims.SUBJECT;
 
 
 /**
@@ -48,9 +47,9 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
     }
 
 
-    static HashMap<String, IDTokenEntry> idTokenStore = new HashMap<String, IDTokenEntry>();
+    static HashMap<URI, IDTokenImpl> idTokenStore = new HashMap<>();
 
-    public static HashMap<String, IDTokenEntry> getIDTokenStore() {
+    public static HashMap<URI, IDTokenImpl> getIDTokenStore() {
         return idTokenStore;
     }
 
@@ -132,59 +131,47 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
         if (!jsonObject.containsKey(ACCESS_TOKEN)) {
             throw new IllegalArgumentException("Error: No access token found in server response");
         }
-        AccessTokenImpl at = new AccessTokenImpl(URI.create(jsonObject.getString(ACCESS_TOKEN)));
+        AccessTokenImpl at = TokenFactory.createAT(jsonObject.getString(ACCESS_TOKEN));
+        if(jsonObject.containsKey(EXPIRES_IN)) {
+            at.setExpiresAt(jsonObject.getLong(EXPIRES_IN) * 1000); // This is authoritative
+        }
+        //AccessTokenImpl at = new AccessTokenImpl(URI.create(jsonObject.getString(ACCESS_TOKEN)));
         RefreshTokenImpl rt = null;
         if (jsonObject.containsKey(REFRESH_TOKEN)) {
             // the refresh token is optional, so if it is missing then there is nothing to do.
-            rt = new RefreshTokenImpl(URI.create(jsonObject.getString(REFRESH_TOKEN)));
+            //rt = new RefreshTokenImpl(URI.create(jsonObject.getString(REFRESH_TOKEN)));
+            rt = TokenFactory.createRT(jsonObject.getString(REFRESH_TOKEN));
+            if(jsonObject.containsKey("refresh_token_lifetime")){
+                rt.setLifetime(jsonObject.getLong("refresh_token_lifetime")*1000);
+                rt.setIssuedAt(jsonObject.getLong("refresh_token_iat")*1000);
+                rt.setExpiresAt(rt.getIssuedAt() + rt.getLifetime());
+            }
         }
         ServletDebugUtil.trace(this, "Is OIDC enabled? " + oidcEnabled);
-
+        IDTokenImpl idToken = null;
+        if(jsonObject.containsKey(ID_TOKEN)){
+               idToken = TokenFactory.createIDT(jsonObject.getString(ID_TOKEN));
+               getIDTokenStore().put(at.getJti(), idToken);
+        }
         if (oidcEnabled) {
-            ServletDebugUtil.trace(this, "Processing id token entry");
-            IDTokenEntry idTokenEntry = new IDTokenEntry();
-            ServletDebugUtil.trace(this, "created new idTokenEntry ");
-            JSONObject idToken = getAndCheckIDToken(jsonObject, atRequest);
-            ServletDebugUtil.trace(this, "got id token = " + idToken.toString(2));
-            if (jsonObject.containsKey(ID_TOKEN)) {
-                params.put(RAW_ID_TOKEN, jsonObject.getString(ID_TOKEN));
-                idTokenEntry.rawToken = (String) params.get(RAW_ID_TOKEN);
-                ServletDebugUtil.trace(this, "raw token = " + idTokenEntry.rawToken);
-            }
-
-            idTokenEntry.idToken = idToken;
-            ServletDebugUtil.trace(this, "idTokenEntry= " + idTokenEntry);
 
             // and now the specific checks for ID tokens returned by the AT server.
             // It is possible (e.g. RFC 8628) that there is no nonce or that the client is not configured to
             // send one, so only check if there was one in the request to start with.
-            if (m.containsKey(NONCE) && !idToken.getString(NONCE).equals(atRequest.getParameters().get(NONCE))) {
+            if (m.containsKey(NONCE) && !idToken.getPayload().getString(NONCE).equals(atRequest.getParameters().get(NONCE))) {
                 throw new GeneralException("Error: Incorrect nonce \"" + atRequest.getParameters().get(NONCE) + "\" returned from server");
             }
 
-            params.put(ISSUED_AT, new Date(idToken.getLong(ISSUED_AT) * 1000L));
-            params.put(SUBJECT, idToken.getString(SUBJECT));
-            if (idToken.containsKey(AUTHORIZATION_TIME)) {
-                // auth_time claim is optional (unless max_age is returned). At this point we do not do max_age.
-                params.put(AUTHORIZATION_TIME, idToken.getLong(AUTHORIZATION_TIME));
-            }
-            params.put(ID_TOKEN, idToken);
-            //params.put(EXPIRES_IN, expiresIn/1000 ); //convert to seconds.
-            params.put(EXPIRES_IN, at.getLifetime() / 1000); // AT is definitive. Convert to seconds.
-            ServletDebugUtil.trace(this, "Adding idTokenEntry with id = " + at.getToken() + " to the ID Token store. Store has " + getIDTokenStore().size() + " entries");
-            getIDTokenStore().put(at.getToken(), idTokenEntry);
-            ServletDebugUtil.trace(this, "ID Token store=" + getIDTokenStore().size());
-            ServletDebugUtil.trace(this, "Added idTokenEntry to the ID Token store. Store now has " + getIDTokenStore().size() + " entries");
         } else {
             ServletDebugUtil.trace(this, "Skipping id token entry...");
         }
-        ATResponse2 atr = createResponse(at, rt);
+        ATResponse2 atr = createResponse(at, rt, idToken);
         atr.setParameters(params);
         return atr;
     }
 
-    protected ATResponse2 createResponse(AccessTokenImpl at, RefreshTokenImpl rt) {
-        return new ATResponse2(at, rt);
+    protected ATResponse2 createResponse(AccessTokenImpl at, RefreshTokenImpl rt, IDTokenImpl idToken) {
+        return new ATResponse2(at, rt, idToken);
     }
 
 }

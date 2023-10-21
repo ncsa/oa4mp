@@ -117,11 +117,20 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
             otherV.setErsatzClient(map.getBoolean(getCK2().ersatzClient()));
         }
         otherV.setRtLifetime(map.getLong(getCK2().rtLifetime()));
+        otherV.setIdTokenLifetime(map.getLong(getCK2().idtLifetime()));
         otherV.setRtGracePeriod(map.getLong(getCK2().rtGracePeriod()));
         otherV.setDfLifetime(map.getLong(getCK2().dfLifetime()));
         otherV.setDfInterval(map.getLong(getCK2().dfInterval()));
-        otherV.setMaxATLifetime(map.getLong(getCK2().maxATLifetime()));
-        otherV.setMaxRTLifetime(map.getLong(getCK2().maxRTLifetime()));
+        if(map.containsKey(getCK2().maxATLifetime()) && map.get(getCK2().maxATLifetime()) != null) {
+            otherV.setMaxATLifetime(map.getLong(getCK2().maxATLifetime()));
+        }
+        if(map.containsKey(getCK2().maxRTLifetime()) && map.get(getCK2().maxRTLifetime()) != null) {
+            otherV.setMaxRTLifetime(map.getLong(getCK2().maxRTLifetime()));
+        }
+        if(map.containsKey(getCK2().maxIDTLifetime()) && map.get(getCK2().maxIDTLifetime()) != null) {
+            // a null value is returned as 0.
+            otherV.setMaxIDTLifetime(map.getLong(getCK2().maxIDTLifetime()));
+        }
         otherV.setSkipServerScripts(map.getBoolean(getCK2().skipServerScripts()));
 
         // In certain legacy cases, this may end up being populated with a null. Treat it like
@@ -236,10 +245,12 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         map.put(getCK2().rtLifetime(), client.getRtLifetime());
         map.put(getCK2().rtGracePeriod(), client.getRtGracePeriod());
         map.put(getCK2().atLifetime(), client.getAtLifetime());
+        map.put(getCK2().idtLifetime(), client.getIdTokenLifetime());
         map.put(getCK2().dfLifetime(), client.getDfLifetime());
         map.put(getCK2().dfInterval(), client.getDfInterval());
         map.put(getCK2().maxATLifetime(), client.getMaxATLifetime());
         map.put(getCK2().maxRTLifetime(), client.getMaxRTLifetime());
+        map.put(getCK2().maxIDTLifetime(), client.getMaxIDTLifetime());
         map.put(getCK2().skipServerScripts(), client.isSkipServerScripts());
         map.put(getCK2().forwardScopesToProxy(), client.isForwardScopesToProxy());
         if (client.getCallbackURIs() == null) {
@@ -327,6 +338,13 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         if (json.containsKey(getCK2().atLifetime())) {
             v.setAtLifetime(getJsonUtil().getJSONValueLong(json, getCK2().atLifetime()));
         }
+        if (json.containsKey(getCK2().idtLifetime())) {
+            v.setIdTokenLifetime(getJsonUtil().getJSONValueLong(json, getCK2().idtLifetime()));
+        }
+        if (json.containsKey(getCK2().maxIDTLifetime())) {
+            v.setMaxIDTLifetime(getJsonUtil().getJSONValueLong(json, getCK2().maxIDTLifetime()));
+        }
+
         if (json.containsKey(getCK2().dfLifetime())) {
             v.setDfLifetime(getJsonUtil().getJSONValueLong(json, getCK2().dfLifetime()));
         }
@@ -419,11 +437,13 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
     public void toJSON(V client, JSONObject json) {
         super.toJSON(client, json);
         getJsonUtil().setJSONValue(json, getCK2().rtLifetime(), client.getRtLifetime());
+        getJsonUtil().setJSONValue(json, getCK2().idtLifetime(), client.getIdTokenLifetime());
         getJsonUtil().setJSONValue(json, getCK2().rtGracePeriod(), client.getRtGracePeriod());
         getJsonUtil().setJSONValue(json, getCK2().dfLifetime(), client.getDfLifetime());
         getJsonUtil().setJSONValue(json, getCK2().dfInterval(), client.getDfInterval());
         getJsonUtil().setJSONValue(json, getCK2().maxATLifetime(), client.getMaxATLifetime());
         getJsonUtil().setJSONValue(json, getCK2().maxRTLifetime(), client.getMaxRTLifetime());
+        getJsonUtil().setJSONValue(json, getCK2().maxIDTLifetime(), client.getMaxIDTLifetime());
         getJsonUtil().setJSONValue(json, getCK2().forwardScopesToProxy(), client.isForwardScopesToProxy());
         getJsonUtil().setJSONValue(json, getCK2().proxyRequestScopes(), client.getProxyRequestScopes());
         getJsonUtil().setJSONValue(json, getCK2().ersatzInheritIDToken(), client.isErsatzInheritIDToken());

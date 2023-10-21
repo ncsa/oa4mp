@@ -327,6 +327,51 @@ gc_check - Check if the current transaction can be GC'd
 Please invoke help for each of these as needed.]]>
        </body>
     </entry>
+    <entry id="refresh_token_expires_at">
+       <body>
+  <![CDATA[Property: Long (**)
+The time (as a long in milliseconds) at which the refresh token in this transaction expires.
+Note that this may not be the same at all as what the token would have if interpreted. This
+is because it may (and probably will be) set during refresh to reflect the grace period
+currently in force. Contrast with the  refresh token lifetime, which is computed from the
+original request and is (unfortunately) overloaded to show not merely lifetimes, but
+whether or not refresh tokens are enabled.]]>
+       </body>
+    </entry>
+    <entry id="id_token_identifier">
+       <body>
+  <![CDATA[Property: String (**)
+The identifier for the ID token, aka user metadata. Note that this is exposed to
+allow for faster searching. Since users may exchange the ID token for another,
+older tokens must be findable.]]>
+       </body>
+    </entry>
+    <entry id="id_token_lifetime">
+       <body>
+  <![CDATA[Property: Long (**)
+The time at which the id token aka user metadata expires. Users may exchange/refresh this,
+and that will be in a TX record. This refers to the current token stored in this
+transaction.]]>
+       </body>
+    </entry>
+    <entry id="at_jwt">
+       <body>
+  <![CDATA[Property: String (**)
+If the access token is a JWT, the returned encoded JWT is stored here for the token
+in the transaction. Note that this will include other information, such as scopes,
+and the access token inthe transaction is the jti (unique identifier) of the
+JWT.]]>
+       </body>
+    </entry>
+    <entry id="rt_jwt">
+       <body>
+  <![CDATA[Property: String (**)
+If the refresh token is a JWT, the returned encoded JWT is stored here for the token
+in the transaction. Note that this will include other information, such as scopes,
+and the refresh token inthe transaction is the jti (unique identifier) of the
+JWT.]]>
+       </body>
+    </entry>
 
     <!--  List of attributes
        access_token            callback_uri            description             proxy_id                scopes                  user_code

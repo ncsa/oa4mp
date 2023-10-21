@@ -29,9 +29,11 @@ public class OA2ClientTable extends ClientStoreTable {
         getColumnDescriptor().add(new ColumnDescriptorEntry(k.ersatzInheritIDToken(), BOOLEAN));
         getColumnDescriptor().add(new ColumnDescriptorEntry(k.extendsProvisioners(), BOOLEAN));
         getColumnDescriptor().add(new ColumnDescriptorEntry(k.forwardScopesToProxy(), BOOLEAN));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(k.idtLifetime(), BIGINT));
         getColumnDescriptor().add(new ColumnDescriptorEntry(k.issuer(), LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(k.ldap(), LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(k.maxATLifetime(), BIGINT));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(k.maxIDTLifetime(), BIGINT));
         getColumnDescriptor().add(new ColumnDescriptorEntry(k.maxRTLifetime(), BIGINT));
         getColumnDescriptor().add(new ColumnDescriptorEntry(k.prototypes(), LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(k.proxyClaimsList(), LONGVARCHAR));

@@ -78,6 +78,7 @@ public class TXRecord extends IdentifiableImpl implements Identifiable, Cloneabl
 
     /**
      * The un-encoded token {@link #getStoredToken()}. In JWTs this is the payload (for header.payload.signature).
+     * Since spent too much time decoding it on the fly, we just stash a readable copy here.
      * @return
      */
     public JSONObject getToken() {
@@ -212,7 +213,7 @@ public class TXRecord extends IdentifiableImpl implements Identifiable, Cloneabl
     Identifier parentID;
     List<String> scopes;
     List<URI> resource;
-    boolean valid;
+    boolean valid = false;
 
     public OA2Client getErsatzClient() {
         return ersatzClient;

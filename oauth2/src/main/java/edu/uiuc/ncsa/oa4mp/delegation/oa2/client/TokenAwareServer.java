@@ -1,6 +1,8 @@
 package edu.uiuc.ncsa.oa4mp.delegation.oa2.client;
 
 import edu.uiuc.ncsa.oa4mp.delegation.client.request.BasicRequest;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.IDTokenImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenFactory;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.JWTUtil;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
@@ -81,16 +83,16 @@ public abstract class TokenAwareServer extends ASImpl {
     }
 
     /**
-     * Takees the response JSON object that contains the ID token and the
+     * Takes the response JSON object that contains the ID token and the
      * request and checks that it is a valid ID Token for this client.
      * Result is the actual ID token (also a JSON Object).
      * @param jsonObject
      * @param atRequest
      * @return
      */
-    protected JSONObject getAndCheckIDToken(JSONObject jsonObject, BasicRequest atRequest) {
+    protected IDTokenImpl getAndCheckIDToken(JSONObject jsonObject, BasicRequest atRequest) {
         if (!oidcEnabled) {
-            return new JSONObject();
+            return null;
         }
         JSONWebKeys keys = getJsonWebKeys();
 
@@ -102,7 +104,7 @@ public abstract class TokenAwareServer extends ASImpl {
         if (claims.isNullObject()) {
             // the response may be a null object. At this point it means that there was a null
             // object and that the resulting signature was valid for it, so that is indeed the server response.
-            return new JSONObject();
+            return null;
         }
         // Now we have to check claims.
         if(!claims.containsKey(AUDIENCE)){
@@ -135,7 +137,7 @@ public abstract class TokenAwareServer extends ASImpl {
         if (exp <= System.currentTimeMillis()) {
             throw new GeneralException("Error: ID Token expired claims.");
         }
-        return claims;
+        return TokenFactory.createIDT(jsonObject.getString(ID_TOKEN));
     }
 
     public URI getTokenEndpoint() {

@@ -120,6 +120,7 @@ public class OA2AuthorizedServletUtil {
             agResponse.setServiceTransaction(transaction);
             transaction = (OA2ServiceTransaction) verifyAndGet(agResponse);
             transaction.setAuthTime(new Date()); // have to set the time to now.
+
             debugger.info(this, "Saved new transaction with id=" + transaction.getIdentifierString());
             /*
             RFC 7636 support. can't do it until here because we need most of the transaction done first
@@ -712,6 +713,7 @@ public class OA2AuthorizedServletUtil {
         Collection<String> scopes = resolveScopes(transactionState, client);
         t.setScopes(scopes);
         t.setValidatedScopes(scopes);
+        t.setRequestedIDTLifetime(ClientUtils.computeIDTLifetime(t, client, (OA2SE)getServiceEnvironment()));
         transactionState.getResponse().setHeader("X-Frame-Options", "DENY");
     }
 }

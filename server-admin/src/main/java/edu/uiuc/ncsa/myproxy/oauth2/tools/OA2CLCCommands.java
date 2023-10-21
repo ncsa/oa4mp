@@ -6,7 +6,6 @@ import edu.uiuc.ncsa.myproxy.oa4mp.client.storage.AssetStoreUtil;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628Constants2;
 import edu.uiuc.ncsa.oa4mp.delegation.client.request.RTResponse;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.Token;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.*;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.JWTUtil;
@@ -59,9 +58,9 @@ import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 
 /**
  * A command line client. Invoke help as needed, but the basic operation is to create the initial
- * request url using the {@link #set_uri(InputLine)} call, paste it in your browser, authenticate
+ * request url using the {@link #uri(InputLine)} call, paste it in your browser, authenticate
  * (since this is an OIDC client, you must pass through a browser at some point). The call back should
- * fail, so you copy the attempted callback from the service using the {@link #get_grant(InputLine)}
+ * fail, so you copy the attempted callback from the service using the {@link #grant(InputLine)}
  * call. You can then do whatever you needed (get an access token, get refresh tokens if the server supports it)
  * inspect id tokens and such.
  * <p>Created by Jeff Gaynor<br>
@@ -341,7 +340,7 @@ public class OA2CLCCommands extends CommonCommands {
     }
 
     /**
-     * What is currently from the {@link #set_uri(InputLine)}.
+     * What is currently from the {@link #uri(InputLine)}.
      */
     URI currentURI;
 
@@ -355,7 +354,7 @@ public class OA2CLCCommands extends CommonCommands {
      * @param inputLine
      * @throws Exception
      */
-    public void set_uri(InputLine inputLine) throws Exception {
+    public void uri(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             getURIHelp();
             return;
@@ -513,7 +512,7 @@ public class OA2CLCCommands extends CommonCommands {
      */
     public static String NO_VERIFY_GRANT_FLAG = "-no_verify";
 
-    public void get_grant(InputLine inputLine) throws Exception {
+    public void grant(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             setGrantHelp();
             return;
@@ -625,8 +624,6 @@ public class OA2CLCCommands extends CommonCommands {
         currentATResponse = null;
         currentURI = null;
         grant = null;
-        rawIdToken = null;
-        claims = null;
 
         canGetCert = false;
         canGetGrant = false;
@@ -729,7 +726,6 @@ public class OA2CLCCommands extends CommonCommands {
         return assetResponse.getX509Certificates() != null;
     }
 
-    String rawIdToken = null;
 
     protected void showRawTokenHelp() {
         sayi("show_raw_id_token:");
@@ -745,21 +741,20 @@ public class OA2CLCCommands extends CommonCommands {
             return;
         }
 
-        if (rawIdToken == null) {
+        if (getIdToken() == null || StringUtils.isTrivial(getIdToken().getToken())) {
             sayi("No id token.");
             return;
         }
-        if (rawIdToken.length() == 0) {
-            sayi("Empty id token");
-            return;
-        }
-        sayi(rawIdToken);
+        sayi(getIdToken().getToken());
     }
 
-    JSONObject claims = null;
+    // https://github.com/ncsa/oa4mp/issues/130
+    public IDTokenImpl getIdToken() {
+        return dummyAsset.getIdToken();
+    }
 
-    public JSONObject getClaims() {
-        return claims;
+    public void setIDToken(IDTokenImpl idToken) {
+        dummyAsset.setIdToken(idToken);
     }
 
     public void claims(InputLine inputLine) throws Exception {
@@ -767,13 +762,10 @@ public class OA2CLCCommands extends CommonCommands {
             showClaimsHelp();
             return;
         }
-        if (claims == null || claims.isEmpty()) {
+        if (getIdToken() == null || !getIdToken().hasPayload()) {
             say("(no claims found)");
         } else {
-            say(claims.toString(2));
-            Date exp = new Date();
-            exp.setTime(claims.getInt(OA2Claims.EXPIRATION) * 1000L);
-            say(exp.getTime() - System.currentTimeMillis() < 0 ? "expired at " : "valid until " + exp);
+            printToken(getIdToken(), true, false);
         }
 
     }
@@ -842,7 +834,7 @@ public class OA2CLCCommands extends CommonCommands {
 
     }
 
-    public void get_at(InputLine inputLine) throws Exception {
+    public void access(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             getATHelp();
             return;
@@ -921,19 +913,19 @@ public class OA2CLCCommands extends CommonCommands {
         if (getDummyAsset().hasRefreshToken() && getDummyAsset().getRefreshToken().isOldVersion() && getDummyAsset().getRefreshToken().getLifetime() < 0) {
             getDummyAsset().getRefreshToken().setLifetime(OA2ConfigurationLoader.MAX_REFRESH_TOKEN_LIFETIME_DEFAULT);
         }
-        Object x = currentATResponse.getParameters().get(RAW_ID_TOKEN);
-        if (x == null) {
-            x = "";
+/*
+                Object rawIdToken = currentATResponse.getParameters().get(RAW_ID_TOKEN);
+        if (rawIdToken == null) {
+            idToken = null; // something is probably wrong
         } else {
-            rawIdToken = x.toString();
+            idToken = TokenFactory.createIDT((String) rawIdToken);
         }
-        claims = (JSONObject) currentATResponse.getParameters().get(ID_TOKEN);
+*/
         if (inputLine.hasArg(CLAIMS_FLAG)) {
-
-            if (claims.isEmpty()) {
+            if (getIdToken() != null && getIdToken().getPayload().isEmpty()) {
                 say("(no claims found)");
             } else {
-                say(claims.toString(2));
+                printToken(getIdToken(), inputLine.hasArg(NO_VERIFY_JWT), true);
             }
         }
         if (isPrintOuput()) {
@@ -943,7 +935,7 @@ public class OA2CLCCommands extends CommonCommands {
 
     ATResponse2 currentATResponse;
 
-    public String getAT() {
+/*    public String getAT() {
         if (currentATResponse == null) return "";
         return currentATResponse.getAccessToken().getToken();
     }
@@ -963,7 +955,7 @@ public class OA2CLCCommands extends CommonCommands {
         if (currentATResponse != null) {
             currentATResponse.setRefreshToken(rt);
         }
-    }
+    }*/
 
     protected void getCertHelp() {
         say("get_cert");
@@ -978,7 +970,7 @@ public class OA2CLCCommands extends CommonCommands {
         sayi("What is returned is dependent upon what the server supports.");
     }
 
-    public void get_user_info(InputLine inputLine) throws Exception {
+    public void user_info(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             getUIHelp();
             return;
@@ -992,7 +984,7 @@ public class OA2CLCCommands extends CommonCommands {
             }
             JSONObject jsonObject = new JSONObject();
             jsonObject.putAll(userInfo.getMap());
-            claims = jsonObject;
+            setIDToken(TokenFactory.createIDT(jsonObject));
         } catch (Throwable t) {
             lastException = t;
             throw t;
@@ -1059,6 +1051,18 @@ public class OA2CLCCommands extends CommonCommands {
 
     }
 
+    public boolean validateJWT(String rawToken) {
+        JSONWebKeys keys = JWTUtil2.getJsonWebKeys(getService().getServiceClient(), ((OA2ClientEnvironment) getService().getEnvironment()).getWellKnownURI());
+        try {
+            JWTUtil.verifyAndReadJWT(rawToken, keys);
+            return true;
+        } catch (Throwable t) {
+            // do nothing.
+        }
+        return false;
+
+    }
+
     public void authz(InputLine inputLine) throws Exception {
         String rawResponse = null;
         try {
@@ -1108,7 +1112,11 @@ public class OA2CLCCommands extends CommonCommands {
         sayi("displayed.");
     }
 
-    public void printToken(AccessToken accessToken, boolean noVerify, boolean printRaw) {
+    public void printToken(TokenImpl accessToken, boolean noVerify, boolean printRaw) {
+        NEWprintToken(accessToken, noVerify, printRaw);
+    }
+
+    protected void OLDprintToken(AccessTokenImpl accessToken, boolean noVerify, boolean printRaw) {
 
         if (accessToken != null) {
             JSONObject token = null;
@@ -1149,17 +1157,63 @@ public class OA2CLCCommands extends CommonCommands {
 
                     at.setLifetime(d.getTime() - System.currentTimeMillis());
                     if (at.getLifetime() <= 0) {
-                        say("   token expired \n");
+                        say("   token expired at " + d + "\n");
                     } else {
                         say("   expires in = " + at.getLifetime() + " ms.\n");
                     }
                 }
             }
         }
-
     }
 
-    protected void printToken(RefreshTokenImpl refreshToken, boolean noVerify, boolean printRaw) {
+    protected void NEWprintToken(TokenImpl tokenImpl, boolean noVerify, boolean printRaw) {
+        if (tokenImpl == null) {
+            return;
+        }
+        String tokenType = "unknown";
+        if (tokenImpl instanceof AccessTokenImpl) {
+            tokenType = "access";
+        }
+        if (tokenImpl instanceof RefreshTokenImpl) {
+            tokenType = "refresh";
+        }
+        if (tokenImpl instanceof IDTokenImpl) {
+            tokenType = "id";
+        }
+        if (tokenImpl.isJWT()) {
+            sayi("JWT " + tokenType + " token " + tokenImpl.getPayload().toString(1));
+            if (noVerify) {
+                sayi("token signature validation skipped");
+            } else {
+                sayi("signature is " + (validateJWT(tokenImpl.getToken()) ? "" : "NOT") + " valid");
+            }
+            if (printRaw) {
+                sayi("raw token=" + tokenImpl.getToken());
+            }
+            Date d = new Date();
+            d.setTime(tokenImpl.getExpiresAt());
+
+            long x = d.getTime() - System.currentTimeMillis();
+            if (x <= 0) {
+                say("   token expired at " + d + "\n");
+            } else {
+                say("   expires in = " + x + " ms.\n");
+            }
+            return;
+        }
+        say(tokenType + " token = " + tokenImpl.getToken());
+        say("   decoded token:" + tokenImpl.getJti());
+        if (tokenImpl.getExpiresAt() < System.currentTimeMillis()) {
+            Date d = new Date(tokenImpl.getExpiresAt());
+            say("   token expired at" + d + "\n");
+        } else {
+            say("   expires in = " + tokenImpl.getLifetime() + " ms.");
+            say("   valid until " + (new Date(tokenImpl.getExpiresAt())) + "\n");
+        }
+    }
+
+
+    protected void OLDprintToken(RefreshTokenImpl refreshToken, boolean noVerify, boolean printRaw) {
         if (refreshToken != null) {
             JSONObject token = null;
             try {
@@ -1170,13 +1224,13 @@ public class OA2CLCCommands extends CommonCommands {
             }
             if (token == null) {
                 say("refresh token = " + refreshToken.getToken());
-                if (TokenUtils.isBase32(refreshToken.getToken())) {
-                    RefreshTokenImpl refreshToken2 = new RefreshTokenImpl(null);
+                //     if (TokenUtils.isBase32(refreshToken.getToken())) {
+                //       RefreshTokenImpl refreshToken2 = new RefreshTokenImpl(null);
 
-                    refreshToken2.decodeToken(refreshToken.getToken());
-                    refreshToken = refreshToken2;
-                    say("   decoded token:" + refreshToken.getToken());
-                }
+                //     refreshToken2.decodeToken(refreshToken.getToken());
+                //   refreshToken = refreshToken2;
+                say("   decoded token:" + refreshToken.getToken());
+                //}
                 Date startDate = DateUtils.getDate(refreshToken.getToken());
                 startDate.setTime(startDate.getTime() + refreshToken.getLifetime());
                 if (startDate.getTime() <= System.currentTimeMillis()) {
@@ -1215,13 +1269,11 @@ public class OA2CLCCommands extends CommonCommands {
         if (getDummyAsset().hasRefreshToken()) {
             printToken(getDummyAsset().getRefreshToken(), noVerify, printRaw);
         }
-
-
     }
 
     public static final String CLAIMS_FLAG = "-claims";
 
-    public void get_rt(InputLine inputLine) throws Exception {
+    public void refresh(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             getRTHelp();
             return;
@@ -1238,15 +1290,13 @@ public class OA2CLCCommands extends CommonCommands {
                 dummyAsset = z;
             }
             // Have to update the AT reponse here every time or no token state is preserved.
-            currentATResponse = new ATResponse2(dummyAsset.getAccessToken(), dummyAsset.getRefreshToken());
+            currentATResponse = new ATResponse2(dummyAsset.getAccessToken(), dummyAsset.getRefreshToken(), dummyAsset.getIdToken());
             currentATResponse.setParameters(rtResponse.getParameters());
-            JSONObject json = JSONObject.fromObject(currentATResponse.getParameters());
-            claims = json;
             if (inputLine.hasArg(CLAIMS_FLAG)) {
-                if (json.isEmpty()) {
+                if (getIdToken().getPayload().isEmpty()) {
                     say("(no claims found)");
                 } else {
-                    say(json.toString(2));
+                    say(getIdToken().getPayload().toString(2));
                 }
             }
             if (isPrintOuput()) {
@@ -1308,6 +1358,7 @@ public class OA2CLCCommands extends CommonCommands {
     }
 
     JSONObject sciToken = null;
+
     /*
     Testing for exchange:
     load localhost:p1
@@ -1358,7 +1409,7 @@ public class OA2CLCCommands extends CommonCommands {
                     tt = "rt";
                 } else {
                     // Contract is that no specified subject token means use the one requested
-                    switch(requestedTokenType){
+                    switch (requestedTokenType) {
                         default:
                         case OA2MPService.EXCHANGE_ACCESS_TOKEN:
                             tt = "at";
@@ -1396,13 +1447,13 @@ public class OA2CLCCommands extends CommonCommands {
                     break;
                 case "id":
                     subjectTokenType = ID_TOKEN;
-                    subjectToken = new IDTokenImpl(rawIdToken, URI.create(claims.getString(OA2Claims.JWT_ID)));
+                    subjectToken = getDummyAsset().getIdToken();
                     break;
                 default:
                     throw new IllegalArgumentException("unknown token type \"" + tt + "\"");
 
             }
-            if(subjectToken == null){
+            if (subjectToken == null) {
                 say("missing subject token -- did you get an access token first?");
                 return;
             }
@@ -1410,11 +1461,12 @@ public class OA2CLCCommands extends CommonCommands {
             // This fixes it, but this code should be moved there, along with the resolveFromToken method
             // Since it only really affects the CLC, it has a low priority though.
 
-            JSONObject json = getService().exchangeRefreshToken(getDummyAsset(),
+            getService().exchangeRefreshToken(getDummyAsset(),
                     subjectToken,
                     exchangeParameters,
                     requestedTokenType,
-                    subjectTokenType);
+                    subjectTokenType, isErsatz());
+            setErsatz(false); // no matter what, after a successful fork, do not re-attempt to fork!
             // Note that the call updates the asset, so we don't need to look at the response,
             // just print th right thing.
             switch (requestedTokenType) {
@@ -1426,8 +1478,8 @@ public class OA2CLCCommands extends CommonCommands {
                     printToken(getDummyAsset().getAccessToken(), false, true);
                     break;
                 case OA2MPService.EXCHANGE_ID_TOKEN:
-                    claims = json.getJSONObject(ID_TOKEN); // update the claims we got back.
-                    claims(new InputLine("claims"));
+                    //JSONObject claims = getDummyAsset().getIdToken(); // update the claims we got back.
+                    printToken(getIdToken(), false, true);
             }
         } catch (Throwable t) {
             lastException = t;
@@ -1439,6 +1491,10 @@ public class OA2CLCCommands extends CommonCommands {
     protected String AT_RESPONSE_KEY = "at_response";
     protected String AUTHZ_GRANT_KEY = "authz_grant";
     protected String AUTHZ_PARAMETERS_KEY = "authz_parameters";
+    /**
+     * Used if the client ID was used with another stored configuration to do a fork.
+     */
+    protected String IS_ERSATZ_KEY = "is_ersatz";
     public String CLAIMS_KEY = "claims";
     protected String CONFIG_NAME_KEY = "config_name";
     protected String CONFIG_FILE_KEY = "config_file";
@@ -1490,8 +1546,10 @@ public class OA2CLCCommands extends CommonCommands {
             lastUserMessage = json.getString(USER_MESSAGE_KEY);
             say(lastUserMessage);
         }
+        IDTokenImpl idToken = null;
         if (json.containsKey(CLAIMS_KEY)) {
-            claims = json.getJSONObject(CLAIMS_KEY);
+            // legacy. snarf it in as best we can.
+            idToken = TokenFactory.createIDT(json.getJSONObject(CLAIMS_KEY));
         }
         if (json.containsKey(CURRENT_URI_KEY)) {
             currentURI = URI.create(json.getString(CURRENT_URI_KEY));
@@ -1510,6 +1568,9 @@ public class OA2CLCCommands extends CommonCommands {
             requestParameters = new HashMap<>();
             requestParameters.putAll(json.getJSONObject(AUTHZ_PARAMETERS_KEY));
         }
+        if (json.containsKey(IS_ERSATZ_KEY)) {
+            setErsatz(json.getBoolean(IS_ERSATZ_KEY));
+        }
         if (json.containsKey(REFRESH_PARAMETERS_KEY)) {
             refreshParameters = new HashMap<>();
             refreshParameters.putAll(json.getJSONObject(REFRESH_PARAMETERS_KEY));
@@ -1527,13 +1588,20 @@ public class OA2CLCCommands extends CommonCommands {
         }
         if (json.containsKey(AT_RESPONSE_KEY)) {
             JSONObject atr = json.getJSONObject(AT_RESPONSE_KEY);
-            AccessTokenImpl ati = new AccessTokenImpl(null);
-            ati.fromJSON(atr.getJSONObject("access_token"));
-            RefreshTokenImpl rti = new RefreshTokenImpl(null);
-            rti.fromJSON(atr.getJSONObject("refresh_token"));
-            currentATResponse = new ATResponse2(ati, rti);
-            if (atr.containsKey("parameters")) {
-                currentATResponse.setParameters(atr.getJSONObject("parameters"));
+            if (atr.containsKey(RTResponse.TYPE)) {
+                currentATResponse = new ATResponse2(null);
+                currentATResponse.fromJSON(atr);
+            } else {
+                // old
+                AccessTokenImpl ati = new AccessTokenImpl(null);
+                ati.fromJSON(atr.getJSONObject("access_token"));
+                RefreshTokenImpl rti = new RefreshTokenImpl(null);
+                rti.fromJSON(atr.getJSONObject("refresh_token"));
+                currentATResponse = new ATResponse2(ati, rti, idToken);
+                if (atr.containsKey("parameters")) {
+                    currentATResponse.setParameters(atr.getJSONObject("parameters"));
+                }
+
             }
         }
 
@@ -1575,12 +1643,23 @@ public class OA2CLCCommands extends CommonCommands {
 
     }
 
+    public boolean isErsatz() {
+        return ersatz;
+    }
+
+    public void setErsatz(boolean ersatz) {
+        this.ersatz = ersatz;
+    }
+
+    boolean ersatz = false;
+
     public void read(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             showReadHelp();
             return;
         }
-        boolean loadStoredCfg = !(inputLine.hasArg(PROVISION_ONLY_FLAG) || inputLine.hasArg(PROVISION_ONLY_SHORT_FLAG));
+        setErsatz(inputLine.hasArg(PROVISION_ONLY_FLAG) || inputLine.hasArg(PROVISION_ONLY_SHORT_FLAG));
+        //boolean loadStoredCfg = !isErsatz();
         inputLine.removeSwitch(PROVISION_ONLY_FLAG);
         inputLine.removeSwitch(PROVISION_ONLY_SHORT_FLAG);
         if (0 == inputLine.getArgCount()) {
@@ -1611,7 +1690,7 @@ public class OA2CLCCommands extends CommonCommands {
             stringBuffer.append(content + "\n");
         }
         JSONObject json = JSONObject.fromObject(stringBuffer.toString());
-        fromJSON(json, loadStoredCfg);
+        fromJSON(json, !isErsatz());
         say("done!");
     }
 
@@ -1669,7 +1748,7 @@ public class OA2CLCCommands extends CommonCommands {
         }
         jsonObject.put(CONFIG_NAME_KEY, oa2CommandLineClient.getConfigName());
         jsonObject.put(CONFIG_FILE_KEY, oa2CommandLineClient.getConfigFile());
-
+        jsonObject.put(IS_ERSATZ_KEY, isErsatz());
         if (!requestParameters.isEmpty()) {
             JSONObject jj = new JSONObject();
             jj.putAll(requestParameters);
@@ -1700,9 +1779,9 @@ public class OA2CLCCommands extends CommonCommands {
             jsonObject.put(DF_RESPONSE_KEY, dfResponse);
         }
 
-        if (claims != null && !claims.isEmpty()) {
-            jsonObject.put(CLAIMS_KEY, claims);
-        }
+    /*    if (idToken != null && !idToken.getPayload().isEmpty()) {
+            jsonObject.put(CLAIMS_KEY, idToken.toJSON().toString());
+        }*/
         if (currentATResponse != null) {
             JSONObject atr = new JSONObject();
             //Only serialize things that exist.
@@ -2073,26 +2152,6 @@ public class OA2CLCCommands extends CommonCommands {
 
     }
 
-    public void refresh(InputLine inputLine) throws Exception {
-        get_rt(inputLine);
-    }
-
-    public void access(InputLine inputLine) throws Exception {
-        get_at(inputLine);
-    }
-
-    public void grant(InputLine inputLine) throws Exception {
-        get_grant(inputLine);
-    }
-
-    public void uri(InputLine inputLine) throws Exception {
-        set_uri(inputLine);
-    }
-
-
-    public void user_info(InputLine inputLine) throws Exception {
-        get_user_info(inputLine);
-    }
 
     public String USERNAME_FLAG = "-user";
 
@@ -2114,8 +2173,8 @@ public class OA2CLCCommands extends CommonCommands {
             parameters.put(OA2Claims.SUBJECT, getCe().getClient().getIdentifierString());
         }
         JSONObject jsonObject = getService().rfc7523(getDummyAsset(), parameters);
-        rawIdToken = jsonObject.getString(ID_TOKEN);
-        claims = JWTUtil.readJWT(rawIdToken)[1]; // just read it.
+/*        rawIdToken = jsonObject.getString(ID_TOKEN);
+        idToken = JWTUtil.readJWT(rawIdToken)[1]; // just read it.*/
         return jsonObject;
     }
 

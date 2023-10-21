@@ -150,6 +150,7 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
 
 
         jwtRunner.doAuthClaims();
+
         getTransactionStore().save(st2);
     }
 

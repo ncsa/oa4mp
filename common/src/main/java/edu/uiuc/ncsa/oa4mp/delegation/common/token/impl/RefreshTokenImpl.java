@@ -17,6 +17,9 @@ public class RefreshTokenImpl extends TokenImpl implements RefreshToken {
         super(sciToken, jti);
     }
 
+    public RefreshTokenImpl() {
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (!(obj
@@ -25,5 +28,10 @@ public class RefreshTokenImpl extends TokenImpl implements RefreshToken {
             return false;
         }
         return super.equals(obj);
+    }
+
+    @Override
+    protected String getTokenType() {
+        return "refresh_token";
     }
 }

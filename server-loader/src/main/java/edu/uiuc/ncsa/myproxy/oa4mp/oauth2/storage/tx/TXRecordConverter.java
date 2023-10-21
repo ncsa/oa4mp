@@ -3,7 +3,6 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
-import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.data.ConversionMap;
@@ -22,12 +21,11 @@ import java.util.ArrayList;
 public class TXRecordConverter<V extends TXRecord> extends MapConverter<V> {
     public TXRecordConverter(SerializationKeys keys,
                              IdentifiableProvider<V> provider,
-                             TXStore txStore,
                              ClientStore<? extends OA2Client> clientStore) {
         super(keys, provider);
         this.clientStore = clientStore;
-        this.txStore = txStore;
     }
+
 
     TXStore<? extends TXRecord> txStore;
 
@@ -54,10 +52,12 @@ public class TXRecordConverter<V extends TXRecord> extends MapConverter<V> {
         if (map.containsKey(tkeys().ersatzID())) {
             txr.setErsatzClient(clientStore.get(BasicIdentifier.newID(map.getString(tkeys().ersatzID()))));
         }
-        if (map.containsKey(getKeys().previousTXRecord)) {
+    /*    if (map.containsKey(getKeys().previousTXRecord)) {
             Identifier previousID = BasicIdentifier.newID(map.getString(tkeys().previousTXRecord()));
-            txr.setPreviousTXR(txStore.get(previousID));
-        }
+            if(previousID != null) {
+                txr.setPreviousTXR(txStore.get(previousID));
+            }
+        }*/
         if(map.containsKey(getKeys().token())){
             txr.setToken(JSONObject.fromObject(map.getString(getKeys().token())));
         }
@@ -106,9 +106,9 @@ public class TXRecordConverter<V extends TXRecord> extends MapConverter<V> {
         if (value.getErsatzClient() != null) {
             data.put(tkeys().ersatzID(), value.getErsatzClient().getIdentifierString());
         }
-        if(value.getPreviousTXR() != null){
+    /*    if(value.getPreviousTXR() != null){
             data.put(tkeys().previousTXRecord(), value.getPreviousTXR().getIdentifierString());
-        }
+        }*/
         if(value.getToken()!= null){
             data.put(tkeys().token(), value.getToken().toString());
         }

@@ -26,9 +26,14 @@ old_tokens. := clc#tokens();
 
 old_id. := clc#claims();
 tokens. := clc#exchange('-rt', args.0, args.1); // forks flow
+say('initial at:\n' + print(old_tokens.'access_token'));
+say('ersatz at:\n' + print(tokens.'access_token'));
+say('------------------');
+say('initial rt:\n' + print(old_tokens.'refresh_token'));
+say('ersatz rt:\n' + print(tokens.'refresh_token'));
 rt. := tokens.'refresh_token';
 // same token returned by the service, not a new one.
-⊨ rt.'jti' != old_tokens.'refresh_token'.'jti' : 'refresh token not swapped';
+⊨ (rt.'jti') != (old_tokens.'refresh_token'.'jti') : 'refresh token not swapped';
 
 // As per the spec, the access_token is always returned but the content is no specified.
 // If the return type is a RT, then BOTh are the same token, the RT

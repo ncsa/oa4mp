@@ -1,14 +1,10 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.AbstractAccessTokenHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.PayloadHandlerConfigImpl;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenUtils;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
-import net.sf.json.JSONObject;
 
 import java.net.URI;
 
@@ -26,24 +22,18 @@ public class DefaultAccessTokenHandler extends AbstractAccessTokenHandler {
     }
 
     @Override
-    public AccessToken getSignedAT(JSONWebKey key) {
-        if (!getAtData().containsKey(JWT_ID)) {
+    public AccessTokenImpl getSignedPayload(JSONWebKey key) {
+        if (!getPayload().containsKey(JWT_ID)) {
             // There is something wrong. This is required.
             throw new IllegalStateException("Error: no JTI. Cannot create access token");
         }
-        AccessTokenImpl at = new AccessTokenImpl(URI.create(TokenUtils.b32EncodeToken(getAtData().getString(JWT_ID))));
+        AccessTokenImpl at = new AccessTokenImpl(URI.create(TokenUtils.b32EncodeToken(getPayload().getString(JWT_ID))));
         return at;
     }
 
-    @Override
+/*    @Override
     public void setAccountingInformation() {
-        JSONObject atData = getAtData();
-        // Could try to create a token with a custom lifetime, but that would involve   re-creating the token
-        // and applying all the server logic to make sure the lifetime is right.
-/*        OA2TokenForge oa2TokenForge = null;
-        ATRequest atRequest = new ATRequest(null, getPhCfg().getTransaction());
-
-        oa2TokenForge.createToken(atRequest);*/
+        long lifetime = ClientUtils.computeATLifetime(transaction, oa2se);
         OA2ServiceTransaction transaction = getPhCfg().getTransaction();
         if (0 < getATConfig().getLifetime()) {
             transaction.setAccessTokenLifetime(System.currentTimeMillis() + getATConfig().getLifetime());
@@ -51,5 +41,5 @@ public class DefaultAccessTokenHandler extends AbstractAccessTokenHandler {
             transaction.setAccessTokenLifetime(System.currentTimeMillis() + OA2ConfigurationLoader.ACCESS_TOKEN_LIFETIME_DEFAULT);
         }
         super.setAccountingInformation();
-    }
+    }*/
 }

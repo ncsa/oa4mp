@@ -6,18 +6,17 @@ import edu.uiuc.ncsa.myproxy.oa4mp.client.ClientEnvironment;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.OA4MPService;
 import edu.uiuc.ncsa.oa4mp.delegation.client.request.*;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.MyX509Certificates;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.Verifier;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AuthorizationGrantImpl;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.*;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.NonceHerder;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.UserInfo;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.client.*;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.client.ATResponse2;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.client.ATServer2;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.client.DS2;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.client.RFC7523Utils;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.JWTUtil2;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.InvalidNonceException;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
@@ -211,8 +210,12 @@ public class OA2MPService extends OA4MPService {
 
     private ATResponse2 processAtRequest(OA2Asset asset, DelegatedAssetRequest dar) {
         ATResponse2 atResponse2 = (ATResponse2) getEnvironment().getDelegationService().getAT(dar);
-        asset.setIssuedAt((Date) atResponse2.getParameters().get(OA2Claims.ISSUED_AT));
-        asset.setUsername((String) atResponse2.getParameters().get(OA2Claims.SUBJECT));
+        asset.setIssuedAt(new Date(atResponse2.getAccessToken().getIssuedAt()));
+        //asset.setIssuedAt((Date) atResponse2.getParameters().get(OA2Claims.ISSUED_AT));
+        if(atResponse2.getIdToken().getPayload().containsKey(OA2Claims.SUBJECT)){
+            asset.setUsername(atResponse2.getIdToken().getPayload().getString(OA2Claims.SUBJECT));
+        }
+        //asset.setUsername((String) atResponse2.getParameters().get(OA2Claims.SUBJECT));
         if (atResponse2.getParameters().containsKey(NONCE) && !NonceHerder.hasNonce((String) atResponse2.getParameters().get(NONCE))) {
             throw new InvalidNonceException("Unknown nonce.");
         }
@@ -220,11 +223,10 @@ public class OA2MPService extends OA4MPService {
 
 
         asset.setAccessToken((AccessTokenImpl) atResponse2.getAccessToken());
-        asset.setRefreshToken(atResponse2.getRefreshToken());
-        Object idToken = atResponse2.getParameters().get(OA2Constants.ID_TOKEN);
-        if (idToken != null) {
-            asset.setIdToken((JSONObject) idToken);
+        if (atResponse2.hasRefreshToken()) {
+            asset.setRefreshToken(atResponse2.getRefreshToken());
         }
+        asset.setIdToken(atResponse2.getIdToken());
         getAssetStore().save(asset);
         return atResponse2;
     }
@@ -293,10 +295,11 @@ public class OA2MPService extends OA4MPService {
         rtRequest.setRefreshToken(asset.getRefreshToken());
         RTResponse rtResponse = ds2.refresh(rtRequest);
         asset.setAccessToken((AccessTokenImpl) rtResponse.getAccessToken());
-        asset.setRefreshToken(rtResponse.getRefreshToken());
-        Object idToken = rtResponse.getParameters().get(OA2Constants.ID_TOKEN);
-        if (idToken != null) {
-            asset.setIdToken((JSONObject) idToken);
+        if (rtResponse.hasRefreshToken()) {
+            asset.setRefreshToken(rtResponse.getRefreshToken());
+        }
+        if (rtResponse.hasIDToken()) {
+            asset.setIdToken(rtResponse.getIdToken());
         }
         getAssetStore().remove(asset.getIdentifier()); // clear out
         getAssetStore().save(asset);
@@ -314,7 +317,6 @@ public class OA2MPService extends OA4MPService {
         JSONObject json = JSONObject.fromObject(resp.getRawJSON());
         UserInfo ui = new UserInfo();
         ui.setMap(json); // return everything, even specialized fields.
-        //UserInfo ui = (UserInfo) JSONObject.toBean(json, UserInfo.class);
         return ui;
     }
 
@@ -359,10 +361,11 @@ public class OA2MPService extends OA4MPService {
                                            TokenImpl subjectToken,
                                            Map additionalParameters,
                                            int requestedTokenType,
-                                           String subjectType) {
+                                           String subjectType,
+                                           boolean isErsatz) {
         HashMap<String, String> parameterMap = new HashMap<>();
         parameterMap.put(SUBJECT_TOKEN, subjectToken.getToken());
-        switch (subjectType){
+        switch (subjectType) {
             case ACCESS_TOKEN:
                 parameterMap.put(SUBJECT_TOKEN_TYPE, ACCESS_TOKEN_TYPE);
                 break;
@@ -393,7 +396,7 @@ public class OA2MPService extends OA4MPService {
         if (additionalParameters != null) {
             parameterMap.putAll(additionalParameters);
         }
-        return exchangeIt(asset, parameterMap);
+        return exchangeIt(asset, parameterMap, isErsatz);
     }
 
     public final static int EXCHANGE_ID_TOKEN = 100;
@@ -410,7 +413,7 @@ public class OA2MPService extends OA4MPService {
      * @param additionalParams
      * @return
      */
-    public JSONObject exchangeAccessToken(OA2Asset asset, AccessToken accessToken, Map<String, String> additionalParams) {
+/*    public JSONObject exchangeAccessToken(OA2Asset asset, AccessToken accessToken, Map<String, String> additionalParams) {
         Map parameterMap = new HashMap();
         parameterMap.put(SUBJECT_TOKEN, accessToken.getToken());
         parameterMap.put(SUBJECT_TOKEN_TYPE, ACCESS_TOKEN_TYPE);
@@ -418,16 +421,18 @@ public class OA2MPService extends OA4MPService {
         parameterMap.putAll(additionalParams);
 
         return exchangeIt(asset, parameterMap);
-    }
+    }*/
 
     /**
-     * Actual workhorse. Takes the token and the type then does the exchange.
+     * Actual workhorse. Takes the token and the type then does the exchange.  This updates the asset
+     * and returns then entire response fromm the server.
      *
      * @param asset
      * @param additionalParameters
      * @return
      */
-    protected JSONObject exchangeIt(OA2Asset asset, Map<String, String> additionalParameters) {
+    protected JSONObject exchangeIt(OA2Asset asset, Map<String, String> additionalParameters,
+                                    boolean isErsatz) {
         ServiceClient serviceClient = getServiceClient();
         Map parameterMap = new HashMap<>();
         if (additionalParameters != null) {
@@ -444,36 +449,36 @@ public class OA2MPService extends OA4MPService {
                     oa2ClientEnvironment.getKid(),
                     parameterMap);
         } else {
-
             rawResponse = serviceClient.doGet(parameterMap, client.getIdentifierString(), client.getSecret());
         }
 
         DebugUtil.trace(this, "raw response = " + rawResponse);
         JSONObject json = JSONObject.fromObject(rawResponse);
-        updateExchangedAsset(asset, json);
-        String rawToken = json.getString(OA2Constants.ACCESS_TOKEN);
         JSONWebKeys keys = JWTUtil2.getJsonWebKeys(serviceClient, ((OA2ClientEnvironment) getEnvironment()).getWellKnownURI());
-        JSONObject j = null;
-        try {
-            // See if it's a SciToken
-            j = JWTUtil2.verifyAndReadJWT(rawToken, keys);
-        } catch (Throwable t) {
-            j = new JSONObject();
+        if (isErsatz) {
+            // all tokens get updated.
+            asset.setRefreshToken(TokenFactory.createRT(json.getString(REFRESH_TOKEN)));
+            asset.setIdToken(TokenFactory.createIDT(json.getString(ACCESS_TOKEN)));
+            asset.setAccessToken(TokenFactory.createAT(json.getString(ACCESS_TOKEN)));
+        } else {
             switch (json.getString(ISSUED_TOKEN_TYPE)) {
                 case REFRESH_TOKEN_TYPE:
-                    j.put(REFRESH_TOKEN, rawToken);
+                    asset.setRefreshToken(TokenFactory.createRT(json.getString(REFRESH_TOKEN)));
                     break;
                 case ACCESS_TOKEN_TYPE:
-                    j.put(OA2Constants.ACCESS_TOKEN, rawToken);
+                    asset.setAccessToken(TokenFactory.createAT(json.getString(ACCESS_TOKEN)));
                     break;
                 case ID_TOKEN_TYPE:
-                    j.put(ID_TOKEN, rawToken);
+                    //asset.setIdToken(TokenFactory.createIDT(json.getString(ACCESS_TOKEN)).getPayload());
+                    asset.setIdToken(TokenFactory.createIDT(json.getString(ACCESS_TOKEN)));
                     break;
                 default:
                     throw new IllegalArgumentException("unknown token type \"" + json.getString(ISSUED_TOKEN_TYPE) + "\"");
             }
+
         }
-        return j;
+        getEnvironment().getAssetStore().save(asset);
+        return json;
 
     }
 
@@ -489,7 +494,7 @@ public class OA2MPService extends OA4MPService {
     }
 
     protected void updateExchangedAsset(OA2Asset asset, JSONObject claims) {
-        NEWupdateExchangedAsset(asset, claims);
+     //   NEWupdateExchangedAsset(asset, claims);
     }
 
     /**
@@ -517,6 +522,7 @@ public class OA2MPService extends OA4MPService {
         return new AccessTokenImpl(URI.create(rawToken));
     }
 
+/*
     protected void NEWupdateExchangedAsset(OA2Asset asset, JSONObject claims) {
         boolean saveAsset = false;
         if (claims.containsKey(ISSUED_TOKEN_TYPE)) {
@@ -550,6 +556,7 @@ public class OA2MPService extends OA4MPService {
             getEnvironment().getAssetStore().save(asset);
         }
     }
+*/
 
     protected void OLDupdateExchangedAsset(OA2Asset asset, JSONObject claims) {
         boolean saveAsset = false;
@@ -634,19 +641,18 @@ public class OA2MPService extends OA4MPService {
         if (!json.containsKey(ACCESS_TOKEN)) {
             throw new IllegalArgumentException("Error: No access token found in server response");
         }
-        AccessTokenImpl at = new AccessTokenImpl(URI.create(json.getString(ACCESS_TOKEN)));
+        AccessTokenImpl at = TokenFactory.createAT(json.getString(ACCESS_TOKEN));
         asset.setIssuedAt(new Date(at.getIssuedAt()));
 
         asset.setAccessToken(at);
         RefreshTokenImpl rt = null;
         if (json.containsKey(REFRESH_TOKEN)) {
             // the refresh token is optional, so if it is missing then there is nothing to do.
-            rt = new RefreshTokenImpl(URI.create(json.getString(REFRESH_TOKEN)));
+            rt = TokenFactory.createRT(json.getString(REFRESH_TOKEN));
             asset.setRefreshToken(rt);
         }
-        Object idToken = response.getIdToken();
-        if (idToken != null) {
-            asset.setIdToken((JSONObject) idToken);
+        if (response.getIdToken() != null) {
+            asset.setIdToken(response.getIdToken());
         }
         getAssetStore().save(asset);
 

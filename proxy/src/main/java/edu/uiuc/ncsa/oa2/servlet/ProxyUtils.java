@@ -281,7 +281,7 @@ public class ProxyUtils {
         try {
             t.setProxyState(clcCommands.toJSON());
             debugger.trace(ProxyUtils.class, "doRFC8628AT saving proxy state.");
-            setClaimsFromProxy(t, clcCommands.getClaims(), debugger);
+            setClaimsFromProxy(t, clcCommands.getIdToken().getPayload(), debugger);
             oa2SE.getTransactionStore().save(t);
         } catch (Throwable throwable) {
             if (debugger.isEnabled()) {
@@ -346,7 +346,7 @@ public class ProxyUtils {
         OA2CLCCommands clcCommands = getCLC(oa2SE, t);
         clcCommands.refresh(new InputLine("user_info "));
         if (!clcCommands.hadException()) {
-            setClaimsFromProxy(t, clcCommands.getClaims(), MyProxyDelegationServlet.createDebugger(t.getOA2Client()));
+            setClaimsFromProxy(t, clcCommands.getIdToken().getPayload(), MyProxyDelegationServlet.createDebugger(t.getOA2Client()));
         }
         t.setProxyState(clcCommands.toJSON());
         oa2SE.getTransactionStore().save(t);

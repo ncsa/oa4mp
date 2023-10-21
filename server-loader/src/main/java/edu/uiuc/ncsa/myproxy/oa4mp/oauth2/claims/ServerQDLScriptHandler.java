@@ -1,10 +1,11 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
-import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.PayloadHandler;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.PayloadHandlerConfig;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSource;
+import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunRequest;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse;
@@ -52,9 +53,7 @@ public class ServerQDLScriptHandler implements PayloadHandler {
      */
     @Override
     public void addRequestState(ScriptRunRequest req) throws Throwable {
-        req.getArgs().put(SRE_REQ_CLAIMS, getClaims());
         req.getArgs().put(SRE_REQ_CLAIM_SOURCES, getSources()); // so its a map
-        req.getArgs().put(SRE_REQ_EXTENDED_ATTRIBUTES, getExtendedAttributes()); // so its a map
         req.getArgs().put(SRE_REQ_ACCESS_TOKEN, getAtData());
         req.getArgs().put(SRE_REQ_REFRESH_TOKEN, getRTData());
     }
@@ -114,13 +113,12 @@ public class ServerQDLScriptHandler implements PayloadHandler {
     }
 
     @Override
-    public void saveState() throws Throwable {
+    public void saveState(String execPhase) throws Throwable {
 
     }
 
 
-    @Override
-    public JSONObject getClaims() {
+    public JSONObject getUserMetaData() {
         return cfg.transaction.getUserMetaData();
     }
 
@@ -169,10 +167,9 @@ public class ServerQDLScriptHandler implements PayloadHandler {
         return cfg.oa2SE.getQDLEnvironment().hasServerScripts();
     }
 
-    @Override
-    public String getToken(JSONWebKey key) {
+/*    public String getToken(JSONWebKey key) {
         throw new NotImplementedException("no tokens from server script handler");
-    }
+    }*/
 
     public void setResponseCode(int responseCode) {
         this.responseCode = responseCode;
@@ -210,5 +207,25 @@ public class ServerQDLScriptHandler implements PayloadHandler {
             case RC_NOT_RUN:
                 return;
         }
+    }
+
+    @Override
+    public JSONObject getPayload() {
+        throw new NotImplementedException("No single payload in QDL Script Handler");
+    }
+
+    @Override
+    public void setPayload(JSONObject payload) {
+        throw new NotImplementedException("No single payload in QDL Script Handler");
+    }
+
+    @Override
+    public TokenImpl getSignedPayload(JSONWebKey key) {
+        throw new NotImplementedException("No single payload in QDL Script Handler");
+    }
+
+    @Override
+    public TokenImpl getSignedPayload(JSONWebKey key, String headerType) {
+        throw new NotImplementedException("No single payload in QDL Script Handler");
     }
 }

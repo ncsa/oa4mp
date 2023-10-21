@@ -2,18 +2,16 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Scopes;
-import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
-import edu.uiuc.ncsa.security.core.util.Iso8601;
-import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.JWTUtil2;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.PayloadHandler;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.PayloadHandlerConfig;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSource;
+import edu.uiuc.ncsa.security.core.util.Iso8601;
+import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
-import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -22,7 +20,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims.*;
-import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims.AUDIENCE;
 import static edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse.RC_NOT_RUN;
 
 /**
@@ -41,6 +38,14 @@ public abstract class AbstractPayloadHandler implements PayloadHandler, OA2Scope
 
     PayloadHandlerConfigImpl phCfg;
 
+    public boolean hasTXRecord() {
+        return getPhCfg().hasTXRecord();
+    }
+
+    public TXRecord getTXRecord() {
+        return getPhCfg().getTxRecord();
+    }
+
     /**
      * Create the instance for the authorization phase, while there is an {@link HttpServletRequest} with possible
      * headers that need to be processed.
@@ -57,14 +62,6 @@ public abstract class AbstractPayloadHandler implements PayloadHandler, OA2Scope
         ServletDebugUtil.trace(this, "has OA2SE? " + (oa2se != null));
     }
 
-    @Override
-    public JSONObject getClaims() {
-        return transaction.getUserMetaData();
-    }
-
-    public void setClaims(JSONObject claims) {
-        transaction.setUserMetaData(claims);
-    }
 
     public void setExtendedAttributes(JSONObject extendedAttributes) {
         this.extendedAttributes = extendedAttributes;
@@ -118,13 +115,16 @@ public abstract class AbstractPayloadHandler implements PayloadHandler, OA2Scope
         this.phCfg = (PayloadHandlerConfigImpl) phCfg;
     }
 
+
+/*
     @Override
-    public String getToken(JSONWebKey key) {
-        if (getClaims() == null || getClaims().isEmpty()) {
+abstract   public String getToken(JSONWebKey key)
+    {
+        if (getUserMetaData() == null || getUserMetaData().isEmpty()) {
             return "";
         }
         try {
-            return JWTUtil2.createJWT(getClaims(), key);
+            return JWTUtil2.createJWT(getUserMetaData(), key);
         } catch (Throwable e) {
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
@@ -132,6 +132,7 @@ public abstract class AbstractPayloadHandler implements PayloadHandler, OA2Scope
             throw new GeneralException("Could not create signed token", e);
         }
     }
+*/
 
     public void setResponseCode(int responseCode) {
         this.responseCode = responseCode;
@@ -187,12 +188,15 @@ public abstract class AbstractPayloadHandler implements PayloadHandler, OA2Scope
     /**
      * Used by access tokens and refresh tokens. This allows for certain substitutions for various server
      * variables.
+     *
      * @param targetClaims
      */
-    protected void doServerVariables(JSONObject targetClaims) {
+    protected void doServerVariables(JSONObject targetClaims, JSONObject userMetaData) {
         JSONObject serverVariableTemplates = new JSONObject();
         // Allow for substitutions in audience, subject, issuer and resource
-        serverVariableTemplates.putAll(getClaims());
+        if (userMetaData != null) {
+            serverVariableTemplates.putAll(userMetaData);
+        }
         long now = System.currentTimeMillis();
         serverVariableTemplates.put("client_id", getPhCfg().getTransaction().getClient().getIdentifierString());
         serverVariableTemplates.put("host", getPhCfg().getOa2se().getServiceAddress().toString());
@@ -240,4 +244,18 @@ public abstract class AbstractPayloadHandler implements PayloadHandler, OA2Scope
         }
     }
 
+    @Override
+    public void saveState(String execPhase) throws Throwable {
+        if(hasTXRecord()) {
+            getTXRecord().setToken(getPayload());
+        }
+    }
+
+
+    @Override
+    public void setPayload(JSONObject payload) {
+        this.payload = payload;
+    }
+
+    protected JSONObject payload;
 }

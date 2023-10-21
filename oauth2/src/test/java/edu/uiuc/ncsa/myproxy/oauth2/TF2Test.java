@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oauth2;
 
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
@@ -53,6 +54,11 @@ public class TF2Test extends TestBase {
 
         @Override
         public void setResource(List<String> resource) {
+
+        }
+
+        @Override
+        public void setClaimsSources(List<ClaimSource> sources) {
 
         }
 

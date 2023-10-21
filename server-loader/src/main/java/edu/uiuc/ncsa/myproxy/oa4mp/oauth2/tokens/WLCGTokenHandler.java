@@ -28,7 +28,7 @@ public class WLCGTokenHandler extends AbstractAccessTokenHandler implements WLCG
     @Override
     public void setAccountingInformation() {
         super.setAccountingInformation();
-        JSONObject atData = getAtData();
+        JSONObject atData = getPayload();
         // NOTE: wlcg.groups are not processed here since the source for them is not
         // canonical, i.e., they may come from any of a number of sources so there is
         // just no way to know a priori what to use. 
@@ -40,13 +40,13 @@ public class WLCGTokenHandler extends AbstractAccessTokenHandler implements WLCG
             atData.put(SUBJECT, transaction.getUserMetaData().getString("eppn"));
         }
         // WLCG also supports a few constants from the 9068 spec.
-        if (getClaims().containsKey(RFC9068Constants.AUTHENTICATION_CLASS_REFERENCE)) {
-            atData.put(RFC9068Constants.AUTHENTICATION_CLASS_REFERENCE, getClaims().get(RFC9068Constants.AUTHENTICATION_CLASS_REFERENCE));
+        if (getUserMetaData().containsKey(RFC9068Constants.AUTHENTICATION_CLASS_REFERENCE)) {
+            atData.put(RFC9068Constants.AUTHENTICATION_CLASS_REFERENCE, getUserMetaData().get(RFC9068Constants.AUTHENTICATION_CLASS_REFERENCE));
         }
         atData.put(RFC9068Constants.AUTHENTICATION_TIME, transaction.getAuthTime().getTime() / 1000);
         // Some IDPS might also include this. Send it along if present.
-        if (getClaims().containsKey(EDUPERSON_ASSURANCE)) {
-            atData.put(EDUPERSON_ASSURANCE, getClaims().get(EDUPERSON_ASSURANCE));
+        if (getUserMetaData().containsKey(EDUPERSON_ASSURANCE)) {
+            atData.put(EDUPERSON_ASSURANCE, getUserMetaData().get(EDUPERSON_ASSURANCE));
         }
         if (getATConfig().getAudience().isEmpty()) {
             atData.put(AUDIENCE, DEFAULT_AUDIENCE);
@@ -63,7 +63,7 @@ public class WLCGTokenHandler extends AbstractAccessTokenHandler implements WLCG
 
     @Override
     public void finish(boolean doTemplates, boolean isQuery) throws Throwable {
-        JSONObject atData = getAtData();
+        JSONObject atData = getPayload();
         // As per spec., empty scopes means we *may* throw an exception in the generic case
         // and *must* throw one if the capability set is denied.
         super.finish(doTemplates, isQuery);
