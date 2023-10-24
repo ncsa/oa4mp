@@ -98,11 +98,12 @@ public class UserInfoServlet extends BearerTokenServlet {
                 resolvedClient.getIDTokenConfig(),
                 oa2SE,
                 transaction,
+                resolvedClient,
                 null, // no token exchange record outside of token exchanges.
                 null));
         idTokenHandler.refreshAccountingInformation();
 
-        JWTRunner jwtRunner = new JWTRunner(transaction, ScriptRuntimeEngineFactory.createRTE(oa2SE, transaction, null, transaction.getOA2Client().getConfig()));
+        JWTRunner jwtRunner = new JWTRunner(transaction, ScriptRuntimeEngineFactory.createRTE(oa2SE, transaction, null, resolvedClient.getConfig()));
         OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, transaction, resolvedClient, request);
         try {
             jwtRunner.doUserInfo();

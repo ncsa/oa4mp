@@ -4,10 +4,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2TransactionKeys;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.MyX509Certificates;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AuthorizationGrantImpl;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.VerifierImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.*;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.Identifier;
@@ -98,8 +95,10 @@ public class TransactionStemMC<V extends OA2ServiceTransaction> extends StemConv
         String verifier = "oauth_verifier";
         String tempCred = "temp_token";  // This is not used in OA2, but because of class inheritence from OA 1 is in the list
          */
-        if (stem.containsKey(kk().accessToken())) {v.setAccessToken(new AccessTokenImpl(URI.create(stem.getString(kk().accessToken()))));}
-        if (stem.containsKey(kk().authGrant())) {v.setAuthorizationGrant(new AuthorizationGrantImpl(URI.create(stem.getString(kk().authGrant()))));}
+        //if (stem.containsKey(kk().accessToken())) {v.setAccessToken(new AccessTokenImpl(URI.create(stem.getString(kk().accessToken()))));}
+        if (stem.containsKey(kk().accessToken())) {v.setAccessToken(TokenFactory.createAT(stem.getString(kk().accessToken())));}
+        //if (stem.containsKey(kk().authGrant())) {v.setAuthorizationGrant(new AuthorizationGrantImpl(URI.create(stem.getString(kk().authGrant()))));}
+        if (stem.containsKey(kk().authGrant())) {v.setAuthorizationGrant(TokenFactory.createAG(stem.getString(kk().authGrant())));}
         if(stem.containsKey(kk().verifier())){v.setVerifier(new VerifierImpl(URI.create(stem.getString(kk().verifier()))));}
         // 3 (4th unused)
         // ======
@@ -171,7 +170,8 @@ public class TransactionStemMC<V extends OA2ServiceTransaction> extends StemConv
         if(stem.containsKey(kk().idTokenIdentifier())){v.setIDTokenIdentifier(stem.getString(kk().idTokenIdentifier()));        }
         if(stem.containsKey(kk().isRFC8628())){v.setRFC8628Request(stem.getBoolean(kk().isRFC8628()));        }
         if(stem.containsKey(kk().proxyID())){v.setProxyId(stem.getString(kk().proxyID()));        }
-        if (stem.containsKey(kk().refreshToken())) {v.setRefreshToken(new RefreshTokenImpl(URI.create(stem.getString(kk().refreshToken()))));}
+        //if (stem.containsKey(kk().refreshToken())) {v.setRefreshToken(new RefreshTokenImpl(URI.create(stem.getString(kk().refreshToken()))));}
+        if (stem.containsKey(kk().refreshToken())) {v.setRefreshToken(TokenFactory.createRT(stem.getString(kk().refreshToken())));}
         if (stem.containsKey(kk().rtJWT())) {v.setRTJWT(stem.getString(kk().rtJWT()));}
         // 5
         if (stem.containsKey(kk().refreshTokenLifetime())) {v.setRefreshTokenLifetime(stem.getLong(kk().refreshTokenLifetime()));}

@@ -11,6 +11,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.AuthorizationTemplates;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenFactory;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.AccessTokenHandlerInterface;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.IDTokenHandlerInterface;
@@ -318,7 +319,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
         /*
           Make SURE the JTI gets set or token exchange, user info etc. will never work.
          */
-        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(transaction.getOA2Client());
+        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(client);
         debugger.trace(this, "starting AT handler finish with transaction =" + transaction.summary());
         JSONObject atData = getPayload();
         if (getPhCfg().hasTXRecord()) {
@@ -340,14 +341,8 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
                 atData.put(OA2Constants.SCOPE, scopes);
             }
         }
+
         // AT Data is in seconds, as per spec!
-        long proposedLifetime = (atData.getLong(EXPIRATION) - atData.getLong(ISSUED_AT)) * 1000;
-        if (proposedLifetime <= 0) {
-            proposedLifetime = transaction.getMaxAtLifetime();
-        } else {
-            proposedLifetime = Math.min(proposedLifetime, transaction.getMaxAtLifetime());
-        }
-        atData.put(EXPIRATION, (atData.getLong(ISSUED_AT) * 1000 + proposedLifetime) / 1000);
         if (!atData.containsKey(ISSUER)) {
             atData.put(ISSUER, transaction.getUserMetaData().getString(ISSUER));
         }
@@ -365,12 +360,11 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
                 atData.put(SUBJECT, transaction.getUserMetaData().getString(SUBJECT));
             }
         }
-
+        refreshAccountingInformation();
         doServerVariables(atData, getUserMetaData());
         setPayload(atData); // If these are updated by the server variable, update.
         if (getPhCfg().hasTXRecord()) {
             getPhCfg().getTxRecord().setToken(getPayload());
-            getPhCfg().getTxRecord().setLifetime(proposedLifetime);
         }
         //   transaction.setAccessTokenLifetime(proposedLifetime);
     }
@@ -403,7 +397,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
     @Override
     public AccessTokenImpl getSignedPayload(JSONWebKey key, String headerType) {
         if (key == null) {
-            oa2se.warn("Error: Null or missing key for signing encountered processing client \"" + transaction.getOA2Client().getIdentifierString() + "\"");
+            oa2se.warn("Error: Null or missing key for signing encountered processing client \"" + client.getIdentifierString() + "\"");
             throw new IllegalArgumentException("Error: Missing JSON web key. Cannto sign access token.");
         }
         if (getPayload().isEmpty()) return null;
@@ -414,7 +408,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
         if (getPayload().size() == 1) {
             String k = String.valueOf(getPayload().keySet().iterator().next());
             String v = String.valueOf(getPayload().get(k));
-            oa2se.info("Single value access token for client \"" + transaction.getOA2Client().getIdentifierString() + "\" found. Setting token value to " + v);
+            oa2se.info("Single value access token for client \"" + client.getIdentifierString() + "\" found. Setting token value to " + v);
             AccessTokenImpl accessToken = new AccessTokenImpl(URI.create(v));
             return accessToken;
         }
@@ -424,10 +418,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
         }
         try {
             String at = JWTUtil2.createJWT(getPayload(), key, headerType);
-            URI jti = URI.create(getPayload().getString(JWT_ID));
-            AccessTokenImpl at0 = new AccessTokenImpl(at, jti);
-            at0.setLifetime(1000 * (getPayload().getLong(EXPIRATION) - getPayload().getLong(ISSUED_AT)));
-            return at0;
+            return TokenFactory.createAT(at);
         } catch (Throwable e) {
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
@@ -459,7 +450,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
         String issuer = "";
 
         if (isTrivial(getATConfig().getIssuer())) {
-            VirtualOrganization vo = oa2se.getVO(transaction.getClient().getIdentifier());
+            VirtualOrganization vo = oa2se.getVO(client.getIdentifier());
             if (vo == null) {
                 // fail safe. No VO, no configuration, return this service as issuer.
                 issuer = OA2DiscoveryServlet.getIssuer(request);
@@ -487,22 +478,30 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
             String newSubject = TemplateUtil.replaceAll(getATConfig().getSubject(), atData);
             atData.put(SUBJECT, newSubject);
         }
-        long lifetime = ClientUtils.computeATLifetime(transaction, oa2se);
-        long expiresAt = System.currentTimeMillis() + lifetime;
-        atData.put(EXPIRATION, expiresAt / 1000L);
-        if (hasTXRecord()) {
-            getTXRecord().setLifetime(lifetime);
-            getTXRecord().setExpiresAt(expiresAt);
-        }
-        atData.put(NOT_VALID_BEFORE, (System.currentTimeMillis() - 5000L) / 1000L); // not before is 5 minutes before current
-        atData.put(ISSUED_AT, System.currentTimeMillis() / 1000L);
+        refreshAccountingInformation();
 
-        setPayload(atData);
+   //     setPayload(atData);
     }
 
     @Override
     public void refreshAccountingInformation() {
-        setAccountingInformation();
+        //   setAccountingInformation();
+        JSONObject atData = getPayload();
+
+        long lifetime = ClientUtils.computeATLifetime(transaction,client,  oa2se);
+        long issuedAt = System.currentTimeMillis();
+        long expiresAt = issuedAt + lifetime;
+
+        atData.put(EXPIRATION, expiresAt / 1000L);
+        atData.put(NOT_VALID_BEFORE, (issuedAt - 5000L) / 1000L); // not before is 5 minutes before current
+        atData.put(ISSUED_AT, issuedAt / 1000L);
+        if (hasTXRecord()) {
+            getTXRecord().setLifetime(lifetime);
+            getTXRecord().setExpiresAt(expiresAt);
+            getTXRecord().setIssuedAt(issuedAt);
+        }
+
+
     }
 
     public AccessToken getAccessToken() {

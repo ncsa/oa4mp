@@ -17,7 +17,7 @@ public class TokenFactory {
      * create an instance with the raw token (unparsed) and this will figure out what the token
      * is and populate it.
      */
-    public static class TokenParse{
+    public static class TokenParse {
         public TokenParse(String rawToken, TokenImpl token) {
             this.rawToken = rawToken;
             this.token = token;
@@ -39,65 +39,124 @@ public class TokenFactory {
      * @param rawToken
      * @param token
      */
-   protected static void parseRawToken(String rawToken, TokenImpl token){
-       if(TokenUtils.isBase32(rawToken)){
-           String decodedToken = TokenUtils.b32DecodeToken(rawToken);
-           token.setToken(rawToken);
-           token.setJti(URI.create(decodedToken));
-           token.setJWT(false);
-           return;
-       }
-       // next thing to try is to see if it's a JWT
-       StringTokenizer st = new StringTokenizer(rawToken, ".");
-       if(1 < st.countTokens() && st.countTokens() <= 3){
-           st.nextToken();
-           String payload = st.nextToken();
-           try {
-               byte[] x = Base64.decodeBase64(payload);
-               String pp = new String(x, StandardCharsets.UTF_8);
-               JSONObject jsonObject = JSONObject.fromObject(pp);
-               token.setPayload(jsonObject);
-               // remember that in JWTs the times are in seconds.
-               if(jsonObject.containsKey("jti")){
-                   token.setJti(URI.create(jsonObject.getString("jti")));
-               }
-               if(jsonObject.containsKey("iat")){
-                   token.setIssuedAt(1000*jsonObject.getLong("iat"));
-               }
-               if(jsonObject.containsKey("exp")){
-                   long expiresAt = jsonObject.getLong("exp");
-                   token.setExpiresAt(1000*expiresAt);
-                   token.setLifetime(1000*expiresAt - token.getIssuedAt());
-               }
-               token.setJWT(true);
-               token.setToken(rawToken);// can't really change this. Should be a string...
-               return;
-           }catch(Throwable t){
-               // so it ain't a JWT.
-               t.printStackTrace();
-           }
-       }
-       // so at this point, we have to assume that it is indeed just a token.
-       token.setJWT(false);
-       token.setJti(URI.create(rawToken));
-       token.setToken(rawToken);
-   }
-   public static RefreshTokenImpl createRT(String rawToken){
+    protected static void parseRawToken(String rawToken, TokenImpl token) {
+        if (TokenUtils.isBase32(rawToken)) {
+            String decodedToken = TokenUtils.b32DecodeToken(rawToken);
+            token.setToken(rawToken);
+            token.setJti(URI.create(decodedToken));
+            token.setJWT(false);
+            return;
+        }
+        // next thing to try is to see if it's a JWT
+        JSONObject jsonObject = getPayload(rawToken);
+        if(jsonObject!=null){
+            token.setPayload(jsonObject);
+            if (jsonObject.containsKey("jti")) {
+                token.setJti(URI.create(jsonObject.getString("jti")));
+            }
+            if (jsonObject.containsKey("iat")) {
+                token.setIssuedAt(1000 * jsonObject.getLong("iat"));
+            }
+            if (jsonObject.containsKey("exp")) {
+                long expiresAt = jsonObject.getLong("exp");
+                token.setExpiresAt(1000 * expiresAt);
+                token.setLifetime(1000 * expiresAt - token.getIssuedAt());
+            }
+            token.setJWT(true);
+            token.setToken(rawToken);// can't really change this. Should be a string...
+            return;
+
+        }
+/*
+        StringTokenizer st = new StringTokenizer(rawToken, ".");
+        if (1 < st.countTokens() && st.countTokens() <= 3) {
+            st.nextToken();
+            String payload = st.nextToken();
+            try {
+                byte[] x = Base64.decodeBase64(payload);
+                String pp = new String(x, StandardCharsets.UTF_8);
+                JSONObject jsonObject = JSONObject.fromObject(pp);
+                token.setPayload(jsonObject);
+                // remember that in JWTs the times are in seconds.
+                if (jsonObject.containsKey("jti")) {
+                    token.setJti(URI.create(jsonObject.getString("jti")));
+                }
+                if (jsonObject.containsKey("iat")) {
+                    token.setIssuedAt(1000 * jsonObject.getLong("iat"));
+                }
+                if (jsonObject.containsKey("exp")) {
+                    long expiresAt = jsonObject.getLong("exp");
+                    token.setExpiresAt(1000 * expiresAt);
+                    token.setLifetime(1000 * expiresAt - token.getIssuedAt());
+                }
+                token.setJWT(true);
+                token.setToken(rawToken);// can't really change this. Should be a string...
+                return;
+            } catch (Throwable t) {
+                // so it ain't a JWT.
+                t.printStackTrace();
+            }
+        }
+*/
+        // so at this point, we have to assume that it is indeed just a token.
+        token.setJWT(false);
+        token.setJti(URI.create(rawToken));
+        token.setToken(rawToken);
+    }
+
+    /**
+     * Given a raw signed JWT, H.P.S, this will determine if P, the payload, is a JSON
+     * object and decode it if so. Otherwise this returns a null.
+     * @param rawToken
+     * @return
+     */
+     protected static JSONObject getPayload(String rawToken){
+         StringTokenizer st = new StringTokenizer(rawToken, ".");
+         if (1 < st.countTokens() && st.countTokens() <= 3) { // 2 or 3 components. 2 means unsigned token
+             st.nextToken();
+             String payload = st.nextToken();
+             // really cheap trick. Since we want to parse a JSON payload, it has to
+             // start with { and this encodes to "eyJ"
+             if (!payload.startsWith("ey")) {
+                 return null;
+             }
+             try {
+                 byte[] x = Base64.decodeBase64(payload);
+                 String pp = new String(x, StandardCharsets.UTF_8);
+                 return JSONObject.fromObject(pp);
+             } catch (Throwable t) {
+                 // it may well be that this is not JSON at all and we have a false positive that there
+                 // is a "." someplace in a string identifier. There is really no way to tell
+                 // without trying to parse it.
+             }
+         }
+        return null;
+     }
+    public static AuthorizationGrantImpl createAG(String rawToken) {
+        AuthorizationGrantImpl ag = new AuthorizationGrantImpl();
+        parseRawToken(rawToken, ag);
+        return ag;
+    }
+
+
+    public static RefreshTokenImpl createRT(String rawToken) {
         RefreshTokenImpl refreshToken = new RefreshTokenImpl();
         parseRawToken(rawToken, refreshToken);
         return refreshToken;
-   }
+    }
 
     /**
      * Recreate the object from its serialized form.
+     *
      * @param json
      * @return
      */
-    public static RefreshTokenImpl createRT(JSONObject json){
-       RefreshTokenImpl refreshToken = new RefreshTokenImpl(URI.create("a"));
-       refreshToken.fromJSON(json);
-       return refreshToken;
+    public static RefreshTokenImpl createRT(JSONObject json) {
+        RefreshTokenImpl refreshToken = new RefreshTokenImpl(URI.create("a"));
+        refreshToken.fromJSON(json);
+        return refreshToken;
     }
+
     public static AccessTokenImpl createAT(String rawToken) {
         AccessTokenImpl accessToken = new AccessTokenImpl();
         parseRawToken(rawToken, accessToken);
@@ -107,15 +166,17 @@ public class TokenFactory {
     /**
      * Recreate the object from it serialized format. This will fail if the object is not
      * serialized propertly!
+     *
      * @param json
      * @return
      */
-    public static AccessTokenImpl createAT(JSONObject json){
-       AccessTokenImpl accessToken = new AccessTokenImpl(URI.create("a"));
-       accessToken.fromJSON(json);
-       return accessToken;
+    public static AccessTokenImpl createAT(JSONObject json) {
+        AccessTokenImpl accessToken = new AccessTokenImpl(URI.create("a"));
+        accessToken.fromJSON(json);
+        return accessToken;
     }
-    public static IDTokenImpl createIDT(String rawToken){
+
+    public static IDTokenImpl createIDT(String rawToken) {
         IDTokenImpl idToken = new IDTokenImpl();
         parseRawToken(rawToken, idToken);
         return idToken;
@@ -128,30 +189,35 @@ public class TokenFactory {
      * about the best that can be done since the original token and its signature, header,
      * etc. are missing is fake. Alternately, if the argument is just a serialized ID
      * token, this will deserialize it and return it.
+     *
      * @param json
      * @return
      */
-    public static IDTokenImpl createIDT(JSONObject json){
-        if(json.containsKey("token_type")){
+    public static IDTokenImpl createIDT(JSONObject json) {
+        if (json.containsKey("token_type")) {
             // This is actually a serialized ID token. Deserialize it.
             IDTokenImpl idToken = new IDTokenImpl(URI.create("a"));
-            if(!json.getString("token_type").equals(idToken.getTokenType())){
+            if (!json.getString("token_type").equals(idToken.getTokenType())) {
                 throw new IllegalArgumentException("Attempt to deserialize a non ID token, type is \"" + json.getString("token_type") + "\".");
             }
             idToken.fromJSON(json);
             return idToken;
         }
-        if(!json.containsKey("jti")){
+        if (!json.containsKey("jti")) {
             throw new IllegalArgumentException("unknown token type");
         }
-         IDTokenImpl idToken = new IDTokenImpl(URI.create(json.getString("jti")));
-         idToken.setExpiresAt(1000*json.getLong("exp"));
-         idToken.setPayload(json);
-         idToken.setIssuedAt(1000*json.getLong("iat"));
-         idToken.setLifetime(idToken.getExpiresAt() - idToken.getIssuedAt());
-         idToken.setToken("A." + Base64.encodeBase64URLSafeString(json.toString().getBytes(StandardCharsets.UTF_8)) + ".Z");
-         idToken.setJWT(true); // since all ID tokens are JWTs!
-         return idToken;
+        IDTokenImpl idToken = new IDTokenImpl(URI.create(json.getString("jti")));
+        if (json.containsKey("exp")) {
+            idToken.setExpiresAt(1000 * json.getLong("exp"));
+        }
+        idToken.setPayload(json);
+        if (json.containsKey("iat")) {
+            idToken.setIssuedAt(1000 * json.getLong("iat"));
+        }
+        idToken.setLifetime(idToken.getExpiresAt() - idToken.getIssuedAt());
+        idToken.setToken("A." + Base64.encodeBase64URLSafeString(json.toString().getBytes(StandardCharsets.UTF_8)) + ".Z");
+        idToken.setJWT(true); // since all ID tokens are JWTs!
+        return idToken;
     }
 
 }

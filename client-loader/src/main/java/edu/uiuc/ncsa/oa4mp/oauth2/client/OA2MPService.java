@@ -212,7 +212,7 @@ public class OA2MPService extends OA4MPService {
         ATResponse2 atResponse2 = (ATResponse2) getEnvironment().getDelegationService().getAT(dar);
         asset.setIssuedAt(new Date(atResponse2.getAccessToken().getIssuedAt()));
         //asset.setIssuedAt((Date) atResponse2.getParameters().get(OA2Claims.ISSUED_AT));
-        if(atResponse2.getIdToken().getPayload().containsKey(OA2Claims.SUBJECT)){
+        if (atResponse2.getIdToken().getPayload().containsKey(OA2Claims.SUBJECT)) {
             asset.setUsername(atResponse2.getIdToken().getPayload().getString(OA2Claims.SUBJECT));
         }
         //asset.setUsername((String) atResponse2.getParameters().get(OA2Claims.SUBJECT));
@@ -456,10 +456,13 @@ public class OA2MPService extends OA4MPService {
         JSONObject json = JSONObject.fromObject(rawResponse);
         JSONWebKeys keys = JWTUtil2.getJsonWebKeys(serviceClient, ((OA2ClientEnvironment) getEnvironment()).getWellKnownURI());
         if (isErsatz) {
-            // all tokens get updated.
+            // only return types supported for forking is access (everything) or refresh token only.
             asset.setRefreshToken(TokenFactory.createRT(json.getString(REFRESH_TOKEN)));
-            asset.setIdToken(TokenFactory.createIDT(json.getString(ACCESS_TOKEN)));
-            asset.setAccessToken(TokenFactory.createAT(json.getString(ACCESS_TOKEN)));
+            if (!json.getString(ISSUED_TOKEN_TYPE).equals(REFRESH_TOKEN_TYPE)) {
+                // all tokens get updated.
+                asset.setIdToken(TokenFactory.createIDT(json.getString(ACCESS_TOKEN)));
+                asset.setAccessToken(TokenFactory.createAT(json.getString(ACCESS_TOKEN)));
+            }
         } else {
             switch (json.getString(ISSUED_TOKEN_TYPE)) {
                 case REFRESH_TOKEN_TYPE:
@@ -494,7 +497,7 @@ public class OA2MPService extends OA4MPService {
     }
 
     protected void updateExchangedAsset(OA2Asset asset, JSONObject claims) {
-     //   NEWupdateExchangedAsset(asset, claims);
+        //   NEWupdateExchangedAsset(asset, claims);
     }
 
     /**

@@ -203,7 +203,6 @@ public class FileStoreTest extends BaseTransactionStoreTest {
      */
     public static class FakeAccessToken extends FakeTokenImpl implements AccessToken {
 
-
         public FakeAccessToken(String token) {
             super(token);
         }

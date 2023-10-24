@@ -757,6 +757,9 @@ public class OA2CLCCommands extends CommonCommands {
         dummyAsset.setIdToken(idToken);
     }
 
+    public RefreshTokenImpl getRefreshToken(){
+        return dummyAsset.getRefreshToken();
+    }
     public void claims(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             showClaimsHelp();
@@ -965,8 +968,11 @@ public class OA2CLCCommands extends CommonCommands {
     protected void getUIHelp() {
         say("user_info");
         sayi("Usage: This will get the user info from the server.");
-        sayi("You must have already authenticated");
-        sayi("*and* gotten a valid access token by this point. Just a list of these it printed.");
+        sayi("NOTE: As per the spec., this is the claims, not the expiration etc.");
+        sayi("      This will not locally update the user metadata, and is therefore not ");
+        say("       equivalent to regetting the token. Use the token exchange for that.");
+        sayi("You must have already authenticated and have an access token to use this endpoint");
+        sayi("Just a list of these it printed.");
         sayi("What is returned is dependent upon what the server supports.");
     }
 
@@ -975,20 +981,22 @@ public class OA2CLCCommands extends CommonCommands {
             getUIHelp();
             return;
         }
+        UserInfo userInfo = user_info2(inputLine);
+        say("user info:");
+        for (String key : userInfo.getMap().keySet()) {
+            say("          " + key + " = " + userInfo.getMap().get(key));
+        }
+    }
+
+    public UserInfo user_info2(InputLine inputLine) throws Exception {
         lastException = null;
         try {
-            UserInfo userInfo = getService().getUserInfo(dummyAsset.getIdentifier().toString());
-            say("user info:");
-            for (String key : userInfo.getMap().keySet()) {
-                say("          " + key + " = " + userInfo.getMap().get(key));
-            }
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.putAll(userInfo.getMap());
-            setIDToken(TokenFactory.createIDT(jsonObject));
+            return getService().getUserInfo(dummyAsset.getIdentifier().toString());
         } catch (Throwable t) {
             lastException = t;
             throw t;
         }
+
     }
 
 
@@ -1466,21 +1474,31 @@ public class OA2CLCCommands extends CommonCommands {
                     exchangeParameters,
                     requestedTokenType,
                     subjectTokenType, isErsatz());
-            setErsatz(false); // no matter what, after a successful fork, do not re-attempt to fork!
             // Note that the call updates the asset, so we don't need to look at the response,
             // just print th right thing.
-            switch (requestedTokenType) {
-                case OA2MPService.EXCHANGE_REFRESH_TOKEN:
-                    printToken(getDummyAsset().getRefreshToken(), false, true);
-                    break;
-                case OA2MPService.EXCHANGE_ACCESS_TOKEN:
-                case OA2MPService.EXCHANGE_DEFAULT:
-                    printToken(getDummyAsset().getAccessToken(), false, true);
-                    break;
-                case OA2MPService.EXCHANGE_ID_TOKEN:
-                    //JSONObject claims = getDummyAsset().getIdToken(); // update the claims we got back.
-                    printToken(getIdToken(), false, true);
+            if (isErsatz()) {
+                 if(requestedTokenType == OA2MPService.EXCHANGE_REFRESH_TOKEN){
+                     printToken(getRefreshToken(), false, true);
+                 }else{
+                     printTokens(false, true);
+                     printToken(getIdToken(), false, true);
+                 }
+                setErsatz(false); // no matter what, after a successful fork, do not re-attempt to fork!
+            } else {
+                switch (requestedTokenType) {
+                    case OA2MPService.EXCHANGE_REFRESH_TOKEN:
+                        printToken(getDummyAsset().getRefreshToken(), false, true);
+                        break;
+                    case OA2MPService.EXCHANGE_ACCESS_TOKEN:
+                    case OA2MPService.EXCHANGE_DEFAULT:
+                        printToken(getDummyAsset().getAccessToken(), false, true);
+                        break;
+                    case OA2MPService.EXCHANGE_ID_TOKEN:
+                        //JSONObject claims = getDummyAsset().getIdToken(); // update the claims we got back.
+                        printToken(getIdToken(), false, true);
+                }
             }
+
         } catch (Throwable t) {
             lastException = t;
             throw t;
@@ -1658,7 +1676,7 @@ public class OA2CLCCommands extends CommonCommands {
             showReadHelp();
             return;
         }
-        setErsatz(inputLine.hasArg(PROVISION_ONLY_FLAG) || inputLine.hasArg(PROVISION_ONLY_SHORT_FLAG));
+        boolean isErsatz = inputLine.hasArg(PROVISION_ONLY_FLAG) || inputLine.hasArg(PROVISION_ONLY_SHORT_FLAG);
         //boolean loadStoredCfg = !isErsatz();
         inputLine.removeSwitch(PROVISION_ONLY_FLAG);
         inputLine.removeSwitch(PROVISION_ONLY_SHORT_FLAG);
@@ -1690,7 +1708,8 @@ public class OA2CLCCommands extends CommonCommands {
             stringBuffer.append(content + "\n");
         }
         JSONObject json = JSONObject.fromObject(stringBuffer.toString());
-        fromJSON(json, !isErsatz());
+        fromJSON(json, !isErsatz);
+        setErsatz(isErsatz);
         say("done!");
     }
 
@@ -2154,6 +2173,7 @@ public class OA2CLCCommands extends CommonCommands {
 
 
     public String USERNAME_FLAG = "-user";
+    public String ALT_USERNAME_FLAG = "-sub";
 
     public JSONObject rfc7523(Map parameters) throws Exception {
         clear(new InputLine(), false); // start by clearing everything but current parameters,
@@ -2180,10 +2200,10 @@ public class OA2CLCCommands extends CommonCommands {
 
     public void rfc7523(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
-            say("rfc7523 [" + USERNAME_FLAG + " user_name]- make an RFC 7523 request to the service.");
+            say("rfc7523 [" + USERNAME_FLAG + "|" + ALT_USERNAME_FLAG + " user_name]- make an RFC 7523 request to the service.");
             say("This is compliant with section 2.1, and is in effect an authorization grant.");
             say("Note that parameters set with the -a flag are passed along.");
-            say(USERNAME_FLAG + " - if present, set the subject of the request (hence the username) to this,");
+            say(ALT_USERNAME_FLAG + " | " + USERNAME_FLAG + " - if present, set the subject of the request (hence the username) to this,");
             say("   If missing, the default subject will be the client ID.");
             return;
         }
@@ -2198,6 +2218,12 @@ public class OA2CLCCommands extends CommonCommands {
             inputLine.removeSwitchAndValue(USERNAME_FLAG);
             parameters.put(OA2Claims.SUBJECT, username);
         }
+        if (inputLine.hasArg(ALT_USERNAME_FLAG)) {
+            username = inputLine.getNextArgFor(ALT_USERNAME_FLAG);
+            inputLine.removeSwitchAndValue(ALT_USERNAME_FLAG);
+            parameters.put(OA2Claims.SUBJECT, username);
+        }
+
         for (String x : getRequestParameters().keySet()) {
             parameters.put(x, getRequestParameters().get(x));
         }

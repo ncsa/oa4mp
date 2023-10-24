@@ -628,7 +628,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
     long rtGracePeriod = -1L;
 
     public boolean isRTGracePeriodEnabled() {
-        return rtGracePeriod == OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_DISABLED;
+        return rtGracePeriod != OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_DISABLED;
     }
 
     public boolean isUseProxyForCerts() {

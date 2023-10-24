@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions;
 
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenFactory;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken;
@@ -65,7 +66,8 @@ public class BasicTransactionConverter<V extends BasicTransaction> extends MapCo
             if (token instanceof AccessToken) {
                 b.setAccessToken((AccessToken) token);
             } else {
-                AccessTokenImpl at = new AccessTokenImpl(URI.create(token.toString()));
+                AccessTokenImpl at = TokenFactory.createAT(token.toString());
+                //AccessTokenImpl at = new AccessTokenImpl(URI.create(token.toString()));
                 b.setAccessToken(at);
             }
         }

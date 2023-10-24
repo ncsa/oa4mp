@@ -10,6 +10,9 @@ import java.net.URI;
  * on Mar 16, 2011 at  1:00:30 PM
  */
 public class AuthorizationGrantImpl extends TokenImpl implements AuthorizationGrant {
+    public AuthorizationGrantImpl() {
+    }
+
     public AuthorizationGrantImpl(URI token) {
         super(token);
     }

@@ -8,10 +8,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VirtualOrganization;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.ClientDebugUtil;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClient;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.IDTokenImpl;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenUtils;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.*;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.*;
 import edu.uiuc.ncsa.security.core.exceptions.InvalidAlgorithmException;
 import edu.uiuc.ncsa.security.core.exceptions.InvalidSignatureException;
@@ -65,6 +62,19 @@ public class OA2TokenUtils {
      * @return
      */
     public static AccessTokenImpl getAT(String subjectToken, OA2SE oa2se, JSONWebKeys keys, MetaDebugUtil debugger) {
+        AccessTokenImpl accessToken = TokenFactory.createAT(subjectToken); // use the factory now
+        if (accessToken.isJWT()) {
+            try {
+                JWTUtil.verifyAndReadJWT(subjectToken, keys);
+            } catch (InvalidSignatureException | InvalidAlgorithmException | UnsupportedJWTTypeException tt) {
+                debugger.trace(OA2TokenUtils.class, "Failed to verify access token JWT: \"" + tt.getMessage());
+                throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                        "invalid access token",
+                        HttpStatus.SC_BAD_REQUEST,
+                        null, (debugger instanceof ClientDebugUtil ? ((ClientDebugUtil) debugger).getClient() : null));
+            }
+        }
+/*
         if (TokenUtils.isBase32(subjectToken)) {
             subjectToken = TokenUtils.b32DecodeToken(subjectToken);
         }
@@ -85,6 +95,7 @@ public class OA2TokenUtils {
                     HttpStatus.SC_BAD_REQUEST,
                     null, (debugger instanceof ClientDebugUtil ? ((ClientDebugUtil) debugger).getClient() : null));
         }
+*/
         debugger.trace(OA2TokenUtils.class, "access token from subject token = " + accessToken);
 
         OA2ServiceTransaction t;
@@ -178,6 +189,20 @@ public class OA2TokenUtils {
      * @return
      */
     public static RefreshTokenImpl getRT(String subjectToken, OA2SE oa2SE, JSONWebKeys keys, MetaDebugUtil debugger) {
+        RefreshTokenImpl refreshToken = TokenFactory.createRT(subjectToken); // use the factory now, verify separately
+        if (refreshToken.isJWT()) {
+            try {
+                JWTUtil.verifyAndReadJWT(subjectToken, keys);
+            } catch (InvalidSignatureException | InvalidAlgorithmException | UnsupportedJWTTypeException tt) {
+                // This is benign and may just mean that the format of the token is not a JWT. Only flog it on debug
+                debugger.trace(OA2TokenUtils.class, "Failed to verify refresh token JWT: \"" + tt.getMessage());
+                throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                        "invalid refresh token",
+                        HttpStatus.SC_BAD_REQUEST,
+                        null);
+            }
+        }
+/*
         if (TokenUtils.isBase32(subjectToken)) {
             subjectToken = TokenUtils.b32DecodeToken(subjectToken);
         }
@@ -197,6 +222,7 @@ public class OA2TokenUtils {
                     HttpStatus.SC_BAD_REQUEST,
                     null);
         }
+*/
         debugger.trace(OA2TokenUtils.class, "refresh token from subject token = " + refreshToken);
         OA2ServiceTransaction t = null;
         boolean isRTValid = false;

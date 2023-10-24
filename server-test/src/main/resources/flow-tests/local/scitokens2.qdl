@@ -84,12 +84,11 @@ define[test(tokens., expected_scopes., user_id)][
     ⊨ at.'ver' ≡ 'scitoken:2.0' : 'incorrect scitokens version claim';
     ⊨ reduce(@∧, expected_scopes. ∈ s.) : 'incorrect AT scopes';
     ⊨ rt.'aud' ≡ 'https://localhost/test' : 'wrong RT audience';
-    ⊨ tokens.'refresh_token'.'lifetime' - 900000 < 2000 : 'wrong refresh token lifetime';
+    ⊨ tokens.'refresh_token'.'lifetime' - 900000 < 2000 : 'wrong refresh token lifetime, got ' + (tokens.'refresh_token'.'lifetime');
 ];
 
 rc := script_load('driver.qdl', cfg., params.);
 if[rc!='ok'][return(rc);];
-
 tokens. := clc#access();
 test(tokens., expected_token_scopes., user_id);
 issued_at := claims().'iat';

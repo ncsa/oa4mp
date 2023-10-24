@@ -1,10 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.TransactionConverter;
-import edu.uiuc.ncsa.security.core.IdentifiableProvider;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import edu.uiuc.ncsa.security.core.util.StringUtils;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.RefreshToken;
@@ -12,14 +8,18 @@ import edu.uiuc.ncsa.oa4mp.delegation.common.token.TokenForge;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AuthorizationGrantImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenFactory;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2TokenForge;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
+import edu.uiuc.ncsa.security.core.IdentifiableProvider;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.data.ConversionMap;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
 
-import java.net.URI;
 import java.util.Collection;
 
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
@@ -52,21 +52,24 @@ public class OA2TConverter<V extends OA2ServiceTransaction> extends TransactionC
             if (refreshToken instanceof RefreshToken) {
                 st.setRefreshToken((RefreshToken) refreshToken);
             } else {
-                RefreshTokenImpl rt = new RefreshTokenImpl(URI.create(refreshToken.toString()));
+                //RefreshTokenImpl rt = new RefreshTokenImpl(URI.create(refreshToken.toString()));
+                RefreshTokenImpl rt = TokenFactory.createRT(refreshToken.toString());
                 st.setRefreshToken(rt);
             }
         }
         Object rawAG = map.get(getTCK().authGrant());
         if (rawAG == null) {
             if (st.getIdentifier() != null) {
-                AuthorizationGrantImpl ag = new AuthorizationGrantImpl(st.getIdentifier().getUri());
+                AuthorizationGrantImpl ag = TokenFactory.createAG(st.getIdentifierString());
+                //AuthorizationGrantImpl ag = new AuthorizationGrantImpl(st.getIdentifier().getUri());
                 st.setAuthorizationGrant(ag);
             }
         } else {
             if (rawAG instanceof AuthorizationGrant) {
                 st.setAuthorizationGrant((AuthorizationGrant) rawAG);
             } else {
-                AuthorizationGrantImpl ag = new AuthorizationGrantImpl(URI.create(rawAG.toString()));
+                //AuthorizationGrantImpl ag = new AuthorizationGrantImpl(URI.create(rawAG.toString()));
+                AuthorizationGrantImpl ag = TokenFactory.createAG(rawAG.toString());
                 st.setAuthorizationGrant(ag);
             }
         }

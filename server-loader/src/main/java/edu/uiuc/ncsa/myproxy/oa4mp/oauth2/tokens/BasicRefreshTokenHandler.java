@@ -6,12 +6,12 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.ClientUtils;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.RefreshToken;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenFactory;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.JWTUtil2;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.RefreshTokenHandlerInterface;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC8693Constants;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunRequest;
@@ -25,7 +25,8 @@ import java.util.List;
 import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims.*;
 import static edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse.RC_NOT_RUN;
 import static edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse.RC_OK;
-import static edu.uiuc.ncsa.security.util.scripting.ScriptingConstants.*;
+import static edu.uiuc.ncsa.security.util.scripting.ScriptingConstants.SRE_POST_AUTH;
+import static edu.uiuc.ncsa.security.util.scripting.ScriptingConstants.SRE_REQ_REFRESH_TOKEN;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -82,7 +83,7 @@ public class BasicRefreshTokenHandler extends AbstractPayloadHandler implements 
         if (getPayload().size() == 1) {
             String k = String.valueOf(getPayload().keySet().iterator().next());
             String v = String.valueOf(getPayload().get(k));
-            oa2se.info("Single value in refresh token for \"" + transaction.getOA2Client().getIdentifierString() + "\" found. Setting token value to " + v);
+            oa2se.info("Single value in refresh token for \"" + client.getIdentifierString() + "\" found. Setting token value to " + v);
             return new RefreshTokenImpl(URI.create(v));
         }
         if (!getPayload().containsKey(JWT_ID)) {
@@ -94,10 +95,7 @@ public class BasicRefreshTokenHandler extends AbstractPayloadHandler implements 
                 key.algorithm = JWTUtil2.NONE_JWT;
             }
             String at = JWTUtil2.createJWT(getPayload(), key);
-            URI jti = URI.create(getPayload().getString(JWT_ID));
-            RefreshTokenImpl rt0 = new RefreshTokenImpl(at, jti);
-      //      rt0.setLifetime(1000 * (getPayload().getLong(EXPIRATION) - getPayload().getLong(ISSUED_AT)));
-            return rt0;
+            return TokenFactory.createRT(at);
         } catch (Throwable e) {
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
@@ -163,18 +161,14 @@ public class BasicRefreshTokenHandler extends AbstractPayloadHandler implements 
             // default
                 rtData.put(JWT_ID, transaction.getRefreshToken().getToken());
         }
-        long lifetime = ClientUtils.computeRefreshLifetime(transaction, oa2se);
-        rtData.put(EXPIRATION, (System.currentTimeMillis() + lifetime) / 1000);
         if(hasTXRecord()){
             // Fixes CIL-971
             TXRecord txRecord = getTXRecord();
             if(RFC8693Constants.REFRESH_TOKEN_TYPE.equals(txRecord.getTokenType())){
                 rtData.put(JWT_ID, txRecord.getIdentifierString());
             }
-            txRecord.setToken(getPayload());
-            txRecord.setLifetime(lifetime);
         }
-
+        refreshAccountingInformation();
         doServerVariables(rtData, null);
     }
 
@@ -217,35 +211,27 @@ public class BasicRefreshTokenHandler extends AbstractPayloadHandler implements 
             rtData.put(RESOURCE, listToString(getRTConfig().getResource()));
         }
 
-        long currentTS = System.currentTimeMillis();
-        long lifetime = ClientUtils.computeRefreshLifetime(transaction, oa2se);
-        long expiresAt = System.currentTimeMillis() + lifetime;
-        rtData.put(EXPIRATION, expiresAt / 1000L);
-        if(hasTXRecord()){
-            getTXRecord().setLifetime(lifetime);
-            getTXRecord().setExpiresAt(expiresAt);
-        }
-/*
-        if (0 < getRTConfig().getLifetime()) {
-            rtData.put(EXPIRATION, (System.currentTimeMillis() + lifetime) / 1000L);
-        } else {
-            rtData.put(EXPIRATION, REFRESH_TOKEN_LIFETIME_DEFAULT); // Half the max.
-        }
-*/
 
-
-        rtData.put(NOT_VALID_BEFORE, (currentTS - 5000L) / 1000L); // not before is 5 minutes before current
-        DebugUtil.trace(this, "Setting refresh lifetime = " + transaction.getRefreshTokenLifetime());
-        rtData.put(ISSUED_AT, currentTS / 1000L);
-      //  rtData.put(EXPIRATION, (currentTS + transaction.getRefreshTokenLifetime()) / 1000L);
         if (transaction.getRefreshToken() != null) {
             rtData.put(JWT_ID, transaction.getRefreshToken().getToken());
         }
-   //     setRTData(rtData); // since if it was empty, then no such object has been set in the transaction.
+        refreshAccountingInformation();
     }
 
     @Override
     public void refreshAccountingInformation() {
-        setAccountingInformation();
+        JSONObject rtData = getPayload();
+        long lifetime = ClientUtils.computeRefreshLifetime(transaction, client, oa2se);
+        long issuedAt = System.currentTimeMillis();
+        long expiresAt = issuedAt + lifetime;
+        rtData.put(EXPIRATION, expiresAt / 1000L);
+        rtData.put(NOT_VALID_BEFORE, (issuedAt - 5000L) / 1000L); // not before is 5 minutes before current
+        rtData.put(ISSUED_AT, issuedAt / 1000L);
+        
+        if(hasTXRecord()){
+            getTXRecord().setLifetime(lifetime);
+            getTXRecord().setExpiresAt(expiresAt);
+            getTXRecord().setIssuedAt(issuedAt);
+        }
     }
 }

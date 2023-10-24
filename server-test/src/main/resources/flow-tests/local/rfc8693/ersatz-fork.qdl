@@ -54,7 +54,12 @@ scopes. := tokenize(at.'jwt'.'scope', ' ');
 ⊨ 'read:/Y/Q' ∈ scopes. : 'AT missing permission';
 ⊨ at.'jwt'.'client_id' == 'localhost:e1' : ' AT wrong client id';
 
+// if that worked, then we should just be able to do regular exchanges, so as a test,
+// here is one for a new id token. Note that the ID token is not inherited, as per
+// configuration, so the subject is reset to the client id as a default.
+
 id. := clc#exchange('-id', '-subject', 'at');
-⊨ id.'sub' == 'jeff' : 'IDT wrong subject';
+⊨ id.'jti' != old_id.'jti' : 'IDT JTI not updated';
+⊨ id.'sub' == 'localhost:e1' : 'IDT wrong subject';
 ⊨ id.'iat' != old_id.'iat' : 'IDT issued at not updated';
 say('𝕰𝖗s𝖆𝖙𝖟 basic fork using ' + (args.2) + ' for the subject token and requesting ' + (args.0) + ':  ok');

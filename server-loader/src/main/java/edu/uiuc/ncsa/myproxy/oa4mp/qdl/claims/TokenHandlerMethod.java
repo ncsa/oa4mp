@@ -49,6 +49,7 @@ public abstract class TokenHandlerMethod implements QDLFunction {
                     getPayloadConfig(),
                     getSE(),
                     getTransaction(),
+                    getClient(),
                     getTXRecord(),
                     getServletRequest());
         }

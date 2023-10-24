@@ -82,12 +82,22 @@ public class OA2Client extends Client implements OA2ClientScopes {
     populateClone(BaseClient c) {
         OA2Client client = (OA2Client) c;
         super.populateClone(client);
+        client.setAtLifetime(getAtLifetime());
+        client.setAudience(getAudience());
         client.setCallbackURIs(getCallbackURIs());
         client.setConfig(getConfig());
+        client.setDfInterval(getDfInterval());
+        client.setDfLifetime(getDfLifetime());
+        client.setExtendedAttributes(getExtendedAttributes());
+        client.setErsatzClient(isErsatzClient());
+        client.setErsatzInheritIDToken(isErsatzInheritIDToken());
+        client.setExtendsProvisioners(isExtendsProvisioners());
         client.setForwardScopesToProxy(isForwardScopesToProxy());
+        client.setIdTokenLifetime(getIdTokenLifetime());
         client.setIssuer(getIssuer());
         client.setLdaps(getLdaps());
         client.setMaxATLifetime(getMaxATLifetime());
+        client.setMaxIDTLifetime(getMaxIDTLifetime());
         client.setMaxRTLifetime(getMaxRTLifetime());
         client.setPrototypes(getPrototypes());
         client.setProxyClaimsList(getProxyClaimsList());
@@ -95,9 +105,12 @@ public class OA2Client extends Client implements OA2ClientScopes {
         // https://github.com/rcauth-eu/OA4MP/commit/38f0f2ca7e2ef5609006794b96485ae1a7e00ff0
         client.setPublicClient(isPublicClient());
         client.setRawConfig(getRawConfig());
+        client.setResource(getResource());
+        client.setRtGracePeriod(getRtGracePeriod());
         client.setRtLifetime(getRtLifetime());
         client.setScopes(getScopes());
         client.setSignTokens(isSignTokens());
+        client.setSkipServerScripts(isSkipServerScripts());
     }
 
     public void setComment(String comment) {
@@ -259,6 +272,9 @@ public class OA2Client extends Client implements OA2ClientScopes {
         return 0 < rtLifetime;
     }
 
+    public boolean useServerDefaultRTLifetime(){
+        return rtLifetime == USE_SERVER_DEFAULT;
+    }
     public Collection<String> getAudience() {
         return audience;
     }

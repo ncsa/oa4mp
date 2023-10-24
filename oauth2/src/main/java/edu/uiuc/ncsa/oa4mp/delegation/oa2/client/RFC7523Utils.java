@@ -100,9 +100,9 @@ public class RFC7523Utils implements RFC7523Constants {
             map.put(CILENT_ASSERTION_TYPE, ASSERTION_JWT_BEARER);
             return serviceClient.doPost(map);
         } catch (Throwable t) {
-            if (DebugUtil.isEnabled()) {
+          /*  if (DebugUtil.isEnabled()) {
                 t.printStackTrace();
-            }
+            }*/
             if (t instanceof RuntimeException) {
                 throw (RuntimeException) t;
             }

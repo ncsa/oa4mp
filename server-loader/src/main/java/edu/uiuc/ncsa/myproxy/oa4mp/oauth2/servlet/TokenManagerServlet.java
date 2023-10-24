@@ -283,11 +283,13 @@ public abstract class TokenManagerServlet extends BearerTokenServlet implements 
                     // token still exists on the server.
 
             }
+        }
+
             if (accessToken == null && refreshToken == null) {
                 throw new NFWException("could not determine token type");
             }
             if (accessToken != null) {
-                if (atBearer.equals(accessToken)) {
+                if (atBearer.getJti().equals(accessToken.getJti())) {
                     state.accessToken = atBearer;
                     state.isAT = true;
                 } else {
@@ -300,7 +302,6 @@ public abstract class TokenManagerServlet extends BearerTokenServlet implements 
                 state.isAT = false;
             }
 
-        }
     }
 
     @Override

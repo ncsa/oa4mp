@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
@@ -30,6 +31,7 @@ public abstract class AbstractPayloadHandler implements PayloadHandler, OA2Scope
     protected OA2ServiceTransaction transaction;
     protected OA2SE oa2se;
     protected HttpServletRequest request;
+    protected OA2Client client;
 
     public PayloadHandlerConfigImpl getPhCfg() {
         return phCfg;
@@ -55,6 +57,7 @@ public abstract class AbstractPayloadHandler implements PayloadHandler, OA2Scope
     public AbstractPayloadHandler(PayloadHandlerConfigImpl payloadHandlerConfig) {
         phCfg = payloadHandlerConfig;
         oa2se = phCfg.getOa2se();
+        client = phCfg.getClient();
         transaction = phCfg.getTransaction();
         request = phCfg.getRequest();
         ServletDebugUtil.trace(this, "payload handler cfg=" + phCfg);

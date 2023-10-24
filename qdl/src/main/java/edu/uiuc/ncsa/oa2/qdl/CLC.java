@@ -2,10 +2,7 @@ package edu.uiuc.ncsa.oa2.qdl;
 
 import edu.uiuc.ncsa.myproxy.oauth2.tools.OA2CLCCommands;
 import edu.uiuc.ncsa.myproxy.oauth2.tools.OA2CommandLineClient;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenImpl;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenUtils;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.*;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
 import edu.uiuc.ncsa.qdl.exceptions.BadArgException;
 import edu.uiuc.ncsa.qdl.exceptions.MissingArgException;
@@ -22,7 +19,6 @@ import edu.uiuc.ncsa.security.util.cli.InputLine;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
-import java.net.URI;
 import java.util.*;
 
 /**
@@ -505,8 +501,12 @@ public class CLC implements QDLModuleMetaClass {
         public Object evaluate(Object[] objects, State state) throws Throwable {
             checkInit();
             QDLStem out = new QDLStem();
-            clcCommands.user_info(argsToInputLine(getName(), objects));
-            out.fromJSON(clcCommands.getIdToken().getPayload());
+            // remember that this call returns essentially a snapshot of the current user info on the
+            // server. It is NOT an ID token or some such.
+            edu.uiuc.ncsa.oa4mp.delegation.oa2.UserInfo userInfo = clcCommands.user_info2(argsToInputLine(getName(), objects));
+            JSONObject json = new JSONObject();
+            json.putAll(userInfo.getMap());
+            out.fromJSON(json);
             return out;
         }
 
@@ -955,10 +955,14 @@ public class CLC implements QDLModuleMetaClass {
           ts : 1675711109000
      */
     protected AccessTokenImpl stemToAT(QDLStem stem) {
-        if (stem.containsKey("jwt")) {
-            return new AccessTokenImpl(stem.getString("raw_token"), URI.create(stem.getString("jti")));
+        if (stem.containsKey("raw_token")) {
+            return TokenFactory.createAT(stem.getString("raw_token"));
         }
-        return new AccessTokenImpl(stem.getString("raw_token"), URI.create(stem.getString("jti")));
+        if(stem.containsKey("jti")) {
+            return TokenFactory.createAT(stem.getString("jti"));
+        }
+        throw new IllegalArgumentException("Incorrect access token stem. Cannot create access token");
+        //return new AccessTokenImpl(stem.getString("raw_token"), URI.create(stem.getString("jti")));
     }
 
     /*
@@ -981,10 +985,15 @@ public class CLC implements QDLModuleMetaClass {
           ts : 1675711109000
      */
     protected RefreshTokenImpl stemToRT(QDLStem stem) {
-        if (stem.containsKey("jwt")) {
-            return new RefreshTokenImpl(stem.getString("raw_token"), URI.create(stem.getString("jti")));
+        if (stem.containsKey("raw_token")) {
+            return TokenFactory.createRT(stem.getString("raw_token"));
+          //  return new RefreshTokenImpl(stem.getString("raw_token"), URI.create(stem.getString("jti")));
         }
-        return new RefreshTokenImpl(stem.getString("raw_token"), URI.create(stem.getString("jti")));
+        if(stem.containsKey("jti")) {
+            return TokenFactory.createRT(stem.getString("jti"));
+        }
+        throw new IllegalArgumentException("Incorrect refresh token stem. Cannot create refresh token");
+        //return new RefreshTokenImpl(stem.getString("raw_token"), URI.create(stem.getString("jti")));
     }
 
     public static String ACCESS_TOKEN_ACCESSOR = "at";

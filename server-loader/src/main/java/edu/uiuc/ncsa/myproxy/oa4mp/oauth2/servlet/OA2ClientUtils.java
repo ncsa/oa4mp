@@ -332,6 +332,7 @@ public class OA2ClientUtils {
                     client.getIDTokenConfig(),
                     oa2SE,
                     transaction,
+                    client,
                     idTX,
                     req);
             switch (client.getIDTokenConfig().getType()) {
@@ -351,6 +352,7 @@ public class OA2ClientUtils {
                     new IDTokenClientConfig(),  // here is the trick: An empty object triggers a hunt for functors.
                     oa2SE,
                     transaction,
+                    client,
                     atTX,
                     req);
             idthCfg.setLegacyHandler(true);
@@ -365,6 +367,7 @@ public class OA2ClientUtils {
                     client.getAccessTokensConfig(),
                     oa2SE,
                     transaction,
+                    client,
                     atTX,
                     req);
             AbstractAccessTokenHandler sth = null;
@@ -403,6 +406,7 @@ public class OA2ClientUtils {
                     client.getRefreshTokensConfig(),
                     oa2SE,
                     transaction,
+                    client,
                     rtTX,
                     req);
             BasicRefreshTokenHandler rth = new BasicRefreshTokenHandler(st);

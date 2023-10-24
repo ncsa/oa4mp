@@ -5,9 +5,22 @@
 
    localhost:p1
 
-   for sesatz tests. This takes a single argument, the file to write the state to.
+   for ersatz tests. This takes a single argument, the file to write the state to.
    Normally this is called by a test to do the provisioning, passing in the filename.
 
+   Testing tip:You can start this flow from the CLC easily with (change write target if needed).
+   load localhost:p1
+   set_param -a scope "openid p.q read:/X"
+   rfc7523 -sub jeff
+   write /tmp/p1.json
+
+   Then in another CLC instance, start the fork as
+   load localhost:e1
+   read -p /tmp/p1.json
+   exchange -subject rt
+
+   The last call uses the refresh token as the subject, so you can repeat this fork in testing
+   until that expires.
 */
 path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests/local/rfc8693';
 if[path∉script_path()][script_path(path ~ script_path());];

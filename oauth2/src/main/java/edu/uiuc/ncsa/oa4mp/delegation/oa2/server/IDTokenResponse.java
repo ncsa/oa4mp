@@ -34,6 +34,7 @@ public abstract class IDTokenResponse extends IResponse2 {
         this.refreshToken = refreshToken;
     }
 
+
     public AccessToken getAccessToken() {
         return accessToken;
     }

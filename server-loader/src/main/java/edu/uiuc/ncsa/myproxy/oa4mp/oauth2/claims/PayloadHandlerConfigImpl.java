@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.PayloadHandlerConfig;
@@ -49,6 +50,7 @@ public class PayloadHandlerConfigImpl implements PayloadHandlerConfig {
     public PayloadHandlerConfigImpl(AbstractPayloadConfig abstractClientConfig,
                                     OA2SE oa2se,
                                     OA2ServiceTransaction transaction,
+                                    OA2Client cLient,
                                     TXRecord txRecord,
                                     HttpServletRequest request) {
         clientConfig = abstractClientConfig;
@@ -56,8 +58,24 @@ public class PayloadHandlerConfigImpl implements PayloadHandlerConfig {
         this.transaction = transaction;
         this.request = request;
         this.txRecord = txRecord;
+        this.client = cLient;
     }
 
+    /**
+     * Get the client associated with this. <b>NOTE</b> that this client is possibly resolved
+     * from prototypes and is therefore not the client in the transaction. It is needed to
+     * set the correct lifetimes and such later.
+     * @return
+     */
+    public OA2Client getClient() {
+        return client;
+    }
+
+    public void setClient(OA2Client client) {
+        this.client = client;
+    }
+
+    OA2Client client;
 
     public OA2SE getOa2se() {
         return oa2se;

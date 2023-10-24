@@ -4,24 +4,30 @@
    Tests the revocation (and introspection) machinery for a client.
    This creates a flow, then
 */
+/*
+   Run it in QDL:
+   path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests';
+   script_path(path ~ script_path());
+   script_load('/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests/local/revoke.qdl');
+
+   Run it in the CLC
+   load ashigaru:command.line2
+   rfc7523 -username jeff
+
+*/
 path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests';
 if[path∉script_path()][script_path(path ~ script_path());];
-// script_path(os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests:vfs#/scripts/:vfs#/mysql/:vfs#/pt/temp:vfs#/pt');
-/* Alternate with login
-cfg.'id'  := 'localhost:test/no_cfg';
-cfg.'idp'  := 'ANY';
-cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
-cfg.'description' :=  'Test revocation and introspection machinery for a client. (uses Derby)';
-cfg.'flow_type' := 'df';
-rc := script_load('driver.qdl', cfg.);
-if[rc!='ok'][return(rc);];
-tokens. := clc#access();
-*/
 
+temp_file := '/tmp/revoke-test.json';
+
+debugger(5);
 params. ≔ {'sub':'jeff'};
 clc#init('/home/ncsa/dev/csd/config/client-oa2.xml', 'ashigaru:command.line2');
 tokens. := clc#rfc7523(params.);
-
+clc#write(temp_file); // save for later.
+debugger(1, 'got tokens from RFC7523, wrote state file #0');
+debugger(1, 'at:\n' + print(tokens.'access_token'));
+debugger(1, 'rt:\n' + print(tokens.'refresh_token'));
 rc := false;
 ⊨ clc#introspect('-at').'active':'access token not active';
 ⊨ clc#introspect('-rt').'active':'refresh token not active';
@@ -30,35 +36,63 @@ rc := false;
 // Make sure server is not set to revoke everything asap in refresh endpoint
 // or this will fail.
 new_tokens. := clc#refresh();
+debugger(1, 'After refresh #1');
+debugger(1, 'at:\n' + print(new_tokens.'access_token'));
+debugger(1, 'rt:\n' + print(new_tokens.'refresh_token'));
+
+
 ⊨ clc#revoke('-at'):'token not revoked';
 ⊨ !clc#introspect('-at').'active' : 'AT is still active';
 ⊨ clc#introspect('-rt').'active' : 'RT is not active (and should be)';
 try[
- clc#refresh();
+debugger(1, 'Before refresh #2');
+ new_tokens. := clc#refresh();
+debugger(1, 'After refresh #2');
+debugger(1, 'at:\n' + print(new_tokens.'access_token'));
+debugger(1, 'rt:\n' + print(new_tokens.'refresh_token'));
  rc := true;
 ]catch[
   say('error 1:' + error_message);
 ];
 
 try[
- clc#exchange();
+ new_tokens. := clc#exchange();
+ debugger(1, 'After exchange #3');
+ debugger(1, 'at:\n' + print(new_tokens.'access_token'));
+ debugger(1, 'rt:\n' + print(new_tokens.'refresh_token'));
+
  rc := true;
 ]catch[
   say('error2:' + error_message);
 ];
 
 // Now reset to the original tokens and check you can start over
-clc#tokens(tokens.);
+//clc#tokens(tokens.);
+debugger(1,'reading back in state file, checking that tokens are still in grace period');
+
+clc#read(temp_file);
+new_tokens. := clc#tokens();
+debugger(1, 'After read #4');
+debugger(1, 'at:\n' + print(new_tokens.'access_token'));
+debugger(1, 'rt:\n' + print(new_tokens.'refresh_token'));
+
 ⊨ introspect('-at').'active':'access token not active after state reset';
 ⊨ introspect('-rt').'active':'refresh token not active after state reset';
+tokens. := clc#refresh();
+debugger(1, 'After refresh #5');
+debugger(1, 'at:\n' + print(tokens.'access_token'));
+debugger(1, 'rt:\n' + print(tokens.'refresh_token'));
 
-clc#refresh();
 // RT tests
+debugger(1, 'Doing exchanges #6');
+
 tt1. := exchange('-rt'); // refresh_token has new RT
 tt2. := exchange('-at', '-subject', 'rt'); // access_token has new RT
 tokens.'access_token' := tt2.'access_token';
 tokens.'refresh_token' := tt1.'refresh_token';
-clc#tokens(tokens.);
+debugger(1, 'at:\n' + print(tokens.'access_token'));
+debugger(1, 'rt:\n' + print(tokens.'refresh_token'));
+//clc#tokens(tokens.);
 ⊨ introspect('-rt').'active':'refresh token not active';
 ⊨ introspect('-at').'active':'access token not active';
 ⊨ revoke('-rt'): 'refresh token not revoked';
@@ -66,6 +100,8 @@ clc#tokens(tokens.);
 ⊨ !introspect('-rt').'active':'revoked refresh token active';
 ⊨ !introspect('-at').'active':'revoked access token active';
 rc := true;
+debugger(1, 'Final exchange #7 (should fail -- no valid tokens)');
+
 try[
   refresh();
   rc := false;
