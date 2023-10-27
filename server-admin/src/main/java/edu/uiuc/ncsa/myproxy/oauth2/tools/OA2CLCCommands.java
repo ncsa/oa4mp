@@ -14,7 +14,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.UserInfo;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.client.ATResponse2;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.client.RFC7523Utils;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.JWTUtil2;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.MyOtherJWTUtil2;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
 import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2Asset;
 import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2ClientEnvironment;
@@ -52,7 +52,7 @@ import java.util.List;
 import java.util.*;
 
 import static edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants.*;
-import static edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.JWTUtil2.PAYLOAD_INDEX;
+import static edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.MyOtherJWTUtil2.PAYLOAD_INDEX;
 import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC8628Constants.*;
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 
@@ -1048,7 +1048,7 @@ public class OA2CLCCommands extends CommonCommands {
                 return null;
             }
         }
-        JSONWebKeys keys = JWTUtil2.getJsonWebKeys(getService().getServiceClient(), ((OA2ClientEnvironment) getService().getEnvironment()).getWellKnownURI());
+        JSONWebKeys keys = MyOtherJWTUtil2.getJsonWebKeys(getService().getServiceClient(), ((OA2ClientEnvironment) getService().getEnvironment()).getWellKnownURI());
         try {
             JSONObject json = JWTUtil.verifyAndReadJWT(token.getToken(), keys);
             return json;
@@ -1060,7 +1060,7 @@ public class OA2CLCCommands extends CommonCommands {
     }
 
     public boolean validateJWT(String rawToken) {
-        JSONWebKeys keys = JWTUtil2.getJsonWebKeys(getService().getServiceClient(), ((OA2ClientEnvironment) getService().getEnvironment()).getWellKnownURI());
+        JSONWebKeys keys = MyOtherJWTUtil2.getJsonWebKeys(getService().getServiceClient(), ((OA2ClientEnvironment) getService().getEnvironment()).getWellKnownURI());
         try {
             JWTUtil.verifyAndReadJWT(rawToken, keys);
             return true;

@@ -8,15 +8,14 @@ import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
-import edu.uiuc.ncsa.security.util.crypto.KeyUtil;
+import edu.uiuc.ncsa.security.util.jwk.JWKUtil2;
 import net.sf.json.JSONObject;
 
-import javax.xml.bind.DatatypeConverter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.security.KeyPair;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
@@ -31,7 +30,7 @@ import java.util.List;
 public class SigningCommands extends CommonCommands {
     @Override
     public void bootstrap() throws Throwable {
-         // no-op at this point
+        // no-op at this point
     }
 
     @Override
@@ -43,7 +42,7 @@ public class SigningCommands extends CommonCommands {
     public static final String RS_384 = "RS384";
     public static final String RS_512 = "RS512";
 
-    public SigningCommands(OA2SE oa2se) throws Throwable{
+    public SigningCommands(OA2SE oa2se) throws Throwable {
         super(oa2se == null ? null : oa2se.getMyLogger());
         this.oa2SE = oa2se;
     }
@@ -79,9 +78,9 @@ public class SigningCommands extends CommonCommands {
             // a lot of command utils specify the fiule with this flag. Since everyone keeps
             // sending this, allow for it (otherwise people create a key file called -file in the
             // invocation directory, which is not intuitive and therefore not findable afterwards).
-            if(inputLine.hasArg("-file")){
+            if (inputLine.hasArg("-file")) {
                 publicKeyFile = new File(inputLine.getNextArgFor("-file"));
-            }else {
+            } else {
                 publicKeyFile = new File(inputLine.getArg(1));
             }
         }
@@ -135,17 +134,33 @@ public class SigningCommands extends CommonCommands {
 
     /**
      * This should probably move to {@link JSONWebKeyUtil}.
+     *
      * @return
      * @throws NoSuchProviderException
      * @throws NoSuchAlgorithmException
      */
-    public static JSONWebKeys createJsonWebKeys() throws NoSuchProviderException, NoSuchAlgorithmException {
+    public static JSONWebKeys createRSAJsonWebKeys(int size) throws  NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+        JSONWebKeys keys = new JSONWebKeys(null);
+          keys.put(createRSAJWK(size, RS_256));
+          keys.put(createRSAJWK(size,RS_384));
+          keys.put(createRSAJWK(size,RS_512));
+          return keys;
+    }
+    public static JSONWebKeys createECJsonWebKeys(String curve) throws  NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+        JSONWebKeys keys = new JSONWebKeys(null);
+          keys.put(createECJWK(curve, JWKUtil2.ES_256));
+          keys.put(createECJWK(curve, JWKUtil2.ES_384));
+          keys.put(createECJWK(curve, JWKUtil2.ES_512));
+          return keys;
+    }
+    public static JSONWebKeys createJsonWebKeys() throws  NoSuchAlgorithmException, InvalidAlgorithmParameterException {
         JSONWebKeys keys = new JSONWebKeys(null);
         keys.put(createJWK(RS_256));
         keys.put(createJWK(RS_384));
         keys.put(createJWK(RS_512));
         return keys;
     }
+
     public int defaultSymmetricKeyLength = 256;
     public String SYMMETRIC_KEY_ARG = "-length";
     public String SYMMETRIC_KEY_COUNT_ARG = "-count";
@@ -186,14 +201,14 @@ public class SigningCommands extends CommonCommands {
         File targetFile = null;
         if (inputLine.hasArg(SYMMETRIC_KEY_FILE_ARG)) {
             try {
-                targetFile  = new File(inputLine.getNextArgFor(SYMMETRIC_KEY_FILE_ARG));
+                targetFile = new File(inputLine.getNextArgFor(SYMMETRIC_KEY_FILE_ARG));
             } catch (Throwable t) {
                 // rock on
             }
         }
 
         byte[] array = null;
-        if (!isBatchMode() && targetFile== null) {
+        if (!isBatchMode() && targetFile == null) {
             say(count + " base 64 encoded key" + (count == 1 ? "" : "s") + " with length of " + length + " bytes:\n");
         }
         List<String> keys = new ArrayList<>();
@@ -206,17 +221,17 @@ public class SigningCommands extends CommonCommands {
             while (output.endsWith("=")) {
                 output = output.substring(0, output.length() - 2);
             }
-            if(targetFile != null){
+            if (targetFile != null) {
                 keys.add(output);
-            }else {
+            } else {
                 say(output);
             }
 
         }
-        if(targetFile != null){
+        if (targetFile != null) {
             try {
                 Files.write(targetFile.toPath(), keys);
-                say("Done. Wrote " + count + " key" + (count==1?"":"s") + " to " + targetFile);
+                say("Done. Wrote " + count + " key" + (count == 1 ? "" : "s") + " to " + targetFile);
             } catch (IOException e) {
                 say("Could not write keys to " + targetFile + ":" + e.getMessage());
             }
@@ -230,10 +245,37 @@ public class SigningCommands extends CommonCommands {
      */
     static SecureRandom random = new SecureRandom();
 
-    public static JSONWebKey createJWK(String algorithm) throws NoSuchProviderException, NoSuchAlgorithmException {
-        byte[] byteArray = new byte[16];
-        random.nextBytes(byteArray);
-        String id = DatatypeConverter.printHexBinary(byteArray);
+    public static JSONWebKey createJWK(String algorithm) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException {
+        return createRSAJWK(2048, algorithm); // create an RSA key
+    }
+
+    public static JSONWebKey createRSAJWK(int size, String algorithm) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException {
+        return getJwkUtil2().createRSAKey(size, algorithm);
+    }
+
+    public static JWKUtil2 getJwkUtil2() {
+        if(jwkUtil2 == null){
+            jwkUtil2 = new JWKUtil2();
+        }
+        return jwkUtil2;
+    }
+
+    public static void setJwkUtil2(JWKUtil2 newJWKUtil2) {
+        jwkUtil2 = newJWKUtil2;
+    }
+
+    protected static JWKUtil2 jwkUtil2;
+
+    public static JSONWebKey createECJWK(String curve, String algorithm) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException {
+        return getJwkUtil2().createECKey(curve, algorithm);
+
+    }
+    public static JSONWebKey createJWK(String algorithm, boolean isRSA) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException {
+        if (isRSA) {
+            return getJwkUtil2().createRSAKey(2048, algorithm);
+        }
+        return getJwkUtil2().createECKey("P-256", algorithm);
+/*
 
         KeyPair keyPair = KeyUtil.generateKeyPair();
         JSONWebKey webKey = new JSONWebKey();
@@ -244,5 +286,6 @@ public class SigningCommands extends CommonCommands {
         webKey.algorithm = algorithm;
         webKey.type = "RSA"; //only one supported
         return webKey;
+*/
     }
 }

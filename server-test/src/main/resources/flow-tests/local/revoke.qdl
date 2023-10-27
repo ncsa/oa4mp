@@ -19,6 +19,11 @@ path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tes
 if[path∉script_path()][script_path(path ~ script_path());];
 
 temp_file := '/tmp/revoke-test.json';
+  try[
+     rm(temp_file);     // get rid of it if it is there so user is not repeatedly prompted.
+   ]catch[
+   // ok if it doesn't exist.
+   ];
 
 debugger(5);
 params. ≔ {'sub':'jeff'};
@@ -109,4 +114,4 @@ try[
  ];
 ⊨ rc:'was able to refresh with invalid tokens';
 
-say('ok');
+say('Revocation test: ok');

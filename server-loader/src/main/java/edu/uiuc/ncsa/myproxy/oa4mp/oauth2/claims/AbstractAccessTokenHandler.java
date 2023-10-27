@@ -15,7 +15,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenFactory;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.AccessTokenHandlerInterface;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.IDTokenHandlerInterface;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.JWTUtil2;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.MyOtherJWTUtil2;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC8693Constants;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
@@ -391,7 +391,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
 
     @Override
     public AccessTokenImpl getSignedPayload(JSONWebKey key) {
-        return getSignedPayload(key, JWTUtil2.DEFAULT_TYPE);
+        return getSignedPayload(key, MyOtherJWTUtil2.DEFAULT_TYPE);
     }
 
     @Override
@@ -417,7 +417,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
             throw new IllegalStateException("Error: no JTI. Cannot create access token");
         }
         try {
-            String at = JWTUtil2.createJWT(getPayload(), key, headerType);
+            String at = MyOtherJWTUtil2.createJWT(getPayload(), key, headerType);
             return TokenFactory.createAT(at);
         } catch (Throwable e) {
             if (e instanceof RuntimeException) {

@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.client;
 
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.JWTUtil2;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.MyOtherJWTUtil2;
 import edu.uiuc.ncsa.security.core.configuration.StorageConfigurationTags;
 
 /**
@@ -41,7 +41,7 @@ public interface ClientXMLTags extends StorageConfigurationTags{
     public static final String SECRET_KEY = "secret";
     public static final String JWKS = "jwks";
     public static final String JWKS_FILE = "jwksFile";
-    public static final String JWK_KEY_ID = JWTUtil2.KEY_ID;
+    public static final String JWK_KEY_ID = MyOtherJWTUtil2.KEY_ID;
     public static final String CERT_LIFETIME = "lifetime";
     public static final String SKIN = "skin";
     public static final String MAX_ASSET_LIFETIME = "maxAssetLifetime";

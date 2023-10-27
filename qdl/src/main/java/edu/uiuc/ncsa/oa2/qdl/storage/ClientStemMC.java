@@ -90,7 +90,7 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
         }
         if(stem.containsKey(kk().jwks())){
             try {
-                JSONWebKeys jwks = JSONWebKeyUtil.fromJSON(stem.getStem(kk().jwks()).toJSON());
+                JSONWebKeys jwks = JSONWebKeyUtil.fromJSON( stem.getStem(kk().jwks()).toJSON());
                 v.setJWKS(jwks);
             } catch (Throwable e) {
                if(DebugUtil.isEnabled()){ e.printStackTrace();}

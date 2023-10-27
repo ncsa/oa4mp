@@ -5,7 +5,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Errors;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2GeneralError;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.JWTUtil2;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.MyOtherJWTUtil2;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC7523Constants;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC8628Constants;
 import edu.uiuc.ncsa.security.core.Identifier;
@@ -73,7 +73,7 @@ public class OA2HeaderUtils extends HeaderUtils {
         }
         JSONObject[] hp;
         try {
-            hp = JWTUtil2.readJWT(raw);
+            hp = MyOtherJWTUtil2.readJWT(raw);
         } catch (IllegalArgumentException iax) {
             // means this is sent as a JWT, but is not one
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, RFC7523Constants.CILENT_ASSERTION + " is not a JWT", HttpStatus.SC_BAD_REQUEST, null);
@@ -97,7 +97,7 @@ public class OA2HeaderUtils extends HeaderUtils {
         }
 // Finally. We can verify the JWT
         try {
-            JWTUtil2.verifyAndReadJWT(raw, client.getJWKS());
+            MyOtherJWTUtil2.verifyAndReadJWT(raw, client.getJWKS());
         } catch (Throwable t) {
             // We read the token before without verifying it because we could not. The only error(s) left are if the signature fails.
             throw new OA2GeneralError(OA2Errors.INVALID_TOKEN, "failed to verify token", HttpStatus.SC_BAD_REQUEST, state);
@@ -155,7 +155,7 @@ public class OA2HeaderUtils extends HeaderUtils {
         }
         JSONObject[] hp;
         try {
-            hp = JWTUtil2.readJWT(raw);
+            hp = MyOtherJWTUtil2.readJWT(raw);
         } catch (IllegalArgumentException iax) {
             // means this is sent as a JWT, but is not one
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, RFC7523Constants.CILENT_ASSERTION + " is not a JWT", HttpStatus.SC_BAD_REQUEST, null);
@@ -188,7 +188,7 @@ public class OA2HeaderUtils extends HeaderUtils {
             }
             JSONObject[] hp;
             try {
-                hp = JWTUtil2.readJWT(raw);
+                hp = MyOtherJWTUtil2.readJWT(raw);
             } catch (IllegalArgumentException iax) {
                 // means this is sent as a JWT, but is not one
                 throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, RFC7523Constants.CILENT_ASSERTION + " is not a JWT", HttpStatus.SC_BAD_REQUEST, null);
@@ -204,7 +204,7 @@ public class OA2HeaderUtils extends HeaderUtils {
           }
   // Finally. We can verify the JWT
           try {
-              JWTUtil2.verifyAndReadJWT(raw, client.getJWKS());
+              MyOtherJWTUtil2.verifyAndReadJWT(raw, client.getJWKS());
           } catch (Throwable t) {
               // We read the token before without verifying it because we could not. The only error(s) left are if the signature fails.
               throw new OA2GeneralError(OA2Errors.INVALID_TOKEN, "failed to verify token", HttpStatus.SC_BAD_REQUEST, state);

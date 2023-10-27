@@ -17,7 +17,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.oa2.client.ATResponse2;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.client.ATServer2;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.client.DS2;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.client.RFC7523Utils;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.JWTUtil2;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.MyOtherJWTUtil2;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.InvalidNonceException;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
@@ -454,7 +454,7 @@ public class OA2MPService extends OA4MPService {
 
         DebugUtil.trace(this, "raw response = " + rawResponse);
         JSONObject json = JSONObject.fromObject(rawResponse);
-        JSONWebKeys keys = JWTUtil2.getJsonWebKeys(serviceClient, ((OA2ClientEnvironment) getEnvironment()).getWellKnownURI());
+        JSONWebKeys keys = MyOtherJWTUtil2.getJsonWebKeys(serviceClient, ((OA2ClientEnvironment) getEnvironment()).getWellKnownURI());
         if (isErsatz) {
             // only return types supported for forking is access (everything) or refresh token only.
             asset.setRefreshToken(TokenFactory.createRT(json.getString(REFRESH_TOKEN)));
@@ -510,8 +510,8 @@ public class OA2MPService extends OA4MPService {
      */
     protected TokenImpl figureOutToken(String rawToken, boolean isRT) {
         try {
-            JSONObject[] json = JWTUtil2.readJWT(rawToken);
-            URI jti = URI.create(json[JWTUtil2.PAYLOAD_INDEX].getString(OA2Claims.JWT_ID));
+            JSONObject[] json = MyOtherJWTUtil2.readJWT(rawToken);
+            URI jti = URI.create(json[MyOtherJWTUtil2.PAYLOAD_INDEX].getString(OA2Claims.JWT_ID));
             if (isRT) {
                 return new RefreshTokenImpl(rawToken, jti);
             }

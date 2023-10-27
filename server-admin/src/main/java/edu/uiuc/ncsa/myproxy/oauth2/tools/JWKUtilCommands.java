@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oauth2.tools;
 
+import com.nimbusds.jose.util.Base64URL;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.util.SigningCommands;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.JWTUtil;
@@ -13,8 +14,8 @@ import edu.uiuc.ncsa.security.util.cli.HelpUtil;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.crypto.KeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
-import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
+import edu.uiuc.ncsa.security.util.jwk.JWKUtil2;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -25,11 +26,12 @@ import java.math.BigInteger;
 import java.net.URI;
 import java.security.KeyPair;
 import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.StringTokenizer;
+import java.util.TreeSet;
 
-import static edu.uiuc.ncsa.myproxy.oa4mp.qdl.util.SigningCommands.RS_256;
-import static edu.uiuc.ncsa.myproxy.oa4mp.qdl.util.SigningCommands.createJWK;
+import static edu.uiuc.ncsa.myproxy.oa4mp.qdl.util.SigningCommands.*;
 import static edu.uiuc.ncsa.oa4mp.delegation.oa2.JWTUtil.decat;
 import static edu.uiuc.ncsa.oa4mp.delegation.oa2.JWTUtil.getJsonWebKeys;
 
@@ -38,6 +40,18 @@ import static edu.uiuc.ncsa.oa4mp.delegation.oa2.JWTUtil.getJsonWebKeys;
  * on 5/6/19 at  2:39 PM
  */
 public class JWKUtilCommands extends CommonCommands {
+    public JWKUtil2 getJwkUtil() {
+        if (jwkUtil == null) {
+            jwkUtil = new JWKUtil2();
+        }
+        return jwkUtil;
+    }
+
+    public void setJwkUtil(JWKUtil2 jwkUtil) {
+        this.jwkUtil = jwkUtil;
+    }
+
+    JWKUtil2 jwkUtil;
 
     public JWKUtilCommands(MyLoggingFacade logger) throws Throwable {
         super(logger);
@@ -68,6 +82,11 @@ public class JWKUtilCommands extends CommonCommands {
         sayi(FORCE_TO_STD_OUT_FLAG + " - write the keys to standard out.");
         sayi(CL_OUTPUT_FILE_FLAG + " - write the keys to the given file.");
         sayi(CREATE_SINGLE_KEY_FLAG + " - create only a single RSA 256 key.");
+        sayi(RSA_KEY_SIZE_FLAG + " - specify the key size for the RSA key. Default is 2048 and the value must be multiple of 256");
+        sayi(ELLIPTIC_CURVE_FLAG + " - specify the specific elliptic curve to use. Invoke help with ec to see a list");
+        sayi(ALGORITHM_KEY_FLAG + " - For both RSA and ellitpic functions. Specify the key generation algorithm. Invoke help");
+        sayi("       with ec or rsa to see a list.");
+        sayi(CREATE_ELLIPTIC_KEY_FLAG + " - if present will create an keys with the default elliptic function");
         sayi("Create a set of RSA JSON Web keys and store them in the given file");
         sayi("There are several modes of operation. If you do not specify an output file, then the keys are written ");
         sayi("to the command line.");
@@ -83,6 +102,10 @@ public class JWKUtilCommands extends CommonCommands {
         sayi("   create_keys " + CL_IS_PUBLIC_FLAG + " " + CL_INPUT_FILE_FLAG + " keys.jwk " + CL_OUTPUT_FILE_FLAG + "  pub_keys.jwk");
         sayi("        This will take the full set of keys in keys.jwk extract the public keys and place the result in pub_keys.jwk");
         sayi("        Note: including the -public flag implies the -in argument is given and an error will result if it is not found");
+        sayi("If you invoke help with an argument of ec, you will get information on generating elliptic curve keys. ");
+        sayi("If you supply rsa as the argument, you will et information on generating RSA keys");
+        sayi("E.g.");
+        sayi("create_keys --help ec");
         say("See also create_public_keys");
     }
 
@@ -134,11 +157,11 @@ public class JWKUtilCommands extends CommonCommands {
         JSONWebKeys sourceKeys = this.keys;
         if (hasInputFile) {
             String contents = readFile(inputLine.getNextArgFor(CL_INPUT_FILE_FLAG));
-            sourceKeys = JSONWebKeyUtil.fromJSON(contents);
+            sourceKeys = getJwkUtil().fromJSON(contents);
         }
         SigningCommands sg = createSG(null);
         JSONWebKeys keys = sg.createJsonWebKeys();
-        JSONObject jwks = JSONWebKeyUtil.toJSON(keys);
+        JSONObject jwks = getJwkUtil().toJSON(keys);
         // While really unlikely that there would be a key collision, having one could be catastrophic
         // for users. Therefore, only add keys if there are no clashes.
         for (String x : keys.keySet()) {
@@ -147,7 +170,7 @@ public class JWKUtilCommands extends CommonCommands {
             }
         }
         if (hasOutputFile) {
-            writeFile(inputLine.getNextArgFor(CL_OUTPUT_FILE_FLAG), JSONWebKeyUtil.toJSON(sourceKeys).toString(2));
+            writeFile(inputLine.getNextArgFor(CL_OUTPUT_FILE_FLAG), getJwkUtil().toJSON(sourceKeys).toString(2));
         }
         say("done!");
 
@@ -164,11 +187,50 @@ public class JWKUtilCommands extends CommonCommands {
 
     String FORCE_TO_STD_OUT_FLAG = "-o";
     String CREATE_SINGLE_KEY_FLAG = "-single";
+    String CREATE_ELLIPTIC_KEY_FLAG = "-ec";
+    String ALGORITHM_KEY_FLAG = "-alg";
+    String ELLIPTIC_CURVE_FLAG = "-curve";
+    String RSA_KEY_SIZE_FLAG = "-size";
 
     public void create_keys(InputLine inputLine) throws Exception {
         // Intercept the help request here since the one in the signing utility is a bit different.
         if (showHelp(inputLine)) {
-            createKeysHelps();
+            if (inputLine.hasNextArgFor("--help")) {
+                TreeSet<String> algs = new TreeSet<>();
+                switch (inputLine.getNextArgFor("--help")) {
+                    case "ec":
+                        TreeSet<String> curves = new TreeSet<>();
+                        curves.addAll(Arrays.asList(JWKUtil2.ALL_EC_CURVES));
+                        algs.addAll(Arrays.asList(JWKUtil2.ALL_EC_ALGORITHMS));
+                        say("Supported curves");
+                        say("----------------");
+                        for(String x: curves){
+                            say(x);
+                        }
+                        say("The default is " + JWKUtil2.EC_CURVE_P_256);
+                        say("\nSupported algorithms");
+                        say("--------------------");
+                        for(String x : algs){
+                            say(x);
+                        }
+                        say("The default is " + JWKUtil2.ES_256);
+                        break;
+                    case "rsa":
+                        say("Supported algorithms");
+                        say("--------------------");
+                        algs.addAll(Arrays.asList(JWKUtil2.ALL_RSA_ALGORITHMS));
+                        for(String x : algs){
+                            say(x);
+                        }
+                        say("The default is " + JWKUtil2.RS_256);
+                        break;
+                    default:
+                        say("no help for this topic.");
+                }
+            } else {
+
+                createKeysHelps();
+            }
             return;
         }
         // Fingers and toes cases
@@ -179,10 +241,41 @@ public class JWKUtilCommands extends CommonCommands {
             sg.create(inputLine);
             return;
         }
+        boolean isCreateElliptic = inputLine.hasArg(CREATE_ELLIPTIC_KEY_FLAG);
+        inputLine.removeSwitch(CREATE_ELLIPTIC_KEY_FLAG);
         boolean createSingleKey = inputLine.hasArg(CREATE_SINGLE_KEY_FLAG);
         inputLine.removeSwitch(CREATE_SINGLE_KEY_FLAG);
         boolean writeToStdOut = inputLine.hasArg(FORCE_TO_STD_OUT_FLAG);
         inputLine.removeSwitch(FORCE_TO_STD_OUT_FLAG);
+        String algorithm = JWKUtil2.RS_256; // RSA default
+        if (inputLine.hasArg(ALGORITHM_KEY_FLAG)) {
+            algorithm = inputLine.getNextArgFor(ALGORITHM_KEY_FLAG);
+            inputLine.removeSwitchAndValue(ALGORITHM_KEY_FLAG);
+        } else {
+            if (isCreateElliptic) {
+                algorithm = JWKUtil2.ES_256; // Default for elliptic curves
+            }
+        }
+        String ellipticCurve = null;
+        if (inputLine.hasArg(ELLIPTIC_CURVE_FLAG)) {
+            ellipticCurve = inputLine.getNextArgFor(ELLIPTIC_CURVE_FLAG);
+            inputLine.removeSwitchAndValue(ELLIPTIC_CURVE_FLAG);
+            isCreateElliptic = true; // implicit
+        } else {
+            if (isCreateElliptic) {
+                ellipticCurve = JWKUtil2.ES_256; //
+            }
+        }
+        int keySize = 2048;
+        if (inputLine.hasArg(RSA_KEY_SIZE_FLAG)) {
+            try {
+                keySize = inputLine.getNextIntArg(RSA_KEY_SIZE_FLAG);
+            } catch (Throwable t) {
+                say("sorry, but " + inputLine.getNextArgFor(RSA_KEY_SIZE_FLAG) + " could not be parsed.");
+                return;
+            }
+            inputLine.removeSwitchAndValue(RSA_KEY_SIZE_FLAG);
+        }
         // #2 Error case that public keys are wanted, but no input file is specified.
         if (inputLine.hasArg(CL_IS_PUBLIC_FLAG) && !inputLine.hasArg(CL_INPUT_FILE_FLAG)) {
             if (isBatch()) {
@@ -224,11 +317,19 @@ public class JWKUtilCommands extends CommonCommands {
             JSONWebKeys keys;
             if (createSingleKey) {
                 keys = new JSONWebKeys(null);
-                keys.put(createJWK(RS_256)); // make one
+                if (isCreateElliptic) {
+                    keys.put(createECJWK(ellipticCurve, algorithm)); // make one
+                } else {
+                    keys.put(createRSAJWK(keySize, algorithm)); // make one
+                }
             } else {
-                keys = sg.createJsonWebKeys(); // make full set
+                if(isCreateElliptic){
+                    keys = sg.createECJsonWebKeys(ellipticCurve); // make full set
+                }else{
+                    keys = sg.createRSAJsonWebKeys(keySize); // make full set
+                }
             }
-            JSONObject jwks = JSONWebKeyUtil.toJSON(keys);
+            JSONObject jwks = getJwkUtil().toJSON(keys);
             if (hasOutputFile) {
                 writeFile(outFilename, jwks.toString(2));
             }
@@ -240,9 +341,9 @@ public class JWKUtilCommands extends CommonCommands {
         // final case, generate the public keys.
         String contents = readFile(inFilename);
 
-        JSONWebKeys keys = JSONWebKeyUtil.fromJSON(contents);
-        JSONWebKeys targetKeys = JSONWebKeyUtil.makePublic(keys);
-        JSONObject zzz = JSONWebKeyUtil.toJSON(targetKeys);
+        JSONWebKeys keys = getJwkUtil().fromJSON(contents);
+        JSONWebKeys targetKeys = getJwkUtil().makePublic(keys);
+        JSONObject zzz = getJwkUtil().toJSON(targetKeys);
         if (hasOutputFile) {
             writeFile(outFilename, zzz.toString(2));
         } else {
@@ -266,7 +367,7 @@ public class JWKUtilCommands extends CommonCommands {
 
     }
 
-    public void create_password(InputLine inputLine) throws Exception{
+    public void create_password(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             sayi("create_password [length] - create a password with the given length in bytes.");
             sayi("No argument implies an 8 byte password. Result is printed to standard out.");
@@ -291,7 +392,7 @@ public class JWKUtilCommands extends CommonCommands {
     }
 
 
-    public void create_symmetric_keys(InputLine inputLine) throws Exception{
+    public void create_symmetric_keys(InputLine inputLine) throws Exception {
         SigningCommands signingCommands = createSG(null);
         // make sure these get propagated
         signingCommands.setBatchMode(isBatchMode());
@@ -389,7 +490,7 @@ public class JWKUtilCommands extends CommonCommands {
 
 
     protected JSONWebKeys readKeys(File file) throws Exception {
-        return JSONWebKeyUtil.fromJSON(file);
+        return getJwkUtil().fromJSON(file);
     }
 
     public static String LOAD_KEY = "-load";
@@ -422,12 +523,12 @@ public class JWKUtilCommands extends CommonCommands {
             jsonWebKeys = new JSONWebKeys("dummy");
             jsonWebKeys.put(jwk);
         } else {
-            jsonWebKeys = JSONWebKeyUtil.fromJSON(new File(inputLine.getLastArg()));
+            jsonWebKeys = getJwkUtil().fromJSON(new File(inputLine.getLastArg()));
         }
         if (isLoad) {
             keys = jsonWebKeys;
         } else {
-            say(JSONWebKeyUtil.toJSON(jsonWebKeys).toString(1));
+            say(getJwkUtil().toJSON(jsonWebKeys).toString(1));
         }
 
     }
@@ -470,8 +571,8 @@ public class JWKUtilCommands extends CommonCommands {
         } else {
             localKeys = keys;
         }
-        JSONWebKeys targetKeys = JSONWebKeyUtil.makePublic(localKeys);
-        JSONObject zzz = JSONWebKeyUtil.toJSON(targetKeys);
+        JSONWebKeys targetKeys = getJwkUtil().makePublic(localKeys);
+        JSONObject zzz = getJwkUtil().toJSON(targetKeys);
         say(zzz.toString(2));
     }
 
@@ -513,8 +614,8 @@ public class JWKUtilCommands extends CommonCommands {
             localKeys = keys;
         }
 
-        JSONWebKeys targetKeys = JSONWebKeyUtil.makePublic(localKeys);
-        JSONObject zzz = JSONWebKeyUtil.toJSON(targetKeys);
+        JSONWebKeys targetKeys = getJwkUtil().makePublic(localKeys);
+        JSONObject zzz = getJwkUtil().toJSON(targetKeys);
         String finalOutput = zzz.toString(2);
         if (doB64) {
             finalOutput = Base64.encodeBase64String(finalOutput.getBytes());
@@ -1083,12 +1184,12 @@ public class JWKUtilCommands extends CommonCommands {
         }
         JSONWebKeys jsonWebKeys = null;
         if (1 < inputLine.size()) {
-            jsonWebKeys = JSONWebKeyUtil.fromJSON(new File(inputLine.getArg(1)));
+            jsonWebKeys = getJwkUtil().fromJSON(new File(inputLine.getArg(1)));
         } else {
             if (keys == null) {
                 if (getBooleanInput("Do you want to enter a file name?")) {
                     String x = getInput("Enter path and name of the key file");
-                    jsonWebKeys = JSONWebKeyUtil.fromJSON(new File(x));
+                    jsonWebKeys = getJwkUtil().fromJSON(new File(x));
                 } else {
                     return;
                 }
@@ -1177,9 +1278,20 @@ public class JWKUtilCommands extends CommonCommands {
         if (gracefulExit(keys == null, "Sorry, no keys set, please set keys or specify a well-known URL.")) return;
 
         String[] x = decat(token);
-        JSONObject h = JSONObject.fromObject(new String(Base64.decodeBase64(x[0])));
+        /*
+                JSONObject h = JSONObject.fromObject(new String(Base64.decodeBase64(x[0])));
         JSONObject p = JSONObject.fromObject(new String(Base64.decodeBase64(x[1])));
         if (JWTUtil.verify(h, p, x[2], keys.get(h.getString("kid")))) {
+         */
+        Base64URL h = new Base64URL(x[0]);
+        Base64URL p = new Base64URL(x[1]);
+        Base64URL s = null;
+        JSONObject fullHeader = JSONObject.fromObject(new String(Base64.decodeBase64(x[0])));
+        if (x.length == 3) {
+            /// There is a signature
+            s = new Base64URL(new String(x[2]));
+        }
+        if (JWTUtil.verify(h, p, s, keys.get(fullHeader.getString("kid")))) {
             if (isBatch()) {
                 sayv("token valid!");
                 return;

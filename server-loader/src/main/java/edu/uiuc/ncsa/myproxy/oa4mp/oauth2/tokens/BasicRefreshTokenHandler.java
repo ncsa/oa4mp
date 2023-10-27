@@ -7,7 +7,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.RefreshToken;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenFactory;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.JWTUtil2;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.MyOtherJWTUtil2;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.RefreshTokenHandlerInterface;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC8693Constants;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSource;
@@ -92,9 +92,9 @@ public class BasicRefreshTokenHandler extends AbstractPayloadHandler implements 
         try {
             if (key == null) {
                 key = new JSONWebKey();
-                key.algorithm = JWTUtil2.NONE_JWT;
+                key.algorithm = MyOtherJWTUtil2.NONE_JWT;
             }
-            String at = JWTUtil2.createJWT(getPayload(), key);
+            String at = MyOtherJWTUtil2.createJWT(getPayload(), key);
             return TokenFactory.createRT(at);
         } catch (Throwable e) {
             if (e instanceof RuntimeException) {

@@ -15,8 +15,6 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.XMLEvent;
 import java.nio.charset.StandardCharsets;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
 import java.util.Iterator;
 
@@ -87,7 +85,7 @@ public class VirtualOrganization extends Monitored {
 
     public void setDefaultKeyID(String defaultKeyID) {
         this.defaultKeyID = defaultKeyID;
-        if(getJsonWebKeys() != null){
+        if (getJsonWebKeys() != null) {
             getJsonWebKeys().setDefaultKeyID(defaultKeyID);
         }
     }
@@ -117,7 +115,6 @@ public class VirtualOrganization extends Monitored {
     }
 
 
-
     public String getTitle() {
         return title;
     }
@@ -145,7 +142,7 @@ public class VirtualOrganization extends Monitored {
         if (!isTrivial(defaultKeyID)) {
             xsw.writeAttribute(VO_DEFAULT_KEY, defaultKeyID);
         }
-        if(jsonWebKeys != null){
+        if (jsonWebKeys != null) {
             JSONObject json = JSONWebKeyUtil.toJSON(jsonWebKeys);
             xsw.writeStartElement(VO_JSON_WEB_KEYS);
             // It is base 64 encoded so we don't have to grapple with escaping and such. All we need
@@ -167,11 +164,7 @@ public class VirtualOrganization extends Monitored {
                     switch (xe.asStartElement().getName().getLocalPart()) {
                         case VO_JSON_WEB_KEYS:
                             String raw = xe.asCharacters().getData();
-                            try {
-                                jsonWebKeys = JSONWebKeyUtil.fromJSON(new String(Base64.decodeBase64(raw)));
-                            }catch(NoSuchAlgorithmException | InvalidKeySpecException nsa){
-                              throw new IllegalStateException("Error creating JSON web keys:\"" + nsa.getMessage() + "\"");
-                            }
+                            jsonWebKeys = JSONWebKeyUtil.fromJSON(new String(Base64.decodeBase64(raw)));
                             break;
                     } //end inner switch
                     break;
@@ -200,7 +193,7 @@ public class VirtualOrganization extends Monitored {
                     setIdentifier(BasicIdentifier.newID(v));
                     break;
                 case VO_CREATED:
-                    setCreationTS( new Date(Long.parseLong(v)));
+                    setCreationTS(new Date(Long.parseLong(v)));
                     break;
                 case VO_LAST_MODIFIED:
                     setLastModifiedTS(new Date(Long.parseLong(v)));

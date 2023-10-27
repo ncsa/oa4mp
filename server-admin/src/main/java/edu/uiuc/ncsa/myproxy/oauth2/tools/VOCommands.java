@@ -13,11 +13,12 @@ import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
+import edu.uiuc.ncsa.security.util.jwk.JWKUtil2;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.qdl.util.SigningCommands.RS_256;
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
@@ -27,7 +28,7 @@ import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
  * on 2/22/21 at  8:01 AM
  */
 public class VOCommands extends StoreCommands2 {
-    public VOCommands(MyLoggingFacade logger, String defaultIndent, Store store) throws Throwable{
+    public VOCommands(MyLoggingFacade logger, String defaultIndent, Store store) throws Throwable {
         super(logger, defaultIndent, store);
     }
 
@@ -49,14 +50,14 @@ public class VOCommands extends StoreCommands2 {
         super.extraUpdates(identifiable, magicNumber);
         VirtualOrganization vo = (VirtualOrganization) identifiable;
         VOSerializationKeys keys = (VOSerializationKeys) getSerializationKeys();
-        vo.setTitle(getPropertyHelp(keys.title(),"enter the title", vo.getTitle()));
-        vo.setIssuer(getPropertyHelp(keys.issuer(),"enter the issuer", vo.getIssuer()));
-        vo.setValid(getPropertyHelp(keys.valid(),"is this valid?", Boolean.toString(vo.isValid())).equalsIgnoreCase("y"));
+        vo.setTitle(getPropertyHelp(keys.title(), "enter the title", vo.getTitle()));
+        vo.setIssuer(getPropertyHelp(keys.issuer(), "enter the issuer", vo.getIssuer()));
+        vo.setValid(getPropertyHelp(keys.valid(), "is this valid?", Boolean.toString(vo.isValid())).equalsIgnoreCase("y"));
         String iss = vo.getAtIssuer();
-        if(iss == null){
-            iss=vo.getIssuer(); //default is they are equal
+        if (iss == null) {
+            iss = vo.getIssuer(); //default is they are equal
         }
-        vo.setAtIssuer(getPropertyHelp(keys.atIssuer(),"enter the access token issuer", iss));
+        vo.setAtIssuer(getPropertyHelp(keys.atIssuer(), "enter the access token issuer", iss));
         vo.setDiscoveryPath(getPropertyHelp(keys.discoveryPath(), "enter the discovery path. NOTE this should be of the form host/path e.g.cilogon.org/ligo:", vo.getDiscoveryPath()));
         String ok = getInput("Did you want to specify a file with the JSON web keys(y/n)", "n");
         if (!isTrivial(ok)) {
@@ -87,15 +88,46 @@ public class VOCommands extends StoreCommands2 {
                 }
 
             } else {
-                String rc = getPropertyHelp(keys.jsonWebKeys(),"Did you want to create a new set?", "n");
+                String rc = getPropertyHelp(keys.jsonWebKeys(), "Did you want to create a new set?", "n");
                 if (rc.trim().toLowerCase().equals("y")) {
-                    try {
-                        newKeys(vo);
-                    } catch (Throwable e) {
-                        if (DebugUtil.isEnabled()) {
-                            e.printStackTrace();
+                    String type = readline("enter type RSA or EC:");
+                    type = type.toUpperCase();
+                    if (type.equals("RSA")) {
+                        int keySize = 2048;
+                        String raw = readline("Enter key size (default is" + keySize + ")");
+                        try {
+                            keySize = Integer.parseInt(raw);
+                        } catch (Throwable t) {
+                            say("sorry but \"" + raw + "\" is not an integer");
+                            return;
+                        }
+                        try {
+                            newKeys(vo, keySize);
+                        } catch (Throwable t) {
+                            say("That did not work:" + t.getMessage());
+                            if (DebugUtil.isEnabled()) {
+                                t.printStackTrace();
+                            }
+                            return;
                         }
                     }
+                    if (type.equals("EC")) {
+                        String curve = readline("Enter the curve you want to use (default is P-256)");
+                        if (isTrivial(curve)) {
+                            curve = JWKUtil2.EC_CURVE_P_256;
+                        }
+                        try {
+                            newKeys(vo, curve);
+                        } catch (Throwable e) {
+                            say("That did not work:" + e.getMessage());
+                            if (DebugUtil.isEnabled()) {
+                                e.printStackTrace();
+                            }
+                        }
+                        return;
+                    }
+                        say("Sorry but \"" + type + "\" is not a valid type of key");
+
                 }
             }
         }
@@ -109,7 +141,7 @@ public class VOCommands extends StoreCommands2 {
                 }
             }
         }
-        vo.setDefaultKeyID(getPropertyHelp(keys.defaultKeyID(),"enter the default key id", defaultKey));
+        vo.setDefaultKeyID(getPropertyHelp(keys.defaultKeyID(), "enter the default key id", defaultKey));
 
     }
 
@@ -124,18 +156,43 @@ public class VOCommands extends StoreCommands2 {
             say("sorry, no such VO");
             return;
         }
+        int keySize = 2048;
+        boolean isEllipticCurve = inputLine.hasArg("-ec");
+        String curve = JWKUtil2.EC_CURVE_P_256;
+        inputLine.removeSwitch("-ec");
+        if (isEllipticCurve) {
+            if (inputLine.hasArg("-curve")) {
+                curve = inputLine.getNextArgFor("-curve");
+                inputLine.removeSwitchAndValue("-curve");
+            }
+        } else {
+            if (inputLine.hasArg("-size")) {
+                try {
+                    keySize = inputLine.getNextIntArg("-size");
+                    inputLine.removeSwitchAndValue("-size");
+                } catch (Throwable t) {
+                    say("sorry, but " + inputLine.getNextArgFor("-size") + " is not a number");
+                    return;
+                }
+            }
+
+        }
         VirtualOrganization vo = (VirtualOrganization) id;
         if (vo.getJsonWebKeys() != null) {
             String ok = getInput("Did you want to overwrite the current set of keys?(y/n)", "n");
             if (ok.trim().equalsIgnoreCase("y")) {
-                newKeys(vo);
+                if (isEllipticCurve) {
+                    newKeys(vo, curve);
+                } else {
+                    newKeys(vo, keySize);
+                }
                 String defaultId = null;
-                for(JSONWebKey key :vo.getJsonWebKeys().values()){
-                    if(key.algorithm.equals(RS_256)){
+                for (JSONWebKey key : vo.getJsonWebKeys().values()) {
+                    if (key.algorithm.equals(JWKUtil2.RS_256) || key.algorithm.equals(JWKUtil2.ES_256)) {
                         defaultId = key.id;
                     }
                 }
-                String newID = getInput("Set the new default key", defaultId==null?"":defaultId);
+                String newID = getInput("Set the new default key", defaultId == null ? "" : defaultId);
                 vo.setDefaultKeyID(newID);
                 getStore().save(vo);
                 say("new keys saved");
@@ -146,8 +203,15 @@ public class VOCommands extends StoreCommands2 {
         }
     }
 
-    protected void newKeys(VirtualOrganization vo) throws NoSuchProviderException, NoSuchAlgorithmException {
-        JSONWebKeys jsonWebKeys = SigningCommands.createJsonWebKeys();
+    protected void newKeys(VirtualOrganization vo, int keySize) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+        JSONWebKeys jsonWebKeys = SigningCommands.createRSAJsonWebKeys(keySize);
+        vo.setJsonWebKeys(jsonWebKeys);
+        printJWK(jsonWebKeys);
+
+    }
+
+    protected void newKeys(VirtualOrganization vo, String curve) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+        JSONWebKeys jsonWebKeys = SigningCommands.createECJsonWebKeys(curve);
         vo.setJsonWebKeys(jsonWebKeys);
         printJWK(jsonWebKeys);
     }

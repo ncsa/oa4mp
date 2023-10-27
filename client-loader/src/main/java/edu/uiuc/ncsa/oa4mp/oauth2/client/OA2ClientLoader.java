@@ -5,12 +5,6 @@ import edu.uiuc.ncsa.myproxy.oa4mp.client.ClientXMLTags;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.OA4MPServiceProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.loader.AbstractClientLoader;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.storage.*;
-import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
-import edu.uiuc.ncsa.security.core.configuration.provider.TypedProvider;
-import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
-import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
-import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.oa4mp.delegation.client.DelegationService;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.TokenForge;
@@ -18,11 +12,17 @@ import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2ConfigurationLoaderUtils;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2TokenForge;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.client.*;
+import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
+import edu.uiuc.ncsa.security.core.configuration.provider.TypedProvider;
+import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
+import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
-import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
+import edu.uiuc.ncsa.security.util.jwk.JWKUtil2;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import javax.inject.Provider;
@@ -265,7 +265,7 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
             return null;
         }
         try {
-            return JSONWebKeyUtil.fromJSON(new File(fname));
+            return getJwkUtil().fromJSON(new File(fname));
         } catch (Throwable t) {
             if (debugger.isEnabled()) {
                 t.printStackTrace();
@@ -285,7 +285,7 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
             return null;
         }
         try {
-            return JSONWebKeyUtil.fromJSON(raw);
+            return getJwkUtil().fromJSON(raw);
         } catch (Throwable t) {
             if (debugger.isEnabled()) {
                 t.printStackTrace();
@@ -295,6 +295,18 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
 
     }
 
+    public JWKUtil2 getJwkUtil() {
+        if(jwkUtil == null){
+            jwkUtil = new JWKUtil2();
+        }
+        return jwkUtil;
+    }
+
+    public void setJwkUtil(JWKUtil2 jwkUtil) {
+        this.jwkUtil = jwkUtil;
+    }
+
+    JWKUtil2 jwkUtil;
     JSONWebKeys jwks = null;
 
     protected JSONWebKeys getKeys() {

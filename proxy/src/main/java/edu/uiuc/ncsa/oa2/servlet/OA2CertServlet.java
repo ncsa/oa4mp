@@ -16,7 +16,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Errors;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2GeneralError;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Scopes;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.JWTUtil2;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.MyOtherJWTUtil2;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.PAIResponse2;
 import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.oa4mp.delegation.server.request.IssuerResponse;
@@ -80,7 +80,7 @@ public class OA2CertServlet extends ACS2 {
         try {
             OA2SE oa2se = (OA2SE) getServiceEnvironment();
 
-            JSONObject jwt = JWTUtil2.verifyAndReadJWT(rawAT, oa2se.getJsonWebKeys());
+            JSONObject jwt = MyOtherJWTUtil2.verifyAndReadJWT(rawAT, oa2se.getJsonWebKeys());
             if (jwt.containsKey(JWT_ID)) {
                 rawAT = jwt.getString(JWT_ID);
             } else {

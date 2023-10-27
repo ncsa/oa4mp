@@ -10,6 +10,7 @@ import edu.uiuc.ncsa.security.storage.data.ConversionMap;
 import edu.uiuc.ncsa.security.storage.data.MonitoredConverter;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
+import edu.uiuc.ncsa.security.util.jwk.JWKUtil2;
 import net.sf.json.JSONObject;
 
 import java.net.URI;
@@ -54,7 +55,7 @@ public abstract class BaseClientConverter<V extends BaseClient> extends Monitore
         // database may report this as being null. Do not propagate it along.
         if (map.containsKey(getBKK().jwks()) && map.get(getBKK().jwks())!=null) {
             try {
-                JSONWebKeys jwks = JSONWebKeyUtil.fromJSON(map.getString(getBKK().jwks()));
+                JSONWebKeys jwks = jwkUtil2.fromJSON(map.getString(getBKK().jwks()));
                 value.setJWKS(jwks);
             } catch (Throwable e) {
                 if (DebugUtil.isEnabled()) {
@@ -68,6 +69,7 @@ public abstract class BaseClientConverter<V extends BaseClient> extends Monitore
         }
         return value;
     }
+    protected JWKUtil2 jwkUtil2 = new JWKUtil2();
 
     @Override
     public void toMap(V client, ConversionMap<String, Object> map) {
@@ -100,7 +102,7 @@ public abstract class BaseClientConverter<V extends BaseClient> extends Monitore
         }
         if (json.containsKey(getBKK().jwks())) {
             try {
-                v.setJWKS(JSONWebKeyUtil.fromJSON((JSONObject) getJsonUtil().getJSONValue(json, getBKK().jwks())));
+                v.setJWKS(jwkUtil2.fromJSON((JSONObject) getJsonUtil().getJSONValue(json, getBKK().jwks())));
             } catch (Throwable e) {
                 if (DebugUtil.isEnabled()) {
                     e.printStackTrace();

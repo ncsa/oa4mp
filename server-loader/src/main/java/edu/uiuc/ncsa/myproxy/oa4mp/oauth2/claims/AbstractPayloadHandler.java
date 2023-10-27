@@ -127,7 +127,7 @@ abstract   public String getToken(JSONWebKey key)
             return "";
         }
         try {
-            return JWTUtil2.createJWT(getUserMetaData(), key);
+            return MyOtherJWTUtil2.createJWT(getUserMetaData(), key);
         } catch (Throwable e) {
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;

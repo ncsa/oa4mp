@@ -3,7 +3,7 @@ package edu.uiuc.ncsa.oa4mp.delegation.oa2.client;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.NonceHerder;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.JWTUtil2;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.MyOtherJWTUtil2;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC7523Constants;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
@@ -95,7 +95,7 @@ public class RFC7523Utils implements RFC7523Constants {
          */
 
             request.put(OA2Claims.AUDIENCE, accessTokenEndpoint.toString()); // token endpoint.
-            String payload = JWTUtil2.createJWT(request, key);
+            String payload = MyOtherJWTUtil2.createJWT(request, key);
             map.put(CILENT_ASSERTION, payload);
             map.put(CILENT_ASSERTION_TYPE, ASSERTION_JWT_BEARER);
             return serviceClient.doPost(map);
@@ -173,7 +173,7 @@ public class RFC7523Utils implements RFC7523Constants {
         request.putAll(parameters);
         request.put(OA2Constants.GRANT_TYPE, GRANT_TYPE_JWT_BEARER);
         try {
-            request.put(ASSERTION, JWTUtil2.createJWT(authGrant, key));
+            request.put(ASSERTION, MyOtherJWTUtil2.createJWT(authGrant, key));
         } catch (Throwable t) {
             if (DebugUtil.isEnabled()) {
                 t.printStackTrace();

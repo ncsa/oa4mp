@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.qdl.xml.XMLMissingCloseTagException;
 import edu.uiuc.ncsa.qdl.xml.XMLUtilsV2;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
+import edu.uiuc.ncsa.security.util.jwk.JWKUtil2;
 import org.apache.commons.codec.binary.Base64;
 
 import javax.xml.stream.XMLEventReader;
@@ -134,7 +135,7 @@ public class JWTModule extends JavaModule {
                                     // the tag is empty.
                                     return;
                                 }
-                                jwtCommands.jwks = JSONWebKeyUtil.fromJSON(raw);
+                                jwtCommands.jwks = jwkUtil2.fromJSON(raw);
                                 //jwtCommands.jwks = JSONWebKeyUtil.fromXML(xer);
                             } catch (Throwable e) {
                                 System.out.println("Error: Could not deserialize the JWT module. " + e.getMessage());
@@ -164,4 +165,5 @@ public class JWTModule extends JavaModule {
         }
         return descr;
     }
+    JWKUtil2 jwkUtil2 = new JWKUtil2();
 }

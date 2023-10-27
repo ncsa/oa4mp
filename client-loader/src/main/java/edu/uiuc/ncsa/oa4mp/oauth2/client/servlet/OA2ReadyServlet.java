@@ -10,7 +10,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.IDTokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.*;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.client.ATResponse2;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.client.ATServer2;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.JWTUtil2;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.MyOtherJWTUtil2;
 import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2Asset;
 import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2ClientEnvironment;
 import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2MPService;
@@ -258,7 +258,7 @@ public class OA2ReadyServlet extends ClientServlet {
         boolean isVerified = false;
         boolean isSciToken = false;
         try {
-            JSONObject scitoken = JWTUtil2.verifyAndReadJWT(rawAT, jsonWebKeys);
+            JSONObject scitoken = MyOtherJWTUtil2.verifyAndReadJWT(rawAT, jsonWebKeys);
             request.setAttribute("at_payload", scitoken.toString(2));
             isVerified = true;
             isSciToken = true;
@@ -270,11 +270,11 @@ public class OA2ReadyServlet extends ClientServlet {
                     int width = 80;
 
                     request.setAttribute("accessToken", StringUtils.wrap(rawAT, width));
-                    String[] atParts = JWTUtil2.decat(rawAT);
-                    String h = atParts[JWTUtil2.HEADER_INDEX];
+                    String[] atParts = MyOtherJWTUtil2.decat(rawAT);
+                    String h = atParts[MyOtherJWTUtil2.HEADER_INDEX];
                     JSONObject header = null;
 
-                    String p = atParts[JWTUtil2.PAYLOAD_INDEX];
+                    String p = atParts[MyOtherJWTUtil2.PAYLOAD_INDEX];
                     try {
                         header = JSONObject.fromObject(new String(Base64.decodeBase64(h)));
                         request.setAttribute("at_accessToken", rawAT);

@@ -15,7 +15,10 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.Permission;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.EnvServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.*;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Errors;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2JSONException;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Scopes;
 import edu.uiuc.ncsa.oa4mp.delegation.server.UnapprovedClientException;
 import edu.uiuc.ncsa.oa4mp.delegation.server.WrongPasswordException;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
@@ -32,6 +35,7 @@ import edu.uiuc.ncsa.security.servlet.ExceptionHandlerThingie;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
+import edu.uiuc.ncsa.security.util.jwk.JWKUtil2;
 import net.sf.json.*;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -44,9 +48,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URI;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.security.spec.InvalidKeySpecException;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -1066,19 +1068,7 @@ public class OIDCCMServlet extends EnvServlet {
                     }
                     if (jsonRequest.containsKey(JWKS)) {
                         client.setSecret(null);
-                        try {
-                            client.setJWKS(JSONWebKeyUtil.fromJSON(jsonRequest.getJSONObject(JWKS)));
-                        } catch (NoSuchAlgorithmException e) {
-                            throw new OA2JSONException(OA2Errors.INVALID_REQUEST,
-                                    "JWKS error, no such algorithm",
-                                    HttpStatus.SC_BAD_REQUEST,
-                                    null, client);
-                        } catch (InvalidKeySpecException e) {
-                            throw new OA2JSONException(OA2Errors.INVALID_REQUEST,
-                                    "JWKS error, invalid key spec.",
-                                    HttpStatus.SC_BAD_REQUEST,
-                                    null, client);
-                        }
+                        client.setJWKS(getJwkUtil().fromJSON(jsonRequest.getJSONObject(JWKS)));
                         jsonRequest.remove(JWKS);
                         gotSupportedAuthMethod = true;
                     }
@@ -1482,4 +1472,18 @@ public class OIDCCMServlet extends EnvServlet {
             oa2SE.getMailUtil().sendMessage(subjectTemplate, messageTemplate, replacements, oa2SE.getNotifyACEventEmailAddresses());
         }
     }
+
+    public JWKUtil2 getJwkUtil() {
+        if (jwkUtil == null) {
+            jwkUtil = new JWKUtil2();
+        }
+        return jwkUtil;
+    }
+
+    public void setJwkUtil(JWKUtil2 jwkUtil) {
+        this.jwkUtil = jwkUtil;
+    }
+
+    JWKUtil2 jwkUtil;
+
 }

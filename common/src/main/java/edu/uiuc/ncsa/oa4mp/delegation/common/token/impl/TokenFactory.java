@@ -112,7 +112,7 @@ public class TokenFactory {
      */
      protected static JSONObject getPayload(String rawToken){
          StringTokenizer st = new StringTokenizer(rawToken, ".");
-         if (1 < st.countTokens() && st.countTokens() <= 3) { // 2 or 3 components. 2 means unsigned token
+         if (1 < st.countTokens()) { // 2 or more components (thanks to JOSE)
              st.nextToken();
              String payload = st.nextToken();
              // really cheap trick. Since we want to parse a JSON payload, it has to

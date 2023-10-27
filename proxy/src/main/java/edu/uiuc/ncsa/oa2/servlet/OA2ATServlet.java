@@ -28,7 +28,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.common.token.RefreshToken;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.*;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.*;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.JWTRunner;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.JWTUtil2;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.MyOtherJWTUtil2;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.*;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
 import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
@@ -218,10 +218,10 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 throw new OA2ATException(OA2Errors.INVALID_REQUEST, "missing json assertion");
             }
             if (client.hasJWKS()) {
-                jsonRequest = JWTUtil2.verifyAndReadJWT(raw, client.getJWKS());
+                jsonRequest = MyOtherJWTUtil2.verifyAndReadJWT(raw, client.getJWKS());
             } else {
                 if (client.hasJWKSURI()) {
-                    jsonRequest = JWTUtil2.verifyAndReadJWT(raw, client.getJwksURI());
+                    jsonRequest = MyOtherJWTUtil2.verifyAndReadJWT(raw, client.getJwksURI());
                 } else {
                     throw new OA2ATException(OA2Errors.INVALID_REQUEST, "missing JSON web key. Cannot verify signature."); // Not a JWT
                 }
@@ -1846,9 +1846,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         }
         RefreshTokenStore rts = (RefreshTokenStore) getTransactionStore();
         try {
-            JSONObject jsonObject = JWTUtil2.verifyAndReadJWT(refreshToken.getToken(), ((OA2SE) MyProxyDelegationServlet.getServiceEnvironment()).getJsonWebKeys());
+            JSONObject jsonObject = MyOtherJWTUtil2.verifyAndReadJWT(refreshToken.getToken(), ((OA2SE) MyProxyDelegationServlet.getServiceEnvironment()).getJsonWebKeys());
             if (jsonObject.containsKey(JWT_ID)) {
-                refreshToken = new RefreshTokenImpl(URI.create(jsonObject.getString(JWT_ID)));
+                refreshToken = TokenFactory.createRT(jsonObject);
             } else {
                 throw new OA2ATException(OA2Errors.INVALID_GRANT, "refresh token is a JWT, but has no " + JWT_ID + " claim.");
             }

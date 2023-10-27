@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.qdl.util;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ExtendedParameters;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.OA2State;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.MyOtherJWTUtil2;
 import edu.uiuc.ncsa.qdl.evaluate.IOEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
@@ -12,8 +13,8 @@ import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.JWTUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
-import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
+import edu.uiuc.ncsa.security.util.jwk.JWKUtil2;
 import net.sf.json.JSONObject;
 
 import java.io.File;
@@ -30,7 +31,21 @@ import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ExtendedParameters.OA4MP_
  * on 4/7/20 at  1:06 PM
  */
 public class JWTCommands implements QDLModuleMetaClass {
+    JWKUtil2 jwkUtil;
+
     JSONWebKeys jwks;
+
+    public JWKUtil2 getJwkUtil() {
+        if(jwkUtil == null){
+            jwkUtil = new JWKUtil2();
+        }
+        return jwkUtil;
+    }
+
+    public void setJwkUtil(JWKUtil2 jwkUtil) {
+        this.jwkUtil = jwkUtil;
+    }
+
 
     public JWTCommands(MyLoggingFacade logger) {
         this.logger = logger;
@@ -54,15 +69,15 @@ public class JWTCommands implements QDLModuleMetaClass {
         return signingCommands;
     }
 
-    public JSONWebKeyUtil getJsonWebKeyUtil() {
+    public JWKUtil2 getJsonWebKeyUtil() {
         if (jsonWebKeyUtil == null) {
-            jsonWebKeyUtil = new JSONWebKeyUtil();
+            jsonWebKeyUtil = new JWKUtil2();
         }
         return jsonWebKeyUtil;
     }
 
     transient SigningCommands signingCommands = null;
-    transient JSONWebKeyUtil jsonWebKeyUtil = null;
+    transient JWKUtil2 jsonWebKeyUtil = null;
     protected String CREATE_KEYS_NAME = "create_keys";
 
     public class CreateJWK implements QDLFunction {
@@ -455,9 +470,9 @@ public class JWTCommands implements QDLModuleMetaClass {
             for (String id : jwks.keySet()) {
                 JSONWebKey jwk = jwks.get(id);
                 QDLStem entry = new QDLStem();
-                entry.put(JSONWebKeyUtil.ALGORITHM, jwk.algorithm);
-                entry.put(JSONWebKeyUtil.KEY_TYPE, jwk.use);
-                entry.put(JSONWebKeyUtil.KEY_TYPE, jwk.type);
+                entry.put(MyOtherJWTUtil2.ALGORITHM, jwk.algorithm);
+                entry.put(JWKUtil2.USE, jwk.use);
+                entry.put(JWKUtil2.KEY_TYPE, jwk.type);
                 QDLStem.put(id, entry);
             }
             return QDLStem;
