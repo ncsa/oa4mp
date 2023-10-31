@@ -326,6 +326,7 @@ public class OA2ClientUtils {
             jwtRunner.addHandler(qdlScriptHandler);
         }
         PayloadHandlerConfigImpl idthCfg = null;
+        IDTokenHandler idTokenHandler = null;
         if (client.hasIDTokenConfig()) {
             debugger.trace(OA2ClientUtils.class, "has id token config, creating handler");
             idthCfg = new PayloadHandlerConfigImpl(
@@ -357,7 +358,7 @@ public class OA2ClientUtils {
                     req);
             idthCfg.setLegacyHandler(true);
         }
-        IDTokenHandler idTokenHandler = new IDTokenHandler(idthCfg);
+        idTokenHandler = new IDTokenHandler(idthCfg);
         jwtRunner.setIdTokenHandlerInterface(idTokenHandler);
 
         if (client.hasAccessTokenConfig()) {
@@ -463,25 +464,25 @@ public class OA2ClientUtils {
                 if (obj instanceof Long) {
                     long pValue = (Long) obj;
                     long eValue = -1L; // means override
-                    if(clientMap.containsKey(key)){
+                    if (clientMap.containsKey(key)) {
                         eValue = clientMap.getLong(key);
                     }
-                    if(eValue <0){
+                    if (eValue < 0) {
                         // use the original value
                         clientMap.put(key, pValue);
-                    }else{
+                    } else {
                     }
                 } else {
                     if (obj instanceof Integer) {
                         int pValue = (Integer) obj;
                         int eValue = -1;
-                        if(clientMap.containsKey(key)){
+                        if (clientMap.containsKey(key)) {
                             eValue = clientMap.getInteger(key);
                         }
-                        if(eValue < 0){
+                        if (eValue < 0) {
                             // use original
                             clientMap.put(key, pValue);
-                        }else{
+                        } else {
                         }
                     } else {
                         clientMap.put(key, obj);

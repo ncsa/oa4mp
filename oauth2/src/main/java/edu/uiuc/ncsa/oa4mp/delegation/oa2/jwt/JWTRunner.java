@@ -59,7 +59,7 @@ public class JWTRunner {
 
     IDTokenHandlerInterface idTokenHandlerInterface = null;
 
-    public boolean hasIDTokenHander() {
+    public boolean hasIDTokenHandler() {
         return idTokenHandlerInterface != null;
     }
 

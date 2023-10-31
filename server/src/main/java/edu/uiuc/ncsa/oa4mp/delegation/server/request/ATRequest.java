@@ -52,13 +52,14 @@ public class ATRequest extends IssuerRequest {
     }
 
     Verifier verifier;
-/*    public long getExpiresIn() {
-           return expiresIn;
-       }
 
-       public void setExpiresIn(long expiresIn) {
-           this.expiresIn = expiresIn;
-       }
+    public boolean isOidc() {
+        return oidc;
+    }
 
-       long expiresIn;*/
+    public void setOidc(boolean oidc) {
+        this.oidc = oidc;
+    }
+
+    boolean oidc = false;
 }

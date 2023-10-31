@@ -134,7 +134,7 @@ public class UserInfoServlet extends BearerTokenServlet {
         if (jwtRunner.hasATHandler()) {
             transaction.setUserMetaData(jwtRunner.getAccessTokenHandler().getUserMetaData());
         } else {
-            if (jwtRunner.hasIDTokenHander()) {
+            if (jwtRunner.hasIDTokenHandler()) {
                 transaction.setUserMetaData(jwtRunner.getIdTokenHandlerInterface().getUserMetaData());
             }
         }

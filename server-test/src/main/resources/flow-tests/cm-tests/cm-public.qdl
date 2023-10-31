@@ -15,4 +15,4 @@ r. := http#get({'client_id':resp.'content'.'client_id'});
  script_load('cm-compare.qdl', r.'content', payload., {'application_type', 'token_endpoint_auth_method', 'scope'});
 
 r. := http#delete({'client_id':resp.'content'.'client_id'});
-logger(2,say('ok: Admin creation of a public client'));
+say('ok: Admin creation of a public client');

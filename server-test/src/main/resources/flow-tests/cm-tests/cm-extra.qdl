@@ -10,5 +10,5 @@ r. := http#get({'client_id':resp.'content'.'client_id'});
 // r. now contains the uploaded client
 script_load('cm-compare.qdl', r.'content', payload., {'application_type', 'token_endpoint_auth_method'});
 r. := http#delete({'client_id':resp.'content'.'client_id'});
-logger(2,say('ok: Admin creation of client with extra (OA4MP) properties'));
+say('ok: Admin creation of client with extra (OA4MP) properties');
 

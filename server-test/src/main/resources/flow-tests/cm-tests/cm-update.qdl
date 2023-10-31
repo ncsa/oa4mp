@@ -15,5 +15,5 @@ r. := http#get({'client_id':resp2.'content'.'client_id'});
 // r. now contains the uploaded client
 script_load('cm-compare.qdl', r.'content', update., {'application_type', 'token_endpoint_auth_method'});
 r. := http#delete({'client_id':resp.'content'.'client_id'});
-logger(say('ok: Admin creation and update of a client'));
+say('ok: Admin creation and update of a client');
 

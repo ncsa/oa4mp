@@ -24,6 +24,8 @@
    }
   }}
 
+Do note that this is as close to the spec as possible, so it is does not have an
+openid scope and does not therefore get an id token.
 */
 path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests';
 if[path∉script_path()][script_path(path ~ script_path());];
@@ -72,10 +74,11 @@ rc := script_load('driver.qdl', cfg., params.);
 if[rc!='ok'][return(rc);];
 
 tokens. := clc#access();
+at. := tokens.'access_token';
 test(tokens., expected_token_scopes., user_id);
-issued_at := claims().'iat';
+issued_at := at.'ts';
 tokens. := refresh();
-⊨ issued_at <= claims().'iat' : 'ID token not updated';
+⊨ issued_at <= tokens.'access_token'.'ts' : 'access token timestamp not updated';
 test(tokens., expected_token_scopes., user_id);
 
 say('Scitokens test: ok');

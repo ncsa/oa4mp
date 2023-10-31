@@ -9,6 +9,7 @@ import edu.uiuc.ncsa.security.util.crypto.MyPKCS10CertRequest;
 import edu.uiuc.ncsa.security.util.pkcs.MyCertUtil;
 
 import java.net.URI;
+import java.util.List;
 
 /**
  * Server-side transactions. These should be stored between (the stateless) calls in the protocol.
@@ -153,4 +154,7 @@ public class ServiceTransaction extends BasicTransaction {
         return true;
     }
 
+   public List<String> getResponseTypes(){
+      return null;
+   }
 }

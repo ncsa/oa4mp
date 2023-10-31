@@ -49,7 +49,7 @@ public class RTServer2 extends TokenAwareServer implements RTServer {
         RefreshTokenImpl refreshTokenImpl2 = TokenFactory.createRT(json.getString(OA2Constants.REFRESH_TOKEN));
         AccessTokenImpl newAT = TokenFactory.createAT(returnedAT);
         IDTokenImpl idToken = null;
-        if (oidcEnabled) {
+        if (serverOIDCEnabled) {
             idToken = getAndCheckIDToken(json, rtRequest);
         }
         RTResponse rtResponse = createResponse(newAT, refreshTokenImpl2, idToken);

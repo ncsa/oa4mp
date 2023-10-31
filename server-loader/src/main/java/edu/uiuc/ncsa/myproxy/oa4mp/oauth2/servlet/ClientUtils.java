@@ -416,7 +416,7 @@ public class ClientUtils {
         }
         if (((OA2SE) getServiceEnvironment()).isOIDCEnabled()) {
 
-            if (!hasOpenIDScope)
+            if (oa2Client.getScopes().contains(OA2Scopes.SCOPE_OPENID) && !hasOpenIDScope)
                 throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST,
                         "The " + OA2Scopes.SCOPE_OPENID + " scope is missing from the request.",
                         HttpStatus.SC_BAD_REQUEST,

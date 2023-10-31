@@ -112,7 +112,7 @@ public class VOCommands extends StoreCommands2 {
                         }
                     }
                     if (type.equals("EC")) {
-                        String curve = readline("Enter the curve you want to use (default is P-256)");
+                        String curve = readline("If yo do not want the default curves used, enter a specific one");
                         if (isTrivial(curve)) {
                             curve = JWKUtil2.EC_CURVE_P_256;
                         }

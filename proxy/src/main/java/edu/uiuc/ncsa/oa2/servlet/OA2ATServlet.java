@@ -1519,7 +1519,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             t.setMaxRTLifetime(0L);
         }
 
-        return new ATRequest(request, transaction);
+        ATRequest atRequest = new ATRequest(request, transaction);
+        atRequest.setOidc(client.isOIDCClient());
+        return atRequest;
     }
 
     @Override
@@ -1801,8 +1803,10 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         } else {
             debugger.trace(this, "NO ATHandler in jwtRunner");
         }
-        tokenResponse.setUserMetadata(jwtRunner.getIdTokenHandlerInterface().getUserMetaData());
-        tokenResponse.setIdToken(((IDTokenHandler) jwtRunner.getIdTokenHandlerInterface()).getSignedPayload(key));
+        if(jwtRunner.hasIDTokenHandler()) {
+            tokenResponse.setUserMetadata(jwtRunner.getIdTokenHandlerInterface().getUserMetaData());
+            tokenResponse.setIdToken(((IDTokenHandler) jwtRunner.getIdTokenHandlerInterface()).getSignedPayload(key));
+        }
 
         debugger.trace(this, "set token signing flag =" + tokenResponse.isSignToken());
         // no processing of the refresh token is needed if there is none.

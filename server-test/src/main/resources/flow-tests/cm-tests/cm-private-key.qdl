@@ -1,21 +1,17 @@
 #! /usr/bin/env -S qdl-run  
 
 script_load('init.qdl', args(0));
-
 payload. := from_json(file_read(ini.'payloads' + 'create-key.json'));
 payload.'client_id' := custom_id();
 resp. := http#post(payload.);
-logger(2,'creating basic client with public key');
+debugger(1,'creating basic client with public key');
 ⊨ resp.'status'.'code' == ini.'status' : 'incorrect returned status of ' + resp.'status'.'code';
-logger(2,'got client id=' + resp.'content'.'client_id');
+debugger(1,'got client id=' + resp.'content'.'client_id');
 ⊨ ini.'caput' < resp.'content'.'client_id' : 'failed to get custom generated client id';
 r. := http#get({'client_id':resp.'content'.'client_id'});
+//debugger(1,'returned from get:\n' + print(r.'content'));
 // r. now contains the uploaded client
-try[
-  script_load('cm-compare.qdl', r.'content', payload., {'application_type', 'token_endpoint_auth_method'});
-  ]catch[
-    say(error_message);
-  ];
-r. := http#delete({'client_id':resp.'content'.'client_id'});
-logger(2,say('ok: Admin creation  client with public key'));
+http#delete({'client_id':resp.'content'.'client_id'}); //cleanup before tests in case something bombs.
+script_load('cm-compare.qdl', r.'content', payload., {'application_type', 'token_endpoint_auth_method'});
+say('ok: Admin creation  client with public key');
 

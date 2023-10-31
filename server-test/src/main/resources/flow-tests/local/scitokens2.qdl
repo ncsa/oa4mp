@@ -90,10 +90,12 @@ define[test(tokens., expected_scopes., user_id)][
 rc := script_load('driver.qdl', cfg., params.);
 if[rc!='ok'][return(rc);];
 tokens. := clc#access();
+at. := tokens.'access_token';
+issued_at := at.'ts';
 test(tokens., expected_token_scopes., user_id);
-issued_at := claims().'iat';
+
 tokens. := refresh();
-⊨ issued_at <= claims().'iat' : 'ID token not updated';
+⊨ issued_at <= tokens.'access_token'.'ts' : 'access token timestamp not updated';
 test(tokens., expected_token_scopes., user_id);
 
 say('Scitokens test: ok');

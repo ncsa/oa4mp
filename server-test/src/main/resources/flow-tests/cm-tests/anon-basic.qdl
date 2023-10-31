@@ -37,4 +37,4 @@ try[
 ]catch[
   say('there was a problem deleting the client with id ' + client_id);
 ];
-logger(2,say('ok: Anonymous basic client test'));
+say('ok: Anonymous basic client test');

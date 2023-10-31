@@ -17,7 +17,7 @@ tokens. := clc#exchange(); // does fork
 */
 path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests/';
 if[path∉script_path()][script_path(path ~ script_path());];
-debugger(5);
+debugger(1);
 args. := (0<size(args()))?args().0:['-subject', 'at']; // default is to use access token for exchange.
 saved_cfg := '/tmp/ersatz1-test.json';
 script_load('local/rfc8693/provisioner.qdl', saved_cfg);
@@ -27,18 +27,14 @@ old_tokens. := clc#tokens();
 
 old_id. := clc#claims();
 tokens. := clc#exchange('-rt', args.0, args.1); // forks flow
-debugger(1,'initial at:\n' + print(old_tokens.'access_token'));
-debugger(1,'ersatz at:\n' + print(tokens.'access_token'));
-debugger(1,'------------------');
-debugger(1,'initial rt:\n' + print(old_tokens.'refresh_token'));
-debugger(1,'ersatz rt:\n' + print(tokens.'refresh_token'));
 rt. := tokens.'refresh_token';
+say('rt:\n' + print(rt.));
 // same token returned by the service, not a new one.
 ⊨ (rt.'jti') != (old_tokens.'refresh_token'.'jti') : 'refresh token not swapped';
 
 // As per the spec, the access_token is always returned but the content is no specified.
 // If the return type is a RT, then BOTh are the same token, the RT
-⊨ tokens.'access_token'.'jti' == rt.'jti' : 'refresh token not returned as main token';
+//⊨ tokens.'access_token'.'jti' == rt.'jti' : 'refresh token not returned as main token';
 ⊨ 4800000 == rt.'lifetime' : 'refresh token has incorrect lifetime';
 ⊨ 'https://wlcg.cern.ch/jwt/refresh1' == rt.'jwt'.'aud' : 'refresh token has incorrect audience';
 

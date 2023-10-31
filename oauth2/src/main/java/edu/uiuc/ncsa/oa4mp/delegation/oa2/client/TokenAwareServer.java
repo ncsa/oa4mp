@@ -25,7 +25,12 @@ import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims.*;
  * on 9/13/17 at  2:37 PM
  */
 public abstract class TokenAwareServer extends ASImpl {
-    boolean oidcEnabled = true;
+    /**
+     * Is OIDc enabled for the server?
+     */
+    boolean serverOIDCEnabled = true;
+
+    boolean clientOIDCEnabled = false;
 
     ServiceClient serviceClient;
 
@@ -36,12 +41,12 @@ public abstract class TokenAwareServer extends ASImpl {
 
     public TokenAwareServer(ServiceClient serviceClient,
                             String wellKnown,
-                            boolean oidcEnabled
+                            boolean serverOIDCEnabled
                             ) {
         super(serviceClient.host());
         this.serviceClient = serviceClient;
         this.wellKnown = wellKnown;
-        this.oidcEnabled = oidcEnabled;
+        this.serverOIDCEnabled = serverOIDCEnabled;
         this.tokenEndpoint = serviceClient.host();
     }
 
@@ -91,7 +96,7 @@ public abstract class TokenAwareServer extends ASImpl {
      * @return
      */
     protected IDTokenImpl getAndCheckIDToken(JSONObject jsonObject, BasicRequest atRequest) {
-        if (!oidcEnabled) {
+        if (!serverOIDCEnabled) {
             return null;
         }
         JSONWebKeys keys = getJsonWebKeys();

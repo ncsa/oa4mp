@@ -36,4 +36,4 @@ try[
 ]catch[
   say('there was a problem deleting the client with id ' + client_id);
 ];
-logger(2,say('ok: Anonymous client with extra parameters (which are ignored)'));
+say('ok: Anonymous client with extra (ignored) parameters.');

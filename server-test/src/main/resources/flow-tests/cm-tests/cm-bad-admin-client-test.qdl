@@ -19,4 +19,4 @@ http#headers(h.);
 http#open(true); // localhost has self-signed cert, so don't check.
 payload. := from_json(file_read(ini.'payloads' + 'create.json'));
 resp. := http#post(payload.); // should fail
-say('resp' + to_string(resp.));
+say('Call should have failed, resp:\n' + to_string(resp.));

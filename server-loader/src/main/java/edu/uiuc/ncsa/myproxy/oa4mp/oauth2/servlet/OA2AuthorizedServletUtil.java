@@ -31,6 +31,7 @@ import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.http.HttpStatus;
 
@@ -96,6 +97,7 @@ public class OA2AuthorizedServletUtil {
             AGIResponse2 agResponse = (AGIResponse2) servlet.getAGI().process(agRequest2);
             agResponse.setEncodeToken(encodeTokenInResponse);
             OA2ServiceTransaction transaction = createNewTransaction(agResponse.getGrant());
+            transaction.setResponseTypes(getAndCheckResponseTypes(req));
             transaction.setAuthGrantLifetime(oa2se.getAuthorizationGrantLifetime()); // make sure these match.
             String requestState = req.getParameter(OA2Constants.STATE);
             transaction.setRequestState(requestState);
@@ -166,7 +168,7 @@ public class OA2AuthorizedServletUtil {
     }
 
     /**
-     * Note the at the entry point for this is the {@link #doIt(HttpServletRequest, HttpServletResponse)} method
+     * Note the entry point for this is the {@link #doIt(HttpServletRequest, HttpServletResponse)} method
      * if authorization is done elsewhere (so the assumption is that authorization has already happened),
      * vs. the doDelegation call that is invoked by the OA4MP Authorize servlet. The difference is
      * that the two paths will invoke the claims processing at different points.
@@ -179,6 +181,7 @@ public class OA2AuthorizedServletUtil {
     protected OA2ServiceTransaction doIt(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable {
         String rawcb = basicChecks(httpServletRequest);
         OA2ServiceTransaction t = CheckIdTokenHint(httpServletRequest, httpServletResponse, rawcb);
+        t.setResponseTypes(getAndCheckResponseTypes(httpServletRequest));
         if (t != null) {
             // In this case, there is an id token hint, so processing changes.
             return t;
@@ -256,6 +259,22 @@ public class OA2AuthorizedServletUtil {
                     HttpStatus.SC_BAD_REQUEST,
                     requestState);
         }
+
+
+        return rawcb;
+    }
+
+    /**
+     * This will take the {@link HttpServletRequest} and pull out the response_type.
+     * If the response type is not supported (e.g. implicit flow),
+     * an error is raised.
+     * @param httpServletRequest
+     * @return
+     */
+    protected List<String> getAndCheckResponseTypes(HttpServletRequest httpServletRequest){
+        JSONArray array = new JSONArray();
+        String requestState = httpServletRequest.getParameter(OA2Constants.STATE);
+
         // CIL-833 fix?
         // Use may send
         // "code" or "code id_token" or "id_token code"
@@ -286,20 +305,17 @@ public class OA2AuthorizedServletUtil {
                             requestState);
                 }
             }
+            array.addAll(responseTypes);
+            return array;
             // response type of code is all we support. They may also ask for a response
             // type of id_token
-        } else {
+        }
             DebugUtil.trace(this, "unrecognized response type \"" + httpServletRequest.getParameter(RESPONSE_TYPE));
             throw new OA2GeneralError(OA2Errors.UNSUPPORTED_RESPONSE_TYPE,
                     "The given " + RESPONSE_TYPE + " is not supported.",
                     HttpStatus.SC_BAD_REQUEST,
                     requestState);
-
-        }
-
-        return rawcb;
     }
-
     /**
      * In this case, a previous request to the token endpoint returned an ID token. If this is sent to
      * this endpoint, we are to check that there is an active logon for the user (=there is a transaction

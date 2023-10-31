@@ -54,6 +54,8 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
     public String RETURNED_ACCESS_TOKEN_JWT_KEY = "atJWT";
     public String RETURNED_REFRESH_TOKEN_JWT_KEY = "rtJWT";
 
+    public static String RESPONSE_TYPE_KEY = "responseTypes";
+
 
     public String getProxyId() {
         return proxyId;
@@ -193,6 +195,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
 
     /**
      * The actual time the refresh token in the transaction expires.
+     *
      * @return
      */
     public long getRefreshTokenExpiresAt() {
@@ -231,8 +234,8 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         return null;
     }
 
-    public boolean hasResource(){
-        return getState().containsKey(RESOURCE_KEY) && getState().get(RESOURCE_KEY)!=null;
+    public boolean hasResource() {
+        return getState().containsKey(RESOURCE_KEY) && getState().get(RESOURCE_KEY) != null;
     }
 
     public void setResource(List<String> r) {
@@ -302,7 +305,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         getState().put(FLOW_STATE_KEY, flowStates.toJSON());
     }
 
-    public void setClaimsSources(List<ClaimSource> sources)  {
+    public void setClaimsSources(List<ClaimSource> sources) {
         if (sources == null || sources.isEmpty()) {
             return;
         }
@@ -311,11 +314,11 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         // We don't use this nor need it going forward.
         // It is maintained starting in 5.2.8.3 for backwards compatibility and will be removed at some point.
         oldCSSerialize(sources);
-   //     oldCSSerialize(sources);
+        //     oldCSSerialize(sources);
     }
 
-    protected void  newCSSerialize(List<ClaimSource> sources) {
-       JSONArray array = new JSONArray();
+    protected void newCSSerialize(List<ClaimSource> sources) {
+        JSONArray array = new JSONArray();
         for (ClaimSource claimSource : sources) {
             //array.add(ConfigtoCS.convert(claimSource).toJSON());
             array.add(claimSource.toQDL().toJSON());
@@ -323,7 +326,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         getState().put(CLAIMS_SOURCES_STATE_KEY2, array);
     }
 
-    protected void oldCSSerialize(List<ClaimSource> sources)  {
+    protected void oldCSSerialize(List<ClaimSource> sources) {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ObjectOutputStream out = new ObjectOutputStream(baos);
@@ -331,9 +334,9 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
             out.flush();
             out.close();
             getState().put(CLAIMS_SOURCES_STATE_KEY, Base64.encodeBase64URLSafeString(baos.toByteArray()));
-        }catch(Throwable t){
-            if(t instanceof RuntimeException){
-                throw (RuntimeException)t;
+        } catch (Throwable t) {
+            if (t instanceof RuntimeException) {
+                throw (RuntimeException) t;
             }
             throw new GeneralException("error serializing claims:" + t.getMessage(), t);
         }
@@ -341,11 +344,11 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
 
 
     public List<ClaimSource> getClaimSources(OA2SE oa2SE) {
-       // CIL-1550 with a vengeance.
+        // CIL-1550 with a vengeance.
         if (getState().containsKey(CLAIMS_SOURCES_STATE_KEY2)) {
-            try{
-                 return newCSDeserialize(oa2SE);
-            }catch(Throwable t){
+            try {
+                return newCSDeserialize(oa2SE);
+            } catch (Throwable t) {
                 // try the old way.
                 ServletDebugUtil.info(this, "could not deserialize claim sources new way, reverting to Java serialization");
             }
@@ -354,36 +357,38 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         if (getState().containsKey(CLAIMS_SOURCES_STATE_KEY)) {
             try {
                 return oldCSDeserialize(oa2SE);
-            }catch(Throwable tt){
+            } catch (Throwable tt) {
                 // ok, some work to do. really blow up since there is no state stored.
-                if(ServletDebugUtil.isEnabled()){
+                if (ServletDebugUtil.isEnabled()) {
                     ServletDebugUtil.info(this, "could not deserialize claim sources in any way:" + tt.getMessage());
                     tt.printStackTrace();
                 }
-                if(tt instanceof RuntimeException){
-                    throw (RuntimeException)tt;
+                if (tt instanceof RuntimeException) {
+                    throw (RuntimeException) tt;
                 }
                 throw new GeneralException("Error deserializing claim source:" + tt.getMessage(), tt);
             }
         }
         return new ArrayList<>();
     }
+
     protected ConfigtoCS configtoCS;
-    public ConfigtoCS getConfigToCS(){
-        if(configtoCS == null){
+
+    public ConfigtoCS getConfigToCS() {
+        if (configtoCS == null) {
             configtoCS = new ConfigtoCS();
         }
         return configtoCS;
     }
 
     protected List<ClaimSource> newCSDeserialize(OA2SE oa2SE) throws Throwable {
-          // Assumed to be a serialized JSON Array
+        // Assumed to be a serialized JSON Array
         JSONArray array = getState().getJSONArray(CLAIMS_SOURCES_STATE_KEY2);
         ArrayList<ClaimSource> claimSources = new ArrayList<>();
-        for(int i =0; i < array.size(); i++){
-                 QDLStem stem = new QDLStem();
-                 claimSources.add(getConfigToCS().convert(stem.fromJSON(array.getJSONObject(0)), oa2SE));
-             }
+        for (int i = 0; i < array.size(); i++) {
+            QDLStem stem = new QDLStem();
+            claimSources.add(getConfigToCS().convert(stem.fromJSON(array.getJSONObject(0)), oa2SE));
+        }
         return claimSources;
     }
 
@@ -470,7 +475,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
      * @param provisioningAdminID
      */
     public void setProvisioningAdminID(Identifier provisioningAdminID) {
-        getState().put(PROVISIONING_ADMIN_ID, provisioningAdminID==null?null:provisioningAdminID.toString());
+        getState().put(PROVISIONING_ADMIN_ID, provisioningAdminID == null ? null : provisioningAdminID.toString());
     }
 
     String PROVISIONING_CLIENT_ID = "provisioning_client_id";
@@ -532,6 +537,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         }
         return -1L;
     }
+
     public long getRequestedIDTLifetime() {
         if (hasRequestedIDTLifetime()) {
             return getState().getLong(REQUESTED_IDT_LIFETIME_KEY);
@@ -601,6 +607,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
     public boolean hasMaxATLifetime() {
         return getState().containsKey(MAX_AT_LIFETIME_KEY);
     }
+
     public boolean hasMaxIDTLifetime() {
         return getState().containsKey(MAX_IDT_LIFETIME_KEY);
     }
@@ -717,6 +724,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
      * client and may be set in the registration. If &lt;=0 then refresh tokens are
      * disabled. The actual expiration for the refresh token in the transaction is
      * found in {@link #refreshTokenExpiresAt}.
+     *
      * @return
      */
     public long getRefreshTokenLifetime() {
@@ -726,6 +734,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
     public void setRefreshTokenLifetime(long refreshTokenLifetime) {
         this.refreshTokenLifetime = refreshTokenLifetime;
     }
+
     /**
      * This is the state parameter in the initial request, if present
      *
@@ -894,5 +903,24 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         }
         out = out + ", client=" + firstSix(getClient().getIdentifier().getUri());
         return out + "]";
+    }
+
+    @Override
+    public List<String> getResponseTypes() {
+        if (getState().containsKey(RESPONSE_TYPE_KEY)) {
+            return getState().getJSONArray(RESPONSE_TYPE_KEY);
+        }
+        return new ArrayList<>();
+    }
+
+    public void setResponseTypes(List<String> responseTypes) {
+        JSONArray r;
+        if (responseTypes instanceof JSONArray) {
+            r = (JSONArray) responseTypes;
+        } else {
+            r = new JSONArray();
+            r.addAll(responseTypes);
+        }
+        getState().put(RESPONSE_TYPE_KEY, r);
     }
 }

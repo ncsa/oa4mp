@@ -212,10 +212,10 @@ public class OA2MPService extends OA4MPService {
         ATResponse2 atResponse2 = (ATResponse2) getEnvironment().getDelegationService().getAT(dar);
         asset.setIssuedAt(new Date(atResponse2.getAccessToken().getIssuedAt()));
         //asset.setIssuedAt((Date) atResponse2.getParameters().get(OA2Claims.ISSUED_AT));
-        if (atResponse2.getIdToken().getPayload().containsKey(OA2Claims.SUBJECT)) {
+        if(atResponse2.hasIDToken() && atResponse2.getIdToken().getPayload().containsKey(OA2Claims.SUBJECT)) {
             asset.setUsername(atResponse2.getIdToken().getPayload().getString(OA2Claims.SUBJECT));
+            asset.setIdToken(atResponse2.getIdToken());
         }
-        //asset.setUsername((String) atResponse2.getParameters().get(OA2Claims.SUBJECT));
         if (atResponse2.getParameters().containsKey(NONCE) && !NonceHerder.hasNonce((String) atResponse2.getParameters().get(NONCE))) {
             throw new InvalidNonceException("Unknown nonce.");
         }
@@ -226,7 +226,6 @@ public class OA2MPService extends OA4MPService {
         if (atResponse2.hasRefreshToken()) {
             asset.setRefreshToken(atResponse2.getRefreshToken());
         }
-        asset.setIdToken(atResponse2.getIdToken());
         getAssetStore().save(asset);
         return atResponse2;
     }

@@ -165,13 +165,14 @@ public abstract class IDTokenResponse extends IResponse2 {
             }
             m.put(SCOPE, ss);
         }
-
-        if (isOIDC()) {
+        // We have to compute the user metadata no matter what, but only return it if the
+        // client is OIDC.
+        if (isOIDC() || serviceTransaction.getResponseTypes().contains(RESPONSE_TYPE_ID_TOKEN)) {
+            DebugUtil.trace(this, "writing ID token response");
             m.put(ID_TOKEN, getIdToken().getToken());
         }
 
         JSONObject json = JSONObject.fromObject(m);
-        DebugUtil.trace(this, "writing ID token response");
 
         response.setContentType("application/json;charset=UTF-8");
         response.setCharacterEncoding("UTF-8");

@@ -5,11 +5,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
     <title>Ersatz Clients</title>
-    <!--#include virtual="../../head.html" -->
 
 </head>
 <body class="composite">
-<!--#include virtual="../../header.html" -->
 
 <h1>Ersatz Clients</h1>
 <h2>Introduction</h2>
@@ -21,15 +19,63 @@
     is getting hard -- more time is spent on what the word means in context than anything
     else. An ersatz client has a very specific, narrow definition
     and there should be few if any conflicts with other nomenclature.</p>
+
 <h3>Definition of an ersatz client</h3>
-<p>An <i>ersatz client</i> in OA4MP is a specific type of
+<p>An <b><i>ersatz client</i></b> in OA4MP is a specific type of
     client which may substitute for another in a flow. A client that starts a flow is called
     the <i>provisioning client.</i> A provisioning client is just a standard client
     in OA4MP and may be confidential or public.</p>
 
 <p><b><i>Definition:</i></b>If A is the provisioning client and α is an ersatz client
     we say write <b><i>A ≻ α</i></b> read <i>A provisions α</i> or <i>α can substitute for A</i>.
-   When A provisions α, we say the flow has <i>forked</i> to α.</p>
+    When A provisions α, we say the flow has <b><i>forked</i></b> to α.</p>
+<h2>Forking a flow</h2>
+<h3>Prerequisites</h3>
+<p>The provisioning client, <b>A</b>, must exist. The ersatz client <b>α</b> must exist.
+    <b>A</b> must be set as the provisioner of <b>α</b>. This is normally done
+    by an administrator. The steps then are</p>
+<ol>
+    <li>Start the flow with <b>A</b>. Get access and refresh tokens for <b>A</b>.</li>
+    <li>Start an <a href="https://www.rfc-editor.org/rfc/rfc8693">exchange</a> using the credentials
+        of <b>α</b> and a valid refresh or access token from <b>A</b>. The requested token type
+        is either omitted or for an access token.
+    </li>
+    <li>You will receive a response that includes an access token, refresh token and (if
+        applicable) an id token
+    </li>
+    <li>At this point, the flow has been forked and you simply use the returned tokens with
+        the credentials for <b>α</b>.
+    </li>
+</ol>
+
+<p>Additional notes:</p>
+<ul>
+    <li>Remeber that ersatz clients cannot start flows, they may only substitute for a provisioning client.</li>
+    <li>The scopes for <b>α</b> are restricted to be <i>at most</i> what <b>A</b> was granted.
+        During the fork, you may downscope. At that point, the resulting scopes become the maximum
+        for <b>α</b>.
+    </li>
+    <li>If you do the fork and request a refresh token as the return type, you will
+        get exactly a refresh token but can just do a regular exchange or refresh to get
+        access tokens as needed. This can be useful if the ersatz client may have a long wait before
+        actually needing an access token.
+    </li>
+    <li>You may fork as freely as you like. Every exchange as per above will fork the flow.</li>
+    <li>OA4MP supports <a href="https://www.rfc-editor.org/rfc/rfc7523">JWTs for authorization</a>
+        which means that <b>A</b> may start a completely automated flow and hand off its
+        work to ersatz clients -- no human intervention is needed. Do read about
+        <a href="rfc7523-clients.html">service clients</a> (OA4MP's name for a client
+        that has sent a public key and can use a JWT).
+    </li>
+</ul>
+<p>A not uncommon use is to provision all the permissions for a job with <b>A</b>, then have
+    specific forks for specific permissions (say a fork for read, one for writes, one for
+    managing capabilities, such as starting or stopping jobs.) You could even have dedicated ersatz
+    clients <b>α</b>, <b>β</b>,...</p>
+
+<p>The rest of this document is for more detail or very specialized uses.</p>
+
+<hr/>
 
 <h3>Ersatz Client Properties</h3>
 <ul>
@@ -52,7 +98,7 @@
     </li>
     <li>It is perfectly acceptable to have multiple ersatz clients, so A ≻ α, A ≻ β, A ≻ γ.</li>
 </ul>
-<h2>Relationship to </h2>
+
 <p><a href="https://datatracker.ietf.org/doc/html/rfc8693">The token exchange specification</a> has
     a section on impersonation and delegation semantics. It states <i>in toto</i></p>
 
@@ -74,21 +120,25 @@
     the trust relations are made out of band. Why not call this impersonation? Because
     other OAuth systems are free to implement this any way they want, and we want to be clear
     exactly how we do it. </p>
+
 <h3>Note on provisioning chains</h3>
 <p>
-    You may have ersatz clients substitute for other ersatz clients, so  A ≻ α, α ≻ β and  β ≻ γ is perfectly fine.
-    This means that A provisions and that α may substitute for it. Later, β may substitute for α, but cannot substitute for
+    You may have ersatz clients substitute for other ersatz clients, so A ≻ α, α ≻ β and β ≻ γ is perfectly fine.
+    This means that A provisions and that α may substitute for it. Later, β may substitute for α, but cannot substitute
+    for
     A (unless that relation is made explicit). This allows for chains of substitution. We may write this chain
-    more compactly as A ≻ α ≻ β  ≻ γ
+    more compactly as A ≻ α ≻ β ≻ γ
 </p>
-<h2>Creation of Ersatz Clients</h2>
+
+<h2>Creation of Ersatz Clients via the Client Management API</h2>
 <p>Ersatz clients may be created by an admin client, just like any other.
-    In order to set up the provisioners, you set the property <code>org.oa4mp:/ersatz/provisioners</code>
+    In order to set up the provisioners, you set the property <b>org.oa4mp:/ersatz/provisioners</b>
     to be either the provisioner ID (i.e., the client ID of the client that an start the flow) or
     a list of IDs. The list of IDs is <br/><br/>
     provisionerID ≻ ersatzID_0 ≻ ersatzID_1 ≻ ... ≻ ersatzID_n<br/><br/>
-    All of these must be administered by the same admin client.</p>
-<h2>Using them</h2>
+    All of these must be administered by the same admin client and provision each other in sequence.</p>
+
+<h2>Inheritance etc. (advanced)</h2>
 <p>Normally if A ≻ α, then A starts the flow and in the token exchange, α presents the
     access or refresh token to the exchange endpoint. If α is presented for the first time,
     the flow forks. Note that A cannot resume the flow for α after this point and they become
@@ -101,7 +151,8 @@
     you need to have finer grained control. An ersatz client ξ with a specific script
     (say allowing Lab X) could be used as A ≻ ξ ≻ α and B ≻ ξ ≻ β, (say α and β are used by specific groups
     within Lab X) so that α and β have consistent behavior but can add their own logic. </p>
-<h2>Inheritance and provisioning</h2>
+
+<h3>Inheritance from provisioners</h3>
 <p>
     Clients in OA4MP may set <i>prototypes</i> which are other clients from which they
     inherit configuration. There may be multiple prototypes (effectively yielding
@@ -114,10 +165,9 @@
 <p>
     Since provisioning clients can form a prototype hierarchy, there is an attribute for clients
     named<b>extendsProvisioners</b> and this means that the provisioners should be used as the
-    prototype hierarchy. This is a very common pattern. If you set this and specify prototypes,
+    prototype hierarchy.  If you set this and specify prototypes,
     then provisioning clients are used first, followed by all specifically set prototypes.
 </p>
 
-<!--#include virtual="../../footer.html" -->
 </body>
 </html>

@@ -262,8 +262,10 @@ public class JWKUtilCommands extends CommonCommands {
             inputLine.removeSwitchAndValue(ELLIPTIC_CURVE_FLAG);
             isCreateElliptic = true; // implicit
         } else {
-            if (isCreateElliptic) {
-                ellipticCurve = JWKUtil2.ES_256; //
+            // If they are requesting a single key and do not specify this,
+            // use P-256. Otherwise, leave null so default set of keys is generated.
+            if (isCreateElliptic && createSingleKey) {
+                ellipticCurve = JWKUtil2.EC_CURVE_P_256; //
             }
         }
         int keySize = 2048;
@@ -349,9 +351,6 @@ public class JWKUtilCommands extends CommonCommands {
         } else {
             say(zzz.toString(2));
         }
-        return;
-
-
     }
 
     protected void showSymmetricKeyHelp(SigningCommands signingCommands) {

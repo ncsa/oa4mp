@@ -1,14 +1,14 @@
 package edu.uiuc.ncsa.oa4mp.delegation.oa2.server;
 
-import edu.uiuc.ncsa.oa4mp.delegation.server.issuers.ATIssuer;
-import edu.uiuc.ncsa.oa4mp.delegation.server.issuers.AbstractIssuer;
-import edu.uiuc.ncsa.oa4mp.delegation.server.request.ATRequest;
-import edu.uiuc.ncsa.oa4mp.delegation.server.request.ATResponse;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.TokenForge;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2TokenForge;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Utilities;
+import edu.uiuc.ncsa.oa4mp.delegation.server.issuers.ATIssuer;
+import edu.uiuc.ncsa.oa4mp.delegation.server.issuers.AbstractIssuer;
+import edu.uiuc.ncsa.oa4mp.delegation.server.request.ATRequest;
+import edu.uiuc.ncsa.oa4mp.delegation.server.request.ATResponse;
 
 import java.net.URI;
 import java.util.Map;
@@ -39,11 +39,11 @@ public class ATI2 extends AbstractIssuer implements ATIssuer {
     public ATResponse processATRequest(ATRequest accessTokenRequest) {
         Map<String,String> reqParamMap = OA2Utilities.getParameters(accessTokenRequest.getServletRequest());
         // get access token
-        RTIRequest rtiRequest = new RTIRequest(accessTokenRequest.getTransaction(), isOIDC);
+        RTIRequest rtiRequest = new RTIRequest(accessTokenRequest.getTransaction(), accessTokenRequest.isOidc());
         OA2TokenForge tf2 = (OA2TokenForge) tokenForge;
         AccessTokenImpl accessToken =tf2.createToken(accessTokenRequest);
         RefreshTokenImpl refreshToken = tf2.createToken(rtiRequest);
-        ATIResponse2 atResp = new ATIResponse2(accessToken, refreshToken, isOIDC);
+        ATIResponse2 atResp = new ATIResponse2(accessToken, refreshToken, accessTokenRequest.isOidc());
         atResp.setParameters(reqParamMap);
         atResp.setServiceTransaction(accessTokenRequest.getTransaction());
         return atResp;

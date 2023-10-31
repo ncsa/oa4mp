@@ -15,6 +15,5 @@ clients#init(cfg.);
 
   cfg.type := 'client_approval';
 approvals#init(cfg.);
-logger(2,'cleaning up client with id \'' + client_id +'\'');
 clients#remove(client_id);
 approvals#remove(client_id);

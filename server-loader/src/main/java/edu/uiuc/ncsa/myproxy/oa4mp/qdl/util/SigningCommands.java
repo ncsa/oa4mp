@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.qdl.util;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.util.cli.CommonCommands;
 import edu.uiuc.ncsa.security.util.cli.HelpUtil;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
@@ -133,27 +134,59 @@ public class SigningCommands extends CommonCommands {
     }
 
     /**
-     * This should probably move to {@link JSONWebKeyUtil}.
+     * These are done as per <a href="https://www.rfc-editor.org/rfc/rfc7518.html#section-3.3">https://www.rfc-editor.org/rfc/rfc7518.html#section-3.3</a>
      *
      * @return
      * @throws NoSuchProviderException
      * @throws NoSuchAlgorithmException
      */
-    public static JSONWebKeys createRSAJsonWebKeys(int size) throws  NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+    public static JSONWebKeys createRSAJsonWebKeys(int size) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
         JSONWebKeys keys = new JSONWebKeys(null);
-          keys.put(createRSAJWK(size, RS_256));
-          keys.put(createRSAJWK(size,RS_384));
-          keys.put(createRSAJWK(size,RS_512));
-          return keys;
+        keys.put(createRSAJWK(size, RS_256));
+        keys.put(createRSAJWK(size, RS_384));
+        keys.put(createRSAJWK(size, RS_512));
+        return keys;
     }
-    public static JSONWebKeys createECJsonWebKeys(String curve) throws  NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+
+    /**
+     * Note that these are done as per
+     * <href a="https://www.rfc-editor.org/rfc/rfc7518.html#section-3.4">https://www.rfc-editor.org/rfc/rfc7518.html#section-3.4</href>
+     * and generate the basic set of all elliptic curves
+     *
+     * @return
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidAlgorithmParameterException
+     */
+    public static JSONWebKeys createECJsonWebKeys() throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+
         JSONWebKeys keys = new JSONWebKeys(null);
-          keys.put(createECJWK(curve, JWKUtil2.ES_256));
-          keys.put(createECJWK(curve, JWKUtil2.ES_384));
-          keys.put(createECJWK(curve, JWKUtil2.ES_512));
-          return keys;
+        keys.put(createECJWK(JWKUtil2.EC_CURVE_P_256, JWKUtil2.ES_256));
+        keys.put(createECJWK(JWKUtil2.EC_CURVE_P_384, JWKUtil2.ES_384));
+        keys.put(createECJWK(JWKUtil2.EC_CURVE_P_521, JWKUtil2.ES_512));
+        return keys;
     }
-    public static JSONWebKeys createJsonWebKeys() throws  NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+
+    /**
+     * Create a set of keys for a given curve using the 3 standard signing algorithms. If the parameter is
+     * trivial, then it returns the default as per {@link #createECJsonWebKeys()};
+     * @param curve
+     * @return
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidAlgorithmParameterException
+     */
+    public static JSONWebKeys createECJsonWebKeys(String curve) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+        if (StringUtils.isTrivial(curve)) {
+            return createECJsonWebKeys();
+        }
+        JSONWebKeys keys = new JSONWebKeys(null);
+        keys.put(createECJWK(curve, JWKUtil2.ES_256));
+        keys.put(createECJWK(curve, JWKUtil2.ES_384));
+        keys.put(createECJWK(curve, JWKUtil2.ES_512));
+        return keys;
+
+    }
+
+    public static JSONWebKeys createJsonWebKeys() throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
         JSONWebKeys keys = new JSONWebKeys(null);
         keys.put(createJWK(RS_256));
         keys.put(createJWK(RS_384));
@@ -254,7 +287,7 @@ public class SigningCommands extends CommonCommands {
     }
 
     public static JWKUtil2 getJwkUtil2() {
-        if(jwkUtil2 == null){
+        if (jwkUtil2 == null) {
             jwkUtil2 = new JWKUtil2();
         }
         return jwkUtil2;
@@ -270,6 +303,7 @@ public class SigningCommands extends CommonCommands {
         return getJwkUtil2().createECKey(curve, algorithm);
 
     }
+
     public static JSONWebKey createJWK(String algorithm, boolean isRSA) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException {
         if (isRSA) {
             return getJwkUtil2().createRSAKey(2048, algorithm);

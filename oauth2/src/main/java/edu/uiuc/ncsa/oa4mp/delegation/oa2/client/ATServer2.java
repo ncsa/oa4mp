@@ -147,13 +147,13 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
                 rt.setExpiresAt(rt.getIssuedAt() + rt.getLifetime());
             }
         }
-        ServletDebugUtil.trace(this, "Is OIDC enabled? " + oidcEnabled);
+        ServletDebugUtil.trace(this, "Is OIDC enabled? " + serverOIDCEnabled);
         IDTokenImpl idToken = null;
         if(jsonObject.containsKey(ID_TOKEN)){
                idToken = TokenFactory.createIDT(jsonObject.getString(ID_TOKEN));
                getIDTokenStore().put(at.getJti(), idToken);
         }
-        if (oidcEnabled) {
+        if (serverOIDCEnabled && idToken!=null) {
 
             // and now the specific checks for ID tokens returned by the AT server.
             // It is possible (e.g. RFC 8628) that there is no nonce or that the client is not configured to

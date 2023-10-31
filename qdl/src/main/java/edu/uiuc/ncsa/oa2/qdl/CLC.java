@@ -127,10 +127,11 @@ public class CLC implements QDLModuleMetaClass {
         @Override
         public Object evaluate(Object[] objects, State state) throws Throwable {
             QDLStem claims = new QDLStem();
-            if (objects.length == 0) {
-                JSONObject jsonObject = clcCommands.getIdToken().getPayload();
-                claims.fromJSON(jsonObject);
+            if (clcCommands.getIdToken() == null || clcCommands.getIdToken().getPayload() == null) {
+                return claims;
             }
+            JSONObject jsonObject = clcCommands.getIdToken().getPayload();
+            claims.fromJSON(jsonObject);
             return claims;
         }
 
@@ -329,7 +330,7 @@ public class CLC implements QDLModuleMetaClass {
 
         @Override
         public int[] getArgCount() {
-            return new int[]{0, 1, 2,3,4,5,6,7}; // just ion case we need to pass lots
+            return new int[]{0, 1, 2, 3, 4, 5, 6, 7}; // just ion case we need to pass lots
         }
 
         @Override
@@ -340,6 +341,12 @@ public class CLC implements QDLModuleMetaClass {
                 // if they request an id token, return it.
                 QDLStem x = new QDLStem();
                 x.fromJSON(clcCommands.getIdToken().getPayload());
+                return x;
+            }
+            if (Arrays.asList(objects).contains("-rt")) {
+                // if they request only a refresh token, return it.
+                QDLStem x = new QDLStem();
+                x.put("refresh_token", tokenToStem(clcCommands.getDummyAsset().getRefreshToken()));
                 return x;
             }
             return getTokens();
@@ -958,7 +965,7 @@ public class CLC implements QDLModuleMetaClass {
         if (stem.containsKey("raw_token")) {
             return TokenFactory.createAT(stem.getString("raw_token"));
         }
-        if(stem.containsKey("jti")) {
+        if (stem.containsKey("jti")) {
             return TokenFactory.createAT(stem.getString("jti"));
         }
         throw new IllegalArgumentException("Incorrect access token stem. Cannot create access token");
@@ -987,9 +994,9 @@ public class CLC implements QDLModuleMetaClass {
     protected RefreshTokenImpl stemToRT(QDLStem stem) {
         if (stem.containsKey("raw_token")) {
             return TokenFactory.createRT(stem.getString("raw_token"));
-          //  return new RefreshTokenImpl(stem.getString("raw_token"), URI.create(stem.getString("jti")));
+            //  return new RefreshTokenImpl(stem.getString("raw_token"), URI.create(stem.getString("jti")));
         }
-        if(stem.containsKey("jti")) {
+        if (stem.containsKey("jti")) {
             return TokenFactory.createRT(stem.getString("jti"));
         }
         throw new IllegalArgumentException("Incorrect refresh token stem. Cannot create refresh token");

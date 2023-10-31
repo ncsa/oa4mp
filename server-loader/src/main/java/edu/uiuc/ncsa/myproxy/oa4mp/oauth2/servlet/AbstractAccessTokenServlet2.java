@@ -43,6 +43,11 @@ public abstract class AbstractAccessTokenServlet2 extends MultiAuthServlet {
 
     protected abstract ServiceTransaction getTransaction(AuthorizationGrant ag, HttpServletRequest req) throws ServletException;
 
+    @Override
+    public OA2Client getClient(HttpServletRequest request) {
+        return (OA2Client) super.getClient(request);
+    }
+
     /**
      * Contract: if the token gets updated (might have to because of changes to token versions), return it.
      * If no changes, return null.

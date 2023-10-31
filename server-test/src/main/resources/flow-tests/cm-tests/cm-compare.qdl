@@ -14,8 +14,8 @@ while[
   key ∈ key_set
    ][
 
-/* These print a ton of stuff, so don't willy-nilly enable.
-   say('key=' + key);
+// These print a ton of stuff, so don't willy-nilly enable.
+/*   say('key=' + key);
    say('  client=' + to_string(client.key));
    say(' payload=' + to_string(payload.key));*/
    if[key=='jwks'][continue();]; // skip it, since it's really complex and equality is ill-defined.

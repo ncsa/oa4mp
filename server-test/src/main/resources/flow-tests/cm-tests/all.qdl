@@ -17,12 +17,9 @@ test.:= path + ['cm-basic.qdl',
                 'anon-cfg.qdl',
                 'anon-extra.qdl',
                 'cm-cleanup.qdl'];
-say('Running all tests. ');
-logger(1);
+say('Running all client management tests');
 default_suite:='cm_local';
 suite := 0<size(args())?args(0):default_suite;
-say('suite=' + suite);
-say('logging to ' + info().'boot'.'log_file');
 counter.'pass' := 0;
 counter.'fail' := 0;
 while[x∈test.][
@@ -30,14 +27,14 @@ try[
   script_load(x,suite);
   counter.'pass' += 1;
   ]catch[
-     logger(4,say('error running script ' + x));
-     logger(4,say('error message:' + error_message));
+     say('error running script ' + x);
+     say('error message:' + error_message);
      //say('error running script ' + x);
      //say('error message:' + error_message);
     counter.'fail' += 1;
   ];
 ];
 
-logger(2,say(counter.'pass' + ' passed'));
-logger(2,say(counter.'fail' + ' failed'));
-logger(2,say('total tests run = ' + (counter.'pass' + counter.'fail')));
+say(counter.'pass' + ' passed');
+say(counter.'fail' + ' failed');
+say('total tests run = ' + (counter.'pass' + counter.'fail'));
