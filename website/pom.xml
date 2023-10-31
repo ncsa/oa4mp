@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>edu.uiuc.ncsa.myproxy</groupId>
-    <version>5.3-SNAPSHOT</version>
+    <version>5.4</version>
 
     <artifactId>website</artifactId>
     <packaging>jar</packaging>
@@ -19,78 +19,78 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>client</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.4</version>
         </dependency>
 
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>common</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.4</version>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>core</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.4</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>servlet</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.4</version>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>server</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.4</version>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>common</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.4</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>util</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.4</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>myproxy-logon</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.4</version>
         </dependency>
 
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>client-api</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.4</version>
         </dependency>
 
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>client-loader</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.4</version>
         </dependency>
 
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>server-api</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.4</version>
         </dependency>
 
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>server-loader</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.4</version>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>oauth2</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.4</version>
         </dependency>
         <dependency>
             <groupId>org.apache.velocity</groupId>
@@ -171,7 +171,7 @@
                     <dependency>
                         <groupId>edu.uiuc.ncsa.maven.skin</groupId>
                         <artifactId>skin</artifactId>
-                        <version>5.3-SNAPSHOT</version>
+                        <version>5.4</version>
                     </dependency>
                 </dependencies>
             </plugin>
