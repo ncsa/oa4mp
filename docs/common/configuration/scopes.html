@@ -48,7 +48,7 @@
     
         
                     <div class="xleft">
-            Last Published: 2023-05-24
+            Last Published: 2023-10-31
                                 </div>
                 <div class="xright">            
     
@@ -161,7 +161,9 @@
 
 <p>Remember that, unhelpfully, if you send in a scope request, the resulting claim is asserted
 using the scope tag again. This completely confuses many people since the request and response look
-the same. It's the specification though, so we get to live with it.</p>
+the same. It's the specification though, so we get to live with it. A fuller discussion about scopes
+generally to be found <a href="../../pdf/scopes.pdf">here</a>. This blurb is concerned with configuring
+a server or client to use scopes.</p>
 
 
 <p>
@@ -318,13 +320,13 @@ at that point and the more standard OAuth 2 behvaior of just ignoring anything u
 <div>
 <pre>
 &lt;config&gt;
-   &lt;server name=&quot;my-server&quot;&gt;
+   &lt;service name=&quot;my-server&quot;&gt;
     &lt;scopes&gt;
     &lt;scope enabled=&quot;false&quot;&gt;edu.uiuc.ncsa.myproxy.getcert&lt;/scope&gt;
     &lt;scope&gt;my.custom.scope&lt;/scope&gt;
     &lt;/scopes&gt;
         &lt;!-- other stuff.. --&gt;
-    &lt;/server&gt;
+    &lt;/service&gt;
 &lt;/config&gt;
 </pre></div>
 

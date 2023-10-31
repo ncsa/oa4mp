@@ -48,7 +48,7 @@
     
         
                     <div class="xleft">
-            Last Published: 2023-05-24
+            Last Published: 2023-10-31
                                 </div>
                 <div class="xright">            
     
@@ -141,99 +141,195 @@
 
 
 
-
 <h1>Ersatz Clients</h1>
 <section>
 <h2><a name="Introduction"></a>Introduction</h2>
 
 <p>The ability for a client to take over the flow that another has initiated is
-referred to as <i>substitution</i> and clients that are specifically tasked with
-this as referred to as <i>ersatz clients</i>. We use the cognated word
-&#x1d570;&#x1d597;s&#x1d586;&#x1d599;&#x1d59f; (which just means substitute in German) because words like delegate,
-impersonate, substitute etc. are so overloaded in English that discourse
-is getting hard -- more time is spent on what the word means in context than anything
-else. An ersatz client has a very specific, narrow definition
-and there should be few if any conflicts with other nomenclature.</p>
+    referred to as <i>substitution</i> and clients that are specifically tasked with
+    this as referred to as <i>ersatz clients</i>. We use the cognated word
+    &#x1d570;&#x1d597;s&#x1d586;&#x1d599;&#x1d59f; (which just means substitute in German) because words like delegate,
+    impersonate, substitute etc. are so overloaded in English that discourse
+    is getting hard -- more time is spent on what the word means in context than anything
+    else. An ersatz client has a very specific, narrow definition
+    and there should be few if any conflicts with other nomenclature.</p>
+
 <section>
 <h3><a name="Definition_of_an_ersatz_client"></a>Definition of an ersatz client</h3>
 
-<p>An <i>ersatz client</i> in OA4MP is a specific type of
-client which may substitute for another in a flow. A client that starts a flow is called
-the <i>provisioning client.</i> A provisioning client is just a standard client
-in OA4MP and may be confidential or public. If A is the provisioning client and &#x3b1; is an ersatz client
-we say write A &#x227b; &#x3b1; and refer to &quot;A provisions &#x3b1;&quot; or that &quot;&#x3b1; can substitute for A&quot;. &#x227a; 	&#x227b;  </p>
+<p>An <b><i>ersatz client</i></b> in OA4MP is a specific type of
+    client which may substitute for another in a flow. A client that starts a flow is called
+    the <i>provisioning client.</i> A provisioning client is just a standard client
+    in OA4MP and may be confidential or public.</p>
+
+
+<p><b><i>Definition:</i></b>If A is the provisioning client and &#x3b1; is an ersatz client
+    we say write <b><i>A &#x227b; &#x3b1;</i></b> read <i>A provisions &#x3b1;</i> or <i>&#x3b1; can substitute for A</i>.
+    When A provisions &#x3b1;, we say the flow has <b><i>forked</i></b> to &#x3b1;.</p>
+</section></section><section>
+<h2><a name="Forking_a_flow"></a>Forking a flow</h2>
+<section>
+<h3><a name="Prerequisites"></a>Prerequisites</h3>
+
+<p>The provisioning client, <b>A</b>, must exist. The ersatz client <b>&#x3b1;</b> must exist.
+    <b>A</b> must be set as the provisioner of <b>&#x3b1;</b>. This is normally done
+    by an administrator. The steps then are</p>
+
+<ol style="list-style-type: decimal">
+    
+<li>Start the flow with <b>A</b>. Get access and refresh tokens for <b>A</b>.</li>
+    
+<li>Start an <a class="externalLink" href="https://www.rfc-editor.org/rfc/rfc8693">exchange</a> using the credentials
+        of <b>&#x3b1;</b> and a valid refresh or access token from <b>A</b>. The requested token type
+        is either omitted or for an access token.
+    </li>
+    
+<li>You will receive a response that includes an access token, refresh token and (if
+        applicable) an id token
+    </li>
+    
+<li>At this point, the flow has been forked and you simply use the returned tokens with
+        the credentials for <b>&#x3b1;</b>.
+    </li>
+</ol>
+
+
+<p>Additional notes:</p>
 
 <ul>
     
-<li>All substitution relations are explicit and must be set.</li>
+<li>Remeber that ersatz clients cannot start flows, they may only substitute for a provisioning client.</li>
     
-<li>Ersatz clients cannot start a flow and can only be used at the token exchange (RFC 8693) endpoint.</li>
+<li>The scopes for <b>&#x3b1;</b> are restricted to be <i>at most</i> what <b>A</b> was granted.
+        During the fork, you may downscope. At that point, the resulting scopes become the maximum
+        for <b>&#x3b1;</b>.
+    </li>
     
-<li>Ersatz clients are restricted in their scopes to whatever the provisioning client has and may only downscope.</li>
+<li>If you do the fork and request a refresh token as the return type, you will
+        get exactly a refresh token but can just do a regular exchange or refresh to get
+        access tokens as needed. This can be useful if the ersatz client may have a long wait before
+        actually needing an access token.
+    </li>
+    
+<li>You may fork as freely as you like. Every exchange as per above will fork the flow.</li>
+    
+<li>OA4MP supports <a class="externalLink" href="https://www.rfc-editor.org/rfc/rfc7523">JWTs for authorization</a>
+        which means that <b>A</b> may start a completely automated flow and hand off its
+        work to ersatz clients -- no human intervention is needed. Do read about
+        <a href="rfc7523-clients.html">service clients</a> (OA4MP's name for a client
+        that has sent a public key and can use a JWT).
+    </li>
+</ul>
+
+<p>A not uncommon use is to provision all the permissions for a job with <b>A</b>, then have
+    specific forks for specific permissions (say a fork for read, one for writes, one for
+    managing capabilities, such as starting or stopping jobs.) You could even have dedicated ersatz
+    clients <b>&#x3b1;</b>, <b>&#x3b2;</b>,...</p>
+
+
+<p>The rest of this document is for more detail or very specialized uses.</p>
+
+<hr />
+
+</section><section>
+<h3><a name="Ersatz_Client_Properties"></a>Ersatz Client Properties</h3>
+
+<ul>
+    
+<li>All ersatz relations are explicit and must be set out of band.</li>
+    
+<li>Ersatz clients cannot start a flow.</li>
+    
+<li>Ersatz clients can only be substituted at the token exchange (RFC 8693) endpoint.</li>
+    
+<li>once provisioned, they are simply clients can be used at the
+        refresh endpoint, revoked, introspected etc.
+    </li>
+    
+<li>Ersatz clients are restricted in their scopes to whatever the provisioning client has and may only downscope.
+    </li>
     
 <li>If A &#x227b; &#x3b1;, then &#x3b1; inherits the configuration (lifetimes, scripts etc.) from A unless explicitly overridden.</li>
     
-<li>These may be chained as A &#x227b; &#x3b1; &#x227b; &#x3b2; &#x227b; &#x3b3; ... which connotes an inheritance chain for abilities, not necessarily a custodial chain.</li>
+<li>Provisioning chains may have multiple elements: A &#x227b; &#x3b1; &#x227b; &#x3b2; &#x227b; &#x3b3; ... which connotes
+        an inheritance chain for abilities, not necessarily a custodial chain. Note especially that &#x3b1;, &#x3b2; and &#x3b3;
+        are ersatz client. There is exactly one provisioning client as the first element of the chain.
+    </li>
     
-<li>&#x227b; is not an ordering relationship! It is perfectly acceptable to have a multiple provisioning
-    clients, A, B, C and set A &#x227b; &#x3b1;, B &#x227b; &#x3b1;, C &#x227b; &#x3b1;.  This is because these relations are set by security policies which
-    may be quite arbitrary.</li>
+<li>&#x227b; is not an ordering relationship! It is perfectly acceptable to have provision multiple
+        clients, A, B, C and set A &#x227b; &#x3b1;, B &#x227b; &#x3b1;, C &#x227b; &#x3b1;. This is because these relations are set by security policies which
+        may be quite arbitrary.
+    </li>
     
-<li>it is perfectly acceptable to have multiple ersatz clients, so A &#x227b; &#x3b1;, A &#x227b; &#x3b2;, A &#x227b; &#x3b3;.</li>
+<li>It is perfectly acceptable to have multiple ersatz clients, so A &#x227b; &#x3b1;, A &#x227b; &#x3b2;, A &#x227b; &#x3b3;.</li>
 </ul>
-</section></section><section>
-<h2><a name="Relationship_to"></a>Relationship to </h2>
+
 
 <p><a class="externalLink" href="https://datatracker.ietf.org/doc/html/rfc8693">The token exchange specification</a> has
-a section on impersonation and delegation semantics. It states <i>in toto</i> </p>
+    a section on impersonation and delegation semantics. It states <i>in toto</i></p>
 
 
 <blockquote> When principal A impersonates principal B, A is given all the rights
-   that B has within some defined rights context and is
-   indistinguishable from B in that context.  Thus, when principal A
-   impersonates principal B, then insofar as any entity receiving such a
-   token is concerned, they are actually dealing with B.  It is true
-   that some members of the identity system might have awareness that
-   impersonation is going on, but it is not a requirement.  For all
-   intents and purposes, when A is impersonating B, A is B within the
-   context of the rights authorized by the token.  A's ability to
-   impersonate B could be limited in scope or time, or even with a one-
-   time-use restriction, whether via the contents of the token or an
-   out-of-band mechanism.</blockquote>
+    that B has within some defined rights context and is
+    indistinguishable from B in that context. Thus, when principal A
+    impersonates principal B, then insofar as any entity receiving such a
+    token is concerned, they are actually dealing with B. It is true
+    that some members of the identity system might have awareness that
+    impersonation is going on, but it is not a requirement. For all
+    intents and purposes, when A is impersonating B, A is B within the
+    context of the rights authorized by the token. A's ability to
+    impersonate B could be limited in scope or time, or even with a one-
+    time-use restriction, whether via the contents of the token or an
+    out-of-band mechanism.
+</blockquote>
 
 
 <p>What this means is that our substitutions are a form of impersonation and that
-the trust relations are made out of band. Why not call this impersonation? Because
-other OAuth systems are free to implement this any way they want and we want to be clear
-exactly how we do it. </p>
-</section><section>
-<h2><a name="Where_do_they_live.3F"></a>Where do they live?</h2>
+    the trust relations are made out of band. Why not call this impersonation? Because
+    other OAuth systems are free to implement this any way they want, and we want to be clear
+    exactly how we do it. </p>
 
-<p>Ersatz clients are administered by an admin client just like any other and may be
-created like any other. Since they may inherit from the provisioning client, there is really
-not much of a need to do more than create it with credentials and flag it as an ersatz client.</p>
 </section><section>
-<h2><a name="Using_them"></a>Using them</h2>
+<h3><a name="Note_on_provisioning_chains"></a>Note on provisioning chains</h3>
+
+<p>
+    You may have ersatz clients substitute for other ersatz clients, so A &#x227b; &#x3b1;, &#x3b1; &#x227b; &#x3b2; and &#x3b2; &#x227b; &#x3b3; is perfectly fine.
+    This means that A provisions and that &#x3b1; may substitute for it. Later, &#x3b2; may substitute for &#x3b1;, but cannot substitute
+    for
+    A (unless that relation is made explicit). This allows for chains of substitution. We may write this chain
+    more compactly as A &#x227b; &#x3b1; &#x227b; &#x3b2; &#x227b; &#x3b3;
+</p>
+
+</section></section><section>
+<h2><a name="Creation_of_Ersatz_Clients_via_the_Client_Management_API"></a>Creation of Ersatz Clients via the Client Management API</h2>
+
+<p>Ersatz clients may be created by an admin client, just like any other.
+    In order to set up the provisioners, you set the property org.oa4mp:/ersatz/provisioners
+    to be either the provisioner ID (i.e., the client ID of the client that an start the flow) or
+    a list of IDs. The list of IDs is <br /><br />
+    provisionerID &#x227b; ersatzID_0 &#x227b; ersatzID_1 &#x227b; ... &#x227b; ersatzID_n<br /><br />
+    All of these must be administered by the same admin client and provision each other in sequence.</p>
+
+</section><section>
+<h2><a name="Inheritance_etc._.28advanced.29"></a>Inheritance etc. (advanced)</h2>
 
 <p>Normally if A &#x227b; &#x3b1;, then A starts the flow and in the token exchange, &#x3b1; presents the
-access or refresh token to the exchange endpoint. If &#x3b1; is presented for the first time,
-the flow forks. Note that A cannot resume the flow for &#x3b1; after this point and they become
-independent, meaning that if A provisions &#x3b1; with an access token, &#x3c4;, then &#x3b1; exchanges it for &#x3c4;',
-A cannot use &#x3c4;'. On the other hand, if A &#x227b; &#x3b2; as well then A may provision &#x3b2; with &#x3c4; too.</p>
+    access or refresh token to the exchange endpoint. If &#x3b1; is presented for the first time,
+    the flow forks. Note that A cannot resume the flow for &#x3b1; after this point and they become
+    independent, meaning that if A provisions &#x3b1; with an access token, &#x3c4;, then &#x3b1; exchanges it for &#x3c4;',
+    A cannot use &#x3c4;'. On the other hand, if A &#x227b; &#x3b2; as well then A may provision &#x3b2; with &#x3c4; too.</p>
 
-<p>While there may be chains of substitution, such as A &#x227b; &#x3b1; &#x227b; &#x3b2; &#x227b; &#x3b3;, you must present the final
-ersatz client, &#x3b3; here. In other words, the endpoints of chains determine how the substitution is made</p>
 <section>
 <h3><a name="Why_would_you_want_intermediate_ersatz_clients.3F"></a>Why would you want intermediate ersatz clients?</h3>
 
-<p>If you have a very large and complex set of substitutions, you may stream line the flow. Let
-us say that you have provisioning clients A, B, C, D and (say these provision with some logic
-centered on IDPs or perhaps the hosting institution)
-you need to have finer grained control. An ersatz client &#x3be; with a specific script
-(say allowing Lab X) could be used as A &#x227b; &#x3be; &#x227b; &#x3b1; and B &#x227b; &#x3be; &#x227b; &#x3b2;, (say &#x3b1; and &#x3b2; are used by specific groups
-within Lab X) so that &#x3b1; and &#x3b2; have consistent behavior but can add their own logic. </p>
-</section></section><section>
-<h2><a name="Inheritance_and_provisioning"></a>Inheritance and provisioning</h2>
+<p>If you have a very large and complex set of substitutions, you may streamline the flow. Let
+    us say that you have provisioning clients A, B, C, D and
+    you need to have finer grained control. An ersatz client &#x3be; with a specific script
+    (say allowing Lab X) could be used as A &#x227b; &#x3be; &#x227b; &#x3b1; and B &#x227b; &#x3be; &#x227b; &#x3b2;, (say &#x3b1; and &#x3b2; are used by specific groups
+    within Lab X) so that &#x3b1; and &#x3b2; have consistent behavior but can add their own logic. </p>
+
+</section><section>
+<h3><a name="Inheritance_from_provisioners"></a>Inheritance from provisioners</h3>
 
 <p>
     Clients in OA4MP may set <i>prototypes</i> which are other clients from which they
@@ -248,12 +344,11 @@ within Lab X) so that &#x3b1; and &#x3b2; have consistent behavior but can add t
 <p>
     Since provisioning clients can form a prototype hierarchy, there is an attribute for clients
     named<b>extendsProvisioners</b> and this means that the provisioners should be used as the
-    prototype hierarchy. This is a very common pattern. If you set this and specify prototypes,
+    prototype hierarchy.  If you set this and specify prototypes,
     then provisioning clients are used first, followed by all specifically set prototypes.
 </p>
 
-
-</section>
+</section></section>
 
     </div>
 </div>
