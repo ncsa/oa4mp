@@ -28,6 +28,11 @@ import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
  * on 2/22/21 at  8:01 AM
  */
 public class VOCommands extends StoreCommands2 {
+
+    public static final String EC_FLAG = "-ec";
+    public static final String RSA_SIZE_FLAG = "-size";
+    public static final String EC_CURVE_FLAG = "-curve";
+
     public VOCommands(MyLoggingFacade logger, String defaultIndent, Store store) throws Throwable {
         super(logger, defaultIndent, store);
     }
@@ -149,6 +154,17 @@ public class VOCommands extends StoreCommands2 {
         if (showHelp(inputLine)) {
             say("new_keys");
             sayi("Create a completely new set of keys,");
+            sayi("You can create a default set of RSA keys with no arguments");
+            sayi("A complete set of default elliptic curve keys is done with the " + EC_FLAG);
+            sayi("E.g: Generate a new set of default elliptic curve keys");
+            sayi("new_keys " + EC_FLAG);
+            sayi("This creates a set of keys for the P-256 curve and algorithm ES256, P-384 and ES384, and P-521 and ES512" );
+            sayi("E.g: Generate a new set of RSA keys of 4096 bits");
+            sayi("new_keys " + RSA_SIZE_FLAG + " 4096");
+            sayi("E.g: Generate a new set of elliptic curve keys for a specific curve");
+            sayi("new_keys " + EC_FLAG + " " + EC_CURVE_FLAG + " P-384");
+            sayi("This creates a set of keys using the curve P-384 and the algorithms ES256, ES384 and ES512");
+
             return;
         }
         Identifiable id = findItem(inputLine);
@@ -157,21 +173,21 @@ public class VOCommands extends StoreCommands2 {
             return;
         }
         int keySize = 2048;
-        boolean isEllipticCurve = inputLine.hasArg("-ec");
-        String curve = JWKUtil2.EC_CURVE_P_256;
-        inputLine.removeSwitch("-ec");
+        boolean isEllipticCurve = inputLine.hasArg(EC_FLAG);
+        String curve = null; // default
+        inputLine.removeSwitch(EC_FLAG);
         if (isEllipticCurve) {
-            if (inputLine.hasArg("-curve")) {
-                curve = inputLine.getNextArgFor("-curve");
-                inputLine.removeSwitchAndValue("-curve");
+            if (inputLine.hasArg(EC_CURVE_FLAG)) {
+                curve = inputLine.getNextArgFor(EC_CURVE_FLAG);
+                inputLine.removeSwitchAndValue(EC_CURVE_FLAG);
             }
         } else {
-            if (inputLine.hasArg("-size")) {
+            if (inputLine.hasArg(RSA_SIZE_FLAG)) {
                 try {
-                    keySize = inputLine.getNextIntArg("-size");
-                    inputLine.removeSwitchAndValue("-size");
+                    keySize = inputLine.getNextIntArg(RSA_SIZE_FLAG);
+                    inputLine.removeSwitchAndValue(RSA_SIZE_FLAG);
                 } catch (Throwable t) {
-                    say("sorry, but " + inputLine.getNextArgFor("-size") + " is not a number");
+                    say("sorry, but " + inputLine.getNextArgFor(RSA_SIZE_FLAG) + " is not a number");
                     return;
                 }
             }

@@ -1,0 +1,12 @@
+To test long-term token lifetimes,
+
+cd  /home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests/long-term
+./start.qdl /home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests/test/lt-ids.ini
+
+Then
+
+./resume.qdl /home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests/test/lt-ids.ini  2> out.txt
+
+Pipe std err to out.txt or someplace else because in the current release (5.4 for OA4MP) the HTTP Client
+is antiquated (see https://github.com/ncsa/security-lib/issues/25) since there are a ton of Cookie errors
+because the Cookie spec changed someething with the expiration dates. 

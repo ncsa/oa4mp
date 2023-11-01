@@ -26,4 +26,4 @@ claims. := claims();
 ⊨ claims.'iss' == 'https://dev.cilogon.org' : 'wrong issuer';
 ⊨ claims.'cert_subject_dn' == '/DC=org/DC=cilogon/C=US/O=GitHub/CN=Jeff Gaynor D4620' : 'wrong cert subject DN';
 ⊨ claims.'oidc' == '2953537' : 'wrong oidc identifier';
-
+say('ok');

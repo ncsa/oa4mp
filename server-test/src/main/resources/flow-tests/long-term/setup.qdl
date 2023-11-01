@@ -1,0 +1,33 @@
+// Used by the start and resume scripts to set common state.
+
+// The next function will do the override in order for sys., y., z for the value in key.
+// It is assumed that sys. is the system default and always has a value.
+
+define[do_override(sys., y., z., key)]
+body[
+   if[∄sys.key][say('warning, key ' + key + ' not found in stem for do_overrides');];
+   if[sys.key << Stem][
+    out. := sys.key ;
+    out. := ∃y.key?y.key:out.;
+    out. := ∃z.key?z.key:out.;
+    return(out.);
+   ];
+    out := sys.key ;
+    out := ∃y.key?y.key:out;
+    out := ∃z.key?z.key:out;
+    return(out);
+    ];
+
+define[get_save_path(sys., y., z.)]
+  body[
+           sys.'save_name' := encode(z.'id', 32) + '.xml';
+           save_path := do_override(sys., y., z., 'save_path');
+           return(save_path+'/' +do_override(sys., y., z., 'save_name'));
+    ];
+
+return({'file':'/home/ncsa/dev/csd/config/client-oa2.xml',
+                            'flow_type' :'uri',
+                            'idp':'NCSA',
+                            'description' : 'long term test',
+                            'save_path' : '/home/ncsa/dev/flow-test',
+                            'scope':[]});

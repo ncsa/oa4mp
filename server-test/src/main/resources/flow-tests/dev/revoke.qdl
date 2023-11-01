@@ -17,32 +17,4 @@ if[rc!='ok'][return(rc);];
 tokens. := clc#access();
 // Tests that the start of the PEM format is a substring of the response.
 ⊨    '---BEGIN CERTIFICATE-----'<clc#get_cert() : 'could not get a cert';
-
-⊨ introspect().'active':'access token not active';
-⊨ introspect('-rt').'active':'refresh token not active';
-⊨ revoke():'token not revoked';
-⊨ !introspect().'active' : 'AT is not active';
-
-try[
-  exchange();
-  ⊨ false : 'token should be invalid.';
-]catch[
-];
-
-exchange('-at', '-subject', 'rt'); // Get a new access token for later before we invalidate the refresh token
-// RT tests
-tokens. := exchange('-rt');
-⊨ introspect('-rt').'active':'refresh token not active';
-⊨ revoke('-rt'): 'refresh token not revoked';
-⊨ !introspect('-rt').'active':'refresh token not active';
-try[
-  exchange('-rt');
-  ⊨ false : 'token should be invalid.';
-]catch[
-];
-
- exchange('-at'); // can still get an access token
-
-⊨ introspect().'active':'access token not active';
-
-say('ok');
+script_load('revoke.qdl', '/tmp/dev-test-revoke.json', tokens.);

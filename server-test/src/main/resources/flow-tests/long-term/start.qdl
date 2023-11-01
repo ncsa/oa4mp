@@ -1,0 +1,41 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   Starts a bunch of flows, saves them and waits for restart.qdl
+*/
+path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests';
+script_path(path ~ script_path());
+
+ini. := file_read(args().0, 2); // get the ini file
+debugger(5);
+debugger(1, 'read the ini file');
+defaults. := ini.'default';
+system_defaults. := script_load('long-term/setup.qdl');
+
+cfgs. := ini\pick((x)->x!='default', list_keys(ini.)); // picks out everything but default
+
+while[x.∈cfgs.]
+   do[
+   debugger(1,'x:\n' + print(x.));
+       if[∄x.'id'][say('no id found in cfg entry, skipping');continue();];
+       cfg.'id' := x.'id';
+       cfg.'flow_type' := do_override(system_defaults., defaults., x., 'flow_type');
+       cfg.'file' := do_override(system_defaults., defaults., x., 'file');
+       cfg.'idp' := do_override(system_defaults., defaults., x., 'idp');
+         if[∃defaults.'description' || ∃x.'description']
+       then[cfg.'description' := do_override(system_defaults., defaults., x., 'description');]
+       else[cfg.'description' := 'long term test for ' + cfg.'id';];
+       params.'authz' := [];
+       s := detokenize(do_override(system_defaults., defaults., x., 'scope'), ' ');
+       if[0 < size(s)][params.'authz' := {'scope':s};];
+       rc := script_load('driver.qdl', cfg., params.);
+       tokens. := clc#access();
+       save_to := get_save_path(system_defaults., defaults., x.);
+       try[
+         rm(save_to);     // get rid of it if it is there so user is not repeatedly prompted.
+       ]catch[
+       // ok if it doesn't exist.
+       ];
+       clc#write(save_to);
+       say('write ok for ' + x.'id' + ' (' + tokens.'refresh_token'.'lifetime'+ ' ms.)');
+    ]; //end while

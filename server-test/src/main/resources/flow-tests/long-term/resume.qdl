@@ -1,0 +1,34 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   Tests the client with no configuration
+
+*/
+path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests';
+if[path∉script_path()][script_path(path ~ script_path());];
+
+debugger(5);
+ini. := file_read(args().0, 2); // get the ini file
+defaults. := ini.'default';
+system_defaults. := script_load('long-term/setup.qdl');
+cfgs. := ini\pick((x)->x!='default', list_keys(ini.)); // picks out everything but default
+
+while[
+  x. ∈ cfgs.
+  ][
+   try[
+       say('reading ' + x.'id');
+       save_to := get_save_path(system_defaults., defaults., x.);
+       f := do_override(system_defaults., defaults., x., 'file');
+       clc#init(f, x.'id'); // init or stuff like the debugger fails
+
+       clc#read(save_to);
+       tokens. := clc#refresh();
+       tokens. := clc#exchange();
+       tokens. := clc#exchange('-rt');
+       say('   check ok');
+     ]catch[
+       say('check failed for ' + x.'id' + ': ' + error_message);
+     ]; // end catch
+  ]; // end while
+
