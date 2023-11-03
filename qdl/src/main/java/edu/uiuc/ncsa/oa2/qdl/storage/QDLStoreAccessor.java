@@ -195,7 +195,7 @@ public class QDLStoreAccessor {
             // fall back, but it probably should do something else eventually.
             XMLConverter xmlConverter = store.getXMLConverter();
             if (!(xmlConverter instanceof StemConverter)) {
-                throw new GeneralException("Internal error: XMLConverter not an instance of StemConverter");
+                throw new GeneralException("Internal  XMLConverter not an instance of StemConverter");
             }
             mapConverter = (StemConverter) xmlConverter;
         }

@@ -79,7 +79,7 @@ public class OA2MPService extends OA4MPService {
                 keyPair = new KeyPair(certRequest.getPublicKey(), asset.getPrivateKey());
             }
             if (asset.getPrivateKey() == null) {
-                String msg = "Error: The private key is missing. The internal state of the asset is invalid";
+                String msg = "The private key is missing. The internal state of the asset is invalid";
                 NFWException x = new NFWException((msg));
                 getEnvironment().getMyLogger().warn(msg, x);
                 throw x;
@@ -87,7 +87,7 @@ public class OA2MPService extends OA4MPService {
             try {
                 asset.setCertReq(CertUtil.createCertRequest(keyPair));
             } catch (Throwable t) {
-                String msg = "Error: could not create cert request.";
+                String msg = "could not create cert request.";
                 getEnvironment().getMyLogger().warn(msg, t);
                 if (t instanceof RuntimeException) {
                     throw (RuntimeException) t;
@@ -641,7 +641,7 @@ public class OA2MPService extends OA4MPService {
         }
         NonceHerder.removeNonce((String) json.get(NONCE)); // prevent replay attacks.
         if (!json.containsKey(ACCESS_TOKEN)) {
-            throw new IllegalArgumentException("Error: No access token found in server response");
+            throw new IllegalArgumentException("No access token found in server response");
         }
         AccessTokenImpl at = TokenFactory.createAT(json.getString(ACCESS_TOKEN));
         asset.setIssuedAt(new Date(at.getIssuedAt()));

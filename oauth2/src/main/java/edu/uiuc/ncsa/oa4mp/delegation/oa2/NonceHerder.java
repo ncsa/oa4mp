@@ -46,7 +46,7 @@ public class NonceHerder {
             return; // not a lot we can do if they don't give us a nonce.
         }
         if (hasNonce(nonce)) {
-            throw new InvalidNonceException("Error: nonce used");
+            throw new InvalidNonceException(" nonce used");
         }
         putNonce(nonce);
     }

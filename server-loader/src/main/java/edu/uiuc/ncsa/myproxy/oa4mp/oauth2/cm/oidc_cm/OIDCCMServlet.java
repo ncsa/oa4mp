@@ -106,11 +106,11 @@ public class OIDCCMServlet extends EnvServlet {
 
         try {
             if (!(getOA2SE().getCmConfigs().hasRFC7592Config() && getOA2SE().getCmConfigs().getRFC7592Config().enabled) && getOA2SE().getCmConfigs().isEnabled()) {
-                throw new IllegalAccessError("Error: RFC 7592 not supported on this server. Request rejected.");
+                throw new IllegalAccessError("RFC 7592 not supported on this server. Request rejected.");
             }
             if (doPing(httpServletRequest, httpServletResponse)) return;
             if (!getOA2SE().getCmConfigs().hasRFC7592Config()) {
-                throw new IllegalAccessError("Error: RFC 7592 not supported on this server. Request rejected.");
+                throw new IllegalAccessError("RFC 7592 not supported on this server. Request rejected.");
             }
 
             boolean isAnonymous = false;  // Meaning that a client is trying to get information
@@ -131,7 +131,7 @@ public class OIDCCMServlet extends EnvServlet {
                 // Do not allow an administered client to query anything.
                 oa2Client = getAndCheckOA2Client(httpServletRequest);
                 if (!getOA2SE().getPermissionStore().getAdmins(oa2Client.getIdentifier()).isEmpty()) {
-                    throw new IllegalArgumentException("error: administered clients cannot query their properties, only their administrator can.");
+                    throw new IllegalArgumentException("administered clients cannot query their properties, only their administrator can.");
                 }
                 debugger = MyProxyDelegationServlet.createDebugger(oa2Client);
             } else {
@@ -375,7 +375,7 @@ public class OIDCCMServlet extends EnvServlet {
 
         try {
             if (!(getOA2SE().getCmConfigs().hasRFC7592Config() && getOA2SE().getCmConfigs().getRFC7592Config().enabled) && getOA2SE().getCmConfigs().isEnabled()) {
-                throw new IllegalAccessError("Error: RFC 7592 not supported on this server. Request rejected.");
+                throw new IllegalAccessError("RFC 7592 not supported on this server. Request rejected.");
             }
 
             AdminClient adminClient = getAndCheckAdminClient(req);
@@ -460,7 +460,7 @@ public class OIDCCMServlet extends EnvServlet {
         OA2Client client = null;
         try {
             if (!(getOA2SE().getCmConfigs().hasRFC7592Config() && getOA2SE().getCmConfigs().getRFC7592Config().enabled) && getOA2SE().getCmConfigs().isEnabled()) {
-                throw new IllegalAccessError("Error: RFC 7592 not supported on this server. Request rejected.");
+                throw new IllegalAccessError("RFC 7592 not supported on this server. Request rejected.");
             }
 
             adminClient = getAndCheckAdminClient(req);
@@ -471,8 +471,8 @@ public class OIDCCMServlet extends EnvServlet {
             }
             JSON rawJSON = getPayload(req, adminDebugger);
             if (rawJSON.isArray()) {
-                adminDebugger.info(this, "Error: Got a JSON array rather than a request:" + rawJSON);
-                throw new IllegalArgumentException("Error: incorrect argument. Not a valid JSON request");
+                adminDebugger.info(this, "Got a JSON array rather than a request:" + rawJSON);
+                throw new IllegalArgumentException("incorrect argument. Not a valid JSON request");
             }
             JSONObject jsonRequest = (JSONObject) rawJSON;
             // can send the client id as either a parameter or in the JSON blob.
@@ -495,7 +495,7 @@ public class OIDCCMServlet extends EnvServlet {
             if (jsonRequest.size() == 0) {
                 // Playing nice here. If they upload an empty object, the net effect is going to be to zero out
                 // everything for this client except the id. The assumption is they don't want to do that.
-                adminDebugger.info(this, "Error: Got an empty JSON object. Request rejected.");
+                adminDebugger.info(this, "Got an empty JSON object. Request rejected.");
                 throw new OA2JSONException(OA2Errors.INVALID_REQUEST,
                         "invalid request",
                         HttpStatus.SC_BAD_REQUEST,
@@ -618,7 +618,7 @@ public class OIDCCMServlet extends EnvServlet {
 
         try {
             if (!(getOA2SE().getCmConfigs().hasRFC7591Config() && getOA2SE().getCmConfigs().getRFC7591Config().enabled) && getOA2SE().getCmConfigs().isEnabled()) {
-                throw new IllegalAccessError("Error: RFC 7591 not supported on this server. Request rejected.");
+                throw new IllegalAccessError("RFC 7591 not supported on this server. Request rejected.");
             }
             // The super class rejects anything that does not have an encoding type of
             // application/x-www-form-urlencoded
@@ -631,7 +631,7 @@ public class OIDCCMServlet extends EnvServlet {
             // TODO Probably should parse the encoding type. 'application/json; charset=UTF-8' would be standard.
             if (!httpServletRequest.getContentType().contains("application/json")) {
                 httpServletResponse.setStatus(HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE);
-                throw new ServletException("Error: Unsupported encoding of \"" + httpServletRequest.getContentType() + "\" for body of POST. Request rejected.");
+                throw new ServletException("Unsupported encoding of \"" + httpServletRequest.getContentType() + "\" for body of POST. Request rejected.");
             }
             // delegates to the doIt method.
             doIt(httpServletRequest, httpServletResponse);
@@ -665,22 +665,22 @@ public class OIDCCMServlet extends EnvServlet {
         // need to verify that this is an admin client.
         Identifier acID = BasicIdentifier.newID(credentials[OA2HeaderUtils.ID_INDEX]);
         if (!getOA2SE().getAdminClientStore().containsKey(acID)) {
-            throw new UnknownClientException("Error: the given id of \"" + acID + "\" is not recognized as an admin client.");
+            throw new UnknownClientException("the given id of \"" + acID + "\" is not recognized as an admin client.");
         }
         AdminClient adminClient = getOA2SE().getAdminClientStore().get(acID);
         MetaDebugUtil adminDebugger = MyProxyDelegationServlet.createDebugger(adminClient);
         String adminSecret = credentials[OA2HeaderUtils.SECRET_INDEX];
         if (adminSecret == null || adminSecret.isEmpty()) {
-            throw new WrongPasswordException("Error: missing secret.");
+            throw new WrongPasswordException("missing secret.");
         }
         if (!getOA2SE().getClientApprovalStore().isApproved(acID)) {
             adminDebugger.trace(this, "Admin client \"" + acID + "\" is not approved.");
-            throw new UnapprovedClientException("error: This admin client has not been approved.", null);
+            throw new UnapprovedClientException("this admin client has not been approved.", null);
         }
         String hashedSecret = DigestUtils.sha1Hex(adminSecret);
         if (!adminClient.getSecret().equals(hashedSecret)) {
             adminDebugger.trace(this, "Admin client \"" + acID + "\" and secret do not match.");
-            throw new WrongPasswordException("error: client and secret do not match");
+            throw new WrongPasswordException("client and secret do not match");
         }
         return adminClient;
     }
@@ -691,22 +691,22 @@ public class OIDCCMServlet extends EnvServlet {
         // need to verify that this is an admin client.
         Identifier clientID = BasicIdentifier.newID(credentials[OA2HeaderUtils.ID_INDEX]);
         if (!getOA2SE().getClientStore().containsKey(clientID)) {
-            throw new GeneralException("Error: the given id of \"" + clientID + "\" is not recognized as a  client.");
+            throw new GeneralException("the given id of \"" + clientID + "\" is not recognized as a  client.");
         }
         OA2Client oa2Client = (OA2Client) getOA2SE().getClientStore().get(clientID);
         MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(oa2Client);
         String clientSecret = credentials[OA2HeaderUtils.SECRET_INDEX];
         if (clientSecret == null || clientSecret.isEmpty()) {
-            throw new GeneralException("Error: missing secret.");
+            throw new GeneralException("missing secret.");
         }
         if (!getOA2SE().getClientApprovalStore().isApproved(clientID)) {
             debugger.trace(this, "Client \"" + clientID + "\" is not approved.");
-            throw new UnapprovedClientException("error: This client has not been approved.", oa2Client);
+            throw new UnapprovedClientException("this client has not been approved.", oa2Client);
         }
         String hashedSecret = DigestUtils.sha1Hex(clientSecret);
         if (!oa2Client.getSecret().equals(hashedSecret)) {
             debugger.trace(this, "Client \"" + clientID + "\" and secret do not match.");
-            throw new GeneralException("error: client and secret do not match");
+            throw new GeneralException("client and secret do not match");
         }
         return oa2Client;
     }
@@ -762,13 +762,13 @@ public class OIDCCMServlet extends EnvServlet {
         JSON rawJSON = getPayload(httpServletRequest, debugger);
 
         if ((!isAnonymous) && adminClient.getMaxClients() < getOA2SE().getPermissionStore().getClientCount(adminClient.getIdentifier())) {
-            debugger.info(this, "Error: Max client count of " + adminClient.getMaxClients() + " exceeded.");
-            throw new GeneralException("Error: Max client count of " + adminClient.getMaxClients() + " exceeded.");
+            debugger.info(this, " Max client count of " + adminClient.getMaxClients() + " exceeded.");
+            throw new GeneralException("Max client count of " + adminClient.getMaxClients() + " exceeded.");
         }
         debugger.trace(this, rawJSON.toString());
         if (rawJSON.isArray()) {
-            debugger.info(this, "Error: Got a JSON array rather than a request:" + rawJSON);
-            throw new IllegalArgumentException("Error: incorrect argument. Not a valid JSON request");
+            debugger.info(this, " Got a JSON array rather than a request:" + rawJSON);
+            throw new IllegalArgumentException("incorrect argument. Not a valid JSON request");
         }
         JSONObject jsonRequest = (JSONObject) rawJSON; // now we know it is a JSON Object
         OA2Client template = null;
@@ -922,7 +922,7 @@ public class OIDCCMServlet extends EnvServlet {
         }
         br.close();
         if (stringBuffer.length() == 0) {
-            throw new IllegalArgumentException("Error: There is no content for this request");
+            throw new IllegalArgumentException("There is no content for this request");
         }
         return JSONSerializer.toJSON(stringBuffer.toString());
     }
@@ -983,14 +983,14 @@ public class OIDCCMServlet extends EnvServlet {
             if (!(z instanceof String)) {
                 throw new OA2JSONException(
                         OA2Errors.INVALID_REQUEST,
-                        "Error: illegal redirect uri \"" + z + "\" ",
+                        " illegal redirect uri \"" + z + "\" ",
                         HttpStatus.SC_BAD_REQUEST,
                         null, client);
             }
             if (z.toString().contains("*")) {
                 throw new OA2JSONException(
                         OA2Errors.INVALID_REQUEST,
-                        "Error: wildcards not allows in redirect uri \"" + z + "\" ",
+                        "wildcards not allows in redirect uri \"" + z + "\" ",
                         HttpStatus.SC_BAD_REQUEST, null, client);
             }
         }
@@ -1000,7 +1000,7 @@ public class OIDCCMServlet extends EnvServlet {
         if (!jsonRequest.containsKey(OIDCCMConstants.CLIENT_NAME)) {
             throw new OA2JSONException(
                     OA2Errors.INVALID_REQUEST,
-                    "Error: no client name",
+                    "no client name",
                     HttpStatus.SC_BAD_REQUEST,
                     null, client);
         }

@@ -32,10 +32,10 @@ public abstract class TokenHandlerMethod implements QDLFunction {
 
     protected OA2State checkState(State state){
         if(state == null){
-            throw new IllegalStateException("Error: No state was found");
+            throw new IllegalStateException("No state was found");
         }
         if(!(state instanceof OA2State)){
-            throw new IllegalArgumentException("Error: An instance of OA2State was expected, but one of type \"" + state.getClass().getCanonicalName() + "\" was found.");
+            throw new IllegalArgumentException(" An instance of OA2State was expected, but one of type \"" + state.getClass().getCanonicalName() + "\" was found.");
         }
         return (OA2State)state;
     }
@@ -83,7 +83,7 @@ public abstract class TokenHandlerMethod implements QDLFunction {
         if (objects[argIndex] instanceof QDLStem) {
             return (QDLStem) objects[argIndex];
         }
-        throw new IllegalArgumentException("Error: " + name + " requires a stem argument #" + argIndex);
+        throw new IllegalArgumentException(name + " requires a stem argument #" + argIndex);
     }
 
     protected OA2ServiceTransaction getTransaction() {

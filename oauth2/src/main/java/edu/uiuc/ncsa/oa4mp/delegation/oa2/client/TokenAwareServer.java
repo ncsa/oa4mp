@@ -56,7 +56,7 @@ public abstract class TokenAwareServer extends ASImpl {
     public JSONWebKeys getJsonWebKeys() {
         // Fix for OAUTH-164, id_token support follows.
         if (wellKnown == null) {
-            throw new NFWException("Error: no well-known URI has been configured. Please add this to the configuration file.");
+            throw new NFWException("no well-known URI has been configured. Please add this to the configuration file.");
         }
         return JWTUtil.getJsonWebKeys(getServiceClient(), wellKnown);
     }
@@ -70,7 +70,7 @@ public abstract class TokenAwareServer extends ASImpl {
         if (response.startsWith("<") || response.startsWith("\n")) {
             // this is actually HTML
             //    System.out.println(getClass().getSimpleName() + ".getAccessToken: response from server is " + response);
-            throw new GeneralException("Error: Response from server was html: " + response);
+            throw new GeneralException("response from server was html: " + response);
         }
         JSONObject jsonObject = null;
         try {
@@ -79,10 +79,10 @@ public abstract class TokenAwareServer extends ASImpl {
             // it is at this point we may not have a JSON object because the request failed and the server returned an
             // error string. Throw an exception, print the response.
             DebugUtil.trace(this, "Response from server was not a JSON Object: " + response);
-            throw new GeneralException("Error: The server encountered an error and the response was not JSON:\n\"" + response + "\"", t);
+            throw new GeneralException("the server encountered an error and the response was not JSON:\n\"" + response + "\"", t);
         }
         if (!jsonObject.getString(TOKEN_TYPE).equals(BEARER_TOKEN_TYPE)) {
-            throw new GeneralException("Error: incorrect token type");
+            throw new GeneralException("incorrect token type");
         }
         return jsonObject;
     }
@@ -103,7 +103,7 @@ public abstract class TokenAwareServer extends ASImpl {
 
         JSONObject claims;
         if (!jsonObject.containsKey(ID_TOKEN)) {
-            throw new GeneralException("Error: ID Token not found.");
+            throw new GeneralException("ID Token not found.");
         }
         claims = JWTUtil.verifyAndReadJWT(jsonObject.getString(ID_TOKEN), keys);
         if (claims.isNullObject()) {
@@ -113,14 +113,14 @@ public abstract class TokenAwareServer extends ASImpl {
         }
         // Now we have to check claims.
         if(!claims.containsKey(AUDIENCE)){
-            throw new GeneralException("Error: ID Token missing " + AUDIENCE + " claim for \"" + atRequest.getClient().getIdentifierString() + "\"");
+            throw new GeneralException(" ID Token missing " + AUDIENCE + " claim for \"" + atRequest.getClient().getIdentifierString() + "\"");
         }
         if (!claims.getString(AUDIENCE).equals(atRequest.getClient().getIdentifierString())) {
-            throw new GeneralException("Error: ID Token audience is incorrect. Expected \"" + claims.getString(AUDIENCE) + "\", got \"" + atRequest.getClient().getIdentifierString() + "\"");
+            throw new GeneralException(" ID Token audience is incorrect. Expected \"" + claims.getString(AUDIENCE) + "\", got \"" + atRequest.getClient().getIdentifierString() + "\"");
         }
 
         if(!claims.containsKey(ISSUER)){
-            throw new GeneralException("Error: ID Token missing " + ISSUER + " claim for \"" + atRequest.getClient().getIdentifierString() + "\"");
+            throw new GeneralException(" ID Token missing " + ISSUER + " claim for \"" + atRequest.getClient().getIdentifierString() + "\"");
         }
 
         try {
@@ -129,18 +129,18 @@ public abstract class TokenAwareServer extends ASImpl {
             if (!host.getProtocol().equals(remoteHost.getProtocol()) ||
                     !host.getHost().equals(remoteHost.getHost()) ||
                     host.getPort() != remoteHost.getPort()) {
-                throw new GeneralException("Error: ID Token issuer is incorrect. Got \"" + remoteHost + "\", expected \"" + host + "\"");
+                throw new GeneralException(" ID Token issuer is incorrect. Got \"" + remoteHost + "\", expected \"" + host + "\"");
             }
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
 
         if (!claims.containsKey(EXPIRATION)) {
-            throw new GeneralException("Error: ID Token claims failed to have required expiration");
+            throw new GeneralException(" ID Token claims failed to have required expiration");
         }
         long exp = Long.parseLong(claims.getString(EXPIRATION)) * 1000L; // convert to ms.
         if (exp <= System.currentTimeMillis()) {
-            throw new GeneralException("Error: ID Token expired claims.");
+            throw new GeneralException(" ID Token expired claims.");
         }
         return TokenFactory.createIDT(jsonObject.getString(ID_TOKEN));
     }

@@ -208,7 +208,7 @@ public class TransactionStemMC<V extends OA2ServiceTransaction> extends StemConv
             try {
                 stem.put(kk().cert(), myCert.getX509CertificatesPEM());
             } catch (CertificateEncodingException e) {
-                throw new IllegalArgumentException("Error: could not encode certificate", e);
+                throw new IllegalArgumentException("could not encode certificate", e);
             }
 
         }

@@ -52,14 +52,14 @@ public class ScopeTemplateQDLUtil {
             }
 
             if (!(objects[0] instanceof QDLStem)) {
-                throw new IllegalArgumentException("Error: The first argument (for the computed scopes) must be a stem.");
+                throw new IllegalArgumentException(" The first argument (for the computed scopes) must be a stem.");
             }
             QDLStem allowedStem = (QDLStem) objects[0];
             if(allowedStem.isEmpty()){
                 return new QDLStem();
             }
             if (!(objects[1] instanceof QDLStem)) {
-                throw new IllegalArgumentException("Error: The second argument (for the requested scopes) must be a stem.");
+                throw new IllegalArgumentException(" The second argument (for the requested scopes) must be a stem.");
             }
 
             QDLStem requestedStem = (QDLStem) objects[1];
@@ -67,7 +67,7 @@ public class ScopeTemplateQDLUtil {
                 return new QDLStem();
             }
             if (!(objects[2] instanceof Boolean)) {
-                throw new IllegalArgumentException("Error: The third argument (if the operation queries available scopes) must be a boolean.");
+                throw new IllegalArgumentException(" The third argument (if the operation queries available scopes) must be a boolean.");
             }
 
             Boolean isQuery = (Boolean) objects[2];

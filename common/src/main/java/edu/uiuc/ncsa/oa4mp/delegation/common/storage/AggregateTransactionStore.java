@@ -64,11 +64,11 @@ public class AggregateTransactionStore<V extends TransactionStore> extends Aggre
 
     @Override
     public XMLConverter getXMLConverter() {
-        throw new NotImplementedException("Error: there is no single converter possible for an aggregate store. Method not implemented");
+        throw new NotImplementedException(" there is no single converter possible for an aggregate store. Method not implemented");
     }
 
     @Override
     public MapConverter getMapConverter() {
-        throw new NotImplementedException("Error: there is no single converter possible for an aggregate store. Method not implemented");
+        throw new NotImplementedException(" there is no single converter possible for an aggregate store. Method not implemented");
     }
 }

@@ -167,17 +167,17 @@ public  class TransactionMemoryStore<V extends BasicTransaction> extends MemoryS
     }
     @Override
     public XMLConverter<V> getXMLConverter() {
-        throw new NotImplementedException("Error: Method not implemented");
+        throw new NotImplementedException(" Method not implemented");
     }
 
     @Override
     public MapConverter getMapConverter() {
-        throw new NotImplementedException("Error: This is not yet implemented for memory stores");
+        throw new NotImplementedException(" This is not yet implemented for memory stores");
     }
 
     @Override
     public List<V> search(String key, String condition, boolean isRegEx, List<String> attr) {
-        throw new NotImplementedException("Error: This is not yet implemented for memory stores");
+        throw new NotImplementedException(" This is not yet implemented for memory stores");
 
     }
 }

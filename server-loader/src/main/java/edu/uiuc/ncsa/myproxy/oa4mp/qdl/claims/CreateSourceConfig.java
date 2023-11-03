@@ -32,11 +32,11 @@ public class CreateSourceConfig implements QDLFunction, CSConstants {
     @Override
     public Object evaluate(Object[] objects, State state) {
         if (objects == null || objects.length == 0) {
-            throw new IllegalArgumentException("Error:" + getName() + " requires one argument");
+            throw new IllegalArgumentException(getName() + " requires one argument");
         }
 
         if (!(objects[0] instanceof QDLStem)) {
-            throw new IllegalAccessException("Error:" + getName() + " requires a stem variable as its argument.");
+            throw new IllegalAccessException(getName() + " requires a stem variable as its argument.");
         }
         QDLStem arg = (QDLStem) objects[0];
         if (!arg.containsKey(CS_DEFAULT_TYPE)) {

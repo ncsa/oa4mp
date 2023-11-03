@@ -352,7 +352,7 @@ public class JWTRunner {
 
         }
 
-        throw new NotImplementedException("Error: other script runtime reponses not implemented yet.");
+        throw new NotImplementedException(" other script runtime reponses not implemented yet.");
     }
 
     protected void doScript(String phase) throws Throwable {

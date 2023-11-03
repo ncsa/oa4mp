@@ -87,7 +87,7 @@ public class BasicRefreshTokenHandler extends AbstractPayloadHandler implements 
             return new RefreshTokenImpl(URI.create(v));
         }
         if (!getPayload().containsKey(JWT_ID)) {
-            throw new IllegalStateException("Error: no " + JWT_ID + ". Cannot create refresh token");
+            throw new IllegalStateException("no " + JWT_ID + ". Cannot create refresh token");
         }
         try {
             if (key == null) {

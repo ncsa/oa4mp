@@ -95,7 +95,7 @@ public class StoreFacade implements QDLModuleMetaClass {
 
     protected void checkInit() {
         if (!initCalled) {
-            throw new IllegalStateException("Error: You must call init before calling this function");
+            throw new IllegalStateException(" You must call init before calling this function");
         }
     }
 
@@ -147,7 +147,7 @@ public class StoreFacade implements QDLModuleMetaClass {
             boolean verboseOn = false;
             if (objects.length == 1) {
                 if (!(objects[0] instanceof QDLStem)) {
-                    throw new IllegalArgumentException("Error: A single argument must be a stem.");
+                    throw new IllegalArgumentException(" A single argument must be a stem.");
                 }
                 QDLStem stem = (QDLStem) objects[0];
                 file = stem.getString(FILE_ARG);
@@ -161,7 +161,7 @@ public class StoreFacade implements QDLModuleMetaClass {
             if (objects.length == 3) {
                 for (int j = 0; j < objects.length; j++) {
                     if (!(objects[j] instanceof String)) {
-                        throw new IllegalArgumentException("Error: argument " + j + " must be a string.");
+                        throw new IllegalArgumentException(" argument " + j + " must be a string.");
                     }
                 }
                 file = (String) objects[0];
@@ -170,7 +170,7 @@ public class StoreFacade implements QDLModuleMetaClass {
             }
             // Implicit case of zero args is here too.
             if (isTrivial(file) || isTrivial(cfgName) || isTrivial(storeType)) {
-                throw new IllegalArgumentException("Error: Missing argument");
+                throw new IllegalArgumentException(" Missing argument");
             }
 
             doSetup(verboseOn);
@@ -364,13 +364,13 @@ public class StoreFacade implements QDLModuleMetaClass {
         @Override
         public Object evaluate(Object[] objects, State state) {
             if (objects.length != 1) {
-                throw new IllegalArgumentException("Error: " + getName() + " requires a single argument.");
+                throw new IllegalArgumentException(getName() + " requires a single argument.");
             }
             if ((objects[0] instanceof String)) {
                 return getStoreAccessor().fromXML((String) objects[0]);
             }
             if (!(objects[0] instanceof QDLStem)) {
-                throw new IllegalArgumentException("Error: " + getName() + " requires a string argument or stem of them,.");
+                throw new IllegalArgumentException(getName() + " requires a string argument or stem of them,.");
             }
             QDLStem arg = (QDLStem) objects[0];
             QDLStem out = new QDLStem();
@@ -425,7 +425,7 @@ public class StoreFacade implements QDLModuleMetaClass {
                 if (objects[0] instanceof String) {
                     return getStoreAccessor().create((String) objects[0]);
                 }
-                throw new IllegalArgumentException("Error: The argument must be a string identifier.");
+                throw new IllegalArgumentException(" The argument must be a string identifier.");
             }
             return getStoreAccessor().create(null);
         }
@@ -495,7 +495,7 @@ public class StoreFacade implements QDLModuleMetaClass {
         public Object evaluate(Object[] objects, State state) {
             checkInit();
             if (!(objects[0] instanceof QDLStem)) {
-                throw new IllegalArgumentException("Error: The argument must be a stem variable");
+                throw new IllegalArgumentException(" The argument must be a stem variable");
             }
             QDLStem QDLStem = (QDLStem) objects[0];
             List<Boolean> out = getStoreAccessor().saveOrUpdate(QDLStem, false);
@@ -539,7 +539,7 @@ public class StoreFacade implements QDLModuleMetaClass {
         public Object evaluate(Object[] objects, State state) {
             checkInit();
             if (!(objects[0] instanceof QDLStem)) {
-                throw new IllegalArgumentException("Error: The argument must be a stem variable");
+                throw new IllegalArgumentException(" The argument must be a stem variable");
             }
             QDLStem QDLStem = (QDLStem) objects[0];
             List<Boolean> out = getStoreAccessor().saveOrUpdate(QDLStem, true);
@@ -700,7 +700,7 @@ public class StoreFacade implements QDLModuleMetaClass {
         public Object evaluate(Object[] objects, State state) {
             checkInit();
             if (objects.length != 1) {
-                throw new IllegalArgumentException("Error: You must specify an identifier for " + REMOVE_NAME);
+                throw new IllegalArgumentException(" You must specify an identifier for " + REMOVE_NAME);
             }
             String id = null;
             if (objects[0] instanceof String) {
@@ -711,11 +711,11 @@ public class StoreFacade implements QDLModuleMetaClass {
                 if (QDLStem.containsKey(getStoreAccessor().getStoreKeys().identifier())) {
                     id = (String) QDLStem.get(getStoreAccessor().getStoreKeys().identifier());
                 } else {
-                    throw new IllegalArgumentException("Error: The stem does not contain the key \"" + getStoreAccessor().getStoreKeys().identifier() + "\", hence there is no unique identifier given.");
+                    throw new IllegalArgumentException(" The stem does not contain the key \"" + getStoreAccessor().getStoreKeys().identifier() + "\", hence there is no unique identifier given.");
                 }
             }
             if (isTrivial(id)) {
-                throw new IllegalArgumentException("Error: argument must be a string for " + REMOVE_NAME);
+                throw new IllegalArgumentException(" argument must be a string for " + REMOVE_NAME);
             }
 
                 return getStoreAccessor().remove(BasicIdentifier.newID(id));
@@ -995,7 +995,7 @@ public class StoreFacade implements QDLModuleMetaClass {
             doxx.add("This returns a stem of booleans with a true for each removed item and a false otherwise.");
             doxx.add("If you send things that are not version ids, they are ignored.");
             doxx.add("E.g.");
-            doxx.add("   " + getName() + "(true, false); // not a validway to identify a version");
+            doxx.add(getName() + "(true, false); // not a validway to identify a version");
             doxx.add("[false]");
             doxx.add("Meaning nothing was done. Note also that a true means that such a thing does not");
             doxx.add("exist in the store any longer, so a true means the entry could");

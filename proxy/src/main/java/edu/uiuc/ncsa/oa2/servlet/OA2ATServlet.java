@@ -1497,7 +1497,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             logOK(request); // CIL-1722
             return;
         }
-        warn("Error: grant type +\"" + grantType + "\" was not recognized. Request rejected.");
+        warn("grant type +\"" + grantType + "\" was not recognized. Request rejected.");
         throw new OA2ATException(OA2Errors.REQUEST_NOT_SUPPORTED,
                 "unsupported grant type \"" + grantType + "\"");
     }
@@ -1893,8 +1893,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         // request always sends the RT. This recovers the transactions from the TX record if needed.
         try {
             oldRT = OA2TokenUtils.getRT(rawRefreshToken, oa2SE, keys, debugger);
-        } catch (OA2ATException oa2ATException) {
+        } catch (OA2GeneralError oa2ATException) {
             info(oa2ATException.getError() + " in refresh for client " + client.getIdentifierString());
+            oa2ATException.setClient(client);
             throw oa2ATException;
         }
         OA2ServiceTransaction t = null;
@@ -1905,9 +1906,12 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             if (!t.getClient().getIdentifier().equals(client.getIdentifier())) {
                 debugger.trace(this, "transaction lists client id \"" + t.getClient().getIdentifierString()
                         + "\", but the client in the request is \"" + client.getIdentifierString() + "\". Request rejected.");
-                throw new OA2ATException(OA2Errors.INVALID_GRANT, // fixes https://github.com/ncsa/oa4mp/issues/119
+                OA2ATException x=new OA2ATException(OA2Errors.INVALID_GRANT, // fixes https://github.com/ncsa/oa4mp/issues/119
                         "wrong client",
                         HttpStatus.SC_BAD_REQUEST, null);
+                    x.setForensicMessage("expected client \""+ client.getIdentifierString() + "\" but got client \"" + t.getClient().getIdentifierString()+"\"");
+                    x.setClient(client);
+                    throw x;
 
             }
         } catch (TransactionNotFoundException e) {
@@ -1915,8 +1919,11 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             if (t == null) {
                 String message = "The refresh token \"" + oldRT.getToken() + "\" for client " + client.getIdentifierString() + " is not expired, but also was not found.";
                 debugger.info(this, message);
-                throw new OA2ATException(OA2Errors.INVALID_TOKEN, "The token \"" + oldRT.getToken() + "\" could not be associated with a pending flow",
+                OA2ATException x = new OA2ATException(OA2Errors.INVALID_TOKEN, "The token could not be associated with a pending flow",
                         HttpStatus.SC_BAD_REQUEST, null);
+                x.setClient(client);
+                x.setForensicMessage("token cannot be associated witH a pending flow:" + oldRT);
+                throw x;
             }
             oldTXRT = (TXRecord) getOA2SE().getTxStore().get(BasicIdentifier.newID(oldRT.getJti()));
         }
@@ -1934,9 +1941,12 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
 
         if (t == null || !t.isRefreshTokenValid()) {
             debugger.trace(this, "Missing refresh token.");
-            throw new OA2ATException(OA2Errors.INVALID_REQUEST,
+            OA2ATException x= new OA2ATException(OA2Errors.INVALID_REQUEST,
                     "The refresh token is no longer valid.",
                     t.getRequestState());
+            x.setForensicMessage("the token is invalid:" + oldRT);
+            x.setClient(client);
+            throw x;
         }
         if (client.hasExtendedAttributeSupport()) {
             ExtendedParameters xp = new ExtendedParameters();
@@ -2189,7 +2199,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                     "No pending transaction found for id=" + basicIdentifier);
         }
         if (!transaction.isAuthGrantValid()) {
-            String msg = "Error: Attempt to use invalid authorization code \"" + basicIdentifier + "\".  Request rejected.";
+            String msg = "Attempt to use invalid authorization code \"" + basicIdentifier + "\".  Request rejected.";
             warn(msg);
             throw new OA2ATException(
                     OA2Errors.INVALID_REQUEST,

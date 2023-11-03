@@ -54,7 +54,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
     public LDAPClaimsSource(LDAPConfiguration ldapConfiguration, MyLoggingFacade myLogger) {
         super();
         if (ldapConfiguration == null) {
-            throw new LDAPException("Error: null ldap config");
+            throw new LDAPException("null ldap config");
         }
         setConfiguration(ldapConfiguration);
         this.myLogger = myLogger;
@@ -69,7 +69,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
     public LDAPClaimsSource(OA2SE oa2SE) {
         super(oa2SE);
         if (oa2SE == null) {
-            throw new LDAPException("Error: null service env");
+            throw new LDAPException("null service env");
         }
         this.myLogger = oa2SE.getMyLogger();
         loggingEnabled = (this.myLogger != null);
@@ -104,7 +104,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
             return transaction.getUsername();
         }
         if (!claims.containsKey(getLDAPCfg().getSearchNameKey()) || claims.get(getLDAPCfg().getSearchNameKey()) == null) {
-            String message = "Error: no recognized search name key was found in the claims for config with id=" + getLDAPCfg().getId() +
+            String message = "no recognized search name key was found in the claims for config with id=" + getLDAPCfg().getId() +
                     ". Requested was \"" + getLDAPCfg().getSearchNameKey() + "\"";
             DebugUtil.trace(this, message);
             throw new LDAPException(message);
@@ -357,7 +357,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
             // CIL-1306: This is a little tricky. An LDAP configuration can have several alternate
             // hosts to try, so failures are expected and considered benign. Only if the very last one
             // fails is it considered a failure. This tries to construct a more helpful message.
-            throw new LDAPException("Error: Could not create the LDAP context on " + (new Date()) +
+            throw new LDAPException("could not create the LDAP context on " + (new Date()) +
                     " server=" + getLDAPCfg().getServer() + ", base=" + getLDAPCfg().getSearchBase());
         }
 
@@ -657,7 +657,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
 
         String groupName = attribute.toString().substring(id.length()).trim();
         if (groupName.isEmpty()) {
-            throw new NFWException("Error: The group name somehow was empty. This implies the LDAP entry has changed or is incorrect");
+            throw new NFWException("The group name somehow was empty. This implies the LDAP entry has changed or is incorrect");
         }
         GroupElement g = null;
         if (gid == -1) {

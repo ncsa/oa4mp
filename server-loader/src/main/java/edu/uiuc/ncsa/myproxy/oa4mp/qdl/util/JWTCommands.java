@@ -216,7 +216,7 @@ public class JWTCommands implements QDLModuleMetaClass {
                 if (e instanceof RuntimeException) {
                     throw (RuntimeException) e;
                 }
-                throw new QDLException("Error: Could not create JSON web keys" + e.getMessage(), e);
+                throw new QDLException(" Could not create JSON web keys" + e.getMessage(), e);
             }
         }
 
@@ -286,7 +286,7 @@ public class JWTCommands implements QDLModuleMetaClass {
         @Override
         public Object evaluate(Object[] objects, State state) {
             if (objects.length != 1) {
-                throw new IllegalArgumentException("Error:" + getName() + " requires a file name");
+                throw new IllegalArgumentException(getName() + " requires a file name");
             }
             if (!(objects[0] instanceof String)) {
                 throw new IllegalArgumentException(getName() + " requires a string as its argument");
@@ -327,10 +327,10 @@ public class JWTCommands implements QDLModuleMetaClass {
         @Override
         public Object evaluate(Object[] objects, State state) {
             if (objects.length != 1) {
-                throw new IllegalArgumentException("Error: " + getName() + " requires a file name.");
+                throw new IllegalArgumentException(getName() + " requires a file name.");
             }
             if (jwks == null || jwks.isEmpty()) {
-                throw new IllegalStateException("Error: No keys found to save.");
+                throw new IllegalStateException(" No keys found to save.");
             }
             if (!Constant.isString(objects[0])) {
                 throw new IllegalArgumentException(getName() + " requires a string as its argument");
@@ -338,7 +338,7 @@ public class JWTCommands implements QDLModuleMetaClass {
             try {
                 writeWebkeys(state, getJsonWebKeyUtil().toJSON(jwks), (String) objects[0]);
             } catch (Throwable e) {
-                throw new QDLException("Error: could not save keys to " + objects[0], e);
+                throw new QDLException(" could not save keys to " + objects[0], e);
             }
 
             return true;
@@ -378,19 +378,19 @@ public class JWTCommands implements QDLModuleMetaClass {
                     break;
                 case 1:
                     if (!(objects[0] instanceof Long)) {
-                        throw new IllegalArgumentException("Error: The first argument must be an integer");
+                        throw new IllegalArgumentException(" The first argument must be an integer");
                     }
                     Long lCount = (Long) objects[0];
                     count = lCount.intValue();
                     break;
                 case 2:
                     if (!(objects[0] instanceof Long)) {
-                        throw new IllegalArgumentException("Error: The first argument must be an integer");
+                        throw new IllegalArgumentException(" The first argument must be an integer");
                     }
                     lCount = (Long) objects[0];
                     count = lCount.intValue();
                     if (!(objects[1] instanceof Long)) {
-                        throw new IllegalArgumentException("Error: The second argument must be an integer");
+                        throw new IllegalArgumentException(" The second argument must be an integer");
                     }
                     Long lLength = (Long) objects[1];
                     length = lLength.intValue();
@@ -467,7 +467,7 @@ public class JWTCommands implements QDLModuleMetaClass {
             // so we have one.
             String newId = objects[0].toString();
             if (!jwks.containsKey(newId)) {
-                throw new IllegalArgumentException("Error: There is no such key in the collection.");
+                throw new IllegalArgumentException(" There is no such key in the collection.");
             }
             String oldID = jwks.getDefaultKeyID();
             jwks.setDefaultKeyID(newId);
@@ -507,14 +507,14 @@ public class JWTCommands implements QDLModuleMetaClass {
                 jwks = ((OA2State) state).getJsonWebKeys();
             }
             if (jwks == null || jwks.isEmpty()) {
-                throw new IllegalStateException("Error: no keys loaded.");
+                throw new IllegalStateException(" no keys loaded.");
             }
             String kid = null;
             if (objects.length == 2) {
                 kid = objects[1].toString();
             } else {
                 if (!jwks.hasDefaultKey()) {
-                    throw new IllegalStateException("Error: no default key.");
+                    throw new IllegalStateException(" no default key.");
                 }
                 kid = jwks.getDefaultKeyID();
 
@@ -567,7 +567,7 @@ public class JWTCommands implements QDLModuleMetaClass {
         @Override
         public Object evaluate(Object[] objects, State state) {
             if (jwks == null || jwks.isEmpty()) {
-                throw new IllegalStateException("Error: No keys have been set.");
+                throw new IllegalStateException(" No keys have been set.");
             }
             QDLStem QDLStem = new QDLStem();
             if (jwks.hasDefaultKey()) {
@@ -609,14 +609,14 @@ public class JWTCommands implements QDLModuleMetaClass {
         @Override
         public Object evaluate(Object[] objects, State state) {
             if (jwks == null || jwks.isEmpty()) {
-                throw new IllegalStateException("Error: No keys have been set.");
+                throw new IllegalStateException(" No keys have been set.");
             }
             URI well_known = null;
             if (objects.length == 2) {
                 try {
                     well_known = URI.create(objects[1].toString());
                 } catch (Throwable t) {
-                    throw new IllegalArgumentException("Error: The second argument \"" + objects[1] + "\" must be a valid URI.");
+                    throw new IllegalArgumentException(" The second argument \"" + objects[1] + "\" must be a valid URI.");
                 }
             }
             String token = objects[0].toString();

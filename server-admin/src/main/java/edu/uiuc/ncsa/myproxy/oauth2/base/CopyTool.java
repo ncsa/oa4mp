@@ -98,7 +98,7 @@ public  class CopyTool extends CLITool {
         try {
             loader = getLoader();
         } catch (Exception e) {
-            throw new GeneralException("Error: Could not get loader", e);
+            throw new GeneralException(" Could not get loader", e);
         }
         //new CILogonConfigurationLoader(node, getMyLogger());
         ServiceEnvironmentImpl env = (ServiceEnvironmentImpl) loader.load();

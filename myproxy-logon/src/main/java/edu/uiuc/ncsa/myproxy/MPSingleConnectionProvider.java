@@ -127,7 +127,7 @@ public class MPSingleConnectionProvider<T extends MyProxyConnectable> implements
                     myProxyLogon.disconnect();
                 }
             } catch (Throwable e) {
-                throw new ConnectionException("Error: disconnecting from myproxy", e);
+                throw new ConnectionException(" disconnecting from myproxy", e);
             }
 
         }
@@ -138,7 +138,7 @@ public class MPSingleConnectionProvider<T extends MyProxyConnectable> implements
                 myProxyLogon.connect();
                 myProxyLogon.logon();
             } catch (Throwable e) {
-                throw new ConnectionException("Error: connecting to myproxy", e);
+                throw new ConnectionException(" connecting to myproxy", e);
             }
         }
 
@@ -162,7 +162,7 @@ public class MPSingleConnectionProvider<T extends MyProxyConnectable> implements
                 certList.addAll(myProxyLogon.getCertificates());
                 return certList;
             } catch (Throwable e) {
-                throw new GeneralException("Error: getting certs from myproxy \"" + e.getMessage() + "\"", e);
+                throw new GeneralException(" getting certs from myproxy \"" + e.getMessage() + "\"", e);
             }
 
         }

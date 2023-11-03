@@ -32,7 +32,7 @@ public class CLC implements QDLModuleMetaClass {
 
     protected void checkInit() {
         if ((clcCommands == null) || !initCalled) {
-            throw new IllegalStateException("Error: You must call " + INIT_NAME + " before calling this function");
+            throw new IllegalStateException("you must call " + INIT_NAME + " before calling this function");
         }
     }
 

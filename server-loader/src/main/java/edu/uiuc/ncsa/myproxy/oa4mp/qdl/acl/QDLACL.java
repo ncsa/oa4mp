@@ -122,7 +122,7 @@ public class QDLACL implements QDLModuleMetaClass {
             }
             if (!isAdminID && !isClientID) {
                 if (failOnBadIds) {
-                    throw new QDLIllegalAccessException("Error: There is a no such client with id '" + identifier.toString() + "'. Access denied.");
+                    throw new QDLIllegalAccessException(" There is a no such client with id '" + identifier.toString() + "'. Access denied.");
                 } else {
                     badIds.add(identifier.toString());
                 }
@@ -204,7 +204,7 @@ public class QDLACL implements QDLModuleMetaClass {
         @Override
         public Object evaluate(Object[] objects, State state) {
             if (!(state instanceof OA2State)) {
-                throw new IllegalArgumentException("Error: This requires an OA2State object.");
+                throw new IllegalArgumentException(" This requires an OA2State object.");
             }
 
             OA2State oa2State = (OA2State) state;
@@ -212,16 +212,16 @@ public class QDLACL implements QDLModuleMetaClass {
 
             if (oa2State.getAclBlackList().contains(oa2State.getClientID())) {
                 // Full stop.
-                throw new QDLIllegalAccessException("Error: client '" + oa2State.getClientID() + "' does not have permission to access this resource.");
+                throw new QDLIllegalAccessException(" client '" + oa2State.getClientID() + "' does not have permission to access this resource.");
             }
             for (Identifier adminID : oa2State.getAdminIDs()) {
                 if (oa2State.getAclBlackList().contains(adminID)) {
-                    throw new QDLIllegalAccessException("Error: client '" + oa2State.getClientID() + "' does not have permission to access this resource.");
+                    throw new QDLIllegalAccessException(" client '" + oa2State.getClientID() + "' does not have permission to access this resource.");
                 }
             }
             if (oa2State.getAclList().isEmpty()) {
                 if (oa2State.isStrictACLs()) {
-                    throw new QDLIllegalAccessException("Error: client '" + oa2State.getClientID() + "' does not have permission to access this resource.");
+                    throw new QDLIllegalAccessException(" client '" + oa2State.getClientID() + "' does not have permission to access this resource.");
                 }
                 return Boolean.FALSE;
             }

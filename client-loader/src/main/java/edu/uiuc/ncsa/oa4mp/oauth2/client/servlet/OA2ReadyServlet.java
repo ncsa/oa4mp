@@ -66,7 +66,7 @@ public class OA2ReadyServlet extends ClientServlet {
         String state = request.getParameter(OA2Constants.STATE);
         if (token == null) {
             warn("2.a.1 The token is " + (token == null ? "null" : token) + ".");
-            GeneralException ge = new GeneralException("Error: This servlet requires parameters for the token and possibly verifier.");
+            GeneralException ge = new GeneralException(" This servlet requires parameters for the token and possibly verifier.");
             request.setAttribute("exception", ge);
             JSPUtil.fwd(request, response, getCE().getErrorPagePath());
             return;
@@ -96,7 +96,7 @@ public class OA2ReadyServlet extends ClientServlet {
         String certXMessage = null;
         if (identifier == null) {
             // Since this is a demo servlet, we don't blow up if there is no identifier found, just can't save anything.
-            String msg = "Error: no cookie found. Cannot save certificates";
+            String msg = " no cookie found. Cannot save certificates";
             warn(msg);
             debug("No cookie found");
             //if(asset == null) asset = new OA2Asset(BasicIdentifier.newID())
@@ -119,7 +119,7 @@ public class OA2ReadyServlet extends ClientServlet {
                 // changed or replaced and the hidden field for the state (passed to the form, then passed back
                 // and therefore not stored on the server anyplace) is missing.
                 warn("The expected state from the server was \"" + asset.getState() + "\", but instead \"" + state + "\" was returned. Transaction aborted.");
-                throw new IllegalArgumentException("Error: The state returned by the server is invalid.");
+                throw new IllegalArgumentException(" The state returned by the server is invalid.");
             }
             ATResponse2 atResponse2 = oa2MPService.getAccessToken(asset, grant);
             accessToken = atResponse2.getAccessToken();
@@ -248,7 +248,7 @@ public class OA2ReadyServlet extends ClientServlet {
         info("2.b. Formatting access token.");
         String rawAT = accessToken.getToken();
         if (rawAT == null || rawAT.length() == 0) {
-            throw new NFWException("Error: no access token returned.");
+            throw new NFWException(" no access token returned.");
         }
 
         OA2ClientEnvironment oa2ce = (OA2ClientEnvironment) getEnvironment();

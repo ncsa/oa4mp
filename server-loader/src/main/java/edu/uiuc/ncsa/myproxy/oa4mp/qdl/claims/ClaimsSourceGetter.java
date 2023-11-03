@@ -51,19 +51,19 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
     @Override
     public Object evaluate(Object[] objects, State state) {
         if (objects.length < 2) {
-            throw new IllegalArgumentException("Error: " + getName() + " requires at least two arguments");
+            throw new IllegalArgumentException(getName() + " requires at least two arguments");
         }
         if (!(objects[0] instanceof QDLStem)) {
-            throw new IllegalArgumentException("Error: " + getName() + " requires a stem variable as its first argument");
+            throw new IllegalArgumentException(getName() + " requires a stem variable as its first argument");
         }
 
         QDLStem arg = (QDLStem) objects[0];
         if (objects[1] == null || !(objects[1] instanceof String)) {
-            throw new IllegalArgumentException("Error: " + getName() + " requires the name of the user as its second argument");
+            throw new IllegalArgumentException(getName() + " requires the name of the user as its second argument");
         }
         String username = (String) objects[1];
         if (!arg.containsKey(CS_DEFAULT_TYPE)) {
-            throw new IllegalStateException("Error: " + getName() + " must have the type of claim source");
+            throw new IllegalStateException(getName() + " must have the type of claim source");
         }
         QDLStem headers = null;
         if (arg.getString(CS_DEFAULT_TYPE).equals(CS_TYPE_HEADERS)) {

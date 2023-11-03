@@ -167,7 +167,7 @@ public class MyProxyServiceFacade {
         myproxy.getCredentials(derCertRequest);
         myproxy.disconnect();
         if (myproxy.getCertificates() == null || myproxy.getCertificates().isEmpty()) {
-            throw new GeneralException("Error: MyProxy did not return a certificate");
+            throw new GeneralException(" MyProxy did not return a certificate");
         }
         return myproxy.getCertificates();
 

@@ -316,7 +316,7 @@ public class TokenImpl implements NewToken {
     }
     public void oldFromJSON(JSONObject json) {
         if (!json.containsKey(TOKEN)) {
-            throw new IllegalArgumentException("Error: the json object is not a token");
+            throw new IllegalArgumentException("the json object is not a token");
         }
         jti = URI.create(json.getString(TOKEN));
         if (json.containsKey("jwt")) {

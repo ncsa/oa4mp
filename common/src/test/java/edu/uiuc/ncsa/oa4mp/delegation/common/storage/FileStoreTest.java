@@ -137,12 +137,12 @@ public class FileStoreTest extends BaseTransactionStoreTest {
 
         @Override
         public BasicTransaction getByProxyID(Identifier proxyID) {
-            throw new NotImplementedException("Error: This is not yet implemented for cache");
+            throw new NotImplementedException(" This is not yet implemented for cache");
         }
 
         @Override
         public XMLConverter getXMLConverter() {
-            throw new NotImplementedException("Error: Method not implemented");
+            throw new NotImplementedException(" Method not implemented");
         }
         public TestFileStore(File file, IdentifiableProviderImpl<BasicTransaction> btp, TestTokenForge ttf) throws IOException {
             super(new File(file, "data"), new File(file, "index"), btp, ttf, new BasicTransactionConverter(btp, ttf), true);
@@ -151,7 +151,7 @@ public class FileStoreTest extends BaseTransactionStoreTest {
 
         @Override
         public MapConverter getMapConverter() {
-            throw new NotImplementedException("Error:  Method not implemented");
+            throw new NotImplementedException("  Method not implemented");
         }
 
         @Override

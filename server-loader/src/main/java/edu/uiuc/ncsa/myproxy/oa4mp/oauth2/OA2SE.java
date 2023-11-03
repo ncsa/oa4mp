@@ -136,7 +136,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
         }
         this.maxAuthorizationGrantLifetime = maxAGLifetime;
         if (clientSecretLength < 0) {
-            throw new MyConfigurationException("Error: The client secret length (=" + clientSecretLength + ") is invalid. It must be a positive integer.");
+            throw new MyConfigurationException("The client secret length (=" + clientSecretLength + ") is invalid. It must be a positive integer.");
         }
         this.clientSecretLength = clientSecretLength;
         this.scopes = scopes;
@@ -594,7 +594,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
                     return null;
                 }
             case 2:
-                throw new NFWException("Error: too many admins for this client.");
+                throw new NFWException("too many admins for this client.");
         }
         return null;
     }

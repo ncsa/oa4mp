@@ -37,24 +37,24 @@ public class IsInGroup2 implements QDLFunction {
         // Much better checks here. Exceptions are very helpful in debugging, but hits
         // a lot of edge cases (empty list, e.g.)
         if (objects == null) {
-            //  throw new IllegalArgumentException("Error: no arguments for " + getName());
+            //  throw new IllegalArgumentException(" no arguments for " + getName());
             return Boolean.FALSE;
         }
 
         if (objects.length != 2) {
-            throw new IllegalArgumentException("Error: This function requires two arguments, a stem and a string.");
+            throw new IllegalArgumentException(" This function requires two arguments, a stem and a string.");
         }
         if (objects[0] == null || (!(objects[0] instanceof QDLStem) && !(objects[0] instanceof String))) {
-            throw new IllegalArgumentException("Error: The first argument of " + getName() + " must be a string or stem of them.");
+            throw new IllegalArgumentException(" The first argument of " + getName() + " must be a string or stem of them.");
         }
         if (objects[1] == null) {
             // only way to get a java null is to have an undefined variable.
-            throw new IllegalArgumentException("Error: Undefined second argument for " + getName());
+            throw new IllegalArgumentException(" Undefined second argument for " + getName());
         }
 
         if (!(objects[1] instanceof QDLStem)) {
             // This indicates that something wrong was passed, so flag it as a bona fide error.
-            throw new IllegalArgumentException("Error: The second argument of " + getName() + " must be a stem list of groups.");
+            throw new IllegalArgumentException(" The second argument of " + getName() + " must be a stem list of groups.");
         }
         QDLStem groups = (QDLStem) objects[1];
         if (groups.size() == 0) {

@@ -41,7 +41,7 @@ public class ClaimSourceConfigConverter implements CSConstants {
         switch (type) {
             case CS_TYPE_CODE:
                 if (!(claimsSource instanceof BasicClaimsSourceImpl)) {
-                    throw new IllegalArgumentException("Error: Custom code must extend BasicClaimSourceImpl. The class \"" +
+                    throw new IllegalArgumentException(" Custom code must extend BasicClaimSourceImpl. The class \"" +
                             claimsSource.getClass().getCanonicalName() + "\" does not.");
                 }
                 BasicClaimsSourceImpl basicClaimsSource = (BasicClaimsSourceImpl) claimsSource;

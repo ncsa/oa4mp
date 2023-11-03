@@ -447,7 +447,7 @@ public class MyProxyLogon {
             throw (GeneralSecurityException) t;
         }
 
-        throw new GeneralSecurityException("Error: " + msg, t);
+        throw new GeneralSecurityException(" " + msg, t);
     }
 
     /**
@@ -613,11 +613,11 @@ public class MyProxyLogon {
             int numCertificates = this.socketIn.read();
             if (numCertificates == -1) {
                 System.err.println("connection aborted");
-                throw new IOException("Error: connection aborted");
+                throw new IOException(" connection aborted");
             } else if (numCertificates == 0 || numCertificates < 0) {
                 System.err.print("bad number of certificates sent by server: ");
                 System.err.println(Integer.toString(numCertificates));
-                throw new GeneralSecurityException("Error: bad number of certificates sent by server");
+                throw new GeneralSecurityException(" bad number of certificates sent by server");
             }
             CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
             this.certificateChain = (Collection<X509Certificate>) certFactory.generateCertificates(this.socketIn);

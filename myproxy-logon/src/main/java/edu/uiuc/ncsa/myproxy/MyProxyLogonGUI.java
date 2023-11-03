@@ -299,7 +299,7 @@ public class MyProxyLogonGUI extends JPanel implements ActionListener, Version {
             saveProperties();
         } catch (Exception exception) {
             exception.printStackTrace();
-            statusTextArea.append("Error: " + exception.getMessage());
+            statusTextArea.append(" " + exception.getMessage());
         } finally {
             try {
                 myproxy.disconnect();

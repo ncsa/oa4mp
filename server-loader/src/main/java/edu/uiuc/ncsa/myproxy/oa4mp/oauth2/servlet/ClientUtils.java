@@ -61,7 +61,7 @@ public class ClientUtils {
      */
     public static long computeATLifetime(OA2ServiceTransaction st2, OA2Client client, OA2SE oa2SE) {
         if (oa2SE.getMaxATLifetime() <= 0) {
-            throw new NFWException("Internal error: the server-wide default for the access token lifetime has not been set.");
+            throw new NFWException("the server-wide default for the access token lifetime has not been set.");
         }
         return computeTokenLifetime(oa2SE.getMaxATLifetime(),
                 OA2ConfigurationLoader.ACCESS_TOKEN_LIFETIME_DEFAULT,
@@ -85,7 +85,7 @@ public class ClientUtils {
         // If the server default is <= 0 that implies there is some misconfiguration. Better to find that out here than
         // get squirrelly results later.
         if (serverMaxLifetime <= 0) {
-            throw new NFWException("Internal error: the server-wide default for the token lifetime has not been set.");
+            throw new NFWException("the server-wide default for the token lifetime has not been set.");
         }
         long maxLifetime = serverMaxLifetime;
         if (0 < clientMaxLifetime) {
@@ -133,7 +133,7 @@ public class ClientUtils {
 
     public static long computeIDTLifetime(OA2ServiceTransaction st2, OA2Client client, OA2SE oa2SE) {
         if (oa2SE.getMaxIdTokenLifetime() <= 0) {
-            throw new NFWException("Internal error: the server-wide default for the IDToken token lifetime has not been set.");
+            throw new NFWException("the server-wide default for the IDToken token lifetime has not been set.");
         }
         return computeTokenLifetime(oa2SE.getMaxIdTokenLifetime(),
                 OA2ConfigurationLoader.ID_TOKEN_LIFETIME_DEFAULT,
@@ -172,10 +172,10 @@ public class ClientUtils {
     public static long computeRefreshLifetimeOLD(OA2ServiceTransaction st2, OA2SE oa2SE) {
         //        OA2SE oa2SE = (OA2SE) getServiceEnvironment();
         if (!oa2SE.isRefreshTokenEnabled()) {
-            throw new NFWException("Internal error: Refresh tokens are disabled for this server.");
+            throw new NFWException("Refresh tokens are disabled for this server.");
         }
         if (oa2SE.getMaxRTLifetime() <= 0) {
-            throw new NFWException("Internal error: Either refresh tokens are disabled for this server, or the server-wide default for the refresh token lifetime has not been set.");
+            throw new NFWException("Either refresh tokens are disabled for this server, or the server-wide default for the refresh token lifetime has not been set.");
         }
         long lifetime = -1L;
 
@@ -203,10 +203,10 @@ public class ClientUtils {
 
     public static long computeRefreshLifetimeNEW(OA2ServiceTransaction st2, OA2Client client, OA2SE oa2SE) {
         if (!oa2SE.isRefreshTokenEnabled()) {
-            throw new NFWException("Internal error: Refresh tokens are disabled for this server.");
+            throw new NFWException("Refresh tokens are disabled for this server.");
         }
         if (oa2SE.getMaxRTLifetime() <= 0) {
-            throw new NFWException("Internal error: Either refresh tokens are disabled for this server, or the server-wide default for the refresh token lifetime has not been set.");
+            throw new NFWException("Either refresh tokens are disabled for this server, or the server-wide default for the refresh token lifetime has not been set.");
         }
 
         return computeTokenLifetime(oa2SE.getMaxRTLifetime(),
@@ -291,7 +291,7 @@ public class ClientUtils {
             try {
                 rawSecret = OA2HeaderUtils.getSecretFromHeaders(request);
             } catch (UnsupportedEncodingException e) {
-                throw new NFWException("Error: internal use of UTF-8 encoding failed");
+                throw new NFWException("internal use of UTF-8 encoding failed");
             }
 
         } else {

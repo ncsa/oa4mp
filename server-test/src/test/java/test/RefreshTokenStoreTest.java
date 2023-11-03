@@ -44,7 +44,7 @@ public class RefreshTokenStoreTest extends TestBase {
     public void testRT(TransactionStore tStore, ClientStore clientStore) throws Exception {
         if (!(tStore instanceof RefreshTokenStore)) {
             // fail here if can't cast
-            throw new IllegalStateException("Error: The store " + tStore.getClass().getSimpleName() + " is not of a type RefreshTokenStore");
+            throw new IllegalStateException(" The store " + tStore.getClass().getSimpleName() + " is not of a type RefreshTokenStore");
         }
 
         RefreshTokenStore rts = (RefreshTokenStore) tStore;
@@ -65,14 +65,14 @@ public class RefreshTokenStoreTest extends TestBase {
         tStore.save(st2);
 
         OA2ServiceTransaction testST = rts.get(rt);
-        assert testST.equals(st2) : "Error: created transaction is not fetched faithfully from the store";
+        assert testST.equals(st2) : " created transaction is not fetched faithfully from the store";
         // get another one and retry since we have to be able to show the store can handle updating the refresh token
         rt = tf2.getRefreshToken();
         st2.setRefreshToken(rt);
         st2.setRefreshTokenValid(false);
 
         tStore.save(st2);
-        assert rts.get(rt).equals(st2) : "Error: updating refresh token fails.";
+        assert rts.get(rt).equals(st2) : " updating refresh token fails.";
         tStore.remove(st2.getIdentifier());
         clientStore.remove(client.getIdentifier());
 

@@ -477,7 +477,7 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
             }
             return TokenFactory.createIDT(idTokken);
         } catch (Throwable e) {
-            throw new IllegalStateException("Error: cannot create ID token", e);
+            throw new IllegalStateException("cannot create ID token", e);
         }
 
     }

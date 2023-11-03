@@ -60,7 +60,7 @@ public class AssetStoreTest extends TestCase {
 
         Identifier id1 = BasicIdentifier.newID("asset:id:/" + r1 + "/" + System.currentTimeMillis());
         Asset asset = store.create();
-        assert asset != null : "Error: The store is not producing valid assets when requested. A null was returned";
+        assert asset != null : " The store is not producing valid assets when requested. A null was returned";
         asset.setIdentifier(id1);
         asset.setUsername(username1);
         asset.setPrivateKey(privateKey1);
@@ -82,7 +82,7 @@ public class AssetStoreTest extends TestCase {
             bad = false;
         }
         if(bad){
-            assert false : "Error: was able to update the identifier.";
+            assert false : " was able to update the identifier.";
         }
 
         // ok, set the id back since that worked.
@@ -138,7 +138,7 @@ public class AssetStoreTest extends TestCase {
         for (int i = 0; i < count; i++) {
             Identifier id = BasicIdentifier.newID("asset:id:/" + r + "/" + i);
             Asset asset = store.create();
-            assert asset != null : "Error: The store is not producing valid assets when requested. A null was returned";
+            assert asset != null : " The store is not producing valid assets when requested. A null was returned";
             assets.add(asset);
             asset.setIdentifier(id);
             String username = "testUser-" + r;

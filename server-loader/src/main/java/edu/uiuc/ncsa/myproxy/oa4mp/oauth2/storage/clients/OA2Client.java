@@ -574,7 +574,7 @@ public class OA2Client extends Client implements OA2ClientScopes {
      */
     public JSONObject getConfig() {
         if (jsonConfig == null && !StringUtils.isTrivial(config)) {
-            throw new IllegalStateException("Error: JSON configuration was not initialized.");
+            throw new IllegalStateException("JSON configuration was not initialized.");
         }
         return jsonConfig;
     }

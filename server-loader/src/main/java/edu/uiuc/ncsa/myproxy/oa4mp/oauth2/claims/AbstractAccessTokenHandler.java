@@ -153,7 +153,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
             switch (getATConfig().getAudience().size()) {
                 case 0:
                     // no audiences configured and none requested.
-                    throw new IllegalStateException("Error: The client has no configured audiences and none were requested. Cannot resolve scopes.");
+                    throw new IllegalStateException(" The client has no configured audiences and none were requested. Cannot resolve scopes.");
                 case 1:
                     // no audience requested and a single one is configured. Use that.
                     if (requestedAudience == null) {
@@ -163,7 +163,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
                     break;
                 default:
                     // no audiences any place, requested or configured.
-                    throw new IllegalStateException("Error: The client is configured with multiple audiences, but none were requested. Cannot resolve scopes.");
+                    throw new IllegalStateException(" The client is configured with multiple audiences, but none were requested. Cannot resolve scopes.");
             }
         }
         Map<String, List<String>> groupMap = new HashMap<>();
@@ -217,7 +217,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
 
         for (String aud : requestedAudience) {
             if (!templates.containsKey(aud)) {
-                throw new IllegalStateException("Error: The requested audience \"" + aud + "\" is not valid for this client. Cannot resolve scopes.");
+                throw new IllegalStateException(" The requested audience \"" + aud + "\" is not valid for this client. Cannot resolve scopes.");
             }
             AuthorizationTemplate template = templates.get(aud);
             for (AuthorizationPath authorizationPath : template.getPaths()) {
@@ -397,8 +397,8 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
     @Override
     public AccessTokenImpl getSignedPayload(JSONWebKey key, String headerType) {
         if (key == null) {
-            oa2se.warn("Error: Null or missing key for signing encountered processing client \"" + client.getIdentifierString() + "\"");
-            throw new IllegalArgumentException("Error: Missing JSON web key. Cannto sign access token.");
+            oa2se.warn(" Null or missing key for signing encountered processing client \"" + client.getIdentifierString() + "\"");
+            throw new IllegalArgumentException(" Missing JSON web key. Cannto sign access token.");
         }
         if (getPayload().isEmpty()) return null;
            /*
@@ -414,7 +414,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
         }
         if (!getPayload().containsKey(JWT_ID)) {
             // There is something wrong. This is required.
-            throw new IllegalStateException("Error: no JTI. Cannot create access token");
+            throw new IllegalStateException(" no JTI. Cannot create access token");
         }
         try {
             String at = MyOtherJWTUtil2.createJWT(getPayload(), key, headerType);

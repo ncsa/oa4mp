@@ -294,13 +294,13 @@ public class RFC8628AuthorizationServer extends EnvServlet {
                 Enumeration enumeration = request.getHeaders(headerName);
                 if (!enumeration.hasMoreElements()) {
                     throw new OA2ATException(OA2Errors.ACCESS_DENIED,
-                            "Error: A custom header of \"" + headerName + "\" was specified for authorization, but no value was found.",
+                            "A custom header of \"" + headerName + "\" was specified for authorization, but no value was found.",
                             HttpStatus.SC_UNAUTHORIZED, null);
                 }
                 userName = enumeration.nextElement().toString();
                 if (enumeration.hasMoreElements()) {
                     throw new OA2ATException(OA2Errors.ACCESS_DENIED,
-                            "Error: A custom header of \"" + headerName + "\" was specified for authorization, but multiple values were found.",
+                            "A custom header of \"" + headerName + "\" was specified for authorization, but multiple values were found.",
                             HttpStatus.SC_UNAUTHORIZED, null);
                 }
             }

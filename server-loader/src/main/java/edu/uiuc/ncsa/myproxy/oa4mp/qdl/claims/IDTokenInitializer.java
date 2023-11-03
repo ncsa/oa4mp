@@ -66,10 +66,10 @@ public class IDTokenInitializer implements QDLModuleMetaClass {
                 idTokenHandler = new IDTokenHandler(getPayloadHandlerConfig());
             }
             if (1 < objects.length) {
-                throw new IllegalArgumentException("Error: Missing second argument must be the execution phase.");
+                throw new IllegalArgumentException(" Missing second argument must be the execution phase.");
             }
             if (!(objects[1] instanceof String)) {
-                throw new IllegalArgumentException("Error: The second argument must be a string.");
+                throw new IllegalArgumentException(" The second argument must be a string.");
 
             }
             String execPhase = (String) objects[1];
@@ -141,7 +141,7 @@ public class IDTokenInitializer implements QDLModuleMetaClass {
         @Override
         public void doMethod(String execPhase) throws Throwable {
             if (!isInit) {
-                throw new IllegalStateException("Error: You must run init first.");
+                throw new IllegalStateException(" You must run init first.");
             }
             getidTokenHandler().finish(execPhase);
         }
@@ -177,7 +177,7 @@ public class IDTokenInitializer implements QDLModuleMetaClass {
         @Override
         public void doMethod(String execPhase) throws Throwable {
             if (!isInit) {
-                throw new IllegalStateException("Error: You must run init first.");
+                throw new IllegalStateException(" You must run init first.");
             }
 
             getidTokenHandler().refresh();

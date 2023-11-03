@@ -66,7 +66,7 @@ public class AGServer2 extends ASImpl implements AGServer, OA2Constants {
         JSONObject json = JSONObject.fromObject(responseString);
         String accessCode = json.getString(AUTHORIZATION_CODE);
         if (accessCode == null) {
-            throw new IllegalArgumentException("Error: server did not return an access code.");
+            throw new IllegalArgumentException(" server did not return an access code.");
         }
         String state = json.getString(STATE);
         if (!sentState.equals(state)) {

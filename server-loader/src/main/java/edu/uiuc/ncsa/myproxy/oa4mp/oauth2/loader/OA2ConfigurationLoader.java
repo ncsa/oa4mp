@@ -238,7 +238,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
             }
             return se;
         } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
-            throw new GeneralException("Error: Could not create the runtime environment", e);
+            throw new GeneralException("Could not create the runtime environment", e);
         }
     }
 
@@ -922,7 +922,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     protected JSONWebKeys getJSONWebKeys() {
         ConfigurationNode node = getFirstNode(cn, "JSONWebKey");
         if (node == null) {
-            warn("Error: No signing keys in the configuration file. Signing is not available");
+            warn(" No signing keys in the configuration file. Signing is not available");
             //throw new IllegalStateException();
             return new JSONWebKeys(null);
         }
@@ -944,7 +944,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         }
 
         if (keys == null) {
-            throw new IllegalStateException("Error: Could not load signing keys");
+            throw new IllegalStateException(" Could not load signing keys");
         }
         if (keys.size() == 1) {
             // CIL-1067

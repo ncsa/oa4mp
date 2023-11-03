@@ -92,7 +92,7 @@ public abstract class StemConverter<V extends Identifiable> extends MapConverter
             return fromMap((QDLStem) map, v);
         }
         System.err.print("MapConverter.fromMap(): failed for " + v);
-        throw new NotImplementedException("Error: not implement for non ConversionMap objects");
+        throw new NotImplementedException(" not implement for non ConversionMap objects");
 
     }
 
@@ -103,7 +103,7 @@ public abstract class StemConverter<V extends Identifiable> extends MapConverter
             return;
         }
         System.err.print("MapConverter.fromMap(): failed for " + data);
-        throw new NotImplementedException("Error: not implement for non ConversionMap objects");
+        throw new NotImplementedException(" not implement for non ConversionMap objects");
 
     }
 

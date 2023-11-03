@@ -33,18 +33,18 @@ public class RTServer2 extends TokenAwareServer implements RTServer {
         AccessToken accessToken = rtRequest.getAccessToken();
         RefreshToken refreshToken = rtRequest.getRefreshToken();
         if (refreshToken == null) {
-            throw new GeneralException("Error: There is no refresh token, so it is not possible to refresh it.");
+            throw new GeneralException("there is no refresh token, so it is not possible to refresh it.");
         }
         String raw = getRTResponse(getAddress(), rtRequest);
         JSONObject json = getAndCheckResponse(raw);
         String returnedAT = json.getString(OA2Constants.ACCESS_TOKEN);
 
         if (accessToken.getToken().equals(returnedAT)) {
-            throw new IllegalArgumentException("Error: The returned access token from the server should not match the one in the request.");
+            throw new IllegalArgumentException("the returned access token from the server should not match the one in the request.");
         }
         String exp = json.getString(OA2Constants.EXPIRES_IN);
         if (exp == null || exp.length() == 0) {
-            throw new IllegalArgumentException("Error: missing expires_in field from server");
+            throw new IllegalArgumentException("missing expires_in field from server");
         }
         RefreshTokenImpl refreshTokenImpl2 = TokenFactory.createRT(json.getString(OA2Constants.REFRESH_TOKEN));
         AccessTokenImpl newAT = TokenFactory.createAT(returnedAT);

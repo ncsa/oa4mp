@@ -102,7 +102,7 @@ public class JWTModule extends JavaModule {
                             try {
                                 jwtCommands.jwks = JSONWebKeyUtil.fromXML(xer);
                             } catch (Throwable e) {
-                                System.out.println("Error: Could not deserialize the JWT module. " + e.getMessage());
+                                System.out.println(" Could not deserialize the JWT module. " + e.getMessage());
                             }
                     }
                     break;
@@ -138,7 +138,7 @@ public class JWTModule extends JavaModule {
                                 jwtCommands.jwks = jwkUtil2.fromJSON(raw);
                                 //jwtCommands.jwks = JSONWebKeyUtil.fromXML(xer);
                             } catch (Throwable e) {
-                                System.out.println("Error: Could not deserialize the JWT module. " + e.getMessage());
+                                System.out.println(" Could not deserialize the JWT module. " + e.getMessage());
                             }
                     }
                     break;

@@ -35,7 +35,7 @@ public class StoreArchiver {
         if (mapConverter == null) {
             XMLConverter xmlConverter = getStore().getXMLConverter();
             if (!(xmlConverter instanceof MapConverter)) {
-                throw new NFWException("internal error: The XML converter for the store is not a MapConverter.");
+                throw new NFWException("The XML converter for the store is not a MapConverter.");
             }
             mapConverter = (MapConverter) xmlConverter;
         }

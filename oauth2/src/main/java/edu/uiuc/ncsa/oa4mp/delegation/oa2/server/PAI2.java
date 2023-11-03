@@ -41,7 +41,7 @@ public class PAI2 extends AbstractIssuer implements PAIssuer {
             if(x instanceof RuntimeException){
                 throw (RuntimeException)x;
             }
-            throw new GeneralException("Error: could not get protected asset", x);
+            throw new GeneralException(" could not get protected asset", x);
         }
     }
 }

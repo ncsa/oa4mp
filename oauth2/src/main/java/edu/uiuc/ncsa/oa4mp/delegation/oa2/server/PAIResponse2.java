@@ -96,7 +96,7 @@ public class PAIResponse2 extends IResponse2 implements PAResponse {
         try {
             MyX509Certificates certs = (MyX509Certificates) getProtectedAsset();
             if(certs == null || certs.getX509CertificatesPEM() == null){
-                throw new GeneralException("Error: No certificate found.");
+                throw new GeneralException(" No certificate found.");
             }
 
             response.setContentType("text/plain");

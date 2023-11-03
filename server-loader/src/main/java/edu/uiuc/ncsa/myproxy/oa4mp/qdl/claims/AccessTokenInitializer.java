@@ -60,7 +60,7 @@ public class AccessTokenInitializer implements QDLModuleMetaClass {
 
         protected void setupHandler(Object[] objects) {
             if (!(objects[0] instanceof String)) {
-                throw new IllegalArgumentException("Error: You must supply the type of the token.");
+                throw new IllegalArgumentException(" You must supply the type of the token.");
             }
             String type = (String) objects[0];
             switch (type) {
@@ -196,7 +196,7 @@ public class AccessTokenInitializer implements QDLModuleMetaClass {
         @Override
         public Object evaluate(Object[] objects, State state) {
             if (objects.length != getArgCount()[0] && objects.length != getArgCount()[1]) {
-                throw new IllegalArgumentException("Error:" + getName() + " requires 2 or 3  arguments and you supplied " + objects.length);
+                throw new IllegalArgumentException("" + getName() + " requires 2 or 3  arguments and you supplied " + objects.length);
             }
             oa2State = checkState(state);
             setupHandler(objects);
@@ -209,7 +209,7 @@ public class AccessTokenInitializer implements QDLModuleMetaClass {
                 if ((objects[2] instanceof Boolean)) {
                     doTemplates = (Boolean) objects[2];
                 } else {
-                    throw new IllegalArgumentException("Error: the third argument must be a boolean");
+                    throw new IllegalArgumentException(" the third argument must be a boolean");
                 }
             }
             if (objects.length == 4) {

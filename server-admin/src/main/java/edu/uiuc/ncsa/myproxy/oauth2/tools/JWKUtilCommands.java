@@ -292,7 +292,7 @@ public class JWKUtilCommands extends CommonCommands {
         boolean isPrivate = inputLine.hasArg(CL_IS_PRIVATE_FLAG);
         inputLine.removeSwitch(CL_IS_PRIVATE_FLAG);
         if (isPrivate && isPublic) {
-            String err = "Error: cannot specify both private and public keys at the same time";
+            String err = " cannot specify both private and public keys at the same time";
             if (isBatch()) {
                 sayv(err);
                 System.exit(1);
@@ -985,7 +985,7 @@ public class JWKUtilCommands extends CommonCommands {
         if (localKeys == null) {
             if (isBatchMode()) {
                 // Error in this case -- there cannot be a set of keys defined, so exit
-                sayv("Error: no keys specified");
+                sayv(" no keys specified");
                 return;
             } else {
                 if (keys == null || keys.isEmpty()) {

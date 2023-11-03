@@ -98,7 +98,7 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
             m.put(CLIENT_ID, atRequest.getClient().getIdentifierString());
         } else {
             if (params.get(REDIRECT_URI) == null) {
-                throw new GeneralException("Error: the client redirect uri was not set in the request.");
+                throw new GeneralException(" the client redirect uri was not set in the request.");
             }
             DebugUtil.trace(this, "getting access token, use http header for token? " + useBasicAuth);
             // Create the request
@@ -129,7 +129,7 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
         }
         JSONObject jsonObject = getAndCheckResponse(response);
         if (!jsonObject.containsKey(ACCESS_TOKEN)) {
-            throw new IllegalArgumentException("Error: No access token found in server response");
+            throw new IllegalArgumentException(" No access token found in server response");
         }
         AccessTokenImpl at = TokenFactory.createAT(jsonObject.getString(ACCESS_TOKEN));
         if(jsonObject.containsKey(EXPIRES_IN)) {
@@ -159,7 +159,7 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
             // It is possible (e.g. RFC 8628) that there is no nonce or that the client is not configured to
             // send one, so only check if there was one in the request to start with.
             if (m.containsKey(NONCE) && !idToken.getPayload().getString(NONCE).equals(atRequest.getParameters().get(NONCE))) {
-                throw new GeneralException("Error: Incorrect nonce \"" + atRequest.getParameters().get(NONCE) + "\" returned from server");
+                throw new GeneralException(" Incorrect nonce \"" + atRequest.getParameters().get(NONCE) + "\" returned from server");
             }
 
         } else {

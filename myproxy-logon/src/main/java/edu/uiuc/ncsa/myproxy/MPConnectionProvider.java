@@ -133,7 +133,7 @@ public class MPConnectionProvider<T extends MyProxyConnectable> implements javax
         if (lastException instanceof NoUsableMyProxyServerFoundException) {
             throw (NoUsableMyProxyServerFoundException) lastException;
         }
-        throw new NoUsableMyProxyServerFoundException("Error: No usable MyProxy service found.", (lastException.getCause() == null ? lastException : lastException.getCause()));
+        throw new NoUsableMyProxyServerFoundException(" No usable MyProxy service found.", (lastException.getCause() == null ? lastException : lastException.getCause()));
 
     }
 

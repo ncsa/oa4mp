@@ -169,7 +169,7 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
                 fis.close();
                 secret = sb.toString();
             } catch (Throwable t) {
-                say("Error: could not read file: " + t.getMessage());
+                say(" could not read file: " + t.getMessage());
                 return;
             }
         } else {

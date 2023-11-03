@@ -100,7 +100,7 @@ public class TransactionConverter<V extends OA4MPServiceTransaction> extends Ser
             try {
                 map.put(getDSTK().cert(), myCert.getX509CertificatesPEM());
             } catch (CertificateEncodingException e) {
-                throw new GeneralException("Error: could not encode certificate", e);
+                throw new GeneralException(" could not encode certificate", e);
             }
         }
         if (t.getClient() == null) {

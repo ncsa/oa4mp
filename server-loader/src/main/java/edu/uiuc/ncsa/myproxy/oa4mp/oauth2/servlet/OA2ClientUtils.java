@@ -62,7 +62,7 @@ public class OA2ClientUtils {
                     HttpStatus.SC_BAD_REQUEST, null);
         }
         if (!(client instanceof OA2Client)) {
-            throw new NFWException("Internal error: Client is not an OA2Client");
+            throw new NFWException("Client is not an OA2Client");
         }
 
         OA2Client oa2Client = (OA2Client) client;
@@ -117,13 +117,13 @@ public class OA2ClientUtils {
             try {
                 // CIL-871 fix -- no wildcards allowed.
                 if (x.contains("*")) {
-                    throw new IllegalArgumentException("Error: wildcard in \"" + x + "\" is not allowed.");
+                    throw new IllegalArgumentException("wildcard in \"" + x + "\" is not allowed.");
                 }
 
                 URI temp = URI.create(x);
                 // Fix for CIL-739, accept only absolute URIs
                 if (!temp.isAbsolute()) {
-                    throw new IllegalArgumentException("Error: uri \"" + temp + "\" is not absolute.");
+                    throw new IllegalArgumentException("uri \"" + temp + "\" is not absolute.");
                 }
                 String host = temp.getHost();
                 String scheme = temp.getScheme();

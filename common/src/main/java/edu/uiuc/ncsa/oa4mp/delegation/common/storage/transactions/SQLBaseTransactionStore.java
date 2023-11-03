@@ -52,7 +52,7 @@ abstract public class SQLBaseTransactionStore<V extends BasicTransaction> extend
     protected V getTransaction(String identifier, String statement) {
 
         if (identifier == null) {
-            throw new IllegalStateException("Error: a null identifier was supplied");
+            throw new IllegalStateException("a null identifier was supplied");
         }
         ConnectionRecord cr = getConnection();
         Connection c = cr.connection;

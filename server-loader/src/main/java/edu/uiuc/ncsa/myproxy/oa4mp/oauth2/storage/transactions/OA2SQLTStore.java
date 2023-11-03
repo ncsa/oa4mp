@@ -58,7 +58,7 @@ public class OA2SQLTStore<V extends OA2ServiceTransaction> extends DSSQLTransact
     @Override
     public V get(AccessTokenImpl accessToken, Identifier clientID) {
         if (accessToken == null) {
-            throw new IllegalStateException("Error: a null access token was supplied");
+            throw new IllegalStateException("a null access token was supplied");
         }
           return get(accessToken.getJti().toString(), clientID.toString(), true);
     }
@@ -66,7 +66,7 @@ public class OA2SQLTStore<V extends OA2ServiceTransaction> extends DSSQLTransact
     @Override
     public V get(RefreshTokenImpl refreshToken, Identifier clientID) {
         if (refreshToken == null) {
-            throw new IllegalStateException("Error: a null access token was supplied");
+            throw new IllegalStateException("a null access token was supplied");
         }
           return get(refreshToken.getJti().toString(), clientID.toString(), false);
     }
@@ -103,7 +103,7 @@ public class OA2SQLTStore<V extends OA2ServiceTransaction> extends DSSQLTransact
             t = create();
             populate(map, t);
         } catch (SQLException e) {
-            throw new GeneralException("Error getting transaction with token \"" + token + "\" + and client id =" + clientID, e);
+            throw new GeneralException("could not get transaction with token \"" + token + "\" + and client id =" + clientID, e);
         }
         return t;
     }
@@ -112,7 +112,7 @@ public class OA2SQLTStore<V extends OA2ServiceTransaction> extends DSSQLTransact
     public List<V> getByUsername(String username) {
         String statement = ((OA2TransactionTable) getTransactionTable()).getByUsernameStatement();
         if (username == null) {
-            throw new IllegalStateException("Error: a null identifier was supplied");
+            throw new IllegalStateException("a null identifier was supplied");
         }
         ConnectionRecord cr = getConnection();
         Connection c = cr.connection;
@@ -140,7 +140,7 @@ public class OA2SQLTStore<V extends OA2ServiceTransaction> extends DSSQLTransact
             stmt.close();
             releaseConnection(cr);
         } catch (SQLException e) {
-            throw new GeneralException("Error getting transaction with username \"" + username + "\"", e);
+            throw new GeneralException("coould not get transaction with username \"" + username + "\"", e);
         }
         return list;
 
@@ -151,7 +151,7 @@ public class OA2SQLTStore<V extends OA2ServiceTransaction> extends DSSQLTransact
         OA2TransactionTable table = (OA2TransactionTable) getTransactionTable();
         String statement = table.getTokenInfoStatement();
         if (username == null) {
-            throw new IllegalStateException("Error: a null identifier was supplied");
+            throw new IllegalStateException("a null identifier was supplied");
         }
         ConnectionRecord cr = getConnection();
         Connection c = cr.connection;
@@ -181,7 +181,7 @@ public class OA2SQLTStore<V extends OA2ServiceTransaction> extends DSSQLTransact
             stmt.close();
             releaseConnection(cr);
         } catch (SQLException e) {
-            throw new GeneralException("Error getting transaction with username \"" + username + "\"", e);
+            throw new GeneralException("could not get transaction with username \"" + username + "\"", e);
         }
         return records;
 
@@ -221,7 +221,7 @@ public class OA2SQLTStore<V extends OA2ServiceTransaction> extends DSSQLTransact
             releaseConnection(cr);
         } catch (SQLException e) {
             destroyConnection(cr);
-            throw new GeneralException("Error: could not get database object", e);
+            throw new GeneralException("could not get database object", e);
         }
 
         return pending;
@@ -270,13 +270,13 @@ public class OA2SQLTStore<V extends OA2ServiceTransaction> extends DSSQLTransact
             stmt.close();
             releaseConnection(cr);
             if (tooManyresults) {
-                throw new IllegalStateException("error: Multiple transactions with \"" + targetString + "\" found.");
+                throw new IllegalStateException("multiple transactions with \"" + targetString + "\" found.");
             }
             result = create();
             populate(map, result);
         } catch (SQLException e) {
             destroyConnection(cr);
-            throw new GeneralException("Error: could not get database object", e);
+            throw new GeneralException("could not get database object", e);
         }
 
         return result;

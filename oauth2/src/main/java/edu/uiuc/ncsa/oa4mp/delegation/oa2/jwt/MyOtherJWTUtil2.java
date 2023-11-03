@@ -232,7 +232,7 @@ val jwt: String = signedJWT.serialize()     */
         if (algorithm.equals(RS512_JWT)) {
             return RS512_JAVA;
         }
-        throw new IllegalArgumentException("Error: unknow algorithm \"" + algorithm + "\"");
+        throw new IllegalArgumentException("unknown algorithm \"" + algorithm + "\"");
 
     }
 
@@ -328,7 +328,7 @@ val jwt: String = signedJWT.serialize()     */
         switch (st.countTokens()) {
             case 0:
             case 1:
-                throw new IllegalArgumentException("Error: No JWT components found.");
+                throw new IllegalArgumentException("no JWT components found.");
             case 2:
                 output[HEADER_INDEX] = st.nextToken();
                 output[PAYLOAD_INDEX] = st.nextToken();
@@ -397,7 +397,7 @@ val jwt: String = signedJWT.serialize()     */
         //    DebugUtil.trace(JWTUtil.class, "header=" + h);
         //     DebugUtil.trace(JWTUtil.class, "payload=" + p);
         if (h.get(ALGORITHM) == null) {
-            throw new InvalidAlgorithmException("Error: no algorithm.");
+            throw new InvalidAlgorithmException("no algorithm.");
         } else {
             if (h.get(ALGORITHM).equals(NONE_JWT)) {
                 DebugUtil.trace(JWTUtil.class, "unsigned id token. Returning payload");
@@ -412,7 +412,7 @@ val jwt: String = signedJWT.serialize()     */
         //  DebugUtil.trace(JWTUtil.class, "key_id=" + keyID);
 
         if (keyID == null || !(keyID instanceof String)) {
-            throw new InvalidAlgorithmException("Error: Unknown algorithm");
+            throw new InvalidAlgorithmException("Unknown algorithm");
         }
         boolean isOK = false;
         try {
@@ -425,10 +425,10 @@ val jwt: String = signedJWT.serialize()     */
             }
             isOK = verify(h64, p64, s64, wk);
         } catch (Throwable t) {
-            throw new InvalidSignatureException("Error: could not verify signature", t);
+            throw new InvalidSignatureException("could not verify signature", t);
         }
         if (!isOK) {
-            throw new InvalidSignatureException("Error: could not verify signature");
+            throw new InvalidSignatureException("could not verify signature");
         }
         return p;
     }
@@ -444,7 +444,7 @@ val jwt: String = signedJWT.serialize()     */
      */
     public static JSONWebKeys getJsonWebKeys(String wellKnown) {
         if (wellKnown == null || wellKnown.isEmpty()) {
-            throw new GeneralException("Error: missing well known URI. Cannot get keys");
+            throw new GeneralException("missing well known URI. Cannot get keys");
         }
         ServiceClient serviceClient = new ServiceClient(URI.create(wellKnown));
         return getJsonWebKeys(serviceClient, wellKnown);
@@ -452,7 +452,7 @@ val jwt: String = signedJWT.serialize()     */
 
     public static JSONWebKeys getJsonWebKeys(URI wellKnown) {
         if (wellKnown == null) {
-            throw new GeneralException("Error: Missing well known uri. Cannot resolve the keys");
+            throw new GeneralException("missing well known uri. Cannot resolve the keys");
         }
 
         return getJsonWebKeys(wellKnown.toString());
@@ -460,10 +460,10 @@ val jwt: String = signedJWT.serialize()     */
 
     public static JSONObject verifyAndReadJWT(String jwt, URI wellKnown) {
         if (wellKnown == null) {
-            throw new GeneralException("Error: Missing well known uri. Cannot resolve the keys");
+            throw new GeneralException("missing well known uri. Cannot resolve the keys");
         }
         if (jwt == null || jwt.isEmpty()) {
-            throw new GeneralException("Error: Missing or empty token.");
+            throw new GeneralException("missing or empty token.");
         }
         return verifyAndReadJWT(jwt, JWTUtil.getJsonWebKeys(wellKnown.toString()));
     }
@@ -471,10 +471,10 @@ val jwt: String = signedJWT.serialize()     */
     public static JSONWebKeys getJsonWebKeys(ServiceClient serviceClient, String wellKnown) {
         JWKUtil2 jwkUtil21 = new JWKUtil2();
         if (serviceClient == null) {
-            throw new GeneralException("Error: Missing service client.");
+            throw new GeneralException("missing service client.");
         }
         if (wellKnown == null || wellKnown.isEmpty()) {
-            throw new GeneralException("Error: missing well known URI. Cannot get keys");
+            throw new GeneralException("missing well known URI. Cannot get keys");
         }
 
         // Fix for OAUTH-164, id_token support follows.
@@ -482,7 +482,7 @@ val jwt: String = signedJWT.serialize()     */
         JSON rawJSON = JSONSerializer.toJSON(rawResponse);
 
         if (!(rawJSON instanceof JSONObject)) {
-            throw new IllegalStateException("Error: Attempted to get JSON Object but returned result is not JSON");
+            throw new IllegalStateException("Attempted to get JSON Object but returned result is not JSON");
         }
         JSONObject json = (JSONObject) rawJSON;
         String rawKeys = serviceClient.doGet(json.getString("jwks_uri"));
@@ -491,7 +491,7 @@ val jwt: String = signedJWT.serialize()     */
         try {
             keys = jwkUtil21.fromJSON(rawKeys);
         } catch (Throwable e) {
-            throw new GeneralException("Error getting keys", e);
+            throw new GeneralException("could not get keys", e);
         }
         return keys;
     }

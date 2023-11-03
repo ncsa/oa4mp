@@ -277,7 +277,7 @@ public class OA2RegistrationServlet extends AbstractRegistrationServlet {
                 save(cState.getClient());
                 //getServiceEnvironment().getClientStore().save(cState.getClient());
             } else {
-                throw new IllegalStateException("Error: An instance of ClientState was expected, but got an instance of \"" + state.getClass().getName() + "\"");
+                throw new IllegalStateException("An instance of ClientState was expected, but got an instance of \"" + state.getClass().getName() + "\"");
             }
 
         }

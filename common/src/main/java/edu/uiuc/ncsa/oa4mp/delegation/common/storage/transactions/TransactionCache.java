@@ -119,16 +119,16 @@ public class TransactionCache<V extends BasicTransaction> extends CachedMapFacad
 
     @Override
     public List<V> getAll() {
-        throw new NotImplementedException("Error: this is not supported in a cache.");
+        throw new NotImplementedException("this is not supported in a cache.");
     }
 
     public void update(BasicTransaction t) {
         if (t == null) {
-            throw new GeneralException("Error: null transaction cannot be updated");
+            throw new GeneralException(" null transaction cannot be updated");
         }
         checkDestroyed();
         if (!containsKey(t.getIdentifier())) {
-            throw new UnregisteredObjectException("Error: non-existent transaction \"" + t.getIdentifierString() + "\" cannot be updated. Save it first.");
+            throw new UnregisteredObjectException(" non-existent transaction \"" + t.getIdentifierString() + "\" cannot be updated. Save it first.");
         }
         getTransactionIndices().updateIndices(t);
         getTransactionIndices().add(t);
@@ -166,7 +166,7 @@ public class TransactionCache<V extends BasicTransaction> extends CachedMapFacad
                 t = getTransactionIndices().get((Identifier) key);
                 break;
             default:
-                throw new IllegalStateException("Error: unrecognized action for getting a transaction");
+                throw new IllegalStateException(" unrecognized action for getting a transaction");
         }
         if (t != null) return (V) t;
         if (hasStore()) {
@@ -505,32 +505,32 @@ public class TransactionCache<V extends BasicTransaction> extends CachedMapFacad
 
     @Override
     public List<V> search(String key, String condition, boolean isRegEx) {
-        throw new NotImplementedException("Error: This is not yet implemented for cache");
+        throw new NotImplementedException(" This is not yet implemented for cache");
     }
 
     @Override
     public List<V> search(String key, String condition, boolean isRegEx, List<String> attr) {
-        throw new NotImplementedException("Error: This is not yet implemented for cache");
+        throw new NotImplementedException(" This is not yet implemented for cache");
     }
 
     @Override
     public List<V> search(String key, String condition, boolean isRegEx, List<String> attr, String dateField, Date before, Date after) {
-        throw new NotImplementedException("Error: This is not yet implemented for cache");
+        throw new NotImplementedException(" This is not yet implemented for cache");
     }
 
 
     @Override
     public MapConverter getMapConverter() {
-        throw new NotImplementedException("Error: This is not yet implemented for cache");
+        throw new NotImplementedException(" This is not yet implemented for cache");
     }
 
     @Override
     public boolean remove(List<Identifiable> objects) {
-        throw new NotImplementedException("Error: This is not yet implemented for cache");
+        throw new NotImplementedException(" This is not yet implemented for cache");
     }
 
     @Override
     public V getByProxyID(Identifier proxyID) {
-        throw new NotImplementedException("Error: This is not yet implemented for cache");
+        throw new NotImplementedException(" This is not yet implemented for cache");
     }
 }

@@ -59,20 +59,20 @@ public abstract class TokenManagerServlet extends BearerTokenServlet implements 
         // need to verify that this is an admin client.
         Identifier acID = BasicIdentifier.newID(credentials[OA2HeaderUtils.ID_INDEX]);
         if (!oa2SE.getClientStore().containsKey(acID)) {
-            throw new GeneralException("Error: the given id of \"" + acID + "\" is not recognized as valid client.");
+            throw new GeneralException("the given id of \"" + acID + "\" is not recognized as valid client.");
         }
         String adminSecret = credentials[OA2HeaderUtils.SECRET_INDEX];
         if (adminSecret == null || adminSecret.isEmpty()) {
-            throw new GeneralException("Error: missing secret.");
+            throw new GeneralException("missing secret.");
         }
         OA2Client client = (OA2Client) oa2SE.getClientStore().get(acID);
         if (!oa2SE.getClientApprovalStore().isApproved(acID)) {
             ServletDebugUtil.trace(this, "Client \"" + acID + "\" is not approved.");
-            throw new GeneralException("error: This  client has not been approved.");
+            throw new GeneralException("this  client has not been approved.");
         }
         String hashedSecret = DigestUtils.sha1Hex(adminSecret);
         if (!client.getSecret().equals(hashedSecret)) {
-            throw new GeneralException("error: client and secret do not match");
+            throw new GeneralException("client and secret do not match");
         }
         return client;
     }

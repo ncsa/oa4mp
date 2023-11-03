@@ -64,7 +64,7 @@ public class ClientManagementCommands implements QDLModuleMetaClass {
 
     protected void checkInit() {
         if (!initCalled) {
-            throw new IllegalStateException("Error: You must call init before calling this function");
+            throw new IllegalStateException(" You must call init before calling this function");
         }
     }
 
@@ -184,12 +184,12 @@ public class ClientManagementCommands implements QDLModuleMetaClass {
         public Object evaluate(Object[] objects, State state) throws Throwable{
             checkInit();
             if (!(objects[0] instanceof QDLStem)) {
-                throw new IllegalArgumentException("Error: The argument must be a stem variable");
+                throw new IllegalArgumentException(" The argument must be a stem variable");
             }
             QDLStem QDLStem = (QDLStem) objects[0];
             JSON jj = QDLStem.toJSON();
             if (jj.isArray()) {
-                throw new IllegalArgumentException("Error: The client is not in the expected format.");
+                throw new IllegalArgumentException(" The client is not in the expected format.");
             }
 
             JSONObject json = (JSONObject) jj;
@@ -397,7 +397,7 @@ public class ClientManagementCommands implements QDLModuleMetaClass {
             Boolean toApprove = null;
             if (objects.length == 2) {
                 if (!(objects[1] instanceof Boolean)) {
-                    throw new IllegalArgumentException("Error: The second argument must be a boolean.");
+                    throw new IllegalArgumentException(" The second argument must be a boolean.");
                 }
                 toApprove = (Boolean) objects[1];
             }

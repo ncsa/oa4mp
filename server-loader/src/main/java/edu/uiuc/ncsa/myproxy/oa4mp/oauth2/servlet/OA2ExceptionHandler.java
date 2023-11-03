@@ -48,15 +48,28 @@ public class OA2ExceptionHandler implements ExceptionHandler {
         }
     }
 
+    protected void error(String x) {
+        if (getLogger() != null) {
+            getLogger().error(x);
+        } else {
+            System.err.println(x); // Just awful, definitely killed the flow.
+        }
+    }
+
     @Override
     public void handleException(ExceptionHandlerThingie xh) throws IOException, ServletException {
         Throwable t = xh.throwable;
         HttpServletRequest request = xh.request;
         HttpServletResponse response = xh.response;
         BaseClient baseClient = null;
+        String forensicMessage = null;
         if (t instanceof OA2GeneralError) {
-            if (((OA2GeneralError) t).hasClient()) {
-                baseClient = ((OA2GeneralError) t).getClient();
+            OA2GeneralError ge =(OA2GeneralError) t;
+            if (ge.hasClient()) {
+                baseClient = ge.getClient();
+            }
+            if(ge.hasForensicMessage()){
+                forensicMessage = ge.getForensicMessage();
             }
         } else {
             if ((xh instanceof OA2ExceptionHandlerThingie) && ((OA2ExceptionHandlerThingie) xh).hasClient()) {
@@ -75,8 +88,16 @@ public class OA2ExceptionHandler implements ExceptionHandler {
             message = "[" + baseClient.getIdentifierString() + "]";
         }
         String address = AbstractServlet.getRequestIPAddress(xh.request);
-        message = message + "<" + address + "> error: " + t.getMessage();
-        warn(message); // Fixes CIL-1722
+        message = message + "<" + address + ">";
+        if(forensicMessage== null){
+            message = message + " error: " + t.getMessage();
+            warn(message); // Fixes CIL-1722
+        }else{
+            message = message + "\n\tclient id : " + (baseClient==null?"unknown":baseClient.getIdentifierString());
+            message = message + "\n\t    error : " + t.getMessage();
+            message = message + "\n\t  message : " + forensicMessage;
+            warn(message); // Fixes CIL-1722
+        }
         if (t == null) {
             // really messed up, should never ever happen
             t = new OA2GeneralError(OA2Errors.SERVER_ERROR, "Internal error", HttpStatus.SC_INTERNAL_SERVER_ERROR, null);

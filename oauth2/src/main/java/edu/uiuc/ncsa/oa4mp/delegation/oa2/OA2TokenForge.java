@@ -151,7 +151,7 @@ public class OA2TokenForge implements TokenForge {
         }
         String authCode = parameters.get(OA2Constants.AUTHORIZATION_CODE);
         if (authCode == null) {
-            throw new GeneralException("Error: missing authorization code");
+            throw new GeneralException(" missing authorization code");
         }
         return getAccessToken(authCode);
     }
@@ -213,7 +213,7 @@ public class OA2TokenForge implements TokenForge {
     public AuthorizationGrant getAuthorizationGrant(Map<String, String> parameters) {
         String token = parameters.get(OA2Constants.AUTHORIZATION_CODE);
         if (token == null) {
-            throw new MissingTokenException("Error: the authorization grant token is missing.");
+            throw new MissingTokenException(" the authorization grant token is missing.");
         }
         return getAuthorizationGrant(token);
     }
@@ -224,7 +224,7 @@ public class OA2TokenForge implements TokenForge {
         try {
             return getAuthorizationGrant(OA2Utilities.getParameters(request));
         } catch (Exception e) {
-            throw new GeneralException("Error: could not create the authorization grant", e);
+            throw new GeneralException(" could not create the authorization grant", e);
         }
     }
 

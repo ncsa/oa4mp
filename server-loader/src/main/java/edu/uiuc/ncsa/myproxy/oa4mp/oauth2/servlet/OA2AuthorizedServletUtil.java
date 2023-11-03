@@ -394,7 +394,7 @@ public class OA2AuthorizedServletUtil {
 
         } catch (IOException e) {
             // Really something is probably wrong with the class structure is this fails...
-            throw new NFWException("Internal error: Could not cast the store to a username findable store.");
+            throw new NFWException("Could not cast the store to a username findable store.");
         }
 
         // Something is wrong with the request, so just bomb.

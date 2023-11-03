@@ -40,7 +40,7 @@ public class IsInGroup implements QDLFunction {
             return Boolean.FALSE;
         }
         if (objects.length != 2) {
-            throw new IllegalArgumentException("Error: This function requires two arguments, a stem and a string.");
+            throw new IllegalArgumentException(" This function requires two arguments, a stem and a string.");
         }
 
         if (objects[0]==null) {
@@ -48,14 +48,14 @@ public class IsInGroup implements QDLFunction {
         }
         if(!(objects[0] instanceof QDLStem)){
             // This indicates that something wrong was passed, so flag it as a bona fide error.
-            throw new IllegalArgumentException("Error: The first argument of " + getName() + " must be a stem list of groups.");
+            throw new IllegalArgumentException(" The first argument of " + getName() + " must be a stem list of groups.");
         }
         QDLStem groups = (QDLStem) objects[0];
         if(groups.size() == 0){
             return Boolean.FALSE;
         }
         if (objects[1] == null | !(objects[1] instanceof String)) {
-            throw new IllegalArgumentException("Error: The second argument of " + getName() + " must be a string.");
+            throw new IllegalArgumentException(" The second argument of " + getName() + " must be a string.");
         }
         String name = (String) objects[1];
         for (Object key : groups.keySet()) {

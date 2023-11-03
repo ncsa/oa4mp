@@ -87,29 +87,29 @@ public class CopyToolVerifier {
     public boolean verifyStore(String storeName, Store<? extends Identifiable> source, Store<? extends Identifiable> target) {
         long srcSize = source.size();
         if (srcSize != target.size()) {
-            say("Error: Source \"" + source + "\"(" + srcSize + ") and target \"" + target + "\"(" + target.size() + ") are not the same");
+            say(" Source \"" + source + "\"(" + srcSize + ") and target \"" + target + "\"(" + target.size() + ") are not the same");
             return false;
         }
         saynoCR("Checking store " + storeName + " with " + srcSize + " elements... ");
         for (Identifier identifier : source.keySet()) {
             if (!target.containsKey(identifier)) {
-                say("Error: Source store contains key " + "\"" + identifier + "\" and target store does not.");
+                say(" Source store contains key " + "\"" + identifier + "\" and target store does not.");
                 return false;
             }
             Identifiable src = source.get(identifier);
             if (src == null) {
-                say("Error: Failed getting source object with identifier \"" + identifier + "\"");
+                say(" Failed getting source object with identifier \"" + identifier + "\"");
                 return false;
             }
             Identifiable trgt = target.get(identifier);
 
             if (trgt == null) {
-                say("Error: Failed getting target object with identifier \"" + identifier + "\"");
+                say(" Failed getting target object with identifier \"" + identifier + "\"");
                 return false;
             }
 
             if (!src.equals(trgt)) {
-                say("Error: source and target objects do not match!");
+                say(" source and target objects do not match!");
                 say("Source object:\n\n" + src.toString());
                 say("\nTarget object:\n\n" + trgt.toString());
                 return false;

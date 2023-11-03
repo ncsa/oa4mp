@@ -131,17 +131,21 @@ public class OA2TokenUtils {
             //if (!t.isAccessTokenValid()) {
             if (!isAtValid) {
                 debugger.info(OA2TokenUtils.class, "Access token invalid: " + t.summary());
-                throw new OA2ATException(OA2Errors.INVALID_TOKEN,
+                OA2ATException x = new OA2ATException(OA2Errors.INVALID_TOKEN,
                         "token invalid",
                         t.getRequestState(),
                         t.getClient());
+                x.setForensicMessage("offending token invalid:" + subjectToken);
+                throw x;
             }
             if (isATExpired) {
                 debugger.info(OA2TokenUtils.class, "Access token expired: " + t.summary());
-                throw new OA2ATException(OA2Errors.INVALID_TOKEN,
+                OA2ATException x =  new OA2ATException(OA2Errors.INVALID_TOKEN,
                         "token expired",
                         t.getRequestState(),
                         t.getClient());
+                x.setForensicMessage("offending token expired:" + subjectToken);
+                throw x;
             }
         }
         return accessToken;
@@ -313,26 +317,32 @@ public class OA2TokenUtils {
             } else {
                 debugger.info(OA2TokenUtils.class, "no transaction found");
             }
-            throw new OA2GeneralError(OA2Errors.INVALID_TOKEN,
+            OA2GeneralError ge =  new OA2GeneralError(OA2Errors.INVALID_TOKEN,
                     "token not found",
                     HttpStatus.SC_UNAUTHORIZED,
                     null);
+            ge.setForensicMessage("offending token not found:" + jti);
+            throw ge;
         }
         if (!txRecord.isValid()) {
             if (debugger != null) {
                 debugger.info(OA2TokenUtils.class, "invalid token");
             }
-            throw new OA2ATException(OA2Errors.INVALID_TOKEN,
+            OA2ATException x= new OA2ATException(OA2Errors.INVALID_TOKEN,
                     "invalid token",
                     (String) null);
+            x.setForensicMessage("offending token invalid:" + jti);
+            throw x;
         }
         if (txRecord.getExpiresAt() < System.currentTimeMillis()) {
             if (debugger != null) {
                 debugger.info(OA2TokenUtils.class, "expired token");
             }
-            throw new OA2ATException(OA2Errors.INVALID_TOKEN,
+            OA2ATException x = new OA2ATException(OA2Errors.INVALID_TOKEN,
                     "token expired",
                     (String) null);
+            x.setForensicMessage("offending token expired:" + jti);
+            throw x;
         }
         return (OA2ServiceTransaction) oa2se.getTransactionStore().get(txRecord.getParentID());
     }

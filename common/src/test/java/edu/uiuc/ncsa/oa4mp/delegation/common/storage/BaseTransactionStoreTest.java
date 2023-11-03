@@ -112,7 +112,7 @@ public abstract class BaseTransactionStoreTest extends TestBase {
 
         store.save(t);
         BasicTransaction t2 = (BasicTransaction) store.get(t.getIdentifier());
-        assert t2 != null : "Internal error: Could not save file for id=\"" + t.getIdentifierString() + "\"";
+        assert t2 != null : "Could not save file for id=\"" + t.getIdentifierString() + "\"";
         assert t.equals(t2);
         assert t.equals(store.get(ag));
         assert t.equals(store.get(v));
@@ -157,7 +157,7 @@ public abstract class BaseTransactionStoreTest extends TestBase {
         try {
             //updating a non-existent transaction fails
             store.update(t);
-            assert false : "Error: was able to update an non-existent transaction";
+            assert false : " was able to update an non-existent transaction";
         } catch (GeneralException x) {
             assert true;
         }
