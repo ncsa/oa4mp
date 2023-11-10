@@ -48,7 +48,7 @@
     
         
                     <div class="xleft">
-            Last Published: 2023-10-31
+            Last Published: 2023-11-09
                                 </div>
                 <div class="xright">            
     
@@ -142,10 +142,23 @@
 
 
 <h1>Configuring QDL.</h1>
+<section>
+<h2><a name="Server_tags"></a>Server tags</h2>
+
+<p>There is the server tag <a href="../dtd/server-dtd-service-tag.html#qdlConfigName">qdlConfigName</a>
+    that is used to designate the active QDL configuration. This does mean you may have several in the
+    configuration as needed.</p>
+
+</section><section>
+<h2><a name="The_QDL_configuration_itself"></a>The QDL configuration itself</h2>
 
 <p>A great place to start is in the base system's configuration
     <a class="externalLink" href="https://qdl-lang.org/pdf/qdl_configuration.pdf">documentation</a>.
-All of that is supported as well as extensions specific to OA4MP, which are documented here.</p>
+    All of that is supported as well as extensions specific to OA4MP, which are documented here.</p>
+<section>
+<h3><a name="Additional_attributes."></a>Additional attributes.</h3>
+
+<p>These are in the &lt;qdl&gt; tag in additional to the standard attributes:</p>
 
 <table class="bodyTable" style="text-align: left; width: 1148px; height: 165px;" border="1" cellspacing="2" cellpadding="2">
     <tbody>
@@ -166,60 +179,183 @@ All of that is supported as well as extensions specific to OA4MP, which are docu
 <td style="vertical-align: top;">false</td>
         
 <td style="vertical-align: top;">Enabled/disable enforcing strict access control for scripts.
-        If this is set true, then every script must have permission granted to execute.</td>
+            If this is set true, then every script must have permission granted to execute.
+            <i>Corollary</i>: You must set permissions for every script to run or you will
+            get errors if set to true.
+        </td>
     </tr>
     </tbody>
 </table>
-<section>
-<h2><a name="Server_mode_and_restricted_IO"></a>Server mode and restricted IO</h2>
+
+</section><section>
+<h3><a name="Server_mode_and_restricted_IO_for_client_scripts"></a>Server mode and restricted IO for client scripts</h3>
 
 <p>In the standard QDL configuration there are two parameters that bear special mention here.</p>
 
 <ul>
     
-<li><b>server_mode</b>: limits various operations to the underlying OS, such as file reads and writes.</li>
+<li><b>server_mode</b>: limits various operations to the underlying OS, such as
+        file reads and writes. Again, this does not apply to server scripts</li>
     
-<li><b>restricted_io</b>: Allows printing (when false) and logging. </li>
+<li><b>restricted_io</b>: Allows printing (when false) and logging. If set to true
+    then no IO of any sort is allowed in client scripts.</li>
 </ul>
 
-<p></p>
 </section><section>
-<h2><a name="Naming"></a>Naming</h2>
+<h3><a name="Naming_configurations_and_resolution"></a>Naming configurations and resolution</h3>
 
 <p>If there is a single configuration, that may be named anything you like and it
-will be used. If there are multiple configurations, then you should set the
-attribute for <b>qdlConfigName</b> to be whatever the active configuration is.
-If it is omitted, the default name of <b>qdl-default</b> will be used.</p>
-</section><section>
-<h2><a name="Server_scripts"></a>Server scripts</h2>
+    will be used. If there are multiple configurations, then you should set the
+    attribute for <b>qdlConfigName</b> to be whatever the active configuration is.
+    If it is omitted, the default name of <b>qdl-default</b> will be used.</p>
 
-<p>You may also have scripts specified in the QDL configuration. These are
-JSON objects. (Is it ugly to have JSON inside XML? Sure. But it's consistent
-with client configurations. <i>shrug.</i>) </p>
+</section></section><section>
+<h2><a name="Scripts"></a>Scripts</h2>
+
+<p>Scripts at the server level are run for every client in the specified phase -- they
+    are just standard script elements like in the client configuration. The following contract
+    for server scripts holds for client scripts: Server script are run first, creating/updating the workspace,
+    then the client scripts are run in the workspace.</p>
+
+<p>This allows an administrator to set up state across the entire service. For instance, OA4MP has almost
+    no concept of a user natively, since the idea is to use whatever infrastructure you have. A server
+    script that grabs a user record and populates some data structures would allow extending OA4MP
+    without having to alter the base server itself. Adding, say, a User and all supporting code
+    is possible and CILogon does that, but it is a very major piece of coding and then you have to
+    maintain it <i>vis-a-vis</i> OA4MP updates. QDL is much more straightforward and insulates
+    you from server code changes.</p>
 <section>
-<h3><a name="Purpose"></a>Purpose</h3>
+<h3><a name="Lifecycle_of_scripts"></a>Lifecycle of scripts</h3>
+
+<p>If you give a script a specific exec_phase, the server scripts are run before any
+    other scripts. This may take a bit of planning. If you want to so something in the
+    post_auth phase after all clients have run their handlers, then you should
+    actually set the script for the pre_token phase to run before any other processing
+    in the next round.</p>
+</section><section>
+<h3><a name="Clients_may_opt_out"></a>Clients may opt out</h3>
+
+<p>Clients may skip server scripts if their <b>skipServerScripts</b> flag is
+    set.</p>
+</section><section>
+<h3><a name="Script_syntax_in_the_configuration_file."></a>Script syntax in the configuration file.</h3>
+
+<p>To add a script, put it in script tags:</p>
+
+<div>
+<pre>
+    &lt;scripts&gt;
+       &lt;script&gt;
+          {qdl:... 
+       &lt;/script&gt;
+       &lt;script&gt;
+          {qdl:...
+       &lt;/script&gt;
+       ...
+    &lt;/scripts&gt;
+</pre></div>
 
 <p>There are many reasons to have them.</p>
 
 <ul>
     
-<li><b>Asserting claims for all clients.</b> There is no </li>
+<li><b>Initializing the workspace.</b>: This may be required if you need to extend OA4MP with a feature, such
+        as user management or getting user metadata from some strange source.
+    </li>
     
-<li><b>Administrative tasks</b> such as regularizing all the returned claims.</li>
+<li><b>Asserting claims for all clients.</b>: Another possibility is that some projects require that grant
+        information
+        be supplied in the user metadata (aka the id token) for each flow so that proper billing may be done.
+        Setting that information via a script ensures it is always done in a consistent fashion.
+    </li>
+    
+<li><b>Administrative tasks</b>: Such as regularizing all the returned claims. Some installations
+        require certain types of information be anonymized in specific ways. A script that checks
+        and does that is a possibility.
+    </li>
 </ul>
-</section><section>
-<h3><a name="Lifecycle"></a>Lifecycle</h3>
 
-<p>If you give a script a specific exec_phase, the server scripts are run before any
-other scripts. This may take a bit of planning. If you want to so something in the
-post_auth phase after all clients have run their handlers, then you should
-actually set the script for the pre_token phase to run before any other processing
-in the next round.</p>
-</section><section>
-<h3><a name="Clients_may_opt_out"></a>Clients may opt out</h3>
+<p>(Is it ugly to have JSON inside XML? Sure. But it's consistent
+    with client configurations. <i>shrug.</i>)</p>
 
-<p>Clients may skip server scripts if their <b>skipServerScripts</b> flag is
-set.</p>
+</section></section><section>
+<h2><a name="Full_example"></a>Full example</h2>
+
+<p>Here is a full example taken from my testing system:</p>
+
+<div>
+<pre>
+    &lt;qdl name=&quot;qdl-test&quot;
+          enabled=&quot;true&quot;
+          debug=&quot;info&quot;
+          skipBadModulesOnLoad=&quot;true&quot;
+          restricted_io=&quot;false&quot;
+          strict_acls = &quot;false&quot;
+          server_mode_on=&quot;true&quot;
+          script_path=&quot;vfs#/scripts/&quot;&gt;
+         &lt;virtual_file_systems&gt;
+             &lt;vfs type=&quot;pass_through&quot;
+                  access=&quot;rw&quot;&gt;
+                 &lt;root_dir&gt;/home/ncsa/dev/ncsa-git/oa4mp/server-admin/src/main/resources/qdl&lt;/root_dir&gt;
+                 &lt;scheme&gt;&lt;![CDATA[vfs]]&gt;&lt;/scheme&gt;
+                 &lt;mount_point&gt;/scripts&lt;/mount_point&gt;
+             &lt;/vfs&gt;
+         &lt;/virtual_file_systems&gt;
+
+         &lt;modules&gt;
+             &lt;module type=&quot;java&quot;
+                     import_on_start=&quot;true&quot;&gt;
+                 &lt;class_name&gt;edu.uiuc.ncsa.myproxy.oa4mp.qdl.OA2QDLLoader&lt;/class_name&gt;
+             &lt;/module&gt;
+         &lt;/modules&gt;
+         &lt;modules&gt;
+             &lt;module type=&quot;java&quot;
+                     import_on_start=&quot;true&quot;&gt;
+                 &lt;class_name&gt;edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims.TokenHandlerLoader&lt;/class_name&gt;
+             &lt;/module&gt;
+         &lt;/modules&gt;
+
+         &lt;scripts&gt;
+            &lt;script&gt;
+            {&quot;qdl&quot;:{&quot;code&quot;:[
+                   &quot;x:='my_custom_claim';&quot;,
+                   &quot;say('*** IN SERVER SCRIPT');&quot;,
+                   &quot;claims.'my_claim':=x;&quot;,
+                   &quot;access_token.'my_at_claim':='my_at_claim';&quot;,
+                &quot;refresh_token.'my_rt_claim':='my_rt_claim';&quot;
+                ],
+
+             &quot;xmd&quot;:{&quot;exec_phase&quot;:&quot;post_token&quot;}}}
+           &lt;/script&gt;
+
+           &lt;script&gt;
+            {&quot;qdl&quot;:
+               {
+                &quot;load&quot;:&quot;ws_init.qdl&quot;,
+                &quot;xmd&quot;:{&quot;exec_phase&quot;:&quot;pre_auth&quot;,&quot;token_type&quot;:&quot;access&quot;},
+                &quot;args&quot;:[4,true,{&quot;server&quot;:&quot;localhost&quot;,&quot;port&quot;:443}]
+               }
+            }
+           &lt;/script&gt;
+
+        &lt;/scripts&gt;
+    &lt;/qdl&gt;
+</pre></div>
+<section>
+<h3><a name="QDL_Exegesis"></a>QDL Exegesis</h3>
+
+<p>The configuration sets the runtime environment for every QDL workspace. The script path is set,
+    the virtual file system mounted and a couple of modules are loaded into every workspace.
+    The two specified
+    scripts run resp. a block of code which just sets a couple of attributes in the access and refresh token
+    (to show it can be done), and run a script called ws_init.qdl (resolved against the script path)
+    in the pre_auth phase, so that
+    the workspace is set up for all clients. One point is that while the
+    server has server_mode_on=&quot;true&quot;, server scripts are still allowed to run code blocks. This
+    is because clients have no access to them. The standard caveat applies to code blocks. Keep
+    them very simple or just run a script.</p>
+
+<p>Finally, clients may be configured individually to not have these scripts run.</p>
 </section></section>
 
     </div>

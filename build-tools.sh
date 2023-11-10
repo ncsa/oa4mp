@@ -33,10 +33,10 @@ if [ ! -d "$OA4MP_QDL_DEPLOY" ]; then
 fi
 # next line is so the profiles for the tools can be found in the source and built.
 
-cd $OA4MP_ROOT/qdl
-mvn -P qdl package
-mv target/oa2-qdl-jar-with-dependencies.jar target/qdl.jar
-cp target/qdl.jar $OA4MP_QDL_DEPLOY
+#cd $OA4MP_ROOT/qdl
+#mvn -P qdl package
+#mv target/oa2-qdl-jar-with-dependencies.jar target/qdl.jar
+#cp target/qdl.jar $OA4MP_QDL_DEPLOY
 
 # If the user has the sources to QDL, build the installer.
 # /home/ncsa/dev/ncsa-git/qdl/language/src/main/scripts/create_installer.sh $OA4MP_ROOT/qdl $DEPLOY_ROOT/oa2-qdl oa2-qdl-installer.jar
@@ -49,12 +49,16 @@ cp target/qdl.jar $OA4MP_QDL_DEPLOY
 
 # Update local QDL install with the latest and greatest
 #
+cd "$OA4MP_ROOT/qdl/src/main/scripts"
+
+./create_installer.sh
+
 if [ -z ${QDL_HOME+x} ];  then
     echo "no QDL install, skipping..."
   else
   # If there is a local QDL install, update it.
-    cp target/qdl.jar $QDL_HOME/lib;
-    cp $NCSA_DEV_OUTPUT/qdl/lib/build-info.txt $QDL_HOME/lib ;
+    cp "$OA4MP_QDL_DEPLOY/lib/qdl.jar" $QDL_HOME/lib;
+    cp "$OA4MP_QDL_DEPLOY/lib/build-info.txt" $QDL_HOME/lib ;
 fi
 
 if [ -z ${OA4MP_HOME+x} ];  then

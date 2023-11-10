@@ -4,13 +4,16 @@
 # and resides in oa4mp/qdl/target
 OA4MP_QDL_ROOT=$NCSA_DEV_INPUT/oa4mp/qdl
 OA4MP_QDL_DEPLOY=$NCSA_DEV_OUTPUT/oa4mp-qdl
+DEFAULT_JAR_NAME="qdl-installer.jar"
+
+JAR_NAME=${1:-$DEFAULT_JAR_NAME}
 
 ./create_dirs.sh
 
 cd $OA4MP_QDL_ROOT
-mvn -P qdl package
-cp "target/oa4mp-qdl-jar-with-dependencies.jar" $OA4MP_QDL_DEPLOY/lib/qdl.jar
-unzip -p target/oa4mp-qdl-jar-with-dependencies.jar META-INF/MANIFEST.MF > $OA4MP_QDL_DEPLOY/lib/build-info.txt
+mvn -P qdl package > mvn.log
+cp "$OA4MP_QDL_ROOT/target/oa4mp-qdl-jar-with-dependencies.jar" $OA4MP_QDL_DEPLOY/lib/qdl.jar
+unzip -p "$OA4MP_QDL_ROOT/target/oa4mp-qdl-jar-with-dependencies.jar" META-INF/MANIFEST.MF > $OA4MP_QDL_DEPLOY/lib/build-info.txt
 
 cd $OA4MP_QDL_DEPLOY
 # Get the actual manifest so that build info is available.
