@@ -36,6 +36,7 @@
         <profile>
             <id>qdl</id>
             <build>
+                <finalName>oa4mp-qdl</finalName>
                 <plugins>
                     <plugin>
                         <artifactId>maven-assembly-plugin</artifactId>
@@ -59,7 +60,6 @@
                             <descriptorRefs>
                                 <descriptorRef>jar-with-dependencies</descriptorRef>
                             </descriptorRefs>
-                            <finalName>oa2-qdl</finalName>
 
                         </configuration>
                         <executions>

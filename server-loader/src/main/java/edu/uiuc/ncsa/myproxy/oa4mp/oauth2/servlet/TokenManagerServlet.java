@@ -312,8 +312,11 @@ public abstract class TokenManagerServlet extends BearerTokenServlet implements 
     @Override
     public void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws
             ServletException, IOException {
-        httpServletResponse.setStatus(HttpStatus.SC_SERVICE_UNAVAILABLE);
-        throw new ServletException("Unsupported operation");
+        // Fixes CIL-1852
+        httpServletResponse.setStatus(HttpStatus.SC_METHOD_NOT_ALLOWED);
+        httpServletResponse.setContentType("text/plain");
+        httpServletResponse.getWriter().println("GET unsupported on this server");
+        httpServletResponse.getWriter().flush(); // commit it
     }
 
     protected int getTokenType(String token) {
@@ -325,6 +328,7 @@ public abstract class TokenManagerServlet extends BearerTokenServlet implements 
         if (resp != null) {
             httpServletResponse.setContentType("application/json");
             httpServletResponse.getWriter().println(resp.toString());
+            httpServletResponse.setContentType("application/json");
             httpServletResponse.getWriter().flush(); // commit it
         }
         httpServletResponse.setStatus(HttpStatus.SC_OK);

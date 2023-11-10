@@ -54,6 +54,7 @@ public class ServerQDLScriptHandler implements PayloadHandler {
     @Override
     public void addRequestState(ScriptRunRequest req) throws Throwable {
         req.getArgs().put(SRE_REQ_CLAIM_SOURCES, getSources()); // so its a map
+        req.getArgs().put(SRE_REQ_CLAIMS, getUserMetaData());
         req.getArgs().put(SRE_REQ_ACCESS_TOKEN, getAtData());
         req.getArgs().put(SRE_REQ_REFRESH_TOKEN, getRTData());
     }

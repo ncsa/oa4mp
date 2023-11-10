@@ -41,14 +41,14 @@ at. := tokens.'access_token'.'jwt';
 rt. := tokens.'refresh_token';
 idt.:= claims();
 ⊨ idt.'sub' ≡ 'jeffrey.gaynor@ligo.org' : 'wrong ID token subject';
-⊨ idt.'iss' ≡ 'https://test.cilogon.org/ligo'; // Check it's in VO
-⊨ idt.'aud' ≡ 'test:jeff/ligo';
-⊨ idt.'uid' ≡ 'jeffrey.gaynor'; // uid must not have trailing domain or LIGO's credmon will lose track
+⊨ idt.'iss' ≡ 'https://test.cilogon.org/igwn': 'wrong issuer'; // Check it's in VO
+⊨ idt.'aud' ≡ 'test:jeff/ligo' : 'wrong audience';
+⊨ idt.'uid' ≡ 'jeffrey.gaynor' : 'wrong uid'; // uid must not have trailing domain or LIGO's credmon will lose track
 
 ⊨ at.'sub' ≡ 'jeffrey.gaynor@ligo.org' : 'wrong AT subject';
 ⊨ at.'aud' ≡ 'ANY' : 'wrong AT audience';
 ⊨ at.'scope' ≡ 'read:/frames' : 'wrong AT scope';
-⊨ at.'iss' ≡ 'https://test.cilogon.org/ligo' : 'wrong AT sissuer';
+⊨ at.'iss' ≡ 'https://test.cilogon.org/igwn' : 'wrong AT sissuer';
 
 say('basic LIGO test ok');
 /*

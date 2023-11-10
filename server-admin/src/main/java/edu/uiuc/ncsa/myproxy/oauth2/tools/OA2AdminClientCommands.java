@@ -477,4 +477,6 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
         adminClient.setAllowQDL("y".equals(getInput("Allow QDL in scripts?(y/n)", adminClient.isAllowQDL() ? "y" : "n")));
         return adminClient;
     }
+
+
 }

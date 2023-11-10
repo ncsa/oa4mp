@@ -12,6 +12,7 @@ block[
      // set every time. Remove it if present since these would normally be removed in the access.qdl script.
      tx_scopes. := ~mask(tx_scopes., starts_with(tx_scopes., CS_HEAD)!= 0) ;
      tx_scopes. := ~mask(tx_scopes., starts_with(tx_scopes., 'wlcg.groups:')!= 0) ;
+
      xi. := resolve_templates(at_claims.EPE., tx_scopes., false); // resolves any scopes explicitly granted to user
 
      trace('FTS','rtx xi. =' + to_string(xi.));

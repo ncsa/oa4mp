@@ -3,6 +3,9 @@
    The main test suite for client management.
    See readme.txt for details.
 
+   Note this is quite similar to the standard runner, but just enough off that
+   it cannot use it since the scripts called have different signatures from other tests.
+
 */
 path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests/cm-tests/';
 script_path(path ~ script_path());
@@ -18,6 +21,7 @@ test.:= path + ['cm-basic.qdl',
                 'anon-extra.qdl',
                 'cm-cleanup.qdl'];
 say('Running all client management tests');
+say('--------------------');
 default_suite:='cm_local';
 suite := 0<size(args())?args(0):default_suite;
 counter.'pass' := 0;
@@ -29,8 +33,6 @@ try[
   ]catch[
      say('error running script ' + x);
      say('error message:' + error_message);
-     //say('error running script ' + x);
-     //say('error message:' + error_message);
     counter.'fail' += 1;
   ];
 ];

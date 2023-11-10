@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.qdl.config.QDLConfigurationLoader;
 import edu.uiuc.ncsa.qdl.scripting.AnotherJSONUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.scripting.ScriptSet;
+import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.configuration.tree.ConfigurationNode;
@@ -106,7 +107,18 @@ public class OA2QDLConfigurationLoader<T extends OA2QDLEnvironment> extends QDLC
             String rawJSON = (String) scriptNode.getValue();
             if (rawJSON != null && !rawJSON.trim().isEmpty()) {
                 // skip empty tags
-                allScripts.add(JSONObject.fromObject(rawJSON));
+                JSONObject jsonObject = JSONObject.fromObject(rawJSON);
+                Object o = jsonObject.get("qdl");
+                if(!(o instanceof JSON)){
+                    // skip it. What the heck?
+                    continue;
+                }
+                if(o instanceof JSONArray){
+                   allScripts.addAll((JSONArray)o);
+                }
+                if(o instanceof JSONObject){
+                    allScripts.add(o);
+                }
             }
         }
         return AnotherJSONUtil.createScripts(allScripts);

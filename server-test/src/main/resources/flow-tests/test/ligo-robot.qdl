@@ -29,26 +29,32 @@ cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
 cfg.'description' :=  'Robot test for LIGO';
 cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
 user_id := 'http://cilogon.org/serverT/users/21340363'; // id from Github on test.cilogon.org
-params.'authz' :=  {'scope': 'scitokentesting.read scitokentesting.write igwn.robot:ligorobottesting'}; // initial request
+params.'authz' :=  {'scope': 'read:/frames scitokentesting.read scitokentesting.write igwn.robot:ligorobottesting'}; // initial request
 
 rc := script_load('driver.qdl', cfg., params.);
 if[rc!='ok'][return(rc);];
-
+ say('before access');
 tokens. := clc#access();
+ say('got access');
 
 at. := tokens.'access_token'.'jwt';
 rt. := tokens.'refresh_token';
+say('at:\n' + print(at.));
+say('rt:\n' + print(rt.));
 idt.:= claims();
+say('idt:\n' + print(idt.));
 ⊨ idt.'sub' ≡ 'ligorobottesting@ligo.org' : 'wrong ID token subject';
-⊨ idt.'iss' ≡ 'https://test.cilogon.org/ligo'; // Check it's in VO
-⊨ idt.'aud' ≡ 'test:jeff/ligo';
-⊨ idt.'uid' ≡ 'ligorobottesting'; // uid must not have trailing domain or LIGO's credmon will lose track
-⊨ idt.'eppn' ≡ 'jeffrey.gaynor@ligo.org'; // eppn should be the same as the person requesting the robot
+⊨ idt.'iss' ≡ 'https://test.cilogon.org/igwn' : 'issuer wrong'; // Check it's in VO
+⊨ idt.'aud' ≡ 'test:jeff/ligo' : 'audience wrong';
+⊨ idt.'uid' ≡ 'ligorobottesting' : 'uid wrong'; // uid must not have trailing domain or LIGO's credmon will lose track
+⊨ idt.'eppn' ≡ 'jeffrey.gaynor@ligo.org' : 'eppn wrong'; // eppn should be the same as the person requesting the robot
+say('idt ok');
 
 ⊨ at.'sub' ≡ 'ligorobottesting@ligo.org' : 'wrong AT subject';
 ⊨ at.'aud' ≡ 'ANY' : 'wrong AT audience';
+say('at ok');
 ⊨ 'scitokentesting.write'< at.'scope' &&  'scitokentesting.read' < at.'scope' : 'wrong AT scope';
-⊨ at.'iss' ≡ 'https://test.cilogon.org/ligo' : 'wrong AT sissuer';
+⊨ at.'iss' ≡ 'https://test.cilogon.org/igwn' : 'wrong AT issuer';
 
 say('LIGO robot test ok');
 /*

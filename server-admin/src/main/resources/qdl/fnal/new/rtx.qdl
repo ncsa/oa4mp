@@ -10,21 +10,25 @@ block[
      // the original scope request.
      // 3/20/2022 -- Oopsie! Dave switched to using another client which *always* sends the capability
      // set every time. Remove it if present since these would normally be removed in the access.qdl script.
+     SS(y)->say('*** FNAL' +  (is_defined(access_control.)?('[' + access_control.client_id + ']:'):':') + to_string(y));
+
+     SS('tx_scopes.=' + print(tx_scopes.));
+
      tx_scopes. := ~mask(tx_scopes., starts_with(tx_scopes., CS_HEAD)!= 0) ;
      tx_scopes. := ~mask(tx_scopes., starts_with(tx_scopes., 'wlcg.groups:')!= 0) ;
      xi. := resolve_templates(at_claims.EPE., tx_scopes., false); // resolves any scopes explicitly granted to user
-
-     say('*** FNAL rtx xi. =' + to_string(xi.));
+     SS('rtx xi.:\n' + print(xi.));
 
      cs. := []~mask(scopes., -1 < starts_with(scopes., CS_HEAD));
+     SS('FNAL rtx cs.=' + print(cs.));
      if[
          1 == size(cs.)
      ][
-       	 say('*** FNAL rtx got ' + CS + ': ' + input_form(cs.));
 
+         SS('rtx got ' + CS + ':\n' + print(cs.));
           record. :=  script_load('fnal/new/get_service.qdl',  (cs.0-CS_HEAD)+'@fnal.gov');
 
-         say('*** FNAL rtx record =' + to_string(record.));
+         SS('rtx record:\n' + print(record.));
          if[
               0 < size(record.)
          ][
@@ -36,29 +40,28 @@ block[
                   is_uri(x)->is_defined(to_uri(x).scheme);
                   // do any substitutions in the templates.
                   s_rec. := template_substitution(record.EPE., claims.); // use s_rec not record.EPE now
-                  say('*** FNAL rtx s_rec. post subst =' + to_string(s_rec.));
+                  SS('rtx s_rec. post subst:\n' + print(s_rec.));
                   uq_. := []~mask(s_rec., !for_each(@is_uri, s_rec.)); // unqualified names
-                  say('*** FNAL rtx uq_. =' + to_string(uq_.));
-                  // CIL-1736
+                  SS('rtx uq_.:\n' + print(uq_.));
+                  // If uq_. is empty, i.e., no unqualified names, then skip extracting them.
                     if[0 < size(uq_.)]
-                  then[
-                       uq_. := mask(uq_.,reduce(@||, for_each(@==, tx_scopes., uq_.)));
-                       say('*** FNAL rtx uq_. after reduce =' + to_string(uq_.));
+                  then[uq_. := mask(uq_.,reduce(@||, for_each(@==, tx_scopes., uq_.)));
+                       SS('rtx uq_. after reduce:\n' + print(uq_.));
                       ];
                   // Get any specific overrides.
                   eta. := resolve_templates(s_rec., tx_scopes., false);
-                  say('*** FNAL rtx eta. =' + to_string(eta.));
+                  SS('rtx eta.:\n' + print(eta.));
                    xi. := xi. ~ eta. ~ uq_.; // duplicates ok here, removed later
               ]; // end if LDAP has entries for CS.
          ]; // end if something in LDAP to process
      ]; // end if capabilities are requested.
 
-      say('*** FNAL rtx final xi =' + to_string(xi.));
+      SS('rtx final xi.:\n' + print(xi.));
 
       access_token.scope := detokenize(unique(xi.), ' ', 2); // turn in to string, omit duplications, trailing space
-        say('*** FNAL rtx access token = \'' + access_token.scope + '\'');
+      SS('rtx access token scope = \'' + access_token.scope + '\'');
 
      if[is_defined(record.EPPN)][access_token.sub := record.EPPN;];
-
+     SS('rtx done!');
 ];
 

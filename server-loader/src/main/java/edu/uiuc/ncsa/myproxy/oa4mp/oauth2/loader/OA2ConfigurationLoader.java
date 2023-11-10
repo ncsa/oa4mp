@@ -98,6 +98,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     public static final String CLEANUP_INTERVAL_TAG = "cleanupInterval";
     public static final String CLEANUP_ALARMS_TAG = "cleanupAlarms";
     public static final String CLEANUP_LOCKING_ENABLED = "cleanupLockingEnabled";
+    public static final String CLEANUP_FAIL_ON_ERRORS = "cleanupFailOnErrors";
 
     public static final String MONITOR_ENABLED = "monitorEnable";
     public static final String MONITOR_INTERVAL = "monitorInterval";
@@ -153,6 +154,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
 
     public static long CLEANUP_INTERVAL_DEFAULT = 30 * 60 * 1000L; // 30 minutes
     public static boolean CLEANUP_LOCKING_ENABLED_DEFAULT = false; // Don't lock tables by default
+    public static boolean CLEANUP_FAIL_ON_ERRORS_DEFAULT = true; // fail on errors
     public static boolean MONITOR_ENABLED_DEFAULT = false; // Don't enabled monitoring by default
     public static boolean UUC_ENABLED_DEFAULT = false; // Don't just clean up clients
     public static long UUC_INTERVAL_DEFAULT = 6 * 60 * 60 * 1000L; // 6 hours minutes
@@ -217,6 +219,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     isQdlStrictACLS(),
                     isSafeGC(),
                     isCleanupLockingEnabled(),
+                    getCleanupFailOnErrors(),
                     getRFC8628ServletConfig(),
                     isRFC8628Enabled(),
                     isprintTSInDebug(),
@@ -634,6 +637,26 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         return cleanupLockingEnabled;
     }
 
+    public Boolean getCleanupFailOnErrors() {
+        if (cleanupFailOnErrors == null) {
+
+            String raw = getFirstAttribute(cn, CLEANUP_FAIL_ON_ERRORS);
+            if (StringUtils.isTrivial(raw)) {
+                cleanupFailOnErrors = CLEANUP_FAIL_ON_ERRORS_DEFAULT;
+            } else {
+                try {
+                    cleanupFailOnErrors = Boolean.parseBoolean(raw);
+                } catch (Throwable t) {
+                    cleanupFailOnErrors = CLEANUP_FAIL_ON_ERRORS_DEFAULT;
+                }
+            }
+            DebugUtil.trace(this, CLEANUP_FAIL_ON_ERRORS + " set to " + cleanupFailOnErrors);
+        }
+
+        return cleanupFailOnErrors;
+    }
+
+    Boolean cleanupFailOnErrors = null;
 
     Boolean monitorEnabled = null;
 

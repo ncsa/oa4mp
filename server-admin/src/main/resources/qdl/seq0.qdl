@@ -59,7 +59,12 @@ then[
         if[∃claims.'roles2']
       then[claims.'roles2' := xas.'org.oa4mp'.'/roles2';];
     ];
-/*  Uncomment to test error handling. */
+say('mail.cfg:\n' + print(mail.cfg.));
+say('mail.message:\n' + print(mail.message.));
+   /*
+     Uncomment to test error handling. This makes the flow bomb, but then you get to
+     see what an error should look like.
+    */
 /*
   raise_error('raise_error test', oa4mp_code, {'message':'error test', 'error_type' :
      'error_type_message','error_uri':'https://localhost/oops'});

@@ -30,4 +30,4 @@ return({'file':'/home/ncsa/dev/csd/config/client-oa2.xml',
                             'idp':'NCSA',
                             'description' : 'long term test',
                             'save_path' : '/home/ncsa/dev/flow-test',
-                            'scope':[]});
+                            'scope':''});

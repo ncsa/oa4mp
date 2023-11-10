@@ -17,7 +17,6 @@ while[
   x. ∈ cfgs.
   ][
    try[
-       say('reading ' + x.'id');
        save_to := get_save_path(system_defaults., defaults., x.);
        f := do_override(system_defaults., defaults., x., 'file');
        clc#init(f, x.'id'); // init or stuff like the debugger fails
@@ -26,9 +25,9 @@ while[
        tokens. := clc#refresh();
        tokens. := clc#exchange();
        tokens. := clc#exchange('-rt');
-       say('   check ok');
+       say('ok: ' +  x.'id');
      ]catch[
-       say('check failed for ' + x.'id' + ': ' + error_message);
+       say('failure for ' + x.'id' + ': ' + error_message);
      ]; // end catch
   ]; // end while
 

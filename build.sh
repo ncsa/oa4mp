@@ -6,8 +6,8 @@
 #  OA4MP_ROOT = root of sources
 #  OA4MP_CLIENT_DEPLOY = where client artifacts are put
 #  OA4MP_SERVER_DEPLOY = where server artifacts are put
-#  OA4MP_QDL_ROOT = where QDL artifacts are put
 #
+#  N.B. QDL is built and deployed in the build-tools script
 if [ -z ${NCSA_DEV_INPUT+x} ]
   then
     echo "no sources, skipping..."

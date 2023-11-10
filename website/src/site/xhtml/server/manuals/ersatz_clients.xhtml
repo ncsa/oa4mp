@@ -131,12 +131,16 @@
 </p>
 
 <h2>Creation of Ersatz Clients via the Client Management API</h2>
-<p>Ersatz clients may be created by an admin client, just like any other.
+<p>Ersatz clients may be created by an admin client, just like any other. Set the property
+    <b>ersatz_client</b> to true and then set the provisioners.
     In order to set up the provisioners, you set the property <b>org.oa4mp:/ersatz/provisioners</b>
     to be either the provisioner ID (i.e., the client ID of the client that an start the flow) or
     a list of IDs. The list of IDs is <br/><br/>
     provisionerID ≻ ersatzID_0 ≻ ersatzID_1 ≻ ... ≻ ersatzID_n<br/><br/>
     All of these must be administered by the same admin client and provision each other in sequence.</p>
+
+<p>If you want the ersatz client to inherit the user metadata (i.e., the id token) then you should set
+    <b>ersatz_inherit_id_token</b> to true. The default is true.</p>
 
 <h2>Inheritance etc. (advanced)</h2>
 <p>Normally if A ≻ α, then A starts the flow and in the token exchange, α presents the
@@ -165,7 +169,7 @@
 <p>
     Since provisioning clients can form a prototype hierarchy, there is an attribute for clients
     named<b>extendsProvisioners</b> and this means that the provisioners should be used as the
-    prototype hierarchy.  If you set this and specify prototypes,
+    prototype hierarchy. If you set this and specify prototypes,
     then provisioning clients are used first, followed by all specifically set prototypes.
 </p>
 

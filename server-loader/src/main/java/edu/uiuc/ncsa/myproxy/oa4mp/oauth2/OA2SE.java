@@ -96,6 +96,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  boolean qdlStrictACLs,
                  boolean safeGC,
                  boolean cleanupLockingEnabled,
+                 boolean cleanupFailOnErrors,
                  RFC8628ServletConfig rfc8628ServletConfig,
                  boolean rfc8628Enabled,
                  boolean printTSInDebug,
@@ -188,8 +189,14 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.monitorAlarms = monitorAlarms;
         this.monitorEnabled = isMonitorEnabled;
         this.uucConfiguration = uucConfiguration;
+        this.cleanupFailOnErrors = cleanupFailOnErrors;
     }
 
+    public boolean isCleanupFailOnErrors() {
+        return cleanupFailOnErrors;
+    }
+
+    boolean cleanupFailOnErrors;
     public UUCConfiguration getUucConfiguration() {
         return uucConfiguration;
     }

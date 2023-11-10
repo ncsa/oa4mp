@@ -28,7 +28,6 @@ old_tokens. := clc#tokens();
 old_id. := clc#claims();
 tokens. := clc#exchange('-rt', args.0, args.1); // forks flow
 rt. := tokens.'refresh_token';
-say('rt:\n' + print(rt.));
 // same token returned by the service, not a new one.
 ⊨ (rt.'jti') != (old_tokens.'refresh_token'.'jti') : 'refresh token not swapped';
 
@@ -38,4 +37,4 @@ say('rt:\n' + print(rt.));
 ⊨ 4800000 == rt.'lifetime' : 'refresh token has incorrect lifetime';
 ⊨ 'https://wlcg.cern.ch/jwt/refresh1' == rt.'jwt'.'aud' : 'refresh token has incorrect audience';
 
-say('𝕰𝖗s𝖆𝖙𝖟 requesting a refresh token using ' + (args.1) + ' for the subject token:  ok');
+say('ok: 𝕰𝖗s𝖆𝖙𝖟 requesting a refresh token using ' + (args.1) + ' for the subject token');

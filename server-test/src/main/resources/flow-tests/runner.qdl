@@ -4,7 +4,7 @@
 path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests';
 script_path(path ~ script_path());
 test. := args().0;
-
+skip_line := 1<size(args())?args().1:false; // print a blank line between tests?
 
 counter.'pass' := 0;
 counter.'fail' := 0;
@@ -19,7 +19,7 @@ try[
 
   if[rc == 'q'][break();]; // exit app
   if[rc=='s'][counter.'skipped'+=1;continue();]; // skip this test
-  say(''); // blank line for clean display.
+  if[!skip_line][say('');]; // blank line for clean display.
   counter.'pass' += 1;
   ]catch[
      say('error running script ' + x);

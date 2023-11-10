@@ -1,6 +1,8 @@
-Long term tests for test.cilogon.org
+Long term tests for a service
+
 This emulates the case
-of clients with long term active flows that get caught in an upgrade.
+of clients with long term active flows that e.g.,
+get caught in an upgrade.
 
 Flows are started (with start.qdl) and their state is stashed. Then upgrade the
 server and run the resume.qdl command. If there are no errors, then
@@ -34,7 +36,7 @@ System defaults
 description := 'long term test of ' + id;
        file := '/home/ncsa/dev/csd/config/client-oa2.xml';
   flow_type := 'uri';
-      scope := {Optional stem of scopes}
+      scope := {Optional string of scopes}
   save_name := {base 32 encoded id}
 
 Here are the entries and their defaults. Only the id is required,
@@ -47,7 +49,7 @@ missing will be used.
 description := 'long term test of UCSD with read scopes'
        file := '/home/ncsa/dev/csd/config/client-oa2.xml';
   flow_type := 'uri';
-      scope := ['read:/x/y', 'read:/p/q/r'];
+      scope := 'read:/x/y read:/p/q/r' // This is a string since ini files do not allow lists here
 
 The scope parameter would be sent on authorization and is a stem of
 scopes. The section_name is for you and the contract is to loop over

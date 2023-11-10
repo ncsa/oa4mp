@@ -297,6 +297,7 @@ public class JWTRunner {
                 map.put(SRE_REQ_EXTENDED_ATTRIBUTES, transaction.getExtendedAttributes());
                 map.put(SRE_REQ_FLOW_STATES, transaction.getFlowStates()); // so its a map
                         isPopulated = true;
+
             }
             @Override
             public Map<String, Object> getArgs() {

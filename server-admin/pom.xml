@@ -82,6 +82,7 @@
         <profile>
             <id>cli</id>
             <build>
+                <finalName>cli</finalName>
                 <plugins>
                     <plugin>
                         <artifactId>maven-assembly-plugin</artifactId>
@@ -97,7 +98,6 @@
                             <descriptorRefs>
                                 <descriptorRef>jar-with-dependencies</descriptorRef>
                             </descriptorRefs>
-                            <finalName>cli</finalName>
 
                         </configuration>
                         <executions>
@@ -119,6 +119,7 @@
         <profile>
             <id>client</id>
             <build>
+                <finalName>clc</finalName>
                 <plugins>
                     <plugin>
                         <artifactId>maven-assembly-plugin</artifactId>
@@ -133,7 +134,6 @@
                             <descriptorRefs>
                                 <descriptorRef>jar-with-dependencies</descriptorRef>
                             </descriptorRefs>
-                            <finalName>clc</finalName>
                         </configuration>
                         <executions>
                             <execution>
@@ -153,6 +153,7 @@
         <profile>
             <id>jwt</id>
             <build>
+                <finalName>jwt</finalName>
                 <plugins>
                     <plugin>
                         <artifactId>maven-assembly-plugin</artifactId>
@@ -167,7 +168,6 @@
                             <descriptorRefs>
                                 <descriptorRef>jar-with-dependencies</descriptorRef>
                             </descriptorRefs>
-                            <finalName>jwt</finalName>
                         </configuration>
                         <executions>
                             <execution>

@@ -18,9 +18,16 @@ public class OA2LibLoader implements LibLoader {
     public void add(State state) {
         QDLStem lib = new QDLStem();
         lib.put("description", "OA4MP tools for ACLs, JWTs, claims as well as token handlers");
-        lib.put("claims", ClaimsLoader.class.getCanonicalName());
-        lib.put("jwt", JWTLoader.class.getCanonicalName());
-        lib.put("acl", ACLoader.class.getCanonicalName());
-        state.addLibEntries(libKey, lib);
+        state.addLibEntries(libKey, createEntries());
+    }
+    protected QDLStem createEntries(){
+        QDLStem lib = new QDLStem();
+        lib.put("description", "OA4MP tools for ACLs, JWTs, claims as well as token handlers");
+        QDLStem subLib = new QDLStem();
+        subLib.put("claims", ClaimsLoader.class.getCanonicalName());
+        subLib.put("jwt", JWTLoader.class.getCanonicalName());
+        subLib.put("acl", ACLoader.class.getCanonicalName());
+        lib.put("util", subLib);
+        return lib;
     }
 }

@@ -62,4 +62,4 @@ id. := clc#exchange('-id', '-subject', 'at');
 ⊨ id.'jti' != old_id.'jti' : 'IDT JTI not updated';
 ⊨ id.'sub' == 'localhost:e1' : 'IDT wrong subject';
 ⊨ id.'iat' != old_id.'iat' : 'IDT issued at not updated';
-say('𝕰𝖗s𝖆𝖙𝖟 basic fork using ' + (args.2) + ' for the subject token and requesting ' + (args.0) + ':  ok');
+say('ok: 𝕰𝖗s𝖆𝖙𝖟 basic fork using ' + (args.2) + ' for the subject token and requesting ' + (args.0));

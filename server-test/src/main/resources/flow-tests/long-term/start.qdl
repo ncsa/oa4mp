@@ -13,7 +13,7 @@ defaults. := ini.'default';
 system_defaults. := script_load('long-term/setup.qdl');
 
 cfgs. := ini\pick((x)->x!='default', list_keys(ini.)); // picks out everything but default
-
+ total = 0;
 while[x.∈cfgs.]
    do[
    debugger(1,'x:\n' + print(x.));
@@ -26,7 +26,7 @@ while[x.∈cfgs.]
        then[cfg.'description' := do_override(system_defaults., defaults., x., 'description');]
        else[cfg.'description' := 'long term test for ' + cfg.'id';];
        params.'authz' := [];
-       s := detokenize(do_override(system_defaults., defaults., x., 'scope'), ' ');
+       s := do_override(system_defaults., defaults., x., 'scope');
        if[0 < size(s)][params.'authz' := {'scope':s};];
        rc := script_load('driver.qdl', cfg., params.);
        tokens. := clc#access();
@@ -36,6 +36,9 @@ while[x.∈cfgs.]
        ]catch[
        // ok if it doesn't exist.
        ];
+       total++;
        clc#write(save_to);
        say('write ok for ' + x.'id' + ' (' + tokens.'refresh_token'.'lifetime'+ ' ms.)');
+       say('');
     ]; //end while
+ say('ok: ' + total + ' configurations written');

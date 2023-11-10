@@ -31,4 +31,4 @@ id. := exchange('-id','-subject',args.0?'at':'rt');
 ⊨ claims().'iss' == 'https://localhost:9443/oauth2' : 'IDT wrong issuer';
 ⊨ claims().'aud' == 'localhost:p1' : 'IDT wrong audience';
 ⊨ claims().'iat' != claims.'iat' : 'IDT issued at time not updated';
-say('token exchange test using ' + (args.0?'access':'refresh') + ' token for subject: ok');
+say('ok: token exchange test using ' + (args.0?'access':'refresh') + ' token for subject');

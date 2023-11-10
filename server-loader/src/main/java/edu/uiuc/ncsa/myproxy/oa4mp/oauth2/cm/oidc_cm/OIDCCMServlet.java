@@ -630,8 +630,15 @@ public class OIDCCMServlet extends EnvServlet {
             DebugUtil.trace(this, "ENCODING is of type " + httpServletRequest.getContentType());
             // TODO Probably should parse the encoding type. 'application/json; charset=UTF-8' would be standard.
             if (!httpServletRequest.getContentType().contains("application/json")) {
+                // Fixes CIL-1852
                 httpServletResponse.setStatus(HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE);
-                throw new ServletException("Unsupported encoding of \"" + httpServletRequest.getContentType() + "\" for body of POST. Request rejected.");
+                httpServletResponse.setContentType("application/json");
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("error", "unsupported encoding");
+                jsonObject.put("description" ,"Unsupported encoding of \"" + httpServletRequest.getContentType() + "\" for body of POST. Request rejected." );
+                httpServletResponse.getWriter().println(jsonObject);
+                httpServletResponse.getWriter().flush();
+                return;
             }
             // delegates to the doIt method.
             doIt(httpServletRequest, httpServletResponse);

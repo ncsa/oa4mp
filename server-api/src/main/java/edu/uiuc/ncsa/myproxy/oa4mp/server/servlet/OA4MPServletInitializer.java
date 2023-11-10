@@ -4,7 +4,6 @@ import edu.uiuc.ncsa.myproxy.MyProxyConnectable;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.AbstractCLIApprover;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.ConnectionCacheRetentionPolicy;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.util.ExceptionEventNotifier;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientNotifier;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
@@ -114,8 +113,9 @@ public class OA4MPServletInitializer implements Initialization {
         }
 
 
+    /*  Fixes CIL-1852 Notifications on random failures is just too much traffic.
         ExceptionEventNotifier exceptionNotifier = new ExceptionEventNotifier(x, logger);
-        MyProxyDelegationServlet.addNotificationListener(exceptionNotifier);
+        MyProxyDelegationServlet.addNotificationListener(exceptionNotifier);*/
         notifiersSet = true;
     }
 

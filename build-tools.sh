@@ -3,8 +3,10 @@
 # If you have local installs of QDL and OA4MP, this will update them.
 #
 # The normal lifecycle is to invoke build.sh from this directory, then
-# if you want the tools, invoke this. Nothing will run unless try {
+# if you want the tools, invoke this. Nothing will run unless it
 # detects various environment variables:
+# Generally this should be run after building QDL, though a planned improvement
+# is to have it with its own installer.
 # QDL_HOME
 # OA4MP_HOME
 
@@ -52,7 +54,7 @@ if [ -z ${QDL_HOME+x} ];  then
   else
   # If there is a local QDL install, update it.
     cp target/qdl.jar $QDL_HOME/lib;
-    cp /home/ncsa/dev/temp-deploy/oa2-qdl/lib/build-info.txt $QDL_HOME/lib ;
+    cp $NCSA_DEV_OUTPUT/qdl/lib/build-info.txt $QDL_HOME/lib ;
 fi
 
 if [ -z ${OA4MP_HOME+x} ];  then

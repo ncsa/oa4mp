@@ -56,7 +56,7 @@
         <td style="vertical-align: top;">900</td>
         <td style="vertical-align: top;">"<span style="background-color: #ff6600;">OAuth 2</span>
             specific. This will set the lifetime of authorization grants, in seconds, issued by
-            the server.  The default is 900 seconds = 15 minutes. As long as the grant has not expired,
+            the server. The default is 900 seconds = 15 minutes. As long as the grant has not expired,
             the second leg of the exchange (getting an access token) can be done. If there is too
             long a gap between authentication and getting an access token, it will fail. Generally
             the default is quite reasonable. See note below on units.
@@ -67,21 +67,47 @@
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">20 minutes</td>
         <td style="vertical-align: top;">How often should the cleanup thread run (in seconds). To disable
-            cleanup completely, set this ≤ 0 and do not set alarms.</td>
+            cleanup completely, set this ≤ 0 and do not set alarms.
+        </td>
     </tr>
     <tr id="cleanupAlarms">
         <td style="vertical-align: top;">cleanupAlarms</td>
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">N/A</td>
         <td style="vertical-align: top;">Comma delimited list of times of the form hh:mm:ss.
-        Times are on a 24 hour clock and fractions of seconds are ignored.
-        Cleanups will happen daily at these times.
-        Note that alarms have right of way in that if you define alarms
-        and a cleanupInterval, the alarms will be done. If you do not want alarms,
-        omit this entry. <br/><br/>
-        E.g.<br/>
-        cleanupAlarms="06:00:00, 18:30:00"<br/><br/>
-        Would have garbage collection run daily at 6:00 am and 6:30 pm.</td>
+            Times are on a 24 hour clock and fractions of seconds are ignored.
+            Cleanups will happen daily at these times.
+            Note that alarms have right of way in that if you define alarms
+            and a cleanupInterval, the alarms will be done. If you do not want alarms,
+            omit this entry. <br/><br/>
+            E.g.<br/>
+            cleanupAlarms="06:00:00, 18:30:00"<br/><br/>
+            Would have garbage collection run daily at 6:00 am and 6:30 pm.
+        </td>
+    </tr>
+    <tr id="cleanupFailOnErrors">
+        <td style="vertical-align: top;">cleanupFailOnErrors</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">true</td>
+        <td style="vertical-align: top;">If cleanup threads should continue processing if there is an error. A typical
+            casse is that there
+            are munged or otherwise unparseable files in a transaction file store (e.g. someone copied
+            a non-transaction to the directory). If cleaup stops when it hits a bad file, then <b>no</b> more
+            cleanup will happen and stale file store entries will accumulate. If it's an active server,
+            this may happen quite quickly. In other contexts, such as a database store, a failure often means
+            that the database itself is unreachable and attempting further processing is a waste of
+            resources. Note that a list of failures is written to the log if debugging is enabled.
+        </td>
+    </tr>
+    <tr id="cleanupLockingEnabled">
+        <td style="vertical-align: top;">cleanupLockingEnabled</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">false</td>
+        <td style="vertical-align: top;">Enabled locking the stores during cleanup. This is useful if the store is shared
+            among OA4MP instances (e.g. there are several behind a load balancer that share the same database).
+            If you do not have multiple concurrent instances of OA4MP running,
+            you do not need to enable this feature.
+        </td>
     </tr>
     <tr id="clientSecretLength">
         <td style="vertical-align: top;">clientSecretLength</td>
@@ -93,7 +119,7 @@
             the returned secret is URL safe encoded as well. The default is 64 bytes = 512 bits.
         </td>
     </tr>
-    <tr id = "debug">
+    <tr id="debug">
         <td style="vertical-align: top;">debug</td>
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">"warn"</td>
@@ -131,8 +157,10 @@
         <td style="vertical-align: top;">demoModeEnabled</td>
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">false</td>
-        <td style="vertical-align: top;">Enable demo mode. This just shuts off authorization and is intended that an administrator
-        can quickly set up OA4MP to evaluate it. See <a href="../manuals/demo-mode.html">using demo mode</a>.</td>
+        <td style="vertical-align: top;">Enable demo mode. This just shuts off authorization and is intended that an
+            administrator
+            can quickly set up OA4MP to evaluate it. See <a href="../manuals/demo-mode.html">using demo mode</a>.
+        </td>
     </tr>
     <tr id="disableDefaultStores">
         <td style="vertical-align: top;">disableDefaultStores</td>
@@ -151,8 +179,10 @@
         <td style="vertical-align: top;">enableDeviceFlow</td>
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">false</td>
-        <td style="vertical-align: top;">Boolean value. If true, the support for the device authorization flow as per RFC 8628 is enabled
-            with defaults. Alternately there is a <a href = "../configuration/device-flow-servlet-configuration.html">device flow servlet configuration</a>
+        <td style="vertical-align: top;">Boolean value. If true, the support for the device authorization flow as per
+            RFC 8628 is enabled
+            with defaults. Alternately there is a <a href="../configuration/device-flow-servlet-configuration.html">device
+                flow servlet configuration</a>
             that will be used.
         </td>
     </tr>
@@ -161,7 +191,8 @@
         <td style="vertical-align: top;">enableTokenExchange</td>
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">true</td>
-        <td style="vertical-align: top;">Boolean value. If true, the support for exchanging tokens as per RFC 8693 is enabled.
+        <td style="vertical-align: top;">Boolean value. If true, the support for exchanging tokens as per RFC 8693 is
+            enabled.
         </td>
     </tr>
     <tr id="enableTwoFactorSupport">
@@ -206,7 +237,8 @@
         <td style="vertical-align: top;">maxAuthorizationGrantLifetime</td>
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">1800</td>
-        <td style="vertical-align: top;">This is the largest authorization grant lifetime, in seconds, that the server will
+        <td style="vertical-align: top;">This is the largest authorization grant lifetime, in seconds, that the server
+            will
             permit,
             regardless of what is requested. Note that there is no way for clients to request this
             except as part of a device flow. Contrast this with the defaultAuthorizationGrantLifetime property
@@ -227,21 +259,22 @@
         </td>
     </tr>
     <tr id="maxClientRefreshTokenLifetime">
-         <td style="vertical-align: top;">maxClientRefreshTokenLifetime</td>
-         <td style="vertical-align: top;">N</td>
-         <td style="vertical-align: top;">2592000</td>
-         <td style="vertical-align: top;">"<span style="background-color: #ff6600;">OAuth 2</span>
-             specific. This will set a global maximum on the server, in seconds, for refresh tokens a client
-             may request at registration. The default is 13 months. Note that in practice this should
-             <i>never</i> exceed the server default maximum, because the server default is always enforced.
-             See note below on units.
-         </td>
-     </tr>
+        <td style="vertical-align: top;">maxClientRefreshTokenLifetime</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">2592000</td>
+        <td style="vertical-align: top;">"<span style="background-color: #ff6600;">OAuth 2</span>
+            specific. This will set a global maximum on the server, in seconds, for refresh tokens a client
+            may request at registration. The default is 13 months. Note that in practice this should
+            <i>never</i> exceed the server default maximum, because the server default is always enforced.
+            See note below on units.
+        </td>
+    </tr>
     <tr id="maxRefreshTokenLifetime">
         <td style="vertical-align: top;">maxRefreshTokenLifetime</td>
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">2592000</td>
-        <td style="vertical-align: top;">This is the largest refresh token lifetime in seconds that the server will permit,
+        <td style="vertical-align: top;">This is the largest refresh token lifetime in seconds that the server will
+            permit,
             regardless of what is requested. Default is 30 days or 2592000 seconds.
             See note below on units.
         </td>
@@ -261,24 +294,25 @@
         <td style="vertical-align: top;">monitorInterval</td>
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">2 hours</td>
-        <td style="vertical-align: top;">How often should the monitor thread run. </td>
+        <td style="vertical-align: top;">How often should the monitor thread run.</td>
     </tr>
     <tr id="monitorAlarms">
         <td style="vertical-align: top;">monitorAlarms</td>
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">N/A</td>
         <td style="vertical-align: top;">Comma delimited list of times of the form hh:mm:ss.
-        Times are on a 24 hour clock and fractions of seconds are ignored.
-        Monitoring will happen daily at these times.
-        Note that alarms have right of way in that if you define alarms
-        and a monitorInterval, the alarms will be done. If you do not want alarms,
-        omit this entry. <br/><br/>
-        E.g.<br/>
-        monitorAlarms="06:00:00, 18:30:00"<br/><br/>
-        Would have updates run daily at 6:00 am and 6:30 pm.</td>
+            Times are on a 24 hour clock and fractions of seconds are ignored.
+            Monitoring will happen daily at these times.
+            Note that alarms have right of way in that if you define alarms
+            and a monitorInterval, the alarms will be done. If you do not want alarms,
+            omit this entry. <br/><br/>
+            E.g.<br/>
+            monitorAlarms="06:00:00, 18:30:00"<br/><br/>
+            Would have updates run daily at 6:00 am and 6:30 pm.
+        </td>
     </tr>
 
-    <!--
+    <!--   ex.
                  enableMonitor="true"
              monitorInterval="60 sec"
              monitorAlarms="09:30:00, 09:00:00, 16:00:00,  12:00:00"
@@ -378,7 +412,8 @@
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">false</td>
         <td style="vertical-align: top;">Set to <code>true</code> if you want to <b>require</b> all
-            public clients to use code challenges as per <a href="https://datatracker.ietf.org/doc/html/rfc7636">RFC 7636</a>.
+            public clients to use code challenges as per <a href="https://datatracker.ietf.org/doc/html/rfc7636">RFC
+                7636</a>.
             Note that OA4MP will allow <i>any</i> client to send along a challenge. If this flag is set
             to true though, public clients will be required to use it or will be denied access.
         </td>
@@ -387,7 +422,8 @@
         <td style="vertical-align: top;">rtGracePeriod</td>
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">-1</td>
-        <td style="vertical-align: top;">For 0 ≤ values, this sets the lifetime in seconds of the refresh token on refresh.
+        <td style="vertical-align: top;">For 0 ≤ values, this sets the lifetime in seconds of the refresh token on
+            refresh.
             If the value is 0, this invalidates the token immediately. A value of -1 means to simply let
             the tokens age with their current lifetimes. Each client may have this set as well which will
             override the server setting. The client default is to use whatever the server has configured.<br/>
@@ -448,7 +484,7 @@
 
 <h2>A note on time and units</h2>
 <p>As of 5.1, all the times for grants, access tokens and refresh tokens may have units
-specified. So this is a perfectly acceptable snipped from a configuration file:</p>
+    specified. So this is a perfectly acceptable snipped from a configuration file:</p>
 <pre>
     &lt;service name="localhost:oa4mp.oa2.mariadb"
              disableDefaultStores="true"
@@ -464,7 +500,7 @@ specified. So this is a perfectly acceptable snipped from a configuration file:<
     &lt;!-- lots of stuff --&gt;
 </pre>
 <p>Note that, in order to maintain backwards compatibility, the assumption is that all of these <i>without</i>
-units are in <b>seconds</b>. Blanks before and after units are allowed. Acceptable units are</p>
+    units are in <b>seconds</b>. Blanks before and after units are allowed. Acceptable units are</p>
 <ul>
     <li>"ms.", "ms" for milliseconds, e.g. "1000 ms."</li>
     <li>"sec.", "sec", "s.", "s" for seconds, e.g., "300 sec"</li>

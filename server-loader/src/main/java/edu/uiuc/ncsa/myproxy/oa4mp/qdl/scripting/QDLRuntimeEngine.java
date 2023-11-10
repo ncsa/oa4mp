@@ -12,8 +12,10 @@ import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSource;
 import edu.uiuc.ncsa.qdl.config.QDLConfigurationLoaderUtils;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.exceptions.RaiseErrorException;
+import edu.uiuc.ncsa.qdl.extensions.mail.QDLMail;
 import edu.uiuc.ncsa.qdl.scripting.Scripts;
 import edu.uiuc.ncsa.qdl.state.StateUtils;
+import edu.uiuc.ncsa.qdl.variables.QDLList;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.qdl.workspace.WorkspaceCommands;
@@ -33,10 +35,7 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
 import java.io.*;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -280,9 +279,9 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             scriptRuntimeException.setCode(errorCode);
             scriptRuntimeException.setErrorURI(errorURI);
             scriptRuntimeException.setCustomErrorURI(customErrorURI);
-            if(httpStatus == -1 && customErrorURI != null){
+            if (httpStatus == -1 && customErrorURI != null) {
                 scriptRuntimeException.setHttpStatus(HttpStatus.SC_MOVED_TEMPORARILY); // force the redirect
-            }else{
+            } else {
                 scriptRuntimeException.setHttpStatus(httpStatus);
             }
             scriptRuntimeException.setRequestedType(requestedType);
@@ -305,6 +304,10 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
     public static String FLOW_STATE_VAR = "flow_states" + STEM_INDEX_MARKER;
     public static String CLAIMS_VAR = "claims" + STEM_INDEX_MARKER;
     public static String PROXY_CLAIMS_VAR = "proxy_claims" + STEM_INDEX_MARKER;
+    public static String MAIL_VAR = "mail" + STEM_INDEX_MARKER;
+    // next couple are element in the mail. stem
+    public static String MAIL_CFG_VAR = "cfg";
+    public static String MAIL_MESSAGE_VAR = "message" ;
     public static String ACCESS_TOKEN_VAR = "access_token" + STEM_INDEX_MARKER;
     public static String REFRESH_TOKEN_VAR = "refresh_token" + STEM_INDEX_MARKER;
     public static String SCOPES_VAR = "scopes" + STEM_INDEX_MARKER;
@@ -341,13 +344,41 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         state.setValue(SYS_ERR_VAR, sysErr);
         // New way, raise an error with this reserved error code.
         state.setValue(OA4MP_ERROR_CODE_NAME, OA4MP_ERROR_CODE);
+        if (state.getOa2se().getMailUtil().isEnabled()) {
+            QDLStem mailStem = new QDLStem();
 
+            QDLStem mailCfg = QDLMail.convertMEToStem(state.getOa2se().getMailUtil().getMailEnvironment());
+            mailStem.put(MAIL_CFG_VAR, mailCfg);
+            QDLList body = new QDLList();
+            try {
+                // CIL-1873 support for email notifications from QDL.
+                if(state.getOa2se().getMailUtil().getSubjectTemplate()==null){
+                    body.add("(no subject)");
+                }else{
+                    body.add(state.getOa2se().getMailUtil().getSubjectTemplate());
+                }
+                if (state.getOa2se().getMailUtil().getMessageTemplate() == null) {
+                    body.add("(no content)");
+                }else{
+                    StringTokenizer stringTokenizer = new StringTokenizer(state.getOa2se().getMailUtil().getMessageTemplate(), "\n");
+                    while(stringTokenizer.hasMoreTokens()){
+                        body.add(stringTokenizer.nextToken());
+                    }
+                }
+                mailStem.put(MAIL_MESSAGE_VAR, new QDLStem(body));
+            }catch(IOException iox){
+                getState().getLogger().warn("could not get mail message for QDL runtime environment");
+            }
+            state.setValue(MAIL_VAR, mailStem);
+        }
         FlowStates2 flowStates = (FlowStates2) req.getArgs().get(SRE_REQ_FLOW_STATES);
         state.setValue(FLOW_STATE_VAR, toStem(flowStates));
 
         JSONObject claims = (JSONObject) req.getArgs().get(SRE_REQ_CLAIMS);
         QDLStem claimStem = new QDLStem();
-        claimStem.fromJSON(claims);
+        if(claims != null) {
+            claimStem.fromJSON(claims);
+        }
         state.setValue(CLAIMS_VAR, claimStem);
 
         JSONObject proxyClaims = (JSONObject) req.getArgs().get(SRE_REQ_PROXY_CLAIMS);
@@ -468,7 +499,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
     }
 
     public ConfigtoCS getConfigToCS() {
-        if(configToCS == null){
+        if (configToCS == null) {
             configToCS = new ConfigtoCS();
         }
         return configToCS;
@@ -479,6 +510,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
     }
 
     protected ConfigtoCS configToCS;
+
     protected List<ClaimSource> toSources(QDLStem QDLStem) {
         ArrayList<ClaimSource> claimSources = new ArrayList<>();
 

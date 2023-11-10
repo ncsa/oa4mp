@@ -120,6 +120,7 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
                             oa2SE.getServiceAddress().toString(),
                             oa2SE.isSafeGC()));
             MyProxyDelegationServlet.transactionCleanup.setEnabledLocking(oa2SE.isCleanupLockingEnabled());
+            MyProxyDelegationServlet.transactionCleanup.setFailOnError(oa2SE.isCleanupFailOnErrors());
             MyProxyDelegationServlet.transactionCleanup.setStopThread(false);
             MyProxyDelegationServlet.transactionCleanup.start(); // start it here.
             oa2SE.getMyLogger().info("Started refresh token cleanup thread with interval " + oa2SE.getCleanupInterval() + " ms.");
@@ -140,6 +141,7 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
                 DebugUtil.trace(this, "setting \"" + name + "\" interval to " + oa2SE.getCleanupInterval() + " ms.");
             }
             lc.setEnabledLocking(oa2SE.isCleanupLockingEnabled());
+            lc.setFailOnError(oa2SE.isCleanupFailOnErrors());
             lc.setStopThread(false);
             //txRecordCleanup.setMap(oa2SE.getTxStore());
             lc.addRetentionPolicy(new TokenExchangeRecordRetentionPolicy(oa2SE.getServiceAddress().toString(), oa2SE.isSafeGC()));

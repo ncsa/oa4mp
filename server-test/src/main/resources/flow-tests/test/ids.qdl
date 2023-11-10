@@ -1,8 +1,0 @@
-/*
-   Simple script that just returns all the ids.
-*/
-return(['test:test/ucsd',
-         'test:jeff/ligo',
-         'test:test/functor',
-         'test:command.line2'
-       ]);
