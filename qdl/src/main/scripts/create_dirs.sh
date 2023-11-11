@@ -15,9 +15,8 @@ cd $QDL_ROOT/language/src/main/scripts
 
 cd $OA4MP_QDL_DEPLOY
 cd docs
-echo "converting docs..."
-lowriter --headless --convert-to pdf $OA4MP_QDL_ROOT/src/main/docs/qdl_oa4mp_store_access.odt
-lowriter --headless --convert-to pdf $OA4MP_QDL_ROOT/src/main/docs/creating_claim_sources2.odt
-lowriter --headless --convert-to pdf $OA4MP_QDL_ROOT/src/main/docs/claim_source_examples.odt
-lowriter --headless --convert-to pdf $OA4MP_QDL_ROOT/src/main/docs/token_handler_configuration.odt
-echo "...done!"
+echo "   converting docs..."
+lowriter --headless --convert-to pdf $OA4MP_QDL_ROOT/src/main/docs/qdl_oa4mp_store_access.odt  > /dev/null
+lowriter --headless --convert-to pdf $OA4MP_QDL_ROOT/src/main/docs/creating_claim_sources2.odt > /dev/null
+lowriter --headless --convert-to pdf $OA4MP_QDL_ROOT/src/main/docs/claim_source_examples.odt > /dev/null
+lowriter --headless --convert-to pdf $OA4MP_QDL_ROOT/src/main/docs/token_handler_configuration.odt > /dev/null

@@ -11,7 +11,7 @@ JAR_NAME=${1:-$DEFAULT_JAR_NAME}
 ./create_dirs.sh
 
 cd $OA4MP_QDL_ROOT
-mvn -P qdl package > mvn.log
+mvn -P qdl package > qdl-maven.log
 cp "$OA4MP_QDL_ROOT/target/oa4mp-qdl-jar-with-dependencies.jar" $OA4MP_QDL_DEPLOY/lib/qdl.jar
 unzip -p "$OA4MP_QDL_ROOT/target/oa4mp-qdl-jar-with-dependencies.jar" META-INF/MANIFEST.MF > $OA4MP_QDL_DEPLOY/lib/build-info.txt
 

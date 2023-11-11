@@ -28,8 +28,8 @@ OA4MP_QDL_DEPLOY=$NCSA_DEV_OUTPUT/oa4mp-qdl
 
 if [ ! -d "$OA4MP_QDL_DEPLOY" ]; then
    mkdir "$OA4MP_QDL_DEPLOY"
-   else
-     echo "$OA4MP_QDL_DEPLOY" exists
+  # else
+  #   echo "  QDL deploy directory exists"
 fi
 # next line is so the profiles for the tools can be found in the source and built.
 
@@ -50,8 +50,10 @@ fi
 # Update local QDL install with the latest and greatest
 #
 cd "$OA4MP_ROOT/qdl/src/main/scripts"
-
+echo "building OA4MP QDL installer"
 ./create_installer.sh
+echo "deploying OA4MP QDL installer"
+
 
 if [ -z ${QDL_HOME+x} ];  then
     echo "no QDL install, skipping..."
@@ -69,4 +71,5 @@ if [ -z ${OA4MP_HOME+x} ];  then
     cp cli.jar $OA4MP_HOME/lib
     cp clc.jar $OA4MP_HOME/lib
 fi
+echo "     ... done!"
 

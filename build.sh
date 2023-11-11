@@ -8,6 +8,7 @@
 #  OA4MP_SERVER_DEPLOY = where server artifacts are put
 #
 #  N.B. QDL is built and deployed in the build-tools script
+echo "building OA4MP from sources ..."
 if [ -z ${NCSA_DEV_INPUT+x} ]
   then
     echo "no sources, skipping..."
@@ -29,15 +30,15 @@ if [ ! -d "$OA4MP_ROOT" ]
   then
      echo "$OA4MP_ROOT does not exist. No sources,  exiting.."
      exit 1
-   else
-     echo "$OA4MP_ROOT" exists
+  # else
+    # echo "$OA4MP_ROOT" exists
 fi
 
 if [ ! -d "$OA4MP_CLIENT_DEPLOY" ]
   then
     mkdir "$OA4MP_CLIENT_DEPLOY"
   else
-    echo "$OA4MP_CLIENT_DEPLOY exists, cleaning..."
+    echo "   client deploy directory exists, cleaning..."
     cd $OA4MP_CLIENT_DEPLOY
     rm -Rf *
 fi
@@ -47,7 +48,7 @@ if [ ! -d "$OA4MP_SERVER_DEPLOY" ]
   then
     mkdir "$OA4MP_SERVER_DEPLOY"
    else
-    echo "$OA4MP_SERVER_DEPLOY exists, cleaning..."
+    echo "   server deploy directory exists, cleaning..."
     cd $OA4MP_SERVER_DEPLOY
     rm -Rf *
 fi
@@ -59,26 +60,26 @@ fi
 OA2_TOOLS=$OA4MP_ROOT/server-admin
 
 cd $OA4MP_ROOT
-echo "building from sources ..."
 mvn clean install > maven.log
 
 if [[ $? -ne 0 ]] ; then
     echo "OA4MP maven build failed, exiting..."
     exit 1
 fi
-echo "done!"
+echo "      ... done!"
 
 cp $OA4MP_ROOT/client-oauth2/target/client2.war $OA4MP_CLIENT_DEPLOY
 cp $OA4MP_ROOT/client-oauth2/src/main/resources/*.sql $OA4MP_CLIENT_DEPLOY
 cp $OA4MP_ROOT/oa4mp-server-oauth2/target/oauth2.war  $OA4MP_SERVER_DEPLOY
 
-echo "building tools..."
+echo "building OA4MP tools..."
 cd $OA2_TOOLS
 mvn -P cli package > cli.log
 mvn -P client package > client.log
 mvn -P jwt package > jwt.log
 cd $OA2_TOOLS/target
-echo "done!"
+echo "deploying OA4MP tools..."
+
 
 cp cli-jar-with-dependencies.jar $OA4MP_SERVER_DEPLOY/cli.jar
 cp clc-jar-with-dependencies.jar $OA4MP_SERVER_DEPLOY/clc.jar
@@ -104,4 +105,5 @@ cp cli $OA4MP_SERVER_DEPLOY
 cp clc $OA4MP_SERVER_DEPLOY
 cp oidc-cm-scripts.tar $OA4MP_SERVER_DEPLOY
 cp jwt-scripts.tar $OA4MP_SERVER_DEPLOY
+echo "     ... done!"
 

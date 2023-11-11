@@ -8,6 +8,9 @@ import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.QDLStem;
 
 /**
+ * Remember that a reference to this class goes into the QDL configuration &lt;modules&gt;
+ * tag and its function is to simply put a convenient listing of whatever classes it has
+ * into the info().lib entry. 
  * <p>Created by Jeff Gaynor<br>
  * on 4/4/23 at  9:20 AM
  */
