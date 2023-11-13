@@ -6,6 +6,7 @@
   * exception = the exception that caused this page to be displayed.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page session="false" %>
 <html>
 <head><title>Registration Error Page</title></head>
 <body>

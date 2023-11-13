@@ -672,6 +672,52 @@ An optional list of audiences that this client is restricted to. ]]>
 An optional list of resources that this client is restricted to. ]]>
     </body>
     </entry>
+    <entry id="ersatz">
+    <body>
+    <![CDATA["Create, link, unlink or list ersatz clients
+ersatz -create [new_id] [-link] [-admin_id adminID] [provisioner_id] - create a new ersatz client,
+     optionally linking it to the provisioner. Note that if you do not supply an admin id and the provisioner is administered,
+     then the new ersatz client will be added to the admin. If there is no admin, then none will be specified"
+     Finally, if the provisioner has multiple admins, this specifies which to use or the request will be rejected."
+ersatz -link [-m | -array | -json] [provisioner_id] - list the ersatz clients associated with this provisioner"
+     Optionally list any chains as arrays, a json array or the (default) multi-line format"
+ersatz -link ersatz_id | [e0,e1,...] [-adminID adminID] [provisioner_id]- link an existing ersatz client/chain to the current one"
+ersatz -unlink ersatz_id | [e0,e1,...] [-adminID adminID] [provisioner_id] - unlink the ersatz client from this client. It does not do anything to the ersatz client."
+]]>
+    </body>
+    <example>
+    <![CDATA[E.g. Create a new ersatz client and link it
+> ersatz -create -link clientID:/bobs/provisioner
+
+This would start the entire creation of a new ersatz client from the beginning
+(equivalent to issuing create from the command line). It will then set it to
+be an ersatz client if needed, add it to the same VO as the provisioner,
+and finally link the two so the correct permissions are created. It does
+not approve the new client.
+
+E.g. Link and existing client to an existing provisioner
+> ersatz -link my:client/99 -adminID my:admin/42 my:provisioner/12
+
+Links the existing client my:client/99 to my:provisioner/12 and specifies
+that the admin client my_admin/42 is to be used.
+
+E.g. Unlink a client from the currently active client
+> ersatz -unlink my:client/99
+
+Unlinks the ersatz client with id my:client/99 from whatever is set
+as the current client usign the set_id command.
+This means that the permissions that allow for the fork are removed,
+but the clients themselves are unaltered.
+
+E.g. List the ersatz clients for the currently active client
+> ersatz -list -json
+["client:id/1"]
+
+This is a JSON array of the ersatz clients for the currently active
+client. This means that there is one ersatz client.
+]]>
+    </example>
+    </entry>
 
     <!--
 at_lifetime           description           extended_attributes   maxATLifetime         public_client         strict_scopes

@@ -152,8 +152,52 @@ CREATE TABLE oauth2.clients
     skip_server_scripts BOOLEAN,
    extends_provisioners BOOLEAN,
    proxy_request_scopes CLOB,
+ersatz_inherit_id_token BOOLEAN,
 forward_scopes_to_proxy BOOLEAN
 );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -242,3 +286,10 @@ CREATE TABLE oauth2.virtual_organizations
           resource CLOB,
              valid boolean);
   create  INDEX discovery_path on oauth2.virtual_organizations (discovery_path);
+
+/*
+ Darned use command for mysql equivalent SHow Create Tables for Derby
+
+describe oauth2.transactions
+
+ */

@@ -79,11 +79,7 @@ public class GenericClientStoreUtils extends GenericStoreUtils {
             if(!acceptLADate(uucConfiguration, baseClient.getLastAccessed())){
                 continue;
             }
-/*
-            if(baseClient.getLastAccessed() != null && baseClient.getLastAccessed().getTime() != 0L){
-                continue;
-            }
-*/
+
             total++;
             if (uucRetentionPolicy.retain(baseClient.getIdentifier(), baseClient.getCreationTS().getTime(), baseClient.getLastModifiedTS().getTime())) {
                 // do nothing for now.

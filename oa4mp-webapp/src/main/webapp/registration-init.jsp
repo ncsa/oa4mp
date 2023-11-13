@@ -17,7 +17,7 @@
         * request = contents of field with the state of this
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-
+<%@ page session="false" %>
 
 <html>
 <head>

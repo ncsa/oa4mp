@@ -35,7 +35,7 @@ public class OA2FSTStore<V extends OA2ServiceTransaction> extends DSFSTransactio
 
     @Override
     public V get(RefreshToken refreshToken) {
-        return getIndexEntry(refreshToken.getToken());
+        return getIndexEntry(refreshToken.getJti().toString());
     }
 
     @Override
@@ -56,9 +56,9 @@ public class OA2FSTStore<V extends OA2ServiceTransaction> extends DSFSTransactio
     @Override
     public V realRemove(V thingie) {
         super.realRemove(thingie);
-        if (thingie.getRefreshToken() != null) {
+ /*       if (thingie.getRefreshToken() != null) {
             removeIndexEntry(thingie.getRefreshToken().getToken());
-        }
+        }*/
         if (thingie.getUsername() != null) {
             removeIndexEntry(thingie.getUsername());
         }
@@ -80,7 +80,7 @@ public class OA2FSTStore<V extends OA2ServiceTransaction> extends DSFSTransactio
         super.realSave(checkExists, t);
         try {
             if (t.hasRefreshToken()) {
-                createIndexEntry(t.getRefreshToken().getToken(), t.getIdentifierString());
+                createIndexEntry(t.getRefreshToken().getJti().toString(), t.getIdentifierString());
                 // The next is for creating an index entry to track substitution clients
                 createIndexEntry(getSubIndexKey(t.getRefreshToken().getJti().toString(), t.getOA2Client().getIdentifier()), t.getIdentifierString());
             }

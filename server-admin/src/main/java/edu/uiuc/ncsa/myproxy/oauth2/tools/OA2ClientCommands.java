@@ -795,7 +795,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
         say("ersatz " + E_CREATE_FLAG + " [new_id] [" + E_LINK_FLAG + "] [" + E_ADMIN_ID_FLAG + " admin_id] [provisioner_id] - create a new ersatz client, ");
         say("     optionally linking it to the provisioner. Note that if you do not supply an admin id and the provisioner is administered,");
         say("     then the new ersatz client will be added to the admin. If there is no admin, then none will be specified");
-        say("     Finally, if the provisioner has multiple admins, you must specify which to use or the request will be rejected.");
+        say("     Finally, if the provisioner has multiple admins, this specifies which to use or the request will be rejected.");
         say("ersatz " + E_LIST_FLAG + " [" + E_LIST_AS_MULTILINE_FLAG + " | " + E_LIST_AS_ARRAY_FLAG + " | " + E_LIST_AS_JSON_FLAG + "] [provisioner_id] - list the ersatz clients associated with this provisioner");
         say("     Optionally list any chains as arrays, a json array or the (default) multi-line format");
         say("ersatz " + E_LINK_FLAG + " ersatz_id | [e0,e1,...] [" + E_ADMIN_ID_FLAG + " adminID] [provisioner_id]- link an existing ersatz client/chain to the current one");

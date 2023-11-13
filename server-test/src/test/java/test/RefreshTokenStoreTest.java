@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.TestUtils;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenFactory;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.TransactionStore;
@@ -55,7 +56,7 @@ public class RefreshTokenStoreTest extends TestBase {
         RefreshToken rt = tf2.getRefreshToken();
         st2.setRefreshToken(rt);
         // the auth grant is used to retrieve this later and should in this case just be set to the identifier.
-        AuthorizationGrant ag = tf2.getAuthorizationGrant(st2.getIdentifierString());
+        AuthorizationGrant ag = TokenFactory.createAG(st2.getIdentifierString());
         OA2Client client = new OA2Client(BasicIdentifier.randomID());
         clientStore.save(client);
         st2.setClient(client);

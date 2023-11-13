@@ -1,5 +1,6 @@
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page session="false" %>
 <%@ page isErrorPage="true" %>
 <%@ page import="java.io.*" %>
 <%@ page import="java.net.InetAddress" %>
@@ -63,6 +64,7 @@
         String er = "Error Report - " + application.getServerInfo() + "\n";
         er       += "------------\n";
         er += "Error  : " + ed.getStatusCode() + "\n";
+        erout += "Error  : " + ed.getStatusCode() + "\n";
         er += "Host   : " + request.getServerName() + "\n";
         er += "Client : " + remoteAddr + "\n";
         try {
@@ -115,12 +117,8 @@
 
         sendEmail(er,request.getServerName());
 
-        out.println("<pre>");
-        out.println(er);
-        out.println("The error has been reported to system administrators.");
-        out.println("</pre>");
-    } else {
-        out.println("<p>No information about this error was available.</p>");
+        erout += "The error has been reported to system administrators.";
+        request.setAttribute("erout", erout);
     }
 %>
 

@@ -7,6 +7,7 @@
   * exception = the exception that generated this page if there is one.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page session="false" %>
 <%@ page isErrorPage="true" %>
 <html>
 <head>

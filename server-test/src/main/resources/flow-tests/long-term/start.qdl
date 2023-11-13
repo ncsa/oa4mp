@@ -13,7 +13,7 @@ defaults. := ini.'default';
 system_defaults. := script_load('long-term/setup.qdl');
 
 cfgs. := ini\pick((x)->x!='default', list_keys(ini.)); // picks out everything but default
- total = 0;
+ total := 0;
 while[x.∈cfgs.]
    do[
    debugger(1,'x:\n' + print(x.));

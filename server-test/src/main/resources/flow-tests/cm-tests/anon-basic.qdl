@@ -5,7 +5,6 @@ path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tes
 script_path(path ~ script_path());
 */
 script_load('anon-init.qdl', args(0));
-
 payload. := from_json(file_read(ini.'payloads' + 'create.json'));
 resp. := http#post(payload.);
 //⊨ resp.'status'.'code' == ini.'status' : 'incorrect returned status of ' + resp.'status'.'code';

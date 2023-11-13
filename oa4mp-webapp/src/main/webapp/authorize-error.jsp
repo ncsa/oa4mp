@@ -8,6 +8,7 @@
     This page should redirect the user to  ${client.errorUri}
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page session="false" %>
 <html>
 <head>
     <title>The Delegation Service 404 Error Page.</title>

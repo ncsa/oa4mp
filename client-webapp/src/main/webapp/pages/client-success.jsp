@@ -7,6 +7,7 @@
   on a live server. It is intended to show control flow as simply as possible.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page session="false" %>
 <html>
 <head><title>Simple client success page.</title>
     <link rel="stylesheet"

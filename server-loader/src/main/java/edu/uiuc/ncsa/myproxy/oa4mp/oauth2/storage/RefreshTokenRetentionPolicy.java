@@ -100,8 +100,13 @@ public class RefreshTokenRetentionPolicy extends SafeGCRetentionPolicy {
                     timeout = st2.getRefreshTokenLifetime(); // it was set at some point
                 }
             } else {
-                //timeout = st2.getRefreshTokenLifetime();
-                timeout = st2.getRefreshTokenExpiresAt() - System.currentTimeMillis();
+                if(0 < st2.getRefreshTokenExpiresAt()){
+                    // Version >= 5.4 uses the refresh token expires at value
+                    timeout = st2.getRefreshTokenExpiresAt() - System.currentTimeMillis();
+                }else{
+                    // Version < 5.4 uses the lifetime, which may be huge in some tokens.
+                    timeout = st2.getRefreshTokenLifetime();
+                }
             }
             //token = rt.getToken();
             token = rt.getJti().toString();

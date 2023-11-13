@@ -24,9 +24,12 @@ say('Running all client management tests');
 say('--------------------');
 default_suite:='cm_local';
 suite := 0<size(args())?args(0):default_suite;
+say('suite=' + suite);
 counter.'pass' := 0;
 counter.'fail' := 0;
 while[x∈test.][
+say(' >>>' + x + ': ' + (suite =='cm_dev' && '.*anon\\-.*'=~x));
+  suite =='cm_dev' && '.*anon\\-.*'=~x?continue():''; // DEV does not support anonymous access.
 try[
   script_load(x,suite);
   counter.'pass' += 1;
