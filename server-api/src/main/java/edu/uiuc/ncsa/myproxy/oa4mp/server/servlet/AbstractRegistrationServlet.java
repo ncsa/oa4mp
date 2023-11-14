@@ -10,6 +10,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.server.request.IssuerResponse;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.core.exceptions.RetryException;
 import edu.uiuc.ncsa.security.servlet.*;
+import org.apache.commons.lang.StringEscapeUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -75,7 +76,6 @@ public abstract class AbstractRegistrationServlet extends MyProxyDelegationServl
 
                 request.setAttribute(CLIENT_ACTION_KEY, CLIENT_ACTION_KEY);
                 request.setAttribute(CLIENT_ACTION_REQUEST_VALUE, CLIENT_ACTION_REQUEST_VALUE);
-                System.out.println("context path = " + request.getContextPath() + ", servlet path =" + request.getServletPath() + ", request utl = " + request.getRequestURL());
                 request.setAttribute("actionToTake", request.getContextPath() + request.getServletPath());
                 break;
             case REQUEST_STATE:
@@ -221,7 +221,7 @@ public abstract class AbstractRegistrationServlet extends MyProxyDelegationServl
             request.setAttribute("actionToTake", request.getContextPath() + request.getServletPath());
 
 
-            request.setAttribute("retryMessage", r.getMessage());
+            request.setAttribute("retryMessage", StringEscapeUtils.escapeHtml(r.getMessage()));
             logOK(request); //CIL-1722
 
             JSPUtil.fwd(request, response, getInitPage());
@@ -249,7 +249,8 @@ public abstract class AbstractRegistrationServlet extends MyProxyDelegationServl
             if (p != null) {
                 String key = p.toString();
                 request.setAttribute(key, key);
-                request.setAttribute(getValueTag(key), request.getParameter(key));
+                String escapedValue = StringEscapeUtils.escapeHtml(request.getParameter(key));
+                request.setAttribute(getValueTag(key), escapedValue);
             }
         }
     }

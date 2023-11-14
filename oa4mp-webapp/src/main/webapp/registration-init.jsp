@@ -19,6 +19,8 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page session="false" %>
 
+<%@ page import="java.net.URLDecoder"%>
+
 <html>
 <head>
     <title>MyProxy Delegation Service Client Registration Page</title>
@@ -33,7 +35,7 @@
         To get your client approved,
         please fill out the form below. Your request will be evaluated for approval. For more information,
         please make sure you read the
-        <a href="http://grid.ncsa.illinois.edu/myproxy/oauth/client/manuals/registering-with-a-server.xhtml"
+        <a href="https://oa4mp.org/client/manuals/registering-with-an-oauth2-server.html"
            target="_blank">Client Registration Document</a>.
     </p><br>
     <table>
@@ -43,6 +45,10 @@
         </tr>
         <tr>
             <td>Contact email:</td>
+            <%
+            String decoded = URLDecoder.decode("${clientEmailValue}");
+            System.out.println("Decoded String 1 is: "+decoded);
+            %>
             <td><input type="text" size="25" name="${clientEmail}" value="${clientEmailValue}"/></td>
         </tr>
         <tr>
