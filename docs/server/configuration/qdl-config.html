@@ -48,7 +48,7 @@
     
         
                     <div class="xleft">
-            Last Published: 2023-11-09
+            Last Published: 2023-11-13
                                 </div>
                 <div class="xright">            
     
@@ -58,7 +58,7 @@
                         
     
         
-                         Version: 5.3-SNAPSHOT
+                         Version: 5.4.1
             </div>
     <div class="clear">
         <hr/>
@@ -240,7 +240,8 @@
 </section><section>
 <h3><a name="Script_syntax_in_the_configuration_file."></a>Script syntax in the configuration file.</h3>
 
-<p>To add a script, put it in script tags:</p>
+<p>To add a script, put it in script tags as per <a class="externalLink" href="https://qdl-lang.org/pdf/qdl_server_scripts.pdf">QDL
+server scripts</a></p>
 
 <div>
 <pre>
@@ -255,7 +256,9 @@
     &lt;/scripts&gt;
 </pre></div>
 
-<p>There are many reasons to have them.</p>
+<p>You can either have one script per tag or have a single tag with an array of scripts. These are not
+    in token handlers, but are at the top level. See the example below.
+    There are many reasons to have scripts on the server:</p>
 
 <ul>
     
@@ -322,10 +325,11 @@
                    &quot;say('*** IN SERVER SCRIPT');&quot;,
                    &quot;claims.'my_claim':=x;&quot;,
                    &quot;access_token.'my_at_claim':='my_at_claim';&quot;,
-                &quot;refresh_token.'my_rt_claim':='my_rt_claim';&quot;
-                ],
-
-             &quot;xmd&quot;:{&quot;exec_phase&quot;:&quot;post_token&quot;}}}
+                   &quot;refresh_token.'my_rt_claim':='my_rt_claim';&quot;
+                   ],
+                   &quot;xmd&quot;:{&quot;exec_phase&quot;:&quot;post_token&quot;}
+                  }
+             }
            &lt;/script&gt;
 
            &lt;script&gt;
@@ -350,7 +354,9 @@
     scripts run resp. a block of code which just sets a couple of attributes in the access and refresh token
     (to show it can be done), and run a script called ws_init.qdl (resolved against the script path)
     in the pre_auth phase, so that
-    the workspace is set up for all clients. One point is that while the
+    the workspace is set up for all clients. They are in separate script elements, though
+    you could just run them together as elements in an array, though that gets pretty
+    hard to parse manually. One point is that while the
     server has server_mode_on=&quot;true&quot;, server scripts are still allowed to run code blocks. This
     is because clients have no access to them. The standard caveat applies to code blocks. Keep
     them very simple or just run a script.</p>

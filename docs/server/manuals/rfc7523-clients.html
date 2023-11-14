@@ -1,0 +1,342 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="https://ncsa.github.io/oa4mp/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/oa4mp-logo-small-2.png" alt="OA4MP"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2023-11-13
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 5.4.1
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OA4MP</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../oa4mp-faq.html">FAQ</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../common/configuration/supported-specifications.html">Supported specification</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+<h1>What is a service client?</h1>
+
+<p>A <i>service client</i> is a specialized OA4MP client that complies with
+<a class="externalLink" href="https://datatracker.ietf.org/doc/html/rfc7523#section-2.1">section 2.1 of
+RFC7523</a>. This means that it is allowed to directly issue a token request without authentication.
+<b><i>However</i></b>, this implies a trust relationship and requires vetting.
+</p>
+<section>
+<h2><a name="Why.3F"></a>Why?</h2>
+
+<p>As computing switches to token-based trust models and leaves behind X.509 certificates,
+services still need to be able to identify themselves and there need to be trust relationships
+in effect. Before, a server would have an X.509 certificate to prove who or what it was and now
+it needs a signed token. Requiring a service (and its human administrator) to go through an OAuth
+flow every time, say, a server restarts,
+is an intolerable burden on a system. Therefore, the trust is agreed upon separately with
+a service client. Typically, a service client has a single user and restricts which users
+can be recognized. Public/private keys must be generated and all authentication is
+key-based. Once all is in place, the service simply issues a grant request (which is in JSON and
+also signed with the private key) to the
+token endpoint, signed with its keys, and gets tokens back.</p>
+
+
+<h1>Authentication generally</h1>
+
+<p>As per the spec., <a class="externalLink" href="https://datatracker.ietf.org/doc/html/rfc7523#section-2.2">section 2.2</a>,
+a service client must use client authentication. This is in addition to it signing its grant request.
+</p>
+
+<h1>The JSON request</h1>
+
+<p>This request replaces the authorization grant request from OAuth.
+<a class="externalLink" href="https://datatracker.ietf.org/doc/html/rfc7523#section-2.1">Section 2.1 of
+    RFC7523</a> lists the requirements. Note that the subject is effectively the
+    username. The list of allowed users may be restricted by setting it in the server's client
+    configuration. In addition, you may include the following parameters:</p>
+
+<table class="bodyTable" style="text-align: left; width: 100%;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">Attribute</td>
+        
+<td style="vertical-align: top;">Required?</td>
+        
+<td style="vertical-align: top;">Default</td>
+        
+<td style="vertical-align: top;">Description</td>
+    </tr>
+    
+<tr class="b" id="at_lifetime">
+        
+<td style="vertical-align: top;">at_lifetime</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">--</td>
+        
+<td style="vertical-align: top;">Request time for the access token to be valid. Note this is subject to
+            server restrictions. See note below about times.
+        </td>
+    </tr>
+    
+<tr class="a" id="audience">
+        
+<td style="vertical-align: top;">audience</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">--</td>
+        
+<td style="vertical-align: top;">A single string  or multiple values. These are compliant with RFC 8693 (token exchange).</td>
+    </tr>
+    
+<tr class="b" id="extended_attributes">
+        
+<td style="vertical-align: top;">extended attributes</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">--</td>
+        
+<td style="vertical-align: top;">Any OA4MP <a href="extended-attributes.html">extended attributes</a>.</td>
+    </tr>
+    
+<tr class="a" id="resource">
+        
+<td style="vertical-align: top;">resource</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">--</td>
+        
+<td style="vertical-align: top;">A single URI  or multiple values. These are compliant with RFC 8693 (token exchange).</td>
+    </tr>
+    
+<tr class="b" id="rt_lifetime">
+        
+<td style="vertical-align: top;">rt_lifetime</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">--</td>
+        
+<td style="vertical-align: top;">Request time for the refresh token to be valid. Note this is subject to
+            server restrictions. See note below about times.
+        </td>
+    </tr>
+    
+<tr class="a" id="scope">
+        
+<td style="vertical-align: top;">scope</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">--</td>
+        
+<td style="vertical-align: top;">A single scope or array of scopes.</td>
+    </tr>
+    </tbody>
+</table>
+</section><section>
+<h2><a name="About_times"></a>About times</h2>
+
+<p>Note that the assumption is that all of these <i>without</i>
+units are in <b>seconds</b>. Blanks before and after units are allowed. Acceptable units are</p>
+
+<ul>
+    
+<li>&quot;ms.&quot;, &quot;ms&quot; for milliseconds, e.g. &quot;1000 ms.&quot;</li>
+    
+<li>&quot;sec.&quot;, &quot;sec&quot;, &quot;s.&quot;, &quot;s&quot; for seconds, e.g., &quot;300 sec&quot;</li>
+    
+<li>&quot;min.&quot;, &quot;min&quot;, &quot;mins.&quot;, &quot;mins&quot; for minutes, e.g. &quot;20 min.&quot;</li>
+    
+<li>&quot;hr.&quot;, &quot;hr&quot;, &quot;hrs.&quot;, &quot;hrs&quot; for hours, &quot;e.g. 2 hrs.&quot;</li>
+    
+<li>&quot;day&quot;, &quot;days&quot; for days, e.g. &quot;1 day&quot;, &quot;10 days&quot;</li>
+</ul>
+</section><section>
+<h2><a name="Example"></a>Example</h2>
+
+<p>A typical JSON request would be</p>
+
+<div>
+<pre>
+    {
+      &quot;iss&quot;: &quot;ashigaru:command.line2&quot;,
+      &quot;sub&quot;: &quot;jeff&quot;,
+      &quot;jti&quot;: &quot;ashigaru:command.line2:/rfc7523/GmGUmD4J0JZH1oAkqNgkeTpWpqklq2HCJi38SuUNV-U&quot;,
+      &quot;exp&quot;: 1686595091,
+      &quot;iat&quot;: 1686594191,
+      &quot;scope&quot;:   [
+        &quot;org.cilogon.userinfo&quot;,
+        &quot;openid&quot;,
+        &quot;profile&quot;,
+        &quot;email&quot;
+      ],
+      &quot;oa4mp:/roles&quot;: &quot;admin,all-user&quot;,
+      &quot;oa4mp:/tokens/access/lifetime&quot;: 1000000,
+      &quot;redirect_uri&quot;: &quot;https://oauth.bigstate.edu/client2/ready&quot;,
+      &quot;nonce&quot;: &quot;1yv5JQ5sElsxDHTcObWhJGBp6uy0i4VwMgV4vCHou1I&quot;
+    }
+</pre></div>
+
+<p>Note that this would be turned into the payload of a JWT and signed with the client's private
+key before being sent to the server.</p>
+</section><section>
+<h2><a name="Using_the_device_flow"></a>Using the device flow</h2>
+
+<p>You may also use key authentication with the device flow, the single difference is that the
+  audience must be the device flow endpoint, not the token endpoint.</p>
+</section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2023
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+
