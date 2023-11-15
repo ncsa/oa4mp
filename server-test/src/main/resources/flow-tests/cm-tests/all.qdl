@@ -28,7 +28,6 @@ say('suite=' + suite);
 counter.'pass' := 0;
 counter.'fail' := 0;
 while[x∈test.][
-say(' >>>' + x + ': ' + (suite =='cm_dev' && '.*anon\\-.*'=~x));
   suite =='cm_dev' && '.*anon\\-.*'=~x?continue():''; // DEV does not support anonymous access.
 try[
   script_load(x,suite);

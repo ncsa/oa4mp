@@ -165,14 +165,6 @@ public class OA2ClientUtils {
                 dudUris.add(x);
             }
 
-              /*  Old stuff before CIL-545
-                 if (!x.toLowerCase().startsWith("https:")) {
-                      warn("Attempt to add bad callback uri for client " + client.getIdentifierString());
-                      throw new ClientRegistrationRetryException("The callback \"" + x + "\" is not secure.", null, client);
-                  }
-                  URI.create(x); // passes here means it is a uri. All we want this to do is throw an exception if needed.
-
-                  uris.add(x);*/
         }
         return uris;
     }
@@ -201,10 +193,16 @@ public class OA2ClientUtils {
         br.close();
         LinkedList<String> foundURIs = createCallbacks(uris, dudUris);
         if (0 < dudUris.size()) {
-            String xx = "</br>";
+            String xx = null;
+            boolean isFirst = true;
             boolean isOne = dudUris.size() == 1;
             for (String y : dudUris) {
-                xx = xx + y + "</br>";
+                if(isFirst){
+                    xx = y ;
+                    isFirst = false;
+                }else {
+                    xx = xx + ", " + y;
+                }
             }
             String helpfulMessage = "The callback" + (isOne ? " " : "s ") + xx + (isOne ? "is" : "are") + " not valid.";
             throw new AbstractRegistrationServlet.ClientRegistrationRetryException(helpfulMessage, null, client);

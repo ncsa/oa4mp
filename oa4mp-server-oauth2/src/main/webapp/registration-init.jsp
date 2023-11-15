@@ -14,7 +14,7 @@
         To get your client approved,
         please fill out the form below. Your request will be evaluated for approval. For more information,
         please make sure you read the
-        <a href="http://grid.ncsa.illinois.edu/myproxy/oauth/client/manuals/registering-with-an-oauth2-server.xhtml"
+        <a href="https://oa4mp.org/client/manuals/registering-with-an-oauth2-server.html"
            target="_blank">Registering a Client with an OAuth 2 server</a> document.
     </p><br>
     <table>

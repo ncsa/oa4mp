@@ -635,7 +635,9 @@ public class OIDCCMServlet extends EnvServlet {
                 httpServletResponse.setContentType("application/json");
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("error", "unsupported encoding");
-                jsonObject.put("description" ,"Unsupported encoding of \"" + httpServletRequest.getContentType() + "\" for body of POST. Request rejected." );
+                // Fix https://github.com/ncsa/oa4mp/issues/133 as issue 3.1.3.1 in AAF report
+                getMyLogger().info("Unsupported encoding of \"" + httpServletRequest.getContentType() + " for body of POST. Request rejected.");
+                jsonObject.put("description" ,"Unsupported encoding for body of POST. Request rejected." );
                 httpServletResponse.getWriter().println(jsonObject);
                 httpServletResponse.getWriter().flush();
                 return;
