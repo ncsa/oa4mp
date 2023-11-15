@@ -895,10 +895,10 @@ public class OIDCCMServlet extends EnvServlet {
         getOA2SE().getClientApprovalStore().save(approval);
         // Github 84 https://github.com/ncsa/oa4mp/issues/84
         // Also this is CIL-1597
-        writeCreateOK(httpServletResponse, jsonResp);
+        //writeCreateOK(httpServletResponse, jsonResp);
         logOK(httpServletRequest); // CIL-1722
 
-        //  writeOK(httpServletResponse, jsonResp);
+          writeOK(httpServletResponse, jsonResp);
     }
 
 
