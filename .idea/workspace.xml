@@ -11,52 +11,13 @@
   <component name="ChangeListManager">
     <list default="true" id="eb414374-02ed-40a4-9689-d382715049b9" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-oauth2/src/main/webapp/pages/client-error.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/client-oauth2/src/main/webapp/pages/client-error.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-oauth2/src/main/webapp/pages/client-show-redirect.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/client-oauth2/src/main/webapp/pages/client-show-redirect.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-oauth2/src/main/webapp/pages/client-success.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/client-oauth2/src/main/webapp/pages/client-success.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-webapp/src/main/webapp/pages/client-error.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/client-webapp/src/main/webapp/pages/client-error.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-webapp/src/main/webapp/pages/client-show-redirect.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/client-webapp/src/main/webapp/pages/client-show-redirect.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-webapp/src/main/webapp/pages/client-success.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/client-webapp/src/main/webapp/pages/client-success.jsp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/src/main/webapp/admin-client-registration-init.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/src/main/webapp/admin-client-registration-init.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/src/main/webapp/admin-client-registration-ok.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/src/main/webapp/admin-client-registration-ok.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/src/main/webapp/authorize-init.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/src/main/webapp/authorize-init.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/src/main/webapp/authorize-remote-user.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/src/main/webapp/authorize-remote-user.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/src/main/webapp/device-fail.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/src/main/webapp/device-fail.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/src/main/webapp/device-init.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/src/main/webapp/device-init.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/src/main/webapp/device-ok.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/src/main/webapp/device-ok.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/src/main/webapp/device-remote-user.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/src/main/webapp/device-remote-user.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/src/main/webapp/registration-init.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/src/main/webapp/registration-init.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/src/main/webapp/registration-ok.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/src/main/webapp/registration-ok.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-webapp/src/main/webapp/authorize-error.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-webapp/src/main/webapp/authorize-error.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-webapp/src/main/webapp/authorize-init.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-webapp/src/main/webapp/authorize-init.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-webapp/src/main/webapp/authorize-remote-user.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-webapp/src/main/webapp/authorize-remote-user.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-webapp/src/main/webapp/errorPage.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-webapp/src/main/webapp/errorPage.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-webapp/src/main/webapp/errorPage2.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-webapp/src/main/webapp/errorPage2.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-webapp/src/main/webapp/failedLogin.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-webapp/src/main/webapp/failedLogin.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-webapp/src/main/webapp/generalerror.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-webapp/src/main/webapp/generalerror.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-webapp/src/main/webapp/noClientErrorPage.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-webapp/src/main/webapp/noClientErrorPage.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-webapp/src/main/webapp/oops.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-webapp/src/main/webapp/oops.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-webapp/src/main/webapp/registration-error.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-webapp/src/main/webapp/registration-error.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-webapp/src/main/webapp/registration-init.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-webapp/src/main/webapp/registration-init.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-webapp/src/main/webapp/registration-ok.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-webapp/src/main/webapp/registration-ok.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-webapp/src/main/webapp/tooManyClientRequests.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-webapp/src/main/webapp/tooManyClientRequests.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-webapp/src/main/webapp/well-known.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-webapp/src/main/webapp/well-known.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oauth2/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/oa2/jwt/MyOtherJWTUtil2.java" beforeDir="false" afterPath="$PROJECT_DIR$/oauth2/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/oa2/jwt/MyOtherJWTUtil2.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2ClientCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2ClientCommands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/resources/help/client_help.xml" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/resources/help/client_help.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/resources/oa4mp-derby.sql" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/resources/oa4mp-derby.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/resources/oa4mp-pg.sql" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/resources/oa4mp-pg.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/RefreshTokenRetentionPolicy.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/RefreshTokenRetentionPolicy.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/transactions/OA2FSTStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/transactions/OA2FSTStore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/ligo/vo4/access.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/ligo/vo4/access.qdl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/ligo/vo4/rtx.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/ligo/vo4/rtx.qdl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-test/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/cm-tests/all.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/cm-tests/all.qdl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/cm-tests/anon-basic.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/cm-tests/anon-basic.qdl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/dev/vo_1.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/dev/vo_1.qdl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/local/derby.log" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/local/derby.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/long-term/start.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/long-term/start.qdl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-test/src/test/java/test/RefreshTokenStoreTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/test/java/test/RefreshTokenStoreTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/server/storage/impl/GenericClientStoreUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/server/storage/impl/GenericClientStoreUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/website/src/site/xhtml/common/configuration/supported-specifications.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/xhtml/common/configuration/supported-specifications.xhtml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -829,7 +790,7 @@
       <option name="project" value="LOCAL" />
       <updated>1698164931181</updated>
     </task>
-    <option name="localTasksCounter" value="69" />
+    <option name="localTasksCounter" value="70" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -841,7 +802,6 @@
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="Fixed https://github.com/ncsa/oa4mp/issues/115&#10;&#10;Lots of test updates and improvements." />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/108 List ersatz clients" />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/108 List ersatz clients, part 2. Can create, link and unlink them." />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/108 List ersatz clients, part 3. Updated documentation, fixed edge case in permission store where missing admin client ID cause an NPE." />
@@ -866,7 +826,8 @@
     <MESSAGE value="Tweaks to the build trying to speed it up." />
     <MESSAGE value="Removed a very annoying redundant &quot;error:&quot; tag that was appearing in messages. This would lead to error messages like&#10;&#10;error: error: invalid grant.&#10;&#10;Not the polished prose we all strive for in error messages." />
     <MESSAGE value="Getting build messages to be informative, not overpowering." />
-    <option name="LAST_COMMIT_MESSAGE" value="Getting build messages to be informative, not overpowering." />
+    <MESSAGE value="Merge 5.4.1 final changes" />
+    <option name="LAST_COMMIT_MESSAGE" value="Merge 5.4.1 final changes" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
@@ -1162,7 +1123,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/cm/oidc_cm/OIDCCMServlet.java</url>
-          <line>1253</line>
+          <line>1255</line>
           <option name="timeStamp" value="811" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -1186,9 +1147,14 @@
           <option name="timeStamp" value="817" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/servlet/OA2DiscoveryServlet.java</url>
-          <line>50</line>
-          <option name="timeStamp" value="820" />
+          <url>file://$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/claims/AbstractAccessTokenHandler.java</url>
+          <line>420</line>
+          <option name="timeStamp" value="832" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/oauth2/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/oa2/jwt/MyOtherJWTUtil2.java</url>
+          <line>105</line>
+          <option name="timeStamp" value="835" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-field">
           <url>file://$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/loader/OA2ConfigurationLoader.java</url>

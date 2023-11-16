@@ -87,7 +87,7 @@ public class MyOtherJWTUtil2 {
         return createJWT(payload, jsonWebKey, DEFAULT_TYPE);
     }
 
-    public static String createJWT(JSONObject payload, JSONWebKey jsonWebKey, String type) throws  ParseException, JOSEException {
+    public static String createJWT(JSONObject payload, JSONWebKey jsonWebKey, String type) throws ParseException, JOSEException {
         JSONObject header = new JSONObject();
         header.put(TYPE, type);
         // Don't send an empty kid. Every key should have one though, but a missing one is not an error.
@@ -105,9 +105,7 @@ public class MyOtherJWTUtil2 {
             //     DebugUtil.trace(JWTUtil.class, "Signing ID token with algorithm=" + jsonWebKey.algorithm);
             signature = sign(header, payload, jsonWebKey);
         }
-        String x = concat(header, payload);
-        return x + "." + signature;
-
+        return signature;
     }
 
 
