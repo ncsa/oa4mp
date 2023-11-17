@@ -87,27 +87,25 @@ public class MyOtherJWTUtil2 {
         return createJWT(payload, jsonWebKey, DEFAULT_TYPE);
     }
 
-    public static String createJWT(JSONObject payload, JSONWebKey jsonWebKey, String type) throws  ParseException, JOSEException {
+    public static String createJWT(JSONObject payload, JSONWebKey jsonWebKey, String type) throws ParseException, JOSEException {
         JSONObject header = new JSONObject();
         header.put(TYPE, type);
         // Don't send an empty kid. Every key should have one though, but a missing one is not an error.
         if (jsonWebKey.id != null && jsonWebKey.id.length() != 0) {
             header.put(KEY_ID, jsonWebKey.id);
         }
-        String signature = null;
+        String token = null;
 
         header.put(ALGORITHM, jsonWebKey.algorithm);
 
         if (jsonWebKey.algorithm.equals(NONE_JWT)) {
-            signature = ""; // as per spec
+            token = concat(header, payload) +"."; // as per spec. Ends with a period if not signed.
 
         } else {
             //     DebugUtil.trace(JWTUtil.class, "Signing ID token with algorithm=" + jsonWebKey.algorithm);
-            signature = sign(header, payload, jsonWebKey);
+            token = sign(header, payload, jsonWebKey);
         }
-        String x = concat(header, payload);
-        return x + "." + signature;
-
+        return token;
     }
 
 
