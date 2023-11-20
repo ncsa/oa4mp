@@ -61,7 +61,13 @@ then[
     ];
 say('mail.cfg:\n' + print(mail.cfg.));
 say('mail.message:\n' + print(mail.message.));
-   /*
+// regression for https://github.com/ncsa/oa4mp/issues/137. If this is empty when
+// proxying then a lot
+// of OA4MP installs will no longer function.
+  if[size(proxy_claims.) == 0]
+    [raise_error('missing proxy claims')];
+
+     /*
      Uncomment to test error handling. This makes the flow bomb, but then you get to
      see what an error should look like.
     */

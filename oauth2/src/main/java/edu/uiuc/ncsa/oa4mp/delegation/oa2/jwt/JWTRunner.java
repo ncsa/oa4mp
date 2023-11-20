@@ -1,5 +1,7 @@
 package edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt;
 
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.IDTokenImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenFactory;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.OIDCServiceTransactionInterface;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSource;
 import edu.uiuc.ncsa.qdl.scripting.Scripts;
@@ -285,8 +287,15 @@ public class JWTRunner {
                 if(isPopulated){
                     return;
                 }
-                if (transaction.getProxyState().containsKey("claims")) {
-                    map.put(SRE_REQ_PROXY_CLAIMS, transaction.getProxyState().getJSONObject("claims"));
+                // Fix for https://github.com/ncsa/oa4mp/issues/137
+                if (transaction.getProxyState().containsKey("asset")) {
+                    JSONObject idt = transaction.getProxyState().getJSONObject("asset").getJSONObject("id_token");
+                    if(idt != null) {
+                        IDTokenImpl idToken = TokenFactory.createIDT(idt);
+                        map.put(SRE_REQ_PROXY_CLAIMS, idToken.getPayload());
+                    }else{
+                        map.put(SRE_REQ_PROXY_CLAIMS, new JSONObject());
+                    }
                 } else {
                     map.put(SRE_REQ_PROXY_CLAIMS, new JSONObject());
                 }
