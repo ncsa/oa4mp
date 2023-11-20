@@ -65,7 +65,7 @@ say('mail.message:\n' + print(mail.message.));
 // proxying then a lot
 // of OA4MP installs will no longer function.
   if[size(proxy_claims.) == 0]
-    [raise_error('missing proxy claims')];
+    [raise_error('missing proxy claims');];
 
      /*
      Uncomment to test error handling. This makes the flow bomb, but then you get to
