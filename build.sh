@@ -23,8 +23,8 @@ fi
 
 
 OA4MP_ROOT=$NCSA_DEV_INPUT/oa4mp
-OA4MP_CLIENT_DEPLOY=$NCSA_DEV_OUTPUT/client
-OA4MP_SERVER_DEPLOY=$NCSA_DEV_OUTPUT/server
+OA4MP_CLIENT_DEPLOY=$NCSA_DEV_OUTPUT/oa4mp
+OA4MP_SERVER_DEPLOY=$NCSA_DEV_OUTPUT/oa4mp
 
 if [ ! -d "$OA4MP_ROOT" ]
   then
@@ -34,21 +34,21 @@ if [ ! -d "$OA4MP_ROOT" ]
     # echo "$OA4MP_ROOT" exists
 fi
 
-if [ ! -d "$OA4MP_CLIENT_DEPLOY" ]
-  then
-    mkdir "$OA4MP_CLIENT_DEPLOY"
-  else
-    echo "   client deploy directory exists, cleaning..."
-    cd $OA4MP_CLIENT_DEPLOY
-    rm -Rf *
-fi
+#if [ ! -d "$OA4MP_CLIENT_DEPLOY" ]
+#  then
+#    mkdir "$OA4MP_CLIENT_DEPLOY"
+#  else
+#    echo "   client deploy directory exists, cleaning..."
+#    cd $OA4MP_CLIENT_DEPLOY
+#    rm -Rf *
+#fi
 
 
 if [ ! -d "$OA4MP_SERVER_DEPLOY" ]
   then
     mkdir "$OA4MP_SERVER_DEPLOY"
    else
-    echo "   server deploy directory exists, cleaning..."
+    echo "   deploy directory exists, cleaning..."
     cd $OA4MP_SERVER_DEPLOY
     rm -Rf *
 fi

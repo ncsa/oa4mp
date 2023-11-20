@@ -48,6 +48,16 @@ public class TF2Test extends TestBase {
 
     public static class FakeST extends ServiceTransaction implements OIDCServiceTransactionInterface {
         @Override
+        public JSONObject getATData() {
+            return null;
+        }
+
+        @Override
+        public void setATData(JSONObject atData) {
+
+        }
+
+        @Override
         public List<String> getResource() {
             return null;
         }

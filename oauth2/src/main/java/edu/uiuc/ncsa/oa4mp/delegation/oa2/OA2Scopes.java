@@ -70,7 +70,26 @@ public interface OA2Scopes {
             return out;
 
         }
+        /**
+         * Given a scope collection, turn it into a blank delimited string.
+         * @param scopes
+         * @return
+         */
+        public static String toString(Collection<String> scopes) {
+            String ss = "";
+            if (!scopes.isEmpty()) {
+                boolean firstPass = true;
+                for (String s : scopes) {
+                    ss = ss + (firstPass ? "" : " ") + s;
+                    if (firstPass) {
+                        firstPass = false;
+                    }
+                }
+            }
+            return ss;
+        }
     }
+
 
 
 }

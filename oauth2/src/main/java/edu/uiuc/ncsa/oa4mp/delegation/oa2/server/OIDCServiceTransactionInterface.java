@@ -55,5 +55,9 @@ public interface OIDCServiceTransactionInterface {
     
     public String getIDTokenIdentifier();
     public void setIDTokenIdentifier(String idTokenIdentifier);
+
+    public JSONObject getATData();
+    public void setATData(JSONObject atData);
+
 }
 

@@ -11,13 +11,17 @@
   <component name="ChangeListManager">
     <list default="true" id="eb414374-02ed-40a4-9689-d382715049b9" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.sh" beforeDir="false" afterPath="$PROJECT_DIR$/build.sh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oauth2/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/oa2/OA2Scopes.java" beforeDir="false" afterPath="$PROJECT_DIR$/oauth2/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/oa2/OA2Scopes.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oauth2/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/oa2/jwt/MyOtherJWTUtil2.java" beforeDir="false" afterPath="$PROJECT_DIR$/oauth2/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/oa2/jwt/MyOtherJWTUtil2.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oauth2/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/oa2/server/IDTokenResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/oauth2/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/oa2/server/IDTokenResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oauth2/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/oa2/server/OIDCServiceTransactionInterface.java" beforeDir="false" afterPath="$PROJECT_DIR$/oauth2/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/oa2/server/OIDCServiceTransactionInterface.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oauth2/src/test/java/edu/uiuc/ncsa/myproxy/oauth2/TF2Test.java" beforeDir="false" afterPath="$PROJECT_DIR$/oauth2/src/test/java/edu/uiuc/ncsa/myproxy/oauth2/TF2Test.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/ligo/vo4/access.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/ligo/vo4/access.qdl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/ligo/vo4/rtx.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/ligo/vo4/rtx.qdl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-test/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/website/src/site/xhtml/common/configuration/supported-specifications.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/xhtml/common/configuration/supported-specifications.xhtml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/local/rfc8693/tx-basic.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/local/rfc8693/tx-basic.qdl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -239,6 +243,19 @@
       <option name="TEST_SEARCH_SCOPE">
         <value defaultName="moduleWithDependencies" />
       </option>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="skin" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="skin" />
+      <option name="filePath" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -790,7 +807,7 @@
       <option name="project" value="LOCAL" />
       <updated>1698164931181</updated>
     </task>
-    <option name="localTasksCounter" value="70" />
+    <option name="localTasksCounter" value="71" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -802,7 +819,6 @@
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="https://github.com/ncsa/oa4mp/issues/108 List ersatz clients" />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/108 List ersatz clients, part 2. Can create, link and unlink them." />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/108 List ersatz clients, part 3. Updated documentation, fixed edge case in permission store where missing admin client ID cause an NPE." />
     <MESSAGE value="https://jira.ncsa.illinois.edu/browse/CIL-1815 including better help and now every property entry as per https://github.com/ncsa/oa4mp/issues/120." />
@@ -827,7 +843,8 @@
     <MESSAGE value="Removed a very annoying redundant &quot;error:&quot; tag that was appearing in messages. This would lead to error messages like&#10;&#10;error: error: invalid grant.&#10;&#10;Not the polished prose we all strive for in error messages." />
     <MESSAGE value="Getting build messages to be informative, not overpowering." />
     <MESSAGE value="Merge 5.4.1 final changes" />
-    <option name="LAST_COMMIT_MESSAGE" value="Merge 5.4.1 final changes" />
+    <MESSAGE value="Fix https://github.com/ncsa/oa4mp/issues/139" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix https://github.com/ncsa/oa4mp/issues/139" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
@@ -1069,16 +1086,6 @@
           <option name="timeStamp" value="779" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/servlet/OA2ExceptionHandler.java</url>
-          <line>91</line>
-          <option name="timeStamp" value="785" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/servlet/OA2ExceptionHandler.java</url>
-          <line>96</line>
-          <option name="timeStamp" value="786" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/util/5.3-SNAPSHOT/util-5.3-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/util/mail/MailSenderThread.java</url>
           <line>51</line>
           <option name="timeStamp" value="792" />
@@ -1122,11 +1129,6 @@
           <option name="timeStamp" value="802" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/cm/oidc_cm/OIDCCMServlet.java</url>
-          <line>1255</line>
-          <option name="timeStamp" value="811" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/OA2LibLoader2.java</url>
           <line>23</line>
           <option name="timeStamp" value="813" />
@@ -1147,14 +1149,14 @@
           <option name="timeStamp" value="817" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/claims/AbstractAccessTokenHandler.java</url>
-          <line>420</line>
-          <option name="timeStamp" value="832" />
+          <url>file://$PROJECT_DIR$/proxy/src/main/java/edu/uiuc/ncsa/oa2/servlet/OA2ATServlet.java</url>
+          <line>2066</line>
+          <option name="timeStamp" value="845" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/oauth2/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/oa2/jwt/MyOtherJWTUtil2.java</url>
-          <line>105</line>
-          <option name="timeStamp" value="835" />
+          <url>file://$PROJECT_DIR$/oauth2/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/oa2/server/IDTokenResponse.java</url>
+          <line>159</line>
+          <option name="timeStamp" value="846" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-field">
           <url>file://$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/loader/OA2ConfigurationLoader.java</url>

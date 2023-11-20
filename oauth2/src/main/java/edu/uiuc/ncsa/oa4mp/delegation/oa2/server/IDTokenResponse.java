@@ -4,9 +4,11 @@ import edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.IDTokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Scopes;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
 import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import net.sf.json.JSONObject;
 
@@ -16,6 +18,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.TreeSet;
 
 import static edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants.*;
 
@@ -55,6 +58,7 @@ public abstract class IDTokenResponse extends IResponse2 {
     }
 
     IDTokenImpl idToken;
+
     public boolean hasRefreshToken() {
         return refreshToken != null;
     }
@@ -150,19 +154,24 @@ public abstract class IDTokenResponse extends IResponse2 {
                 m.put(REFRESH_TOKEN, getRefreshToken().getToken()); // don't encode JWTs
             }
             // CIL-1655
-            m.put("refresh_token_lifetime", refreshToken.getLifetime()/1000);
-            m.put("refresh_token_" + OA2Claims.ISSUED_AT, refreshToken.getIssuedAt()/1000);
+            m.put("refresh_token_lifetime", refreshToken.getLifetime() / 1000);
+            m.put("refresh_token_" + OA2Claims.ISSUED_AT, refreshToken.getIssuedAt() / 1000);
+        }
+        TreeSet<String> allScopes = new TreeSet<>();
+        // Fix https://github.com/ncsa/oa4mp/issues/134
+        OIDCServiceTransactionInterface st = (OIDCServiceTransactionInterface) getServiceTransaction();
+        if (st.getATData().containsKey(SCOPE)) {
+            allScopes.addAll(OA2Scopes.ScopeUtil.toScopes(st.getATData().getString(SCOPE)));
         }
         if (!getSupportedScopes().isEmpty()) {
             // construct the scope response.
-            String ss = "";
-            boolean firstPass = true;
             for (String s : getSupportedScopes()) {
-                ss = ss + (firstPass ? "" : " ") + s;
-                if (firstPass) {
-                    firstPass = false;
-                }
+                allScopes.add(s);
             }
+        }
+
+        String ss = OA2Scopes.ScopeUtil.toString(allScopes);
+        if(!StringUtils.isTrivial(ss)) {
             m.put(SCOPE, ss);
         }
         // We have to compute the user metadata no matter what, but only return it if the
@@ -176,7 +185,6 @@ public abstract class IDTokenResponse extends IResponse2 {
 
         response.setContentType("application/json;charset=UTF-8");
         response.setCharacterEncoding("UTF-8");
-        System.err.println(response.getHeaderNames());
         Writer osw = response.getWriter();
         json.write(osw);
         osw.flush();

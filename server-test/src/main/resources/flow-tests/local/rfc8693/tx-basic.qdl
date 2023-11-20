@@ -25,7 +25,7 @@ id. := exchange('-id','-subject',args.0?'at':'rt');
 
 ⊨ at.'lifetime' == 750000 : 'wrong access token lifetime';
 ⊨ at.'jwt'.'iss' == 'https://localhost:9443/oauth2' : 'wrong access token issuer';
-⊨ at.'jwt'.'aud'.0 == 'https://wlcg.cern.ch/jwt/v1/access' : 'wrong access token audience';
+⊨ at.'jwt'.'aud' == 'https://wlcg.cern.ch/jwt/v1/access' : 'wrong access token audience';
 ⊨ rt.'lifetime' == 3600000 : 'wrong refresh token lifetime';
 ⊨ claims().'sub' == 'jeff' : 'IDT wrong subject';
 ⊨ claims().'iss' == 'https://localhost:9443/oauth2' : 'IDT wrong issuer';

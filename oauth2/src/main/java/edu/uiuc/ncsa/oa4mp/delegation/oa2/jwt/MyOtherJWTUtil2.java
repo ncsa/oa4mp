@@ -94,18 +94,17 @@ public class MyOtherJWTUtil2 {
         if (jsonWebKey.id != null && jsonWebKey.id.length() != 0) {
             header.put(KEY_ID, jsonWebKey.id);
         }
-        String signature = null;
+        String token = null;
 
         header.put(ALGORITHM, jsonWebKey.algorithm);
 
         if (jsonWebKey.algorithm.equals(NONE_JWT)) {
-            signature = ""; // as per spec
+            token = concat(header, payload) +"."; // as per spec. Ends with a period if not signed.
 
         } else {
-            //     DebugUtil.trace(JWTUtil.class, "Signing ID token with algorithm=" + jsonWebKey.algorithm);
-            signature = sign(header, payload, jsonWebKey);
+            token = sign(header, payload, jsonWebKey);
         }
-        return signature;
+        return token;
     }
 
 

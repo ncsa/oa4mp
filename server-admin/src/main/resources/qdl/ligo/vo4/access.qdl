@@ -7,7 +7,6 @@ then [
              robot_name := robots.0 - robot_caput;
       robot_test_names. := [ 'gw-astronomy:KAGRA-LIGO:Robots:' + robot_name + ':SciTokens:authorized',
                           'Services:Robots:' + robot_name + ':SciTokens:authorized'];
-                          //igwn.robot:dashboard2-scitoken
       r_test.:=robot_test_names. ∈ attributes\'isMemberOf'\*\'name';
         if [true ∈ r_test.]
       then [
