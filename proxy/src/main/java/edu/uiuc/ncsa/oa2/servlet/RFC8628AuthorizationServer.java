@@ -209,6 +209,11 @@ public class RFC8628AuthorizationServer extends EnvServlet {
                         userCode = RFC8628Servlet.convertToCanonicalForm(userCode, getServiceEnvironment().getRfc8628ServletConfig());
                         RFC8628Store<? extends OA2ServiceTransaction> rfc8628Store = (RFC8628Store) getServiceEnvironment().getTransactionStore();
                         OA2ServiceTransaction trans = rfc8628Store.getByUserCode(userCode);
+                        // https://github.com/ncsa/oa4mp/issues/141
+                        if(trans == null){
+                            throw new OA2ATException("access_denied", "unknown user code \"" + userCode +"\"",
+                                    HttpStatus.SC_BAD_REQUEST, null);
+                        }
                         MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(trans.getOA2Client());
                         debugger.trace(this, "got transaction = " + trans);
                         printAllParameters(request, debugger);
