@@ -566,13 +566,18 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                 }
             }
             ConfigurationNode whiteListNode = getFirstNode(node, UUC_WHITELIST);
-            List[] outList = processUUCList(whiteListNode);
-            uucConfiguration.whiteList = outList[0];
-            uucConfiguration.whitelistRegex = outList[1];
+            // Fix https://github.com/ncsa/oa4mp/issues/139
+            if (whiteListNode != null) {
+                List[] outList = processUUCList(whiteListNode);
+                uucConfiguration.whiteList = outList[0];
+                uucConfiguration.whitelistRegex = outList[1];
+            }
             ConfigurationNode blackListNode = getFirstNode(node, UUC_BLACKLIST);
-            outList = processUUCList(blackListNode);
-            uucConfiguration.blacklist = outList[0];
-            uucConfiguration.blacklistRegex = outList[1];
+            if (blackListNode != null) {
+                List[] outList = processUUCList(blackListNode);
+                uucConfiguration.blacklist = outList[0];
+                uucConfiguration.blacklistRegex = outList[1];
+            }
         }
         return uucConfiguration;
     }
