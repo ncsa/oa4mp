@@ -1,5 +1,7 @@
-say('seq 1');
-say('debug level =' + debugger());
+say('seq 1, exec_phase=' + exec_phase);
+say('debug config:\n' + print(debugger()));
 debugger(1,'This should not print');
-debugger(3,'seq 1 debug test ok');
+debugger(3,'(prints as a warning) seq 1 debug test ok ');
 claims.'seq1' := args().0.'isMemberOf'; // returns 'is_member_of'
+
+

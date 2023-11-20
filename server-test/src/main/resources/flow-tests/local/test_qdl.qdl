@@ -2,9 +2,15 @@
 
 /*
    Tests running a sequence of QDL scripts on the server.
-   Note that this also tests extended attribute support, which is
-   enabled in the CLI (using the ea_support command). This should return
-   a string of two values that can be parsed. 
+   Notes
+   -----
+   * There is an array of scripts 0, 1, 2 that are run in sequence every time there is a call.
+   * Tests that server variables are set in the QDL runtime environment.
+   * Tests extended attribute support, which is enabled in the
+     CLI (using the ea_support command). This should return a string of two
+     values that can be parsed.
+   * Each call has the various vaules updated with the current flow and these are what
+     is checked.
 */
 path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests';
 if[path∉script_path()][script_path(path ~ script_path());];
@@ -21,23 +27,23 @@ if[rc!='ok'][return(rc);];
 tokens. := clc#access();
 claims. := claims();
 
-⊨ tokens.'access_token'.'lifetime' ≡ 900000 : 'wrong access token lifetime';
-⊨ tokens.'refresh_token'.'lifetime' ≡ 1000000 : 'wrong refresh token lifetime';
-⊨ claims.'seq0' ≡ 636 : 'wrong seq 0 value';
-⊨ claims.'roles'.0 ≡ 'admin,all-user' : 'wrong extended attribute value';
-⊨ claims.'seq0_phase' ≡ 'post_token' : 'wrong seq0_phase value';
-⊨ claims.'seq1' ≡ 'is_member_of' : 'wrong seq 1 value';
-⊨ claims.'seq2' ≡ 'seq 2 passed post_token' : 'wrong seq 2 value';
+⊨ tokens.'access_token'.'lifetime' ≡ 900000 : 'wrong access token lifetime, got ' + tokens.'access_token'.'lifetime';
+⊨ tokens.'refresh_token'.'lifetime' ≡ 1000000 : 'wrong refresh token lifetime, got ' + tokens.'refresh_token'.'lifetime';
+⊨ claims.'seq0' ≡ 636 : 'wrong seq 0 value, expected 636 and got ' + claims.'seq0';
+⊨ claims.'roles'.0 ≡ 'admin,all-user' : 'wrong extended attribute value, got ' + claims.'roles'.0;
+⊨ claims.'seq0_phase' ≡ 'post_token' : 'wrong seq0_phase value, got ' + claims.'seq0_phase';
+⊨ claims.'seq1' ≡ 'is_member_of' : 'wrong post_token seq 1 value, got ' + claims.'seq1';
+⊨ claims.'seq2' ≡ 'seq 2 passed post_token' : 'wrong post_token seq 2 value, got ' + claims.'seq2';
 
 old_claims. := claims.;
 tokens. := refresh();
 claims. := claims();
-⊨ tokens.'access_token'.'lifetime' ≡ 900000 : 'wrong access token lifetime';
-⊨ tokens.'refresh_token'.'lifetime' ≡ 1000000 : 'wrong refresh token lifetime';
-⊨ claims.'seq0' ≡ 636 : 'wrong seq 0 value';
-⊨ claims.'seq0_phase' ≡ 'post_refresh' : 'wrong seq0_phase value';
-⊨ claims.'seq1' ≡ 'is_member_of' : 'wrong seq 1 value';
-⊨ claims.'seq2' ≡ 'seq 2 passed post_refresh' : 'wrong seq 2 value';
+⊨ tokens.'access_token'.'lifetime' ≡ 900000 : 'wrong access token lifetime, got ' + tokens.'access_token'.'lifetime';
+⊨ tokens.'refresh_token'.'lifetime' ≡ 1000000 : 'wrong refresh token lifetime, got ' + tokens.'refresh_token'.'lifetime';
+⊨ claims.'seq0' ≡ 636 : 'wrong seq 0 value, expected 636 and got ' + claims.'seq0';
+⊨ claims.'seq0_phase' ≡ 'post_refresh' : 'wrong seq0_phase value, got ' + claims.'seq0_phase';
+⊨ claims.'seq1' ≡ 'is_member_of' : 'wrong post_refresh seq 1 value, got ' + claims.'seq1';
+⊨ claims.'seq2' ≡ 'seq 2 passed post_refresh' : 'wrong post_refresh seq 2 value, got ' + claims.'seq2';
 
 // No exchange at this point since that does nothing to the claims.
 say('Test multiple QDL scripts: ok');

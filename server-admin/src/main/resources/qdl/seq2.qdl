@@ -1,5 +1,4 @@
-say('seq 2');
+say('seq 2, exec_phase=' + exec_phase);
 say(size(args()));
-say('exec_phase=' + exec_phase);
 ⊨ size(args()) == 1;
 claims.'seq2' := 'seq 2 passed ' + exec_phase;

@@ -45,10 +45,17 @@
   "type": "identity"
 }}}
 */
+
+
+// regression for https://github.com/ncsa/oa4mp/issues/137. If this is empty when
+// proxying then a lot
+// of OA4MP installs will no longer function.
+say('script_path=' + script_path());
+script_load('runtime-vars-check.qdl', false, false);
 say('setting debug to level 2');
 debugger(2);
-debugger(2,'seq 0');
-debugger(3,size(args()));
+debugger(2,'seq 0, exec_phase=' + exec_phase);
+debugger(3,'args size= ' + size(args()));
 debugger(1,'this should not print!');
 claims.'seq0' := args().0.'port'; // returns 636
 claims.'seq0_phase' := exec_phase; // returns current exec phase
@@ -59,19 +66,12 @@ then[
         if[∃claims.'roles2']
       then[claims.'roles2' := xas.'org.oa4mp'.'/roles2';];
     ];
-say('mail.cfg:\n' + print(mail.cfg.));
-say('mail.message:\n' + print(mail.message.));
-// regression for https://github.com/ncsa/oa4mp/issues/137. If this is empty when
-// proxying then a lot
-// of OA4MP installs will no longer function.
-  if[size(proxy_claims.) == 0]
-    [raise_error('missing proxy claims');];
 
      /*
      Uncomment to test error handling. This makes the flow bomb, but then you get to
      see what an error should look like.
     */
-/*
-  raise_error('raise_error test', oa4mp_code, {'message':'error test', 'error_type' :
-     'error_type_message','error_uri':'https://localhost/oops'});
-*/
+
+/*  raise_error('raise_error test', oa4mp_error, {'message':'error test', 'error_type' :
+     'error_type_message','error_uri':'https://localhost/oops'});*/
+

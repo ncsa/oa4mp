@@ -1,0 +1,41 @@
+/*
+     if[size(proxy_claims.) == 0][raise_error('missing proxy_claims.');];
+   This may be invoked from any test *on the servers ide* to check that the runtime variables are
+   being set at least semi-reasonably.
+   It takes two arguments,
+      (0) is true if the access token is a JWT
+      (1) is true if the refresh token is a JWT
+
+   This does not need to be run for every test, but should be included in at least
+   a couple so that we know if there is regression. A change to the runtime variables
+   without warning is a fatal error for doing QDL in OA4MP!
+*/
+
+if[size(args())!=2][raise_error('incorrect number of arguments');];
+atJWT := args().0;
+rtJWT := args().1;
+say('args()=' + args());
+// These are regression tests for workspace variables.
+// https://github.com/ncsa/oa4mp/issues/140
+say('checking runtime variables');
+                 if[∄oa4mp_error][raise_error('oa4mp_error code not set');]; // can't propagate error. Something really wrong
+            if[oa4mp_error!=1000][raise_error('oa4mp_error code value incorrect, should be 1000, got ' + oa4mp_error, 1000);];
+     if[size(proxy_claims.) == 0][raise_error('missing proxy_claims.');];
+                  if[∄exec_phase][raise_error('missing exec_phase variable', oa4mp_error);];
+             if[∄access_control.][raise_error('missing access control stem', oa4mp_error);];
+  if[∄access_control.'client_id'][raise_error('access control client_id not set', oa4mp_error);];
+                   if[∄audience.][raise_error('audience. not set', oa4mp_error);];
+                     if[∄scopes.][raise_error('scopes. not set', oa4mp_error);];
+                if[∄flow_states.][raise_error('missing flow states', oa4mp_error);];
+                  if[∄mail.'cfg'][raise_error('missing mail configuration', oa4mp_error);];
+              if[∄mail.'message'][raise_error('missing default mail message', oa4mp_error);];
+if[exec_phase != 'post_auth'][
+    if[atJWT][
+               if[∄access_token.][raise_error('access_token. not set', oa4mp_error);];
+                  if[∄tx_scopes.][raise_error('tx_scopes. not set', oa4mp_error);];
+                if[∄tx_audience.][raise_error('tx_audience. not set', oa4mp_error);];
+                if[∄tx_resource.][raise_error('tx_resource. not set', oa4mp_error);];
+      ]; // end AT JWT checks
+     if[rtJWT && ∄refresh_token.][raise_error('refresh_token. not set', oa4mp_error);];
+   say('     ... runtime variables ok');
+  ]; // end regression tests for runtime variables.

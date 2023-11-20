@@ -286,6 +286,9 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             }
             scriptRuntimeException.setRequestedType(requestedType);
             throw scriptRuntimeException;
+        }else{
+            getState().getLogger().warn("Unhandled QDL exception:" + raiseErrorException.getMessage(),raiseErrorException);
+            DebugUtil.error("Unhandled QDL exception", raiseErrorException);
         }
     }
 
