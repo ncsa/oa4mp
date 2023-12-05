@@ -314,13 +314,9 @@ public class ClientManagementCommands implements QDLModuleMetaClass {
         @Override
         public Object evaluate(Object[] objects, State state) throws Throwable{
             checkInit();
-//            try {
                 Identifier id = BasicIdentifier.newID(objects[0].toString());
                 getEnvironment().getClientStore().remove(id);
-  /*          } catch (Throwable e) {
-                throw new QDLException("Error: Could not remove object with id " + objects[0] + ":" + e.getMessage());
-            }
-  */          return Boolean.TRUE;
+         return Boolean.TRUE;
         }
 
 
@@ -350,12 +346,8 @@ public class ClientManagementCommands implements QDLModuleMetaClass {
         public Object evaluate(Object[] objects, State state) throws Throwable{
             checkInit();
             OA2ClientConverter cc = null;
-//            try {
                 cc = (OA2ClientConverter) getEnvironment().getClientStore().getMapConverter();
-  /*          } catch (Exception e) {
-                e.printStackTrace();
-            }
-  */          List<Object> x = new ArrayList<>();
+          List<Object> x = new ArrayList<>();
             x.addAll(cc.getKeys().allKeys());
             QDLStem QDLStem = new QDLStem();
             QDLStem.addList(x);
@@ -401,7 +393,6 @@ public class ClientManagementCommands implements QDLModuleMetaClass {
                 }
                 toApprove = (Boolean) objects[1];
             }
-    //        try {
 
                 Boolean isApproved = getEnvironment().getClientApprovalStore().isApproved(id);
                 if (objects.length == 1) {
@@ -418,10 +409,6 @@ public class ClientManagementCommands implements QDLModuleMetaClass {
                 }
                 getEnvironment().getClientApprovalStore().save(approval);
                 return isApproved;
-     /*       } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return Boolean.FALSE; */
         }
 
 
@@ -441,4 +428,13 @@ public class ClientManagementCommands implements QDLModuleMetaClass {
         }
     }
 
+    @Override
+    public JSONObject serializeToJSON() {
+        return null;
+    }
+
+    @Override
+    public void deserializeFromJSON(JSONObject jsonObject) {
+
+    }
 }

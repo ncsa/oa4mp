@@ -23,7 +23,7 @@ if [ -z ${NCSA_DEV_OUTPUT+x} ];  then
 fi
 
 OA4MP_ROOT=$NCSA_DEV_INPUT/oa4mp
-OA4MP_SERVER_DEPLOY=$NCSA_DEV_OUTPUT/server
+OA4MP_SERVER_DEPLOY=$NCSA_DEV_OUTPUT/oa4mp
 OA4MP_QDL_DEPLOY=$NCSA_DEV_OUTPUT/oa4mp-qdl
 
 if [ ! -d "$OA4MP_QDL_DEPLOY" ]; then
@@ -52,6 +52,11 @@ fi
 cd "$OA4MP_ROOT/qdl/src/main/scripts"
 echo "building OA4MP QDL installer"
 ./create_installer.sh
+if [[ $? -ne 0 ]] ; then
+    echo "OA4MP create installer failed"
+    exit 1
+fi
+
 echo "deploying OA4MP QDL installer"
 
 

@@ -10,6 +10,7 @@ import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import net.sf.json.JSONObject;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -248,5 +249,15 @@ public class QDLACL implements QDLModuleMetaClass {
             doxx.add("See also: " + ADD_TO_ACL_NAME);
             return doxx;
         }
+    }
+
+    @Override
+    public JSONObject serializeToJSON() {
+        return null;
+    }
+
+    @Override
+    public void deserializeFromJSON(JSONObject jsonObject) {
+
     }
 }

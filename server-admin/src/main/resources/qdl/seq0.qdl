@@ -51,7 +51,6 @@
 // proxying then a lot
 // of OA4MP installs will no longer function.
 say('script_path=' + script_path());
-script_load('runtime-vars-check.qdl', false, false);
 say('setting debug to level 2');
 debugger(2);
 debugger(2,'seq 0, exec_phase=' + exec_phase);

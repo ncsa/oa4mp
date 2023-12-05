@@ -1258,4 +1258,21 @@ public class CLC implements QDLModuleMetaClass {
             return dd;
         }
     }
+
+    @Override
+    public JSONObject serializeToJSON() {
+        return clcCommands.toJSON();
+    }
+
+    @Override
+    public void deserializeFromJSON(JSONObject jsonObject){
+      try {
+          clcCommands.fromJSON(jsonObject);
+      }catch(Throwable t){
+          if(t instanceof RuntimeException){
+              throw (RuntimeException)t;
+          }
+          throw new RuntimeException("error loading stored CLC state", t);
+      }
+    }
 }

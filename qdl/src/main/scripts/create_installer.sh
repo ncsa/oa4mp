@@ -12,6 +12,11 @@ JAR_NAME=${1:-$DEFAULT_JAR_NAME}
 
 cd $OA4MP_QDL_ROOT
 mvn -P qdl package > qdl-maven.log
+if [[ $? -ne 0 ]] ; then
+    echo "create OA4MP QDL failed. See qdl-maven.log"
+    exit 1
+fi
+
 cp "$OA4MP_QDL_ROOT/target/oa4mp-qdl-jar-with-dependencies.jar" $OA4MP_QDL_DEPLOY/lib/qdl.jar
 unzip -p "$OA4MP_QDL_ROOT/target/oa4mp-qdl-jar-with-dependencies.jar" META-INF/MANIFEST.MF > $OA4MP_QDL_DEPLOY/lib/build-info.txt
 

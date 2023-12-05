@@ -5,7 +5,6 @@
    It takes two arguments,
       (0) is true if the access token is a JWT
       (1) is true if the refresh token is a JWT
-
    This does not need to be run for every test, but should be included in at least
    a couple so that we know if there is regression. A change to the runtime variables
    without warning is a fatal error for doing QDL in OA4MP!

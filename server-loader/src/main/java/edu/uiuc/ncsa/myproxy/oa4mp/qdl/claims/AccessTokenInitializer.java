@@ -261,4 +261,13 @@ public class AccessTokenInitializer implements QDLModuleMetaClass {
         }
     }
 
+    @Override
+    public JSONObject serializeToJSON() {
+        return null;
+    }
+
+    @Override
+    public void deserializeFromJSON(JSONObject jsonObject) {
+
+    }
 }

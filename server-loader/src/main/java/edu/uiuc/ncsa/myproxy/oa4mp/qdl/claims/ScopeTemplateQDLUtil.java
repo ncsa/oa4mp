@@ -11,6 +11,7 @@ import edu.uiuc.ncsa.qdl.variables.QDLList;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.QDLStem;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -19,7 +20,7 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 1/21/21 at  11:11 AM
  */
-public class ScopeTemplateQDLUtil {
+public class ScopeTemplateQDLUtil implements Serializable {
     public static final String RESOLVE_TEMPLATES_NAME = "resolve_templates";
 
     public class ResolveTemplates implements QDLFunction {

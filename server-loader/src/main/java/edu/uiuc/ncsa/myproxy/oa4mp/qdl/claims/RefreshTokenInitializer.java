@@ -182,4 +182,14 @@ public class RefreshTokenInitializer implements QDLModuleMetaClass {
             return doxx;
         }
     }
+
+    @Override
+    public JSONObject serializeToJSON() {
+        return null;
+    }
+
+    @Override
+    public void deserializeFromJSON(JSONObject jsonObject) {
+
+    }
 }

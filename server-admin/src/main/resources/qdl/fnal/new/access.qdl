@@ -3,6 +3,7 @@
   for the capability set and all capabilities are returned (this is a query) along
   with any extras.
 */
+
 block[
     theta. := []~mask(scopes. , -1 < starts_with(scopes., CS_HEAD)); //requested capability sets
     say('*** FNAL CS_HEAD ==' + to_string(CS_HEAD));

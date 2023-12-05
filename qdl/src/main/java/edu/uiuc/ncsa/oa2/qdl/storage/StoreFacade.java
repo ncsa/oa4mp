@@ -19,6 +19,7 @@ import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.*;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
+import net.sf.json.JSONObject;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import java.io.OutputStream;
@@ -1231,4 +1232,13 @@ public class StoreFacade implements QDLModuleMetaClass {
         }
     }
 
+    @Override
+    public JSONObject serializeToJSON() {
+        return null;
+    }
+
+    @Override
+    public void deserializeFromJSON(JSONObject jsonObject) {
+
+    }
 }

@@ -26,7 +26,7 @@ public class CLCModule extends JavaModule {
     public Module newInstance(State state) {
         CLCModule clcModule = new CLCModule(URI.create("oa2:/qdl/oidc/client"), "clc");
         CLC clc = new CLC();
-
+       clcModule.setMetaClass(clc);
         funcs = new ArrayList<>();
         funcs.add(clc.new Access());
         funcs.add(clc.new AccessAT());

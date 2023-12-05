@@ -75,8 +75,23 @@ cp $OA4MP_ROOT/oa4mp-server-oauth2/target/oauth2.war  $OA4MP_SERVER_DEPLOY
 echo "building OA4MP tools..."
 cd $OA2_TOOLS
 mvn -P cli package > cli.log
+if [[ $? -ne 0 ]] ; then
+    echo "could not build cli, see cli/log"
+    exit 1
+fi
+
 mvn -P client package > client.log
+if [[ $? -ne 0 ]] ; then
+    echo "could not build client, see client.log"
+    exit 1
+fi
+
 mvn -P jwt package > jwt.log
+if [[ $? -ne 0 ]] ; then
+    echo "could not build jwt, see jwt.log"
+    exit 1
+fi
+
 cd $OA2_TOOLS/target
 echo "deploying OA4MP tools..."
 
@@ -96,6 +111,7 @@ then
 fi
 tar cf oidc-cm-scripts.tar oidc-cm-scripts/
 if [ -f jwt-scripts.tar ]
+
 then
   rm jwt-scripts.tar
 fi

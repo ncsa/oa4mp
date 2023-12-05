@@ -10,6 +10,8 @@ script_load('fnal/acl.qdl');
       CS_HEAD := CS + ':/';
  say('*** FNAL args ' + to_string(script_args(-1)));
 
+script_load('runtime-vars-check.qdl', true, false); // regression testing. DO NOT DEPLOY
+
 
     at_claims. := script_load('fnal/new/get_user.qdl', claims.eppn);
 
