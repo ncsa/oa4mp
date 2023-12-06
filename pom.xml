@@ -86,7 +86,7 @@
         <module>client-test</module>
         <module>oa4mp-webapp</module>
         <module>proxy</module>
-        <module>website</module>
+ <!--       <module>website</module> -->
         <module>server-test</module>
         <module>skin</module>
         <module>myproxy-website</module>
