@@ -8,6 +8,8 @@ cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token 
 cfg.'description' :=  'Test FNAL with basic scopes';
 
 params.'authz' :=  {'scope': 'storage.read:/ wlcg.capabilityset:/duneana wlcg.groups'};
+params.'refresh' :=  {'scope': 'storage.read:/dune storage.create:/dune/scratch/users/cilogontest compute.read compute.cancel compute.modify compute.create storage.read:/dune'};
+params.'exchange' :=  {'scope': 'compute.read compute.cancel compute.modify compute.create'};
 rc := script_load('driver.qdl', cfg., params.);
 if[rc!='ok'][return(rc);];
 
@@ -46,7 +48,7 @@ ss. := tokenize(at.'scope', ' ');
 ⊨ abs(tokens.'access_token'.'lifetime' - 750000)<2000 : 'wrong lifetime, expected 750000, got ' + (tokens.'access_token'.'lifetime');
 at.'access_token' := exchange('-at');
 rt.'refresh_token' := exchange('-rt');
-expected_scopes. := ['compute.create', 'compute.read', 'compute.cancel', 'compute.modify', 'storage.create:/dune/scratch/users/cilogontest', 'storage.read:/dune'];
+expected_scopes. := ['compute.create', 'compute.read', 'compute.cancel', 'compute.modify'];
 ss. := tokenize(at.'scope', ' ');
 ⊨ reduce(@&&, expected_scopes. ∈ ss.) : 'incorrect access token scopes';
 ⊨ abs(tokens.'access_token'.'lifetime' -750000)<2000 : 'wrong lifetime, expected 750000, got ' + (tokens.'access_token'.'lifetime');

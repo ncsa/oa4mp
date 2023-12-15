@@ -9,6 +9,7 @@ import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
@@ -19,8 +20,8 @@ import java.io.File;
 import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Date;
 
-import static edu.uiuc.ncsa.myproxy.oa4mp.qdl.util.SigningCommands.RS_256;
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 
 /**
@@ -55,6 +56,9 @@ public class VOCommands extends StoreCommands2 {
         super.extraUpdates(identifiable, magicNumber);
         VirtualOrganization vo = (VirtualOrganization) identifiable;
         VOSerializationKeys keys = (VOSerializationKeys) getSerializationKeys();
+        if (vo.getCreationTS() == null) {
+            vo.setCreationTS(new Date());
+        }
         vo.setTitle(getPropertyHelp(keys.title(), "enter the title", vo.getTitle()));
         vo.setIssuer(getPropertyHelp(keys.issuer(), "enter the issuer", vo.getIssuer()));
         vo.setValid(getPropertyHelp(keys.valid(), "is this valid?", Boolean.toString(vo.isValid())).equalsIgnoreCase("y"));
@@ -115,36 +119,29 @@ public class VOCommands extends StoreCommands2 {
                             }
                             return;
                         }
-                    }
-                    if (type.equals("EC")) {
-                        String curve = readline("If yo do not want the default curves used, enter a specific one");
-                        if (isTrivial(curve)) {
-                            curve = JWKUtil2.EC_CURVE_P_256;
-                        }
-                        try {
-                            newKeys(vo, curve);
-                        } catch (Throwable e) {
-                            say("That did not work:" + e.getMessage());
-                            if (DebugUtil.isEnabled()) {
-                                e.printStackTrace();
-                            }
-                        }
-                        return;
-                    }
-                        say("Sorry but \"" + type + "\" is not a valid type of key");
+                    }else{
+                        if (type.equals("EC")) {
+                            String curve = readline("If you do not want the default curves used, enter a specific one:");
 
+                            try {
+                                newKeys(vo, curve);
+                            } catch (Throwable e) {
+                                say("That did not work:" + e.getMessage());
+                                if (DebugUtil.isEnabled()) {
+                                    e.printStackTrace();
+                                }
+                                return;
+                            }
+                        }else{
+                            say("Sorry but \"" + type + "\" is not a valid type of key");
+                        }
+                    }
                 }
             }
         }
         String defaultKey = null;
         if (vo.getJsonWebKeys() != null) {
-            for (String keyID : vo.getJsonWebKeys().keySet()) {
-                JSONWebKey jsonWebKey = vo.getJsonWebKeys().get(keyID);
-                if (jsonWebKey.algorithm.equals(RS_256)) {
-                    defaultKey = jsonWebKey.id;
-                    break;
-                }
-            }
+            defaultKey = vo.getJsonWebKeys().getDefaultKeyID();
         }
         vo.setDefaultKeyID(getPropertyHelp(keys.defaultKeyID(), "enter the default key id", defaultKey));
 
@@ -158,7 +155,7 @@ public class VOCommands extends StoreCommands2 {
             sayi("A complete set of default elliptic curve keys is done with the " + EC_FLAG);
             sayi("E.g: Generate a new set of default elliptic curve keys");
             sayi("new_keys " + EC_FLAG);
-            sayi("This creates a set of keys for the P-256 curve and algorithm ES256, P-384 and ES384, and P-521 and ES512" );
+            sayi("This creates a set of keys for the P-256 curve and algorithm ES256, P-384 and ES384, and P-521 and ES512");
             sayi("E.g: Generate a new set of RSA keys of 4096 bits");
             sayi("new_keys " + RSA_SIZE_FLAG + " 4096");
             sayi("E.g: Generate a new set of elliptic curve keys for a specific curve");
@@ -227,9 +224,26 @@ public class VOCommands extends StoreCommands2 {
     }
 
     protected void newKeys(VirtualOrganization vo, String curve) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
-        JSONWebKeys jsonWebKeys = SigningCommands.createECJsonWebKeys(curve);
+        JSONWebKeys jsonWebKeys;
+        if (StringUtils.isTrivial(curve)) {
+            jsonWebKeys = SigningCommands.createECJsonWebKeys();
+        } else {
+            jsonWebKeys = SigningCommands.createECJsonWebKeys(curve);
+        }
         vo.setJsonWebKeys(jsonWebKeys);
         printJWK(jsonWebKeys);
+    }
+
+    /**
+     * Create the new keys with the spec default. Note that this requires difference curves for each
+     * size.
+     *
+     * @param vo
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidAlgorithmParameterException
+     */
+    protected void newKeys(VirtualOrganization vo) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+        newKeys(vo, null); // do the spec default
     }
 
     public void print_keys(InputLine inputLine) throws Exception {

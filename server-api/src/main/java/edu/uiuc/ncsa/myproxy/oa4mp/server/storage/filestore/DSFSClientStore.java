@@ -19,16 +19,18 @@ public class DSFSClientStore extends FSClientStore<Client> {
     public DSFSClientStore(File f,
                            IdentifiableProviderImpl<Client> idp,
                            MapConverter<Client> cp,
-                           boolean removeEmptyFiles) {
-        super(f, idp, cp, removeEmptyFiles);
+                           boolean removeEmptyFiles,
+                           boolean removeFailedFiles) {
+        super(f, idp, cp, removeEmptyFiles,removeFailedFiles);
     }
 
     public DSFSClientStore(File storeDirectory,
                            File indexDirectory,
                            IdentifiableProviderImpl<Client> idp,
                            MapConverter<Client> cp,
-                           boolean removeEmptyFiles) {
-        super(storeDirectory, indexDirectory, idp, cp, removeEmptyFiles);
+                           boolean removeEmptyFiles,
+                           boolean removeFailedFiles) {
+        super(storeDirectory, indexDirectory, idp, cp, removeEmptyFiles,removeFailedFiles);
     }
 
     @Override

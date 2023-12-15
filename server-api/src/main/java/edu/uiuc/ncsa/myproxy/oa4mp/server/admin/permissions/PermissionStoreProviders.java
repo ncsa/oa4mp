@@ -52,8 +52,8 @@ public class PermissionStoreProviders {
 
 
         @Override
-        protected PermissionFileStore produce(File dataPath, File indexPath, boolean removeEmptyFiles) {
-            return new PermissionFileStore(dataPath, indexPath, getPermissionProvider(), converter, removeEmptyFiles);
+        protected PermissionFileStore produce(File dataPath, File indexPath, boolean removeEmptyFiles, boolean removeFailedFiles) {
+            return new PermissionFileStore(dataPath, indexPath, getPermissionProvider(), converter, removeEmptyFiles,removeFailedFiles);
         }
     }
 

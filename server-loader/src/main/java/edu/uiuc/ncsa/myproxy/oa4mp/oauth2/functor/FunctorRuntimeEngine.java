@@ -83,6 +83,15 @@ public class FunctorRuntimeEngine extends ScriptRuntimeEngine implements Scripti
         // no op, because functors are stateless (which is one of their ultimate shortcomings...)
     }
 
+    @Override
+    public String serializeState(String version) {
+        return null;
+    }
+
+    @Override
+    public void deserializeState(String state, String version) {
+
+    }
 
     private ScriptRunResponse doPostAT(ScriptRunRequest request) {
         OA2FunctorFactory functorFactory = getFF((Map) request.getArgs().get(SRE_REQ_CLAIMS),

@@ -10,9 +10,10 @@ if[path∉script_path()][script_path(path ~ script_path());];
 debugger(5);
 ini. := file_read(args().0, 2); // get the ini file
 defaults. := ini.'default';
+all_passed := false;
 system_defaults. := script_load('long-term/setup.qdl');
 cfgs. := ini\pick((x)->x!='default', list_keys(ini.)); // picks out everything but default
-
+extract_error(msg)->tail(msg,'description=')-'\n';
 while[
   x. ∈ cfgs.
   ][
@@ -22,12 +23,38 @@ while[
        clc#init(f, x.'id'); // init or stuff like the debugger fails
 
        clc#read(save_to);
-       tokens. := clc#refresh();
-       tokens. := clc#exchange();
-       tokens. := clc#exchange('-rt');
-       say('ok: ' +  x.'id');
+       // to do the exchange if the system has been idle for a long time requires getting
+       // a valid refresh token, then an access token, then doing a refresh.
+        say('processing ' +  x.'id');
+       tokens. := clc#exchange('-rt'); // gets RT, uses RT as subject
+        say('   ok : exchange refresh token');
+        all_passed := true;
      ]catch[
-       say('failure for ' + x.'id' + ': ' + error_message);
+        say(' fail : exchange refresh token | '  + extract_error(error_message));
      ]; // end catch
-  ]; // end while
+
+     try[
+       tokens. := clc#exchange('-at','-subject','rt'); // gets AT, uses RT as subject
+        say('   ok : exchange access token' );
+        all_passed := all_passed && true;
+     ]catch[
+        say(' fail :  exchange access token | '  + extract_error(error_message));
+     ];
+
+     try[
+       tokens. := clc#refresh();
+        say('   ok : refresh');
+        all_passed := all_passed && true;
+     ]catch[
+        say(' fail :                refresh | ' + extract_error(error_message));
+     ];
+
+       if[all_passed]
+     then[
+          clc#write(save_to);
+          say('stored state updated\n');
+         ]
+     else[say('** failures, state not saved\n');];
+ 
+ ]; // end while
 

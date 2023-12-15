@@ -19,6 +19,8 @@ import edu.uiuc.ncsa.qdl.variables.QDLList;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.qdl.workspace.WorkspaceCommands;
+import edu.uiuc.ncsa.qdl.xml.SerializationConstants;
+import edu.uiuc.ncsa.qdl.xml.SerializationState;
 import edu.uiuc.ncsa.qdl.xml.XMLUtils;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
@@ -27,6 +29,7 @@ import edu.uiuc.ncsa.security.util.scripting.*;
 import net.sf.json.JSON;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
 
 import javax.xml.stream.XMLEventReader;
@@ -86,7 +89,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         state = (OA2State) StateUtils.newInstance();
         if (transaction.hasScriptState()) {
             try {
-                deserializeState(transaction.getScriptState());
+                deserializeState(transaction.getScriptState(), transaction.getScriptStateSerializationVersion());
             } catch (Throwable t) {
                 DebugUtil.trace(this, "Could not deserialize stored transaction state:" + t.getMessage());
                 if (getState().getOa2se() != null) {
@@ -121,7 +124,40 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
     }
 
     @Override
+    public String serializeState(String version) {
+        if (version.equals(SerializationConstants.VERSION_2_0_TAG)) {
+            return serializeStateOLD();
+        }
+        return serializeState();
+    }
+
+    @Override
     public String serializeState() {
+        WorkspaceCommands workspaceCommands = new WorkspaceCommands();
+        workspaceCommands.setState(state);
+        SerializationState serializationState = new SerializationState();
+        serializationState.setVersion(SerializationConstants.VERSION_2_1_TAG);
+        try {
+            JSONObject json = state.serializeToJSON(serializationState);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            GZIPOutputStream gzipOutputStream = new GZIPOutputStream(baos);
+            gzipOutputStream.write(json.toString().getBytes("UTF-8"));
+            gzipOutputStream.flush();
+            gzipOutputStream.close();
+            return Base64.encodeBase64String(baos.toByteArray());
+        } catch (Throwable e) {
+            throw new QDLException("Error: could not serialize the state:" + e.getMessage(), e);
+        }
+
+    }
+
+    /**
+     * The next would use the version 2.0 serialization into XML. That was insufficient
+     * for updates to the module system, so is deprecated
+     *
+     * @return
+     */
+    public String serializeStateOLD() {
         try {
             StringWriter w = new StringWriter();
             XMLOutputFactory xof = XMLOutputFactory.newInstance();
@@ -149,7 +185,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
 
     OA2State state;
 
-    protected void deserializeStateOLD(String rawState) {
+    protected void deserializeStateOLDXML(String rawState) {
         if (rawState == null || rawState.isEmpty()) return;
         try {
             byte[] xx = Base64.decodeBase64(rawState);
@@ -173,9 +209,46 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         }
     }
 
+
     @Override
-    public void deserializeState(String rawState) {
+    public void deserializeState(String rawState, String version) {
         if (rawState == null || rawState.isEmpty()) return;
+        if (version.isEmpty() || version.equals(SerializationConstants.VERSION_2_0_TAG)) {
+            deserializeStateXML2_0(rawState);
+            return;
+        }
+        // At this point we follow the assumption that a lot of old state in
+        // XML 2.0 format is still on the system, so try to deserialize it first
+        // with 2.1 and only if the bombs try 2.0. 
+        try {
+            deserializeJSON2_1(rawState);
+        }catch(Throwable t){
+            deserializeStateXML2_0(rawState);
+        }
+    }
+
+    protected void deserializeJSON2_1(String rawState) {
+        try {
+            byte[] bytes = Base64.decodeBase64(rawState);
+            ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+            GZIPInputStream gzipInputStream = new GZIPInputStream(bais, 65536);
+            Reader r = new InputStreamReader(gzipInputStream);
+            String rawJSON = IOUtils.toString(r);
+
+            SerializationState serializationState = new SerializationState();
+            serializationState.setVersion(SerializationConstants.VERSION_2_1_TAG);
+            state.deserializeFromJSON(JSONObject.fromObject(rawJSON), serializationState);
+        } catch (Throwable e) {
+            DebugUtil.trace(this, "error deserializing state", e);
+            if (e instanceof RuntimeException) {
+                throw (RuntimeException) e;
+            }
+            throw new QDLException("Error deserializing state", e);
+        }
+
+    }
+
+    protected void deserializeStateXML2_0(String rawState) {
         try {
             byte[] xx = Base64.decodeBase64(rawState);
             ByteArrayInputStream bais = new ByteArrayInputStream(xx);
@@ -211,7 +284,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
                 state = (OA2State) workspaceCommands.getInterpreter().getState();
             } catch (Throwable t) {
                 // That didn't work. Try it in old format.
-                deserializeStateOLD(rawState);
+                deserializeStateOLDXML(rawState);
             }
         } catch (Throwable e) {
             DebugUtil.trace(this, "error deserializing state", e);
@@ -286,8 +359,8 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             }
             scriptRuntimeException.setRequestedType(requestedType);
             throw scriptRuntimeException;
-        }else{
-            getState().getLogger().warn("Unhandled QDL exception:" + raiseErrorException.getMessage(),raiseErrorException);
+        } else {
+            getState().getLogger().warn("Unhandled QDL exception:" + raiseErrorException.getMessage(), raiseErrorException);
             DebugUtil.error("Unhandled QDL exception", raiseErrorException);
         }
     }
@@ -310,7 +383,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
     public static String MAIL_VAR = "mail" + STEM_INDEX_MARKER;
     // next couple are element in the mail. stem
     public static String MAIL_CFG_VAR = "cfg";
-    public static String MAIL_MESSAGE_VAR = "message" ;
+    public static String MAIL_MESSAGE_VAR = "message";
     public static String ACCESS_TOKEN_VAR = "access_token" + STEM_INDEX_MARKER;
     public static String REFRESH_TOKEN_VAR = "refresh_token" + STEM_INDEX_MARKER;
     public static String SCOPES_VAR = "scopes" + STEM_INDEX_MARKER;
@@ -355,21 +428,21 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             QDLList body = new QDLList();
             try {
                 // CIL-1873 support for email notifications from QDL.
-                if(state.getOa2se().getMailUtil().getSubjectTemplate()==null){
+                if (state.getOa2se().getMailUtil().getSubjectTemplate() == null) {
                     body.add("(no subject)");
-                }else{
+                } else {
                     body.add(state.getOa2se().getMailUtil().getSubjectTemplate());
                 }
                 if (state.getOa2se().getMailUtil().getMessageTemplate() == null) {
                     body.add("(no content)");
-                }else{
+                } else {
                     StringTokenizer stringTokenizer = new StringTokenizer(state.getOa2se().getMailUtil().getMessageTemplate(), "\n");
-                    while(stringTokenizer.hasMoreTokens()){
+                    while (stringTokenizer.hasMoreTokens()) {
                         body.add(stringTokenizer.nextToken());
                     }
                 }
                 mailStem.put(MAIL_MESSAGE_VAR, new QDLStem(body));
-            }catch(IOException iox){
+            } catch (IOException iox) {
                 getState().getLogger().warn("could not get mail message for QDL runtime environment");
             }
             state.setValue(MAIL_VAR, mailStem);
@@ -379,7 +452,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
 
         JSONObject claims = (JSONObject) req.getArgs().get(SRE_REQ_CLAIMS);
         QDLStem claimStem = new QDLStem();
-        if(claims != null) {
+        if (claims != null) {
             claimStem.fromJSON(claims);
         }
         state.setValue(CLAIMS_VAR, claimStem);
@@ -689,7 +762,8 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
 
             });
 
-            state.getTransaction().setScriptState(serializeState());
+            state.getTransaction().setScriptState(serializeState(state.getTransaction().getScriptStateSerializationVersion()));
+            state.getTransaction().setScriptStateSerialzationVersion(SerializationConstants.VERSION_2_1_TAG); // moving forward
         } catch (Throwable t) {
             DebugUtil.trace(this, "Could not serialize stored transaction state:" + t.getMessage());
             if (getState().getOa2se() != null) {

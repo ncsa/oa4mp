@@ -1,6 +1,10 @@
-q := module_load('edu.uiuc.ncsa.qdl.extensions.http.QDLHTTPLoader','java');
-q := module_import(q);
-bearer_token(id, secret)-> encode(encode(id,1) + ':' + encode(secret,1)); // bearer token
+//q := module_load('edu.uiuc.ncsa.qdl.extensions.http.QDLHTTPLoader','java');
+//q := module_import(q);
+/*http := j_load('http');
+use('/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/utils/cm.mdl');*/
+//bearer_token(id, secret)-> encode(encode(id,1) + ':' + encode(secret,1)); // bearer token
+// Note that reloading the http module closes the connection then reopens at ea
+
 custom_id()->ini.'caput' + ':' + random_string(16);
 suite := size(args()) == 1 ? args(0):'cm_local';//which test to run. Default is cm for local test
 ini. := file_read('/home/ncsa/dev/csd/config/ini/cm-test.ini',2).suite;

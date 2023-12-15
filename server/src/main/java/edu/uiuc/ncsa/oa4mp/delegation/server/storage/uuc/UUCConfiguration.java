@@ -87,12 +87,21 @@ public class UUCConfiguration {
         return lastAccessed;
     }
 
+    /**
+     * If set, this will be the upper bound on the last access date. Therefore, for a client whose
+     * last accesed timestamp is L
+     * <pre>L ∈ [lastAccessedAfter, lastAccessed]</pre>
+     */
     public Long lastAccessed = null;
 
     public boolean unusedClientsOnly(){
         return lastAccessed == null || lastAccessed == UUC_LAST_ACCESSED_NEVER_VALUE;
     }
 
+    /**
+     * If this is set, it is a lower bound for last accessed, so the utility will look for
+     * unused clients last accessed after this date.
+     */
     public Long lastAccessedAfter = null;
     public boolean hasLastAccessedAfter(){
         return lastAccessedAfter!=null;

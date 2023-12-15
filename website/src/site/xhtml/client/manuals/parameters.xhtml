@@ -11,6 +11,16 @@
 <!--#include virtual="../../header.html" -->
 
 <h2>Client Configuration Parameters.</h2>
+<p>There are 3 ways to designate the standard endpoints for the system</p>
+<ol>
+    <li>Explicitly set each one</li>
+    <li>Set the serviceURI and let the system construct them.</li>
+    <li>Set the well-known URI for the system and let the system read it off the server.</li>
+</ol>
+<p>Any that you set will be taken as overrides, so you could, e.g., set the well-known and set
+a custom token endpoint that would be used. Note that the getcert endpoint is <b>not</b>
+an OIDC or OAuth standard and is used by only certain servers (CILogon in particular),
+so that must be set if used.</p>
 
 <p><a id="tags">These are values that the client needs to supply to identify itself.</a> These are</p>
 

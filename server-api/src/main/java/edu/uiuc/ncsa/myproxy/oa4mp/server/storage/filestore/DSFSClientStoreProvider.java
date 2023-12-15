@@ -26,9 +26,9 @@ public class DSFSClientStoreProvider extends FSProvider<DSFSClientStore> impleme
     Provider<? extends Client> clientProvider;
 
     @Override
-    protected DSFSClientStore produce(File dataPath, File indexPath, boolean removeEmptyFiles) {
+    protected DSFSClientStore produce(File dataPath, File indexPath, boolean removeEmptyFiles, boolean removeFailedFiles) {
     //    DebugUtil.trace(this, "dataPath=" + dataPath + ", indexPath=" + indexPath);
-        DSFSClientStore store = new DSFSClientStore(dataPath, indexPath, (IdentifiableProviderImpl<Client>) clientProvider, converter, removeEmptyFiles);
+        DSFSClientStore store = new DSFSClientStore(dataPath, indexPath, (IdentifiableProviderImpl<Client>) clientProvider, converter, removeEmptyFiles, removeFailedFiles);
   //      DebugUtil.trace(this, "client name is " + store.getClass().getSimpleName());
 //        DebugUtil.trace(this, "client store is a " + store);
 /*        if (store.size() == 0) {

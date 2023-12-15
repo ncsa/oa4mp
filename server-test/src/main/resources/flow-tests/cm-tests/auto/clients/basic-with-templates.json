@@ -1,0 +1,38 @@
+{
+  "comment": ["Client with templates. "],
+  "client_name": "Basic test client with overrides",
+  "token_endpoint_auth_method": "private_key_jwt",
+  "at_lifetime":1009,
+  "rt_lifetime":3600,
+  "id_token_lifetime": 1800,
+  "strict_scopes":false,
+  "client_id":"auto-test:basic/templates",
+  "cfg":  {"tokens": {
+     "access":  {
+      "audience": "https://wlcg.cern.ch/jwt/v1/access",
+      "issuer": "https://access.oa4mp.org",
+      "lifetime": 750019,
+      "templates": [  {
+       "aud": "https://wlcg.cern.ch/jwt/v1/access",
+       "paths":    [
+            {"op": "read","path": "/home/${sub}"},
+            {"op": "read","path": "/public/lsst/${sub}"},
+            {"op": "x.y","path": "/abc/def"},
+            {"op": "x.z"},
+            {"op": "write","path": "/data/cluster"}
+       ]
+      }],
+      "type": "wlcg"
+     },
+     "identity":  {
+      "lifetime": 2400000,
+      "type": "identity"
+     },
+     "refresh":  {
+      "audience": "https://wlcg.cern.ch/jwt/refresh",
+      "issuer": "https://refresh.oa4mp.org",
+      "lifetime": 7200000,
+      "type": "default"
+     }
+    }}
+ }

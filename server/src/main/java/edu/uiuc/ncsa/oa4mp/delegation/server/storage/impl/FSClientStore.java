@@ -20,12 +20,12 @@ import java.util.List;
 //public abstract class FSClientStore<V extends Client> extends FileStore<V> implements ClientStore<V> {
 public abstract class FSClientStore<V extends Client> extends MonitoredFileStore<V> implements ClientStore<V> {
     protected FSClientStore(File storeDirectory, File indexDirectory, IdentifiableProviderImpl<V> idp,MapConverter<V> cp,
-                            boolean removeEmptyFiles) {
-        super(storeDirectory, indexDirectory, idp, cp, removeEmptyFiles);
+                            boolean removeEmptyFiles, boolean removeFailedFiles) {
+        super(storeDirectory, indexDirectory, idp, cp, removeEmptyFiles, removeFailedFiles);
     }
 
-    public FSClientStore(File f, IdentifiableProviderImpl<V> idp,MapConverter<V> cp, boolean removeEmptyFiles) {
-        super(f, idp, cp, removeEmptyFiles);
+    public FSClientStore(File f, IdentifiableProviderImpl<V> idp,MapConverter<V> cp, boolean removeEmptyFiles, boolean removeFailedFiles) {
+        super(f, idp, cp, removeEmptyFiles,removeFailedFiles);
     }
 
     @Override

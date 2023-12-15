@@ -23,8 +23,8 @@ public class JSONFileStore<V extends JSONEntry> extends FileStore<V> implements 
     public JSONFileStore(File storeDirectory,
                          File indexDirectory,
                          IdentifiableProvider<V> identifiableProvider,
-                         MapConverter<V> converter, boolean removeEmptyFiles) {
-        super(storeDirectory, indexDirectory, identifiableProvider, converter, removeEmptyFiles);
+                         MapConverter<V> converter, boolean removeEmptyFiles, boolean removeFailedFiles) {
+        super(storeDirectory, indexDirectory, identifiableProvider, converter, removeEmptyFiles,removeFailedFiles);
     }
 
     @Override

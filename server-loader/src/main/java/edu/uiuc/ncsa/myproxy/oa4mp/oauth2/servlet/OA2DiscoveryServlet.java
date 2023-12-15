@@ -30,21 +30,6 @@ import java.util.StringTokenizer;
    Canonical example: https://accounts.google.com/.well-known/openid-configuration
  */
 public class OA2DiscoveryServlet extends DiscoveryServlet {
-
-    public static final String TOKEN_ENDPOINT = "token_endpoint";
-    public static final String USERINFO_ENDPOINT = "userinfo_endpoint";
-    public static final String TOKEN_INTROSPECTION_ENDPOINT = "introspection_endpoint";
-    public static final String TOKEN_REVOCATION_ENDPOINT = "revocation_endpoint";
-    public static final String RESPONSE_MODES_SUPPORTED = "response_modes_supported";
-    public static final String TOKEN_REVOCATION_ENDPOINT_AUTH_METHODS_SUPPORTED = "revocation_endpoint_auth_methods_supported";
-    public static final String ISSUER = "issuer";
-    public static final String DEVICE_AUTHORIZATION_ENDPOINT = "device_authorization_endpoint";
-    public static final String OPENID_CONFIG_PATH = "openid-configuration";
-    public static final String OAUTH_AUTHZ_SERVER_PATH = "oauth-authorization-server";
-    public static final String WELL_KNOWN_PATH = ".well-known";
-    public static final String CODE_CHALLENGE_METHOD_SUPPORTED = "code_challenge_method_supported"; // RFC 7636
-    public static final String CERTS = "/certs";
-
     public static String DISCOVERY_PATH_SEPARATOR = "/";
 
     protected VirtualOrganization getVO(HttpServletRequest req, String requestUri) {
@@ -128,15 +113,16 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
     @Override
     protected void doIt(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable {
         //     ServletDebugUtil.printAllParameters(this.getClass(), httpServletRequest);
+        String certPath = "/" + JWKS_CERTS; //used for parsing request path
 
         String requestUri = httpServletRequest.getRequestURI();
         boolean isCerts = false;
-        if (requestUri.contains(CERTS)) {
+        if (requestUri.contains(certPath)) {
             isCerts = true;
-            if (requestUri.endsWith(CERTS)) {
-                requestUri = requestUri.substring(0, requestUri.length() - CERTS.length()); // whack off certs part
+            if (requestUri.endsWith(certPath)) {
+                requestUri = requestUri.substring(0, requestUri.length() - certPath.length()); // whack off certs part
             } else {
-                requestUri = requestUri.substring(requestUri.indexOf(CERTS) + CERTS.length()); // whack off leading certs part (vo suffix case)
+                requestUri = requestUri.substring(requestUri.indexOf(certPath) + certPath.length()); // whack off leading certs part (vo suffix case)
             }
         }
         // normalize the uri
@@ -201,12 +187,12 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
         }
         JSONObject json = super.setValues(request, jsonObject);
         if (vo == null) {
-            json.put("jwks_uri", requestURI + "/certs");
+            json.put(JWKS_URI, requestURI + "/" + JWKS_CERTS);
         } else {
             // has to go at the end since there is no way Tomcat can have it specified otherwise
             // without a lot of gyrations in the web.xml file.
             String p = vo.getDiscoveryPath().substring(vo.getDiscoveryPath().lastIndexOf("/") + 1);
-            json.put("jwks_uri", requestURI + "/certs" + "/" + p);
+            json.put(JWKS_URI, requestURI + "/" + JWKS_CERTS + "/" + p);
 
         }
         if (vo == null) {
@@ -214,11 +200,11 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
         } else {
             json.put(ISSUER, vo.getIssuer());
         }
-        json.put(TOKEN_ENDPOINT, requestURI + "/token"); // spec
-        json.put(USERINFO_ENDPOINT, requestURI + "/userinfo"); // spec
+        json.put(TOKEN_ENDPOINT, requestURI + "/" + TOKEN_ENDPOINT_DEFAULT); // spec
+        json.put(USERINFO_ENDPOINT, requestURI + "/" + USER_INFO_ENDPOINT_DEFAULT); // spec
         //CIL-738 fix
-        json.put(TOKEN_INTROSPECTION_ENDPOINT, requestURI + "/introspect"); //spec
-        json.put(TOKEN_REVOCATION_ENDPOINT, requestURI + "/revoke"); //spec
+        json.put(TOKEN_INTROSPECTION_ENDPOINT, requestURI + "/" + INTROSPECTION_ENDPOINT_DEFAULT); //spec
+        json.put(TOKEN_REVOCATION_ENDPOINT, requestURI + "/" + REVOCATION_ENDPOINT_DEFAULT); //spec
         JSONArray revAuthMethods = new JSONArray();
         revAuthMethods.add("client_secret_basic");
         json.put(TOKEN_REVOCATION_ENDPOINT_AUTH_METHODS_SUPPORTED, revAuthMethods);

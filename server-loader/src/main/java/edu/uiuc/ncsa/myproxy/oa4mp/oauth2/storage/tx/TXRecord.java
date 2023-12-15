@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
-import edu.uiuc.ncsa.qdl.xml.XMLConstants;
+import edu.uiuc.ncsa.qdl.xml.SerializationConstants;
 import edu.uiuc.ncsa.qdl.xml.XMLUtilsV2;
 import edu.uiuc.ncsa.security.core.DateComparable;
 import edu.uiuc.ncsa.security.core.Identifiable;
@@ -234,7 +234,7 @@ public class TXRecord extends IdentifiableImpl implements Identifiable, Cloneabl
         // Note that the creation TS is just the issued at value converted
         // to a date, so do not serialize the creation TS.
         xsw.writeStartElement(TX_RECORD);
-        xsw.writeAttribute(XMLConstants.SERIALIZATION_VERSION_TAG, XMLConstants.VERSION_2_0_TAG);
+        xsw.writeAttribute(SerializationConstants.SERIALIZATION_VERSION_TAG, SerializationConstants.VERSION_2_0_TAG);
         xsw.writeAttribute(ID_ATTR, getIdentifierString());
         xsw.writeAttribute(EXPIRES_AT_ATTR, Long.toString(expiresAt));
         xsw.writeAttribute(LIFETIME_ATTR, Long.toString(lifetime));
@@ -286,7 +286,7 @@ public class TXRecord extends IdentifiableImpl implements Identifiable, Cloneabl
         String versionNumber = doXMLAttributes(xe);
 
         switch (versionNumber) {
-            case XMLConstants.VERSION_2_0_TAG:
+            case SerializationConstants.VERSION_2_0_TAG:
                 fromXMLNEW(xer);
                 break;
             default:
@@ -386,7 +386,7 @@ public class TXRecord extends IdentifiableImpl implements Identifiable, Cloneabl
             Attribute a = (Attribute) iterator.next();
             String v = a.getValue();
             switch (a.getName().getLocalPart()) {
-                case XMLConstants.SERIALIZATION_VERSION_TAG:
+                case SerializationConstants.SERIALIZATION_VERSION_TAG:
                     versionNumber = v;
                     break;
                 case STORED_TOKEN:

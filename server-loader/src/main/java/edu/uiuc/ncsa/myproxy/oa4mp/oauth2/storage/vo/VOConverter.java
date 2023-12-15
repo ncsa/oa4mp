@@ -66,8 +66,8 @@ public class VOConverter<V extends VirtualOrganization> extends MapConverter<V> 
     public void toMap(V value, ConversionMap<String, Object> data) {
         super.toMap(value, data);
         data.put(vok().valid(), value.isValid());
-        data.put(vok().creationTS(), value.getCreationTS());
-        data.put(vok().lastModifiedTS(), value.getLastModifiedTS());
+        data.put(vok().creationTS(), value.getCreationTS().getTime());
+        data.put(vok().lastModifiedTS(), value.getLastModifiedTS().getTime());
         if(value.getLastAccessed()!=null) {
             data.put(vok().lastAccessed(), value.getLastAccessed().getTime());
         }

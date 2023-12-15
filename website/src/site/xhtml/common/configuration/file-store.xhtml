@@ -29,25 +29,42 @@ any needed subdirectories.
             one.
         </td>
     </tr>
-<!--
-     CIL-1153: dataPath and indexPath should not be used since they no longer correspond to the inner
-     workings of the store -->
+    </tbody>
+</table>
+    <!--
+         CIL-1153: dataPath and indexPath should not be used since they no longer correspond to the inner
+         workings of the store -->
+<p>The next set of attributes is per file store, so they would be, e.g., in the tag for the
+specific store.</p>
+<table style="text-align: left; width: 100%;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
     <tr>
-           <td style="vertical-align: top;">removeEmptyFiles</td>
-           <td style="vertical-align: top;">Remove any empty files in the store. The default is <b>true</b> meaning that empty files will
-           be deleted if found in the file store. </td>
-       </tr>
+        <td style="vertical-align: top;">removeEmptyFiles</td>
+        <td style="vertical-align: top;">Remove any empty files in the store. The default is <b>true</b> meaning that
+            empty files will
+            be deleted if found in the file store.
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">removeFailedFiles</td>
+        <td style="vertical-align: top;">Remove any files in the store that cannot be loaded/understood by the system.
+            The default is <b>false</b> meaning that bad files will
+            be kept if found in the file store. Set true only if the file store alone manages
+            its directory!
+        </td>
+    </tr>
     </tbody>
 
 </table>
 <p>
-    You <b>must</b> specify  the <span style="font-weight: bold;">path</span>. The effect will be to create (and manage)
+    You <b>must</b> specify the <span style="font-weight: bold;">path</span>. The effect will be to create (and manage)
     directories for each store.
 </p>
 
 <p>A file-based store system is a great, easy way to set up your storage. It require nothing more than the correct
     permissions. Remember though that you should do the usual administrative tasks of backing it up as needed and
-    protecting it from prying eyes since it will contain sensitive information. Both clients and servers support file stores.</p>
+    protecting it from prying eyes since it will contain sensitive information. Both clients and servers support file
+    stores.</p>
 <h2>Server examples</h2>
 <h3>Example 1.</h3>
 
@@ -55,13 +72,13 @@ any needed subdirectories.
 &lt;service name="default" address="https://myservice.org:8443/oauth"&gt;
    &lt;fileStore path="/var/www/storage"&gt;
       &lt;transactions/&gt;
-      &lt;clients/&gt;
+      &lt;clients removeFailedFiles="true"/&gt;
       &lt;clientApprovals/&gt;
    &lt;/fileStore&gt;
 &lt;/service&gt;
 </pre>
 <p>This sets up a fully functioning service with local storage and using the default MyProxy service. This
-would create the following:</p>
+    would create the following:</p>
 <ul>
     <li>/var/www/storage/transactions/dataPath</li>
     <li>/var/www/storage/transactions/indexPath</li>

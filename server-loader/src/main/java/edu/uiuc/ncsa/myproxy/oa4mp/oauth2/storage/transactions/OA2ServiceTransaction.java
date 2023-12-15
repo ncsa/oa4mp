@@ -48,6 +48,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
     public String STATE_COMMENT_KEY = "comment";
     public String CLAIMS_KEY = "claims";
     public String SCRIPT_STATE_KEY = "script_state";
+    public String SCRIPT_STATE_SERIALZATION_VERSION_KEY = "serialization_version";
     public String AUDIENCE_KEY = "audience";
     public String RESOURCE_KEY = "resource";
     public String QUERIED_ACCESS_TOKEN_SCOPES_KEY = "queriedATScopes";
@@ -418,6 +419,14 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         if (scriptState != null && !scriptState.isEmpty()) {
             getState().put(SCRIPT_STATE_KEY, scriptState);
         }
+    }
+
+    public String getScriptStateSerializationVersion() {
+        return getState().getString(SCRIPT_STATE_SERIALZATION_VERSION_KEY);
+    }
+
+    public void setScriptStateSerialzationVersion(String version) {
+        getState().put(SCRIPT_STATE_SERIALZATION_VERSION_KEY, version);
     }
 
     public boolean hasScriptState() {

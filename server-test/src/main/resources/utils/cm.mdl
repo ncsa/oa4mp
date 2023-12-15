@@ -1,0 +1,8 @@
+/*
+   Module for Client Management operations
+
+*/
+module['oa4mp:/tools/rfc7591']
+  [
+   bearer_token(id, secret)-> encode(encode(id,1) + ':' + encode(secret,1)); // bearer token
+  ]; //end module

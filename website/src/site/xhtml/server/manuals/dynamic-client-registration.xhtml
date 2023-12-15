@@ -142,13 +142,7 @@
             refresh_token is added to the list of accepted grants.
         </td>
     </tr>
-    <tr align="left" valign="top">
-        <td>is_service_client</td>
-        <td>N</td>
-        <td>--</td>
-        <td>Is this client a <a href="rfc7523-clients.html">service client</a>?
-        </td>
-    </tr>
+
     <tr align="left" valign="top">
         <td>name</td>
         <td>Y</td>
@@ -187,14 +181,7 @@
             register a new client instead (This is due to our policies regarding creation of client secrets).
         </td>
     </tr>
-    <tr align="left" valign="top">
-        <td>service_client_users</td>
-        <td>N</td>
-        <td>*</td>
-        <td>A list of users (or wildcard to allow all) that the server will accept for
-            grant requests to the token endpoint. See <a href="rfc7523-clients.html">service client</a>?
-        </td>
-    </tr>
+
 </table>
 
 <h2>OA4MP specific attributes</h2>
@@ -282,6 +269,18 @@
         </td>
     </tr>
     <tr align="left" valign="top">
+        <td>id_token_lifetime</td>
+        <td>N</td>
+        <td>-1</td>
+        <td>Y</td>
+        <td>Integer (in seconds)</td>
+        <td>This sets the id token lifetime. Note
+            that is <i>must be less than or equal to the server's default</i>. You should only set this if
+            you have a specific need for it an knowledge of what values will work. The default means to use
+            the server default.
+        </td>
+    </tr>
+    <tr align="left" valign="top">
         <td>is_service_client</td>
         <td>N</td>
         <td>false</td>
@@ -290,6 +289,39 @@
         <td>If this client is to be a <a href="rfc7523-clients.html">service client</a>
         </td>
     </tr>
+    <tr align="left" valign="top">
+        <td>max_at_lifetime</td>
+        <td>N</td>
+        <td>-1</td>
+        <td>Y</td>
+        <td>Integer (in seconds)</td>
+        <td>This sets the maximum access token lifetime. This means that request may ask for a different
+            lifetime than in the configuration, but it cannot exceed this. The server default is the
+            absolute maximum.
+        </td>
+    </tr>
+    <tr align="left" valign="top">
+        <td>max_id_token_lifetime</td>
+        <td>N</td>
+        <td>-1</td>
+        <td>Y</td>
+        <td>Integer (in seconds)</td>
+        <td>This sets the maximum identity token lifetime. This means that request may ask for a different
+            lifetime than in the configuration, but it cannot exceed this. The server default is the
+            absolute maximum.
+        </td>
+    </tr>
+    <tr align="left" valign="top">
+     <td>max_id_rt_lifetime</td>
+     <td>N</td>
+     <td>-1</td>
+     <td>Y</td>
+     <td>Integer (in seconds)</td>
+     <td>This sets the maximum refresh token lifetime. This means that request may ask for a different
+         lifetime than in the configuration, but it cannot exceed this. The server default is the
+         absolute maximum.
+     </td>
+ </tr>
     <tr align="left" valign="top">
         <td>prototypes</td>
         <td>N</td>

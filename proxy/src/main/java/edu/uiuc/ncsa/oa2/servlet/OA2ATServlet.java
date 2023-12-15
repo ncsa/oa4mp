@@ -369,11 +369,12 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         }
 
         getOA2SE().getTransactionStore().save(serviceTransaction);
-
+        XMLMap backup = new XMLMap();
+        getOA2SE().getTransactionStore().getMapConverter().toMap(serviceTransaction, backup);
         // Almost ready to rock and roll. Need the issuer transaction state, then do a standard AT
         // This, among other things, runs QDL scripts.
         IssuerTransactionState issuerTransactionState = new IssuerTransactionState(request, response, new HashMap<>(),
-                serviceTransaction, new XMLMap(), atiResponse2);
+                serviceTransaction, backup, atiResponse2);
         issuerTransactionState = doAT(issuerTransactionState, client);
         // Now, get the right signing key
         VirtualOrganization vo = getOA2SE().getVO(client.getIdentifier());

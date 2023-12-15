@@ -30,11 +30,13 @@ public class UUCRetentionPolicy implements RetentionPolicy {
     UUCConfiguration config;
     Store store;
 
-    public boolean retain(String id, Timestamp create, Timestamp lastModified) {
-        return retain(BasicIdentifier.newID(id), create.getTime(), lastModified.getTime());
+    public boolean retain(String id, Timestamp create, Timestamp lastAccessed, Timestamp lastModified) {
+        return retain(BasicIdentifier.newID(id), create.getTime(),
+                lastAccessed==null?UUCConfiguration.UUC_LAST_ACCESSED_NEVER_VALUE:lastAccessed.getTime() ,
+                lastModified.getTime());
     }
 
-    public boolean retain(Identifier id, long create, long lastModified) {
+    public boolean retain(Identifier id, long create, long lastAccessed, long lastModified) {
        if((!config.deleteVersions)  && getStoreArchiver().isVersion(id)){
            return true;
         }
@@ -54,8 +56,14 @@ public class UUCRetentionPolicy implements RetentionPolicy {
                if(id.toString().matches(rx)){return false;}
            }
        }
+        boolean keepIt = true;
        long now = System.currentTimeMillis();
-      return (now<(lastModified + config.gracePeriod)) && (now<(create+config.gracePeriod));
+       // Only look for unused clients
+       if(lastAccessed <=0){
+           //return now<(create+config.gracePeriod);
+           keepIt = (now<(lastModified + config.gracePeriod)) && (now<(create+config.gracePeriod));
+       }
+        return keepIt;
     }
 
     @Override

@@ -1,0 +1,38 @@
+/*
+   Suite of utilities to set up the XA (extended attributes) for a client to send to the service.
+   This takes a stem of keys and values and returns a set of extended attributes.
+
+*/
+
+/*
+   Takes a token name, one of idt|at|rt and a stem of values, like {'iss':'https:/foo'}
+   and returns the correct set of extended attributes for the test.
+   E.g.
+   v. := {'org.oa4mp:/idt/value/aud':'https:ANY', 'org.oa4mp:/idt/value/iss':'https://foo', 'org.oa4mp:/idt/value/lifetime':1000000};
+   to_xas('idt', v.)
+{
+      org.oa4mp:/idt/value/iss : https://foo,
+      org.oa4mp:/idt/value/aud : https:ANY,
+ org.oa4mp:/idt/value/lifetime : 1000000
+}
+
+*/
+to_xas(token, values.)->rename_keys(values.,'org.oa4mp:/'+token+'/value/'+keys(values.));
+
+/*
+  Inverse of to_xas. You get back the set of claims for the token component
+  and this checks that the values are asserted.
+
+*/
+define[check_xas(token, values., returned.)]
+   [ // first is to check that the expected claims are all there.
+     v_keys:= ⊢list_keys(values.);
+     r_keys := ⊢list_keys(returned.);
+     ⊨ (v_keys)==(r_keys) : 'missing ' + token + ' claims :' + to_string(v_keys/r_keys);
+     // Now check that the expected values are there
+     // Note it is assumed that the keys in values. are all in returned,
+     // so subsetting is not required. Everything is conformable by this point.
+     bad. := (values. != returned.)⌆values.; // extract values that don't match
+     ⊨size(bad.)==0 : 'incorrect claim values: ' + to_string(bad.);
+     return(true); // it worked
+   ]; // end check_xas

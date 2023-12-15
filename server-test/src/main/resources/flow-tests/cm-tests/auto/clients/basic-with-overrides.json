@@ -1,0 +1,15 @@
+{
+  "comment": ["Client with various overrides. These are in the client configuration and test ",
+    "overriding the server defaults, but not using the cfg."],
+  "client_name": "Basic test client with overrides",
+  "token_endpoint_auth_method": "private_key_jwt",
+  "at_lifetime":1009,
+  "rt_lifetime":3600,
+  "id_token_lifetime": 2400,
+  "max_at_lifetime":2000,
+  "max_rt_lifetime":4000,
+  "max_id_token_lifetime": 3000,
+  "strict_scopes":true,
+  "client_id":"auto-test:overrides"
+
+ }

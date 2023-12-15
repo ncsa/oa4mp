@@ -12,6 +12,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2GeneralError;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Scopes;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSource;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
+import edu.uiuc.ncsa.qdl.xml.SerializationConstants;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
@@ -351,7 +352,8 @@ public class OA2ClaimsUtil implements ScriptingConstants {
             handleSREResponse(getScriptRuntimeEngine().run(scriptRunRequest));
             // Note that this may still do things like reset the flow states or decide to remove a claim source
             // based on some criteria before the next round. Save it all.
-            transaction.setScriptState(getScriptRuntimeEngine().serializeState());
+            transaction.setScriptState(getScriptRuntimeEngine().serializeState(transaction.getScriptStateSerializationVersion()));
+            transaction.setScriptStateSerialzationVersion(SerializationConstants.VERSION_2_1_TAG); // version moving forward.
         }
         // save it at this point because the flow states might, e.g. prohibit access to the entire system
         // and that has to be preserved against future access attempts.
@@ -399,7 +401,7 @@ public class OA2ClaimsUtil implements ScriptingConstants {
         List<ClaimSource> claimsSources = transaction.getClaimSources(oa2se);
         ScriptRunRequest scriptRunRequest = null;
         if (getScriptRuntimeEngine() != null) {
-            getScriptRuntimeEngine().deserializeState(transaction.getScriptState()); // put the state back the way it was
+            getScriptRuntimeEngine().deserializeState(transaction.getScriptState(), transaction.getScriptStateSerializationVersion()); // put the state back the way it was
 
             scriptRunRequest = newSRR(transaction, SRE_PRE_AT);
             handleSREResponse(getScriptRuntimeEngine().run(scriptRunRequest));

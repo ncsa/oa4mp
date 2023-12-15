@@ -22,6 +22,11 @@ test.:= path + ['cm-basic.qdl',
                 'cm-cleanup.qdl'];
 say('Running all client management tests');
 say('--------------------');
+http := j_load('http');
+
+q:=load('/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/utils/cm.mdl');
+use(q);
+
 default_suite:='cm_local';
 suite := 0<size(args())?args(0):default_suite;
 say('suite=' + suite);
@@ -31,6 +36,7 @@ while[x∈test.][
   suite =='cm_dev' && '.*anon\\-.*'=~x?continue():''; // DEV does not support anonymous access.
 try[
   script_load(x,suite);
+  http#close(); // extra close is benign, so do it here to be sure.
   counter.'pass' += 1;
   ]catch[
      say('error running script ' + x);

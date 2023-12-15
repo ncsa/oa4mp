@@ -69,7 +69,6 @@ public class OA2ClientEnvironment extends ClientEnvironment {
                                 URI accessTokenUri,
                                 URI authorizationUri,
                                 URI callback,
-                                URI initializeURI,
                                 URI resourceServerUri,
                                 long certLifetime,
                                 String clientId,
@@ -102,7 +101,7 @@ public class OA2ClientEnvironment extends ClientEnvironment {
                 accessTokenUri,
                 authorizationUri,
                 callback,
-                initializeURI,
+                null, // initialize endpoint retired
                 resourceServerUri,
                 certLifetime,
                 clientId,

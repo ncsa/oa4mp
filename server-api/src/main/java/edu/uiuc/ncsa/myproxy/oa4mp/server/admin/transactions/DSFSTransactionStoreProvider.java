@@ -38,12 +38,13 @@ public class DSFSTransactionStoreProvider<T extends DSFSTransactionStore> extend
     }
 
     @Override
-    protected T produce(File dataPath, File indexPath, boolean removeEmptyFiles) {
+    protected T produce(File dataPath, File indexPath, boolean removeEmptyFiles, boolean removeFailedFiles) {
         return (T) new DSFSTransactionStore(dataPath,
                 indexPath,
                 transactionProvider,
                 tokenForgeProvider.get(),
                 converter,
-                removeEmptyFiles);
+                removeEmptyFiles,
+                removeFailedFiles);
     }
 }

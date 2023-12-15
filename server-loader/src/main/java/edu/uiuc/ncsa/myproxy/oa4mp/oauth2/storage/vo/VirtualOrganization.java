@@ -31,6 +31,7 @@ public class VirtualOrganization extends Monitored {
 
     public VirtualOrganization(Identifier identifier) {
         super(identifier);
+
     }
 
     String defaultKeyID;
@@ -59,25 +60,6 @@ public class VirtualOrganization extends Monitored {
         this.valid = valid;
     }
 
-/*
-    long lastModified = System.currentTimeMillis();
-        long created = System.currentTimeMillis();
-
-    public long getCreated() {
-        return created;
-    }
-
-    public void setCreated(long created) {
-        this.created = created;
-    }
-        public long getLastModified() {
-        return lastModified;
-    }
-
-    public void setLastModified(long lastModified) {
-        this.lastModified = lastModified;
-    }
-*/
 
     public String getDefaultKeyID() {
         return defaultKeyID;

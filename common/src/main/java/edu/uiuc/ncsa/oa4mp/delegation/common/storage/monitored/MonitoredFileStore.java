@@ -21,12 +21,18 @@ import java.util.UUID;
  * on 3/29/23 at  10:00 AM
  */
 public abstract class MonitoredFileStore<V extends Identifiable> extends FileStore<V> implements ListeningStoreInterface<V> {
-    public MonitoredFileStore(File storeDirectory, File indexDirectory, IdentifiableProvider<V> identifiableProvider, MapConverter<V> converter, boolean removeEmptyFiles) {
-        super(storeDirectory, indexDirectory, identifiableProvider, converter, removeEmptyFiles);
+    public MonitoredFileStore(File storeDirectory,
+                              File indexDirectory,
+                              IdentifiableProvider<V> identifiableProvider,
+                              MapConverter<V> converter,
+                              boolean removeEmptyFiles,
+                              boolean removeFailedFiles) {
+        super(storeDirectory, indexDirectory, identifiableProvider, converter, removeEmptyFiles,removeFailedFiles);
     }
 
-    public MonitoredFileStore(File directory, IdentifiableProvider<V> idp, MapConverter<V> cp, boolean removeEmptyFiles) {
-        super(directory, idp, cp, removeEmptyFiles);
+    public MonitoredFileStore(File directory, IdentifiableProvider<V> idp, MapConverter<V> cp, boolean removeEmptyFiles,
+                              boolean removeFailedFiles) {
+        super(directory, idp, cp, removeEmptyFiles,removeFailedFiles);
     }
 
 

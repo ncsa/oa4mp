@@ -22,16 +22,18 @@ public class DSFSClientApprovalStore extends FSClientApprovalStore<ClientApprova
     public DSFSClientApprovalStore(File file,
                                    IdentifiableProviderImpl<ClientApproval> idp,
                                    MapConverter<ClientApproval> cp,
-                                   boolean removeEmptyFiles) {
-        super(file, idp, cp, removeEmptyFiles);
+                                   boolean removeEmptyFiles,
+                                   boolean removeFailedFiles) {
+        super(file, idp, cp, removeEmptyFiles, removeFailedFiles);
     }
 
     public DSFSClientApprovalStore(File storeDirectory,
                                    File indexDirectory,
                                    IdentifiableProviderImpl<ClientApproval> idp,
                                    MapConverter<ClientApproval> cp,
-                                   boolean removeEmptyFiles) {
-        super(storeDirectory, indexDirectory, idp, cp, removeEmptyFiles);
+                                   boolean removeEmptyFiles,
+                                   boolean removeFailedFiles) {
+        super(storeDirectory, indexDirectory, idp, cp, removeEmptyFiles, removeFailedFiles);
     }
 
     @Override
@@ -52,6 +54,6 @@ public class DSFSClientApprovalStore extends FSClientApprovalStore<ClientApprova
 
     @Override
     public List<ClientApproval> getMostRecent(int n, List<String> attributes) {
-       return GenericStoreUtils.getMostRecent(this, n, attributes);
+        return GenericStoreUtils.getMostRecent(this, n, attributes);
     }
 }

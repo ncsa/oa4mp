@@ -22,8 +22,8 @@ public class OA2FSTStoreProvider<T extends OA2FSTStore> extends DSFSTransactionS
     }
 
     @Override
-    protected T produce(File dataPath, File indexPath, boolean removeEmptyFiles) {
-        return (T) new OA2FSTStore<>(dataPath, indexPath, (IdentifiableProvider<? extends OA2ServiceTransaction>) transactionProvider, tokenForgeProvider.get(), converter, removeEmptyFiles);
+    protected T produce(File dataPath, File indexPath, boolean removeEmptyFiles, boolean removeFailedFiles) {
+        return (T) new OA2FSTStore<>(dataPath, indexPath, (IdentifiableProvider<? extends OA2ServiceTransaction>) transactionProvider, tokenForgeProvider.get(), converter, removeEmptyFiles, removeFailedFiles);
     }
 
 }

@@ -99,7 +99,12 @@ public class ScriptRuntimeEngineFactory {
         }
 
         @Override
-        public void deserializeState(String state) {
+        public String serializeState(String version) {
+            return null;
+        }
+
+        @Override
+        public void deserializeState(String state, String version) {
 
         }
 

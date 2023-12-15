@@ -22,16 +22,18 @@ public class AdminClientFS<V extends AdminClient> extends FileStore<V> implement
     public AdminClientFS(File directory,
                          IdentifiableProvider<V> idp,
                          MapConverter<V> cp,
-                         boolean removeEmptyFiles) {
-        super(directory, idp, cp, removeEmptyFiles);
+                         boolean removeEmptyFiles,
+                         boolean removeFailedFiles) {
+        super(directory, idp, cp, removeEmptyFiles,removeFailedFiles);
     }
 
     public AdminClientFS(File storeDirectory,
                          File indexDirectory,
                          IdentifiableProvider<V> identifiableProvider,
                          MapConverter<V> converter,
-                         boolean removeEmptyFiles) {
-        super(storeDirectory, indexDirectory, identifiableProvider, converter, removeEmptyFiles);
+                         boolean removeEmptyFiles,
+                         boolean removeFailedFiles) {
+        super(storeDirectory, indexDirectory, identifiableProvider, converter, removeEmptyFiles,removeFailedFiles);
 
     }
 

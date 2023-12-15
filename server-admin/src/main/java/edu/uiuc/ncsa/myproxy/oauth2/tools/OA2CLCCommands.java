@@ -2184,7 +2184,9 @@ public class OA2CLCCommands extends CommonCommands {
             parameters.put(SCOPE, array);
         }
         if (!parameters.containsKey(REDIRECT_URI)) {
-            parameters.put(REDIRECT_URI, getCe().getCallback().toString());
+            if(getCe().getCallback()!=null) {
+                parameters.put(REDIRECT_URI, getCe().getCallback().toString());
+            }
         }
         if (!parameters.containsKey(NONCE)) {
             parameters.put(NONCE, NonceHerder.createNonce());

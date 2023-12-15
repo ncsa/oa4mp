@@ -145,7 +145,8 @@ public class FileStoreTest extends BaseTransactionStoreTest {
             throw new NotImplementedException(" Method not implemented");
         }
         public TestFileStore(File file, IdentifiableProviderImpl<BasicTransaction> btp, TestTokenForge ttf) throws IOException {
-            super(new File(file, "data"), new File(file, "index"), btp, ttf, new BasicTransactionConverter(btp, ttf), true);
+            super(new File(file, "data"), new File(file, "index"), btp, ttf, new BasicTransactionConverter(btp, ttf),
+                    true, true);
 
     };
 

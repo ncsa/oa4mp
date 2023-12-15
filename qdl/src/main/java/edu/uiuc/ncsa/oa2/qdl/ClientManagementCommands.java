@@ -69,6 +69,7 @@ public class ClientManagementCommands implements QDLModuleMetaClass {
     }
 
     protected void init(String configFile, String cfgName) throws Throwable {
+
             setConfigurationNode(ConfigUtil.findConfiguration(configFile, cfgName, "service"));
         initCalled = true;
     }

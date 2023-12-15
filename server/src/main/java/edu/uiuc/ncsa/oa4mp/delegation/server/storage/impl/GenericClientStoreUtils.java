@@ -81,7 +81,10 @@ public class GenericClientStoreUtils extends GenericStoreUtils {
             }
 
             total++;
-            if (uucRetentionPolicy.retain(baseClient.getIdentifier(), baseClient.getCreationTS().getTime(), baseClient.getLastModifiedTS().getTime())) {
+            if (uucRetentionPolicy.retain(baseClient.getIdentifier(),
+                    baseClient.getCreationTS().getTime(),
+                    baseClient.getLastAccessed().getTime(),
+                    baseClient.getLastModifiedTS().getTime())) {
                 // do nothing for now.
                 skipped++;
             }else{

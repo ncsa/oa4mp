@@ -174,7 +174,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         try {
             initialize();
 
-            T se = (T) new OA2SE(loggerProvider.get(),
+            T se = (T) new OA2SE(getMyLogger(),
                     getTransactionStoreProvider(),
                     getTXStoreProvider(),
                     getVOStoreProvider(),
@@ -268,7 +268,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                 try {
                     alarms.add(LocalTime.parse(time.trim()));
                 } catch (Throwable t) {
-                    loggerProvider.get().warn("cannot parse alarm date \"" + ta + "\"");
+                    getMyLogger().warn("cannot parse alarm date \"" + ta + "\"");
                     // do nothing
                 }
             }
@@ -407,7 +407,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                 // nothing to do.
             }
         }
-        OA2QDLConfigurationLoader loader = new OA2QDLConfigurationLoader("(none)", node, loggerProvider.get());
+        OA2QDLConfigurationLoader loader = new OA2QDLConfigurationLoader("(none)", node, getMyLogger());
         return (OA2QDLEnvironment) loader.load();
     }
 
@@ -910,7 +910,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
 
             multiJSONStoreProvider = new MultiJSONStoreProvider(cn,
                     isDefaultStoreDisabled(),
-                    loggerProvider.get(),
+                    getMyLogger(),
                     null,
                     null);
             multiJSONStoreProvider.addListener(JSONStoreProviders.getJSMSP(cn));
@@ -932,7 +932,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         if (macp == null) {
             macp = new MultiDSAdminClientStoreProvider(cn,
                     isDefaultStoreDisabled(),
-                    loggerProvider.get(),
+                    getMyLogger(),
                     null,
                     null,
                     AdminClientStoreProviders.getAdminClientProvider());
@@ -1013,7 +1013,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     @Override
     protected MultiDSClientApprovalStoreProvider getCASP() {
         if (casp == null) {
-            casp = new MultiDSClientApprovalStoreProvider(cn, isDefaultStoreDisabled(), loggerProvider.get());
+            casp = new MultiDSClientApprovalStoreProvider(cn, isDefaultStoreDisabled(), getMyLogger());
             final ClientApprovalProvider caProvider = new ClientApprovalProvider();
             ClientApprovalKeys caKeys = new ClientApprovalKeys();
             caKeys.identifier("client_id");
@@ -1422,7 +1422,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     protected MultiDSClientStoreProvider getCSP() {
         if (csp == null) {
             OA2ClientConverter converter = new OA2ClientConverter(getClientProvider());
-            csp = new OA2MultiDSClientStoreProvider(cn, isDefaultStoreDisabled(), loggerProvider.get(), null, null, getClientProvider());
+            csp = new OA2MultiDSClientStoreProvider(cn, isDefaultStoreDisabled(), getMyLogger(), null, null, getClientProvider());
 
             csp.addListener(new DSFSClientStoreProvider(cn, converter, getClientProvider()));
             csp.addListener(new OA2ClientSQLStoreProvider(getMySQLConnectionPoolProvider(),
@@ -1498,7 +1498,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         if (voStoreProvider == null) {
             VOMultiStoreProvider storeProvider = new VOMultiStoreProvider(cn,
                     isDefaultStoreDisabled(),
-                    loggerProvider.get(),
+                    getMyLogger(),
                     null, null,
                     voProvider, voConverter);
 
@@ -1564,7 +1564,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         if (txStoreProvider == null) {
             TXMultiStoreProvider storeProvider = new TXMultiStoreProvider(cn,
                     isDefaultStoreDisabled(),
-                    loggerProvider.get(),
+                    getMyLogger(),
                     null, null,
                     txRecordProvider, txRecordConverter);
 
@@ -1619,7 +1619,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                                                 OA2TConverter<? extends OA2ServiceTransaction> tc) {
         if (tsp == null) {
             final IdentifiableProvider tp1 = tp; // since this is referenced in an inner class below.
-            OA2MultiTypeTransactionProvider storeProvider = new OA2MultiTypeTransactionProvider(cn, isDefaultStoreDisabled(), loggerProvider.get(), tp);
+            OA2MultiTypeTransactionProvider storeProvider = new OA2MultiTypeTransactionProvider(cn, isDefaultStoreDisabled(), getMyLogger(), tp);
             storeProvider.addListener(createSQLTSP(cn,
                     getMySQLConnectionPoolProvider(),
                     OA4MPConfigTags.MYSQL_STORE,

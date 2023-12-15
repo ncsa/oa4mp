@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CCaseConfig">
     <option name="checkoutReserved" value="false" />
@@ -18,10 +19,6 @@
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="FrameworkDetectionExcludesConfiguration">
     <file url="file://$PROJECT_DIR$/client-oauth2/overlays" />
-    <file type="web" url="file://$PROJECT_DIR$/client-oauth2" />
-    <file type="web" url="file://$PROJECT_DIR$/client-webapp" />
-    <file type="web" url="file://$PROJECT_DIR$/oa4mp-server-oauth2" />
-    <file type="web" url="file://$PROJECT_DIR$/oa4mp-webapp" />
   </component>
   <component name="IdProvider" IDEtalkID="215A14033C971CCE717D28767B12EEA0" />
   <component name="JavadocGenerationManager">
@@ -52,5 +49,5 @@
     <option name="LAST_EDITED_MODULE_NAME" />
     <option name="LAST_EDITED_TAB_NAME" />
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="11 (2)" project-jdk-type="JavaSDK" />
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_17" default="true" project-jdk-name="17" project-jdk-type="JavaSDK" />
 </project>

@@ -84,8 +84,15 @@ public class JSONStoreProviders {
         }
 
         @Override
-        protected JSONFileStore produce(File dataPath, File indexPath, boolean removeEmptyFiles) {
-            return new JSONFileStore(dataPath,indexPath,getJsonEntryProvider(),getJsonConverter(), removeEmptyFiles);
+        protected JSONFileStore produce(File dataPath,
+                                        File indexPath,
+                                        boolean removeEmptyFiles,
+                                        boolean removeFailedFiles) {
+            return new JSONFileStore(dataPath,
+                    indexPath,
+                    getJsonEntryProvider(),getJsonConverter(),
+                    removeEmptyFiles,
+                    removeFailedFiles);
         }
     }
     public static JSONStoreFSProvider getJSFSP(ConfigurationNode node){

@@ -1,0 +1,45 @@
+{
+  "comment": [
+    "Client with various overrides. These are in the client configuration and test ",
+    "overriding the server defaults, but not using the cfg."
+  ],
+  "client_name": "Basic test client with overrides",
+  "token_endpoint_auth_method": "private_key_jwt",
+  "client_id":"auto-test:basic/qdl",
+  "at_lifetime": 1009,
+  "rt_lifetime": 3600,
+  "id_token_lifetime": 1800,
+  "strict_scopes": true,
+  "cfg": {
+    "tokens": {
+      "access": {
+        "qdl": {
+          "load": "bnl/dcqos/v1/access.qdl",
+          "xmd": {
+            "exec_phase": [
+              "post_token",
+              "post_exchange",
+              "post_refresh"
+            ]
+          }
+        },
+        "type": "wlcg",
+        "audience": "https://dcqosdoor.usatlas.bnl.gov",
+        "lifetime": 3600000,
+        "issuer": "https://test.cilogon.org/bnlsdcc"
+      },
+      "identity": {
+        "qdl": {
+          "load": "bnl/drupal/v1/id-token.qdl",
+          "xmd": {
+            "exec_phase": [
+              "post_auth"
+            ]
+          }
+        },
+        "type": "identity"
+      }
+    }
+  }
+}
+}

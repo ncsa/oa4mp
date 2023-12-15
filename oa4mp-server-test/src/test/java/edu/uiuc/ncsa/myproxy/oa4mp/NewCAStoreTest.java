@@ -128,7 +128,7 @@ public class NewCAStoreTest extends TestBase {
           final ClientApprovalProvider caProvider = new ClientApprovalProvider();
           try {
               // Make sure that if someone creates a bad one, it blows up in the constructor.
-               x = new FSClientApprovalStore(null, null, null, null, true) {
+               x = new FSClientApprovalStore(null, null, null, null, true, true) {
                    @Override
                    public List<Identifier> statusSearch(String status) {
                        return null;
@@ -149,7 +149,7 @@ public class NewCAStoreTest extends TestBase {
           } catch (MyConfigurationException xx) {
               assert true;
           }
-          x = new DSFSClientApprovalStore(storeDirectory, indexDirectory,  caProvider,  new ClientApproverConverter(caProvider), true);
+          x = new DSFSClientApprovalStore(storeDirectory, indexDirectory,  caProvider,  new ClientApproverConverter(caProvider), true, true);
           try {
               x.create(); // should bomb here.
               assert false;

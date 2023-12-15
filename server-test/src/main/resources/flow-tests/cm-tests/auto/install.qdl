@@ -1,0 +1,31 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   The installation script for the automated testing system. You run this
+   once to create all of the clientsIt requires an admin client and the server.
+
+*/
+// /home/ncsa/dev/csd/config/auto-test/auto-test.ini
+say(args().0);
+ini. := file_read(args().0,2).'admin';
+
+say('ini:\n' + print(ini.));
+http := j_load('http');
+
+q:=load('/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/utils/cm.mdl');
+use(q);
+client_dir := '/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests/cm-tests/auto/clients';
+clients. :=  dir(client_dir);
+http#host(ini.'address' + 'oidc-cm') ;
+h. := {'Authorization': 'Bearer ' + bearer_token(ini.'id', ini.'secret'),
+       'Content-Type':'application/json; charset=UTF-8'};
+http#headers(h.);
+http#open(true);
+while[c∈clients.]
+     [
+       payload. := from_json(file_read(client_dir + '/' + c));
+       say('\ninstalling: ' + print(payload.));
+          //resp. := http#post(payload.);
+          //say(resp.);
+
+     ];

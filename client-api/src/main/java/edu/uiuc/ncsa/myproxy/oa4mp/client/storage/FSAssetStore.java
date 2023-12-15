@@ -20,16 +20,18 @@ public class FSAssetStore extends FileStore<Asset> implements AssetStore {
     public FSAssetStore(File file,
                         IdentifiableProvider idp,
                         MapConverter cp,
-                        boolean removeEmptyFiles) {
-        super(file, idp, cp, removeEmptyFiles);
+                        boolean removeEmptyFiles,
+                        boolean removeFailedFiles) {
+        super(file, idp, cp, removeEmptyFiles,removeFailedFiles);
     }
 
     public FSAssetStore(File storeDirectory,
                         File indexDirectory,
                         IdentifiableProvider identifiableProvider,
                         MapConverter converter,
-                        boolean removeEmptyFiles) {
-        super(storeDirectory, indexDirectory, identifiableProvider, converter, removeEmptyFiles);
+                        boolean removeEmptyFiles,
+                        boolean removeFailedFiles) {
+        super(storeDirectory, indexDirectory, identifiableProvider, converter, removeEmptyFiles,removeFailedFiles);
     }
 
     @Override

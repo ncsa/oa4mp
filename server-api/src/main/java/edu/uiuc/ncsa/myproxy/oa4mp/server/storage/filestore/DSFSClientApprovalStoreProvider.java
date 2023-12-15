@@ -20,7 +20,7 @@ public class DSFSClientApprovalStoreProvider extends FSProvider<DSFSClientApprov
     }
 
     @Override
-    protected DSFSClientApprovalStore produce(File dataPath, File indexPath, boolean removeEmptyFiles) {
-        return new DSFSClientApprovalStore(dataPath, indexPath, new ClientApprovalProvider(), converter, removeEmptyFiles);
+    protected DSFSClientApprovalStore produce(File dataPath, File indexPath, boolean removeEmptyFiles, boolean removeFailedFiles) {
+        return new DSFSClientApprovalStore(dataPath, indexPath, new ClientApprovalProvider(), converter, removeEmptyFiles, removeFailedFiles);
     }
 }

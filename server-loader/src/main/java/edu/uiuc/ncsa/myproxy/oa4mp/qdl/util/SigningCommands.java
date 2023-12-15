@@ -141,8 +141,9 @@ public class SigningCommands extends CommonCommands {
      * @throws NoSuchAlgorithmException
      */
     public static JSONWebKeys createRSAJsonWebKeys(int size) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
-        JSONWebKeys keys = new JSONWebKeys(null);
-        keys.put(createRSAJWK(size, RS_256));
+        JSONWebKey defaultKey = createRSAJWK(size, RS_256);
+        JSONWebKeys keys = new JSONWebKeys(defaultKey.id);
+        keys.put(defaultKey);
         keys.put(createRSAJWK(size, RS_384));
         keys.put(createRSAJWK(size, RS_512));
         return keys;
@@ -158,9 +159,9 @@ public class SigningCommands extends CommonCommands {
      * @throws InvalidAlgorithmParameterException
      */
     public static JSONWebKeys createECJsonWebKeys() throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
-
-        JSONWebKeys keys = new JSONWebKeys(null);
-        keys.put(createECJWK(JWKUtil2.EC_CURVE_P_256, JWKUtil2.ES_256));
+       JSONWebKey defaultKey = createECJWK(JWKUtil2.EC_CURVE_P_256, JWKUtil2.ES_256);
+        JSONWebKeys keys = new JSONWebKeys(defaultKey.id);
+        keys.put(defaultKey);
         keys.put(createECJWK(JWKUtil2.EC_CURVE_P_384, JWKUtil2.ES_384));
         keys.put(createECJWK(JWKUtil2.EC_CURVE_P_521, JWKUtil2.ES_512));
         return keys;
@@ -178,8 +179,9 @@ public class SigningCommands extends CommonCommands {
         if (StringUtils.isTrivial(curve)) {
             return createECJsonWebKeys();
         }
-        JSONWebKeys keys = new JSONWebKeys(null);
-        keys.put(createECJWK(curve, JWKUtil2.ES_256));
+        JSONWebKey defaultKey = createECJWK(curve, JWKUtil2.ES_256);
+        JSONWebKeys keys = new JSONWebKeys(defaultKey.id);
+        keys.put(defaultKey);
         keys.put(createECJWK(curve, JWKUtil2.ES_384));
         keys.put(createECJWK(curve, JWKUtil2.ES_512));
         return keys;
@@ -187,8 +189,9 @@ public class SigningCommands extends CommonCommands {
     }
 
     public static JSONWebKeys createJsonWebKeys() throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
-        JSONWebKeys keys = new JSONWebKeys(null);
-        keys.put(createJWK(RS_256));
+        JSONWebKey defaultKey = createJWK(RS_256);
+        JSONWebKeys keys = new JSONWebKeys(defaultKey.id);
+        keys.put(defaultKey);
         keys.put(createJWK(RS_384));
         keys.put(createJWK(RS_512));
         return keys;

@@ -28,6 +28,7 @@ import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
 import java.util.*;
@@ -716,6 +717,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
             say("uuc [" +
                     UUC_FLAG_TEST + " on|true|off|false] [" +
                     UUC_FLAG_CFG + "] [" +
+                    CL_OUTPUT_FILE_FLAG + " file] [" +
                     UUC_FLAG_FOUND + "] [" +
                     UUC_FLAG_ENABLE + "] = unused client cleanup. Run the client cleanup for this store");
             say(UUC_FLAG_TEST + " = (optional) turn on or off test mode. In test mode, the clients to delete");
@@ -723,6 +725,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
             say(UUC_FLAG_CFG + " = simply prints out the configuration, if any.");
             say(UUC_FLAG_FOUND + " = should the list of client ids that were found.");
             say(UUC_FLAG_ENABLE + " = manually enable this if it is disabled.");
+            say(CL_OUTPUT_FILE_FLAG + " = write any output to the given file.");
             say("\nOne use pattern is to put the configuration into the server configuration file and only");
             say("run it manually in the CLI. In that case, set it to disabled and enable it here.");
             say("This will not run disabled configurations.");
@@ -736,6 +739,12 @@ public class OA2ClientCommands extends ClientStoreCommands {
             }
             say(getUucConfiguration().toString(true));
             return;
+        }
+        boolean writeOutput = inputLine.hasArg(CL_OUTPUT_FILE_FLAG);
+        String outputFilename = null;
+        if (writeOutput) {
+            outputFilename = inputLine.getNextArgFor(CL_OUTPUT_FILE_FLAG);
+            inputLine.removeSwitchAndValue(CL_OUTPUT_FILE_FLAG);
         }
         boolean showFound = inputLine.hasArg(UUC_FLAG_FOUND);
         if (getUucConfiguration() == null) {
@@ -766,6 +775,15 @@ public class OA2ClientCommands extends ClientStoreCommands {
         BaseClientStore clientStore = (BaseClientStore) getStore();
         BaseClientStore.UUCResponse response = clientStore.unusedClientCleanup(getUucConfiguration());
         say("Stats are " + response);
+        if (writeOutput) {
+            FileWriter fw = new FileWriter(outputFilename);
+            for (String x : response.found) {
+                fw.write(x + "\n");
+            }
+            fw.flush();
+            fw.close();
+            say("output written to " + outputFilename);
+        }
         if (showFound) {
             say("found ids are:");
             FormatUtil.formatList(inputLine, response.found);
@@ -990,7 +1008,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
             // set them to be so.
             PermissionList pList = getPermissionsStore().get(adminID, id);
             OA2Client e = (OA2Client) getOA2SE().getClientStore().get(id);
-            if(e != null) {
+            if (e != null) {
                 e.setErsatzClient(true);
             }
             // no permissions means create new ones.

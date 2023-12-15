@@ -20,8 +20,9 @@ public class DSFSTransactionStore<V extends OA4MPServiceTransaction> extends FST
                                 IdentifiableProvider<V> idp,
                                 TokenForge tokenForge,
                                 MapConverter<V> cp,
-                                boolean removeEmptyFiles) {
-        super(file, idp, tokenForge, cp, removeEmptyFiles);
+                                boolean removeEmptyFiles,
+                                boolean removeFailedFiles) {
+        super(file, idp, tokenForge, cp, removeEmptyFiles,removeFailedFiles);
     }
 
     public DSFSTransactionStore(File storeDirectory,
@@ -29,8 +30,10 @@ public class DSFSTransactionStore<V extends OA4MPServiceTransaction> extends FST
                                 IdentifiableProvider<V> idp,
                                 TokenForge tokenForge,
                                 MapConverter<V> cp,
-                                boolean removeEmptyFiles) {
-        super(storeDirectory, indexDirectory, idp, tokenForge, cp, removeEmptyFiles);                                                                 }
+                                boolean removeEmptyFiles,
+                                boolean removeFailedFiles) {
+        super(storeDirectory, indexDirectory, idp, tokenForge, cp, removeEmptyFiles,removeFailedFiles);
+    }
 
     @Override
     public List<V> getMostRecent(int n, List<String> attributes) {

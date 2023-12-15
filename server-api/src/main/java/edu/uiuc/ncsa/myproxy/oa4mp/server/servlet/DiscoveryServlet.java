@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.servlet;
 
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OIDCDiscoveryTags;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.oa4mp.delegation.server.request.IssuerResponse;
@@ -15,10 +16,9 @@ import java.io.PrintWriter;
  * <p>Created by Jeff Gaynor<br>
  * on 12/12/16 at  1:04 PM
  */
-public class DiscoveryServlet extends MyProxyDelegationServlet {
+public class DiscoveryServlet extends MyProxyDelegationServlet implements OIDCDiscoveryTags {
 
-    public static final String AUTHORIZATION_ENDPOINT = "authorization_endpoint";
-    public static final String REGISTRATION_ENDPOINT = "registration_endpoint";
+
     public static final String DISCOVERY_PATH = ".well-known";
 
     @Override

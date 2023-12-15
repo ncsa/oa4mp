@@ -1,12 +1,12 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.qdl;
 
-import edu.uiuc.ncsa.qdl.xml.XMLConstants;
+import edu.uiuc.ncsa.qdl.xml.SerializationConstants;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 1/5/21 at  1:37 PM
  */
-public interface QDLXMLConstants extends XMLConstants {
+public interface QDLXMLConstants extends SerializationConstants {
     String TX_RECORD = "tx_record";
     String TOKEN_TYPE = "token_type";
     String AUDIENCE = "audience";

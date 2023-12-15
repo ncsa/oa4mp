@@ -22,12 +22,13 @@ public class VOFSProvider<T extends VOFileStore> extends FSProvider<T> implement
 
 
     @Override
-    protected T produce(File dataPath, File indexPath, boolean removeEmptyFiles) {
+    protected T produce(File dataPath, File indexPath, boolean removeEmptyFiles, boolean removeFailedFiles) {
         return (T) new VOFileStore(dataPath,
                 indexPath,
                 provider,
                 converter,
-                removeEmptyFiles);
+                removeEmptyFiles,
+                removeFailedFiles);
 
     }
 }

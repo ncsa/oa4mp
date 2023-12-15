@@ -11,6 +11,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.common.token.TokenForge;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2ConfigurationLoaderUtils;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2TokenForge;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OIDCDiscoveryTags;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.client.*;
 import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
 import edu.uiuc.ncsa.security.core.configuration.provider.TypedProvider;
@@ -102,7 +103,6 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
                     getAccessTokenURI(),
                     getAuthorizeURI(),
                     getCallback(),
-                    getInitiateURI(),
                     getAssetURI(),
                     checkCertLifetime(),
                     getId(),
@@ -146,23 +146,19 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
         return assetProvider;
     }
 
-    String wellKnownURI = null;
 
-    public String getWellKnownURI() {
-        if (wellKnownURI == null) {
-            wellKnownURI = getCfgValue("wellKnownUri");
-        }
-        return wellKnownURI;
-
-    }
 
     Boolean showIDToken = null;
 
     /**
      * An option for the (demo) client that specifies that the user should be shown the ID token at some point.
-     * Default is <code>false</code>
+     * Default is <code>false</code>.<br/><br/>
+     * This is really old and was used in OAuth 1.0a demos. It would stop the flow and let the user inspect
+     * the id token, then allow the flow to continue. It should probably get tracked down and removed
+     * The current default client shows the ID token every time, so this really is not needed.
      *
      * @return
+     * @deprecated
      */
     public boolean isShowIDToken() {
         if (showIDToken == null) {
@@ -406,7 +402,8 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
             dsp = new Provider<DelegationService>() {
                 @Override
                 public DelegationService get() {
-                    return new DS2(new AGServer2(createServiceClient(getAuthzURI())), // as per spec, request for AG comes through authz endpoint.
+                    //return new DS2(new AGServer2(createServiceClient(getAuthzURI())), // as per spec, request for AG comes through authz endpoint.
+                    return new DS2(new AGServer2(createServiceClient(getAuthorizeURI())), // as per spec, request for AG comes through authz endpoint.
                             new ATServer2(createServiceClient(getAccessTokenURI()),
                                     getWellKnownURI(),
                                     isOIDCEnabled(),
@@ -426,25 +423,46 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
         return dsp;
     }
 
+/*    URI getTagURI(String tag, String discoveryTag){
+        String x = getCfgValue(tag);
+        if(StringUtils.isTrivial(x)){
+            return URI.create(getWellKnownValue(discoveryTag));
+        }
+        return createServiceURIOLD(x, getBaseURI(), USER_INFO_ENDPOINT);
+
+    }*/
     protected URI getUIURI() {
-        return createServiceURI(getCfgValue(ClientXMLTags.USER_INFO_URI), getCfgValue(ClientXMLTags.BASE_URI), USER_INFO_ENDPOINT);
+        return createServiceURI(getCfgValue(ClientXMLTags.USER_INFO_URI),
+                OIDCDiscoveryTags.USER_INFO_ENDPOINT_DEFAULT,
+                OIDCDiscoveryTags.USERINFO_ENDPOINT);
+        //return createServiceURIOLD(getCfgValue(ClientXMLTags.USER_INFO_URI), getCfgValue(ClientXMLTags.BASE_URI), USER_INFO_ENDPOINT);
     }
 
     protected URI getDeviceAuthorizationURI() {
-        return createServiceURI(getCfgValue(DEVICE_AUTHORIZATION_URI), getCfgValue(ClientXMLTags.BASE_URI), DEVICE_AUTHORIZATION_ENDPOINT);
+        return createServiceURI(getCfgValue(DEVICE_AUTHORIZATION_URI),
+                OIDCDiscoveryTags.DEVICE_AUTHORIZATION_ENDPOINT_DEFAULT,
+                OIDCDiscoveryTags.DEVICE_AUTHORIZATION_ENDPOINT);
+//        return createServiceURIOLD(getCfgValue(DEVICE_AUTHORIZATION_URI), getCfgValue(ClientXMLTags.BASE_URI), DEVICE_AUTHORIZATION_ENDPOINT);
     }
 
     protected URI getRFC7009Endpoint() {
-        return createServiceURI(getCfgValue(REVOCATION_URI), getBaseURI(), REVOCATION_ENDPOINT);
+        return createServiceURI(getCfgValue(REVOCATION_URI),
+                OIDCDiscoveryTags.REVOCATION_ENDPOINT_DEFAULT,
+                OIDCDiscoveryTags.TOKEN_REVOCATION_ENDPOINT);
+//        return createServiceURIOLD(getCfgValue(REVOCATION_URI), getBaseURI(), REVOCATION_ENDPOINT);
     }
 
     protected URI getRFC7662Endpoint() {
-        return createServiceURI(getCfgValue(INTROSPECTION_URI), getBaseURI(), INTROSPECTION_ENDPOINT);
+        return createServiceURI(getCfgValue(INTROSPECTION_URI),
+              OIDCDiscoveryTags.INTROSPECTION_ENDPOINT_DEFAULT,
+              OIDCDiscoveryTags.TOKEN_INTROSPECTION_ENDPOINT);
+        
+        //return createServiceURIOLD(getCfgValue(INTROSPECTION_URI), getBaseURI(), INTROSPECTION_ENDPOINT);
     }
 
-    protected URI getAuthzURI() {
-        return createServiceURI(getCfgValue(ClientXMLTags.AUTHORIZE_TOKEN_URI), getCfgValue(ClientXMLTags.BASE_URI), AUTHORIZE_ENDPOINT);
-    }
+/*    protected URI getAuthzURI() {
+        return createServiceURIOLD(getCfgValue(ClientXMLTags.AUTHORIZE_TOKEN_URI), getCfgValue(ClientXMLTags.BASE_URI), AUTHORIZE_ENDPOINT);
+    }*/
 
 
     @Override

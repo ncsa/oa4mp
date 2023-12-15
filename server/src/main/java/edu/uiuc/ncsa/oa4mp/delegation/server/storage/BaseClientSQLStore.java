@@ -113,8 +113,8 @@ public abstract class BaseClientSQLStore<V extends BaseClient> extends Monitored
 
     @Override
     public UUCResponse unusedClientCleanup(UUCConfiguration uucConfiguration) {
-        BaseClientKeys keys = (BaseClientKeys) getMapConverter().getKeys();
-        String query =  "select " + keys.identifier() + ", " + keys.creationTS() + ", " + keys.lastModifiedTS()
+       BaseClientKeys keys = (BaseClientKeys) getMapConverter().getKeys();
+        String query =  "select " + keys.identifier() + ", " + keys.creationTS() + ", " + keys.lastModifiedTS()+ ", " + keys.lastAccessed()
                            + " from " + getTable().getFQTablename() + " where " ;
         if(uucConfiguration.unusedClientsOnly()){
             query =query +  keys.lastAccessed() + "=0 OR " + keys.lastAccessed() + " is NULL";
@@ -127,9 +127,8 @@ public abstract class BaseClientSQLStore<V extends BaseClient> extends Monitored
                 // delete everything before the given last accessed date
                 query = query + keys.lastAccessed() + "<="+uucConfiguration.lastAccessed;
             }
-
         }
-
+        System.out.println(getClass().getSimpleName() + ": query=" + query);
         String deleteStmt = "delete from " + getTable().getFQTablename() + " where " + keys.identifier() + "=?";
         ConnectionRecord cr = getConnection();
         Connection c = cr.connection;
@@ -148,9 +147,10 @@ public abstract class BaseClientSQLStore<V extends BaseClient> extends Monitored
             while (rs.next()) {
                 totalFound++;
                 Timestamp createTS = rs.getTimestamp(keys.creationTS());
-                Timestamp lastModifiedTS = rs.getTimestamp(keys.lastModifiedTS());
+                Timestamp lastModifiedTS = rs.getTimestamp(keys.lastModifiedTS()); //may be null
+                Timestamp lastAccessed = rs.getTimestamp(keys.lastAccessed()); // may be null
                 String id = rs.getString(keys.identifier());
-                if (uucRetentionPolicy.retain(id, createTS, lastModifiedTS)) {
+                if (uucRetentionPolicy.retain(id, createTS, lastAccessed, lastModifiedTS)) {
                     skipped++;
                 }else{
                     numberProcessed++;

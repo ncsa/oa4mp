@@ -4,21 +4,24 @@ import edu.uiuc.ncsa.myproxy.oa4mp.client.ClientEnvironment;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.ClientLoaderInterface;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.ClientXMLTags;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.storage.*;
+import edu.uiuc.ncsa.oa4mp.delegation.client.DelegationService;
+import edu.uiuc.ncsa.oa4mp.delegation.common.servlet.DBConfigLoader;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OIDCDiscoveryTags;
 import edu.uiuc.ncsa.security.core.configuration.Configurations;
 import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
 import edu.uiuc.ncsa.security.core.configuration.provider.TypedProvider;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.oa4mp.delegation.client.DelegationService;
-import edu.uiuc.ncsa.oa4mp.delegation.common.servlet.DBConfigLoader;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
 import edu.uiuc.ncsa.security.util.ssl.SSLConfiguration;
 import edu.uiuc.ncsa.security.util.ssl.SSLConfigurationUtil;
+import net.sf.json.JSONObject;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import javax.inject.Provider;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.client.ClientXMLTags.*;
 
@@ -28,15 +31,7 @@ import static edu.uiuc.ncsa.myproxy.oa4mp.client.ClientXMLTags.*;
  * on 11/25/13 at  1:12 PM
  */
 public abstract class AbstractClientLoader<T extends ClientEnvironment> extends DBConfigLoader<T> implements ClientLoaderInterface {
-    public static final String ACCESS_TOKEN_ENDPOINT = "token";
-    public static final String AUTHORIZE_ENDPOINT = "authorize";
     public static final String ASSET_ENDPOINT = "getcert";
-    public static final String INITIATE_ENDPOINT = "initiate";
-    public static final String USER_INFO_ENDPOINT = "userinfo";
-    public static final String INTROSPECTION_ENDPOINT = "introspect";
-    public static final String REVOCATION_ENDPOINT = "revoke";
-    public static final String DEVICE_AUTHORIZATION_ENDPOINT = "device_authorization"; // suggested in the spec, best guess for default.
-
 
     // FIX for OAUTH-137. Set default cert lifetime to be 12 hours, not 10 days.
     public static final long defaultCertLifetime = 43200L; // default is 12 hours, in seconds.
@@ -94,14 +89,21 @@ public abstract class AbstractClientLoader<T extends ClientEnvironment> extends 
 
     abstract protected Provider<DelegationService> getDSP();
 
-
-    protected URI checkURI(String x, String componentName) {
-        if (trivial(x)) {
+    /**
+     * Checks the uri. The componentName is simply used for a more readable error messages
+     * if the uri is trivial or there is some syntax error with it.
+     *
+     * @param uri
+     * @param componentName
+     * @return
+     */
+    protected URI checkURI(String uri, String componentName) {
+        if (trivial(uri)) {
             throw new MyConfigurationException("Error: There is no " + componentName + " URI specified.");
         }
         try {
             // set it this way rather than with URI.create so we get a recognizable exception to hand back.
-            return new URI(x);
+            return new URI(uri);
         } catch (URISyntaxException e) {
             throw new MyConfigurationException("Error: The specified " + componentName + " is not a valid URI", e);
         }
@@ -109,7 +111,8 @@ public abstract class AbstractClientLoader<T extends ClientEnvironment> extends 
     }
 
     /**
-     * This takes a key and returns the value of the node associated with that key.
+     * This takes a key and returns the value of the node associated with that key. Returns null
+     * if no such value.
      *
      * @param key
      * @return
@@ -161,15 +164,17 @@ public abstract class AbstractClientLoader<T extends ClientEnvironment> extends 
 
 
     /**
-     * Checks if there is a found uri in the configuration. If so, check that and use it,
-     * if not, try and construct the service endpoint from the base uri.
+     * Checks if there is a found uri in the configuration, i.e., an override
+     * to whatever the standard is. If so, check that and use it,
+     * if not, try and construct the service endpoint from the base uri and
+     * the default serviceEndpoint.
      *
      * @param foundURI
      * @param baseUri
      * @param serviceEndpoint
      * @return
      */
-    protected URI createServiceURI(String foundURI, String baseUri, String serviceEndpoint) {
+    protected URI createServiceURIOLD(String foundURI, String baseUri, String serviceEndpoint) {
         if (!trivial(foundURI)) {
             return checkURI(foundURI, serviceEndpoint);
         }
@@ -177,6 +182,21 @@ public abstract class AbstractClientLoader<T extends ClientEnvironment> extends 
             throw new MyConfigurationException("Error: No base uri for " + serviceEndpoint + " found");
         }
         return checkURI(baseUri + (baseUri.endsWith("/") ? "" : "/") + serviceEndpoint, serviceEndpoint);
+    }
+
+    protected URI createServiceURI(String foundURI, String endpoint, String wellKnownEntry) {
+        if (!trivial(foundURI)) {
+            return checkURI(foundURI, wellKnownEntry);
+        }
+        if (getWellKnownURI() != null) {
+            return checkURI(getWellKnownString(wellKnownEntry), wellKnownEntry);
+        }
+        // failing that, try to construct it
+        if (trivial(getBaseURI())) {
+         //   throw new MyConfigurationException("Error: No base uri for " + endpoint + " found");
+            return null;
+        }
+        return checkURI(getBaseURI() + "/" + endpoint, endpoint);
     }
 
     protected long checkCertLifetime() {
@@ -206,57 +226,105 @@ public abstract class AbstractClientLoader<T extends ClientEnvironment> extends 
     }
 
     protected URI getCallback() {
-        return checkURI(getCfgValue(ClientXMLTags.CALLBACK_URI), "callback");
+        String cb = getCfgValue(ClientXMLTags.CALLBACK_URI);
+        if(cb == null){
+            return null; // perfectly fine
+        }
+        return checkURI(cb, "callback");
     }
 
 
     /**
-     *  Fix for OAUTH-107. Check that the protocols are indeed https as per spec at client loading
-     *  rather than wait for a much later error from a server possibly trying to do a redirect.
-     *  It is ok for the argument to be null, since that just means that a (correct) address will be created.
-     *  This is to find mis-specified service addresses.
-
+     * Fix for OAUTH-107. Check that the protocols are indeed https as per spec at client loading
+     * rather than wait for a much later error from a server possibly trying to do a redirect.
+     * It is ok for the argument to be null, since that just means that a (correct) address will be created.
+     * This is to find mis-specified service addresses.
+     *
      * @param b
      */
     protected void checkProtocol(String b) {
-        if(b == null) return;
+        if (b == null) return;
         if (!b.toLowerCase().startsWith("https")) {
             throw new IllegalArgumentException("Error: the " + ClientXMLTags.BASE_URI + " must be https. You have \"" + b + "\"");
         }
     }
+
     String baseURI = null;
+
     protected String getBaseURI() {
-        if(baseURI == null){
+        if (baseURI == null) {
             baseURI = getCfgValue(ClientXMLTags.BASE_URI);
-            if (baseURI == null || baseURI.length() == 0) {
-                throw new IllegalArgumentException("Error: no " + ClientXMLTags.BASE_URI + " specified in the configuration file");
+            if (!(baseURI == null || baseURI.length() == 0)) {
+                // normalize it so there is no trailing /
+                baseURI = baseURI.endsWith("/") ? baseURI.substring(0, baseURI.length() - 1) : baseURI;
+                //throw new IllegalArgumentException("Error: no " + ClientXMLTags.BASE_URI + " specified in the configuration file");
+                checkProtocol(baseURI);
             }
-            checkProtocol(baseURI);
         }
         return baseURI;
     }
 
+    String wellKnownURI = null;
+
+    public String getWellKnownURI() {
+        if (wellKnownURI == null) {
+            wellKnownURI = getCfgValue("wellKnownUri");
+            if (wellKnownURI == null) {
+                // not set, so try to create one
+                if (getBaseURI() == null) {
+                 //   throw new IllegalStateException("no well-known or " + ClientXMLTags.BASE_URI + " specified in the configuration file");
+                }else {
+                    wellKnownURI = getBaseURI() + "/.well-known/openid-configuration";
+                }
+            }
+        }
+        return wellKnownURI;
+    }
+
     protected URI getAccessTokenURI() {
-        return createServiceURI(getCfgValue(ClientXMLTags.ACCESS_TOKEN_URI), getBaseURI(), ACCESS_TOKEN_ENDPOINT);
+/*
+        String at = getCfgValue(ClientXMLTags.ACCESS_TOKEN_URI);
+        if (isTrivial(at)) {
+            String x = getWellKnownValue(OIDCDiscoveryTags.TOKEN_ENDPOINT);
+            return URI.create(x);
+        }
+*/
+        return createServiceURI(getCfgValue(ClientXMLTags.ACCESS_TOKEN_URI),
+                OIDCDiscoveryTags.TOKEN_ENDPOINT_DEFAULT,
+                OIDCDiscoveryTags.TOKEN_ENDPOINT);
     }
 
     protected URI getAssetURI() {
+        // since this is the really old, non-standanrd getcert endpoint, we cannot look it up
         String x = getCfgValue(ClientXMLTags.ASSET_URI);
+        if(x == null){
+            return null; // some system,s just don't use it at all. No reason to require one in the config.
+        }
         checkProtocol(x);
-        return createServiceURI(x, getBaseURI(), ASSET_ENDPOINT);
+        return createServiceURIOLD(x, getBaseURI(), ASSET_ENDPOINT);
     }
 
     protected URI getAuthorizeURI() {
+/*
         String x = getCfgValue(ClientXMLTags.AUTHORIZE_TOKEN_URI);
+        if(isTrivial(x)){
+            return URI.create(getWellKnownValue(OIDCDiscoveryTags.AUTHORIZATION_ENDPOINT));
+        }
         checkProtocol(x);
-        return createServiceURI(x, getBaseURI(), AUTHORIZE_ENDPOINT);
+*/
+        return createServiceURI(getCfgValue(ClientXMLTags.AUTHORIZE_TOKEN_URI),
+                OIDCDiscoveryTags.AUTHORIZATION_ENDPOINT_DEFAULT,
+                OIDCDiscoveryTags.AUTHORIZATION_ENDPOINT);
+        //return createServiceURI(x, getBaseURI(), AUTHORIZE_ENDPOINT);
     }
 
-    protected URI getInitiateURI() {
+    // The next endpoint was used in OAuth 1.a0 and is retired in OAuth 2
+/*    protected URI getInitiateURI() {
+        // non-standard
         String x = getCfgValue(ClientXMLTags.INITIATE_URI);
         checkProtocol(x);
-        return createServiceURI(x, getBaseURI(), INITIATE_ENDPOINT);
-    }
+        return createServiceURIOLD(x, getBaseURI(), INITIATE_ENDPOINT);
+    }*/
 
     T loader = null;
 
@@ -266,6 +334,7 @@ public abstract class AbstractClientLoader<T extends ClientEnvironment> extends 
         }
         return loader;
     }
+
     SSLConfiguration sslConfiguration = null;
 
     public SSLConfiguration getSSLConfiguration() {
@@ -276,8 +345,62 @@ public abstract class AbstractClientLoader<T extends ClientEnvironment> extends 
     }
 
     public ServiceClient createServiceClient(URI host) {
-         return new ServiceClient(host, getSSLConfiguration());
-     }
+        return new ServiceClient(host, getSSLConfiguration());
+    }
 
+    public ServiceClient getWellKnownClient() {
+        if (wellKnownClient == null) {
+            wellKnownClient = createServiceClient(URI.create(getWellKnownURI()));
+        }
+        return wellKnownClient;
+    }
+
+    ServiceClient wellKnownClient = null;
+
+    /**
+     * Get the given value from the given key on the well-known page. This just return strings.
+     * If there is no such value, a null is returned. If the response is incorrect, an exception is
+     * thrown.
+     *
+     * @param key
+     * @return
+     */
+    public String getWellKnownString(String key) {
+        if (getWellKnownConfiguration().containsKey(key)) {
+            return getWellKnownConfiguration().getString(key);
+        }
+        return null;
+    }
+
+    /**
+     * Get a value form the well-known configuration which may be a JSON or other
+     * object. You have to process it once you have it.
+     * @param key
+     * @return
+     */
+    public Object getWellKnownValue(String key) {
+        // This is not used now, but might be useful later for discovery
+        if (getWellKnownConfiguration().containsKey(key)) {
+            return getWellKnownConfiguration().get(key);
+        }
+        return null;
+    }
+
+
+    /**
+     * The well-known page from the server. Cache this or <i>every</i> call
+     * for a configuration value can require a trip to the server. The well-known
+     * page should rarely change, so this is completely reasonable.
+     * @return
+     */
+    public JSONObject getWellKnownConfiguration() {
+        if (wellKnownConfiguration == null) {
+            String response = getWellKnownClient().doGet(new HashMap());// do basic get -- no parameters
+            wellKnownConfiguration = JSONObject.fromObject(response);
+        }
+        return wellKnownConfiguration;
+    }
+
+    JSONObject wellKnownConfiguration = null;
 
 }
