@@ -10,7 +10,10 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.ClientManagementConstants;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.json.JSONStoreProviders;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.json.MultiJSONStoreProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628ServletConfig;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.*;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientConverter;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientMemoryStore;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientProvider;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientSQLStoreProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.*;
@@ -33,9 +36,9 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.filestore.DSFSClientStoreProvi
 import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.sql.provider.DSSQLClientApprovalStoreProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.ClientApprovalMemoryStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.ClientApproverConverter;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.TransactionStore;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.ClientApprovalKeys;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.TransactionStore;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.TokenForge;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2ConfigTags;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2ConfigurationLoaderUtils;
@@ -67,7 +70,7 @@ import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPoolProvider;
-import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
+import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import org.apache.commons.configuration.tree.ConfigurationNode;
@@ -330,7 +333,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                 x = getFirstAttribute(sn, OA4MPConfigTags.DEVICE_FLOW_LIFETIME);
                 if (!isTrivial(x)) {
                     try {
-                        rfc8628ServletConfig.lifetime = ConfigUtil.getValueSecsOrMillis(x, true);
+                        rfc8628ServletConfig.lifetime = XMLConfigUtil.getValueSecsOrMillis(x, true);
                     } catch (NumberFormatException numberFormatException) {
 
                     }
@@ -338,7 +341,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                 x = getFirstAttribute(sn, OA4MPConfigTags.DEVICE_FLOW_INTERVAL);
                 if (!StringUtils.isTrivial(x)) {
                     try {
-                        rfc8628ServletConfig.interval = ConfigUtil.getValueSecsOrMillis(x, true);
+                        rfc8628ServletConfig.interval = XMLConfigUtil.getValueSecsOrMillis(x, true);
                     } catch (NumberFormatException nfe) {
                         // do nothing. Default is set in servlet config.
                     }
@@ -517,13 +520,13 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
             if (StringUtils.isTrivial(raw)) {
                 uucConfiguration.gracePeriod = UUC_GRACE_PERIOD_DEFAULT;
             } else {
-                uucConfiguration.gracePeriod = ConfigUtil.getValueSecsOrMillis(raw, true);
+                uucConfiguration.gracePeriod = XMLConfigUtil.getValueSecsOrMillis(raw, true);
             }
             raw = getFirstAttribute(node, UUC_INTERVAL);
             if (StringUtils.isTrivial(raw)) {
                 uucConfiguration.interval = UUC_INTERVAL_DEFAULT;
             } else {
-                uucConfiguration.interval = ConfigUtil.getValueSecsOrMillis(raw, true);
+                uucConfiguration.interval = XMLConfigUtil.getValueSecsOrMillis(raw, true);
             }
 
             uucConfiguration.deleteVersions = Configurations.getFirstBooleanValue(node, UUC_DELETE_VERSION_FLAG, false);
@@ -610,7 +613,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
             if (StringUtils.isTrivial(raw)) {
                 interval = CLEANUP_INTERVAL_DEFAULT;
             } else {
-                interval = ConfigUtil.getValueSecsOrMillis(raw, true);
+                interval = XMLConfigUtil.getValueSecsOrMillis(raw, true);
             }
         } catch (Throwable t) {
             // use default which is to do safe garbage collection.
@@ -1063,7 +1066,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                 rtGracePeriod = REFRESH_TOKEN_GRACE_PERIOD_DEFAULT; // set the grace period to be the default
             } else {
                 try {
-                    rtGracePeriod = ConfigUtil.getValueSecsOrMillis(x, true);
+                    rtGracePeriod = XMLConfigUtil.getValueSecsOrMillis(x, true);
                 } catch (Throwable t) {
                     rtGracePeriod = REFRESH_TOKEN_GRACE_PERIOD_DEFAULT;
                 }
@@ -1083,7 +1086,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                 agLifetime = AUTHORIZATION_GRANT_LIFETIME_DEFAULT;
             } else {
                 try {
-                    agLifetime = ConfigUtil.getValueSecsOrMillis(x, true);
+                    agLifetime = XMLConfigUtil.getValueSecsOrMillis(x, true);
                     //agLifetime = Long.parseLong(x) * 1000; // The configuration file has this in seconds. Internally this is ms.
                 } catch (Throwable t) {
                     agLifetime = AUTHORIZATION_GRANT_LIFETIME_DEFAULT;
@@ -1102,7 +1105,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                 idTokenLifetime = ID_TOKEN_LIFETIME_DEFAULT;
             } else {
                 try {
-                    idTokenLifetime = ConfigUtil.getValueSecsOrMillis(x, true);
+                    idTokenLifetime = XMLConfigUtil.getValueSecsOrMillis(x, true);
                 } catch (Throwable t) {
                     idTokenLifetime = ID_TOKEN_LIFETIME_DEFAULT;
                 }
@@ -1118,7 +1121,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                 maxIDTokenLifetime = MAX_ID_TOKEN_LIFETIME_DEFAULT;
             } else {
                 try {
-                    maxIDTokenLifetime = ConfigUtil.getValueSecsOrMillis(x, true);
+                    maxIDTokenLifetime = XMLConfigUtil.getValueSecsOrMillis(x, true);
                 } catch (Throwable t) {
                     maxIDTokenLifetime = MAX_ID_TOKEN_LIFETIME_DEFAULT;
                 }
@@ -1142,7 +1145,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                 atLifetime = ACCESS_TOKEN_LIFETIME_DEFAULT;
             } else {
                 try {
-                    atLifetime = ConfigUtil.getValueSecsOrMillis(x, true);
+                    atLifetime = XMLConfigUtil.getValueSecsOrMillis(x, true);
                 } catch (Throwable t) {
                     atLifetime = ACCESS_TOKEN_LIFETIME_DEFAULT;
                 }
@@ -1160,7 +1163,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                 maxAGLifetime = MAX_AUTHORIZATION_GRANT_LIFETIME_DEFAULT;
             } else {
                 try {
-                    maxAGLifetime = ConfigUtil.getValueSecsOrMillis(x, true);
+                    maxAGLifetime = XMLConfigUtil.getValueSecsOrMillis(x, true);
                 } catch (Throwable t) {
                     maxAGLifetime = MAX_AUTHORIZATION_GRANT_LIFETIME_DEFAULT;
                 }
@@ -1176,7 +1179,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                 maxATLifetime = MAX_ACCESS_TOKEN_LIFETIME_DEFAULT;
             } else {
                 try {
-                    maxATLifetime = ConfigUtil.getValueSecsOrMillis(x, true);
+                    maxATLifetime = XMLConfigUtil.getValueSecsOrMillis(x, true);
                 } catch (Throwable t) {
                     maxATLifetime = MAX_ACCESS_TOKEN_LIFETIME_DEFAULT;
                 }
@@ -1200,7 +1203,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                 maxRTLifetime = MAX_REFRESH_TOKEN_LIFETIME_DEFAULT;
             } else {
                 try {
-                    maxRTLifetime = ConfigUtil.getValueSecsOrMillis(x, true);
+                    maxRTLifetime = XMLConfigUtil.getValueSecsOrMillis(x, true);
                     //maxRTLifetime = Long.parseLong(x) * 1000; // The configuration file has this in seconds. Internally this is ms.
                 } catch (Throwable t) {
                     maxRTLifetime = MAX_REFRESH_TOKEN_LIFETIME_DEFAULT;
@@ -1236,7 +1239,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                 maxClientRefreshTokenLifetime = 13 * 30 * 24 * 3600 * 1000L; // default of 13 months.
             } else {
                 try {
-                    maxClientRefreshTokenLifetime = ConfigUtil.getValueSecsOrMillis(x, true); // The configuration file has this in seconds. Internally this is ms.
+                    maxClientRefreshTokenLifetime = XMLConfigUtil.getValueSecsOrMillis(x, true); // The configuration file has this in seconds. Internally this is ms.
                     //maxClientRefreshTokenLifetime = Long.parseLong(x) * 1000; // The configuration file has this in seconds. Internally this is ms.
                 } catch (Throwable t) {
                     maxClientRefreshTokenLifetime = 13 * 30 * 24 * 3600 * 1000L; // default of 13 months.

@@ -1,0 +1,37 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   Tests running a sequence of QDL scripts on the server.
+   Note that this also tests extended attribute support, which is
+   enabled in the CLI (using the ea_support command). This should return
+   a string of two values that can be parsed. 
+*/
+path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests';
+if[path∉script_path()][script_path(path ~ script_path());];
+debugger(1);
+params. ≔ {'sub':'jeff'};
+clc#init('/home/ncsa/dev/csd/config/auto-test/clients.ini', 'auto-test:basic');
+
+define[test(tokens., claims., phase)]
+  body[
+ ⊨ tokens.'access_token'.'lifetime' ≡ 900000 : 'wrong access token lifetime';
+ ⊨ tokens.'refresh_token'.'lifetime' ≡ 1000000000 : 'wrong refresh token lifetime';
+ ⊨ claims.'sub' ≡ 'jeff' : 'wrong subject, got ' + claims.'sub';
+ ⊨ claims.'seq0' ≡ 636 : 'wrong seq 0 value, got ' + claims.'seq0';
+ ⊨ claims.'roles'.0 ≡ 'admin,all-user' : 'wrong extended attribute value, got ' + claims.'roles'.0;
+ ⊨ claims.'seq0_phase' ≡ phase : 'wrong seq0_phase value, got ' + claims.'seq0_phase';
+ ⊨ claims.'seq1' ≡ 'is_member_of' : 'wrong seq 1 value, got ' + claims.'seq1';
+ ⊨ claims.'seq2' ≡ 'seq 2 passed ' + phase : 'wrong seq 2 value, got ' + claims.'seq2';
+ ];
+
+tokens. := clc#rfc7523(params.);
+claims. := clc#claims();
+test(tokens., claims.,'post_token');
+
+tokens. := clc#refresh();
+claims. := clc#claims();
+
+test(tokens., claims., 'post_refresh');
+
+// No exchange at this point since that does nothing to the claims.
+say('RFC7523 auth grant test: ok');

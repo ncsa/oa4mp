@@ -5,15 +5,13 @@ import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.servlet.Bootstrapper;
-import edu.uiuc.ncsa.security.servlet.ServletConfigUtil;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
-import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
+import edu.uiuc.ncsa.security.servlet.ServletXMLConfigUtil;
+import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import javax.servlet.ServletContext;
 import java.io.File;
-
-import static edu.uiuc.ncsa.qdl.config.QDLConfigurationConstants.CONFIG_TAG_NAME;
 
 /**
  * A class required by Tomcat. This is the entry point for loading the configuration file.
@@ -72,7 +70,7 @@ public abstract class AbstractClientBootstrapper extends Bootstrapper {
             if (f.exists() && f.isFile()) {
                 try {
                     logger.info("loading configuration \"" + (configName == null ? "(none)" : configName) + "\" from file " + fileName);
-                    ConfigurationNode node = ConfigUtil.findMultiNode(fileName, configName, ClientXMLTags.COMPONENT);
+                    ConfigurationNode node = XMLConfigUtil.findMultiNode(fileName, configName, ClientXMLTags.COMPONENT);
                     // old single inheritance
                     //ConfigurationNode node = ConfigUtil.findConfiguration(fileName, configName, ClientXMLTags.COMPONENT);
 
@@ -94,7 +92,7 @@ public abstract class AbstractClientBootstrapper extends Bootstrapper {
         logger.info("Starting to load configuration");
         try {
             ConfigurationLoader x = getConfigurationLoader(
-                    ServletConfigUtil.findConfigurationNode(servletContext, getOa4mpConfigFileKey(), getOa4mpConfigNameKey(), ClientXMLTags.COMPONENT));
+                    ServletXMLConfigUtil.findConfigurationNode(servletContext, getOa4mpConfigFileKey(), getOa4mpConfigNameKey(), ClientXMLTags.COMPONENT));
             logger.info("Loaded configuration named " + cfgName + " from file " + fileName);
             return x;
         } catch (MyConfigurationException ce) {

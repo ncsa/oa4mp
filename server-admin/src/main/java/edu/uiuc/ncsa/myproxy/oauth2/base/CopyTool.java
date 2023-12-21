@@ -9,7 +9,7 @@ import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import edu.uiuc.ncsa.security.util.cli.CLITool;
-import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
+import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
 import org.apache.commons.cli.Options;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
@@ -89,7 +89,7 @@ public  class CopyTool extends CLITool {
 
         String configName = getCommandLine().getOptionValue(cfgNameOption);
         sayv("loading configuration \"" + (configName == null ? "(none)" : configName) + "\" from file " + fileName);
-        ConfigurationNode node = ConfigUtil.findConfiguration(fileName,
+        ConfigurationNode node = XMLConfigUtil.findConfiguration(fileName,
                 getCommandLine().getOptionValue(cfgNameOption),
                 OA4MPConfigTags.COMPONENT);
         // override the logging in the configuration file, since that might be remote.

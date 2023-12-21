@@ -1,7 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oauth2.tools;
 
 import edu.uiuc.ncsa.myproxy.oauth2.base.CommandLineClient;
-import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2ClientLoader;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
@@ -38,14 +37,34 @@ public class OA2CommandLineClient extends CommandLineClient {
         return null;
     }
 
+    public void setLoader(ConfigurationLoader<? extends AbstractEnvironment> loader) {
+        this.loader = loader;
+    }
+
+    ConfigurationLoader<? extends AbstractEnvironment> loader;
+
     @Override
     public ConfigurationLoader<? extends AbstractEnvironment> getLoader() {
-        return new OA2ClientLoader<>(getConfigurationNode(), getMyLogger());
+        //return new OA2ClientLoader<>(getConfigurationNode(), getMyLogger());
+        return loader;
     }
+
+    public static OA2CommandLineClient getInstance() {
+        if (instance == null) {
+            instance = new OA2CommandLineClient(null);
+        }
+        return instance;
+    }
+
+    public static void setInstance(OA2CommandLineClient instance) {
+        OA2CommandLineClient.instance = instance;
+    }
+
+    static OA2CommandLineClient instance = null;
 
     public static void main(String[] args) {
         try {
-            OA2CommandLineClient testCommands = new OA2CommandLineClient(null);
+            OA2CommandLineClient testCommands = getInstance();
             testCommands.start(args);
             OA2CLCCommands usc = new OA2CLCCommands(testCommands.getMyLogger(), testCommands);
             usc.setConfigFile(testCommands.getConfigFile());
@@ -58,7 +77,7 @@ public class OA2CommandLineClient extends CommandLineClient {
     }
 
     @Override
-    public void print_help() throws Exception{
+    public void print_help() throws Exception {
     }
 
     public void start(String[] args) throws Exception {
@@ -69,10 +88,15 @@ public class OA2CommandLineClient extends CommandLineClient {
         about();
         try {
             initialize();
-        }catch(MyConfigurationException mc){
-            say("Could not load the configuration:\""+ mc.getMessage() + "\"");
+        } catch (MyConfigurationException mc) {
+            say("Could not load the configuration:\"" + mc.getMessage() + "\"");
         }
+    }
 
+    @Override
+    protected ConfigurationLoader<? extends AbstractEnvironment> figureOutLoader(String fileName, String configName) throws Throwable{
+        ConfigLoaderTool configLoaderTool = new ConfigLoaderTool();
+        return configLoaderTool.figureOutLoader(fileName, configName, getComponentName());
     }
 
     public void about() {

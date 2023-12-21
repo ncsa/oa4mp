@@ -75,7 +75,21 @@ public class ClientUtils {
         return computeATLifetime(st2, st2.getOA2Client(), oa2SE);
     }
 
-
+    /**
+     * The contract for this:
+     * <ol>
+     *     <li>Figure out the max lifetime. Any result is less than or equal to this</li>
+     *     <li>If configured client lifetime =-1, return the server default </li>
+     *     <li>Determine what the lifetime is. The order is client lifetime, script lifetime, requested lifetime</li>
+     * </ol>
+     * @param serverMaxLifetime
+     * @param defaultServerLifetime
+     * @param clientLifetime
+     * @param clientMaxLifetime
+     * @param config
+     * @param requestLifetime
+     * @return
+     */
     protected static long computeTokenLifetime(long serverMaxLifetime,
                                                long defaultServerLifetime,
                                                long clientLifetime,

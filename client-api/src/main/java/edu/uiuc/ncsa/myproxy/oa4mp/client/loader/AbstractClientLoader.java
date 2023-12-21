@@ -30,12 +30,13 @@ import static edu.uiuc.ncsa.myproxy.oa4mp.client.ClientXMLTags.*;
  * <p>Created by Jeff Gaynor<br>
  * on 11/25/13 at  1:12 PM
  */
-public abstract class AbstractClientLoader<T extends ClientEnvironment> extends DBConfigLoader<T> implements ClientLoaderInterface {
+public abstract class AbstractClientLoader<T extends ClientEnvironment> extends DBConfigLoader<T> implements ClientLoaderInterface<T> {
     public static final String ASSET_ENDPOINT = "getcert";
 
     // FIX for OAUTH-137. Set default cert lifetime to be 12 hours, not 10 days.
     public static final long defaultCertLifetime = 43200L; // default is 12 hours, in seconds.
 
+    public static final long defaultMaxAssetLifetime = 30 * 24 * 3600000L; // set it for a month in milliseconds
 
     protected AbstractClientLoader(ConfigurationNode node) {
         super(node);
@@ -50,7 +51,7 @@ public abstract class AbstractClientLoader<T extends ClientEnvironment> extends 
 
     public abstract AssetProvider getAssetProvider();
 
-    protected Provider<AssetStore> getAssetStoreProvider() {
+    public Provider<AssetStore> getAssetStoreProvider() {
         if (assetStoreProvider == null) {
             MultiAssetStoreProvider masp = new MultiAssetStoreProvider(cn, isDefaultStoreDisabled(), loggerProvider.get());
             //final AssetProvider assetProvider = new AssetProvider();
@@ -122,11 +123,11 @@ public abstract class AbstractClientLoader<T extends ClientEnvironment> extends 
     }
 
 
-    protected String getSkin() {
+    public String getSkin() {
         return getCfgValue(SKIN);
     }
 
-    protected long getKeypairLifetime() {
+    public long getKeypairLifetime() {
         String x = getCfgValue(KEYPAIR_LIFETIME);
         long y = 0L; // OAUTH-167: set it to 0 (no key caching) by default
         if (x == null || x.length() == 0) return y;
@@ -139,9 +140,9 @@ public abstract class AbstractClientLoader<T extends ClientEnvironment> extends 
         return y;
     }
 
-    protected long getMaxAssetLifetime() {
+    public long getMaxAssetLifetime() {
         String x = getCfgValue(MAX_ASSET_LIFETIME);
-        long y = 30 * 24 * 3600000L; // set it for a month in milliseconds
+        long y = defaultMaxAssetLifetime; // set it for a month in milliseconds
         if (x == null || x.length() == 0) return y;
         try {
             // The value in the file is assumed to be in seconds.
@@ -152,7 +153,7 @@ public abstract class AbstractClientLoader<T extends ClientEnvironment> extends 
         return y;
     }
 
-    protected boolean isEnableAssetCleanup() {
+    public boolean isEnableAssetCleanup() {
         boolean doIt = false;
         try {
             doIt = Boolean.parseBoolean(getCfgValue(ENABLE_ASSET_CLEANUP));
@@ -192,14 +193,14 @@ public abstract class AbstractClientLoader<T extends ClientEnvironment> extends 
             return checkURI(getWellKnownString(wellKnownEntry), wellKnownEntry);
         }
         // failing that, try to construct it
-        if (trivial(getBaseURI())) {
-         //   throw new MyConfigurationException("Error: No base uri for " + endpoint + " found");
+        if (trivial(getServiceURI())) {
+            //   throw new MyConfigurationException("Error: No base uri for " + endpoint + " found");
             return null;
         }
-        return checkURI(getBaseURI() + "/" + endpoint, endpoint);
+        return checkURI(getServiceURI() + "/" + endpoint, endpoint);
     }
 
-    protected long checkCertLifetime() {
+    public long getCertLifetime() {
         String certLifetimeString = getCfgValue(ClientXMLTags.CERT_LIFETIME);
         if (!trivial(certLifetimeString)) {
             try {
@@ -217,7 +218,7 @@ public abstract class AbstractClientLoader<T extends ClientEnvironment> extends 
         return x == null || 0 == x.length();
     }
 
-    protected String getId() {
+    public String getId() {
         String id = getCfgValue(ClientXMLTags.ID);
         if (trivial(id)) {
             throw new MyConfigurationException("Error: there is no identifier specified.");
@@ -225,9 +226,9 @@ public abstract class AbstractClientLoader<T extends ClientEnvironment> extends 
         return id;
     }
 
-    protected URI getCallback() {
+    public URI getCallback() {
         String cb = getCfgValue(ClientXMLTags.CALLBACK_URI);
-        if(cb == null){
+        if (cb == null) {
             return null; // perfectly fine
         }
         return checkURI(cb, "callback");
@@ -251,7 +252,7 @@ public abstract class AbstractClientLoader<T extends ClientEnvironment> extends 
 
     String baseURI = null;
 
-    protected String getBaseURI() {
+    public String getServiceURI() {
         if (baseURI == null) {
             baseURI = getCfgValue(ClientXMLTags.BASE_URI);
             if (!(baseURI == null || baseURI.length() == 0)) {
@@ -271,40 +272,34 @@ public abstract class AbstractClientLoader<T extends ClientEnvironment> extends 
             wellKnownURI = getCfgValue("wellKnownUri");
             if (wellKnownURI == null) {
                 // not set, so try to create one
-                if (getBaseURI() == null) {
-                 //   throw new IllegalStateException("no well-known or " + ClientXMLTags.BASE_URI + " specified in the configuration file");
-                }else {
-                    wellKnownURI = getBaseURI() + "/.well-known/openid-configuration";
+                if (getServiceURI() == null) {
+                    //   throw new IllegalStateException("no well-known or " + ClientXMLTags.BASE_URI + " specified in the configuration file");
+                } else {
+                    wellKnownURI = getServiceURI() + "/.well-known/openid-configuration";
                 }
             }
         }
         return wellKnownURI;
     }
 
-    protected URI getAccessTokenURI() {
-/*
-        String at = getCfgValue(ClientXMLTags.ACCESS_TOKEN_URI);
-        if (isTrivial(at)) {
-            String x = getWellKnownValue(OIDCDiscoveryTags.TOKEN_ENDPOINT);
-            return URI.create(x);
-        }
-*/
+    public URI getAccessTokenURI() {
+
         return createServiceURI(getCfgValue(ClientXMLTags.ACCESS_TOKEN_URI),
                 OIDCDiscoveryTags.TOKEN_ENDPOINT_DEFAULT,
                 OIDCDiscoveryTags.TOKEN_ENDPOINT);
     }
 
-    protected URI getAssetURI() {
+    public URI getAssetURI() {
         // since this is the really old, non-standanrd getcert endpoint, we cannot look it up
         String x = getCfgValue(ClientXMLTags.ASSET_URI);
-        if(x == null){
+        if (x == null) {
             return null; // some system,s just don't use it at all. No reason to require one in the config.
         }
         checkProtocol(x);
-        return createServiceURIOLD(x, getBaseURI(), ASSET_ENDPOINT);
+        return createServiceURIOLD(x, getServiceURI(), ASSET_ENDPOINT);
     }
 
-    protected URI getAuthorizeURI() {
+    public URI getAuthorizeURI() {
 /*
         String x = getCfgValue(ClientXMLTags.AUTHORIZE_TOKEN_URI);
         if(isTrivial(x)){
@@ -375,6 +370,7 @@ public abstract class AbstractClientLoader<T extends ClientEnvironment> extends 
     /**
      * Get a value form the well-known configuration which may be a JSON or other
      * object. You have to process it once you have it.
+     *
      * @param key
      * @return
      */
@@ -391,6 +387,7 @@ public abstract class AbstractClientLoader<T extends ClientEnvironment> extends 
      * The well-known page from the server. Cache this or <i>every</i> call
      * for a configuration value can require a trip to the server. The well-known
      * page should rarely change, so this is completely reasonable.
+     *
      * @return
      */
     public JSONObject getWellKnownConfiguration() {

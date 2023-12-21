@@ -64,9 +64,10 @@ public class JWKCLI extends ConfigurableCommandsImpl {
     say("Need to write help.");
     }
 
+    ConfigurationLoader<? extends AbstractEnvironment> loader = null;
     @Override
     public ConfigurationLoader<? extends AbstractEnvironment> getLoader() {
-        return null;
+        return loader;
     }
 
     @Override
@@ -310,6 +311,15 @@ public class JWKCLI extends ConfigurableCommandsImpl {
         }
     }
 
+    @Override
+    public void setLoader(ConfigurationLoader<? extends AbstractEnvironment> loader) {
+    this.loader = getLoader();
+    }
 
+    @Override
+    protected ConfigurationLoader<? extends AbstractEnvironment> figureOutLoader(String fileName, String configName) throws Throwable {
+        ConfigLoaderTool configLoaderTool = new ConfigLoaderTool();
+        return configLoaderTool.figureOutLoader(fileName, configName, getComponentName());
+    }
 }
 

@@ -4,7 +4,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPConfigTags;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import edu.uiuc.ncsa.security.servlet.Bootstrapper;
-import edu.uiuc.ncsa.security.servlet.ServletConfigUtil;
+import edu.uiuc.ncsa.security.servlet.ServletXMLConfigUtil;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import javax.servlet.ServletContext;
@@ -27,7 +27,7 @@ public abstract class AbstractBootstrapper extends Bootstrapper {
     }
 
     protected ConfigurationNode getNode(ServletContext servletContext) throws Exception {
-        return ServletConfigUtil.findConfigurationNode(servletContext, getOa4mpConfigFileKey(), getOa4mpConfigNameKey(), OA4MPConfigTags.COMPONENT);
+        return ServletXMLConfigUtil.findConfigurationNode(servletContext, getOa4mpConfigFileKey(), getOa4mpConfigNameKey(), OA4MPConfigTags.COMPONENT);
     }
 
 

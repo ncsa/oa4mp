@@ -7,25 +7,30 @@
 */
 // /home/ncsa/dev/csd/config/auto-test/auto-test.ini
 say(args().0);
-ini. := file_read(args().0,2).'admin';
-
+ini. := file_read(args().0,2);
+admin.:=ini.'admin';
 say('ini:\n' + print(ini.));
+print(info());
 http := j_load('http');
-
+client_keys. := from_json(file_read(ini.'keys'.'jwk_path'));
+print(client_keys.);
 q:=load('/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/utils/cm.mdl');
 use(q);
 client_dir := '/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests/cm-tests/auto/clients';
 clients. :=  dir(client_dir);
-http#host(ini.'address' + 'oidc-cm') ;
-h. := {'Authorization': 'Bearer ' + bearer_token(ini.'id', ini.'secret'),
+http#host(admin.'address' + '/oidc-cm') ;
+h. := {'Authorization': 'Bearer ' + bearer_token(admin.'id', admin.'secret'),
        'Content-Type':'application/json; charset=UTF-8'};
 http#headers(h.);
 http#open(true);
 while[c∈clients.]
      [
        payload. := from_json(file_read(client_dir + '/' + c));
+       // Add the jwks property so the keys get uploaded.
+       payload.'jwks' := client_keys.;
        say('\ninstalling: ' + print(payload.));
           //resp. := http#post(payload.);
           //say(resp.);
 
      ];
+

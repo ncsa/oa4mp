@@ -637,7 +637,7 @@ public class OIDCCMServlet extends EnvServlet {
                 jsonObject.put("error", "unsupported encoding");
                 // Fix https://github.com/ncsa/oa4mp/issues/133 as issue 3.1.3.1 in AAF report
                 getMyLogger().info("Unsupported encoding of \"" + httpServletRequest.getContentType() + " for body of POST. Request rejected.");
-                jsonObject.put("description" ,"Unsupported encoding for body of POST. Request rejected." );
+                jsonObject.put("description", "Unsupported encoding for body of POST. Request rejected.");
                 httpServletResponse.getWriter().println(jsonObject);
                 httpServletResponse.getWriter().flush();
                 return;
@@ -1203,7 +1203,16 @@ public class OIDCCMServlet extends EnvServlet {
 
         if (jsonRequest.containsKey(REFRESH_LIFETIME)) {
             // NOTE this is sent in seconds but is recorded as ms., so convert to milliseconds here.
-            client.setRtLifetime(jsonRequest.getLong(REFRESH_LIFETIME) * 1000);
+            // If the value is <=0 then they are asking for the server default (-1) or disablinf
+            // refresh tokens (0).
+            // It is possible to set up refresh token lifetimes by specifying the grant type of refresh_token,
+            // but passing in this parameter overrides that.
+            long rt = jsonRequest.getLong(REFRESH_LIFETIME);
+            if (rt <= 0) {
+                client.setRtLifetime(rt);
+            } else {
+                client.setRtLifetime(jsonRequest.getLong(REFRESH_LIFETIME) * 1000);
+            }
             jsonRequest.remove(REFRESH_LIFETIME);
         }
         if (jsonRequest.containsKey(MAX_REFRESH_LIFETIME)) {
@@ -1420,7 +1429,8 @@ public class OIDCCMServlet extends EnvServlet {
                     client.setRtLifetime(jsonRequest.getLong(keys.rtLifetime()));
                 } else {
                     // check if there is no RT lifetime specified, set it to the server max.
-                    client.setRtLifetime(getOA2SE().getMaxClientRefreshTokenLifetime());
+                    client.setRtLifetime(-1);// server default
+                    //client.setRtLifetime(getOA2SE().getMaxClientRefreshTokenLifetime());
                 }
             }
         } else {

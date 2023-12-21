@@ -12,6 +12,8 @@ import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import edu.uiuc.ncsa.security.core.util.LoggingConfigLoader;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.cli.*;
+import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
+import org.apache.commons.configuration.tree.ConfigurationNode;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.HashMap;
@@ -49,9 +51,15 @@ public class OA2Commands extends BaseCommands {
         return "oa4mp>";
     }
 
+    ConfigurationLoader<? extends AbstractEnvironment> loader = null;
     @Override
     public ConfigurationLoader<? extends AbstractEnvironment> getLoader() {
-        return new OA2ConfigurationLoader<>(getConfigurationNode(), getMyLogger());
+        if(loader == null) {
+            ConfigurationNode node =
+                    XMLConfigUtil.findConfiguration(getConfigFile(), getConfigName(), getComponentName());
+            loader = new OA2ConfigurationLoader<>(node, getMyLogger());
+        }
+        return loader;
     }
 
     @Override
@@ -246,5 +254,16 @@ public class OA2Commands extends BaseCommands {
     @Override
     public HelpUtil getHelpUtil() {
         return helpUtil;
+    }
+
+    @Override
+    public void setLoader(ConfigurationLoader<? extends AbstractEnvironment> loader) {
+   this.loader = loader;
+    }
+
+    @Override
+    protected ConfigurationLoader<? extends AbstractEnvironment> figureOutLoader(String fileName, String configName) throws Throwable {
+        ConfigLoaderTool configLoaderTool= new ConfigLoaderTool();
+        return configLoaderTool.figureOutLoader(fileName, configName, getComponentName());
     }
 }

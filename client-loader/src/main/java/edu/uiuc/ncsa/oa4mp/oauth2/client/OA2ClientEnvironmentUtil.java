@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.oa4mp.oauth2.client;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.client.ClientXMLTags;
-import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
+import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
 
 import java.io.File;
 
@@ -12,7 +12,7 @@ import java.io.File;
  */
 public class OA2ClientEnvironmentUtil {
     public static OA2ClientEnvironment load(File configFile, String configName) throws Exception{
-        return (OA2ClientEnvironment) new OA2ClientLoader(ConfigUtil.findConfiguration(configFile.getAbsolutePath(),
+        return (OA2ClientEnvironment) new OA2ClientLoader(XMLConfigUtil.findConfiguration(configFile.getAbsolutePath(),
                 configName, ClientXMLTags.COMPONENT)).load();
     }
 

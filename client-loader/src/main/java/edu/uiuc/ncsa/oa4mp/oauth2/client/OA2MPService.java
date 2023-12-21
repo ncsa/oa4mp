@@ -155,6 +155,9 @@ public class OA2MPService extends OA4MPService {
     public void preRequestCert(Asset asset, Map parameters) {
         // do nothing here in this case. Protocol says add cert req before getCert.
         if (!parameters.containsKey(getEnvironment().getConstants().get(CALLBACK_URI_KEY))) {
+            if(getEnvironment().getCallback() ==null){
+                throw new IllegalArgumentException("missing callback in configuration");
+            }
             parameters.put(getEnvironment().getConstants().get(CALLBACK_URI_KEY), getEnvironment().getCallback().toString());
         }
         OA2Asset a = (OA2Asset) asset;

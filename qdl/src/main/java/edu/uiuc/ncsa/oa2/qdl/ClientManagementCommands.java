@@ -14,7 +14,7 @@ import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
+import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
 import net.sf.json.JSON;
 import net.sf.json.JSONObject;
 import org.apache.commons.configuration.tree.ConfigurationNode;
@@ -70,7 +70,7 @@ public class ClientManagementCommands implements QDLModuleMetaClass {
 
     protected void init(String configFile, String cfgName) throws Throwable {
 
-            setConfigurationNode(ConfigUtil.findConfiguration(configFile, cfgName, "service"));
+            setConfigurationNode(XMLConfigUtil.findConfiguration(configFile, cfgName, "service"));
         initCalled = true;
     }
 

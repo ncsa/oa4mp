@@ -24,6 +24,8 @@ import java.util.Map;
  */
 public class OA2ClientEnvironment extends ClientEnvironment {
 
+    public OA2ClientEnvironment() {
+    }
 
     public OA2ClientEnvironment(URI accessTokenUri,
                                 URI authorizationUri,

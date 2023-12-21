@@ -44,7 +44,7 @@ import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
-import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
+import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import net.sf.json.JSONArray;
@@ -308,7 +308,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         if (jsonRequest.containsKey(OA2Constants.ACCESS_TOKEN_LIFETIME)) {
             String rawATLifetime = jsonRequest.getString(OA2Constants.ACCESS_TOKEN_LIFETIME);
             try {
-                long at = ConfigUtil.getValueSecsOrMillis(rawATLifetime);
+                long at = XMLConfigUtil.getValueSecsOrMillis(rawATLifetime);
                 //               long at = Long.parseLong(rawATLifetime);
                 serviceTransaction.setRequestedATLifetime(at);
             } catch (Throwable t) {
@@ -322,7 +322,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         if (jsonRequest.containsKey(OA2Constants.REFRESH_LIFETIME)) {
             String rawRTLifetime = jsonRequest.getString(OA2Constants.REFRESH_LIFETIME);
             try {
-                long at = ConfigUtil.getValueSecsOrMillis(rawRTLifetime);
+                long at = XMLConfigUtil.getValueSecsOrMillis(rawRTLifetime);
                 serviceTransaction.setRequestedRTLifetime(at);
             } catch (Throwable t) {
                 getServiceEnvironment().info("Could not set request refresh token lifetime to \"" + rawRTLifetime
@@ -341,7 +341,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         if (jsonRequest.containsKey(OA2Constants.ID_TOKEN_LIFETIME)) {
             String rawLifetime = jsonRequest.getString(OA2Constants.ID_TOKEN_LIFETIME);
             try {
-                long at = ConfigUtil.getValueSecsOrMillis(rawLifetime);
+                long at = XMLConfigUtil.getValueSecsOrMillis(rawLifetime);
                 serviceTransaction.setRequestedIDTLifetime(at);
             } catch (Throwable t) {
                 getServiceEnvironment().info("Could not set request ID token lifetime to \"" + rawLifetime

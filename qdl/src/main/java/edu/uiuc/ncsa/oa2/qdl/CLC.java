@@ -2,8 +2,10 @@ package edu.uiuc.ncsa.oa2.qdl;
 
 import edu.uiuc.ncsa.myproxy.oauth2.tools.OA2CLCCommands;
 import edu.uiuc.ncsa.myproxy.oauth2.tools.OA2CommandLineClient;
+import edu.uiuc.ncsa.oa2.qdl.clc.QDLCLC;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.*;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims;
+import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2ClientEnvironment;
 import edu.uiuc.ncsa.qdl.exceptions.BadArgException;
 import edu.uiuc.ncsa.qdl.exceptions.MissingArgException;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
@@ -81,8 +83,12 @@ public class CLC implements QDLModuleMetaClass {
         @Override
         public Object evaluate(Object[] objects, State state) throws Throwable {
             try {
+                if(!initCalled){
+                    QDLCLC qdlclc = new QDLCLC(null);
+                    OA2CommandLineClient.setInstance(qdlclc);
+                }
                 DebugUtil.setEnabled(true);
-                clcCommands = new OA2CLCCommands(true, state.getLogger(), new OA2CommandLineClient(state.getLogger()));
+                clcCommands = new OA2CLCCommands(true, state.getLogger(), new QDLCLC(state.getLogger()));
                 // note that the order of the arguments swaps.
                 InputLine inputLine = new InputLine(DUMMY_ARG + " " + objects[1].toString() + "  " + objects[0].toString());
                 clcCommands.load(inputLine);
@@ -100,6 +106,11 @@ public class CLC implements QDLModuleMetaClass {
             return true;
         }
 
+        protected OA2ClientEnvironment createEnvironment(QDLStem ini, String name){
+           OA2ClientEnvironment ce = new OA2ClientEnvironment();
+           ce.setScopes(ini.getStem("scopes").getQDLList());
+           return ce;
+        }
 
         @Override
         public List<String> getDocumentation(int argCount) {

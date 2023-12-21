@@ -1,7 +1,9 @@
 package edu.uiuc.ncsa.oa4mp.delegation.oa2;
 
 import edu.uiuc.ncsa.security.core.configuration.Configurations;
-import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
+import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
+import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
+import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import java.util.*;
@@ -13,7 +15,7 @@ import static edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants.SCOPE;
  * <p>Created by Jeff Gaynor<br>
  * on 8/26/15 at  3:59 PM
  */
-public class OA2ConfigurationLoaderUtils extends ConfigUtil {
+public class OA2ConfigurationLoaderUtils extends XMLConfigUtil {
 
     /**
      * <p>To read a block of parameters from a (client) configuration. These are sent along with the
@@ -35,7 +37,6 @@ public class OA2ConfigurationLoaderUtils extends ConfigUtil {
      * prevent it from being included. This allows you to turn on and off parameters in the file
      * without having to comment things out or remove them. Note that at this point, these are only
      * sent in the initial request.
-     *
      *
      * @param cn
      * @return
@@ -91,7 +92,6 @@ public class OA2ConfigurationLoaderUtils extends ConfigUtil {
      * Each block has an <code>enabled</code> flag so you can turn these off and on without removing them.
      *
      * @param cn
-     * @param isLoadAll if true, load all of the default scopes. Configuration then turns them off.
      * @return
      */
     public static Collection<String> getScopes(ConfigurationNode cn) {
@@ -130,5 +130,7 @@ public class OA2ConfigurationLoaderUtils extends ConfigUtil {
         // }
         return scopes;
     }
+
+
 
 }

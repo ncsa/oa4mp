@@ -26,6 +26,9 @@ import static edu.uiuc.ncsa.security.util.crypto.KeyUtil.toPKCS8PEM;
  * on May 16, 2011 at  3:27:56 PM
  */
 public class ClientEnvironment extends AbstractClientEnvironment {
+    public ClientEnvironment() {
+    }
+
     public static final String CALLBACK_URI_KEY = "oa4mp:callback_uri";
     public static final String TOKEN = "oa4mp:token";
     public static final String FORM_ENCODING = "oa4mp:form_encoding"; //usually UTF-8...

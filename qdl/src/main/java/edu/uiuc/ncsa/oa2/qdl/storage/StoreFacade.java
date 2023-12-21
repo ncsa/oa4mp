@@ -18,7 +18,7 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.*;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
-import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
+import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
 import net.sf.json.JSONObject;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
@@ -102,7 +102,7 @@ public class StoreFacade implements QDLModuleMetaClass {
 
     protected void init(String configFile, String cfgName) throws Throwable {
 //        try {
-            setConfigurationNode(ConfigUtil.findConfiguration(configFile, cfgName, "service"));
+            setConfigurationNode(XMLConfigUtil.findConfiguration(configFile, cfgName, "service"));
   /*      } catch (Exception x) {
             if (x instanceof RuntimeException) {
                 throw (RuntimeException) x;

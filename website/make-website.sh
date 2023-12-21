@@ -12,6 +12,7 @@ lowriter --headless --convert-to pdf ~/dev/ncsa-git/oa4mp/qdl/src/main/docs/qdl_
 lowriter --headless --convert-to pdf ~/dev/ncsa-git/oa4mp/qdl/src/main/docs/creating_claim_sources2.odt
 lowriter --headless --convert-to pdf ~/dev/ncsa-git/oa4mp/qdl/src/main/docs/claim_source_examples.odt
 lowriter --headless --convert-to pdf ~/dev/ncsa-git/oa4mp/qdl/src/main/docs/token_handler_configuration.odt
+lowriter --headless --convert-to pdf ~/dev/ncsa-git/oa4mp/qdl/src/main/docs/qdl_clc_ini.odt
 echo "done converting PDFs"
 
 # ===============

@@ -104,7 +104,7 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
                     getAuthorizeURI(),
                     getCallback(),
                     getAssetURI(),
-                    checkCertLifetime(),
+                    getCertLifetime(),
                     getId(),
                     getSkin(),
                     isEnableAssetCleanup(),
@@ -204,7 +204,7 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
     }
 
     @Override
-    protected Provider<AssetStore> getAssetStoreProvider() {
+    public Provider<AssetStore> getAssetStoreProvider() {
         if (assetStoreProvider == null) {
             MultiAssetStoreProvider masp = new MultiAssetStoreProvider(cn, isDefaultStoreDisabled(), loggerProvider.get());
             OA2AssetSerializationKeys keys = new OA2AssetSerializationKeys();
@@ -242,11 +242,11 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
         return getCfgValue(ClientXMLTags.ERROR_PAGE_PATH);
     }
 
-    protected String getSecret() {
+    public String getSecret() {
         return getCfgValue(ClientXMLTags.SECRET_KEY);
     }
 
-    protected String getKID() {
+    public String getKID() {
         return getCfgValue(JWK_KEY_ID);
     }
 
@@ -305,7 +305,7 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
     JWKUtil2 jwkUtil;
     JSONWebKeys jwks = null;
 
-    protected JSONWebKeys getKeys() {
+    public JSONWebKeys getKeys() {
         if (jwks == null) {
             jwks = getKeysFromFile();
             if (jwks == null) {
@@ -431,28 +431,28 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
         return createServiceURIOLD(x, getBaseURI(), USER_INFO_ENDPOINT);
 
     }*/
-    protected URI getUIURI() {
+    public URI getUIURI() {
         return createServiceURI(getCfgValue(ClientXMLTags.USER_INFO_URI),
                 OIDCDiscoveryTags.USER_INFO_ENDPOINT_DEFAULT,
                 OIDCDiscoveryTags.USERINFO_ENDPOINT);
         //return createServiceURIOLD(getCfgValue(ClientXMLTags.USER_INFO_URI), getCfgValue(ClientXMLTags.BASE_URI), USER_INFO_ENDPOINT);
     }
 
-    protected URI getDeviceAuthorizationURI() {
+    public URI getDeviceAuthorizationURI() {
         return createServiceURI(getCfgValue(DEVICE_AUTHORIZATION_URI),
                 OIDCDiscoveryTags.DEVICE_AUTHORIZATION_ENDPOINT_DEFAULT,
                 OIDCDiscoveryTags.DEVICE_AUTHORIZATION_ENDPOINT);
 //        return createServiceURIOLD(getCfgValue(DEVICE_AUTHORIZATION_URI), getCfgValue(ClientXMLTags.BASE_URI), DEVICE_AUTHORIZATION_ENDPOINT);
     }
 
-    protected URI getRFC7009Endpoint() {
+    public URI getRFC7009Endpoint() {
         return createServiceURI(getCfgValue(REVOCATION_URI),
                 OIDCDiscoveryTags.REVOCATION_ENDPOINT_DEFAULT,
                 OIDCDiscoveryTags.TOKEN_REVOCATION_ENDPOINT);
 //        return createServiceURIOLD(getCfgValue(REVOCATION_URI), getBaseURI(), REVOCATION_ENDPOINT);
     }
 
-    protected URI getRFC7662Endpoint() {
+    public URI getRFC7662Endpoint() {
         return createServiceURI(getCfgValue(INTROSPECTION_URI),
               OIDCDiscoveryTags.INTROSPECTION_ENDPOINT_DEFAULT,
               OIDCDiscoveryTags.TOKEN_INTROSPECTION_ENDPOINT);

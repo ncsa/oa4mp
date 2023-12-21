@@ -187,7 +187,7 @@ public class OA2CLCCommands extends CommonCommands {
 
     OA2CommandLineClient oa2CommandLineClient;
 
-    public void load(InputLine inputLine) throws Exception {
+    public void load(InputLine inputLine) throws Throwable {
         if (!inputLine.hasArgs()) {
             say("config file = " + oa2CommandLineClient.getConfigFile() + ", config name=" + oa2CommandLineClient.getConfigName());
             sayi("Usage: load a configuration from a file and make it active.");
@@ -1528,11 +1528,11 @@ public class OA2CLCCommands extends CommonCommands {
     protected String VERBOSE_ON_KEY = "verbose_on";
 
 
-    public void fromJSON(JSONObject json) throws Exception {
+    public void fromJSON(JSONObject json) throws Throwable {
         fromJSON(json, true);
     }
 
-    protected void fromJSON(JSONObject json, boolean loadStoredConfig) throws Exception {
+    protected void fromJSON(JSONObject json, boolean loadStoredConfig) throws Throwable {
         if (loadStoredConfig && json.containsKey(CONFIG_FILE_KEY)) {
             // make a fake input line for loading the last configuration and run it.
             // Do this first since it clears the current state and anything loaded before it is lost.
@@ -1671,7 +1671,7 @@ public class OA2CLCCommands extends CommonCommands {
 
     boolean ersatz = false;
 
-    public void read(InputLine inputLine) throws Exception {
+    public void read(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
             showReadHelp();
             return;
@@ -2195,8 +2195,6 @@ public class OA2CLCCommands extends CommonCommands {
             parameters.put(OA2Claims.SUBJECT, getCe().getClient().getIdentifierString());
         }
         JSONObject jsonObject = getService().rfc7523(getDummyAsset(), parameters);
-/*        rawIdToken = jsonObject.getString(ID_TOKEN);
-        idToken = JWTUtil.readJWT(rawIdToken)[1]; // just read it.*/
         return jsonObject;
     }
 

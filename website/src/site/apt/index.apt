@@ -40,6 +40,8 @@ OA4MP Extensions to {{{https://qdl-lang.org/}QDL}}
 
     *{{{./pdf/qdl_oa4mp_store_access.pdf}Accessing OA4MP stores via QDL.}}
 
+    *{{{./pdf/qdl_clc_ini.pdf}Using the QDL ini files with the command line client module.}}
+
 Related Resources
 
      * {{{https://www.cilogon.org/oidc}CILogon OIDC page}} Be sure to read here to get the correct endpoints for
