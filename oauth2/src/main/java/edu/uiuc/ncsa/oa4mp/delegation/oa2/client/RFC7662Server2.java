@@ -10,6 +10,7 @@ import edu.uiuc.ncsa.security.servlet.ServiceClient;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 
+import java.net.URI;
 import java.util.HashMap;
 
 /**
@@ -19,9 +20,10 @@ import java.util.HashMap;
  */
 public class RFC7662Server2 extends TokenAwareServer implements RFC7662Server, RFC7662Constants {
     public RFC7662Server2(ServiceClient serviceClient,
+                          URI issuer,
                           String wellKnown,
                           boolean oidcEnabled) {
-        super(serviceClient, wellKnown, oidcEnabled);
+        super(serviceClient, issuer, wellKnown, oidcEnabled);
     }
 
     public RFC7662Response processRFC7662Request(RFC7662Request request) {

@@ -30,6 +30,14 @@ public class QDLCLC extends OA2CommandLineClient {
             return loader;
         }
         ConfigLoaderTool configLoaderTool = new ConfigLoaderTool();
-        return configLoaderTool.figureOutLoader(fileName, configName, getComponentName());
+        return configLoaderTool.figureOutClientLoader(fileName, configName, getComponentName());
+    }
+
+    public static void main(String[] args) {
+        try {
+            runnit(args, new QDLCLC(null));
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
     }
 }

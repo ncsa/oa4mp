@@ -1,0 +1,6 @@
+/*
+   Most basic client. Has refresh token grant in it.
+*/
+{
+ 'token_endpoint_auth_method':'private_key_jwt'
+ };

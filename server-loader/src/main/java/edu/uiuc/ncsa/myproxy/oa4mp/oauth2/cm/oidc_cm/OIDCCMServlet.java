@@ -1073,12 +1073,14 @@ public class OIDCCMServlet extends EnvServlet {
                     if (jsonRequest.containsKey(JWKS_URI)) {
                         client.setJwksURI(URI.create(jsonRequest.getString(JWKS_URI)));
                         jsonRequest.remove(JWKS_URI);
+                        client.setServiceClient(true);
                         gotSupportedAuthMethod = true;
                     }
                     if (jsonRequest.containsKey(JWKS)) {
                         client.setSecret(null);
                         client.setJWKS(getJwkUtil().fromJSON(jsonRequest.getJSONObject(JWKS)));
                         jsonRequest.remove(JWKS);
+                        client.setServiceClient(true);
                         gotSupportedAuthMethod = true;
                     }
                     break;

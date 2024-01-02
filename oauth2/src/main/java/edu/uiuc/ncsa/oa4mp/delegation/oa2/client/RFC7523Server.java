@@ -6,13 +6,17 @@ import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC7523Constants;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
 import net.sf.json.JSONObject;
 
+import java.net.URI;
+
+import static edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants.ID_TOKEN;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 6/6/23 at  3:11 PM
  */
 public class RFC7523Server extends TokenAwareServer implements RFC7523Constants {
-    public RFC7523Server(ServiceClient serviceClient, String wellKnown, boolean oidcEnabled) {
-        super(serviceClient, wellKnown, oidcEnabled);
+    public RFC7523Server(ServiceClient serviceClient, URI issuer, String wellKnown, boolean oidcEnabled) {
+        super(serviceClient, issuer, wellKnown, oidcEnabled);
     }
 
     public RFC7523Response processRFC7523Request(RFC7523Request request) {
@@ -26,7 +30,10 @@ public class RFC7523Server extends TokenAwareServer implements RFC7523Constants 
         rfc7523Response.setResponse(JSONObject.fromObject(response)); // contains access token and refresh token.
 
         // This checks the ID token and verifies it. Use this, not the raw ID token in the response.
-        rfc7523Response.setIdToken(getAndCheckIDToken(rfc7523Response.getResponse(), request));
+        // Not all clients return them, e.g. pure OAuth 2 clients.
+        if(rfc7523Response.getResponse().containsKey(ID_TOKEN)) {
+            rfc7523Response.setIdToken(getAndCheckIDToken(rfc7523Response.getResponse(), request));
+        }
         return rfc7523Response;
     }
 }

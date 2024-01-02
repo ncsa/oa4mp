@@ -1,0 +1,23 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+  Query the client management service for the list of all clients for this admin.
+
+  Invoke with the path to the testing configuration file. This will returns a list of
+  all the client_ids for this admin client.
+*/
+// /home/ncsa/dev/csd/config/auto-test/auto-test.ini
+ini. := file_read(args().0,2);
+admin.:=ini.'admin';
+
+http := j_load('http');
+q:=load('/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/utils/cm.mdl');
+use(q);
+http#host(admin.'address' + '/oidc-cm') ;
+h. := {'Authorization': 'Bearer ' + bearer_token(admin.'id', admin.'secret'),
+       'Content-Type':'application/json; charset=UTF-8'};
+http#headers(h.);
+http#open(true);
+response. := http#get();
+return(response\content\clients\*\client_id);
+

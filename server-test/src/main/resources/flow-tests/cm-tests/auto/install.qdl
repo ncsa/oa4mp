@@ -17,7 +17,8 @@ print(client_keys.);
 q:=load('/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/utils/cm.mdl');
 use(q);
 client_dir := '/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests/cm-tests/auto/clients';
-clients. :=  dir(client_dir);
+//clients. :=  dir(client_dir);
+clients.:=['basic.json'];
 http#host(admin.'address' + '/oidc-cm') ;
 h. := {'Authorization': 'Bearer ' + bearer_token(admin.'id', admin.'secret'),
        'Content-Type':'application/json; charset=UTF-8'};
@@ -28,9 +29,9 @@ while[c∈clients.]
        payload. := from_json(file_read(client_dir + '/' + c));
        // Add the jwks property so the keys get uploaded.
        payload.'jwks' := client_keys.;
-       say('\ninstalling: ' + print(payload.));
-          //resp. := http#post(payload.);
-          //say(resp.);
+       //say('\ninstalling: ' + print(payload.));
+          resp. := http#post(payload.);
+          say(resp.);
 
      ];
 

@@ -7,5 +7,4 @@
   "rt_lifetime":3600,
   "id_token_lifetime": 2400,
   "client_id":"auto-test:public"
-
 }

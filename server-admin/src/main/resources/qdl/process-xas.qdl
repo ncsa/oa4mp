@@ -14,6 +14,11 @@
 
    tokens are idt, at or rt.
 
+   So if you passed org.oa4mp:/idt/value/foo=woof
+
+   then in the id token claims there would be a claim named foo
+   with the value of woof asserted.
+
 */
 
 

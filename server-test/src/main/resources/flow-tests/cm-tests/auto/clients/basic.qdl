@@ -1,0 +1,8 @@
+/*
+   Most basic client. Has refresh token grant in it.
+*/
+{'client_id':'auto-test:basic',
+ 'client_name':'Basic automated test client',
+ 'grant_types':['refresh_token'],
+ 'token_endpoint_auth_method':'private_key_jwt'
+ };

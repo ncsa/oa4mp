@@ -185,6 +185,18 @@ public abstract class AbstractClientLoader<T extends ClientEnvironment> extends 
         return checkURI(baseUri + (baseUri.endsWith("/") ? "" : "/") + serviceEndpoint, serviceEndpoint);
     }
 
+    /**
+     * Creates the service URI. This takes
+     * <ol>
+     *     <li>The tag in the configuration file</li>
+     *     <li>The default endpoint name (used to construct error messages)</li>
+     *     <li>The key in the well-known page to get the value from.</li>
+     * </ol>
+     * @param foundURI
+     * @param endpoint
+     * @param wellKnownEntry
+     * @return
+     */
     protected URI createServiceURI(String foundURI, String endpoint, String wellKnownEntry) {
         if (!trivial(foundURI)) {
             return checkURI(foundURI, wellKnownEntry);
@@ -194,7 +206,6 @@ public abstract class AbstractClientLoader<T extends ClientEnvironment> extends 
         }
         // failing that, try to construct it
         if (trivial(getServiceURI())) {
-            //   throw new MyConfigurationException("Error: No base uri for " + endpoint + " found");
             return null;
         }
         return checkURI(getServiceURI() + "/" + endpoint, endpoint);
@@ -299,27 +310,17 @@ public abstract class AbstractClientLoader<T extends ClientEnvironment> extends 
         return createServiceURIOLD(x, getServiceURI(), ASSET_ENDPOINT);
     }
 
+    public URI getIssuer(){
+        return createServiceURI(getCfgValue(ISSUER_URI),
+                OIDCDiscoveryTags.ISSUER,
+                OIDCDiscoveryTags.ISSUER);
+    }
     public URI getAuthorizeURI() {
-/*
-        String x = getCfgValue(ClientXMLTags.AUTHORIZE_TOKEN_URI);
-        if(isTrivial(x)){
-            return URI.create(getWellKnownValue(OIDCDiscoveryTags.AUTHORIZATION_ENDPOINT));
-        }
-        checkProtocol(x);
-*/
         return createServiceURI(getCfgValue(ClientXMLTags.AUTHORIZE_TOKEN_URI),
                 OIDCDiscoveryTags.AUTHORIZATION_ENDPOINT_DEFAULT,
                 OIDCDiscoveryTags.AUTHORIZATION_ENDPOINT);
-        //return createServiceURI(x, getBaseURI(), AUTHORIZE_ENDPOINT);
     }
 
-    // The next endpoint was used in OAuth 1.a0 and is retired in OAuth 2
-/*    protected URI getInitiateURI() {
-        // non-standard
-        String x = getCfgValue(ClientXMLTags.INITIATE_URI);
-        checkProtocol(x);
-        return createServiceURIOLD(x, getBaseURI(), INITIATE_ENDPOINT);
-    }*/
 
     T loader = null;
 

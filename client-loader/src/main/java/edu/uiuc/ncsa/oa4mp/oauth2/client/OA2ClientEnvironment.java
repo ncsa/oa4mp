@@ -44,6 +44,7 @@ public class OA2ClientEnvironment extends ClientEnvironment {
                                 boolean showIDToken,
                                 boolean useBasicAuth,
                                 URI deviceAuthorizationUri,
+                                URI issuer,
                                 MetaDebugUtil metaDebugUtil,
                                 String kid,
                                 JSONWebKeys jwks) {
@@ -65,6 +66,7 @@ public class OA2ClientEnvironment extends ClientEnvironment {
         this.useBasicAuth = useBasicAuth;
         this.deviceAuthorizationUri = deviceAuthorizationUri;
         this.metaDebugUtil = metaDebugUtil;
+        this.issuer = issuer;
     }
 
     public OA2ClientEnvironment(MyLoggingFacade logger, Map<String, String> constants,
@@ -97,6 +99,7 @@ public class OA2ClientEnvironment extends ClientEnvironment {
                                 boolean useBasicAuth,
                                 Map<String, List<String>> additionalParameters,
                                 URI deviceAuthorizationUri,
+                                URI issuer,
                                 MetaDebugUtil metaDebugUtil) {
         super(logger,
                 constants,
@@ -134,9 +137,18 @@ public class OA2ClientEnvironment extends ClientEnvironment {
         this.additionalParameters = additionalParameters;
         this.deviceAuthorizationUri = deviceAuthorizationUri;
         this.metaDebugUtil = metaDebugUtil;
+        this.issuer = issuer;
     }
 
+    public URI getIssuer() {
+        return issuer;
+    }
 
+    public void setIssuer(URI issuer) {
+        this.issuer = issuer;
+    }
+
+    URI issuer;
 
     public URI getDeviceAuthorizationUri() {
         return deviceAuthorizationUri;

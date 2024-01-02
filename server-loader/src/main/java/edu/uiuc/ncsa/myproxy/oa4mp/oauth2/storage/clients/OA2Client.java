@@ -269,7 +269,7 @@ public class OA2Client extends Client implements OA2ClientScopes {
      * @return
      */
     public boolean isRTLifetimeEnabled() {
-        return 0 < rtLifetime;
+        return 0 != rtLifetime;
     }
 
     public boolean useServerDefaultRTLifetime(){

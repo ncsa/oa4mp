@@ -54,11 +54,12 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
     }
 
     public ATServer2(ServiceClient serviceClient,
+                     URI issuer,
                      String wellKnown,
                      boolean oidcEnabled,
                      long expiresIn,
                      boolean useBasicAuth) {
-        super(serviceClient, wellKnown, oidcEnabled);
+        super(serviceClient, issuer, wellKnown, oidcEnabled);
         this.useBasicAuth = useBasicAuth;
     }
 

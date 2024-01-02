@@ -33,6 +33,11 @@ public abstract class TokenAwareServer extends ASImpl {
     boolean clientOIDCEnabled = false;
 
     ServiceClient serviceClient;
+    URI issuer;
+    URI getIssuer(){
+        return issuer;
+    }
+
 
     public ServiceClient getServiceClient() {
         return serviceClient;
@@ -40,6 +45,7 @@ public abstract class TokenAwareServer extends ASImpl {
 
 
     public TokenAwareServer(ServiceClient serviceClient,
+                            URI issuer,
                             String wellKnown,
                             boolean serverOIDCEnabled
                             ) {
@@ -48,6 +54,7 @@ public abstract class TokenAwareServer extends ASImpl {
         this.wellKnown = wellKnown;
         this.serverOIDCEnabled = serverOIDCEnabled;
         this.tokenEndpoint = serviceClient.host();
+        this.issuer = issuer;
     }
 
     String wellKnown = null;
@@ -125,11 +132,17 @@ public abstract class TokenAwareServer extends ASImpl {
 
         try {
             URL host = getAddress().toURL();
+
             URL remoteHost = new URL(claims.getString(ISSUER));
-            if (!host.getProtocol().equals(remoteHost.getProtocol()) ||
-                    !host.getHost().equals(remoteHost.getHost()) ||
-                    host.getPort() != remoteHost.getPort()) {
-                throw new GeneralException(" ID Token issuer is incorrect. Got \"" + remoteHost + "\", expected \"" + host + "\"");
+            if(!remoteHost.equals(getIssuer().toURL())){
+                // ok something is off -- port specified? pick it a part a bit more, but
+                // don't sweat it too much
+                if (!host.getProtocol().equals(remoteHost.getProtocol()) ||
+                        !host.getHost().equals(remoteHost.getHost()) ||
+                        !remoteHost.equals(getIssuer().toURL()) ||
+                        host.getPort() != remoteHost.getPort()) {
+                    throw new GeneralException(" ID Token issuer is incorrect. Got \"" + remoteHost + "\", expected \"" + host + "\"");
+                }
             }
         } catch (MalformedURLException e) {
             e.printStackTrace();

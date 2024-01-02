@@ -27,6 +27,7 @@ public interface ClientXMLTags extends StorageConfigurationTags{
 
     public static final String ACCESS_TOKEN_URI = "accessTokenUri";
     public static final String ASSET_URI = "assetUri";
+    public static final String ISSUER_URI = "issuerUri";
     public static final String AUTHORIZE_TOKEN_URI = "authorizeUri";
     public static final String BASE_URI = "serviceUri";
     public static final String DEVICE_AUTHORIZATION_URI = "deviceAuthorizationUri";

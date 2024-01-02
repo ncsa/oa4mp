@@ -26,6 +26,7 @@ OA4MP_ROOT=$NCSA_DEV_INPUT/oa4mp
 OA4MP_CLIENT_DEPLOY=$NCSA_DEV_OUTPUT/oa4mp
 OA4MP_SERVER_DEPLOY=$NCSA_DEV_OUTPUT/oa4mp
 
+
 if [ ! -d "$OA4MP_ROOT" ]
   then
      echo "$OA4MP_ROOT does not exist. No sources,  exiting.."
@@ -72,6 +73,9 @@ cp $OA4MP_ROOT/client-oauth2/target/client2.war $OA4MP_CLIENT_DEPLOY
 cp $OA4MP_ROOT/client-oauth2/src/main/resources/*.sql $OA4MP_CLIENT_DEPLOY
 cp $OA4MP_ROOT/oa4mp-server-oauth2/target/oauth2.war  $OA4MP_SERVER_DEPLOY
 
+QDL_OA2_TOOLS=$OA4MP_ROOT/qdl
+
+
 echo "building OA4MP tools..."
 cd $OA2_TOOLS
 mvn -P cli package > cli.log
@@ -80,11 +84,11 @@ if [[ $? -ne 0 ]] ; then
     exit 1
 fi
 
-mvn -P client package > client.log
-if [[ $? -ne 0 ]] ; then
-    echo "could not build client, see client.log"
-    exit 1
-fi
+#mvn -P client package > client.log
+#if [[ $? -ne 0 ]] ; then
+#    echo "could not build client, see client.log"
+#    exit 1
+#fi
 
 mvn -P jwt package > jwt.log
 if [[ $? -ne 0 ]] ; then
@@ -95,10 +99,19 @@ fi
 cd $OA2_TOOLS/target
 echo "deploying OA4MP tools..."
 
-
 cp cli-jar-with-dependencies.jar $OA4MP_SERVER_DEPLOY/cli.jar
-cp clc-jar-with-dependencies.jar $OA4MP_SERVER_DEPLOY/clc.jar
 cp jwt-jar-with-dependencies.jar $OA4MP_SERVER_DEPLOY/jwt.jar
+
+echo "building QDL OA4MP tools..."
+cd $QDL_OA2_TOOLS
+mvn -P client package > clc.log
+if [[ $? -ne 0 ]] ; then
+    echo "could not build cli, see cli/log"
+    exit 1
+fi
+cd target
+cp clc-jar-with-dependencies.jar $OA4MP_SERVER_DEPLOY/clc.jar
+
 
 cd $OA2_TOOLS/src/main/resources
 cp *.sql $OA4MP_SERVER_DEPLOY

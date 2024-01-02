@@ -15,6 +15,7 @@ public interface OA2ConfigTags {
     public String MAX_AUTH_GRANT_LIFETIME = "maxAuthorizationGrantLifetime"; // in seconds, convert to ms.
     public String ACCESS_TOKEN_LIFETIME = "accessTokenLifetime"; // (old) default in seconds, convert to ms.
     public String DEFAULT_ACCESS_TOKEN_LIFETIME = "defaultAccessTokenLifetime"; // in seconds, convert to ms.
+    public String DEFAULT_REFRESH_TOKEN_LIFETIME = "defaultRefreshTokenLifetime"; // in seconds, convert to ms.
     public String MAX_ACCESS_TOKEN_LIFETIME = "maxAccessTokenLifetime"; // in seconds, convert to ms.
     public String DEFAULT_ID_TOKEN_LIFETIME = "defaultIDTokenLifetime"; // in seconds, convert to ms.
     public String MAX_ID_TOKEN_LFIFETIME = "maxIDTokenLifetime"; // in seconds, convert to ms.

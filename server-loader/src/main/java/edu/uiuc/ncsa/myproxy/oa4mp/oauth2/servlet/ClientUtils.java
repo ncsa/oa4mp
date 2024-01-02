@@ -64,7 +64,8 @@ public class ClientUtils {
             throw new NFWException("the server-wide default for the access token lifetime has not been set.");
         }
         return computeTokenLifetime(oa2SE.getMaxATLifetime(),
-                OA2ConfigurationLoader.ACCESS_TOKEN_LIFETIME_DEFAULT,
+                oa2SE.getAccessTokenLifetime(),
+                //OA2ConfigurationLoader.ACCESS_TOKEN_LIFETIME_DEFAULT,
                 client.getAtLifetime(),
                 client.getMaxATLifetime(),
                 client.getAccessTokensConfig(),
@@ -150,7 +151,8 @@ public class ClientUtils {
             throw new NFWException("the server-wide default for the IDToken token lifetime has not been set.");
         }
         return computeTokenLifetime(oa2SE.getMaxIdTokenLifetime(),
-                OA2ConfigurationLoader.ID_TOKEN_LIFETIME_DEFAULT,
+                oa2SE.getIdTokenLifetime(),
+                //OA2ConfigurationLoader.ID_TOKEN_LIFETIME_DEFAULT,
                 client.getIdTokenLifetime(),
                 client.getMaxIDTLifetime(),
                 client.getIDTokenConfig(),
@@ -224,7 +226,8 @@ public class ClientUtils {
         }
 
         return computeTokenLifetime(oa2SE.getMaxRTLifetime(),
-                OA2ConfigurationLoader.REFRESH_TOKEN_LIFETIME_DEFAULT,
+                oa2SE.getRefreshTokenLifetime(),
+                //OA2ConfigurationLoader.REFRESH_TOKEN_LIFETIME_DEFAULT,
                 client.getRtLifetime(),
                 client.getMaxRTLifetime(),
                 client.getRefreshTokensConfig(),

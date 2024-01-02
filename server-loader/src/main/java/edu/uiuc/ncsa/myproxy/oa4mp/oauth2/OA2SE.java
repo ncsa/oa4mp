@@ -44,8 +44,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
-import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader.ACCESS_TOKEN_LIFETIME_DEFAULT;
-import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader.AUTHORIZATION_GRANT_LIFETIME_DEFAULT;
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader.*;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -64,6 +63,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  long maxIDTokenLifetime,
                  long maxATLifetime,
                  long atLifetime,
+                 long rtLifetime,
                  long maxRTLifetime,
                  Provider<ClientApprovalStore> casp,
                  List<MyProxyFacadeProvider> mfp,
@@ -197,6 +197,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
     }
 
     boolean cleanupFailOnErrors;
+
     public UUCConfiguration getUucConfiguration() {
         return uucConfiguration;
     }
@@ -280,12 +281,14 @@ public class OA2SE extends ServiceEnvironmentImpl {
         return cleanupInterval;
     }
 
-    public boolean hasMonitorAlarams(){
+    public boolean hasMonitorAlarams() {
         return monitorAlarms != null && !monitorAlarms.isEmpty();
     }
-    public boolean hasMonitorInterval(){
+
+    public boolean hasMonitorInterval() {
         return 0 < monitorInterval;
     }
+
     long cleanupInterval = -1;
 
     public RFC8628ServletConfig getRfc8628ServletConfig() {
@@ -452,6 +455,11 @@ public class OA2SE extends ServiceEnvironmentImpl {
         return maxIdTokenLifetime;
     }
 
+    /**
+     * Get the configured default ID token lifetime for the server
+     *
+     * @return
+     */
     public long getIdTokenLifetime() {
         return idTokenLifetime;
     }
@@ -469,16 +477,6 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.refreshTokenEnabled = refreshTokenEnabled;
     }
 
-
-    /**
-     * The default if nothing is specified is 15 days.
-     *
-     * @return
-     * @deprecated This was badly named. Use {@link #getMaxRTLifetime()}
-     */
-    public long getRefreshTokenLifetime() {
-        return getMaxRTLifetime();
-    }
 
     int clientSecretLength = 64; // default in spec. see OAUTH-215
 
@@ -539,6 +537,11 @@ public class OA2SE extends ServiceEnvironmentImpl {
 
     long accessTokenLifetime = ACCESS_TOKEN_LIFETIME_DEFAULT;
 
+    /**
+     * Get the configured default access token lifetime for the server
+     *
+     * @return
+     */
     public long getAccessTokenLifetime() {
         return accessTokenLifetime;
     }
@@ -546,6 +549,22 @@ public class OA2SE extends ServiceEnvironmentImpl {
     public void setAccessTokenLifetime(long accessTokenLifetime) {
         this.accessTokenLifetime = accessTokenLifetime;
     }
+
+    public void setRefreshTokenLifetime(long refreshTokenLifetime) {
+        this.refreshTokenLifetime = refreshTokenLifetime;
+    }
+
+    long refreshTokenLifetime = REFRESH_TOKEN_LIFETIME_DEFAULT;
+
+    /**
+     * Get the configured default refresh token lifetime for the server
+     *
+     * @return
+     */
+    public long getRefreshTokenLifetime() {
+        return refreshTokenLifetime;
+    }
+
 
     // This is a nod towards allowing device flow clients to set their df lifetimes.
     // not used yet.

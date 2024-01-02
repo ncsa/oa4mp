@@ -319,7 +319,7 @@ public class JWKCLI extends ConfigurableCommandsImpl {
     @Override
     protected ConfigurationLoader<? extends AbstractEnvironment> figureOutLoader(String fileName, String configName) throws Throwable {
         ConfigLoaderTool configLoaderTool = new ConfigLoaderTool();
-        return configLoaderTool.figureOutLoader(fileName, configName, getComponentName());
+        return configLoaderTool.figureOutClientLoader(fileName, configName, getComponentName());
     }
 }
 

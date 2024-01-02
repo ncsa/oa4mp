@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC7662Constants;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
 
+import java.net.URI;
 import java.util.HashMap;
 
 /**
@@ -16,9 +17,10 @@ import java.util.HashMap;
  */
 public class RFC7009Server2 extends TokenAwareServer implements RFC7009Server, RFC7662Constants {
     public RFC7009Server2(ServiceClient serviceClient,
+                          URI issuer,
                           String wellKnown,
                           boolean oidcEnabled) {
-        super(serviceClient, wellKnown, oidcEnabled);
+        super(serviceClient, issuer, wellKnown, oidcEnabled);
     }
 
     @Override

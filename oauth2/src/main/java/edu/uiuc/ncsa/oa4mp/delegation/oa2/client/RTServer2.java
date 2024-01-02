@@ -24,8 +24,11 @@ import java.util.HashMap;
  */
 public class RTServer2 extends TokenAwareServer implements RTServer {
 
-    public RTServer2(ServiceClient serviceClient, String wellknown, boolean oidcEnabled) {
-        super(serviceClient, wellknown, oidcEnabled);
+    public RTServer2(ServiceClient serviceClient,
+                     URI issuer,
+                     String wellknown,
+                     boolean oidcEnabled) {
+        super(serviceClient, issuer, wellknown, oidcEnabled);
     }
 
     @Override

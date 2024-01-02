@@ -5,13 +5,6 @@ path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tes
 script_path(path ~ script_path());
 
 test.:=(path + '/cm-tests/auto/tests/') + ['basic.qdl'];
-say('**** Flow test suite for OA4MP. ****');
-say('This will do several local tests for various modes of operation.');
-say('In each case, read carefully what is on the screen and do what it says.');
-say('Have your browser handy, since you will need to log in with the requested IDP repeatedly. ');
-say('This suite does take a bit to run, but it is quite a thorough test. If testing for an OA4MP release,');
-say('all tests MUST pass');
-say('There are also client management tests in the cm-tests directory to run');
-say('as well as tests for ersatz clients in the ersatz  directory.');
-say('****\n');
+
+say('**** Automated test suite for OA4MP. ****');
 script_load('runner.qdl', test.);

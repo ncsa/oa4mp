@@ -189,6 +189,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     getMaxIDTokenLifetime(),
                     getMaxATLifetime(),
                     getATLifetime(),
+                    getRTLifetime(),
                     getMaxRTLifetime(),
                     getClientApprovalStoreProvider(),
                     getMyProxyFacadeProvider(),
@@ -1153,7 +1154,27 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         }
         return atLifetime;
     }
-
+    // fixes https://github.com/ncsa/oa4mp/issues/152
+        long rtLifetime =-1L;
+    protected long getRTLifetime() {
+        if (rtLifetime < 0) {
+            String x = getFirstAttribute(cn, DEFAULT_REFRESH_TOKEN_LIFETIME);
+            if (isTrivial(x)) {
+                // Old way
+                x = getFirstAttribute(cn, REFRESH_TOKEN_LIFETIME);
+            }
+            if (isTrivial(x)) {
+                rtLifetime = REFRESH_TOKEN_LIFETIME_DEFAULT;
+            } else {
+                try {
+                    rtLifetime = XMLConfigUtil.getValueSecsOrMillis(x, true);
+                } catch (Throwable t) {
+                    rtLifetime = REFRESH_TOKEN_LIFETIME_DEFAULT;
+                }
+            }
+        }
+        return rtLifetime;
+    }
     long maxAGLifetime = -1L;
 
     public long getMaxAGLifetime() {

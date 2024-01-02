@@ -71,4 +71,6 @@ public interface ClientLoaderInterface<T extends ClientEnvironment> extends Conf
     long getMaxAssetLifetime();
 
     URI getRFC7662Endpoint();
+
+    URI getIssuer();
 }

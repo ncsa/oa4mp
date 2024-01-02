@@ -1,0 +1,6 @@
+/*
+   Most basic public client. Has refresh token grant in it.
+*/
+{'token_endpoint_auth_method':'none' // makes it a public client
+ };
+

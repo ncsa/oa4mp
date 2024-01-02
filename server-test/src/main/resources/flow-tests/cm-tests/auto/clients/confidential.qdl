@@ -1,0 +1,6 @@
+/*
+   Most basic confidential client. Web keys will be added at creation time.
+*/
+{
+ 'token_endpoint_auth_method':'private_key_jwt'
+ };

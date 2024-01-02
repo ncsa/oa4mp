@@ -102,17 +102,18 @@ public abstract class OA2ClientLoaderImpl<T extends OA2ClientEnvironment> implem
                     //return new DS2(new AGServer2(createServiceClient(getAuthzURI())), // as per spec, request for AG comes through authz endpoint.
                     return new DS2(new AGServer2(createServiceClient(getAuthorizeURI())), // as per spec, request for AG comes through authz endpoint.
                             new ATServer2(createServiceClient(getAccessTokenURI()),
+                                    getIssuer(),
                                     getWellKnownURI(),
                                     isOIDCEnabled(),
                                     getMaxAssetLifetime(),
                                     false), // use basic auth deprecated and always false.
                             new PAServer2(createServiceClient(getAssetURI())),
                             new UIServer2(createServiceClient(getUIURI())),
-                            new RTServer2(createServiceClient(getAccessTokenURI()), getWellKnownURI(), isOIDCEnabled()), // as per spec, refresh token server is at same endpoint as access token server.
-                            new RFC7009Server2(createServiceClient(getRFC7009Endpoint()), getWellKnownURI(), isOIDCEnabled()),
-                            new RFC7662Server2(createServiceClient(getRFC7662Endpoint()), getWellKnownURI(), isOIDCEnabled()),
-                            new RFC7523Server(createServiceClient(getAccessTokenURI()), getWellKnownURI(), isOIDCEnabled()),
-                            new RFC8623Server(createServiceClient(getDeviceAuthorizationURI()), getWellKnownURI(), isOIDCEnabled())
+                            new RTServer2(createServiceClient(getAccessTokenURI()), getIssuer(), getWellKnownURI(), isOIDCEnabled()), // as per spec, refresh token server is at same endpoint as access token server.
+                            new RFC7009Server2(createServiceClient(getRFC7009Endpoint()), getIssuer(), getWellKnownURI(), isOIDCEnabled()),
+                            new RFC7662Server2(createServiceClient(getRFC7662Endpoint()), getIssuer(), getWellKnownURI(), isOIDCEnabled()),
+                            new RFC7523Server(createServiceClient(getAccessTokenURI()), getIssuer(), getWellKnownURI(), isOIDCEnabled()),
+                            new RFC8623Server(createServiceClient(getDeviceAuthorizationURI()), getIssuer(), getWellKnownURI(), isOIDCEnabled())
                     );
                 }
             };

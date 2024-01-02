@@ -1272,6 +1272,12 @@ public class CLC implements QDLModuleMetaClass {
 
     @Override
     public JSONObject serializeToJSON() {
+        if(clcCommands == null){
+            // nothing to serialize since it has not been initialized yet
+            // But this might be called when it is first gotten from the symbol
+            // table.
+            return new JSONObject();
+        }
         return clcCommands.toJSON();
     }
 

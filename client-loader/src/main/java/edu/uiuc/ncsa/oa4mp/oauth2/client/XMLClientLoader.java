@@ -174,4 +174,8 @@ public class XMLClientLoader<T extends OA2ClientEnvironment> implements ClientLo
         return getOldLoader().getConstants();
     }
 
+    @Override
+    public URI getIssuer() {
+        return getOldLoader().getIssuer();
+    }
 }

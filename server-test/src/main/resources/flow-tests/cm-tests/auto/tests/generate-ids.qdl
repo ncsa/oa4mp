@@ -1,0 +1,38 @@
+#! /usr/bin/env -S qdl-run
+conf:='conf';
+public:='public';
+oauth:='oauth';
+oidc:='oidc';
+ersatz:='ersatz';
+overrides. := ['none', 'client', 'template', 'qdl', 'parameter'];
+at_type.:=['basic','rfc9068','scitoken','wlcg'];
+id_type.:=['none','jwt'];
+rt_type.:=['none','basic','jwt'];
+cfg.:=['qdl','template','mixed'];
+caput:='auth-test:';
+template.:=[{'aud':'https://localhost/fermilab',
+             'paths':[{'op':'read', 'path':'/home/${sub}'},
+                      {'op':'x.y', 'path':'/abc/def'},
+                      {'op':'write', 'path':'/data/${sub}/cluster'}]}];
+
+
+qdl.'at':={'load':'process-xas.qdl', 'xmd':{'exec_phase':['post_token','post_refresh','post_exchange']}};
+qdl.'id':={'load':'process-xas.qdl', 'xmd':{'exec_phase':['post_auth','post_user_info']}};
+qdl:'rt'={'load':'process-xas.qdl', 'xmd':{'exec_phase':['post_token','post_refresh','post_exchange']}}
+
+token_create(caput,types.,cfg.)->local[
+clone(x.)->interpret(input_form(x.));
+   z.:=[];
+   i := 0;
+  t. := clone(types.);
+  excise(t., 'none'); // don't do basic case
+  while[a∈t.][
+    while[b∈cfg.][
+      z.(i++):=caput + '=' + a + '&' + caput + '=' + b;
+    ]; //end list 2
+  ]; // list 1
+  return(z.);
+];
+
+
+print(token_create('id',id_type.,cfg.));

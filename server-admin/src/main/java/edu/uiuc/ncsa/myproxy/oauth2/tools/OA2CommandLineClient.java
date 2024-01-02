@@ -1,7 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oauth2.tools;
 
 import edu.uiuc.ncsa.myproxy.oauth2.base.CommandLineClient;
-import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import edu.uiuc.ncsa.security.core.util.LoggingConfigLoader;
@@ -64,16 +63,27 @@ public class OA2CommandLineClient extends CommandLineClient {
 
     public static void main(String[] args) {
         try {
-            OA2CommandLineClient testCommands = getInstance();
-            testCommands.start(args);
-            OA2CLCCommands usc = new OA2CLCCommands(testCommands.getMyLogger(), testCommands);
-            usc.setConfigFile(testCommands.getConfigFile());
-            CLIDriver cli = new CLIDriver(usc);
-            usc.bootMessage();
-            cli.start();
+            runnit(args, getInstance());
         } catch (Throwable e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Does all the actual work of running this once it gets the right command line client
+     * instance.
+     * @param args
+     * @param clc
+     * @throws Throwable
+     */
+    protected static void runnit(String[] args, OA2CommandLineClient clc) throws Throwable {
+        clc.start(args);
+        OA2CLCCommands usc = new OA2CLCCommands(clc.getMyLogger(), clc);
+        usc.setConfigFile(clc.getConfigFile());
+        CLIDriver cli = new CLIDriver(usc);
+        usc.bootMessage();
+        cli.start();
+
     }
 
     @Override
@@ -88,15 +98,19 @@ public class OA2CommandLineClient extends CommandLineClient {
         about();
         try {
             initialize();
-        } catch (MyConfigurationException mc) {
-            say("Could not load the configuration:\"" + mc.getMessage() + "\"");
+        } catch (Throwable mc) {
+            Throwable t = mc;
+            if(mc.getCause()!=null){
+                t = mc.getCause();
+            }
+            say("Could not load the configuration:\"" + t.getMessage() + "\"");
         }
     }
 
     @Override
-    protected ConfigurationLoader<? extends AbstractEnvironment> figureOutLoader(String fileName, String configName) throws Throwable{
+    protected ConfigurationLoader<? extends AbstractEnvironment> figureOutLoader(String fileName, String configName) throws Throwable {
         ConfigLoaderTool configLoaderTool = new ConfigLoaderTool();
-        return configLoaderTool.figureOutLoader(fileName, configName, getComponentName());
+        return configLoaderTool.figureOutClientLoader(fileName, configName, getComponentName());
     }
 
     public void about() {

@@ -31,7 +31,7 @@ import java.net.URI;
 import java.util.*;
 import java.util.logging.Level;
 
-import static edu.uiuc.ncsa.myproxy.oa4mp.client.ClientXMLTags.ASSET_STORE;
+import static edu.uiuc.ncsa.myproxy.oa4mp.client.ClientXMLTags.*;
 import static edu.uiuc.ncsa.myproxy.oa4mp.client.ClientXMLTags.CERT_LIFETIME;
 import static edu.uiuc.ncsa.myproxy.oa4mp.client.loader.AbstractClientLoader.defaultCertLifetime;
 import static edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants.*;
@@ -529,6 +529,19 @@ public class QDLConfigLoader<T extends OA2ClientEnvironment> extends OA2ClientLo
         return 0;
     }
 
+    URI issuer = null;
+
+    @Override
+    public URI getIssuer() {
+        if(issuer == null){
+            issuer = createServiceURI(getEndpoint(ISSUER_URI),
+                    OIDCDiscoveryTags.ISSUER,
+                    OIDCDiscoveryTags.ISSUER);
+
+        }
+        return issuer;
+    }
+
     Long maxAssetLiftime = null;
 
     @Override
@@ -599,6 +612,7 @@ public class QDLConfigLoader<T extends OA2ClientEnvironment> extends OA2ClientLo
                 false,
                 getAdditionalParameters(),
                 getDeviceAuthorizationURI(),
+                getIssuer(),
                 getDebugger()
         );
     }

@@ -51,7 +51,7 @@ public class OA2Commands extends BaseCommands {
         return "oa4mp>";
     }
 
-    ConfigurationLoader<? extends AbstractEnvironment> loader = null;
+    protected ConfigurationLoader<? extends AbstractEnvironment> loader = null;
     @Override
     public ConfigurationLoader<? extends AbstractEnvironment> getLoader() {
         if(loader == null) {
@@ -264,6 +264,6 @@ public class OA2Commands extends BaseCommands {
     @Override
     protected ConfigurationLoader<? extends AbstractEnvironment> figureOutLoader(String fileName, String configName) throws Throwable {
         ConfigLoaderTool configLoaderTool= new ConfigLoaderTool();
-        return configLoaderTool.figureOutLoader(fileName, configName, getComponentName());
+        return configLoaderTool.figureOutServerLoader(fileName, configName, getComponentName());
     }
 }
