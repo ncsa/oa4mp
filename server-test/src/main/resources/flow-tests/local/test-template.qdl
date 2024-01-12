@@ -76,10 +76,10 @@ s. := tokenize(at.'scope', ' ');
 ⊨ tokens.'refresh_token'.'lifetime' == 3600000 : 'wrong refresh token lifetime #1';
 ⊨ rt.'iss' == 'https://refresh.cilogon.org' : 'wrong refresh token issuer';
 
-⊨ claims().'aud' == cfg.'id' : 'wrong audience';  // Audience is a little different than usual.
-⊨ claims().'sub' == user_id: 'wrong user id';
+⊨clc#claims().'aud' == cfg.'id' : 'wrong audience';  // Audience is a little different than usual.
+⊨clc#claims().'sub' == user_id: 'wrong user id';
 
-tokens. := refresh();
+tokens. :=clc#refresh();
 at. := tokens.'access_token'.'jwt';
 rt. := tokens.'refresh_token'.'jwt';
 ⊨ 'x.z'== at.'scope' : 'Wrong scopes in access token. Expected only x.z and got ' + at.'scope';
@@ -90,7 +90,7 @@ rt. := tokens.'refresh_token'.'jwt';
 
 // now to test the exchange
 
-tokens. := exchange();
+tokens. :=clc#exchange();
 at. := tokens.'access_token'.'jwt';
 s. := tokenize(at.'scope', ' ');
 /*
@@ -104,7 +104,7 @@ s. := tokenize(at.'scope', ' ');
 ⊨ at.'iss' == 'https://access.cilogon.org' : 'wrong access token issuer';
 ⊨ at.'aud' == 'https://wlcg.cern.ch/jwt/v1/access' : 'wrong access token audience';
 
-tokens. := exchange('-rt');
+tokens. :=clc#exchange('-rt');
 rt. := tokens.'refresh_token'.'jwt';
 ⊨ tokens.'refresh_token'.'lifetime' == 3600000 : 'wrong refresh token lifetime #3';
 

@@ -15,7 +15,7 @@ if[rc!='ok'][return(rc);];
 
 tokens. := null;
 try[
-  tokens. := access(); // fails.
+  tokens. := clc#access(); // fails.
 ]catch[
  // The exception is an OAuth 2 one, hence the error message is the entire
  // JSON payload as a string. Convert this to a stem and test it.

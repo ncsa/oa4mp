@@ -6,6 +6,7 @@ cm_local - Jeff's local box
   cm_dev - the DEV box
  cm_test - test TEST box
 
+(These are section names in the ini file, /home/ncsa/dev/csd/config/ini/cm-test.ini)
 Each of which has a specific configuration it will use. Invoke this script like
 
 ./all.qdl - runs local tests

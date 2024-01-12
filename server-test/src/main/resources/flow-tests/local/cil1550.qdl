@@ -18,6 +18,6 @@ if[rc!='ok'][return(rc);];
 tokens. := clc#access();
 ⊨ tokens.'access_token'.'lifetime' == 900000 : 'wrong access token lifetime';
 ⊨ tokens.'refresh_token'.'lifetime' == 2592000000 : 'wrong refresh token lifetime, got ' + (tokens.'refresh_token'.'lifetime');
-⊨ claims().'aud' == 'test:cil1550' : 'wrong audience';  // Audience is a little different than usual.
-⊨ claims().'eppn' == 'jgaynor@ncsa.illinois.edu' : 'wrong eppn';
+⊨ clc#claims().'aud' == 'test:cil1550' : 'wrong audience';  // Audience is a little different than usual.
+⊨ clc#claims().'eppn' == 'jgaynor@ncsa.illinois.edu' : 'wrong eppn';
 say('CIL1550 (serialization of claims sources) test: ok');

@@ -1,7 +1,9 @@
 //q := module_load('edu.uiuc.ncsa.qdl.extensions.http.QDLHTTPLoader','java');
 //q := module_import(q);
-/*http := j_load('http');
-use('/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/utils/cm.mdl');*/
+/*
+http := j_load('http');
+use('/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/utils/cm.mdl');
+*/
 //bearer_token(id, secret)-> encode(encode(id,1) + ':' + encode(secret,1)); // bearer token
 // Note that reloading the http module closes the connection then reopens at ea
 

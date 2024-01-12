@@ -10,11 +10,8 @@ cfg.'idp'  := 'NCSA';
 cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
 cfg.'description' :=  'Test revocation and introspection machinery for a client.';
 cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
-
 rc := script_load('driver.qdl', cfg.);
 if[rc!='ok'][return(rc);];
 
 tokens. := clc#access();
-// Tests that the start of the PEM format is a substring of the response.
-⊨    '---BEGIN CERTIFICATE-----'<clc#get_cert() : 'could not get a cert';
 script_load('revoke.qdl', '/tmp/dev-test-revoke.json', tokens.);

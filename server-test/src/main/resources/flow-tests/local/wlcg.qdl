@@ -99,15 +99,15 @@ tokens. := clc#access();
 claims. := clc#claims();
 
 test(tokens., claims., expected_token_scopes., user_id);
-issued_at := claims().'iat';
+issued_at :=clc#claims().'iat';
 tokens. := clc#refresh();
 claims. := clc#claims();
-⊨ issued_at <= claims().'iat' : 'ID token not updated';
+⊨ issued_at <=clc#claims().'iat' : 'ID token not updated';
 test(tokens., claims., expected_token_scopes., user_id);
 
 tokens. := clc#exchange();
 claims. := clc#claims();
-⊨ issued_at <= claims().'iat' : 'ID token not updated';
+⊨ issued_at <=clc#claims().'iat' : 'ID token not updated';
 test(tokens., claims., expected_exchange_scopes., user_id);
 
 say('WLCG test: ok');

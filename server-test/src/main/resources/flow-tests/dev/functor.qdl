@@ -17,11 +17,11 @@ if[rc!='ok'][return(rc);];
 
 tokens. := clc#access();
 
-tokens. := refresh();
+tokens. := clc#refresh();
 ⊨ is_defined(tokens.'refresh_token'): ' missing refresh token';
 ⊨ tokens.'access_token'.'lifetime' == 900000: ' wrong AT lifetime';
 ⊨ tokens.'refresh_token'.'lifetime' == 1000000000: ' wrong RT lifetime';
-claims. := claims();
+claims. := clc#claims();
 ⊨ claims.'aud' == cfg.'id' : 'wrong audience';
 ⊨ claims.'iss' == 'https://dev.cilogon.org' : 'wrong issuer';
 ⊨ claims.'cert_subject_dn' == '/DC=org/DC=cilogon/C=US/O=GitHub/CN=Jeff Gaynor D4620' : 'wrong cert subject DN';

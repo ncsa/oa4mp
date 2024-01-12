@@ -1,0 +1,6 @@
+/*
+   This takes the client from the server and tests it.
+*/
+client. := args().0;
+server_defaults := args().1;
+clc := args().2;

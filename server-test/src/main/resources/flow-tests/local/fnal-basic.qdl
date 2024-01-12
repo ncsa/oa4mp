@@ -5,11 +5,9 @@ cfg.'id'  := 'localhost:test/fnal';
 cfg.'idp'  := 'GitHub';
 cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
 cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
-cfg.'description' :=  'Test FNAL with basic scopes';
+cfg.'description' :=  'Test FNAL with basic scopes. No new scopes uploaded.';
 
 params.'authz' :=  {'scope': 'storage.read:/ wlcg.capabilityset:/duneana wlcg.groups'};
-params.'refresh' :=  {'scope': 'storage.read:/dune storage.create:/dune/scratch/users/cilogontest compute.read compute.cancel compute.modify compute.create storage.read:/dune'};
-params.'exchange' :=  {'scope': 'compute.read compute.cancel compute.modify compute.create'};
 rc := script_load('driver.qdl', cfg., params.);
 if[rc!='ok'][return(rc);];
 
@@ -33,7 +31,7 @@ ss. := tokenize(at.'scope', ' ');
 tokens. := clc#refresh();
 at. := tokens.'access_token'.'jwt';
 rt. := tokens.'refresh_token'.'jwt';
-claims. :=clc#claims();
+claims. := clc#claims();
 ⊨ claims.'iat' != iat : 'id token timestamp did not change. This implies the token is not updating.';
 ⊨ claims.'eppn' == 'cilogontest@fnal.gov' : 'wrong eppn';
 ⊨ is_defined(claims.'wlcg.credkey')  : 'missing wlcg.credkey';

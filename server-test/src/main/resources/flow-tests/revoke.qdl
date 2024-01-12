@@ -16,7 +16,6 @@
    rfc7523 -username jeff
 
 */
-
 temp_file := args().0;
 tokens. := args().1;
   try[
@@ -30,8 +29,8 @@ debugger(1, 'got tokens from RFC7523, wrote state file #0');
 debugger(1, 'at:\n' + print(tokens.'access_token'));
 debugger(1, 'rt:\n' + print(tokens.'refresh_token'));
 rc := false;
-⊨ clc#introspect('-at').'active':'access token not active';
-⊨ clc#introspect('-rt').'active':'refresh token not active';
+⊨ (clc#introspect('-at')).'active':'access token not active';
+⊨ (clc#introspect('-rt')).'active':'refresh token not active';
 // Trick. Keep the original tokens so you can restart the flow -- emulates
 // someone having older tokens that haven't aged.
 // Make sure server is not set to revoke everything asap in refresh endpoint
@@ -43,8 +42,8 @@ debugger(1, 'rt:\n' + print(new_tokens.'refresh_token'));
 
 
 ⊨ clc#revoke('-at'):'token not revoked';
-⊨ !clc#introspect('-at').'active' : 'AT is still active';
-⊨ clc#introspect('-rt').'active' : 'RT is not active (and should be)';
+⊨ !(clc#introspect('-at')).'active' : 'AT is still active';
+⊨ (clc#introspect('-rt')).'active' : 'RT is not active (and should be)';
 try[
 debugger(1, 'Before refresh #2');
  new_tokens. := clc#refresh();
@@ -77,8 +76,8 @@ debugger(1, 'After read #4');
 debugger(1, 'at:\n' + print(new_tokens.'access_token'));
 debugger(1, 'rt:\n' + print(new_tokens.'refresh_token'));
 
-⊨ introspect('-at').'active':'access token not active after state reset';
-⊨ introspect('-rt').'active':'refresh token not active after state reset';
+⊨ clc#introspect('-at').'active':'access token not active after state reset';
+⊨ clc#introspect('-rt').'active':'refresh token not active after state reset';
 tokens. := clc#refresh();
 debugger(1, 'After refresh #5');
 debugger(1, 'at:\n' + print(tokens.'access_token'));
@@ -87,24 +86,24 @@ debugger(1, 'rt:\n' + print(tokens.'refresh_token'));
 // RT tests
 debugger(1, 'Doing exchanges #6');
 
-tt1. := exchange('-rt'); // refresh_token has new RT
-tt2. := exchange('-at', '-subject', 'rt'); // access_token has new RT
+tt1. := clc#exchange('-rt'); // refresh_token has new RT
+tt2. := clc#exchange('-at', '-subject', 'rt'); // access_token has new RT
 tokens.'access_token' := tt2.'access_token';
 tokens.'refresh_token' := tt1.'refresh_token';
 debugger(1, 'at:\n' + print(tokens.'access_token'));
 debugger(1, 'rt:\n' + print(tokens.'refresh_token'));
 //clc#tokens(tokens.);
-⊨ introspect('-rt').'active':'refresh token not active';
-⊨ introspect('-at').'active':'access token not active';
-⊨ revoke('-rt'): 'refresh token not revoked';
-⊨ revoke('-at'): 'access token not revoked';
-⊨ !introspect('-rt').'active':'revoked refresh token active';
-⊨ !introspect('-at').'active':'revoked access token active';
+⊨ clc#introspect('-rt').'active':'refresh token not active';
+⊨ clc#introspect('-at').'active':'access token not active';
+⊨ clc#revoke('-rt'): 'refresh token not revoked';
+⊨ clc#revoke('-at'): 'access token not revoked';
+⊨ !clc#introspect('-rt').'active':'revoked refresh token active';
+⊨ !clc#introspect('-at').'active':'revoked access token active';
 rc := true;
 debugger(1, 'Final exchange #7 (should fail -- no valid tokens)');
 
 try[
-  refresh();
+  clc#refresh();
   rc := false;
 ]catch[
  ];

@@ -41,7 +41,7 @@ at. := tokens.'access_token'.'jwt';
 rt. := tokens.'refresh_token';
 say('at:\n' + print(at.));
 say('rt:\n' + print(rt.));
-idt.:= claims();
+idt.:= clc#claims();
 say('idt:\n' + print(idt.));
 ⊨ idt.'sub' ≡ 'ligorobottesting@ligo.org' : 'wrong ID token subject';
 ⊨ idt.'iss' ≡ 'https://test.cilogon.org/igwn' : 'issuer wrong'; // Check it's in VO

@@ -19,20 +19,22 @@ if[rc!='ok'][return(rc);];
 tokens. := clc#access();
 at. := tokens.'access_token';
 rt. := tokens.'refresh_token';
-⊨ claims().'aud' == cfg.'id' : 'wrong audience';
+claims.:= clc#claims();
+⊨ claims.'aud' == cfg.'id' : 'wrong audience';
 ⊨ at.'lifetime' == 900000 : 'wrong access token lifetime';
 ⊨ rt.'lifetime' == 7200000 : 'wrong refresh token lifetime';
 
-tokens. := refresh();
+tokens. := clc#refresh();
 at. := tokens.'access_token';
 rt. := tokens.'refresh_token';
+claims.:= clc#claims();
 
-⊨ claims().'aud' == cfg.'id' : 'wrong audience';
+⊨ claims.'aud' == cfg.'id' : 'wrong audience';
 ⊨ at.'lifetime' == 900000 : 'wrong access token lifetime';
 ⊨ rt.'lifetime' == 7200000 : 'wrong refresh token lifetime';
 
-at. := exchange().'access_token';
-rt. := exchange('-rt').'refresh_token';
+at. := (clc#exchange()).'access_token';
+rt. := (clc#exchange('-rt')).'refresh_token';
 ⊨ at.'lifetime' == 900000 : 'wrong access token lifetime';
 ⊨ rt.'lifetime' == 7200000 : 'wrong refresh token lifetime';
 

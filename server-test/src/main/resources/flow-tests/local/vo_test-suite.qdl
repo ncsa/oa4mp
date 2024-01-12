@@ -25,7 +25,7 @@ tokens. := clc#access();
 at. := tokens.'access_token'.'jwt';
 rt. := tokens.'access_token'.'jwt';
 
-claims. := claims();
+claims. :=clc#claims();
 
 user := claims.'sub';
 expected_scopes. :=['read:/home/'+user,'write:/data/'+user+'/cluster', 'x.y:/abc/def'];
@@ -47,17 +47,17 @@ define[test(at., rt., user, expected_scopes., issuer)][
    ⊨ rt.'aud' == 'https://localhost/test' : 'wrong rt audience';
 ];
 
-tokens. := refresh();
+tokens. :=clc#refresh();
 at. := tokens.'access_token';
 rt. := tokens.'refresh_token';
 expected_scopes. :=['read:/home/'+user,'write:/data/'+user+'/cluster', 'x.y:/abc/def/ghi'];
 test_lifetime(at., rt.);
 test(at.'jwt', rt.'jwt', user, expected_scopes., issuer);
 
-tokens. := exchange();
+tokens. :=clc#exchange();
 at. := tokens.'access_token';
 
-tokens. := exchange('-rt');
+tokens. :=clc#exchange('-rt');
 rt. := tokens.'refresh_token';
 
 test_lifetime(at., rt.);

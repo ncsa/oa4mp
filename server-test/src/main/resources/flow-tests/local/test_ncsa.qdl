@@ -26,7 +26,7 @@ rc := script_load('driver.qdl', cfg.);
 if[rc!='ok'][return(rc);];
 
 tokens. := clc#access();
-claims. := claims();
+claims. :=clc#claims();
 ⊨ tokens.'access_token'.'lifetime' == 1009000 : 'wrong access token lifetime';
 ⊨ tokens.'refresh_token'.'lifetime' == 950400000 : 'wrong refresh token lifetime';
 ⊨ claims.'aud' == cfg.'id' : 'wrong audience';  // Audience is a little different than usual.
@@ -34,9 +34,9 @@ claims. := claims();
 ⊨ claims.'isMemberOf' << List : 'isMemberOf claim is not a simple list';
 ⊨ claims.'isMemberOf'.0 << String  : ' isMemberOf should be a list';
 issued_at := claims.'iat'; // store for future use.
-tokens. := refresh();
-⊨ issued_at < claims().'iat' : 'id tokens should be issued at different time to show they are different';
-user_info. := user_info();
+tokens. :=clc#refresh();
+⊨ issued_at <clc#claims().'iat' : 'id tokens should be issued at different time to show they are different';
+user_info. :=clc#user_info();
 ⊨ user_info.'isMemberOf' << List : 'isMemberOf claim in user info is not a simple list';
 ⊨ user_info.'isMemberOf'.0 << String  : ' isMemberOf in user info should be a list';
 

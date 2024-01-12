@@ -11,15 +11,15 @@ params. ≔ {'sub':'jeff',
          };
 clc#init('/home/ncsa/dev/csd/config/client-oa2.xml', 'localhost:p1');
 tokens. := clc#rfc7523(params.);
-claims. := claims();
+claims. :=clc#claims();
 // Now go and do the exchanges for rt and at ASAP.
 // If args.0 is true, use access token, otherwise, use refresh token
 /*at. := (args.0?exchange('-at'):exchange('-at', '-x')).'access_token';
 rt. := (args.0?exchange('-rt'):exchange('-rt', '-x')).'refresh_token';
 id. := (args.0?exchange('-id'):exchange('-id', '-x'));*/
-at. := exchange('-at','-subject',args.0?'at':'rt').'access_token';
-rt. := exchange('-rt','-subject',args.0?'at':'rt').'refresh_token';
-id. := exchange('-id','-subject',args.0?'at':'rt');
+at. :=clc#exchange('-at','-subject',args.0?'at':'rt').'access_token';
+rt. :=clc#exchange('-rt','-subject',args.0?'at':'rt').'refresh_token';
+id. :=clc#exchange('-id','-subject',args.0?'at':'rt');
 ⊨ at.'jti' != tokens.'access_token'.'jti' : 'access token not updated';
 ⊨ rt.'jti' != tokens.'refresh_token'.'jti' : 'refresh token not updated';
 
@@ -27,8 +27,8 @@ id. := exchange('-id','-subject',args.0?'at':'rt');
 ⊨ at.'jwt'.'iss' == 'https://localhost:9443/oauth2' : 'wrong access token issuer';
 ⊨ at.'jwt'.'aud' == 'https://wlcg.cern.ch/jwt/v1/access' : 'wrong access token audience';
 ⊨ rt.'lifetime' == 3600000 : 'wrong refresh token lifetime';
-⊨ claims().'sub' == 'jeff' : 'IDT wrong subject';
-⊨ claims().'iss' == 'https://localhost:9443/oauth2' : 'IDT wrong issuer';
-⊨ claims().'aud' == 'localhost:p1' : 'IDT wrong audience';
-⊨ claims().'iat' != claims.'iat' : 'IDT issued at time not updated';
+⊨clc#claims().'sub' == 'jeff' : 'IDT wrong subject';
+⊨clc#claims().'iss' == 'https://localhost:9443/oauth2' : 'IDT wrong issuer';
+⊨clc#claims().'aud' == 'localhost:p1' : 'IDT wrong audience';
+⊨clc#claims().'iat' != claims.'iat' : 'IDT issued at time not updated';
 say('ok: token exchange test using ' + (args.0?'access':'refresh') + ' token for subject');

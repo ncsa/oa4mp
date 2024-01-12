@@ -16,7 +16,7 @@ rc := script_load('driver.qdl', cfg.);
 if[rc!='ok'][return(rc);];
 
 tokens. := clc#access();
-claims. := claims();
+claims. := clc#claims();
 
 ⊨ claims.'aud' == cfg.'id' : 'wrong audience';
 groups. := claims.'isMemberOf';
@@ -25,8 +25,8 @@ groups. := claims.'isMemberOf';
 ⊨ tokens.'access_token'.'lifetime' == 1009000 : 'wrong access token lifetime';
 ⊨ tokens.'refresh_token'.'lifetime' == 1000000 : 'wrong refresh token lifetime';
 
-tokens. := refresh();
-claims. := claims();
+tokens. := clc#refresh();
+claims. := clc#claims();
 ⊨ claims.'aud' == cfg.'id' : 'wrong audience';
 groups. := claims.'isMemberOf';
 ⊨ groups. << List : 'is member of claim is not a group';

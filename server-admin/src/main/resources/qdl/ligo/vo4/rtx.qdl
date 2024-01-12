@@ -10,13 +10,13 @@
  permissions. := resolve_templates(scopes., requested_scopes., false); // Only grant scopes already granted
  trace('IGWN', 'permissions = ' + to_string(permissions.));
  //permissions. := ~mask(permissions., !'write:/staging.*' =~ permissions.);
- permissions. := ~(!'write:/staging/.*|'+robot_caput+'.*'=~permissions.)⌆permissions.
+ permissions. := ~(!'write:/staging/.*|'+robot_caput+'.*'=~permissions.)⌆permissions.; // CIL-1886 fix
  trace('IGWN', 'permissions #2 = ' + to_string(permissions.));
  // CIL-1808
  /*
    alternately , do the loop implicitly, since each element of ζ. is a list.
    pp(x.)->pick((x)->'${'<x, x.);
-    templates. :=~ ⊢⊗pp∀[ζ.]; // apply pp to each element, turn into a set (gets unique values), turn back into a stem
+    templates. :=~ ⊢⊗pp∀[ζ.]; // ap;ply pp to each element, turn into a set (gets unique values), turn back into a stem
 
     or perhaps more directly even
     templates. := ⊗~∀[⊢⊗pp∀[ζ.]]; // apply pp to each element, concatenate all the results.

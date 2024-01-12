@@ -58,6 +58,7 @@ public interface OA2Constants {
     public static String NONCE = "nonce";
     public static String PROMPT = "prompt";
     public static String MAX_AGE = "max_age";
+    public static String AUTH_GRANT_TOKEN_LIFETIME = "auth_grant_lifetime";
     public static String ID_TOKEN_HINT = "id_token_hint";
     public static String ID_TOKEN = "id_token";
     public static String ID_TOKEN_LIFETIME = "id_token_lifetime";

@@ -12,7 +12,10 @@ block[
      // set every time. Remove it if present since these would normally be removed in the access.qdl script.
      SS(y)->say('*** FNAL' +  (is_defined(access_control.)?('[' + access_control.client_id + ']:'):':') + to_string(y));
 
+     SS('scopes.=' + print(scopes.));
      SS('tx_scopes.=' + print(tx_scopes.));
+     SS('tx_audience.=' + print(tx_audience.));
+     SS('tx_resource.=' + print(tx_resource.));
 
      tx_scopes. := ~mask(tx_scopes., starts_with(tx_scopes., CS_HEAD)!= 0) ;
      tx_scopes. := ~mask(tx_scopes., starts_with(tx_scopes., 'wlcg.groups:')!= 0) ;

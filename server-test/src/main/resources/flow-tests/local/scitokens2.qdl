@@ -94,7 +94,7 @@ at. := tokens.'access_token';
 issued_at := at.'ts';
 test(tokens., expected_token_scopes., user_id);
 
-tokens. := refresh();
+tokens. :=clc#refresh();
 ⊨ issued_at <= tokens.'access_token'.'ts' : 'access token timestamp not updated';
 test(tokens., expected_token_scopes., user_id);
 

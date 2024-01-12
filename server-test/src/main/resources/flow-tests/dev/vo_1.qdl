@@ -26,9 +26,9 @@ rt. := tokens.'refresh_token'; // This is not a JWT, but a basic token
 ⊨ at.'aud' == 'https://wlcg.cern.ch/jwt/v1/any' : 'incorrect audience, got ' + (at.'aud');
 ⊨ at.'scope' == '/home/jeff' : ' incorrect scope, got ' + (at.'scope');
 ⊨ at.'iss' == 'https://dev.cilogon.org/oauth2/myVO' : 'wrong issuer, got ' + (at.'iss');
-⊨ claims().'aud' == cfg.'id' : 'wrong id token audience, got ' + (claims().'aud');
-⊨ claims().'iss' == 'https://dev.cilogon.org/oauth2/myVO' : 'wrong id token issuer, got '+ (claims().'iss');
-⊨ claims().'eppn' == 'jgaynor@ncsa.illinois.edu' : 'wrong eppn (did you use NCSA as the IDP?), got ' + (claims().'eppn');
+⊨ clc#claims().'aud' == cfg.'id' : 'wrong id token audience, got ' + (claims().'aud');
+⊨ clc#claims().'iss' == 'https://dev.cilogon.org/oauth2/myVO' : 'wrong id token issuer, got '+ (claims().'iss');
+⊨ clc#claims().'eppn' == 'jgaynor@ncsa.illinois.edu' : 'wrong eppn (did you use NCSA as the IDP?), got ' + (claims().'eppn');
 //⊨ tokens.'access_token'.'lifetime' == 1009000 : 'wrong access token lifetime';
 //⊨ tokens.'refresh_token'.'lifetime' == 1000000000 : 'wrong refresh token lifetime';
 say('Basic VO test ok');

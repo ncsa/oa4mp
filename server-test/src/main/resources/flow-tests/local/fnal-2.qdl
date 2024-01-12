@@ -15,7 +15,7 @@ if[rc!='ok'][return(rc);];
 
 tokens. := null;
 try[
-  tokens. := access(); // fails.
+  tokens. := clc#access(); // fails.
 ]catch[
   ⊨'access_denied' < error_message:'unknown error:' + error_message;
 ];

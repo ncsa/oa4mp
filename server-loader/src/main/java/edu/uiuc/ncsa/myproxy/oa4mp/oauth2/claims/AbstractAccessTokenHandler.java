@@ -366,6 +366,8 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
         if (getPhCfg().hasTXRecord()) {
             getPhCfg().getTxRecord().setToken(getPayload());
         }
+        debugger.trace(this, "done  w/ AT handler finish with transaction =" + transaction.summary());
+
         //   transaction.setAccessTokenLifetime(proposedLifetime);
     }
 

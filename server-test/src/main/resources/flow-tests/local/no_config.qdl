@@ -19,5 +19,5 @@ if[rc!='ok'][return(rc);];
 tokens. := clc#access();
 ⊨ tokens.'access_token'.'lifetime' == 1009000 : 'wrong access token lifetime';
 ⊨ tokens.'refresh_token'.'lifetime' == 950400000 : 'wrong refresh token lifetime';
-⊨ claims().'aud' == cfg.'id' : 'wrong audience';
+⊨clc#claims().'aud' == cfg.'id' : 'wrong audience';
 say('Test no config: ok');

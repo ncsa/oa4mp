@@ -26,7 +26,7 @@ say('tokens:' + print(tokens.));
 ⊨ tokens.'access_token'.'lifetime' == 900000 : 'wrong access token lifetime';
 ⊨ tokens.'refresh_token'.'lifetime' == 1000000000 : 'wrong refresh token lifetime';
 ⊨ scope_check(['read:/frames', 'gwdatafind.read', 'write:/staging/jeffrey.gaynor', 'gracedb.read', 'dqsegdb.read'], tokens.'access_token'.'jwt') : 'wrong at scope(1)';
-⊨ claims().'aud' == cfg.'id' : 'wrong audience';
+⊨clc#claims().'aud' == cfg.'id' : 'wrong audience';
 
 tokens. := clc#refresh();
 say('refresh tokens=' + print(tokens.));

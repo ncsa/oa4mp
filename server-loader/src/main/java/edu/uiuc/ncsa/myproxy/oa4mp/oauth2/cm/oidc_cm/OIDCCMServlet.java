@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.CM7591Config;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.permissions.AddClientRequest;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.permissions.PermissionServer;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.permissions.RemoveClientRequest;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2ExceptionHandlerThingie;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2HeaderUtils;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
@@ -91,6 +92,8 @@ public class OIDCCMServlet extends EnvServlet {
         return (OA2SE) getEnvironment();
     }
 
+    public static final String QUERY_PARAMETER = "query";
+
     /**
      * Return information about the client. Note that we do not return the client secret in this call,
      * since among other reasons, we do not have it.
@@ -112,7 +115,11 @@ public class OIDCCMServlet extends EnvServlet {
             if (!getOA2SE().getCmConfigs().hasRFC7592Config()) {
                 throw new IllegalAccessError("RFC 7592 not supported on this server. Request rejected.");
             }
-
+            String[] query = httpServletRequest.getParameterValues(QUERY_PARAMETER);
+            if (query != null && query.length != 0) {
+                handleServerQuery(Arrays.asList(query), httpServletRequest, httpServletResponse);
+                return;
+            }
             boolean isAnonymous = false;  // Meaning that a client is trying to get information
             AdminClient adminClient = null;
             try {
@@ -197,6 +204,39 @@ public class OIDCCMServlet extends EnvServlet {
         } catch (Throwable t) {
             handleException(new ExceptionHandlerThingie(t, httpServletRequest, httpServletResponse));
         }
+    }
+
+    /**
+     * We do support queries against the server. These are sent as queries in a get and are of the form
+     * <pre>
+     *     query=org.oa4mp:/server/...
+     * </pre>
+     * At least initially the only one we do allow for is querying server defaults, so
+     * <pre>
+     *     query=org.oa4mp:/server/defaults
+     * </pre>
+     * which returns a JSON object of various server defaults like default lifetimes and maximums.
+     *
+     * @param queries
+     * @param request
+     * @param response
+     */
+    private void handleServerQuery(List<String> queries, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        JSONObject jsonObject = new JSONObject();
+        // improvement for https://github.com/ncsa/oa4mp/issues/154
+        if (queries.contains("org.oa4mp:/server/defaults")) {
+            // most of the other server configuration information (such as scopes supported)
+            // are in the well-known page, but there is no place for these.
+            jsonObject.put(REFRESH_LIFETIME, getOA2SE().getRefreshTokenLifetime() / 1000);
+            jsonObject.put(ACCESS_TOKEN_LIFETIME, getOA2SE().getAccessTokenLifetime() / 1000);
+            jsonObject.put(ID_TOKEN_LIFETIME, getOA2SE().getIdTokenLifetime() / 1000);
+            jsonObject.put(MAX_REFRESH_LIFETIME, getOA2SE().getMaxRTLifetime() / 1000);
+            jsonObject.put(MAX_ACCESS_TOKEN_LIFETIME, getOA2SE().getMaxATLifetime() / 1000);
+            jsonObject.put(MAX_ID_TOKEN_LIFETIME, getOA2SE().getMaxIdTokenLifetime() / 1000);
+            jsonObject.put(AUTH_GRANT_TOKEN_LIFETIME, getOA2SE().getAuthorizationGrantLifetime() / 1000);
+            jsonObject.put(OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_TAG, getOA2SE().getRtGracePeriod() / 1000);
+        }
+        writeOK(response, jsonObject);
     }
 
     protected String formatIdentifiable(Store store, Identifiable identifiable) {
@@ -289,18 +329,14 @@ public class OIDCCMServlet extends EnvServlet {
         if (client.isPublicClient()) {
             json.put(TOKEN_ENDPOINT_AUTH_METHOD, TOKEN_ENDPOINT_AUTH_NONE);
         }
-        if (0 < client.getRtLifetime()) {
-            // Stored in ms., sent/received in sec. Convert to seconds.
-            json.put(REFRESH_LIFETIME, client.getRtLifetime() / 1000);
-        } else {
-            json.put(REFRESH_LIFETIME, 0L);
-        }
-        if (0 < client.getAtLifetime()) {
-            // Stored in ms., sent/received in sec. Convert to seconds.
-            json.put(ACCESS_TOKEN_LIFETIME, client.getAtLifetime() / 1000);
-        } else {
-            json.put(ACCESS_TOKEN_LIFETIME, 0L);
-        }
+        json.put(ID_TOKEN_LIFETIME, lifetimeToSec(client.getIdTokenLifetime()));
+        json.put(MAX_ID_TOKEN_LIFETIME, lifetimeToSec(client.getMaxIDTLifetime()));
+        json.put(ACCESS_TOKEN_LIFETIME, lifetimeToSec(client.getAtLifetime()));
+        json.put(MAX_ACCESS_TOKEN_LIFETIME, lifetimeToSec(client.getMaxATLifetime()));
+        json.put(REFRESH_LIFETIME, lifetimeToSec(client.getRtLifetime()));
+        json.put(MAX_REFRESH_LIFETIME, lifetimeToSec(client.getMaxRTLifetime()));
+
+
         if (client.hasJWKS()) {
             json.put(JWKS, JSONWebKeyUtil.toJSON(client.getJWKS()));
         }
@@ -359,6 +395,30 @@ public class OIDCCMServlet extends EnvServlet {
         return json;
     }
 
+    /**
+     * Used in serializing the client to JSON. lifetime that are positive
+     * are divided by 1000 to convert from milliseconds to seconds.<br/><br/>
+     * If they are non-positive, however, they are returned as is since negative values
+     * are overloaded.
+     *
+     * @param lifetime
+     * @return
+     */
+    protected long lifetimeToSec(long lifetime) {
+        if (0 < lifetime) {
+            return lifetime / 1000;
+        } else {
+            return lifetime;
+        }
+    }
+
+    protected long lifetimeFromSec(long lifetime) {
+        if (0 < lifetime) {
+            return lifetime * 1000;
+        } else {
+            return lifetime;
+        }
+    }
 
     /**
      * Remove the given client in toto.
@@ -980,31 +1040,29 @@ public class OIDCCMServlet extends EnvServlet {
         jsonRequest.remove(OIDCCMConstants.APPLICATION_TYPE);
         handleGrants(client, jsonRequest, keys);
         handleResponseTypes(client, jsonRequest, keys);
-        JSONArray redirectURIs;
+        JSONArray redirectURIs = null;  // spec says it is a JSON array
         if (jsonRequest.containsKey(OIDCCMConstants.REDIRECT_URIS)) {
-            redirectURIs = jsonRequest.getJSONArray(OIDCCMConstants.REDIRECT_URIS);
-        } else {
-            redirectURIs = new JSONArray(); // just take it as an empty list
-        }
-        // URI sanity check. Since it's JSON they could send garbage.
-        // Wildcard check for CIL-871
-        for (Object z : redirectURIs) {
-            if (!(z instanceof String)) {
-                throw new OA2JSONException(
-                        OA2Errors.INVALID_REQUEST,
-                        " illegal redirect uri \"" + z + "\" ",
-                        HttpStatus.SC_BAD_REQUEST,
-                        null, client);
+            redirectURIs = toJSONArray(jsonRequest, OIDCCMConstants.REDIRECT_URIS, client);
+            // URI sanity check. Since it's JSON they could send garbage.
+            // Wildcard check for CIL-871
+            for (Object z : redirectURIs) {
+                if (!(z instanceof String)) {
+                    throw new OA2JSONException(
+                            OA2Errors.INVALID_REQUEST,
+                            " illegal redirect uri \"" + z + "\" ",
+                            HttpStatus.SC_BAD_REQUEST,
+                            null, client);
+                }
+                if (z.toString().contains("*")) {
+                    throw new OA2JSONException(
+                            OA2Errors.INVALID_REQUEST,
+                            "wildcards not allows in redirect uri \"" + z + "\" ",
+                            HttpStatus.SC_BAD_REQUEST, null, client);
+                }
             }
-            if (z.toString().contains("*")) {
-                throw new OA2JSONException(
-                        OA2Errors.INVALID_REQUEST,
-                        "wildcards not allows in redirect uri \"" + z + "\" ",
-                        HttpStatus.SC_BAD_REQUEST, null, client);
-            }
+            client.setCallbackURIs(redirectURIs);
+            jsonRequest.remove(OIDCCMConstants.REDIRECT_URIS);
         }
-        client.setCallbackURIs(redirectURIs);
-        jsonRequest.remove(OIDCCMConstants.REDIRECT_URIS);
         // Now we do the stuff we think we need.
         if (!jsonRequest.containsKey(OIDCCMConstants.CLIENT_NAME)) {
             throw new OA2JSONException(
@@ -1209,38 +1267,33 @@ public class OIDCCMServlet extends EnvServlet {
             // refresh tokens (0).
             // It is possible to set up refresh token lifetimes by specifying the grant type of refresh_token,
             // but passing in this parameter overrides that.
-            long rt = jsonRequest.getLong(REFRESH_LIFETIME);
-            if (rt <= 0) {
-                client.setRtLifetime(rt);
-            } else {
-                client.setRtLifetime(jsonRequest.getLong(REFRESH_LIFETIME) * 1000);
-            }
+            client.setRtLifetime(lifetimeFromSec(jsonRequest.getLong(REFRESH_LIFETIME)));
             jsonRequest.remove(REFRESH_LIFETIME);
         }
         if (jsonRequest.containsKey(MAX_REFRESH_LIFETIME)) {
             // NOTE this is sent in seconds but is recorded as ms., so convert to milliseconds here.
-            client.setMaxRTLifetime(jsonRequest.getLong(MAX_REFRESH_LIFETIME) * 1000);
+            client.setMaxRTLifetime(lifetimeFromSec(jsonRequest.getLong(MAX_REFRESH_LIFETIME)));
             jsonRequest.remove(MAX_REFRESH_LIFETIME);
         }
         if (jsonRequest.containsKey(ACCESS_TOKEN_LIFETIME)) {
             // NOTE this is sent in seconds but is recorded as ms., so convert to milliseconds here.
-            client.setAtLifetime(jsonRequest.getLong(ACCESS_TOKEN_LIFETIME) * 1000);
+            client.setAtLifetime(lifetimeFromSec(jsonRequest.getLong(ACCESS_TOKEN_LIFETIME)));
             jsonRequest.remove(ACCESS_TOKEN_LIFETIME);
         }
         if (jsonRequest.containsKey(MAX_ACCESS_TOKEN_LIFETIME)) {
             // NOTE this is sent in seconds but is recorded as ms., so convert to milliseconds here.
-            client.setAtLifetime(jsonRequest.getLong(MAX_ACCESS_TOKEN_LIFETIME) * 1000);
+            client.setAtLifetime(lifetimeFromSec(jsonRequest.getLong(MAX_ACCESS_TOKEN_LIFETIME)));
             jsonRequest.remove(MAX_ACCESS_TOKEN_LIFETIME);
         }
 
         if (jsonRequest.containsKey(ID_TOKEN_LIFETIME)) {
             // NOTE this is sent in seconds but is recorded as ms., so convert to milliseconds here.
-            client.setAtLifetime(jsonRequest.getLong(ID_TOKEN_LIFETIME) * 1000);
+            client.setIdTokenLifetime(lifetimeFromSec(jsonRequest.getLong(ID_TOKEN_LIFETIME)));
             jsonRequest.remove(ID_TOKEN_LIFETIME);
         }
         if (jsonRequest.containsKey(MAX_ID_TOKEN_LIFETIME)) {
             // NOTE this is sent in seconds but is recorded as ms., so convert to milliseconds here.
-            client.setAtLifetime(jsonRequest.getLong(MAX_ID_TOKEN_LIFETIME) * 1000);
+            client.setMaxIDTLifetime(lifetimeFromSec(jsonRequest.getLong(MAX_ID_TOKEN_LIFETIME)));
             jsonRequest.remove(MAX_ID_TOKEN_LIFETIME);
         }
 
@@ -1300,7 +1353,8 @@ public class OIDCCMServlet extends EnvServlet {
             }
             // CIL-1221
             if (jsonRequest.containsKey(PROXY_CLAIMS_LIST)) {
-                client.setProxyClaimsList(jsonRequest.getJSONArray(PROXY_CLAIMS_LIST));
+                client.setProxyClaimsList(toJSONArray(jsonRequest, PROXY_CLAIMS_LIST, client));
+                //client.setProxyClaimsList(jsonRequest.getJSONArray(PROXY_CLAIMS_LIST));
                 jsonRequest.remove(PROXY_CLAIMS_LIST);
             }
             if (jsonRequest.containsKey(FORWARD_REQUEST_SCOPES_TO_PROXY)) {
@@ -1308,7 +1362,7 @@ public class OIDCCMServlet extends EnvServlet {
                 jsonRequest.remove(FORWARD_REQUEST_SCOPES_TO_PROXY);
             }
             if (jsonRequest.containsKey(PROXY_REQUEST_SCOPES)) {
-                client.setProxyRequestScopes(jsonRequest.getJSONArray(PROXY_REQUEST_SCOPES));
+                client.setProxyRequestScopes(toJSONArray(jsonRequest, PROXY_REQUEST_SCOPES, client));
                 jsonRequest.remove(PROXY_REQUEST_SCOPES);
             }
             if (jsonRequest.containsKey(IS_SERVICE_CLIENT)) {
@@ -1316,7 +1370,7 @@ public class OIDCCMServlet extends EnvServlet {
                 jsonRequest.remove(IS_SERVICE_CLIENT);
             }
             if (jsonRequest.containsKey(SERVICE_CLIENT_USERS)) {
-                client.setServiceClientUsers(jsonRequest.getJSONArray(SERVICE_CLIENT_USERS));
+                client.setServiceClientUsers(toJSONArray(jsonRequest, SERVICE_CLIENT_USERS, client));
                 jsonRequest.remove(SERVICE_CLIENT_USERS);
             }
 
@@ -1332,6 +1386,37 @@ public class OIDCCMServlet extends EnvServlet {
         }
         return client;
 
+    }
+
+    protected JSONArray toJSONArray(JSONObject jsonRequest,
+                                    String key,
+                                    OA2Client client) {
+        JSONArray array = null;
+        if (jsonRequest.containsKey(key)) {
+            Object object = jsonRequest.get(key);
+            if (object instanceof JSONArray) {
+                array = (JSONArray) object;
+            } else {
+                if (object instanceof JSONObject) {
+                    JSONObject j = (JSONObject) object;
+                    if (j.isEmpty()) {
+                        array = new JSONArray(); // just take it as an empty list
+                    }
+                } else {
+                    if (object instanceof String) {
+                        array = new JSONArray();
+                        array.add(object);
+                    } else {
+                        throw new OA2JSONException(
+                                OA2Errors.INVALID_REQUEST,
+                                "cannot interpret " + key + ", got " + object,
+                                HttpStatus.SC_BAD_REQUEST,
+                                null, client);
+                    }
+                }
+            }
+        }
+        return array;
     }
 
     /**
@@ -1453,21 +1538,32 @@ public class OIDCCMServlet extends EnvServlet {
      * @return
      */
     protected JSONArray toJA(JSONObject obj, String key) {
-        try {
-            return obj.getJSONArray(key);
-        } catch (Throwable t) {
-            // so they did not send along a JSON array. Other option is a string
-            String rawScopes = obj.getString(key);
-            StringTokenizer st = new StringTokenizer(rawScopes, " ");
-            JSONArray jsonArray = new JSONArray();
-            while (st.hasMoreTokens()) {
-                String nextScope = st.nextToken();
-                if (!jsonArray.contains(nextScope)) {
-                    jsonArray.add(nextScope);
+        JSONArray array = null;
+        Object object = obj.get(key);
+        if (object instanceof JSONArray) {
+            array = (JSONArray) object;
+
+        } else {
+            if (object instanceof JSONObject) {
+                if (((JSONObject) object).isEmpty()) {
+                    array = new JSONArray();
                 }
             }
-            return jsonArray;
+            if (object instanceof String) {
+                String rawScopes = obj.getString(key);
+                StringTokenizer st = new StringTokenizer(rawScopes, " ");
+                array = new JSONArray();
+                while (st.hasMoreTokens()) {
+                    String nextScope = st.nextToken();
+                    if (!array.contains(nextScope)) {
+                        array.add(nextScope);
+                    }
+                }
+            }
+            // so they did not send along a JSON array. Other option is a string
+
         }
+        return array;
     }
 
     protected OA2Client processRegistrationRequest(JSONObject jsonRequest,

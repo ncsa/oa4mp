@@ -25,8 +25,9 @@ rc := script_load('driver.qdl', cfg., params.);
 if[rc!='ok'][return(rc);];
 
 tokens. := clc#access();
-claims. := claims();
-
+claims. := clc#claims();
+say('at:' + print(tokens.'access_token'));
+say('rt:' + print(tokens.'refresh_token'));
 ⊨ tokens.'access_token'.'lifetime' ≡ 900000 : 'wrong access token lifetime, got ' + tokens.'access_token'.'lifetime';
 ⊨ tokens.'refresh_token'.'lifetime' ≡ 1000000 : 'wrong refresh token lifetime, got ' + tokens.'refresh_token'.'lifetime';
 ⊨ claims.'seq0' ≡ 636 : 'wrong seq 0 value, expected 636 and got ' + claims.'seq0';
@@ -36,8 +37,10 @@ claims. := claims();
 ⊨ claims.'seq2' ≡ 'seq 2 passed post_token' : 'wrong post_token seq 2 value, got ' + claims.'seq2';
 
 old_claims. := claims.;
-tokens. := refresh();
-claims. := claims();
+tokens. := clc#refresh();
+claims. := clc#claims();
+say('at:' + print(tokens.'access_token'));
+say('rt:' + print(tokens.'refresh_token'));
 ⊨ tokens.'access_token'.'lifetime' ≡ 900000 : 'wrong access token lifetime, got ' + tokens.'access_token'.'lifetime';
 ⊨ tokens.'refresh_token'.'lifetime' ≡ 1000000 : 'wrong refresh token lifetime, got ' + tokens.'refresh_token'.'lifetime';
 ⊨ claims.'seq0' ≡ 636 : 'wrong seq 0 value, expected 636 and got ' + claims.'seq0';

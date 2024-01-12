@@ -22,11 +22,7 @@
 ⊨ 0 < size(args()) < 3 : 'incorrect number of arguments, expected 1 or 2 and got ' + size(args());
 
 cfg. := args().0;
-say('args:' + to_string(args()));
-say('args().1:');
-foo. := args().1;
-say(foo.);
-say(size(foo.));
+foo.:=(∃args().1)?args().1:[];
 
 clc#init(cfg.'file', cfg.'id');
 // only set the parameters if the argument is non-trivial

@@ -621,8 +621,8 @@ public class QDLConfigLoader<T extends OA2ClientEnvironment> extends OA2ClientLo
     @Override
     public HashMap<String, String> getConstants() {
         if (constants == null) {
-            constants = new HashMap<String, String>();
-            // OAuth 1.0a callback constant. This is used to as a key for http request parameters
+            constants = new HashMap<>();
+            // OAuth 1.0a callback constants remap. OA4MP used to extend it for OAuth 2.0...
             constants.put(ServiceConstantKeys.CALLBACK_URI_KEY, REDIRECT_URI);
             constants.put(ServiceConstantKeys.TOKEN_KEY, AUTHORIZATION_CODE);
             constants.put(ServiceConstantKeys.FORM_ENCODING_KEY, FORM_ENCODING);
