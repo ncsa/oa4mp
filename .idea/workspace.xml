@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ArtifactsWorkspaceSettings">
     <artifacts-to-build>
+      <artifact name="client-oauth2:war" />
       <artifact name="oa4mp-server-oauth2:war" />
     </artifacts-to-build>
   </component>
@@ -10,10 +11,42 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="eb414374-02ed-40a4-9689-d382715049b9" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/local/fnal-basic.qdl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-test/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client-api/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/client-api/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client-loader/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/client-loader/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client-oauth2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/client-oauth2/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client-test/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/client-test/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client-webapp/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/client-webapp/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/client/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/common/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/myproxy-logon/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/myproxy-logon/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/myproxy-website/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/myproxy-website/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-test/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-webapp/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-webapp/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oauth2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oauth2/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proxy/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proxy/src/main/java/edu/uiuc/ncsa/oa2/servlet/OA2ATServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/edu/uiuc/ncsa/oa2/servlet/OA2ATServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qdl/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-api/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-loader/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-test/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/local/all.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/local/all.qdl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/local/derby.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/server/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/skin/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/skin/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/website/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/website/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/website/src/site/apt/index.apt" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/apt/index.apt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/website/src/site/site.xml" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/site.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/website/src/site/xhtml/client/manuals/api-reference.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/xhtml/client/manuals/api-reference.xhtml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/website/src/site/xhtml/client/manuals/getting-started.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/xhtml/client/manuals/getting-started.xhtml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/website/src/site/xhtml/server/dtd/server-dtd-content-tags.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/xhtml/server/dtd/server-dtd-content-tags.xhtml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/website/src/site/xhtml/server/manuals/cli.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/xhtml/server/manuals/cli.xhtml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,7 +68,7 @@
     <option name="PUSH_AUTO_UPDATE" value="true" />
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="5.4" />
+        <entry key="$PROJECT_DIR$" value="master" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -1059,19 +1092,9 @@
           <option name="timeStamp" value="759" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/proxy/src/main/java/edu/uiuc/ncsa/oa2/servlet/OA2ATServlet.java</url>
-          <line>1125</line>
-          <option name="timeStamp" value="775" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/oauth2/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/oa2/client/RTServer2.java</url>
           <line>66</line>
           <option name="timeStamp" value="779" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/util/5.3-SNAPSHOT/util-5.3-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/util/mail/MailSenderThread.java</url>
-          <line>51</line>
-          <option name="timeStamp" value="792" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/util/ExceptionEventNotifier.java</url>
@@ -1134,13 +1157,8 @@
           <option name="timeStamp" value="854" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/servlet/OA2ExceptionHandler.java</url>
-          <line>61</line>
-          <option name="timeStamp" value="856" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/proxy/src/main/java/edu/uiuc/ncsa/oa2/servlet/OA2ATServlet.java</url>
-          <line>2047</line>
+          <line>2044</line>
           <option name="timeStamp" value="862" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -1153,11 +1171,6 @@
           <line>2210</line>
           <option name="timeStamp" value="868" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/qdl/language/1.5-QDL-SNAPSHOT/language-1.5-QDL-SNAPSHOT.jar!/edu/uiuc/ncsa/qdl/config/QDLConfigurationLoaderUtils.class</url>
-          <line>172</line>
-          <option name="timeStamp" value="869" />
-        </line-breakpoint>
         <line-breakpoint enabled="true" type="java-field">
           <url>file://$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/loader/OA2ConfigurationLoader.java</url>
           <line>99</line>
@@ -1168,6 +1181,7 @@
     </breakpoint-manager>
     <pin-to-top-manager>
       <pinned-members>
+        <PinnedItemInfo parentTag="org.apache.commons.configuration.XMLConfiguration$XMLNode" memberName="attribute" />
         <PinnedItemInfo parentTag="edu.uiuc.ncsa.qdl.variables.VStack" memberName="addedTables" />
       </pinned-members>
     </pin-to-top-manager>

@@ -7,7 +7,7 @@
     <parent>
         <groupId>edu.uiuc.ncsa.myproxy</groupId>
         <artifactId>oa4mp</artifactId>
-        <version>5.4.2</version>
+        <version>5.4.3</version>
     </parent>
 
     <artifactId>server-loader</artifactId>
@@ -22,7 +22,7 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>client-api</artifactId>
-            <version>5.4.2</version>
+            <version>5.4.3</version>
         </dependency>
         <dependency>
             <groupId>javax.xml.bind</groupId>
@@ -37,17 +37,17 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>server-api</artifactId>
-            <version>5.4.2</version>
+            <version>5.4.3</version>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>servlet</artifactId>
-            <version>5.4.2</version>
+            <version>5.4.3</version>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>myproxy-logon</artifactId>
-            <version>5.4.2</version>
+            <version>5.4.3</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -58,26 +58,26 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>util</artifactId>
-            <version>5.4.2</version>
+            <version>5.4.3</version>
             <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>edu.uiuc.ncsa.qdl</groupId>
             <artifactId>language</artifactId>
-            <version>1.5.4.2</version>
+            <version>1.5.4.3</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>client-loader</artifactId>
-            <version>5.4.2</version>
+            <version>5.4.3</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>common</artifactId>
-            <version>5.4.2</version>
+            <version>5.4.3</version>
         </dependency>
     </dependencies>
 

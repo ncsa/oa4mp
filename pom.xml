@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>edu.uiuc.ncsa.myproxy</groupId>
     <artifactId>oa4mp</artifactId>
-    <version>5.4.2</version>
+    <version>5.4.3</version>
     <packaging>pom</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -93,7 +93,7 @@
         <module>server</module>
         <module>oauth2</module>
         <!-- For the Sonatype deploy, remove the next few since they aren't needed and mess up the deploy. -->
-        <!--      <module>myproxy-logon</module> -->
+              <module>myproxy-logon</module> 
         <!--       <module>website</module> -->
         <!--     <module>myproxy-website</module> -->
     </modules>

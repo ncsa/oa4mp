@@ -25,7 +25,8 @@ test.:=(path + '/local/') + ['test_qdl.qdl',
                              'fnal-0.qdl',
                              'fnal-1.qdl',
                              'fnal-2.qdl',
-                             'fnal-3.qdl'];
+                             'fnal-3.qdl',
+                             'fnal-basic.qdl'];
 say('**** Flow test suite for OA4MP. ****');
 say('This will do several local tests for various modes of operation.');
 say('In each case, read carefully what is on the screen and do what it says.');

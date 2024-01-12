@@ -8,7 +8,7 @@
     <parent>
         <groupId>edu.uiuc.ncsa.myproxy</groupId>
         <artifactId>oa4mp</artifactId>
-        <version>5.4.2</version>
+        <version>5.4.3</version>
     </parent>
     <artifactId>client-api</artifactId>
     <name>OAuth for MyProxy client API.</name>
@@ -22,32 +22,32 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>client</artifactId>
-            <version>5.4.2</version>
+            <version>5.4.3</version>
         </dependency>
 
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>common</artifactId>
-            <version>5.4.2</version>
+            <version>5.4.3</version>
         </dependency>
 
         <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>oauth2</artifactId>
-            <version>5.4.2</version>
+            <version>5.4.3</version>
         </dependency>
 
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>core</artifactId>
-            <version>5.4.2</version>
+            <version>5.4.3</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>servlet</artifactId>
-            <version>5.4.2</version>
+            <version>5.4.3</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>

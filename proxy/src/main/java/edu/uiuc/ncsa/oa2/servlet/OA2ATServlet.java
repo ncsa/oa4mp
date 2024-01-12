@@ -2021,10 +2021,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             txAT.setAudience(audience);
             txAT.setResource(resources);
         }
-        if (scopes == null || scopes.isEmpty()) {
-            scopes = new ArrayList<>();
-            scopes.addAll(t.getScopes()); // default to original
-        }
+  
         txAT.setScopes(scopes);
         txIDT.setScopes(scopes);
         if (txRT != null) {

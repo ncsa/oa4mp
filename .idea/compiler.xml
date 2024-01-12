@@ -19,7 +19,6 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="server" />
-        <module name="website" />
         <module name="oa4mp-server-oauth2" />
         <module name="myproxy-logon" />
         <module name="skin" />
@@ -38,9 +37,12 @@
         <module name="qdl" />
         <module name="client" />
         <module name="client-oauth2" />
-        <module name="myproxy-website" />
         <module name="client-api" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="myproxy-website" target="1.7" />
+      <module name="website" target="1.7" />
+    </bytecodeTargetLevel>
   </component>
 </project>
