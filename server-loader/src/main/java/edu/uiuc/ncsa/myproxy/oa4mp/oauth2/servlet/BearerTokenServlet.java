@@ -60,16 +60,20 @@ public abstract class BearerTokenServlet extends MyProxyDelegationServlet {
                transaction = (OA2ServiceTransaction) getTransactionStore().get(oldTXR.getParentID());
 
                if (!oldTXR.isValid()) {
-                   throw new OA2GeneralError(OA2Errors.INVALID_TOKEN,
+                   OA2GeneralError x = new OA2GeneralError(OA2Errors.INVALID_TOKEN,
                            "The token is not valid",
                            HttpStatus.SC_UNAUTHORIZED,
                            null, transaction==null?null:transaction.getClient());
+                   x.setForensicMessage("The token is not valid");
+                   throw x;
                }
                if (oldTXR.getExpiresAt() < System.currentTimeMillis()) {
-                   throw new OA2GeneralError(OA2Errors.INVALID_TOKEN,
+                   OA2GeneralError x =  new OA2GeneralError(OA2Errors.INVALID_TOKEN,
                            "The token has expired",
                            HttpStatus.SC_UNAUTHORIZED,
                            null, transaction==null?null:transaction.getClient());
+                   x.setForensicMessage("The token has expired");
+                   throw x;
                }
                state.txRecord = oldTXR;
                state.transaction = transaction;
@@ -78,10 +82,12 @@ public abstract class BearerTokenServlet extends MyProxyDelegationServlet {
            }
            // check that
            if (transaction == null) {
-               throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+               OA2GeneralError x = new OA2GeneralError(OA2Errors.INVALID_REQUEST,
                        "no transaction found.",
                        HttpStatus.SC_BAD_REQUEST,
                        null);
+               x.setForensicMessage("no transaction found.");
+               throw x;
            }
            // Now, we finally have the transaction and are in a position to check the signature
            // of the token. we don't have a good way of doing this without looking into the transaction
@@ -103,21 +109,25 @@ public abstract class BearerTokenServlet extends MyProxyDelegationServlet {
                     // all we care about is that the right set of keys works for this.
                }catch(Throwable t){
                    ServletDebugUtil.trace(this, "Failed to verify access token JWT for " + at);
-                   throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                   OA2GeneralError x = new OA2GeneralError(OA2Errors.INVALID_REQUEST,
                                                "invalid access token",
                                                HttpStatus.SC_BAD_REQUEST,
                                                null, transaction.getClient());
+                   x.setForensicMessage("invalid access token");
+                   throw x;
                }
            }
            // Check expiration after verifying it since some of the state of the transaction is returned
            // if it is merely expired. If it is invalid, then there should be no information returned.
            if(at.isExpired()){
-               throw new OA2RedirectableError(OA2Errors.INVALID_TOKEN,
+               OA2RedirectableError x = new OA2RedirectableError(OA2Errors.INVALID_TOKEN,
                        "expired token.",
                        HttpStatus.SC_BAD_REQUEST,
                        transaction.getRequestState(),
                        transaction.getCallback(),
                        transaction.getClient());
+               x.setForensicMessage("expired token.");
+               throw x;
 
            }
            

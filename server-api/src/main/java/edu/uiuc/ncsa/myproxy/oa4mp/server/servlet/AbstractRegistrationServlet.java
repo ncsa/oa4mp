@@ -9,6 +9,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.oa4mp.delegation.server.request.IssuerResponse;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.core.exceptions.RetryException;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.servlet.*;
 import org.apache.commons.lang.StringEscapeUtils;
 
@@ -63,7 +64,11 @@ public abstract class AbstractRegistrationServlet extends MyProxyDelegationServl
         switch (state.getState()) {
             case INITIAL_STATE:
                 HttpServletRequest request = state.getRequest();
-                info("Processing new client registration request.");
+                String host = request.getRemoteAddr();
+                if(StringUtils.isTrivial(host)){
+                    host = "none";
+                }
+                info("Processing new client registration request from <" + request.getRemoteAddr() + ">");
                 request.setAttribute(CLIENT_NAME, CLIENT_NAME);
                 request.setAttribute(CLIENT_PUBLIC_KEY, CLIENT_PUBLIC_KEY);
                 request.setAttribute(CLIENT_HOME_URL, CLIENT_HOME_URL);
