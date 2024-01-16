@@ -10,12 +10,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="eb414374-02ed-40a4-9689-d382715049b9" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/cm/oidc_cm/OIDCCMServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/cm/oidc_cm/OIDCCMServlet.java" afterDir="false" />
-    </list>
+    <list default="true" id="eb414374-02ed-40a4-9689-d382715049b9" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -801,7 +796,7 @@
       <option name="project" value="LOCAL" />
       <updated>1698164931181</updated>
     </task>
-    <option name="localTasksCounter" value="80" />
+    <option name="localTasksCounter" value="81" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -849,7 +844,6 @@
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="Preparing to update some internal bookkeeping. Best to commit before any substantial changes happen. This also inlcudes automated ersatz client and token exchange tests." />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/130" />
     <MESSAGE value="Mostly this was converting using various old constructors for tokens to using centralized factory methods and the fall out from that. This removed a ton of repetitive cruft from the project.&#10;&#10;Also, general cleanup and for the CLC, added a new clear_store command to make removing odl transactions and such for testing easy.&#10;&#10;All tests pass so this phase of the refactoring is finally over." />
     <MESSAGE value="Added support for JOSE in order to get elliptic curve cryptography working." />
@@ -874,7 +868,8 @@
     <MESSAGE value="Updated QDL for better eventual state management. Added some better error handling to the build scripts. Tests updated." />
     <MESSAGE value="5.4.3 release. Fix for https://github.com/ncsa/oa4mp/issues/155." />
     <MESSAGE value="Added better message (with IP address) to registration servlet so we can see who is trying to create a new client." />
-    <option name="LAST_COMMIT_MESSAGE" value="Added better message (with IP address) to registration servlet so we can see who is trying to create a new client." />
+    <MESSAGE value="CIL-1597 reset." />
+    <option name="LAST_COMMIT_MESSAGE" value="CIL-1597 reset." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
