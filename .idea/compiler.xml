@@ -20,7 +20,6 @@
         <outputRelativeToContentRoot value="true" />
         <module name="server" />
         <module name="oa4mp-server-oauth2" />
-        <module name="myproxy-logon" />
         <module name="skin" />
         <module name="server-api" />
         <module name="server-loader" />
@@ -41,6 +40,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="myproxy-logon" target="11" />
       <module name="myproxy-website" target="1.7" />
       <module name="website" target="1.7" />
     </bytecodeTargetLevel>
