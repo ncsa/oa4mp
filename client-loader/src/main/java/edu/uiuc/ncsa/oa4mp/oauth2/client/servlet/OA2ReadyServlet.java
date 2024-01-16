@@ -287,7 +287,7 @@ public class OA2ReadyServlet extends ClientServlet {
 
                     } catch (Throwable t) {
                         getMyLogger().warn("Error decoding header from response", t);
-                        System.err.println("Returned raw AT=" + rawAT);
+                     //   System.err.println("Returned raw AT=" + rawAT);
                     }
                 }else{
                     // The server is not configured to return a SciToken at the first step, so just print this out.

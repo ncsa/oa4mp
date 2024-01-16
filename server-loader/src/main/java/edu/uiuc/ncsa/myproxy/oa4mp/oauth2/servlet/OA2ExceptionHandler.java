@@ -47,6 +47,13 @@ public class OA2ExceptionHandler implements ExceptionHandler {
             System.err.println(x); // really bad, but not a lot we can do.
         }
     }
+    protected void info(String x) {
+        if (getLogger() != null) {
+            getLogger().info(x);
+        }else{
+            System.err.println(x); // Just awful
+        }
+    }
 
     protected void error(String x) {
         if (getLogger() != null) {
@@ -89,6 +96,7 @@ public class OA2ExceptionHandler implements ExceptionHandler {
         }
         String address = AbstractServlet.getRequestIPAddress(xh.request);
         message = message + "<" + address + ">";
+
         if(forensicMessage== null){
             message = message + " error: " + t.getMessage();
             warn(message); // Fixes CIL-1722

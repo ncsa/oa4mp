@@ -15,4 +15,4 @@ lowriter --headless --convert-to pdf ${args[0]}/creating_claim_sources2.odt     
 lowriter --headless --convert-to pdf ${args[0]}/claim_source_examples.odt         > /dev/null
 lowriter --headless --convert-to pdf ${args[0]}/token_handler_configuration.odt   > /dev/null
 lowriter --headless --convert-to pdf ${args[0]}/qdl_clc_ini.odt                   > /dev/null
-echo "done converting OA4MP docs"
+echo "    ... done with OA4MP docs"

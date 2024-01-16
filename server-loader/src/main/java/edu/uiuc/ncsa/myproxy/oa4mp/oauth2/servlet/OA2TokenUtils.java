@@ -124,7 +124,12 @@ public class OA2TokenUtils {
                 oa2se.getMyLogger().info("client " + clientDebugUtil.getClient().getIdentifierString() + ",  transaction not found for \"" + accessToken + "\"");
             }
             debugger.trace(OA2TokenUtils.class, "Transaction not found for \"" + accessToken.getJti() + "\"");
-            throw new OA2ATException(OA2Errors.INVALID_GRANT, "invalid access token");
+            OA2ATException x = new OA2ATException(OA2Errors.INVALID_GRANT,
+                                    "unknown access token",
+                                    t.getRequestState(),
+                                    t.getClient());
+                            x.setForensicMessage("unknown token:" + subjectToken);
+                            throw x;
 
         } else {
             // Must present a valid token to get one.
@@ -246,7 +251,9 @@ public class OA2TokenUtils {
         } catch (Throwable tt) {
             // This is serious. It means that there was a problem getting the transaction vs. the transaction did not exist.
             debugger.error(OA2TokenUtils.class, "error getting refresh token:" + refreshToken.getJti() + " message:" + tt.getMessage());
-            throw new OA2ATException(OA2Errors.INVALID_GRANT, "invalid refresh token", (t == null ? (BaseClient) null : t.getClient()));
+            OA2ATException x = new OA2ATException(OA2Errors.INVALID_GRANT, "invalid refresh token", (t == null ? (BaseClient) null : t.getClient()));
+            x.setForensicMessage("invalid refresh token, could not get transaction");
+            throw x;
         }
         if (t == null) {
             BaseClient ccc = null;
@@ -260,7 +267,9 @@ public class OA2TokenUtils {
                 oa2SE.getMyLogger().info("client " + clientDebugUtil.getClient().getIdentifierString() + ",  transaction not found for \"" + refreshToken + "\"");
             }
             debugger.trace(OA2TokenUtils.class, "Transaction not found for \"" + refreshToken.getJti() + "\"");
-            throw new OA2ATException(OA2Errors.INVALID_GRANT, "invalid refresh token", ccc == null ? (BaseClient) null : ccc);
+            OA2ATException x= new OA2ATException(OA2Errors.INVALID_GRANT, "invalid refresh token", ccc == null ? (BaseClient) null : ccc);
+            x.setForensicMessage("invalid refresh token, transaction not found");
+            throw x;
 
         } else {
 
@@ -269,20 +278,26 @@ public class OA2TokenUtils {
                 //MyProxyDelegationServlet.createDebugger(t.getOA2Client()).trace(OA2TokenUtils.class, "invalid refresh token \"" + refreshToken.getJti() + "\"");
                 debugger.info(OA2TokenUtils.class, "Refresh token invalid: " + t.summary());
 
-                throw new OA2ATException(OA2Errors.INVALID_GRANT,
+                OA2ATException x= new OA2ATException(OA2Errors.INVALID_GRANT,
                         "invalid refresh token",
                         t.getRequestState(),
                         t.getClient());
+                x.setForensicMessage("invalid refresh token");
+                throw x;
+
             }
             // we wait until here to check if it is expired, since we want to return the correct
             // type of error with the state of the transaction.
             if (isRTExpired) {
 //                MyProxyDelegationServlet.createDebugger(t.getOA2Client()).trace(OA2TokenUtils.class, "expired refresh token \"" + refreshToken.getJti() + "\"");
                 debugger.info(OA2TokenUtils.class, "Refresh token expired: " + t.summary());
-                throw new OA2ATException(OA2Errors.INVALID_GRANT,
+                OA2ATException x = new OA2ATException(OA2Errors.INVALID_GRANT,
                         "expired refresh token",
                         t.getRequestState(),
                         t.getClient());
+                x.setForensicMessage("expired refresh token");
+                throw x;
+
             }
         }
         return refreshToken;
