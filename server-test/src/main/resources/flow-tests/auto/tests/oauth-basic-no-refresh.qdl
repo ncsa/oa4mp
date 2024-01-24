@@ -1,0 +1,30 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   Tests a client with no configuration. This is as basic as it gets.
+*/
+params. ≔ {'sub':'jeff'};
+clc#init($$OA4MP_CLC_INI, 'oauth.conf.no_refresh');
+server_lifetimes.:=script_run('auto/utils/get_server_defaults.qdl'); // in seconds from the server
+tokens. := clc#rfc7523(params.);
+⊨ tokens.'access_token'.'lifetime' == 1000*server_lifetimes.'at_lifetime' : 'wrong access token lifetime';
+⊨ ∄tokens.'refresh_token' : 'should not get a refresh token.';
+⊨ size(clc#claims()) == 0 : ' got claims where none should be';
+
+// All the rest of the calls should fail outright with such a minimal client.
+try[
+  clc#user_info();
+  ⊨ false : 'was able to get user info';
+ ]catch[];
+
+try[
+  clc#refresh();
+  ⊨ false : 'was able to perform token refresh';
+ ]catch[];
+
+try[
+  clc#exchange();
+  ⊨ false : 'was able to perform token exchange';
+ ]catch[];
+
+say('ok: OAuth confidential, no refresh token, no claims');

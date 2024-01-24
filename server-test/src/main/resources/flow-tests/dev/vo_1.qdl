@@ -31,4 +31,7 @@ rt. := tokens.'refresh_token'; // This is not a JWT, but a basic token
 ⊨ clc#claims().'eppn' == 'jgaynor@ncsa.illinois.edu' : 'wrong eppn (did you use NCSA as the IDP?), got ' + (claims().'eppn');
 //⊨ tokens.'access_token'.'lifetime' == 1009000 : 'wrong access token lifetime';
 //⊨ tokens.'refresh_token'.'lifetime' == 1000000000 : 'wrong refresh token lifetime';
+// Regression check to make sure sending no scopes works.
+clc#refresh();
+clc#exchange();
 say('Basic VO test ok');

@@ -17,6 +17,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionsStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AuthorizationServletConfig;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
+import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
@@ -614,7 +615,10 @@ public class OA2SE extends ServiceEnvironmentImpl {
                 DebugUtil.trace(this, "got admin client " + ac.getIdentifierString());
                 VirtualOrganization vo = (VirtualOrganization) getVOStore().get(ac.getVirtualOrganization());
                 DebugUtil.trace(this, "got vo  " + (vo == null ? "(none)" : vo.getIdentifierString()));
-                if (vo != null && vo.isValid()) {
+                if(!vo.isValid()){
+                    throw new GeneralException("invalid virtual organization \"" + vo.getIdentifierString() + "\"");
+                }
+                if (vo != null) {
                     return vo;
                 } else {
                     return null;

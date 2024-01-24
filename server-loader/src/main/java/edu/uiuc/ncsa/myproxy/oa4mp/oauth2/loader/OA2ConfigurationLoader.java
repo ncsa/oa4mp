@@ -1167,7 +1167,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                 rtLifetime = REFRESH_TOKEN_LIFETIME_DEFAULT;
             } else {
                 try {
-                    rtLifetime = XMLConfigUtil.getValueSecsOrMillis(x, true);
+                    rtLifetime = XMLConfigUtil.getValueSecsOrMillis(x, false);
                 } catch (Throwable t) {
                     rtLifetime = REFRESH_TOKEN_LIFETIME_DEFAULT;
                 }
@@ -1184,7 +1184,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                 maxAGLifetime = MAX_AUTHORIZATION_GRANT_LIFETIME_DEFAULT;
             } else {
                 try {
-                    maxAGLifetime = XMLConfigUtil.getValueSecsOrMillis(x, true);
+                    maxAGLifetime = XMLConfigUtil.getValueSecsOrMillis(x, false);
                 } catch (Throwable t) {
                     maxAGLifetime = MAX_AUTHORIZATION_GRANT_LIFETIME_DEFAULT;
                 }
@@ -1200,7 +1200,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                 maxATLifetime = MAX_ACCESS_TOKEN_LIFETIME_DEFAULT;
             } else {
                 try {
-                    maxATLifetime = XMLConfigUtil.getValueSecsOrMillis(x, true);
+                    maxATLifetime = XMLConfigUtil.getValueSecsOrMillis(x, false);
                 } catch (Throwable t) {
                     maxATLifetime = MAX_ACCESS_TOKEN_LIFETIME_DEFAULT;
                 }

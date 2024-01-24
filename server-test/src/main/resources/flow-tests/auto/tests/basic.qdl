@@ -1,0 +1,28 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   Tests a client with no configuration. This is as basic as it gets.
+*/
+debugger(1);
+params. ≔ {'sub':'jeff'};
+clc#init($$OA4MP_CLC_INI, 'oauth.conf.basic');
+server_lifetimes.:=script_run('auto/utils/get_server_defaults.qdl'); // in seconds from the server
+tokens. := clc#rfc7523(params.);
+⊨ tokens.'access_token'.'lifetime' == 1000*server_lifetimes.'at_lifetime' : 'wrong access token lifetime';
+⊨ ∃tokens.'refresh_token' : 'did not got a refresh token.';
+⊨ tokens.'refresh_token'.'lifetime' == 1000*server_lifetimes.'rt_lifetime' : 'wrong refresh token lifetime';
+⊨ size(clc#claims()) == 0 : ' got claims where none should be';
+
+// now redo requesting specific lifetimes
+params.'at_lifetime' := '1009 sec';
+params.'rt_lifetime' := '6 hr';
+tokens. := clc#rfc7523(params.);
+⊨ tokens.'access_token'.'lifetime' == 1009000 : 'wrong access token lifetime';
+⊨ tokens.'refresh_token'.'lifetime' == 6*3600*1000 : 'wrong refresh token lifetime';
+tokens. := clc#refresh();
+say('refresh\n' + print(tokens.));
+⊨ tokens.'access_token'.'lifetime' == 1009000 : 'wrong access token lifetime';
+⊨ tokens.'refresh_token'.'lifetime' == 6*3600*1000 : 'wrong refresh token lifetime';
+say('claims:\n' + print(clc#claims()));
+⊨ size(clc#claims()) == 0 : ' got claims where none should be';
+say('ok: OAuth confidential, with refresh tokens, no claims');

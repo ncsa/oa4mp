@@ -7,11 +7,13 @@
   all the client_ids for this admin client.
 */
 // /home/ncsa/dev/csd/config/auto-test/auto-test.ini
-ini. := file_read(args().0,2);
+cfg_file := (size(args())==1)?(args().0):$$OA4MP_AUTO_TEST_INI; // default on my system
+ini. := file_read(cfg_file,2);
+
 admin.:=ini.'admin';
 
 http := j_load('http');
-q:=load('/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/utils/cm.mdl');
+q:=load('test#/utils/cm.mdl');
 use(q);
 http#host(admin.'address' + '/oidc-cm') ;
 h. := {'Authorization': 'Bearer ' + bearer_token(admin.'id', admin.'secret'),

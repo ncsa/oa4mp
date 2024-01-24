@@ -295,16 +295,6 @@ public class OA2Client extends Client implements OA2ClientScopes {
 
     List<URI> resource;
 
-    public Collection<String> getScopes() {
-        return scopes;
-    }
-
-    public void setScopes(Collection<String> scopes) {
-        this.scopes = scopes;
-    }
-
-    Collection<String> scopes = new LinkedList<>();
-
     public Collection<LDAPConfiguration> getLdaps() {
         return ldaps;
     }

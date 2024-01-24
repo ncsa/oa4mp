@@ -1,0 +1,84 @@
+/*
+   Module that has various checks. These generally return a stem that is empty if the test
+   is ok or has the form
+   {
+      'message' : message to display,
+     'asserted' : claims from the server
+     'expected' : the expected values
+   }
+*/
+module['oa4mp:/test/checks']
+body[
+» This module is a library of small tests that allow you to check various bits and pieces
+» of tokens and flows. Generally there is the expected. stem, which has keys and values
+» the server should be returning and asserted. which is what the server hands back.
+» Usually if the result is an empty stem, that means that there were no differences.
+» There is no assumption that expected. is a strict subset of asserted., so you should
+» probably consider running the missing_claims check.
+  foo:='bar';
+
+  define[lifetime(asserted., lifetime)]
+  [
+   === lifetime(asserted., lifetime) - return the difference between the asserted lifetime and the expected lifetime
+   === If this is negative, then the asserted token has expired.
+   (asserted.'exp' - asserted.'iat')*1000-lifetime;
+   ];
+
+  define[l2(asserted., lifetime)]
+  [
+  » l2(asserted., lifetime) - return -1, 0 or 1 if the lifetime is greated than, equal to or less than the asserted lifetime.
+   (rr:=(asserted.'exp' - asserted.'iat')*1000-lifetime)%(rr==0?1:abs(rr));
+   ];
+
+  define[is_expired(token.)]
+  [
+  » is_expired(token.) - returns true if the token is expired, false otherwise
+      token.'exp'*1000 < token.'iat'*1000-date_ms();
+    ];
+// ccc. := {'a':0, 'b':1, 'c':2}
+// ddd. := {'a':0, 'b':-1, 'c':2, 'd':3, 'e':4, 'exp':(date_ms()%1000+3600),'iat':(date_ms()%1000)}
+   define[missing_claims(expected., asserted.)]
+   [
+   » missing_claims(expected., asserted.) - returns a stem of claims that are in expected., but not in asserted.
+     expected.∌asserted.⌆expected.;
+    ];
+  define[claims(expected., asserted.)]
+    body[
+     »  verify_claims(expected., asserted.) -- verify the expected claims have the values asserted.
+     »  This returns the diff of the elements that do not match, with the asserted values first.
+       x. := null;
+       // use  ∈ to test, not ≡ since the latter would not give the
+       // right result for unordered lists., i.e. [1,2]≡[2,1] is [false,false]
+       // but [1,2] ∈ [2,1] is [true,true]
+       // trivially scalar ∈ scalar is just scalar ≡ scalar
+       while[j∋expected.]
+          do[x.j≔⊗∧⊙(expected.j∈asserted.j);];
+       // grab the ones the failed
+       bad.≔(¬x.)⌆asserted.;
+       return(diff(bad., expected.));
+    ];
+
+/*
+   This is a bit different in that it will look up the expected. which is a list
+   inside the group structure asserted. E.g.
+
+
+
+   So here this would be check#groups(['foo','bar'], [{'name':'foo', 'id':2}, {'name':'bar', 'id':3}])
+*/
+   define[groups(expected., asserted.)]
+    body [
+      » groups(expected., asserted.) - This will take a list of expected group names and check if they are asserted.
+      » Note that this is smart enough to pick apart the asserted. stem if it has a group structure
+      »  E.g. {'name':name, 'id':id}
+      » or if it is as flat list of just names.
+      »  The result is always left conformable.
+      » E.g
+      »      g#in_group2(['foo','bar'], [{'name':'foo', 'id':2}, {'name':'bar', 'id':3}])
+      »   [true,true]
+      »       g#in_group2(['foo','bar'], ['baz','foo','bar'])
+      »   [true,true]
+      »      g := import('oa2:/qdl/oidc/claims');
+          return(g#in_group2(expected., asserted.));
+    ];
+ ];

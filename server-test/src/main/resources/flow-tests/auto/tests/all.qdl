@@ -4,7 +4,10 @@
 path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests';
 script_path(path ~ script_path());
 
-test.:=(path + '/cm-tests/auto/tests/') + ['basic.qdl'];
+test.:=(path + '/auto/tests/') + ['basic.qdl',
+                                  'oauth-basic-no-refresh.qdl',
+                                  'oidc-test-overrides.qdl'];
+server_lifetimes.:=script_run('auto/tests/query_server_defaults.qdl'); // in seconds from the server
 
 say('**** Automated test suite for OA4MP. ****');
 script_load('runner.qdl', test.);

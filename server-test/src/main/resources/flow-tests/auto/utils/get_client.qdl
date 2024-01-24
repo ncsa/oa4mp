@@ -1,0 +1,24 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+  Query the client management service for a specific client.
+  0 - the id of the client
+  1 - the ini file, if not the default
+
+*/
+client_id:=args().0;
+cfg_file := (size(args())==2)?(args().1):$$OA4MP_AUTO_TEST_INI; // default on my system
+ini. := file_read(cfg_file,2);
+admin.:=ini.'admin';
+
+http := j_load('http');
+q:=load('test#/utils/cm.mdl');
+use(q);
+http#host(admin.'address' + '/oidc-cm') ;
+h. := {'Authorization': 'Bearer ' + bearer_token(admin.'id', admin.'secret'),
+       'Content-Type':'application/json; charset=UTF-8'};
+http#headers(h.);
+http#open(true);
+response. := http#get({'client_id':client_id});
+return(response\content);
+

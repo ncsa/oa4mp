@@ -26,11 +26,11 @@ import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims.*;
  */
 public abstract class TokenAwareServer extends ASImpl {
     /**
-     * Is OIDc enabled for the server?
+     * Is OIDC enabled for the server?
      */
-    boolean serverOIDCEnabled = true;
+    boolean serverOIDCEnabled = true; // Server can issue ID tokens
 
-    boolean clientOIDCEnabled = false;
+    boolean clientOIDCEnabled = false; // client can request ID tokens
 
     ServiceClient serviceClient;
     URI issuer;

@@ -31,11 +31,10 @@ import java.net.URI;
 import java.util.*;
 import java.util.logging.Level;
 
-import static edu.uiuc.ncsa.myproxy.oa4mp.client.ClientXMLTags.*;
 import static edu.uiuc.ncsa.myproxy.oa4mp.client.ClientXMLTags.CERT_LIFETIME;
+import static edu.uiuc.ncsa.myproxy.oa4mp.client.ClientXMLTags.*;
 import static edu.uiuc.ncsa.myproxy.oa4mp.client.loader.AbstractClientLoader.defaultCertLifetime;
 import static edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants.*;
-import static edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants.CERT_REQ;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -63,16 +62,18 @@ public class QDLConfigLoader<T extends OA2ClientEnvironment> extends OA2ClientLo
 
     protected void initialize(QDLStem s, String configName) {
         fullConfig = s;
-        if (!s.containsKey(configName)) {
-            throw new IllegalArgumentException(configName + " not found");
+        Object obj = null;
+        obj = s.getByMultiIndex(configName); // because the constructor
+        if(obj==null){
+            throw new IllegalArgumentException(configName + " is not an entry");
+
         }
-        Object obj = s.get(configName);
         if (!(obj instanceof QDLStem)) {
             throw new IllegalArgumentException(configName + " must be a stem, but was a " + obj.getClass().getSimpleName());
         }
-        QDLStem base = (QDLStem) obj; // base is teh original stem with all the configurations.
+        QDLStem base = (QDLStem) obj; // base is the original stem with all the configurations.
         if (base.containsKey(EXTENDS)) {
-            obj = base.get(EXTENDS); // reuse obj;
+            obj = base.getByMultiIndex(EXTENDS); // reuse obj;
             QDLStem ext;
             if (obj instanceof QDLStem) {
                 ext = (QDLStem) obj; //ext is the list of extensions
@@ -139,6 +140,9 @@ public class QDLConfigLoader<T extends OA2ClientEnvironment> extends OA2ClientLo
             scopes = new ArrayList<>();
         }
         Object obj = getConfig().get(SCOPES);
+        if(obj == null){
+            return scopes;
+        }
         if (obj instanceof String) {
             scopes.add((String) obj);
         } else {
@@ -453,10 +457,15 @@ public class QDLConfigLoader<T extends OA2ClientEnvironment> extends OA2ClientLo
     @Override
     public URI getDeviceAuthorizationURI() {
         if (deviceAuthorizationURI == null) {
-            deviceAuthorizationURI = createServiceURI(getEndpoint(DEVICE_AUTHORIZATION_URL),
-                    OIDCDiscoveryTags.DEVICE_AUTHORIZATION_ENDPOINT_DEFAULT,
-                    OIDCDiscoveryTags.DEVICE_AUTHORIZATION_ENDPOINT);
-
+            try {
+                deviceAuthorizationURI = createServiceURI(getEndpoint(DEVICE_AUTHORIZATION_URL),
+                        OIDCDiscoveryTags.DEVICE_AUTHORIZATION_ENDPOINT_DEFAULT,
+                        OIDCDiscoveryTags.DEVICE_AUTHORIZATION_ENDPOINT);
+            }catch(Throwable t){
+                // it is entirely possible that this server does not have support for
+                // device authorization in which case the call to the well-known endpoint
+                // fails. This is benign.
+            }
         }
         return deviceAuthorizationURI;
     }

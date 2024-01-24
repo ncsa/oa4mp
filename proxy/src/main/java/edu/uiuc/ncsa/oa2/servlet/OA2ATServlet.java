@@ -1976,7 +1976,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                     t.getRequestState());
         }
 
-        RTIRequest rtiRequest = new RTIRequest(request, t, at, oa2SE.isOIDCEnabled());
+        RTIRequest rtiRequest = new RTIRequest(request, t, at, oa2SE.isOIDCEnabled() && client.isOIDCClient());
         RTI2 rtIssuer = new RTI2(getTF2(), MyProxyDelegationServlet.getServiceEnvironment().getServiceAddress());
 
         RTIResponse rtiResponse = (RTIResponse) rtIssuer.process(rtiRequest);

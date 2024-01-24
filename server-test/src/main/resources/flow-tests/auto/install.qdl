@@ -14,7 +14,7 @@ print(info());
 http := j_load('http');
 client_keys. := from_json(file_read(ini.'keys'.'jwk_path'));
 print(client_keys.);
-q:=load('/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/utils/cm.mdl');
+q:=load('test#/utils/cm.mdl');
 use(q);
 client_dir := '/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests/cm-tests/auto/clients';
 //clients. :=  dir(client_dir);

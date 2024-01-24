@@ -1,6 +1,6 @@
 #! /usr/bin/env -S qdl-run  
 
-script_load('init.qdl', args(0));
+script_load('test#/cm-tests/init.qdl', args(0));
 payload. := from_json(file_read(ini.'payloads' + 'create.json'));
 payload.'client_id' := custom_id();
 resp. := http#post(payload.);

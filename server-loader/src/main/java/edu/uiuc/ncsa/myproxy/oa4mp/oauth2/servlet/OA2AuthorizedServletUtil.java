@@ -276,9 +276,9 @@ public class OA2AuthorizedServletUtil {
         String requestState = httpServletRequest.getParameter(OA2Constants.STATE);
 
         // CIL-833 fix?
-        // Use may send
+        // User may send
         // "code" or "code id_token" or "id_token code"
-        // A response that includes token, indicating implicit flow, must be rejected.
+        // If OIDC id_token is redundant. If an OAuth2 client, return the id token.
         String rawResponseType = httpServletRequest.getParameter(RESPONSE_TYPE);
         StringTokenizer st = new StringTokenizer(rawResponseType, " ");
         TreeSet<String> responseTypes = new TreeSet<>();

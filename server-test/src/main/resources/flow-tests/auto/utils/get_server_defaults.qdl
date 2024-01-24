@@ -1,0 +1,20 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+  Query the client management service for the default lifetimes etc on the server.
+*/
+// /home/ncsa/dev/csd/config/auto-test/auto-test.ini
+cfg_file := (size(args())==1)?(args().0):$$OA4MP_AUTO_TEST_INI; // default on my system
+
+ini. := file_read(cfg_file,2);
+admin.:=ini.'admin';
+http := j_load('http');
+q:=load('test#/utils/cm.mdl');
+use(q);
+http#host(admin.'address' + '/oidc-cm') ;
+h. := {'Authorization': 'Bearer ' + bearer_token(admin.'id', admin.'secret'),
+       'Content-Type':'application/json; charset=UTF-8'};
+http#headers(h.);
+http#open(true);
+// need more graceful error handling here at some point.
+return(http#get({'query':'org.oa4mp:/server/defaults'})\content);

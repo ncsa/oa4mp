@@ -109,6 +109,9 @@ public class SQLPermissionStore<V extends Permission> extends SQLStore<V> implem
     @Override
     public PermissionList getErsatzChains(Identifier adminID, Identifier clientID) {
         PermissionList allOfThem = new PermissionList();
+        if(clientID == null){
+            return allOfThem;
+        }
         ConnectionRecord cr = getConnection();
         Connection c = cr.connection;
 

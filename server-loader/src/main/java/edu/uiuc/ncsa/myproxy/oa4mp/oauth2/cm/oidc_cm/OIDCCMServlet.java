@@ -234,6 +234,7 @@ public class OIDCCMServlet extends EnvServlet {
             jsonObject.put(MAX_ACCESS_TOKEN_LIFETIME, getOA2SE().getMaxATLifetime() / 1000);
             jsonObject.put(MAX_ID_TOKEN_LIFETIME, getOA2SE().getMaxIdTokenLifetime() / 1000);
             jsonObject.put(AUTH_GRANT_TOKEN_LIFETIME, getOA2SE().getAuthorizationGrantLifetime() / 1000);
+            jsonObject.put("use_server_default", OA2Client.USE_SERVER_DEFAULT);
             jsonObject.put(OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_TAG, getOA2SE().getRtGracePeriod() / 1000);
         }
         writeOK(response, jsonObject);
@@ -1282,7 +1283,7 @@ public class OIDCCMServlet extends EnvServlet {
         }
         if (jsonRequest.containsKey(MAX_ACCESS_TOKEN_LIFETIME)) {
             // NOTE this is sent in seconds but is recorded as ms., so convert to milliseconds here.
-            client.setAtLifetime(lifetimeFromSec(jsonRequest.getLong(MAX_ACCESS_TOKEN_LIFETIME)));
+            client.setMaxATLifetime(lifetimeFromSec(jsonRequest.getLong(MAX_ACCESS_TOKEN_LIFETIME)));
             jsonRequest.remove(MAX_ACCESS_TOKEN_LIFETIME);
         }
 

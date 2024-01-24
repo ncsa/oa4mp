@@ -9,6 +9,7 @@ import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 
+import java.io.File;
 import java.io.FileReader;
 
 /**
@@ -24,8 +25,16 @@ public class QDLCLC extends OA2CommandLineClient {
     protected ConfigurationLoader<? extends AbstractEnvironment> figureOutLoader(String fileName, String configName) throws Throwable {
         if (fileName.endsWith(".ini")) {
             IniParserDriver iniParserDriver = new IniParserDriver();
-            FileReader fileReader = new FileReader(fileName);
+            File file= new File(fileName);
+            if(!file.exists()){
+                throw new IllegalArgumentException("no such file '" + file.getAbsolutePath() + "'");
+            }
+            if(!file.isFile()){
+                throw new IllegalArgumentException("'" + file.getAbsolutePath() + "' is not a file");
+            }
+            FileReader fileReader = new FileReader(file);
             QDLStem out = iniParserDriver.parse(fileReader, true);
+            fileReader.close();
             QDLConfigLoader<? extends OA2ClientEnvironment> loader = new QDLConfigLoader<>(out, configName);
             return loader;
         }

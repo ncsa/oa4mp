@@ -212,6 +212,7 @@ public class OA2ClientEnvironment extends ClientEnvironment {
             client.setJWKS(getJWKS()); // RFC 7523 support. Does not make sense here to use a JWKS URI since private key needed.
             client.setIdentifier(new BasicIdentifier(getClientId()));
             client.setSecret(secret);
+            client.setScopes(getScopes());
         }
         return client;
     }

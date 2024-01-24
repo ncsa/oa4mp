@@ -29,9 +29,9 @@ public class OA2ClientKeys extends ClientKeys {
     String forwardScopesToProxy = "forward_scopes_to_proxy";
     String issuer = "issuer";
     String ldap = "ldap";
-    String maxATLifetime = "at_max_Lifetime";
-    String maxRTLifetime = "rt_max_Lifetime";
-    String maxIDTLifetime = "idt_max_Lifetime";
+    String maxATLifetime = "at_max_lifetime";
+    String maxRTLifetime = "rt_max_lifetime";
+    String maxIDTLifetime = "idt_max_lifetime";
     String proxyClaimsList ="proxy_claims_list";
     String proxyRequestScopes ="proxy_request_scopes";
     String publicClient="public_client";

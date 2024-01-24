@@ -1,10 +1,6 @@
 #! /usr/bin/env -S qdl-run
-// If you want to run an indivdual test, add the next two lines to it or none of the utilities
-// will be found.
-path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests';
-script_path(path ~ script_path());
-
-test.:=(path + '/local/') + ['test_qdl.qdl',
+path:='test#/';
+test.:=(path + 'local/') + ['test_qdl.qdl',
                              'cil1550.qdl',
                              'file_claims.qdl',
                              'no_config.qdl',

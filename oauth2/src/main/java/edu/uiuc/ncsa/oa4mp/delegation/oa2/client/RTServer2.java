@@ -11,6 +11,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.IDTokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenFactory;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Scopes;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
 import net.sf.json.JSONObject;
@@ -52,7 +53,8 @@ public class RTServer2 extends TokenAwareServer implements RTServer {
         RefreshTokenImpl refreshTokenImpl2 = TokenFactory.createRT(json.getString(OA2Constants.REFRESH_TOKEN));
         AccessTokenImpl newAT = TokenFactory.createAT(returnedAT);
         IDTokenImpl idToken = null;
-        if (serverOIDCEnabled) {
+        // Fix https://github.com/ncsa/oa4mp/issues/157
+        if (serverOIDCEnabled && rtRequest.getClient().getScopes().contains(OA2Scopes.SCOPE_OPENID)) {
             idToken = getAndCheckIDToken(json, rtRequest);
         }
         RTResponse rtResponse = createResponse(newAT, refreshTokenImpl2, idToken);

@@ -415,7 +415,7 @@ val jwt: String = signedJWT.serialize()     */
         try {
             JSONWebKey wk = webKeys.get(h.getString(KEY_ID));
             if (wk == null) {
-                throw new IllegalArgumentException("Web key with id " + KEY_ID + " not found. Allows keys are " + webKeys.keySet());
+                throw new IllegalArgumentException("Web key with id " + KEY_ID + " not found. Allowed keys are " + webKeys.keySet());
             }
             if (wk.publicKey == null) {
                 throw new IllegalStateException("Web key with id " + KEY_ID + " does not have a public key");

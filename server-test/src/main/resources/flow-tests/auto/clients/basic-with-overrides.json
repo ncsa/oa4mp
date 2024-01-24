@@ -10,6 +10,7 @@
   "max_rt_lifetime":4000,
   "max_id_token_lifetime": 3000,
   "strict_scopes":true,
-  "client_id":"auto-test:overrides"
-
- }
+  "client_id":"auto-test:/oidc/overrides",
+  "grant_types":["refresh_token"],
+  "scope": ["openid"]
+}

@@ -26,8 +26,6 @@ if[rc!='ok'][return(rc);];
 
 tokens. := clc#access();
 claims. := clc#claims();
-say('at:' + print(tokens.'access_token'));
-say('rt:' + print(tokens.'refresh_token'));
 ⊨ tokens.'access_token'.'lifetime' ≡ 900000 : 'wrong access token lifetime, got ' + tokens.'access_token'.'lifetime';
 ⊨ tokens.'refresh_token'.'lifetime' ≡ 1000000 : 'wrong refresh token lifetime, got ' + tokens.'refresh_token'.'lifetime';
 ⊨ claims.'seq0' ≡ 636 : 'wrong seq 0 value, expected 636 and got ' + claims.'seq0';
@@ -39,8 +37,6 @@ say('rt:' + print(tokens.'refresh_token'));
 old_claims. := claims.;
 tokens. := clc#refresh();
 claims. := clc#claims();
-say('at:' + print(tokens.'access_token'));
-say('rt:' + print(tokens.'refresh_token'));
 ⊨ tokens.'access_token'.'lifetime' ≡ 900000 : 'wrong access token lifetime, got ' + tokens.'access_token'.'lifetime';
 ⊨ tokens.'refresh_token'.'lifetime' ≡ 1000000 : 'wrong refresh token lifetime, got ' + tokens.'refresh_token'.'lifetime';
 ⊨ claims.'seq0' ≡ 636 : 'wrong seq 0 value, expected 636 and got ' + claims.'seq0';

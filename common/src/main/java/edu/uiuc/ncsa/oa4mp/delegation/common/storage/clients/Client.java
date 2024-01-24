@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.security.core.Identifier;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 
 import static edu.uiuc.ncsa.security.core.util.BeanUtils.checkEquals;
 
@@ -128,5 +129,14 @@ public class Client extends BaseClient {
                 "\", proxy limited=" + isProxyLimited() +
                 "]";
     }
+    public Collection<String> getScopes() {
+        return scopes;
+    }
+
+    public void setScopes(Collection<String> scopes) {
+        this.scopes = scopes;
+    }
+
+    Collection<String> scopes = new LinkedList<>();
 
 }
