@@ -9,4 +9,4 @@ Then
 
 Pipe std err to out.txt or someplace else because in the current release (5.4 for OA4MP) the HTTP Client
 is antiquated (see https://github.com/ncsa/security-lib/issues/25) since there are a ton of Cookie errors
-because the Cookie spec changed someething with the expiration dates. 
+because the Cookie spec changed something with the expiration dates.

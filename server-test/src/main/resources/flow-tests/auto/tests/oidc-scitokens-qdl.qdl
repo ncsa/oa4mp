@@ -7,16 +7,24 @@
 
    Note that this will get the client configuration from the server and
    test against that.
+
+   PS Don't for get to enable ea_support in the CLI for clients that use it!
 */
-params. ≔ {'sub':'jeff', 'scope':'openid'};
-test_id:= 'oidc.conf.overrides';
+params. ≔ {'sub':'threepwood','scope':'openid org.oa4mp:userinfo read: queue: execute:', 'org.oa4mp:/rt/value/foo':'woof'};
+test_id:= 'oidc.scitokens.qdl';
 clc#init($$OA4MP_CLC_INI, test_id);
 ini.:= file_read($$OA4MP_CLC_INI, 2).tokenize(test_id, '.');
-ini.:= file_read($$OA4MP_CLC_INI, 2).'oidc'.'conf'.'overrides';
 server_lifetimes.:=script_run('auto/utils/get_server_defaults.qdl'); // in seconds from the server
-client.:=script_run('auto/utils/get_client.qdl', ini.'id');
+//client.:=script_run('auto/utils/get_client.qdl', ini.'id');
 // first part of test is to get tokens with the server defaults.
 tokens. := clc#rfc7523(params.);
+say('tokens:\n' + print(tokens.));
+say('\nclaims:\n' + print(clc#claims()));
+say('refresh:\n'+print(clc#refresh()));
+say('\nclaims:\n' + print(clc#claims()));
+return();
+
+
 ⊨ tokens.'access_token'.'lifetime' == 1000*client.'at_lifetime' : 'wrong access token lifetime';
 ⊨ ∃tokens.'refresh_token' : 'should  get a refresh token.';
 ⊨ tokens.'refresh_token'.'lifetime' == 1000*client.'rt_lifetime' : 'wrong refresh token lifetime';

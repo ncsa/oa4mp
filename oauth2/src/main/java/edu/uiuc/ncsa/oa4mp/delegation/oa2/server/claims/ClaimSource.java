@@ -81,7 +81,7 @@ public interface ClaimSource  extends Serializable {
      *
      * @return
      */
-    public boolean isRunAtAuthorization();
+    public boolean isRunOnlyAtAuthorization();
 
     /**
      * This is the preprocessor <b>after</b> it has run. It is not available until execution time since it has to be

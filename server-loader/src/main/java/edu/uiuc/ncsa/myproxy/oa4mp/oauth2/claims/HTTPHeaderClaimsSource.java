@@ -96,7 +96,7 @@ public class HTTPHeaderClaimsSource extends BasicClaimsSourceImpl {
     }
 
     @Override
-    public boolean isRunAtAuthorization() {
+    public boolean isRunOnlyAtAuthorization() {
         return true;
     }
 

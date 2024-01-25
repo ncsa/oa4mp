@@ -1,0 +1,110 @@
+{
+  "comment": [
+    "This JSON file contains meta data for testing user refresh tokens."
+  ],
+  "jeff": {
+    "test_claim": "my3 test 33cl33aim42",
+    "eppn": "jgaynor@foo.bar",
+    "isMemberOf": [
+      {
+        "name": "org_ici",
+        "id": 1282
+      },
+      {
+        "name": "all_ncsa_employe",
+        "id": 1097
+      },
+      {
+        "name": "jira-users",
+        "id": 1363
+      }
+    ]
+  },
+  "http://cilogon.org/serverT/users/21340363": {
+    "isMemberOf": [
+      "bgsu-astronomy:members",
+      "bgsu-astronomy:all-staff",
+      "bgsu-astronomy:xrootd:read-frames",
+      "bgsu-astronomy:xrootd:write-frames"
+    ],
+    "username" : "gaynor"
+
+  },
+  "threepwood": {
+    "comment": [
+      "Record for Galahad Threepwood at St. Wærstan's College in Cnobheresburg.",
+      "This is for testing the scitokens protocol. The access token handler gets this",
+      "and then peels off the eduPersonEntitlement, each entry is a and may be returned in the scopes",
+      "claim of the access token."
+    ],
+    "dn": "voPersonID=MESS1357,ou=people,o=MESS,o=CO,dc=cilogon,dc=org",
+    "sn": "Gally",
+    "cn": "Galahad Threepwood",
+    "given_name": "Galahad",
+    "display_name": "Galahad Cyril Threepwood",
+    "email": "g.threepwood@wærstan.edu",
+    "uid": "threepwood",
+    "eppn": "threepwood@wærstan.edu",
+    "isMemberOf": [
+       "CO:members:all", "CO:members:active", "CO:COU:MESS Employee:members:active", "CO:COU:MESS Employee:members:all"
+    ],
+    "voPersonExternalID": "threepwood@wærstan.edu",
+    "voPersonID": "MESS1357",
+    "eduPersonEntitlement": [
+      "read:/public/vo3",
+      "write:/home/${sub}/vo3/data",
+      "queue:/staging/vo3-production-queue",
+      "execute:/home/${sub}/vo3/bin"
+    ]
+  },
+  "worplesdon": {
+     "comment": [
+       "Record for Dahlia Worplesdon at St. Æþelðryþe's college in Cnobheresburg.",
+       "This is for testing the WLCG token protocol. The access token handler gets this",
+       "and then peels off the eduPersonEntitlement, each entry is a and may be returned in the scopes",
+       "claim of the access token."
+     ],
+     "dn": "voPersonID=MESS2468,ou=people,o=MESS,o=CO,dc=cilogon,dc=org",
+     "first_name": "Dolly",
+     "full_name": "Dahlia Worplesdon",
+     "given_name": "Dahlia",
+     "display_name": "Dahlia Agatha Worplesdon",
+     "email": "d.worplesdon@æþelðryþe.edu",
+     "uid": "worplesdon",
+     "eppn": "worplesdon@æþelðryþe.edu",
+     "isMemberOf": [
+        "CO:members:all", "CO:members:active", "CO:COU:MESS Employee:members:active", "CO:COU:MESS Employee:members:all"
+     ],
+     "voPersonExternalID": "threepwood@wærstan.edu",
+     "voPersonID": "MESS2468",
+     "eduPersonEntitlement": [
+       "storage.read:/home/${sub}/vo3",
+       "storage.create:/public/vo3",
+       "storage.create:/home/${sub}/vo3",
+       "storage.modify:/public/vo3",
+       "storage.modify:/public/${sub}/vo3",
+       "storage.stage:/staging/vo3",
+       "compute.create",
+       "compute.modify",
+       "compute.cancel",
+       "compute.read"
+     ]
+   },
+  "default_claim": {
+    "comment": [
+      "This is the default claim returned by the handler **if** you specify use_default",
+      "as part of the "
+    ],
+    "eppn": "unknown@foo.bar",
+    "isMemberOf": [
+      {
+        "name": "org_baz",
+        "id": 1212
+      },
+      {
+        "name": "jira-users",
+        "id": 1163
+      }
+    ]
+  }
+}

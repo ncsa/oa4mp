@@ -138,7 +138,7 @@ public class CreateSourceConfig implements QDLFunction, CSConstants {
 
 
     protected QDLStem doFS(QDLStem arg, QDLStem output) {
-        if (!arg.containsKey(CS_FILE_FILE_PATH)) {
+        if (!arg.containsKey(CS_FILE_FILE_PATH) && !arg.containsKey(CS_FILE_STEM_CLAIMS)) {
             throw new IllegalArgumentException("Error: No " + CS_FILE_FILE_PATH + " specified. You must specify this.");
         }
         setValue(arg, output, CS_FILE_FILE_PATH, null);

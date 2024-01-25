@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.*;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.OA2State;
 import edu.uiuc.ncsa.qdl.evaluate.IOEvaluator;
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
@@ -241,18 +241,18 @@ get_claims(cfg., 'dweitzel2@unl.edu')
         }
         String rawJSON = null;
         // resolve files against VFS's so scripts have access to them in server mode.
-        if (arg.containsKey(CS_FILE_FILE_PATH)) {
-            Polyad polyad = new Polyad(IOEvaluator.READ_FILE);
-            polyad.addArgument(new ConstantNode(arg.getString(CS_FILE_FILE_PATH), Constant.STRING_TYPE));
-            state.getMetaEvaluator().evaluate(polyad, state);
-            rawJSON = polyad.getResult().toString();
-        } else {
-            if (arg.containsKey(CS_FILE_STEM_CLAIMS)) {
-                Object ooo = arg.get(CS_FILE_STEM_CLAIMS);
-                if (!(ooo instanceof QDLStem)) {
-                    throw new IllegalArgumentException("the " + CS_FILE_STEM_CLAIMS + " argument must be a stem of claims");
-                }
-                rawJSON = ((QDLStem) ooo).toJSON().toString();
+        if (arg.containsKey(CS_FILE_STEM_CLAIMS)) {
+            Object ooo = arg.get(CS_FILE_STEM_CLAIMS);
+            if (!(ooo instanceof QDLStem)) {
+                throw new IllegalArgumentException("the " + CS_FILE_STEM_CLAIMS + " argument must be a stem of claims");
+            }
+            rawJSON = ((QDLStem) ooo).toJSON().toString();
+        }else{
+            if (arg.containsKey(CS_FILE_FILE_PATH)) {
+                Polyad polyad = new Polyad(IOEvaluator.READ_FILE);
+                polyad.addArgument(new ConstantNode(arg.getString(CS_FILE_FILE_PATH), Constant.STRING_TYPE));
+                state.getMetaEvaluator().evaluate(polyad, state);
+                rawJSON = polyad.getResult().toString();
             }
         }
         if (rawJSON == null) {
@@ -273,7 +273,7 @@ get_claims(cfg., 'dweitzel2@unl.edu')
     protected static void testFS() {
         QDLStem mystem = new QDLStem();
         mystem.put(CS_DEFAULT_TYPE, CS_TYPE_FILE);
-        mystem.put(CS_FILE_FILE_PATH, DebugUtil.getDevPath()+"/oa4mp/server-test/src/main/resources/test-claims.json");
+        mystem.put(CS_FILE_FILE_PATH, DebugUtil.getDevPath() + "/oa4mp/server-test/src/main/resources/test-claims.json");
         CreateSourceConfig csc = new CreateSourceConfig();
         QDLStem out = (QDLStem) csc.evaluate(new Object[]{mystem}, null);
         System.out.println(out.toJSON().toString(2));

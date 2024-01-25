@@ -5,7 +5,9 @@
 */
 debugger(1);
 params. ≔ {'sub':'jeff'};
-clc#init($$OA4MP_CLC_INI, 'oauth.conf.basic');
+test_id:= 'oauth.conf.basic';
+clc#init($$OA4MP_CLC_INI, test_id);
+ini.:= file_read($$OA4MP_CLC_INI, 2).tokenize(test_id, '.');
 server_lifetimes.:=script_run('auto/utils/get_server_defaults.qdl'); // in seconds from the server
 tokens. := clc#rfc7523(params.);
 ⊨ tokens.'access_token'.'lifetime' == 1000*server_lifetimes.'at_lifetime' : 'wrong access token lifetime';
@@ -19,10 +21,9 @@ params.'rt_lifetime' := '6 hr';
 tokens. := clc#rfc7523(params.);
 ⊨ tokens.'access_token'.'lifetime' == 1009000 : 'wrong access token lifetime';
 ⊨ tokens.'refresh_token'.'lifetime' == 6*3600*1000 : 'wrong refresh token lifetime';
+
 tokens. := clc#refresh();
-say('refresh\n' + print(tokens.));
 ⊨ tokens.'access_token'.'lifetime' == 1009000 : 'wrong access token lifetime';
 ⊨ tokens.'refresh_token'.'lifetime' == 6*3600*1000 : 'wrong refresh token lifetime';
-say('claims:\n' + print(clc#claims()));
 ⊨ size(clc#claims()) == 0 : ' got claims where none should be';
 say('ok: OAuth confidential, with refresh tokens, no claims');

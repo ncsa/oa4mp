@@ -40,7 +40,6 @@ public class NewTemplate implements QDLFunction, CSConstants {
         switch (type) {
             case CS_TYPE_FILE:
                 output.put(CS_DEFAULT_TYPE, CS_TYPE_FILE);
-                output.put(CS_FILE_FILE_PATH, REQUIRED_TEMPLATE);
                 return output;
             case CS_TYPE_LDAP:
                 output = new QDLStem();

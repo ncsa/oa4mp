@@ -43,14 +43,14 @@ if[
      exec_phase == 'pre_auth'
 ]then[
      cfg. := new_template('ncsa');
-     debugger('*** NCSA claims=' + to_string(claims.,1));
+     debugger('*** NCSA claims=' + print(claims.));
      claims.uid := head(claims.eppn, '@'); // set search key
      claim_sources. := claim_sources. ~ [create_source(cfg.)]; // add it to any claims
      debugger('*** NCSA set claim_sources. ' + size(claim_sources.));
      debugger('*** NCSA updated claims #1 =' + print(claims.));
 ]; //end if
 
- debugger('*** ncsa-default claims=' + to_string(claims.,1));
+ debugger('*** ncsa-default claims=' + print(claims.));
  if[exec_phase ∉ ['post_token', 'post_refresh', 'post_user_info']][return();];
  if[0==script_args()][return();]; // do not process claims
 

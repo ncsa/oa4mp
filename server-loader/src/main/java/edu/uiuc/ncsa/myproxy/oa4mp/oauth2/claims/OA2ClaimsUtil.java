@@ -275,7 +275,7 @@ public class OA2ClaimsUtil implements ScriptingConstants {
 
         dbg(this, "Starting to process server default claims");
 
-        if (oa2se != null && oa2se.getClaimSource() != null && oa2se.getClaimSource().isEnabled() && oa2se.getClaimSource().isRunAtAuthorization()) {
+        if (oa2se != null && oa2se.getClaimSource() != null && oa2se.getClaimSource().isEnabled() && oa2se.getClaimSource().isRunOnlyAtAuthorization()) {
             DebugUtil.trace(this, "Service environment has a claims source enabled=" + oa2se.getClaimSource());
 
             // allow the server to pre-populate the claims. This invokes the global claims handler for the server
@@ -326,7 +326,7 @@ public class OA2ClaimsUtil implements ScriptingConstants {
                 // so there is
                 for (int i = 0; i < claimsSources.size(); i++) {
                     ClaimSource claimSource = claimsSources.get(i);
-                    if (claimSource.isRunAtAuthorization())
+                    if (claimSource.isRunOnlyAtAuthorization())
                         claimSource.process(claims, request, transaction);
 
                     // keep this in case this was set earlier.
@@ -416,7 +416,7 @@ public class OA2ClaimsUtil implements ScriptingConstants {
                 // so there is
                 for (int i = 0; i < claimsSources.size(); i++) {
                     ClaimSource claimSource = claimsSources.get(i);
-                    if (!claimSource.isRunAtAuthorization()) {
+                    if (!claimSource.isRunOnlyAtAuthorization()) {
                         if (claimSource instanceof BasicClaimsSourceImpl) {
                             // since the claim sources were just made, set the environment if it has not been set yet.
                             BasicClaimsSourceImpl b = (BasicClaimsSourceImpl) claimSource;

@@ -24,21 +24,39 @@ public interface OA2Claims {
     String IDP_NAME = "idp_name";
     String EPPN = "eppn";
     String EPTID = "eptid";
+    String EDU_PERSON_ASSURANCE = "eduPersonAssurance";
+    String EDU_PERSON_ORCID = "eduPersonOrcid";
     String OPENID = "openid";
     String OIDC = "oidc";
     String PAIRWISE_ID = "pairwise_id";
     String SUBJECT_ID = "subject_id";
+    String I_TRUST_UIN = "itrustuin";
+    String UID_NUMBER = "uidNumber";
+    String UID = "uid";
+
     String OU = "ou";
     String AFFILIATION = "affiliation";
-    String AUTHENTICATION_CONTEXT_CLASS_REFERENCE = "acr";
+    String ENTITLEMENT = "entitlement";
     String CERT_SUBJECT_DN = "cert_subject_dn";
     String AUTHENTICATION_CLASS_REFERENCE = "acr";
     String AUTHENTICATION_METHOD_REFERENCE = "amr";
+    /*
+    The next few can be attributes that are returned from LDAP (cn = common name,
+    dn = domain name sn = simple(?) name. 
+     */
+    String LDAP_DN = "dn";
+    String LDAP_CN = "cn";
+    String LDAP_SN = "sn";
+
 
     /**
      * OA4MP specific claim for group memberships that may come from e.g. LDAP.
      */
     public static String IS_MEMBER_OF = "isMemberOf";
+    public static String VO_PERSON_ID = "voPersonID";
+    public static String EDU_PERSON_ENTITLEMENT = "eduPersonEntitlement";
+    public static String VO_PERSON_EXTERNALID = "voPersonExternalID";
+
 
     /**
      * End-User's full name in displayable form including all name parts, possibly including titles and
@@ -70,6 +88,13 @@ public interface OA2Claims {
      * janedoe or j.doe. This value MAY be any valid JSON string including special characters such as @, /, or whitespace. The RP MUST NOT rely upon this value being unique, as discussed in Section 5.7.
      */
     public static String PREFERRED_USERNAME = "preferred_username";
+    /**
+     * Also found is the name used in addressing the user directly, in e.g. dialog
+     * boxes. This may be required in various places (such as non-Western or florid Hispanic)
+     * names where it is unclear what to use. Typically the user sets this in some configuration
+     * when they register for their IDP and we simply pass it back.
+     */
+    public static String DISPLAY_NAME = "display_name";
     /**
      * URL of the End-User's profile page. The contents of this Web page SHOULD be
      * about the End-User.
@@ -135,4 +160,8 @@ public interface OA2Claims {
      * the number of seconds from 1970-01-01T0:0:0Z as measured in UTC until the date/time
      */
     public static String UPDATED_AT = "updated_at";
+    String[] USER_INFO_CLAIMS = new String[]{AFFILIATION,CERT_SUBJECT_DN,ENTITLEMENT,
+            EPPN,EPTID,EDU_PERSON_ASSURANCE,EDU_PERSON_ENTITLEMENT,EDU_PERSON_ORCID,IDP,IDP_NAME,
+            IS_MEMBER_OF,I_TRUST_UIN,OIDC,OPENID,OU,PAIRWISE_ID,SUBJECT_ID,
+            UID_NUMBER,VO_PERSON_EXTERNALID,VO_PERSON_ID, LDAP_CN, LDAP_DN, LDAP_SN};
 }

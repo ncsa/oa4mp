@@ -222,15 +222,32 @@ public class JWTRunner {
                 // so there is
                 for (int i = 0; i < h.getSources().size(); i++) {
                     ClaimSource claimSource = h.getSources().get(i);
-                    boolean isRunAtAuthz;
-                    if (checkAuthClaims) {
-                        isRunAtAuthz = claimSource.isRunAtAuthorization();
+                    boolean isRunAtAuthz = (h instanceof IDTokenHandlerInterface) && !(h instanceof AccessTokenHandlerInterface);
+              /*      if (checkAuthClaims) {
+                        isRunAtAuthz = claimSource.isRunOnlyAtAuthorization();
                     } else {
-                        isRunAtAuthz = !claimSource.isRunAtAuthorization();
-                    }
+                        isRunAtAuthz = !claimSource.isRunOnlyAtAuthorization();
+                    }*/
                     if (isRunAtAuthz) {
+                    // There may be mutliple ID Token handlers. Chain them, but don't just
+                    // get claims for every handler since finish runs at the end of this call
+                    // and you can over-write reduced claims with the full set.
+                    //if (h instanceof IDTokenHandlerInterface) {
                         DebugUtil.trace(this, "executing get claims");
-                        claims = h.execute(claimSource, claims);
+                        if(claimSource.isRunOnlyAtAuthorization()){
+                            if(execPhase.endsWith("_auth")){
+                                claims = h.execute(claimSource, claims);
+                            }
+                        }else{
+                            claims = h.execute(claimSource, claims);
+                        }
+/*
+                        if(!(execPhase.endsWith("_auth") && claimSource.isRunOnlyAtAuthorization())){
+                            claims = h.execute(claimSource, claims);
+                        }else{
+                            // what goes here? Probably nothing.
+                        }
+*/
                         //claimSource.process(claims, request, transaction);
 
                         // keep this in case this was set earlier.

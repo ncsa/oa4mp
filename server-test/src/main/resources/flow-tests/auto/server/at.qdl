@@ -1,0 +1,13 @@
+debugger(1);
+debugger(1, 'starting at, phase = ' + exec_phase);
+cfg. := claims#new_template('file');
+cfg.'file_path' := 'test#/auto/server/test-claims.json';
+epe.:=claims#get_claims(claims#create_source(cfg.), claims.'sub').'eduPersonEntitlement';
+debugger(1, '  epe = ' + to_string(epe.));
+out. := claims#template_substitution(epe., claims.);
+debugger(1, '  after subst = ' + to_string(out.));
+out. := claims#resolve_templates(out., scopes., 'post_token'==exec_phase);
+debugger(1, '  after resolve = ' + to_string(out.));
+
+access_token.'scope' := detokenize(out., ' ');
+debugger(1, '  at = ' + to_string(access_token.));

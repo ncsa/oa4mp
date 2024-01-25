@@ -285,7 +285,7 @@ public class BasicClaimsSourceImpl implements ClaimSource {
      * @return
      */
     @Override
-    public boolean isRunAtAuthorization() {
+    public boolean isRunOnlyAtAuthorization() {
         return false;
     }
 

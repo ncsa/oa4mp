@@ -1,0 +1,33 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   Uses an existing configured client to test that the id token does not leak
+   user information. The client has only an openid scope and gets its user metadata
+   from a claim source. The test is to request more scopes than the client is allowed,
+   have it reduced by the server, and not return any extra scopes. This is checked
+*/
+
+params. ≔ {'sub':'threepwood','scope':'openid org.oa4mp:userinfo read: queue: execute:', 'org.oa4mp:/rt/value/foo':'woof'};
+test_id:= 'oidc.scitokens.id_token';
+clc#init($$OA4MP_CLC_INI, test_id);
+ini.:= file_read($$OA4MP_CLC_INI, 2).tokenize(test_id, '.');
+server_lifetimes.:=script_run('auto/utils/get_server_defaults.qdl'); // in seconds from the server
+//client.:=script_run('auto/utils/get_client.qdl', ini.'id');
+// first part of test is to get tokens with the server defaults.
+tokens. := clc#rfc7523(params.);
+claims. := clc#claims();
+⊨claims.'sub' == 'threepwood' : 'wrong subject, got ' + (claims.'sub');
+⊨∄claims.'is_memberOf' : 'got an is member of claim';
+exp:=claims.'exp';
+tokens.:=clc#refresh();
+claims. := clc#claims();
+⊨claims.'sub' == 'threepwood' : 'wrong subject, got ' + (claims.'sub');
+⊨∄claims.'is_memberOf' : 'got an is member of claim';
+⊨exp < claims.'exp' : 'incorrect expiration, got ' + exp + ', expected ' + (claims.'exp');
+exp := claims.'exp';
+clc#exchange('-id','-subject','rt');
+claims. := clc#claims();
+⊨claims.'sub' == 'threepwood' : 'wrong subject, got ' + (claims.'sub');
+⊨∄claims.'is_memberOf' : 'got an is member of claim';
+⊨exp < claims.'exp' : 'incorrect expiration, got ' + exp + ', expected ' + (claims.'exp');
+say('ok: test scope for leaking or extra user information');

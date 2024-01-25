@@ -33,8 +33,8 @@ public class FSClaimSource extends BasicClaimsSourceImpl {
     }
 
     public FSClaimSource(QDLStem stem, OA2SE oa2SE) {
-          super(stem, oa2SE);
-      }
+        super(stem, oa2SE);
+    }
 
     public FSClaimSource(ClaimSourceConfiguration config) {
         setConfiguration(config);
@@ -62,6 +62,10 @@ public class FSClaimSource extends BasicClaimsSourceImpl {
      * {@link #USE_DEFAULT_KEY} is set.
      */
     public static String DEFAULT_CLAIM_KEY = "defaultClaim";
+    /**
+     * The key if the claims were read from
+     */
+    public static String DEFAULT_ALL_CLAIMS_KEY = "claims";
 
     Boolean useDefaultClaims = null;
 
@@ -93,14 +97,21 @@ public class FSClaimSource extends BasicClaimsSourceImpl {
     @Override
     protected JSONObject realProcessing(JSONObject claims, HttpServletRequest request, ServiceTransaction transaction) throws UnsupportedScopeException {
         // Finally, we can do something...
-        String rawJSON = null;
-        try {
-            rawJSON = readFile();
-        } catch (IOException e) {
-            DebugUtil.error(this, "Error reading file \"" + e.getMessage() + "\".", e);
-            throw new GeneralException(e);
+        JSONObject jsonObject;
+        if(getConfiguration().getProperty(FSClaimSource.DEFAULT_ALL_CLAIMS_KEY)==null){
+            try {
+                if (rawJSON == null) {
+                    rawJSON = readFile();
+                }
+            } catch (IOException e) {
+                DebugUtil.error(this, "Error reading file \"" + e.getMessage() + "\".", e);
+                throw new GeneralException(e);
+            }
+             jsonObject = JSONObject.fromObject(rawJSON);
+
+        }else{
+            jsonObject = (JSONObject) getConfiguration().getProperty(FSClaimSource.DEFAULT_ALL_CLAIMS_KEY);
         }
-        JSONObject jsonObject = JSONObject.fromObject(rawJSON);
         JSONObject json;
         if (getConfiguration().getProperty(FILE_CLAIM_KEY) == null) {
             json = jsonObject.getJSONObject(transaction.getUsername());
@@ -161,7 +172,7 @@ public class FSClaimSource extends BasicClaimsSourceImpl {
     }
 
     @Override
-    public boolean isRunAtAuthorization() {
+    public boolean isRunOnlyAtAuthorization() {
         return false; // run this only when access tokens are being created, not in the authorization step.
     }
 
@@ -182,6 +193,9 @@ public class FSClaimSource extends BasicClaimsSourceImpl {
         if (stem.containsKey(CS_DEFAULT_CLAIM_NAME_KEY)) {
             xp.put(FSClaimSource.DEFAULT_CLAIM_KEY, stem.getString(CS_DEFAULT_CLAIM_NAME_KEY));
         }
+        if(stem.containsKey(CS_FILE_STEM_CLAIMS)){
+            xp.put(FSClaimSource.DEFAULT_ALL_CLAIMS_KEY, stem.getStem(CS_FILE_STEM_CLAIMS).toJSON());
+        }
         cfg.setProperties(xp);
     }
 
@@ -195,6 +209,12 @@ public class FSClaimSource extends BasicClaimsSourceImpl {
             stem.put(CS_FILE_CLAIM_KEY, getConfiguration().getProperty(FSClaimSource.FILE_CLAIM_KEY));
         }
         stem.put(CS_USE_DEFAULT_KEY, isUseDefaultClaims());
+        if(getConfiguration().getProperty(FSClaimSource.DEFAULT_ALL_CLAIMS_KEY) !=null){
+            JSONObject jsonObject = (JSONObject) getConfiguration().getProperty(FSClaimSource.DEFAULT_ALL_CLAIMS_KEY);
+            QDLStem x = new QDLStem();
+            x.fromJSON(jsonObject);
+            stem.put(CS_FILE_STEM_CLAIMS, x);
+        }
         if (getDefaultClaimName() != null) {
             stem.put(CS_DEFAULT_CLAIM_NAME_KEY, getDefaultClaimName());
         }

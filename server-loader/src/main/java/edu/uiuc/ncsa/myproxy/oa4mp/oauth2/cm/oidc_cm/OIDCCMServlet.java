@@ -336,7 +336,7 @@ public class OIDCCMServlet extends EnvServlet {
         json.put(MAX_ACCESS_TOKEN_LIFETIME, lifetimeToSec(client.getMaxATLifetime()));
         json.put(REFRESH_LIFETIME, lifetimeToSec(client.getRtLifetime()));
         json.put(MAX_REFRESH_LIFETIME, lifetimeToSec(client.getMaxRTLifetime()));
-
+        json.put(EA_SUPPORT, client.hasExtendedAttributeSupport());
 
         if (client.hasJWKS()) {
             json.put(JWKS, JSONWebKeyUtil.toJSON(client.getJWKS()));
@@ -1317,6 +1317,9 @@ public class OIDCCMServlet extends EnvServlet {
             }
             if (jsonRequest.containsKey(clientKeys.ersatzInheritIDToken())) {
                 client.setErsatzInheritIDToken(jsonRequest.getBoolean(clientKeys.ersatzInheritIDToken()));
+            }
+            if(jsonRequest.containsKey(EA_SUPPORT)){
+                client.setExtendedAttributeSupport(jsonRequest.getBoolean(EA_SUPPORT));
             }
             if (jsonRequest.containsKey(ERSATZ_CLIENT_PROVISIONERS)) {
                 JSONArray array;

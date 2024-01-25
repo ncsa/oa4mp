@@ -1,0 +1,6 @@
+{
+  "comment": "The most basic public OAuth client.",
+  "client_name": "public OAuth test client",
+  "token_endpoint_auth_method": "none",
+  "client_id":"auto-test:/oauth/public"
+}

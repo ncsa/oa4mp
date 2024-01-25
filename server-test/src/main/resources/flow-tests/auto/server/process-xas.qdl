@@ -21,24 +21,24 @@
 
 */
 
-
+debugger(1);
+debugger(1,'xas.=' + input_form(xas.));
  if[size(xas.) == 0][return();];
 
-say('xas.=' + input_form(xas.));
-say('exec_phase='+exec_phase);
+debugger(1,'exec_phase='+exec_phase);
 oa4mp.:=xas.'org.oa4mp';
 z.:=null;
 // This uses the fact that a list is an index, viz.,
 // z.['a','b'] ==z.'a'.'b'
 // so tokenizing the keys returns the index we want.
 while[k∋oa4mp.][z.tokenize(k,'/'):=oa4mp.k;]; // convert to a stem
-say('z:\n' + print(z.));
+debugger(1,'z:\n' + print(z.));
 
 define[set_claims(token., key, values.)][
-  say('set_claims: values.\n' + print(values.));
+  debugger(1,'set_claims: values.\n' + print(values.));
   λ. := values\key\'value'; // a stem of {claim:value} pairs
   while[k∋λ.][λ.k := (size(λ.k)==1)?(λ.k.0):λ.k;];
-  say('set_claims: for ' + key + ' λ.\n' + print(λ.));
+  debugger(1,'set_claims: for ' + key + ' λ.\n' + print(λ.));
   while[k∋λ.][token.k := λ.k;]; // set the claims en masse
 ]; // end define set_claims
 
@@ -47,7 +47,7 @@ define[set_claims(token., key, values.)][
 
 if[exec_phase∈['post_auth','post_user_info']][
    if[∃claims.][
-     say('claims:\n' + print(claims.));
+     debugger(1,'claims:\n' + print(claims.));
      set_claims(claims., 'idt', z.);
   ];
 ];
@@ -55,12 +55,12 @@ if[exec_phase∈['post_auth','post_user_info']][
 if[exec_phase∈['post_token', 'post_refresh', 'post_exchange']][
    // might not be an access token depending on the configuration.
    if[∃access_token.][
-     say('at:\n' + print(access_token.));
+     debugger(1,'at:\n' + print(access_token.));
      set_claims(access_token., 'at', z.);
    ];
    // might not be a refresh token depending on the configuration.
    if[∃refresh_token.][
-     say('rt:\n' + print(refresh_token.));
+     debugger(1,'rt:\n' + print(refresh_token.));
      set_claims(refresh_token., 'rt', z.);
    ];
 ];

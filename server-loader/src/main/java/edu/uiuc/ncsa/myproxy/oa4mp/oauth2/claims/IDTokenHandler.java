@@ -21,9 +21,7 @@ import net.sf.json.JSONObject;
 import org.apache.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 import static edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants.AUTHORIZATION_TIME;
 import static edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants.NONCE;
@@ -138,7 +136,7 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
 
         trace(this, "Starting to process server default claims");
 
-        if (oa2se != null && oa2se.getClaimSource() != null && oa2se.getClaimSource().isEnabled() && oa2se.getClaimSource().isRunAtAuthorization()) {
+        if (oa2se != null && oa2se.getClaimSource() != null && oa2se.getClaimSource().isEnabled() && oa2se.getClaimSource().isRunOnlyAtAuthorization()) {
             DebugUtil.trace(this, "Service environment has a claims source enabled=" + oa2se.getClaimSource());
 
             // allow the server to pre-populate the claims. This invokes the global claims handler for the server
@@ -173,8 +171,6 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
         }*/
         trace(this, "saving the transaction with claims:\n" + getUserMetaData().toString(1));
     }
-
-
 
 
     @Override
@@ -262,18 +258,30 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
     @Override
     public void finish(String execPhase) throws Throwable {
         refreshAccountingInformation();
-        if (getScopes().contains(OA2Scopes.SCOPE_CILOGON_INFO) || !((OA2Client) transaction.getClient()).useStrictScopes()) {
-            permissiveFinish(execPhase);
+        List<String> basicScopes = Arrays.asList(OA2Scopes.basicScopes);
+        HashSet<String> x = new HashSet<>();
+        x.addAll(getScopes());
+        x.retainAll(basicScopes);
+        x.retainAll(transaction.getClient().getScopes());
+        // All we want is the scopes allowed to this client
+        if (x.contains(OA2Scopes.SCOPE_CILOGON_INFO)  || !((OA2Client) transaction.getClient()).useStrictScopes()) {
+            permissiveFinish(x, execPhase);
             return;
         }
-        restrictiveFinish(execPhase);
+        restrictiveFinish(x, execPhase);
     }
 
     Collection<String> scopes = null;
 
+    /**
+     * Contract is to return the current scopes. If these are not overridden, return
+     * the original scopes, which as still in effect.
+     *
+     * @return
+     */
     public Collection<String> getScopes() {
         if (scopes == null) {
-            if (hasTXRecord() && getTXRecord().getScopes()!=null) {
+            if (hasTXRecord() && getTXRecord().getScopes() != null && !getTXRecord().getScopes().isEmpty()) {
                 scopes = getTXRecord().getScopes();
             } else {
                 scopes = transaction.getScopes();
@@ -290,10 +298,10 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
      * @param execPhase
      * @throws Throwable
      */
-    protected void restrictiveFinish(String execPhase) throws Throwable {
+    protected void restrictiveFinish(Collection<String> scopes, String execPhase) throws Throwable {
         JSONObject finalClaims = new JSONObject();
         JSONObject c = new JSONObject();
-        Collection<String> scopes = getScopes();
+        //Collection<String> scopes = getScopes();
         c.putAll(getUserMetaData());
         // These are to present in every ID token.
         String[] requiredClaims = new String[]{ISSUER, AUDIENCE, EXPIRATION, ISSUED_AT, JWT_ID, NONCE, AUTHORIZATION_TIME};
@@ -332,24 +340,37 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
         // these are things that may be returned as user information
         // Fix for https://github.com/ncsa/oa4mp/issues/112
         if (scopes.contains(OA2Scopes.SCOPE_USER_INFO)) {
+            for(String claim : USER_INFO_CLAIMS){
+                setCurrentClaim(c, finalClaims, claim);
+            }
+/*
             setCurrentClaim(c, finalClaims, IDP);
-            setCurrentClaim(c, finalClaims, IDP_NAME);
             setCurrentClaim(c, finalClaims, EPPN);
             setCurrentClaim(c, finalClaims, EPTID);
+            setCurrentClaim(c, finalClaims, CERT_SUBJECT_DN);
             setCurrentClaim(c, finalClaims, PAIRWISE_ID);
             setCurrentClaim(c, finalClaims, SUBJECT_ID);
             setCurrentClaim(c, finalClaims, OIDC);
             setCurrentClaim(c, finalClaims, OPENID);
             setCurrentClaim(c, finalClaims, OU);
             setCurrentClaim(c, finalClaims, AFFILIATION);
+            setCurrentClaim(c, finalClaims, ENTITLEMENT);
             setCurrentClaim(c, finalClaims, IS_MEMBER_OF);
+            setCurrentClaim(c, finalClaims, VO_PERSON_ID);
+            setCurrentClaim(c, finalClaims, VO_PERSON_EXTERNALID);
+            setCurrentClaim(c, finalClaims, EDU_PERSON_ENTITLEMENT);
+            setCurrentClaim(c, finalClaims, EDU_PERSON_ASSURANCE);
+            setCurrentClaim(c, finalClaims, EDU_PERSON_ORCID);
+            setCurrentClaim(c, finalClaims, UID_NUMBER);
+            setCurrentClaim(c, finalClaims, I_TRUST_UIN);
+*/
         }
         //transaction.setUserMetaData(finalClaims);
     }
 
     /**
      * Permissive finish = whittle down certain claims that are not explicit, and
-     * pass back everythign else. This is needed for scripting where claims may
+     * pass back everything else. This is needed for scripting where claims may
      * be simply added. If a client is set to strict scopes, adding claims in a script
      * will have them stripped off.
      * CILogon uses this by default since the scopes they get come from SAML assertions
@@ -357,12 +378,12 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
      * @param execPhase
      * @throws Throwable
      */
-    protected void permissiveFinish(String execPhase) throws Throwable {
+    protected void permissiveFinish(Collection<String> scopes, String execPhase) throws Throwable {
         // only required one by the spec. and only if the server is OIDC.
         if (oa2se.isOIDCEnabled()) {
             checkClaim(getUserMetaData(), SUBJECT);
         }
-        Collection<String> scopes = getScopes();
+        //Collection<String> scopes = getScopes();
         // CIL-1411 -- remove any claims not specifically requested by the user.
         // We need this here since a policy set  may add claims that the user
         // did not request.
@@ -379,7 +400,28 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
             getUserMetaData().remove(GIVEN_NAME);
             getUserMetaData().remove(FAMILY_NAME);
             getUserMetaData().remove(PREFERRED_USERNAME);
+            getUserMetaData().remove(DISPLAY_NAME);
         }
+        // Not having the CILogon userinfo scope but also allowing other scopes means
+        // removing specific scopes and letting other scopes -- such COManage memberships -- through.
+        // Fix for https://github.com/ncsa/oa4mp/issues/158
+        if(scopes.contains(OA2Scopes.SCOPE_CILOGON_INFO)){
+            return; // contract for this is kitchen sink -- return everything not prohibited.
+        }
+        if (!scopes.contains(OA2Scopes.SCOPE_USER_INFO)) {
+            for(String claim: USER_INFO_CLAIMS){
+                getUserMetaData().remove(claim);
+            }
+/*
+            getUserMetaData().remove(IS_MEMBER_OF);
+            getUserMetaData().remove(VO_PERSON_EXTERNALID);
+            getUserMetaData().remove(EDU_PERSON_ENTITLEMENT);
+            getUserMetaData().remove(VO_PERSON_ID);
+            getUserMetaData().remove(EPPN);
+            getUserMetaData().remove(EPTID);
+*/
+        }
+
 
         // everything else gets passed back.
     }

@@ -1,0 +1,7 @@
+{
+  "comment": "The most basic public OIDC client.",
+  "client_name": "Basic automated public test client",
+  "scope": ["openid"] ,
+  "token_endpoint_auth_method": "none",
+  "client_id":"auto-test:/oidc/public"
+}

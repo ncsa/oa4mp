@@ -1,0 +1,12 @@
+cfg. := claims#new_template('file');
+//cfg.'file_path' := 'test#/auto/server/test-claims.json';
+remove(cfg.'file_path');
+cfg.'claims' := from_json(file_read('test#/auto/server/test-claims.json'));
+claim_sources. := claim_sources. ~ [create_source(cfg.)]; // test automated getting claims
+
+/*
+lookup.:=claims#get_claims(claims#create_source(cfg.), claims.'sub');
+epe. := lookup.'eduPersonEntitlement';
+remove(lookup.'eduPersonEntitlement');
+claims.:= claims. ~ lookup.;
+*/

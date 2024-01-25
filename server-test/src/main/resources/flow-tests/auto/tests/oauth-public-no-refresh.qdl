@@ -3,10 +3,10 @@
 /*
    Tests a client with no configuration. This is as basic as it gets.
 */
-params. ≔ {'sub':'jeff'};
+params. ≔ {'sub':'jeff'}
 test_id:= 'oauth.conf.no_refresh';
 clc#init($$OA4MP_CLC_INI, test_id);
-ini.:= file_read($$OA4MP_CLC_INI, 2).tokenize(test_id, '.');
+ini.:= file_read($$OA4MP_CLC_INI, 2).tokenize(test_id, '.');;
 server_lifetimes.:=script_run('auto/utils/get_server_defaults.qdl'); // in seconds from the server
 tokens. := clc#rfc7523(params.);
 ⊨ tokens.'access_token'.'lifetime' == 1000*server_lifetimes.'at_lifetime' : 'wrong access token lifetime';

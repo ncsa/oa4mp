@@ -1,13 +1,12 @@
 #! /usr/bin/env -S qdl-run
 // If you want to run an indivdual test, add the next two lines to it or none of the utilities
 // will be found.
-path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests';
-script_path(path ~ script_path());
-
-test.:=(path + '/auto/tests/') + ['basic.qdl',
+path:='test#/';
+test.:=(path + 'auto/tests/') + ['oauth-with-refresh.qdl',
                                   'oauth-basic-no-refresh.qdl',
-                                  'oidc-test-overrides.qdl'];
-server_lifetimes.:=script_run('auto/tests/query_server_defaults.qdl'); // in seconds from the server
+                                  'oidc-test-overrides.qdl',
+                                  'oidc-id-token.qdl',
+                                  'oidc-scitokens-qdl.qdl'];
 
 say('**** Automated test suite for OA4MP. ****');
-script_load('runner.qdl', test.);
+script_load('runner.qdl', test., true); // Dont' skip lines between tests
