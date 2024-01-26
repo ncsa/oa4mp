@@ -67,37 +67,7 @@ public class TokenFactory {
             return;
 
         }
-/*
-        StringTokenizer st = new StringTokenizer(rawToken, ".");
-        if (1 < st.countTokens() && st.countTokens() <= 3) {
-            st.nextToken();
-            String payload = st.nextToken();
-            try {
-                byte[] x = Base64.decodeBase64(payload);
-                String pp = new String(x, StandardCharsets.UTF_8);
-                JSONObject jsonObject = JSONObject.fromObject(pp);
-                token.setPayload(jsonObject);
-                // remember that in JWTs the times are in seconds.
-                if (jsonObject.containsKey("jti")) {
-                    token.setJti(URI.create(jsonObject.getString("jti")));
-                }
-                if (jsonObject.containsKey("iat")) {
-                    token.setIssuedAt(1000 * jsonObject.getLong("iat"));
-                }
-                if (jsonObject.containsKey("exp")) {
-                    long expiresAt = jsonObject.getLong("exp");
-                    token.setExpiresAt(1000 * expiresAt);
-                    token.setLifetime(1000 * expiresAt - token.getIssuedAt());
-                }
-                token.setJWT(true);
-                token.setToken(rawToken);// can't really change this. Should be a string...
-                return;
-            } catch (Throwable t) {
-                // so it ain't a JWT.
-                t.printStackTrace();
-            }
-        }
-*/
+
         // so at this point, we have to assume that it is indeed just a token.
         token.setJWT(false);
         token.setJti(URI.create(rawToken));
@@ -144,6 +114,7 @@ public class TokenFactory {
         parseRawToken(rawToken, refreshToken);
         return refreshToken;
     }
+
 
     /**
      * Recreate the object from its serialized form.

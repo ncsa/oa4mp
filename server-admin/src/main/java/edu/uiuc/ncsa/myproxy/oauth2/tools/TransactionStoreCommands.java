@@ -14,6 +14,7 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.cache.Cleanup;
 import edu.uiuc.ncsa.security.core.cache.LockingCleanup;
+import edu.uiuc.ncsa.security.core.exceptions.TransactionNotFoundException;
 import edu.uiuc.ncsa.security.core.util.*;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.TransactionStore;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
@@ -225,15 +226,19 @@ public class TransactionStoreCommands extends StoreCommands2 {
             return null;
         }
         AccessTokenImpl at = new AccessTokenImpl(URI.create(rawAT));
-        OA2ServiceTransaction serviceTransaction = (OA2ServiceTransaction) ((TransactionStore) getStore()).get(at);
+        OA2ServiceTransaction serviceTransaction = null;
+        try {
+            serviceTransaction = (OA2ServiceTransaction) ((TransactionStore) getStore()).get(at);
+        } catch (TransactionNotFoundException tnf) {
+
+        }
         if (serviceTransaction != null) {
             return serviceTransaction.getIdentifier();
-        } else {
-            // try to get it from the TXStore
-            TXRecord txRecord = (TXRecord) getTxStore().get(BasicIdentifier.newID(rawAT));
-            if (txRecord != null) {
-                return txRecord.getParentID();
-            }
+        }
+        // try to get it from the TXStore
+        TXRecord txRecord = (TXRecord) getTxStore().get(BasicIdentifier.newID(rawAT));
+        if (txRecord != null) {
+            return txRecord.getParentID();
         }
         return null;
     }
@@ -245,17 +250,20 @@ public class TransactionStoreCommands extends StoreCommands2 {
         }
         // Do the same thing as per above but with refresh tokens.
         RefreshTokenImpl rt = new RefreshTokenImpl(URI.create(rawRT));
-        OA2ServiceTransaction serviceTransaction = ((RefreshTokenStore) getStore()).get(rt);
+        OA2ServiceTransaction serviceTransaction = null;
+        try {
+            serviceTransaction = ((RefreshTokenStore) getStore()).get(rt);
+        } catch (TransactionNotFoundException tfn) {
+
+        }
         if (serviceTransaction != null) {
             return serviceTransaction.getIdentifier();
-        } else {
-            // try to get it from the TXStore
-            TXRecord txRecord = (TXRecord) getTxStore().get(BasicIdentifier.newID(rawRT));
-            if (txRecord != null) {
-                return txRecord.getParentID();
-            }
         }
-
+        // try to get it from the TXStore
+        TXRecord txRecord = (TXRecord) getTxStore().get(BasicIdentifier.newID(rawRT));
+        if (txRecord != null) {
+            return txRecord.getParentID();
+        }
         return null;
     }
 
@@ -446,11 +454,11 @@ public class TransactionStoreCommands extends StoreCommands2 {
             say("get_by_proxy_id proxy_id - get a transaction by its proxy_id");
             return;
         }
-        if(!(getStore() instanceof OA2TStoreInterface)){
+        if (!(getStore() instanceof OA2TStoreInterface)) {
             say("wrong store type");
             return;
         }
-        OA2TStoreInterface tStoreInterface =(OA2TStoreInterface) getStore();
+        OA2TStoreInterface tStoreInterface = (OA2TStoreInterface) getStore();
         String proxyID = inputLine.getLastArg();
         OA2ServiceTransaction serviceTransaction = tStoreInterface.getByProxyID(BasicIdentifier.newID(proxyID));
 

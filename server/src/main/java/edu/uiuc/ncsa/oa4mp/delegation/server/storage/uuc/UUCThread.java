@@ -48,7 +48,7 @@ public class UUCThread extends MyThread {
                     return;
                 }
                 nextRun.setTime(nextRun.getTime() + nextCleanup);
-                info("next iteration for " + getName() + " scheduled for " + nextRun);
+             //   info("next iteration for " + getName() + " scheduled for " + nextRun);
                 sleep(nextCleanup);
 
             BaseClientStore.UUCResponse uucResponse = baseClientStore.unusedClientCleanup(uucConfiguration);

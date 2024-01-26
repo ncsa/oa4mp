@@ -337,7 +337,6 @@ public class OIDCCMServlet extends EnvServlet {
         json.put(REFRESH_LIFETIME, lifetimeToSec(client.getRtLifetime()));
         json.put(MAX_REFRESH_LIFETIME, lifetimeToSec(client.getMaxRTLifetime()));
         json.put(EA_SUPPORT, client.hasExtendedAttributeSupport());
-
         if (client.hasJWKS()) {
             json.put(JWKS, JSONWebKeyUtil.toJSON(client.getJWKS()));
         }
@@ -364,6 +363,8 @@ public class OIDCCMServlet extends EnvServlet {
         json.put(SERVICE_CLIENT_USERS, array);
         json.put("email", client.getEmail());
         OA2ClientKeys clientKeys = (OA2ClientKeys) getOA2SE().getClientStore().getMapConverter().getKeys();
+        // Fix https://github.com/ncsa/oa4mp/issues/159
+        json.put(clientKeys.rtGracePeriod(), client.getRtGracePeriod());
         json.put(clientKeys.extendsProvisioners(), client.isExtendsProvisioners());
         json.put(clientKeys.ersatzClient(), client.isErsatzClient());
         json.put(clientKeys.ersatzInheritIDToken(), client.isErsatzInheritIDToken());
@@ -1308,7 +1309,13 @@ public class OIDCCMServlet extends EnvServlet {
                 }
                 client.setPrototypes(prototypes);
             }
-
+            // Fix  https://github.com/ncsa/oa4mp/issues/159
+            if(jsonRequest.containsKey(clientKeys.rtGracePeriod())){
+                client.setRtGracePeriod(jsonRequest.getLong(clientKeys.rtGracePeriod()));
+            }else{
+                // if missing, set it to use whatever the server default is.
+                client.setRtGracePeriod(OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_USE_SERVER_DEFAULT);
+            }
             if (jsonRequest.containsKey(clientKeys.extendsProvisioners())) {
                 client.setExtendsProvisioners(jsonRequest.getBoolean(clientKeys.extendsProvisioners()));
             }

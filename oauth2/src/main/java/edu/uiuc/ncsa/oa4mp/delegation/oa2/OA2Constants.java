@@ -65,6 +65,7 @@ public interface OA2Constants {
     public static String MAX_ID_TOKEN_LIFETIME = "max_id_token_lifetime";
     public static String ID_TOKEN_IDENTIFIER = "jti"; // was token_id
     public static String EA_SUPPORT = "ea_support";
+
     public static String REQUEST = "request";
     public static String REQUEST_URI = "request_uri";
     public static String AUTHORIZATION_TIME = "auth_time";
