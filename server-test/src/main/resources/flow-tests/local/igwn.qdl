@@ -5,14 +5,13 @@
    and then attempt to get some different scopes. Downscoping is allowed, but that's it.
 
 */
-path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests';
-if[path∉script_path()][script_path(path ~ script_path());];
-scope_check(s., token.)->⊗∧⊙s.∈tokenize(token.'scope', ' '); // Define it here. Checks all the expected scopes are in the token
 
+scope_check(s., token.)->⊗∧⊙s.∈tokenize(token.'scope', ' '); // Define it here. Checks all the expected scopes are in the token
+say($$OA4MP_CLC_XML_INI);
         cfg.'id'  := 'localhost:test/igwn';
        cfg.'idp'  := 'LIGO Collaboration';
-       cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
-cfg.'description' :=  'IGWN test';
+       cfg.'file' := $$OA4MP_CLC_XML_INI;
+       cfg.'description' :=  'IGWN test';
   cfg.'flow_type' := 'df'; // Note to use df you need to set param for the token endpoint
 
     params.'token':={'scope':'read:/frames gwdatafind.read gracedb.read dqsegdb.read write:/staging'}; // CIL-1808 test
@@ -23,7 +22,7 @@ if[rc!='ok'][return(rc);];
 
 tokens. := clc#access();
 say('tokens:' + print(tokens.));
-⊨ tokens.'access_token'.'lifetime' == 900000 : 'wrong access token lifetime';
+⊨ tokens.'access_token'.'lifetime' == 1009000 : 'wrong access token lifetime';
 ⊨ tokens.'refresh_token'.'lifetime' == 1000000000 : 'wrong refresh token lifetime';
 ⊨ scope_check(['read:/frames', 'gwdatafind.read', 'write:/staging/jeffrey.gaynor', 'gracedb.read', 'dqsegdb.read'], tokens.'access_token'.'jwt') : 'wrong at scope(1)';
 ⊨clc#claims().'aud' == cfg.'id' : 'wrong audience';

@@ -1,0 +1,12 @@
+{
+  "comment": [
+    "Client with various overrides. These are in the client configuration and test ",
+    "overriding the server defaults, but not using the cfg."
+  ],
+  "client_name": "Basic test client with overrides",
+  "token_endpoint_auth_method": "private_key_jwt",
+  "client_id":"auto-test:/oauth/rfc9068/qdl",
+  "grant_types":["refresh_token"],
+  "strict_scopes": false
+}
+

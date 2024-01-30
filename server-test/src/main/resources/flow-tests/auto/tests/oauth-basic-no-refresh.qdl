@@ -6,10 +6,12 @@
 params. ≔ {'sub':'jeff'};
 test_id:= 'oauth.conf.no_refresh';
 clc#init($$OA4MP_CLC_INI, test_id);
-ini.:= file_read($$OA4MP_CLC_INI, 2).tokenize(test_id, '.');
-server_lifetimes.:=script_run('auto/utils/get_server_defaults.qdl'); // in seconds from the server
+initialization := size(args())==1⇒args().0:import(load('test#/auto/utils/initialization.mdl'));
+ini.:=initialization#get_client_ini(test_id);
+server_defaults.:=initialization# server_defaults();
+
 tokens. := clc#rfc7523(params.);
-⊨ tokens.'access_token'.'lifetime' == 1000*server_lifetimes.'at_lifetime' : 'wrong access token lifetime';
+⊨ tokens.'access_token'.'lifetime' == 1000*server_defaults.'at_lifetime' : 'wrong access token lifetime';
 ⊨ ∄tokens.'refresh_token' : 'should not get a refresh token.';
 ⊨ size(clc#claims()) == 0 : ' got claims where none should be';
 

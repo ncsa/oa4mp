@@ -11,6 +11,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2HeaderUtils;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientConverter;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientKeys;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VirtualOrganization;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.Permission;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.EnvServlet;
@@ -115,11 +116,7 @@ public class OIDCCMServlet extends EnvServlet {
             if (!getOA2SE().getCmConfigs().hasRFC7592Config()) {
                 throw new IllegalAccessError("RFC 7592 not supported on this server. Request rejected.");
             }
-            String[] query = httpServletRequest.getParameterValues(QUERY_PARAMETER);
-            if (query != null && query.length != 0) {
-                handleServerQuery(Arrays.asList(query), httpServletRequest, httpServletResponse);
-                return;
-            }
+
             boolean isAnonymous = false;  // Meaning that a client is trying to get information
             AdminClient adminClient = null;
             try {
@@ -129,6 +126,11 @@ public class OIDCCMServlet extends EnvServlet {
                     throw ge;
                 }
                 isAnonymous = true;
+            }
+            String[] query = httpServletRequest.getParameterValues(QUERY_PARAMETER);
+            if (query != null && query.length != 0) {
+                handleServerQuery(adminClient, Arrays.asList(query), httpServletRequest, httpServletResponse);
+                return;
             }
             OA2Client oa2Client = null;
             MetaDebugUtil debugger;
@@ -221,7 +223,7 @@ public class OIDCCMServlet extends EnvServlet {
      * @param request
      * @param response
      */
-    private void handleServerQuery(List<String> queries, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    private void handleServerQuery(AdminClient adminClient, List<String> queries, HttpServletRequest request, HttpServletResponse response) throws IOException {
         JSONObject jsonObject = new JSONObject();
         // improvement for https://github.com/ncsa/oa4mp/issues/154
         if (queries.contains("org.oa4mp:/server/defaults")) {
@@ -236,6 +238,14 @@ public class OIDCCMServlet extends EnvServlet {
             jsonObject.put(AUTH_GRANT_TOKEN_LIFETIME, getOA2SE().getAuthorizationGrantLifetime() / 1000);
             jsonObject.put("use_server_default", OA2Client.USE_SERVER_DEFAULT);
             jsonObject.put(OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_TAG, getOA2SE().getRtGracePeriod() / 1000);
+            if(adminClient==null){
+                jsonObject.put("issuer", getOA2SE().getIssuer());
+                jsonObject.put("at_issuer", getOA2SE().getIssuer());
+            }else{
+                VirtualOrganization vo = (VirtualOrganization) getOA2SE().getVOStore().get(adminClient.getVirtualOrganization());
+                jsonObject.put("issuer", vo.getIssuer());
+                jsonObject.put("at_issuer", vo.getAtIssuer());
+            }
         }
         writeOK(response, jsonObject);
     }
@@ -307,10 +317,15 @@ public class OIDCCMServlet extends EnvServlet {
         JSONArray cbs = new JSONArray();
         cbs.addAll(client.getCallbackURIs());
         json.put(OIDCCMConstants.REDIRECT_URIS, cbs);
+        boolean gotJWKSURI = false;
         if (client.hasJWKSURI()) {
+            gotJWKSURI = true;
             json.put(JWKS_URI, client.getJwksURI().toString());
         }
         if (client.hasJWKS()) {
+            if(gotJWKSURI){
+                throw new IllegalStateException("The specification explicitly forbids having both keys and a jwks uri. Request rejected");
+            }
             JSONObject jwks = JSONWebKeyUtil.toJSON(client.getJWKS());
             json.put(JWKS, jwks);
         }
@@ -391,7 +406,11 @@ public class OIDCCMServlet extends EnvServlet {
         if (client.hasOIDC_CM_Attributes()) {
             // add them back
             for (Object key : client.getOIDC_CM_Attributes().keySet()) {
-                json.put(key, client.getOIDC_CM_Attributes().get(key));
+                if(!key.equals(OA2Constants.CLIENT_ID)) {
+                    // had a case where a client uploaded client_id as an extra attribute
+                    // Don't allow the user to hot-rod the client id even by accident.
+                    json.put(key, client.getOIDC_CM_Attributes().get(key));
+                }
             }
         }
         return json;

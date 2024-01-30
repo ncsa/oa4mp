@@ -1,6 +1,7 @@
 #! /usr/bin/env -S qdl-run
 // If you want to run an individual test, add the next two lines to it or none of the utilities
 // will be found.
+
 path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests';
 script_path(path ~ script_path());
 test. := args().0;
@@ -14,7 +15,13 @@ rc := null;// set scope for it
 while[x∈test.][
 try[
   if  [var_type(x) == 4]
-  then[zzz.:=x;rc:=script_load(zzz.0, sublist(zzz., 1));]
+  then[
+       zzz.:=x;
+       //contract is that two arguments [a,b] are interpreted
+       // as script_load(a,b), but [a,b,...,c] as
+       // script_load(a, [b,...c]) i.e. rolled into a list.
+       rc:=script_load(zzz.0, 2==size(zzz.)?zzz.1:sublist(zzz., 1));
+       ]
   else[rc := script_load(x);];
 
   if[rc == 'q'][break();]; // exit app

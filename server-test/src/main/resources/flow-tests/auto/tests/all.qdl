@@ -2,11 +2,24 @@
 // If you want to run an indivdual test, add the next two lines to it or none of the utilities
 // will be found.
 path:='test#/';
-test.:=(path + 'auto/tests/') + ['oauth-with-refresh.qdl',
-                                  'oauth-basic-no-refresh.qdl',
-                                  'oidc-test-overrides.qdl',
-                                  'oidc-id-token.qdl',
-                                  'oidc-scitokens-qdl.qdl'];
+initialization := import(load('test#/auto/utils/initialization.mdl'));
+test.:= [
+          [path + 'auto/tests/' +'rfc7523-grant.qdl'],
+          [path + 'auto/tests/' +'oauth-with-refresh.qdl', initialization],
+          [path + 'auto/tests/' +'oauth-basic-no-refresh.qdl',initialization],
+          [path + 'auto/tests/' +'oidc-test-overrides.qdl',initialization],
+          [path + 'auto/tests/' +'oidc-id-token.qdl',initialization],
+          [path + 'auto/tests/' +'oidc-scitokens-qdl.qdl',initialization],
+          [path + 'auto/tests/' +'revoke.qdl'],
+          [(path + 'auto/tests/rfc8693/') + 'ersatz-rt.qdl',  '-subject','at'],
+          [(path + 'auto/tests/rfc8693/') + 'ersatz-rt.qdl',  '-subject','rt'],
+          [(path + 'auto/tests/rfc8693/') + 'ersatz-fork.qdl', '-at', '-subject','at'],
+          [(path + 'auto/tests/rfc8693/') + 'ersatz-fork.qdl', '-at', '-subject','rt'],
+          [(path + 'auto/tests/rfc8693/') + 'ersatz-fork.qdl', '-none', '-subject','at'],
+          [(path + 'auto/tests/rfc8693/') + 'ersatz-fork.qdl', '-none', '-subject','rt'],
+          [(path + 'auto/tests/rfc8693/') +   'tx-basic.qdl',true], // do exchange with access token
+          [(path + 'auto/tests/rfc8693/') +   'tx-basic.qdl',false] // do exchange with refresh tokens
+        ];
 
 say('**** Automated test suite for OA4MP. ****');
 script_load('runner.qdl', test., true); // Dont' skip lines between tests

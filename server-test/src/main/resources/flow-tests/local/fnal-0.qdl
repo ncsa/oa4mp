@@ -1,12 +1,8 @@
 #! /usr/bin/env -S qdl-run
 
-
-path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests';
-if[path∉script_path()][script_path(path ~ script_path());];
-
 cfg.'id'  := 'localhost:test/fnal';
 cfg.'idp'  := 'GitHub';
-cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
+cfg.'file' := $$OA4MP_CLC_XML_INI;
 cfg.'description' :=  'Test FNAL with no scopes -- fails';
 cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
 

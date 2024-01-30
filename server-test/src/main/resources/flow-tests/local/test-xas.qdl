@@ -6,18 +6,13 @@
    enabled in the CLI (using the ea_support command). This should return
    a string of two values that can be parsed. 
 */
-path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests';
-if[path∉script_path()][script_path(path ~ script_path());];
-/*
-path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/utils';
-if[path∉script_path()][script_path(path ~ script_path());];
-*/
+
 script_load('/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/utils/xa-utils.qdl');
 debugger(1);
 xas. := to_xas('idt',{'foo':'bar'})~to_xas('at',{'group':'all','lifetime':1000000})~to_xas('rt',{'role':'admin'});
 params. ≔ {'sub':'jeff'}~xas.;
 say('params:\n'+print(params.));
-clc#init('/home/ncsa/dev/csd/config/client-oa2.xml', 'localhost:test/rfc9068a');
+clc#init($$OA4MP_CLC_XML_INI, 'localhost:test/rfc9068a');
 
 
 tokens. := clc#rfc7523(params.);

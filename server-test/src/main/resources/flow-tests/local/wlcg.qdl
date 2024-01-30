@@ -31,12 +31,9 @@ Look at the specification at
 https://indico.cern.ch/event/769180/contributions/3563095/attachments/1908176/3152124/WLCG_Common_JWT_Profiles.pdf
 
 */
-path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests';
-if[path∉script_path()][script_path(path ~ script_path());];
-
 cfg.'id'  := 'localhost:wlcg'; // name of the configuration, not the id
 cfg.'idp'  := 'NCSA';
-cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
+cfg.'file' := $$OA4MP_CLC_XML_INI;
 cfg.'description' :=  'Test basic configuration for WLCG tokens, no scripting.';
 cfg.'flow_type' := 'df'; // Note to use df you need to set param for the token endpoint
 //user_id := 'http://cilogon.org/serverT/users/21340363'; // id from Github on test.cilogon.org

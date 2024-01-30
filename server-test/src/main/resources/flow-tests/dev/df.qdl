@@ -9,7 +9,7 @@ path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tes
 if[path∉script_path()][script_path(path ~ script_path());];
 cfg.'id'  := 'dev:test/df';
 cfg.'idp'  := 'NCSA';
-cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
+cfg.'file' := $$OA4MP_CLC_XML_INI;
 cfg.'description' :=  'Test basic device flow on DEV.';
 cfg.'flow_type' := 'df'; 
 

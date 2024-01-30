@@ -7,12 +7,17 @@ debugger(1);
 params. ≔ {'sub':'jeff'};
 test_id:= 'oauth.conf.basic';
 clc#init($$OA4MP_CLC_INI, test_id);
-ini.:= file_read($$OA4MP_CLC_INI, 2).tokenize(test_id, '.');
-server_lifetimes.:=script_run('auto/utils/get_server_defaults.qdl'); // in seconds from the server
+
+initialization := size(args())==1⇒args().0:import(load('test#/auto/utils/initialization.mdl'));
+//checks:=initialization#checks();
+ini.:=initialization#get_client_ini(test_id);
+server_defaults.:=initialization# server_defaults();
+//cc.:=initialization#get_client_config(test_id);
+
 tokens. := clc#rfc7523(params.);
-⊨ tokens.'access_token'.'lifetime' == 1000*server_lifetimes.'at_lifetime' : 'wrong access token lifetime';
+⊨ tokens.'access_token'.'lifetime' == 1000*server_defaults.'at_lifetime' : 'wrong access token lifetime';
 ⊨ ∃tokens.'refresh_token' : 'did not got a refresh token.';
-⊨ tokens.'refresh_token'.'lifetime' == 1000*server_lifetimes.'rt_lifetime' : 'wrong refresh token lifetime';
+⊨ tokens.'refresh_token'.'lifetime' == 1000*server_defaults.'rt_lifetime' : 'wrong refresh token lifetime';
 ⊨ size(clc#claims()) == 0 : ' got claims where none should be';
 
 // now redo requesting specific lifetimes

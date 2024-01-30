@@ -1,5 +1,5 @@
 root:= os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests/';
-config_file := '/home/ncsa/dev/csd/config/client-oa2.xml';
+config_file := $$OA4MP_CLC_XML_INI;
 // Names of scripts to run.
 test_list. := root +  [
       'no_config'

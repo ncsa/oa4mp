@@ -403,6 +403,7 @@ public class OA2Client extends Client implements OA2ClientScopes {
     }
 
     public void setOIDC_CM_attributes(JSONObject attr) {
+        attr.remove(OA2Constants.CLIENT_ID); // do not allow clients to set a client id.
         setNamedAttributes(oidc_cm_attributes, attr);
     }
 

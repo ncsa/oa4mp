@@ -1,0 +1,64 @@
+/*
+   Module that contains all of the initialization for testing. This will
+   import various things and is intended to be passed around between
+   tests to reduce the overhead of e.g., reading in the cnfiguration and
+   parsing for each client for each test.
+
+*/
+module['oa4mp:/auto-test/init']
+  [
+    === Module that contains all of the initialization for testing. This will
+    === import various things and is intended to be passed around between
+    === tests to reduce the overhead of e.g., reading in the configuration and
+    === parsing for each client for each test. Functions are
+    === client_init() = returns the ini file with all of the testing clients
+    === checks() = returns an instance of the checks module
+    === server_defaults() = get the defaults from the server. This requires
+    ===        a call to the server so it expensive. Best to do this once
+    === get_client_ini(test_name) = given the name of the section in the client
+    ===        ini file, read and process the entry, returning the configuration
+    === get_client_config(test_name) = This will take the name of the client entry
+    ===        E.g. oidc.confidential.no_refresh, go to the server and retrieve
+    ===        the client configuration that is current on the server. This allows
+    ===        you to introspect in tests for the expected values.
+    ===
+    === N.B: This requires that the path to the client ini file be set in the global
+    ===        variable $$OA4MP_CLC_INI and that the path to the admin be set in
+    ===        the variable $$OA4MP_AUTO_TEST_INI.
+    === N.B: Each test will check if this is passed and if not, load this module,
+    ===        so you don't really have to worry about it as long as the right global
+    ===        variables are set.
+
+             __checks  := null;
+         __server_ini. := null;
+         __client_inis.:= null;
+    __server_defaults. := null;
+    client_inis()->
+       block[
+          if[is_null(__client_inis.)]
+           [
+             __client_inis.:=file_read($$OA4MP_CLC_INI, 2);
+           ]; //end if
+          return(__client_inis.);
+        ];
+
+      checks()->
+      block[
+         if[__checks == null][
+           __checks := import(load('test#/auto/utils/checks.mdl'));
+         ];
+         return(__checks);
+       ];
+
+      get_client_ini(test_id)-> client_inis().tokenize(test_id, '.');
+
+      server_defaults()->
+      block[
+        if[is_null(__server_defaults.)][
+            __server_defaults.:=script_run('auto/utils/get_server_defaults.qdl'); // in seconds from the server
+        ]; //end if
+        return(__server_defaults.);
+      ];
+      get_client_config(test_id)->script_run('test#/auto/utils/get_client.qdl',get_client_ini(test_id).'id');
+
+  ]; // end module

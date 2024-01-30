@@ -6,12 +6,10 @@
    enabled in the CLI (using the ea_support command). This should return
    a string of two values that can be parsed. 
 */
-path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests';
-if[path∉script_path()][script_path(path ~ script_path());];
 
 cfg.'id'  := 'ashigaru:command.line2';
 cfg.'idp'  := 'ANY';
-cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
+cfg.'file' := $$OA4MP_CLC_XML_INI;
 cfg.'description' :=  'RFC7523 authentication test, then chained QDL scripts in a single handler.';
 cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
 params.'a' := {'org.oa4mp:/tokens/access/lifetime':1000000,'org.oa4mp:/roles':'admin,all-user'};

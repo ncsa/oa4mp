@@ -25,7 +25,7 @@ if[path∉script_path()][script_path(path ~ script_path());];
 
 cfg.'id'  := 'test:jeff/ligo';
 cfg.'idp'  := 'LIGO';
-cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
+cfg.'file' := $$OA4MP_CLC_XML_INI;
 cfg.'description' :=  'Robot test for LIGO';
 cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
 user_id := 'http://cilogon.org/serverT/users/21340363'; // id from Github on test.cilogon.org

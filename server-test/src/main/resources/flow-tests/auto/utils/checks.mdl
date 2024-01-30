@@ -13,15 +13,14 @@ body[
 » of tokens and flows. Generally there is the expected. stem, which has keys and values
 » the server should be returning and asserted. which is what the server hands back.
 » Usually if the result is an empty stem, that means that there were no differences.
-» There is no assumption that expected. is a strict subset of asserted., so you should
+» If there is no assumption that expected. is a strict subset of asserted., so you should
 » probably consider running the missing_claims check.
-  foo:='bar';
 
-  define[lifetime(asserted., lifetime)]
+  define[lifetime(expected_lifetime, asserted.)]
   [
    === lifetime(asserted., lifetime) - return the difference between the asserted lifetime and the expected lifetime
    === If this is negative, then the asserted token has expired.
-   (asserted.'exp' - asserted.'iat')*1000-lifetime;
+   (asserted.'exp' - asserted.'iat')*1000-expected_lifetime;
    ];
 
   define[l2(asserted., lifetime)]
@@ -38,31 +37,58 @@ body[
 // ccc. := {'a':0, 'b':1, 'c':2}
 // ddd. := {'a':0, 'b':-1, 'c':2, 'd':3, 'e':4, 'exp':(date_ms()%1000+3600),'iat':(date_ms()%1000)}
    define[missing_claims(expected., asserted.)]
-   [
-   » missing_claims(expected., asserted.) - returns a stem of claims that are in expected., but not in asserted.
-     expected.∌asserted.⌆expected.;
+   [=== missing_claims(expected., asserted.) -- check a passed list of keys is in asserted.
+    ===  or if passed a stem, the keys are in asserted.
+    === This returns a left conformable stem or list of missing keys. And empty result means all keys
+    === are included.
+    === E.g.
+    ===    x. := {'a':0, 'b':1, 'c':2}
+    ===    y. := {'a':0, 'b':-1, 'c':2, 'd':3, 'e':4, 'exp':(date_ms()%1000+3600),'iat':(date_ms()%1000)}
+    ===    missing_claims(x., y.)
+    ===
+    === (empty result) implies all keys in x. are in y. Compare with
+    ===    missing_claims(y., x.)
+    === {
+    ===  d:3,
+    ===  e:4,
+    ===  exp:1706446932,
+    ===  iat:1706443332
+    === }
+    ===
+    === which tells us what claims are missing in x. Again, this accepts a list of claims one
+    === the left hand side too:
+    ===    missing_claims(['a','b','woof'], y.)
+    === [woof]
+    ===
+    === means that the claim named 'woof' is missing in y.
+      if[is_list(expected.)]
+      then[
+         return(~expected.∉list_keys(asserted.)⌆expected.); // check every expected key is a key in asserted
+       ];
+      return(expected.∌asserted.⌆expected.);
     ];
+
   define[claims(expected., asserted.)]
-    body[
-     »  verify_claims(expected., asserted.) -- verify the expected claims have the values asserted.
-     »  This returns the diff of the elements that do not match, with the asserted values first.
-       x. := null;
-       // use  ∈ to test, not ≡ since the latter would not give the
-       // right result for unordered lists., i.e. [1,2]≡[2,1] is [false,false]
-       // but [1,2] ∈ [2,1] is [true,true]
-       // trivially scalar ∈ scalar is just scalar ≡ scalar
-       while[j∋expected.]
-          do[x.j≔⊗∧⊙(expected.j∈asserted.j);];
-       // grab the ones the failed
-       bad.≔(¬x.)⌆asserted.;
-       return(diff(bad., expected.));
-    ];
+        [
+         ===  claims(expected., asserted.) -- verify the expected claims have the values asserted.
+         ===  This returns the diff of the elements that do not match, with the asserted values first.
+         ===  An empty result means the values matched. This will check simple lists match values,
+         ===  but does not check order of them.
+           x. := null;
+           // use  ∈ to test, not ≡ since the latter would not give the
+           // right result for unordered lists., i.e. [1,2]≡[2,1] is [false,false]
+           // but [1,2] ∈ [2,1] is [true,true]
+           // trivially scalar ∈ scalar is just scalar ≡ scalar
+           while[j∋expected.]
+              do[x.j≔⊗∧⊙(expected.j∈asserted.j);];
+           // grab the ones the failed
+           bad.≔(¬x.)⌆asserted.;
+           return(diff(bad., expected.));
+       ]; // enc claims check
 
 /*
    This is a bit different in that it will look up the expected. which is a list
    inside the group structure asserted. E.g.
-
-
 
    So here this would be check#groups(['foo','bar'], [{'name':'foo', 'id':2}, {'name':'bar', 'id':3}])
 */
@@ -81,4 +107,83 @@ body[
       »      g := import('oa2:/qdl/oidc/claims');
           return(g#in_group2(expected., asserted.));
     ];
- ];
+
+
+    rfc9068(expected., asserted.)-> // can use missing_claims
+      block[=== Check an RFC 9068 access token as per the spec. https://www.rfc-editor.org/rfc/rfc9068
+            === The access_token. is as returned from the service (so it is dissected here)
+            === Note there is a requirement that the JWT header incldeu 'at+jwt' and that
+            === is checked when the signature of the token is verified. If you get to this check
+            === that worked.
+            === params. has the following
+            === client_id = the id of the client making the request
+            === iss = issuer for the service
+            === resource = the resource parameters in the request
+            === lifetime = the lifetime of this token (this is to check OA4MP works)
+            // Checks required claims as per §2.2
+            m. ≔  missing_claims(['exp','iat','aud','sub','iss','jti','client_id'], asserted.);
+            ⊨ size(m.)≡0 : 'missing claims:' + to_string(m.);
+            //⊨ access_token.'lifetime' == 300000 : 'wrong access token lifetime, got ' + (access_token.'lifetime');
+            ⊨ asserted.'aud' == expected.'resource' : 'wrong audience';  // Audience is a little different than usual.
+            ⊨ asserted.'client_id' == expected.'client_id';  // wrong client_id.
+            ⊨ date_ms() < (asserted.'exp')*1000  : 'incorrect expiration time.';  // §4 validation
+            ⊨ asserted.'iss'  == expected.'iss' : 'incorrect issuer value';  // §4 validation
+          ];// end RFC9068
+
+
+    /*
+      the argument params has
+      iss - issuer
+      sub = user id
+      aud = expected audience
+      ver = expected version (default is 'scitoken:2.0')
+      scopes = list of scopes.
+    */
+
+    scitokens(expected., asserted. )->
+    block[=== scitokens(expected., asserted.) -- check an access token for required claims and values.
+          === This is a basic check of a SciToken. Every SciToken from the server should
+          === pass this check.
+          === The list of values in params. is
+          ===
+          ===     iss = issuer
+          ===     sub = user id
+          ===     aud = expected audience
+          ===     ver = expected version (default is 'scitoken:2.0')
+          === scopes. = list of scopes.
+          ===
+          === The scopes will be checked for inclusion, but not value (which is not required).
+          m. ≔  missing_claims(['exp','iat','aud','sub','iss','ver'], asserted.);
+          ⊨ size(m.)≡0 : 'missing claims:' + to_string(m.);
+          ⊨ ¬is_defined(asserted.'cid') : 'Still getting cid claim in scitoken'; // regression test. No cid claim
+
+         // Define the tests to run after access and refresh.
+         // c.:=claims(expected., asserted.);
+          //⊨ size(c.) == 0 : 'incorrect claim values:' + print(c.);
+          ⊨ asserted.'sub' ≡ expected.'sub' : 'wrong AT subject, got ' + (asserted.'sub') + ', expected ' + (expected.'sub');
+          ⊨ asserted.'iss' ≡ expected..'iss' : 'wrong AT issuer, got ' + (asserted.'iss') + ', expected ' + (expected.'iss');
+          ⊨ asserted.'aud' ≡ expected.'aud' : 'wrong AT audience, got ' + (asserted.'aud') + ', expected ' + (expected.'aud');
+
+          version := (∃expected.'ver')⇒expected.'ver': 'scitoken:2.0';
+          ⊨ asserted.'ver' ≡ version : 'incorrect scitokens version claim, got ' + (asserted.'ver') + ', expected ' + version;
+          // now, if they assert there are scopes to check, check them
+          if[∃expected.'scopes']
+            [
+              ⊨ ∃asserted.'scope':'missing scope claim in the access token';
+              verify_scopes(expected.'scopes', asserted.'scope' );
+            ];
+         ]; // end scitokens
+
+
+
+    define[verify_scopes(expected., asserted)]
+        [=== verify_scopes(expected., asserted) -- check a list of expected. scopes against the string of them
+         === returns both match, throws an assertion failed if they don't.
+         === The asserted argument is the string from the token. This checks
+         === that the asserted claims match the expected claims. This does not check
+         === for duplicates. Mostly this is used for access tokens.
+          s := ⊢tokenize(asserted, ' '); // claims in the token as a set
+          σ := ⊢expected.; // the expected scopes as a set
+          ⊨ s ≡ σ : 'scopes do not match: ' + to_string({'missing':σ/s, 'extra': s/σ});
+        ]; // end verify_scopes
+   ]; // end module

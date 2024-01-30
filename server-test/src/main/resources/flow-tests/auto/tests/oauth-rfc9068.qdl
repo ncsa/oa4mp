@@ -4,7 +4,7 @@
    Basic SciToken test. This will do the exchanges with all defaults -- no overrides -- and
    is the most basic possible
 */
-params. ≔ {'sub':'threepwood',
+params. ≔ {'sub':'davenport',
            'scope':'openid org.oa4mp:userinfo read: queue: execute:',
            'org.oa4mp:/rt/value/foo':'woof'};
 test_id:= 'oidc.scitokens.qdl';

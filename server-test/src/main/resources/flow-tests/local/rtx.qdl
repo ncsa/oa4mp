@@ -6,12 +6,9 @@
    chains of refreshes and exchanges the endpoints continue to work.
 */
 
-path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests';
-if[path∉script_path()][script_path(path ~ script_path());];
-
 cfg.'id'  := 'localhost:scitokens'; // name of the configuration, not the id
 cfg.'idp'  := 'Github';
-cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
+cfg.'file' := $$OA4MP_CLC_XML_INI;
 cfg.'description' :=  'Test multiple exchanges and refreshes.';
 cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
 user_id := 'http://cilogon.org/serverT/users/21340363';

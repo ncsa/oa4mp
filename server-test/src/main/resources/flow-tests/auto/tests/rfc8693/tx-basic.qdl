@@ -3,13 +3,12 @@
    Test to do token exchanges. This starts the flow then exchanges the
 */
 
-path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests/local/rfc8693';
-if[path∉script_path()][script_path(path ~ script_path());];
-args. := (0<size(args()))?args().0:[true]; // default is to use access token for exchange.
+
+args. := ~(0<size(args()))?args().0:[true]; // default is to use access token for exchange.
 params. ≔ {'sub':'jeff',
          'scope':['openid', 'read:/X', 'read:/Y/Q', 'p.q'] // should be able to pass in scopes as a simple list
          };
-clc#init('/home/ncsa/dev/csd/config/client-oa2.xml', 'localhost:p1');
+clc#init($$OA4MP_CLC_XML_INI, 'localhost:p1');
 tokens. := clc#rfc7523(params.);
 claims. :=clc#claims();
 // Now go and do the exchanges for rt and at ASAP.

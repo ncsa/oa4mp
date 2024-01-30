@@ -27,8 +27,7 @@
       "bgsu-astronomy:xrootd:read-frames",
       "bgsu-astronomy:xrootd:write-frames"
     ],
-    "username" : "gaynor"
-
+    "username": "gaynor"
   },
   "threepwood": {
     "comment": [
@@ -46,7 +45,10 @@
     "uid": "threepwood",
     "eppn": "threepwood@wærstan.edu",
     "isMemberOf": [
-       "CO:members:all", "CO:members:active", "CO:COU:MESS Employee:members:active", "CO:COU:MESS Employee:members:all"
+      "CO:members:all",
+      "CO:members:active",
+      "CO:COU:MESS Employee:members:active",
+      "CO:COU:MESS Employee:members:all"
     ],
     "voPersonExternalID": "threepwood@wærstan.edu",
     "voPersonID": "MESS1357",
@@ -58,38 +60,106 @@
     ]
   },
   "worplesdon": {
-     "comment": [
-       "Record for Dahlia Worplesdon at St. Æþelðryþe's college in Cnobheresburg.",
-       "This is for testing the WLCG token protocol. The access token handler gets this",
-       "and then peels off the eduPersonEntitlement, each entry is a and may be returned in the scopes",
-       "claim of the access token."
-     ],
-     "dn": "voPersonID=MESS2468,ou=people,o=MESS,o=CO,dc=cilogon,dc=org",
-     "first_name": "Dolly",
-     "full_name": "Dahlia Worplesdon",
-     "given_name": "Dahlia",
-     "display_name": "Dahlia Agatha Worplesdon",
-     "email": "d.worplesdon@æþelðryþe.edu",
-     "uid": "worplesdon",
-     "eppn": "worplesdon@æþelðryþe.edu",
-     "isMemberOf": [
-        "CO:members:all", "CO:members:active", "CO:COU:MESS Employee:members:active", "CO:COU:MESS Employee:members:all"
-     ],
-     "voPersonExternalID": "threepwood@wærstan.edu",
-     "voPersonID": "MESS2468",
-     "eduPersonEntitlement": [
-       "storage.read:/home/${sub}/vo3",
-       "storage.create:/public/vo3",
-       "storage.create:/home/${sub}/vo3",
-       "storage.modify:/public/vo3",
-       "storage.modify:/public/${sub}/vo3",
-       "storage.stage:/staging/vo3",
-       "compute.create",
-       "compute.modify",
-       "compute.cancel",
-       "compute.read"
-     ]
-   },
+    "comment": [
+      "Record for Dahlia Worplesdon at St. Æþelðryþe's college in Cnobheresburg.",
+      "This is for testing the WLCG token protocol. The access token handler gets this",
+      "and then peels off the eduPersonEntitlement, each entry is a and may be returned in the scopes",
+      "claim of the access token."
+    ],
+    "dn": "voPersonID=MESS2468,ou=people,o=MESS,o=CO,dc=cilogon,dc=org",
+    "first_name": "Dolly",
+    "full_name": "Dahlia Worplesdon",
+    "given_name": "Dahlia",
+    "display_name": "Dahlia Agatha Worplesdon",
+    "email": "d.worplesdon@æþelðryþe.edu",
+    "uid": "worplesdon",
+    "eppn": "worplesdon@æþelðryþe.edu",
+    "isMemberOf": [
+      "CO:members:all",
+      "CO:members:active",
+      "CO:COU:MESS Employee:members:active",
+      "CO:COU:MESS Employee:members:all"
+    ],
+    "voPersonExternalID": "threepwood@wærstan.edu",
+    "voPersonID": "MESS2468",
+    "eduPersonEntitlement": [
+      "storage.read:/home/${sub}/vo3",
+      "storage.create:/public/vo3",
+      "storage.create:/home/${sub}/vo3",
+      "storage.modify:/public/vo3",
+      "storage.modify:/public/${sub}/vo3",
+      "storage.stage:/staging/vo3",
+      "compute.create",
+      "compute.modify",
+      "compute.cancel",
+      "compute.read"
+    ]
+  },
+  "davenport": {
+    "comment": [
+      "Record for Alaric Bartholomew Pendlebury-Davenport at St. Æþelðryþe's college in Cnobheresburg.",
+      "This is for testing the RFC 9068 token protocol. The access token handler gets this",
+      "and then peels off the eduPersonEntitlement, each entry is a and may be returned in the scopes",
+      "claim of the access token."
+    ],
+    "first_name": "Alaric",
+    "full_name": "Alaric Bartholomew Pendlebury-Davenport",
+    "given_name": "Alaric",
+    "display_name": "Alaric Βαρθολομαῖος Pendlebury-Davenport",
+    "email": "a.pendav@æþelðryþe.edu",
+    "uid": "pendav",
+    "eppn": "pendav@æþelðryþe.edu",
+    "isMemberOf": [
+      "CO:members:all",
+      "CO:members:active",
+      "CO:COU:MESS Employee:members:active",
+      "CO:COU:MESS Employee:members:all"
+    ],
+    "voPersonExternalID": "penddav@wærstan.edu",
+    "voPersonID": "MESS4321",
+    "eduPersonEntitlement": [
+      "storage.read:/home/${sub}/vo3",
+      "storage.create:/public/vo3",
+      "storage.create:/home/${sub}/vo3",
+      "storage.modify:/public/vo3",
+      "storage.modify:/public/${sub}/vo3",
+      "storage.stage:/staging/vo3",
+      "compute.create",
+      "compute.modify",
+      "compute.cancel",
+      "compute.read"
+    ]
+  },
+  "pilbeam": {
+    "comment": [
+      "Record for Percy Frobisher Pilbeam at St. Wærstan's College in Cnobheresburg.",
+      "This is for testing templates. The access token handler gets this",
+      "and then peels off the eduPersonEntitlement, each entry is a and may be returned in the scopes",
+      "claim of the access token."
+    ],
+    "nickname": "Fruity",
+    "first_name": "Percy",
+    "middle_name": "Frobisher",
+    "last_name": "Pilbeam",
+    "display_name": "Percy Frobisher Pilbeam",
+    "email": "p.pilbeam@wærstan.edu",
+    "uid": "pilbeam",
+    "eppn": "pilbeam@wærstan.edu",
+    "isMemberOf": [
+      "CO:members:all",
+      "CO:members:active",
+      "CO:COU:MESS Employee:members:active",
+      "CO:COU:MESS Employee:members:all"
+    ],
+    "voPersonExternalID": "pilbeam@wærstan.edu",
+    "voPersonID": "MESS1357",
+    "eduPersonEntitlement": [
+      "read:/public/vo3",
+      "write:/home/${sub}/vo3/data",
+      "queue:/staging/vo3-production-queue",
+      "execute:/home/${sub}/vo3/bin"
+    ]
+  },
   "default_claim": {
     "comment": [
       "This is the default claim returned by the handler **if** you specify use_default",

@@ -16,12 +16,13 @@
    rfc7523 -username jeff
 
 */
-path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests';
-if[path∉script_path()][script_path(path ~ script_path());];
+test_id:= 'oauth.conf.basic';
+clc#init($$OA4MP_CLC_INI, test_id);
 
 temp_file := '/tmp/revoke-test.json';
 
 params. ≔ {'sub':'jeff'};
-clc#init('/home/ncsa/dev/csd/config/client-oa2.xml', 'ashigaru:command.line2');
+//clc#init($$OA4MP_CLC_XML_INI, 'ashigaru:command.line2');
+//clc#init($$OA4MP_CLC_XML_INI, 'ashigaru:command.line2');
 tokens. := clc#rfc7523(params.);
 script_load('revoke.qdl', temp_file, tokens.);

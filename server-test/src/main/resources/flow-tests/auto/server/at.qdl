@@ -6,7 +6,10 @@ epe.:=claims#get_claims(claims#create_source(cfg.), claims.'sub').'eduPersonEnti
 debugger(1, '  epe = ' + to_string(epe.));
 out. := claims#template_substitution(epe., claims.);
 debugger(1, '  after subst = ' + to_string(out.));
-out. := claims#resolve_templates(out., scopes., 'post_token'==exec_phase);
+real_scopes.:=size(tx_scopes.)==0?scopes.:tx_scopes.;
+say('at.qdl scopes.\n' + print(scopes.));
+say('at.qdl tx_scopes.\n' + print(tx_scopes.));
+out. := claims#resolve_templates(out., real_scopes., 'post_token'==exec_phase);
 debugger(1, '  after resolve = ' + to_string(out.));
 
 access_token.'scope' := detokenize(out., ' ');

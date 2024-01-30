@@ -29,15 +29,14 @@
 
 
 */
-path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests';
-if[path∉script_path()][script_path(path ~ script_path());];
+
 original_file := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-admin/src/main/resources/qdl/ui-test/test-claims.json';
 claims_file := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-admin/src/main/resources/qdl/ui-test/ui-test.json';
 file_write(claims_file, file_read(original_file)); // initialize it
 debugger(5);
 cfg.'id'  := 'localhost:test/user_info'; // name of the configuration, not the id
 cfg.'idp'  := 'Github';
-cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
+cfg.'file' := $$OA4MP_CLC_XML_INI;
 cfg.'description' :=  'Claim source test. Show that changing the claims in the source between calls is reported.';
 cfg.'flow_type' := 'uri'; // Don't run DF since this requires the post_auth phase to initialize
 user_id := 'http://cilogon.org/serverT/users/21340363';

@@ -16,6 +16,7 @@
    rfc7523 -username jeff
 
 */
+debugger(10);
 temp_file := args().0;
 tokens. := args().1;
   try[
@@ -109,4 +110,4 @@ try[
  ];
 ⊨ rc:'was able to refresh with invalid tokens';
 
-say('Revocation test: ok');
+say('ok: Revocation test');

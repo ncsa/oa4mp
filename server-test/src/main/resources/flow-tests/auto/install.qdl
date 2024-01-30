@@ -6,8 +6,7 @@
 
 */
 // /home/ncsa/dev/csd/config/auto-test/auto-test.ini
-say(args().0);
-ini. := file_read(args().0,2);
+ini. := file_read($$OA4MP_AUTO_TEST_INI,2);
 admin.:=ini.'admin';
 say('ini:\n' + print(ini.));
 print(info());

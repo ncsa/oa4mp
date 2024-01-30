@@ -331,6 +331,9 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
             setCurrentClaim(c, finalClaims, NAME);
             setCurrentClaim(c, finalClaims, GIVEN_NAME);
             setCurrentClaim(c, finalClaims, FAMILY_NAME);
+            setCurrentClaim(c, finalClaims, MIDDLE_NAME);
+            setCurrentClaim(c, finalClaims, NICKNAME);
+            setCurrentClaim(c, finalClaims, DISPLAY_NAME);
             setCurrentClaim(c, finalClaims, PREFERRED_USERNAME);
         }
         if (scopes.contains(OA2Scopes.SCOPE_ADDRESS)) {
@@ -397,6 +400,8 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
         }
         if (!scopes.contains(OA2Scopes.SCOPE_PROFILE)) {
             getUserMetaData().remove(NAME);
+            getUserMetaData().remove(MIDDLE_NAME);
+            getUserMetaData().remove(NICKNAME);
             getUserMetaData().remove(GIVEN_NAME);
             getUserMetaData().remove(FAMILY_NAME);
             getUserMetaData().remove(PREFERRED_USERNAME);
@@ -412,17 +417,7 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
             for(String claim: USER_INFO_CLAIMS){
                 getUserMetaData().remove(claim);
             }
-/*
-            getUserMetaData().remove(IS_MEMBER_OF);
-            getUserMetaData().remove(VO_PERSON_EXTERNALID);
-            getUserMetaData().remove(EDU_PERSON_ENTITLEMENT);
-            getUserMetaData().remove(VO_PERSON_ID);
-            getUserMetaData().remove(EPPN);
-            getUserMetaData().remove(EPTID);
-*/
         }
-
-
         // everything else gets passed back.
     }
 

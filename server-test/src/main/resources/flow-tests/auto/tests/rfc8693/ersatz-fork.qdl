@@ -17,18 +17,17 @@ path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tes
 script_path(path ~ script_path());
 saved_cfg := '/tmp/ersatz1-test.json';
 script_load('local/rfc8693/provisioner.qdl', saved_cfg);
-clc#init('/home/ncsa/dev/csd/config/client-oa2.xml', 'localhost:e1');
+clc#init($$OA4MP_CLC_XML_INI, 'localhost:e1');
 clc#read(saved_cfg , '-p'); // -p switch tell client that this is an ersatz client
 
 tokens. := clc#exchange(); // does fork
 
 */
-path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests/';
-if[path∉script_path()][script_path(path ~ script_path());];
+
 args. := (0<size(args()))?args().0:['-at','-subject', 'at']; // default is to use access token for exchange.
 saved_cfg := '/tmp/ersatz1-test.json';
-script_load('local/rfc8693/provisioner.qdl', saved_cfg);
-clc#init('/home/ncsa/dev/csd/config/client-oa2.xml', 'localhost:e1');
+script_load('auto/tests/rfc8693/provisioner.qdl', saved_cfg);
+clc#init($$OA4MP_CLC_XML_INI, 'localhost:e1');
 clc#read(saved_cfg , '-p'); // -p switch tell client that this is an ersatz client
 old_tokens. := clc#tokens();
 

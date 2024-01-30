@@ -14,12 +14,9 @@
        "type": "identity"
       }}}
 */
-path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests';
-if[path∉script_path()][script_path(path ~ script_path());];
-
 cfg.'id'  := 'localhost:test/ncsa'; // name of the configuration, not the id
 cfg.'idp'  := 'NCSA';
-cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
+cfg.'file' := $$OA4MP_CLC_XML_INI;
 cfg.'description' :=  'Basic NCSA test using default QDL script. START VPN or this hangs!';
 cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
 rc := script_load('driver.qdl', cfg.);

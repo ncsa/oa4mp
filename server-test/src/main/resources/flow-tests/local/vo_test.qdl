@@ -1,11 +1,8 @@
 #! /usr/bin/env -S qdl-run
-path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests';
-if[path∉script_path()][script_path(path ~ script_path());];
-
 /* Next should be set in the main.qdl script.*/
 cfg.'id'  := 'localhost:command.line2';
 cfg.'idp'  := 'ANY';
-cfg.'file' := '/home/ncsa/dev/csd/config/client-oa2.xml';
+cfg.'file' := $$OA4MP_CLC_XML_INI;
 cfg.'flow_type' := 'df';
 cfg.'description' :=  'This tests code challenge machinery, AT permissions, device flow and exchanges.';
 script_load('local/vo_test-suite.qdl', cfg., 'http://localhost:9443/custom/issuer');
