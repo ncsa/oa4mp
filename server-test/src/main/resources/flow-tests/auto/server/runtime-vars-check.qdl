@@ -21,7 +21,7 @@ say('args()=' + args());
 say('checking runtime variables');
                  if[∄oa4mp_error][raise_error('oa4mp_error code not set');]; // can't propagate error. Something really wrong
             if[oa4mp_error!=1000][raise_error('oa4mp_error code value incorrect, should be 1000, got ' + oa4mp_error, 1000);];
-     if[size(proxy_claims.) == 0][raise_error('missing proxy_claims.');];
+               if[∄proxy_claims.][raise_error('missing proxy_claims.');];
                   if[∄exec_phase][raise_error('missing exec_phase variable', oa4mp_error);];
              if[∄access_control.][raise_error('missing access control stem', oa4mp_error);];
   if[∄access_control.'client_id'][raise_error('access control client_id not set', oa4mp_error);];
@@ -30,6 +30,7 @@ say('checking runtime variables');
                 if[∄flow_states.][raise_error('missing flow states', oa4mp_error);];
                   if[∄mail.'cfg'][raise_error('missing mail configuration', oa4mp_error);];
               if[∄mail.'message'][raise_error('missing default mail message', oa4mp_error);];
+         if[∄at_original_scopes.][raise_error('missing original access token scopes', oa4mp_error);];
 if[exec_phase != 'post_auth'][
     if[atJWT][
                if[∄access_token.][raise_error('access_token. not set', oa4mp_error);];

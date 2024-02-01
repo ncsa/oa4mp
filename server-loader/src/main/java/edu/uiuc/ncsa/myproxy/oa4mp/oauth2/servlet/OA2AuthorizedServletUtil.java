@@ -1,7 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ExtendedParameters;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ScriptRuntimeEngineFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.UsernameFindable;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
@@ -111,6 +110,8 @@ public class OA2AuthorizedServletUtil {
             (most likely by a script, so we can avoid server changes). Nothing is done with these here, they
             are stashed and forwarded at the correct time.
              */
+            OA2ServletUtils.processXAs(req, transaction, resolvedClient);
+/*
             if (resolvedClient.hasExtendedAttributeSupport()) {
                 ExtendedParameters xp = new ExtendedParameters();
                 // Take the parameters and parse them into configuration objects,
@@ -119,6 +120,7 @@ public class OA2AuthorizedServletUtil {
                     transaction.setExtendedAttributes(extAttr);
                 }
             }
+*/
             agResponse.setServiceTransaction(transaction);
             transaction = (OA2ServiceTransaction) verifyAndGet(agResponse);
             transaction.setAuthTime(new Date()); // have to set the time to now.

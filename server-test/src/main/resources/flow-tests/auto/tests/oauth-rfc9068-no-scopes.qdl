@@ -1,19 +1,15 @@
 #! /usr/bin/env -S qdl-run
 
 /*
-   Basic SciToken test. This will do the exchanges with all defaults -- no overrides -- and
-   is the most basic possible
+   Basic RFC9068 test. This gets no scopes (allowed in the spec) and sends a resource parameter
+   which should then be checked it ends up in the access token
 */
 params. ≔ {'sub':'davenport',
-           'scope':'storage.read: storage.modify: compute.create',
-           'org.oa4mp:/rt/value/foo':'woof'};
+           'resource':'ANY'};
 // another test should be to send the resource parameter which comes back as the access token audience.
 test_id:= 'oauth.rfc9068.qdl';
 // set up the client
 clc#init($$OA4MP_CLC_INI, test_id);
-refresh_params.'refresh' :=  {'scope': 'storage.read:/home/davenport/vo3 compute.create storage.modify:/public/pendav/vo3 storage.modify:/public/davenport/vo3'};
-refresh_params.'exchange' :=  {'scope': 'storage.read:/home/davenport/vo3 compute.create storage.modify:/public/pendav/vo3 storage.modify:/public/davenport/vo3'};
-clc#set_param(refresh_params.);
 
 initialization := size(args())==1⇒args().0:import(load('test#/auto/utils/initialization.mdl'));
 checks:=initialization#checks();
@@ -26,9 +22,8 @@ cc_rt.:=cc.'cfg'.'tokens'.'refresh';
 // first part of test is to get tokens with the server defaults.
 at_expected.:={'iss':server_defaults.'at_issuer',
                'sub':params.'sub',
-               'aud':cc_at.'audience',
-               'client_id':ini.'id',
-               'scopes':['storage.read:/home/davenport/vo3', 'compute.create', 'storage.modify:/public/pendav/vo3', 'storage.modify:/public/davenport/vo3']};
+               'resource':'ANY',
+               'client_id':ini.'id'};
 
 
 
@@ -36,6 +31,7 @@ at_expected.:={'iss':server_defaults.'at_issuer',
 // the same block of code to be repeated.
 verify()->
 block[ // set of basic verifications to run repeatedly.
+  ⊨∄at_asserted.'scope' : 'should not get scope asserted, got ' + (at_asserted.'scope');
   checks#rfc9068(at_expected., at_asserted.);
   checks#lifetime(cc_at.'lifetime', at_asserted.);
   ⊨size(claims.) ≡ 0 : 'got claims and should not:\n' + print(claims.);
@@ -64,4 +60,4 @@ try[
      ⊨ false : 'got claims and should not:\n' + print(claims.);
    ]catch[];
 verify();
-say('ok: OAuth RFC9068 test');
+say('ok: OAuth RFC9068 test with no scopes');

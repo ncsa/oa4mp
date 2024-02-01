@@ -347,12 +347,11 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
 
     @Override
     protected void rmCleanup(Identifiable x) {
-        if (!getStore().containsKey(x.getIdentifier())) {
-            sayi("Removing approval record");
-            info("Removing approval record for id=" + x.getIdentifierString());
+        if (getStore().containsKey(x.getIdentifier())) { // double checks not removing a live record!
+            sayi("client still active, cannot remove approval");
+        }else{
             getClientApprovalStore().remove(x.getIdentifier());
-            sayi("Done. Client approval with id = " + x.getIdentifierString() + " has been removed from the store");
-            info("Client record removed for id=" + x.getIdentifierString());
+            sayi("approval record removed");
         }
     }
 
@@ -530,6 +529,7 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
             } else {
                 rsRecord = resultSets.get(name);
             }
+
             if (rsRecord == null) {
                 say("no such stored result.");
                 return;
@@ -546,7 +546,7 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
             return;
         }
 
-        super.rm(inputLine);
+        super.rm(inputLine); // removes exactly the client
     }
 
     public void password(InputLine inputLine) throws Exception {

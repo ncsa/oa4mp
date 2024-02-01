@@ -42,19 +42,25 @@ public class RFC9068ATHandler extends AbstractAccessTokenHandler implements RFC9
             // It is possible there is no auth time.
             accessToken.put(AUTHENTICATION_TIME, transaction.getAuthTime().getTime() / 1000); // Must be in seconds.
         }
-        // According to the spec., if there is a resource in the request, it should be used as the audience
+        if(!accessToken.containsKey(AUDIENCE)){
+            // If this is not otherwise set, set it to the client id.
+            accessToken.put(AUDIENCE, transaction.getClient().getIdentifierString());
+        }
+        transaction.setATData(accessToken);
+    }
+
+    @Override
+    public void setAccountingInformation() {
+        super.setAccountingInformation();
+        // as per the RFC, if the resource parameter is sent, use that for the audience.
         if(transaction.hasResource() && !transaction.getResource().isEmpty()){
             if(transaction.getResource().size()==1) {
-                accessToken.put(OA2Claims.AUDIENCE, transaction.getResource().get(0));
+                getPayload().put(OA2Claims.AUDIENCE, transaction.getResource().get(0));
             }else{
                 JSONArray array = new JSONArray();
                 array.addAll(transaction.getResource());
-                accessToken.put(OA2Claims.AUDIENCE, array);
+                getPayload().put(OA2Claims.AUDIENCE, array);
             }
-        }
-        if(!accessToken.containsKey(AUDIENCE)){
-            // Last ditch. If this is not otherwise set, set it to the client id.
-            accessToken.put(AUDIENCE, transaction.getClient().getIdentifierString());
         }
     }
 

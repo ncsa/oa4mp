@@ -1,0 +1,19 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   Tests the client with an old configuration and does repeated refresh and token
+   exchanges. This mimicks pretty rugged usages and checks that even over long
+   chains of refreshes and exchanges the endpoints continue to work.
+*/
+
+params. ≔ {'sub':'jeff'};
+test_id:= 'oauth.conf.basic';
+clc#init($$OA4MP_CLC_INI, test_id);
+
+initialization := size(args())==1⇒args().0:import(load('test#/auto/utils/initialization.mdl'));
+ini.:=initialization#get_client_ini(test_id);
+server_defaults.:=initialization# server_defaults();
+tokens. := clc#rfc7523(params.);
+while[i ∈[;10]][clc#refresh();];
+
+say('ok: multiple refreshes');

@@ -1,6 +1,8 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ExtendedParameters;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2ATException;
@@ -12,10 +14,15 @@ import edu.uiuc.ncsa.qdl.exceptions.QDLExceptionWithTrace;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.XMLMap;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import org.apache.http.HttpStatus;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Utilities for various servlets. These handle the exceptions from the script runtime engine and perform
@@ -110,16 +117,16 @@ public class OA2ServletUtils {
                         transaction.getClient());
             }
         }
-        if(exception instanceof ParsingException){
-            ParsingException parsingException=(ParsingException)exception;
+        if (exception instanceof ParsingException) {
+            ParsingException parsingException = (ParsingException) exception;
             String msg;
-            if(parsingException.hasScriptName()){
+            if (parsingException.hasScriptName()) {
                 msg = "error parsing script '" + parsingException.getScriptName() + "' ";
-            }else{
-                msg = "parser error " ;
+            } else {
+                msg = "parser error ";
             }
             msg = msg + "at line # " + parsingException.getLineNumber() +
-                                    ", char=" + parsingException.getEndCharacterPosition();
+                    ", char=" + parsingException.getEndCharacterPosition();
             debugger.trace(OA2ServletUtils.class, msg, exception);
             // This will get wrapped in an OA2ATException below, but parsing errors should have a note in the logs
             // since we have to track these down as QDL errors.
@@ -215,4 +222,59 @@ public class OA2ServletUtils {
         debugger.trace(callingObject, message);
         debugger.trace(callingObject, truncateStackTrace(throwable, stackTraceMaxLines, false));
     }
+
+    /**
+     * This takes the set of reserved {@link edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ExtendedParameters}
+     * and sets state in the transaction. These parameters are reserved for system use and not propagated to the
+     * client scripting environment. Moreover, they are available to every client.
+     *
+     * @param xas
+     * @param t
+     */
+    public static void processReservedXAs(JSONObject xas, OA2ServiceTransaction t) {
+        if (xas.containsKey(ExtendedParameters.OA4MP_NS)) {
+            // org.oa4mp:/templates
+            JSONObject xa = xas.getJSONObject(ExtendedParameters.OA4MP_NS);
+            // process templates
+            String key = "/" + TEMPLATES_KEY;
+            if (xa.containsKey(key)) {
+                Object object = xa.get(key);
+                List<String> templates;
+                if (object instanceof JSONArray) {
+                    templates = (JSONArray) object;
+                } else {
+                    templates = new JSONArray();
+                    templates.add(object.toString());
+                }
+                t.setUseTemplates(templates);
+                xa.remove(key);
+            }
+        }
+    }
+
+    public static void processXAs(Map<String, String[]> params, OA2ServiceTransaction t, OA2Client client) {
+        ExtendedParameters xp = new ExtendedParameters();
+        // Take the parameters and parse them into configuration objects,
+        JSONObject extAttr = xp.snoopParameters(params);
+        if(extAttr.isEmpty()) return; // nix to do
+        OA2ServletUtils.processReservedXAs(extAttr, t);
+        // allow for setting templates
+        if (client.hasExtendedAttributeSupport()) {
+            if (extAttr != null && !extAttr.isEmpty()) {
+                t.setExtendedAttributes(extAttr);
+            }
+        }
+    }
+
+    /**
+     * Process the extended attrubutes from the request's parameter map.
+     * @param request
+     * @param t
+     * @param client
+     */
+    public static void processXAs(HttpServletRequest request, OA2ServiceTransaction t, OA2Client client) {
+        processXAs(request.getParameterMap(), t, client);
+    }
+
+    public static final String TEMPLATES_KEY = "templates";
 }

@@ -1,0 +1,44 @@
+{
+  "comment": [
+    "OIDC Client for SciTokens using templates. Uses default lifetimes. Need JWKS."
+  ],
+  "client_name": "Scitokens test with default lifetime and audience",
+  "token_endpoint_auth_method": "private_key_jwt",
+  "client_id": "auto-test:/oidc/scitokens/template",
+  "grant_types": [
+    "refresh_token"
+  ],
+  "scope": [
+    "openid", "profile", "email", "org.oa4mp:userinfo"
+  ],
+  "strict_scopes": false,
+  "ea_support": true,
+  "cfg": {
+    "tokens": {
+      "identity":  {
+          "qdl":   {
+           "load": "auto/server/idt.qdl",
+           "xmd": {"exec_phase":    [
+            "pre_token"
+           ]}
+          },
+          "type": "identity"
+         },
+      "access": {
+        "templates": [
+          {
+            "aud": "https://wærstan.edu",
+            "paths": [
+               {"op": "read","path": "/home/${sub}"},
+               {"op": "write","path": "/public/${sub}"},
+               {"op": "execute"},
+               {"op": "modify"}
+            ]
+          }
+        ],
+        "type": "scitoken"
+      }
+    }
+  }
+}
+

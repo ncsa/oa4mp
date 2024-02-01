@@ -3,13 +3,20 @@
 // will be found.
 path:='test#/';
 initialization := import(load('test#/auto/utils/initialization.mdl'));
+start:=date_ms();
 test.:= [
           [path + 'auto/tests/' +'rfc7523-grant.qdl'],
           [path + 'auto/tests/' +'oauth-with-refresh.qdl', initialization],
           [path + 'auto/tests/' +'oauth-basic-no-refresh.qdl',initialization],
+          [path + 'auto/tests/' +'oauth-rfc9068.qdl',initialization],
+          [path + 'auto/tests/' +'oauth-rfc9068-no-scopes.qdl',initialization],
           [path + 'auto/tests/' +'oidc-test-overrides.qdl',initialization],
           [path + 'auto/tests/' +'oidc-id-token.qdl',initialization],
-          [path + 'auto/tests/' +'oidc-scitokens-qdl.qdl',initialization],
+          [path + 'auto/tests/' +'oidc-scitokens.qdl',initialization],
+          [path + 'auto/tests/' +'oidc-scitokens-template.qdl',initialization],
+          [path + 'auto/tests/' +'rtx_exchanges.qdl', initialization],
+          [path + 'auto/tests/' +'rtx_refreshes.qdl', initialization],
+          [path + 'auto/tests/' +'rtx.qdl',initialization],
           [path + 'auto/tests/' +'revoke.qdl'],
           [(path + 'auto/tests/rfc8693/') + 'ersatz-rt.qdl',  '-subject','at'],
           [(path + 'auto/tests/rfc8693/') + 'ersatz-rt.qdl',  '-subject','rt'],
@@ -23,3 +30,5 @@ test.:= [
 
 say('**** Automated test suite for OA4MP. ****');
 script_load('runner.qdl', test., true); // Dont' skip lines between tests
+numeric_digits(4); // make the next bit look better.
+say('total elapsed time =' + ((date_ms()-start)/1000) + ' sec.');

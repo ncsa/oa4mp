@@ -13,6 +13,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenFactory;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Scopes;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.AccessTokenHandlerInterface;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.IDTokenHandlerInterface;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.MyOtherJWTUtil2;
@@ -146,7 +147,14 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
         if (templates.size() == 0) {
             return null; // nix to do
         }
-        Collection<String> requestedAudience = transaction.getAudience();
+        Collection<String> requestedAudience = null;
+        if (transaction.hasUseTemplates()) {
+            requestedAudience = transaction.getUseTemplates();
+        } else {
+            if (transaction.hasAudience()) {
+                requestedAudience = transaction.getAudience();
+            }
+        }
         // check for audiences.
         if (requestedAudience == null || requestedAudience.isEmpty()) {
 
@@ -265,7 +273,6 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
         requestedScopes.remove(badRequests);
 
         /*
-
             If there is a token exchange record, then this is being invoked as part of a token
             exchange. In that case, any supplied scopes are used and the templates are used as
             super-paths.
@@ -274,15 +281,28 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
         actualScopes = doCompareTemplates(computedScopes,
                 requestedScopes,
                 isQuery);
-/*
-        for (String aud : requestedAudience) {
 
-            actualScopes.addAll(    templates.getCapabilities(aud, relativeScopes));
+
+        if(isQuery){
+            actualScopes.addAll(foundCapabilities); // add back in relative computed scopes.
+
+        }else{
+            if(transaction.hasATReturnedOriginalScopes()){
+                for(String fc : foundCapabilities){
+                    if(transaction.getATReturnedOriginalScopes().contains(fc)){
+                        actualScopes.addAll(foundCapabilities); // add back in relative computed scopes.
+                    }
+                }
+            }
         }
-*/
-        actualScopes.addAll(foundCapabilities); // add back in relative computed scopes.
         //actualScopes.addAll(relativeScopes); // add back in relative computed scopes.
         // now we convert to a scope string.
+
+        String s = OA2Scopes.ScopeUtil.toString(actualScopes);
+        if(!isQuery ){
+
+        }
+/*
         String s = "";
         boolean firstPass = true;
         for (String x : actualScopes) {
@@ -296,6 +316,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
         if (isTrivial(s)) {
             return null;
         }
+*/
         return s;
 
     }
@@ -472,8 +493,25 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
             issuer = getATConfig().getIssuer();
         }
         atData.put(ISSUER, issuer);
-        if (getATConfig().getAudience() != null && !getATConfig().getAudience().isEmpty()) {
-            atData.put(AUDIENCE, getATConfig().getAudience());
+        // hierarchy.
+        // 1. If they passed it in explicitly, use that
+        // 2. If it is set in the configuration, use that
+        // 3. If there is a VO, use that
+        // 4. If all else fails, use the standard issuer
+        if (transaction.hasAudience()) {
+            atData.put(AUDIENCE, transaction.getAudience());
+        } else {
+            if (getATConfig().getAudience() != null && !getATConfig().getAudience().isEmpty()) {
+                atData.put(AUDIENCE, getATConfig().getAudience());
+            } else{
+                VirtualOrganization vo = oa2se.getVO(client.getIdentifier());
+                if (vo == null) {
+                    // fail safe. No VO, no configuration, return this service as issuer.
+                    atData.put(AUDIENCE, transaction.getClient().getIdentifierString());
+                } else {
+                    atData.put(AUDIENCE, vo.getAtIssuer());
+                }
+            }
         }
         // If they really asserted it
         if (getATConfig().hasSubject()) {
@@ -482,7 +520,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
         }
         refreshAccountingInformation();
 
-   //     setPayload(atData);
+        //     setPayload(atData);
     }
 
     @Override
@@ -490,7 +528,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
         //   setAccountingInformation();
         JSONObject atData = getPayload();
 
-        long lifetime = ClientUtils.computeATLifetime(transaction,client,  oa2se);
+        long lifetime = ClientUtils.computeATLifetime(transaction, client, oa2se);
         long issuedAt = System.currentTimeMillis();
         long expiresAt = issuedAt + lifetime;
 

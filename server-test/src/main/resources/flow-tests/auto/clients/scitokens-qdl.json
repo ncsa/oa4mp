@@ -1,19 +1,20 @@
 {
   "comment": [
-    "OAuth client for RFC 9069 tests. Uses default lifetimes. Need JWKS."
+    "OIDC Client for SciTokens tests. Uses default lifetimes. Need JWKS."
   ],
-  "client_name": "Basic test client with overrides",
+  "client_name": "Scitokens test with lifetime and audience overrides",
   "token_endpoint_auth_method": "private_key_jwt",
-  "client_id": "auto-test:/oauth/rfc9068/qdl",
+  "client_id": "auto-test:/oidc/scitokens/qdl",
   "grant_types": [
     "refresh_token"
   ],
+  "scope" : ["openid"],
   "strict_scopes": false,
   "ea_support": true,
   "cfg": {
     "tokens": {
       "access": {
-        "audience": "https://aethelthrythe.edu/histrionics",
+        "audience": "https://wærstan.edu/physics",
         "lifetime": 3600000,
         "qdl": {
           "load": "auto/server/at.qdl",
@@ -25,7 +26,7 @@
             ]
           }
         },
-        "type": "rfc9068"
+        "type": "scitoken"
       },
       "identity": {
         "lifetime": 1200000,
@@ -42,7 +43,7 @@
         "type": "identity"
       },
       "refresh": {
-        "audience": "https://aethelthrythe.edu/histrionics/refresh",
+        "audience": "https://wærstan.edu/physics/refresh",
         "lifetime": 259200000,
         "qdl": {
           "load": "auto/server/process-xas.qdl",

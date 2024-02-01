@@ -3,7 +3,7 @@ cfg. := claims#new_template('file');
 remove(cfg.'file_path');
 cfg.'claims' := from_json(file_read('test#/auto/server/test-claims.json'));
 claim_sources. := claim_sources. ~ [create_source(cfg.)]; // test automated getting claims
-
+say('claims:\n'+print(cfg.'claims'));
 /*
 lookup.:=claims#get_claims(claims#create_source(cfg.), claims.'sub');
 epe. := lookup.'eduPersonEntitlement';

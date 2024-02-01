@@ -394,6 +394,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
     public static String TX_RESOURCE_VAR = "tx_resource" + STEM_INDEX_MARKER;
     public static String CLAIM_SOURCES_VAR = "claim_sources" + STEM_INDEX_MARKER;
     public static String ACCESS_CONTROL = "access_control" + STEM_INDEX_MARKER;
+    public static String AT_ORIGINAL_SCOPES = "at_original_scopes" + STEM_INDEX_MARKER;
 
     public static Long OA4MP_ERROR_CODE = 1000L; // reserved error code by OA4MP.
     public static String OA4MP_ERROR_CODE_NAME = "oa4mp_error";
@@ -553,7 +554,11 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         state.setValue(TX_SCOPES_VAR, txScopes);
         state.setValue(TX_AUDIENCE_VAR, txAud);
         state.setValue(TX_RESOURCE_VAR, txRes);
-
+        QDLStem originalScopes = new QDLStem();
+        if(state.getTransaction().hasATReturnedOriginalScopes()) {
+            originalScopes.getQDLList().appendAll(state.getTransaction().getATReturnedOriginalScopes());
+        }
+        state.setValue(AT_ORIGINAL_SCOPES, originalScopes);
 
     }
 

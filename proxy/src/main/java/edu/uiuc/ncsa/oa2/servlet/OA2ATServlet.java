@@ -4,7 +4,6 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.*;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ExtendedParameters;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ScriptRuntimeEngineFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.TokenInfoRecord;
@@ -282,14 +281,18 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 throw new OA2ATException(OA2Errors.INVALID_REQUEST, "user \"" + user + "\" does not have permission");
             }
         }
+        OA2ServletUtils.processXAs(jsonRequest, serviceTransaction, client);
+/*
+        ExtendedParameters xp = new ExtendedParameters();
+        // Take the parameters and parse them into configuration objects,
+        JSONObject extAttr = xp.snoopParameters(jsonRequest);
+        // allow for setting templates
         if (client.hasExtendedAttributeSupport()) {
-            ExtendedParameters xp = new ExtendedParameters();
-            // Take the parameters and parse them into configuration objects,
-            JSONObject extAttr = xp.snoopParameters(jsonRequest);
             if (extAttr != null && !extAttr.isEmpty()) {
                 serviceTransaction.setExtendedAttributes(extAttr);
             }
         }
+*/
         JSONObject claims = new JSONObject();
         claims.put(OA2Claims.SUBJECT, serviceTransaction.getUsername());
         serviceTransaction.setUserMetaData(claims); // set this so it exists for later.
@@ -960,6 +963,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
              service and swap them willy nilly.
            */
         XMLMap tBackup = GenericStoreUtils.toXML(getTransactionStore(), t);
+        OA2ServletUtils.processXAs(request, t, client);
+/*
         if (client.hasExtendedAttributeSupport()) {
             ExtendedParameters xp = new ExtendedParameters();
             // Take the parameters and parse them into configuration objects,
@@ -968,6 +973,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 t.setExtendedAttributes(extAttr);
             }
         }
+*/
         TXRecord newIDTX = null;
         TXRecord newATTX = null;
         TXRecord newRTTX = null;
@@ -1178,6 +1184,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         OA2SE oa2se = getOA2SE();
 
         XMLMap tBackup = GenericStoreUtils.toXML(getTransactionStore(), t);
+        OA2ServletUtils.processXAs(request, t, client);
+/*
         if (client.hasExtendedAttributeSupport()) {
             ExtendedParameters xp = new ExtendedParameters();
             // Take the parameters and parse them into configuration objects,
@@ -1186,6 +1194,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 t.setExtendedAttributes(extAttr);
             }
         }
+*/
         // In practice exactly one of these is active at any given time
         TXRecord newIDTX = null;
         TXRecord newATTX = null;
@@ -1194,6 +1203,16 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
 
         switch (requestedTokenType) {
             case RFC8693Constants.ID_TOKEN_TYPE:
+                if (!client.isOIDCClient()) {
+                    throw new OA2ATException(OA2Errors.INVALID_REQUEST,
+                            "identity tokens not supported for this client",
+                            t.getRequestState());
+                }
+                if (!getOA2SE().isOIDCEnabled()) {
+                    throw new OA2ATException(OA2Errors.INVALID_REQUEST,
+                            "identity tokens not supported on this server",
+                            t.getRequestState());
+                }
                 newIDTX = (TXRecord) oa2se.getTxStore().create();
                 newIDTX.setIdentifier(((OA2TokenForge) oa2se.getTokenForge()).getIDTokenProvider().get());
                 newIDTX.setTokenType(requestedTokenType);
@@ -1702,7 +1721,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         if (tempAT.isJWT()) {
             st2.setATJWT(tempAT.getToken());
         }
-        RefreshTokenImpl tempRT = (RefreshTokenImpl) atResponse.getRefreshToken();
+        RefreshTokenImpl tempRT = atResponse.getRefreshToken();
         if (tempRT != null && tempRT.isJWT()) {
             st2.setRTJWT(tempRT.getToken());
         }
@@ -1712,7 +1731,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         // https://github.com/ncsa/oa4mp/issues/128
 
         updateTransactionJWTFromTokenResponse(atResponse, st2, client);
-
+        if (st2.getATData().containsKey(OA2Constants.SCOPE)) {
+            st2.setATReturnedOriginalScopes(st2.getATData().getString(OA2Constants.SCOPE));
+        }
         getTransactionStore().save(st2);
         // Check again after doing token claims in case a script changed it.
         // If they fail at this point, access it denied and the tokens are invalidated.
@@ -1804,7 +1825,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         } else {
             debugger.trace(this, "NO ATHandler in jwtRunner");
         }
-        if(jwtRunner.hasIDTokenHandler()) {
+        if (jwtRunner.hasIDTokenHandler()) {
             tokenResponse.setUserMetadata(jwtRunner.getIdTokenHandlerInterface().getUserMetaData());
             tokenResponse.setIdToken(((IDTokenHandler) jwtRunner.getIdTokenHandlerInterface()).getSignedPayload(key));
         }
@@ -1907,12 +1928,12 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             if (!t.getClient().getIdentifier().equals(client.getIdentifier())) {
                 debugger.trace(this, "transaction lists client id \"" + t.getClient().getIdentifierString()
                         + "\", but the client in the request is \"" + client.getIdentifierString() + "\". Request rejected.");
-                OA2ATException x=new OA2ATException(OA2Errors.INVALID_GRANT, // fixes https://github.com/ncsa/oa4mp/issues/119
+                OA2ATException x = new OA2ATException(OA2Errors.INVALID_GRANT, // fixes https://github.com/ncsa/oa4mp/issues/119
                         "wrong client",
                         HttpStatus.SC_BAD_REQUEST, null);
-                    x.setForensicMessage("expected client \""+ client.getIdentifierString() + "\" but got client \"" + t.getClient().getIdentifierString()+"\"");
-                    x.setClient(client);
-                    throw x;
+                x.setForensicMessage("expected client \"" + client.getIdentifierString() + "\" but got client \"" + t.getClient().getIdentifierString() + "\"");
+                x.setClient(client);
+                throw x;
 
             }
         } catch (TransactionNotFoundException e) {
@@ -1942,13 +1963,15 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
 
         if (t == null || !t.isRefreshTokenValid()) {
             debugger.trace(this, "Missing refresh token.");
-            OA2ATException x= new OA2ATException(OA2Errors.INVALID_REQUEST,
+            OA2ATException x = new OA2ATException(OA2Errors.INVALID_REQUEST,
                     "The refresh token is no longer valid.",
                     t.getRequestState());
             x.setForensicMessage("the token is invalid:" + oldRT);
             x.setClient(client);
             throw x;
         }
+        OA2ServletUtils.processXAs(request, t, client);
+/*
         if (client.hasExtendedAttributeSupport()) {
             ExtendedParameters xp = new ExtendedParameters();
             // Take the parameters and parse them into configuration objects,
@@ -1957,6 +1980,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 t.setExtendedAttributes(extAttr);
             }
         }
+*/
         AccessTokenImpl at = (AccessTokenImpl) t.getAccessToken();
         debugger.trace(this, "old access token = " + at.getToken());
         List<String> scopes = convertToList(request, OA2Constants.SCOPE);
@@ -2027,9 +2051,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             scopes.addAll(t.getScopes()); // default to original
         }*/
         if (scopes == null) {
-                scopes = new ArrayList<>();
-                //scopes.addAll(t.getScopes()); // default to original
-            }
+            scopes = new ArrayList<>();
+            //scopes.addAll(t.getScopes()); // default to original
+        }
         txAT.setScopes(scopes);
         txIDT.setScopes(scopes);
         if (txRT != null) {
@@ -2396,6 +2420,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                     HttpStatus.SC_UNAUTHORIZED, null);
         }
         checkSentScopes(request, response, transaction);
+        OA2ServletUtils.processXAs(request, transaction, client);
+/*
         if (client.hasExtendedAttributeSupport()) {
             ExtendedParameters xp = new ExtendedParameters();
             // Take the parameters and parse them into configuration objects,
@@ -2404,6 +2430,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 transaction.setExtendedAttributes(extAttr);
             }
         }
+*/
         // Logic is simple. If proxy, farm it out to the proxy and it works or doesn't.
         // otherwise, manage all the state for retries.
         if (getOA2SE().getAuthorizationServletConfig().isUseProxy()) {

@@ -1,0 +1,69 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   Basic SciToken test. This will do the exchanges with all defaults -- no overrides -- and
+   is the most basic possible
+*/
+params. ≔ {'sub':'pilbeam',
+           'scope':'openid profile email org.oa4mp:userinfo read: write: execute',
+           'org.oa4mp:/templates':'https://wærstan.edu'};
+test_id:= 'oidc.scitokens.template';
+// set up the client
+clc#init($$OA4MP_CLC_INI, test_id);
+refresh_params.'refresh' :=  {'scope': 'read: modify write:'}; // token exchange attempts to upscope.
+refresh_params.'exchange' :=  {'scope': 'read:/home/'+params.'sub'+'/woof'  + // read
+                                ' write:/public/'+params.'sub' + '/blarf/fnord' + // write -- wrong, not granted
+                                ' execute'}; // not granted since the path is wrong
+clc#set_param(refresh_params.);
+
+initialization := size(args())==1⇒args().0:import(load('test#/auto/utils/initialization.mdl'));
+checks:=initialization#checks();
+ini.:=initialization#get_client_ini(test_id);
+server_defaults.:=initialization# server_defaults();
+cc.:=initialization#get_client_config(test_id); // This is the client configuration from the server
+cc_at.:=cc.'cfg'.'tokens'.'access';
+cc_idt.:=cc.'cfg'.'tokens'.'identity';
+
+idt_expected.:= from_json(file_read('test#/auto/server/test-claims.json')).params.'sub';
+remove(idt_expected.'comment');
+
+// first part of test is to get tokens with the server defaults.
+
+// This funciton simply inherits everything at the point of call, allowing
+// the same block of code to be repeated.
+verify()->
+block[ // set of basic verifications to run repeatedly.
+  checks#scitokens(at_expected., at_asserted.);
+  checks#lifetime(server_defaults.'at_lifetime', at_asserted.);
+  checks#lifetime(server_defaults.'id_token_lifetime', claims.);
+  checks#claims(idt_expected.,claims.);
+];
+at_expected.:={'iss':server_defaults.'at_issuer',
+               'sub':params.'sub',
+               'scopes':['read:/home/pilbeam', 'execute', 'write:/public/pilbeam'],
+               'aud':server_defaults.'issuer', // default since nothing set
+               'ver':'scitoken:2.0'};
+// Initial token exchange
+tokens. := clc#rfc7523(params.);
+at_asserted.:= tokens.'access_token'.'jwt';
+
+rt_asserted.:= tokens.'refresh_token';
+    claims. := clc#claims();
+verify();
+// Refresh
+tokens. := clc#refresh();
+at_asserted.:= tokens.'access_token'.'jwt';
+rt_asserted.:= tokens.'refresh_token';
+// note that the request attempted to upscope, so nothing should be returned
+remove(at_expected.'scopes');
+claims. := clc#claims();
+verify();
+// time to get the refresh and exchange tokens, downscoping.
+at_expected.'scopes':=['read:/home/pilbeam/woof', 'execute', 'write:/public/pilbeam/blarf/fnord'];
+at_asserted. := clc#exchange('-at','-subject','rt').'access_token'.'jwt';
+rt_asserted. := clc#exchange('-rt','-subject','rt').'refresh_token';
+     claims. := clc#exchange('-id','-subject','rt');
+verify();
+//say('refresh:\n'+print(clc#refresh()));
+//say('\nclaims:\n' + print(clc#claims()));
+say('ok: OIDC SciToken template test');

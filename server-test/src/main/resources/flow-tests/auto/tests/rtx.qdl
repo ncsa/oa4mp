@@ -1,0 +1,50 @@
+#! /usr/bin/env -S qdl-run
+
+params. ≔ {'sub':'jeff'};
+test_id:= 'oauth.conf.basic';
+clc#init($$OA4MP_CLC_INI, test_id);
+
+initialization := size(args())==1⇒args().0:import(load('test#/auto/utils/initialization.mdl'));
+ini.:=initialization#get_client_ini(test_id);
+server_defaults.:=initialization# server_defaults();
+
+tokens. := clc#rfc7523(params.);
+// This emulates a service that is running for a long time and does several exchanges followed by a refresh now
+// and then to get user information.
+while[i∈[1;20]]
+ do[
+     if[0==mod(i, 2)]
+   then[
+       if[0==mod(i%2, 2)]
+     then[clc#exchange('-at');]
+     else[clc#exchange('-rt');];
+       ]
+   else[clc#refresh();];
+ ]; // end while
+
+/*
+clc#refresh();
+clc#refresh();
+clc#refresh();
+clc#refresh();
+clc#exchange();
+clc#exchange();
+clc#exchange();
+clc#exchange();
+clc#exchange();
+clc#exchange();
+clc#exchange('-rt');
+clc#refresh();
+clc#exchange();
+clc#exchange('-rt'); 
+clc#exchange();
+clc#exchange('-rt');
+clc#exchange('-rt');
+clc#exchange('-rt');
+clc#refresh();
+clc#exchange();
+clc#exchange();
+clc#refresh();
+*/
+
+say('ok: multiple exchanges and refreshes');

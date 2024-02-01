@@ -70,6 +70,7 @@
     "first_name": "Dolly",
     "full_name": "Dahlia Worplesdon",
     "given_name": "Dahlia",
+    "middle_name" : "Agatha",
     "display_name": "Dahlia Agatha Worplesdon",
     "email": "d.worplesdon@æþelðryþe.edu",
     "uid": "worplesdon",
@@ -105,6 +106,7 @@
     "first_name": "Alaric",
     "full_name": "Alaric Bartholomew Pendlebury-Davenport",
     "given_name": "Alaric",
+    "middle_name":"Βαρθολομαῖος",
     "display_name": "Alaric Βαρθολομαῖος Pendlebury-Davenport",
     "email": "a.pendav@æþelðryþe.edu",
     "uid": "pendav",
@@ -121,7 +123,7 @@
       "storage.read:/home/${sub}/vo3",
       "storage.create:/public/vo3",
       "storage.create:/home/${sub}/vo3",
-      "storage.modify:/public/vo3",
+      "storage.modify:/public/${uid}/vo3",
       "storage.modify:/public/${sub}/vo3",
       "storage.stage:/staging/vo3",
       "compute.create",
@@ -141,7 +143,7 @@
     "first_name": "Percy",
     "middle_name": "Frobisher",
     "last_name": "Pilbeam",
-    "display_name": "Percy Frobisher Pilbeam",
+    "display_name": "P. F. Pilbeam",
     "email": "p.pilbeam@wærstan.edu",
     "uid": "pilbeam",
     "eppn": "pilbeam@wærstan.edu",
@@ -152,13 +154,7 @@
       "CO:COU:MESS Employee:members:all"
     ],
     "voPersonExternalID": "pilbeam@wærstan.edu",
-    "voPersonID": "MESS1357",
-    "eduPersonEntitlement": [
-      "read:/public/vo3",
-      "write:/home/${sub}/vo3/data",
-      "queue:/staging/vo3-production-queue",
-      "execute:/home/${sub}/vo3/bin"
-    ]
+    "voPersonID": "MESS1357"
   },
   "default_claim": {
     "comment": [

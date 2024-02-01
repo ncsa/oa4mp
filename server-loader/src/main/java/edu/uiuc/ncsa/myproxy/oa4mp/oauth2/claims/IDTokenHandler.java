@@ -283,6 +283,14 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
         if (scopes == null) {
             if (hasTXRecord() && getTXRecord().getScopes() != null && !getTXRecord().getScopes().isEmpty()) {
                 scopes = getTXRecord().getScopes();
+                Collection<String> metadataScopes = OA2Scopes.ScopeUtil.intersection(OA2Scopes.ScopeUtil.getBasicScopes(), scopes);
+                if(metadataScopes.size() == 0){
+                    // So the user sent a bunch of scopes and these are not related to user meta data.
+                    // Treat this as if they had sent NO scopes, and return the original set.
+                    // If there is even one meta data scope, assume they are trying to downscope and let them.
+                    metadataScopes = OA2Scopes.ScopeUtil.intersection(OA2Scopes.ScopeUtil.getBasicScopes(), transaction.getScopes());
+                    scopes.addAll(metadataScopes);
+                }
             } else {
                 scopes = transaction.getScopes();
             }

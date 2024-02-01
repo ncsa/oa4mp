@@ -9,9 +9,9 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.util.AbstractCLIApprover;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.ClientDebugUtil;
 import edu.uiuc.ncsa.oa4mp.delegation.common.servlet.TransactionFilter;
 import edu.uiuc.ncsa.oa4mp.delegation.common.servlet.TransactionState;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.TransactionStore;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClient;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.TransactionStore;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions.BasicTransaction;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant;
 import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
@@ -59,7 +59,6 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
         }
         return DebugUtil.getInstance();
     }
-
     /**
      * This is called after the response is received so that the system can get the approproate
      * transaction. Checks for the validity of the transaction should be done here too.

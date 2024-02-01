@@ -20,9 +20,6 @@ test_id:= 'oauth.conf.basic';
 clc#init($$OA4MP_CLC_INI, test_id);
 
 temp_file := '/tmp/revoke-test.json';
-
 params. ≔ {'sub':'jeff'};
-//clc#init($$OA4MP_CLC_XML_INI, 'ashigaru:command.line2');
-//clc#init($$OA4MP_CLC_XML_INI, 'ashigaru:command.line2');
 tokens. := clc#rfc7523(params.);
 script_load('revoke.qdl', temp_file, tokens.);

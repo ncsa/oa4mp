@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.oa4mp.delegation.oa2;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.StringTokenizer;
@@ -37,6 +38,24 @@ public interface OA2Scopes {
      * present.
      */
     class ScopeUtil {
+        protected static Collection<String> bList = null;
+
+        public static Collection<String> getBasicScopes() {
+            if (bList == null) {
+                bList = Arrays.asList(basicScopes);
+            }
+            return bList;
+        }
+
+        public static Collection<String> intersection(Collection<String> x, Collection<String> y) {
+            HashSet<String> x0 = new HashSet<>();
+            x0.addAll(x);
+            HashSet<String> y0 = new HashSet<>();
+            y0.addAll(y);
+            x0.retainAll(y0);
+            return x0;
+        }
+
         public static Collection<String> getScopes() {
             return scopes;
         }
@@ -70,8 +89,10 @@ public interface OA2Scopes {
             return out;
 
         }
+
         /**
          * Given a scope collection, turn it into a blank delimited string.
+         *
          * @param scopes
          * @return
          */
@@ -89,7 +110,6 @@ public interface OA2Scopes {
             return ss;
         }
     }
-
 
 
 }

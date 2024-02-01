@@ -11,6 +11,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.RefreshToken;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AuthorizationGrantImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Scopes;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.FlowStates;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.OA2TransactionScopes;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.OIDCServiceTransactionInterface;
@@ -50,6 +51,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
     public String SCRIPT_STATE_KEY = "script_state";
     public String SCRIPT_STATE_SERIALZATION_VERSION_KEY = "serialization_version";
     public String AUDIENCE_KEY = "audience";
+    public String USE_TEMPLATES_KEY = "useTemplates";
     public String RESOURCE_KEY = "resource";
     public String QUERIED_ACCESS_TOKEN_SCOPES_KEY = "queriedATScopes";
     public String RETURNED_ACCESS_TOKEN_JWT_KEY = "atJWT";
@@ -194,6 +196,55 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         getState().put(AUDIENCE_KEY, audience);
     }
 
+    public boolean hasAudience() {
+        return getState().containsKey(AUDIENCE_KEY) || (getState().get(AUDIENCE_KEY) != null && !((List) getState().get(AUDIENCE_KEY)).isEmpty());
+
+    }
+
+
+    public List<String> getUseTemplates() {
+        if (getState().containsKey(USE_TEMPLATES_KEY)) {
+            return getState().getJSONArray(USE_TEMPLATES_KEY);
+        }
+        return null;
+    }
+
+    public void setUseTemplates(List<String> templates) {
+        getState().put(USE_TEMPLATES_KEY, templates);
+    }
+
+    public boolean hasUseTemplates() {
+        return getState().containsKey(USE_TEMPLATES_KEY) || (getState().get(USE_TEMPLATES_KEY) != null && !((List) getState().get(USE_TEMPLATES_KEY)).isEmpty());
+
+    }
+
+    public static final String AT_RETURNED_ORIGINAL_SCOPES = "at_returned_original_scopes";
+
+    /**
+     * The first set of returned scopes from the token endpoint. These are the maximum
+     * set of scopes that can be returned in an access token.
+     *
+     * @return
+     */
+    public List<Object> getATReturnedOriginalScopes() {
+        if (getState().containsKey(AT_RETURNED_ORIGINAL_SCOPES)) {
+            return getState().getJSONArray(AT_RETURNED_ORIGINAL_SCOPES);
+        }
+        return null;
+
+    }
+
+    public void setATReturnedOriginalScopes(String s) {
+        setATReturnedOriginalScopes(OA2Scopes.ScopeUtil.toScopes(s));
+    }
+    public void setATReturnedOriginalScopes(Collection<String> s) {
+        getState().put(AT_RETURNED_ORIGINAL_SCOPES, s);
+    }
+
+    public boolean hasATReturnedOriginalScopes() {
+        return getState().containsKey(AT_RETURNED_ORIGINAL_SCOPES);
+    }
+
     /**
      * The actual time the refresh token in the transaction expires.
      *
@@ -295,7 +346,6 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
             if (!jsonObject.isEmpty()) {
                 getState().put(EXTENDED_ATTRIBUTES_KEY, jsonObject);
             }
-
         }
     }
 

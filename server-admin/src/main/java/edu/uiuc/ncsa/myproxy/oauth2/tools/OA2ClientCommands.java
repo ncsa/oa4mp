@@ -1085,4 +1085,22 @@ public class OA2ClientCommands extends ClientStoreCommands {
         }
         return client;
     }
+    // Fixes https://github.com/ncsa/oa4mp/issues/163
+    @Override
+    protected void rmCleanup(Identifiable x) {
+        super.rmCleanup(x);
+        if (getStore().containsKey(x.getIdentifier())) { // double checks not removing a live record!
+            sayi("client still active, cannot remove permissions");
+            return;
+        }
+
+          List<Identifier> admins = getPermissionsStore().getAdmins(x.getIdentifier());
+          if(1<admins.size()){
+              sayi("too many admins, remove permission manually and specify both admin and client ids");
+              return;
+          }
+          PermissionList permissions = getPermissionsStore().get(admins.get(0), x.getIdentifier());
+          getPermissionsStore().remove(permissions); // removes all the permission objects
+          sayi("permissions removed:" + permissions.size());
+    }
 }

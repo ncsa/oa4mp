@@ -13,24 +13,30 @@ counter.'skipped' := 0;
 failures. := [];
 rc := null;// set scope for it
 while[x∈test.][
+  script_name:=null;
+
 try[
-  if  [var_type(x) == 4]
+    if[var_type(x) == 4]
   then[
        zzz.:=x;
+       script_name:=zzz.0;
        //contract is that two arguments [a,b] are interpreted
        // as script_load(a,b), but [a,b,...,c] as
        // script_load(a, [b,...c]) i.e. rolled into a list.
-       rc:=script_load(zzz.0, 2==size(zzz.)?zzz.1:sublist(zzz., 1));
+       rc:=script_load(script_name, 2==size(zzz.)?zzz.1:sublist(zzz., 1));
        ]
-  else[rc := script_load(x);];
+  else[
+      script_name := x;
+      rc := script_load(script_name);
+      ];
 
   if[rc == 'q'][break();]; // exit app
   if[rc=='s'][counter.'skipped'+=1;continue();]; // skip this test
   if[!skip_line][say('');]; // blank line for clean display.
   counter.'pass' += 1;
   ]catch[
-     say('error running script ' + x);
-     say('error message:' + error_message);
+     say('error running script ' + script_name);
+     say('error message:' + (∃error_message⇒error_message:'(no message)'));
     counter.'fail' += 1;
     failures. := failures. ~ x;
   ];
@@ -47,3 +53,4 @@ if[0 < size(failures.)][
      say('   ' + x);
   ];
 ];
+if[0 < counter.'fail'][say('check the logs at '+info().'boot'.'log_file');];

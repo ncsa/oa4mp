@@ -23,7 +23,7 @@ cc_at.:=cc.'cfg'.'tokens'.'access';
 cc_idt.:=cc.'cfg'.'tokens'.'identity';
 cc_rt.:=cc.'cfg'.'tokens'.'refresh';
 // first part of test is to get tokens with the server defaults.
-at_expected.:={'iss':'https://localhost:9443/oauth2/oa4mp_test',
+at_expected.:={'iss':server_defaults.'at_issuer',
                'sub':params.'sub',
                'ver':'scitoken:2.0',
                'aud':cc_at.'audience',
@@ -65,4 +65,4 @@ rt_asserted. := clc#exchange('-rt','-subject','rt').'refresh_token'.'jwt';
 verify();
 //say('refresh:\n'+print(clc#refresh()));
 //say('\nclaims:\n' + print(clc#claims()));
-say('ok: OIDC confidential test of SciToken');
+say('ok: OIDC SciToken script test');
