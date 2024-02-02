@@ -1,5 +1,5 @@
 /*
-   This is not a stand alone test. Several clients either extend this or are provisioned from it, so
+   This is not a standalone test. Several clients either extend this or are provisioned from it, so
    this just runs the tests against localhost:command.line2 and my be invoked as needed.
    The assumption is that the authorization has been done and then the client is simply used
 */
@@ -15,6 +15,7 @@ params.'token' := {
           'scope' : 'read: write: x.y'
    };
 params.'exchange':={'scope':'read:/home/jeff write:/data/jeff/cluster x.y:/abc/def/ghi'};
+// params.'refresh':={'scope':'read:/home/jeff write:/data/jeff/cluster x.y:/abc/def/ghi'};
 rc := script_load('driver.qdl', args().0, params.);
 if[rc!='ok'][return(rc);];
 

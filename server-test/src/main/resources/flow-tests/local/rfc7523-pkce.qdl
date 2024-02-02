@@ -1,0 +1,42 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+  Test RFC 7523 authorization and RFC 7636 PKCE (code challenge). Since PKCE might
+  end up being required for OAuth 2.1, just implement it now and test it.
+*/
+
+cfg.'id'  := 'ashigaru:command.line2';
+cfg.'idp'  := 'ANY';
+cfg.'file' := $$OA4MP_CLC_XML_INI;
+cfg.'description' :=  'RFC 7523 and RFC 7636 test';
+cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
+params.'a' := {
+ 'org.oa4mp:/tokens/access/lifetime' : 1000000,
+                  'org.oa4mp:/roles' : 'admin,all-user',
+                    'code_challenge' : 'N_zjM2czxZIWNar-lWUiuS7-Pacwh-k-L_Akpje6AmY',
+             'code_challenge_method' : 'S256'};
+
+params.'token' := {'code_verifier' : 'qBdfP8Wmpomgkq6aJwcvZQMHx553RK4P7LAYxmzMAkmo8cM7MlE8ViJSOx38nlHr' };
+
+rc := script_load('driver.qdl', cfg., params.);
+
+define[test(tokens., claims., phase)]
+  body[
+        ⊨ tokens.'access_token'.'lifetime' ≡ 900000 : 'wrong access token lifetime';
+        ⊨ tokens.'refresh_token'.'lifetime' ≡ 1000000000 : 'wrong refresh token lifetime';
+        ⊨ claims.'seq0' ≡ 636 : 'wrong seq 0 value';
+        ⊨ claims.'roles'.0 ≡ 'admin,all-user' : 'wrong extended attribute value';
+        ⊨ claims.'seq0_phase' ≡ phase : 'wrong seq0_phase value';
+        ⊨ claims.'seq1' ≡ 'is_member_of' : 'wrong seq 1 value';
+        ⊨ claims.'seq2' ≡ 'seq 2 passed ' + phase : 'wrong seq 2 value';
+  ];
+tokens. := clc#access();
+claims. := clc#claims();
+test(tokens., claims., 'post_token');
+
+tokens. := clc#refresh();
+claims. := clc#claims();
+test(tokens., claims., 'post_refresh');
+
+// No exchange at this point since that does nothing to the claims.
+say('RFC 7523 and RFC 7636 test: ok');

@@ -1568,9 +1568,13 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
     protected IssuerTransactionState doAT(HttpServletRequest request, HttpServletResponse response, OA2Client client) throws Throwable {
         IssuerTransactionState state = doDelegation(client, request, response);
         OA2ServiceTransaction serviceTransaction = (OA2ServiceTransaction) state.getTransaction();
+        String verifier = request.getParameter(RFC7636Util.CODE_VERIFIER);
+        checkCodeChallenge(serviceTransaction, client, verifier);
+        return doAT(state, client);
+    }
 
+    protected void checkCodeChallenge(OA2ServiceTransaction serviceTransaction, OA2Client client, String verifier) {
         if (serviceTransaction.hasCodeChallenge()) {
-            String verifier = request.getParameter(RFC7636Util.CODE_VERIFIER);
             if (StringUtils.isTrivial(verifier)) {
                 throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
                         "missing verifier, access denied",
@@ -1599,7 +1603,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                         serviceTransaction.getRequestState());
             }
         }
-        return doAT(state, client);
     }
 
     protected IssuerTransactionState doAT(IssuerTransactionState state, OA2Client client) throws Throwable {
@@ -2421,16 +2424,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         }
         checkSentScopes(request, response, transaction);
         OA2ServletUtils.processXAs(request, transaction, client);
-/*
-        if (client.hasExtendedAttributeSupport()) {
-            ExtendedParameters xp = new ExtendedParameters();
-            // Take the parameters and parse them into configuration objects,
-            JSONObject extAttr = xp.snoopParameters(request.getParameterMap());
-            if (extAttr != null && !extAttr.isEmpty()) {
-                transaction.setExtendedAttributes(extAttr);
-            }
-        }
-*/
+
         // Logic is simple. If proxy, farm it out to the proxy and it works or doesn't.
         // otherwise, manage all the state for retries.
         if (getOA2SE().getAuthorizationServletConfig().isUseProxy()) {
@@ -2496,6 +2490,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 backup,
                 true);
         try {
+            // Fix https://github.com/ncsa/oa4mp/issues/164
+            String verifier = request.getParameter(RFC7636Util.CODE_VERIFIER);
+             checkCodeChallenge(transaction, client, verifier);
             doAT(issuerTransactionState, client);
         } catch (Throwable t) {
             rollback(backup);

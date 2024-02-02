@@ -195,9 +195,6 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             Reader r = new InputStreamReader(gzipInputStream);
             XMLInputFactory xmlif = XMLInputFactory.newInstance();
             XMLEventReader xer = xmlif.createXMLEventReader(r);
-            // Moar debug, if using the string, replace preceeding line with this.
-            // XMLEventReader xer = xmlif.createXMLEventReader(reader);
-            // state = (OA2State) StateUtils.newInstance();
             state.fromXML(xer, null); // No XProperties in serialization.
             xer.close();
         } catch (Throwable e) {
@@ -556,7 +553,9 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         state.setValue(TX_RESOURCE_VAR, txRes);
         QDLStem originalScopes = new QDLStem();
         if(state.getTransaction().hasATReturnedOriginalScopes()) {
-            originalScopes.getQDLList().appendAll(state.getTransaction().getATReturnedOriginalScopes());
+            ArrayList arrayList = new ArrayList();
+            arrayList.addAll(state.getTransaction().getATReturnedOriginalScopes());
+            originalScopes.getQDLList().appendAll(arrayList);
         }
         state.setValue(AT_ORIGINAL_SCOPES, originalScopes);
 
@@ -766,8 +765,11 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
                     Scripts.EXEC_PHASE
 
             });
-
-            state.getTransaction().setScriptState(serializeState(state.getTransaction().getScriptStateSerializationVersion()));
+            if(state.getTransaction().hasScriptStateSerializationVersion()){
+                state.getTransaction().setScriptState(serializeState(state.getTransaction().getScriptStateSerializationVersion()));
+            } else{
+                state.getTransaction().setScriptState(serializeState(SerializationConstants.VERSION_2_1_TAG));
+            }
             state.getTransaction().setScriptStateSerialzationVersion(SerializationConstants.VERSION_2_1_TAG); // moving forward
         } catch (Throwable t) {
             DebugUtil.trace(this, "Could not serialize stored transaction state:" + t.getMessage());

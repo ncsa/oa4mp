@@ -43,12 +43,12 @@ params.'token' :=  {'scope': 'storage.read:/foo storage.read:/home/' + user_id  
                              ' x.y:/abc/def/pqr' +
                              ' storage.write:/data/' + user_id + '/cluster/node47 ' +
                              ' compute.read' +
-                             ' compute.modify'};
+                             ' compute.create'};
                              // Only has compute.create, compute.modify
 expected_token_scopes. :=  ['storage.read:/home/' + user_id ,
                             'x.y:/abc/def/pqr',
                             'storage.write:/data/' + user_id + '/cluster/node47',
-                            'compute.modify'];
+                            'compute.create'];
 params.'exchange' :=  {'scope': 'storage.read:/home/'+user_id  + // granted
                                 ' storage.write:/home/'+user_id + // denied -- wrong path
                                 ' storage.read:/home/lsst/' + user_id + // denied -- not in original request
@@ -69,6 +69,7 @@ define[test(tokens., claims., expected_scopes., user_id)][
 */
     issuer := 'https://localhost:9443/oauth2';
     at. := tokens.'access_token'.'jwt';
+
     s. := tokenize(at.'scope', ' ');
     rt. := tokens.'refresh_token'.'jwt';
     ⊨ tokens.'access_token'.'lifetime' - 300000 < 2000 : 'wrong access token lifetime';
@@ -103,6 +104,7 @@ claims. := clc#claims();
 test(tokens., claims., expected_token_scopes., user_id);
 
 tokens. := clc#exchange();
+
 claims. := clc#claims();
 ⊨ issued_at <=clc#claims().'iat' : 'ID token not updated';
 test(tokens., claims., expected_exchange_scopes., user_id);

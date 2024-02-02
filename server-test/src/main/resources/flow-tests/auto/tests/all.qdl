@@ -5,7 +5,6 @@ path:='test#/';
 initialization := import(load('test#/auto/utils/initialization.mdl'));
 start:=date_ms();
 test.:= [
-          [path + 'auto/tests/' +'rfc7523-grant.qdl'],
           [path + 'auto/tests/' +'oauth-with-refresh.qdl', initialization],
           [path + 'auto/tests/' +'oauth-basic-no-refresh.qdl',initialization],
           [path + 'auto/tests/' +'oauth-rfc9068.qdl',initialization],
@@ -14,6 +13,7 @@ test.:= [
           [path + 'auto/tests/' +'oidc-id-token.qdl',initialization],
           [path + 'auto/tests/' +'oidc-scitokens.qdl',initialization],
           [path + 'auto/tests/' +'oidc-scitokens-template.qdl',initialization],
+          [path + 'auto/tests/' +'rfc7523-grant.qdl'],
           [path + 'auto/tests/' +'rtx_exchanges.qdl', initialization],
           [path + 'auto/tests/' +'rtx_refreshes.qdl', initialization],
           [path + 'auto/tests/' +'rtx.qdl',initialization],

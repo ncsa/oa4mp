@@ -156,7 +156,7 @@ public class RFC8628AuthorizationServer extends EnvServlet {
                     pendingState.setResponse(response);
                     DebugUtil.trace(this, " starting with PS response committed #6?" + pendingState.getResponse().isCommitted());
                     processRequest(request, pendingState, true);
-                 //   JSPUtil.fwd(request, response, getOkPage());
+                    //   JSPUtil.fwd(request, response, getOkPage());
                     logOK(request); // CIL-1722
 
                     return;
@@ -173,7 +173,9 @@ public class RFC8628AuthorizationServer extends EnvServlet {
                     return;
                 } catch (UserLoginException | UnknownUserCodeException userLoginException) {
                     info("Prompting user to retry login");
-                  if(DebugUtil.isEnabled()){  userLoginException.printStackTrace();}
+                    if (DebugUtil.isEnabled()) {
+                        userLoginException.printStackTrace();
+                    }
                     request.setAttribute(AbstractAuthorizationServlet.RETRY_MESSAGE, userLoginException.getMessage());
                     pendingState.setState(AbstractAuthorizationServlet.AUTHORIZATION_ACTION_START);
                     prepare(pendingState);
@@ -210,22 +212,24 @@ public class RFC8628AuthorizationServer extends EnvServlet {
                         RFC8628Store<? extends OA2ServiceTransaction> rfc8628Store = (RFC8628Store) getServiceEnvironment().getTransactionStore();
                         OA2ServiceTransaction trans = rfc8628Store.getByUserCode(userCode);
                         // https://github.com/ncsa/oa4mp/issues/141
-                        if(trans == null){
-                            throw new OA2ATException("access_denied", "unknown user code \"" + userCode +"\"",
+                        if (trans == null) {
+                            throw new OA2ATException("access_denied", "unknown user code \"" + userCode + "\"",
                                     HttpStatus.SC_BAD_REQUEST, null);
                         }
                         MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(trans.getOA2Client());
                         debugger.trace(this, "got transaction = " + trans);
                         printAllParameters(request, debugger);
+                        // RFC 7636 support for device flow
+
                         try {
                             ProxyUtils.userCodeToProxyRedirect(getServiceEnvironment(), trans, pendingState);
-                        }catch(Throwable t){
-                            if(t instanceof OA2GeneralError){
+                        } catch (Throwable t) {
+                            if (t instanceof OA2GeneralError) {
                                 throw t;
                             }
                             throw new OA2ATException("internal_error", t.getMessage(),
                                     HttpStatus.SC_BAD_REQUEST, trans.getRequestState(), trans.getClient());
-                            
+
                         }
                         return;
                     }
@@ -358,8 +362,8 @@ public class RFC8628AuthorizationServer extends EnvServlet {
                     trans.getClient());
         }
         MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(trans.getOA2Client());
-        if(debugger instanceof ClientDebugUtil){
-            ((ClientDebugUtil)debugger).setTransaction(trans);
+        if (debugger instanceof ClientDebugUtil) {
+            ((ClientDebugUtil) debugger).setTransaction(trans);
         }
         debugger.trace(this, "processRequest committed?" + pendingState.getResponse().isCommitted());
         if (!trans.isRFC8628Request()) {
@@ -375,8 +379,8 @@ public class RFC8628AuthorizationServer extends EnvServlet {
                 debugger.trace(this, "processRequest calling userCodeToProxy");
                 ProxyUtils.userCodeToProxyRedirect(getServiceEnvironment(), trans, pendingState);
                 return;
-            }catch(Throwable t){
-                if(t instanceof OA2GeneralError){
+            } catch (Throwable t) {
+                if (t instanceof OA2GeneralError) {
                     throw t;
                 }
                 throw new OA2ATException("internal_error", t.getMessage(),

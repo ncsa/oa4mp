@@ -46,7 +46,7 @@ cfg.'description' :=  'Test that a plain handler configuration (w/ templates, no
 cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
 user_id := 'http://cilogon.org/serverA/users/6849'; // for given IDP and identitu
 params.'authz' :=  {'scope': 'read: x.y: x.z write:'}; // initial request is query
-params.'token' :=  {'scope': 'read: x.y: x.z write:'}; // token exchange attempts to upscope.
+params.'refresh' :=  {'scope': 'read: x.y: x.z write:'}; // token exchange attempts to upscope.
 params.'exchange' :=  {'scope': 'read:/home/'+user_id  + // read
                                 ' write:/home/'+user_id + // write -- wrong, not granted
                                 ' read:/public/lsst/' + user_id + // ok

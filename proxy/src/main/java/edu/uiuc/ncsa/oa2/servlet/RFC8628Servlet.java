@@ -13,6 +13,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenUtils;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.*;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.AGRequest2;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC7523Constants;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC7636Util;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC8628Constants;
 import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.oa4mp.delegation.server.request.AGResponse;
@@ -119,6 +120,13 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
         t.setAuthGrantLifetime(lifetime);
         t.setAuthGrantValid(true);
         t.setRFC8628Request(true);
+        // Fix https://github.com/ncsa/oa4mp/issues/164
+        OA2AuthorizedServletUtil.setupPKCE(req.getParameter(RFC7636Util.CODE_CHALLENGE),
+                req.getParameter(RFC7636Util.CODE_CHALLENGE_METHOD),
+                oa2SE,
+                t,
+                client,
+                debugger);
         RFC8628State rfc8628State = new RFC8628State();
         String scope = req.getParameter(OA2Constants.SCOPE);
         rfc8628State.originalScopes = scope;

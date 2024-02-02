@@ -226,7 +226,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
      *
      * @return
      */
-    public List<Object> getATReturnedOriginalScopes() {
+    public Collection<String> getATReturnedOriginalScopes() {
         if (getState().containsKey(AT_RETURNED_ORIGINAL_SCOPES)) {
             return getState().getJSONArray(AT_RETURNED_ORIGINAL_SCOPES);
         }
@@ -471,6 +471,9 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         }
     }
 
+    public boolean hasScriptStateSerializationVersion(){
+        return getState().containsKey(SCRIPT_STATE_SERIALZATION_VERSION_KEY);
+    }
     public String getScriptStateSerializationVersion() {
         return getState().getString(SCRIPT_STATE_SERIALZATION_VERSION_KEY);
     }

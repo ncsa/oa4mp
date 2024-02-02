@@ -243,9 +243,15 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
         // E.g. if a scope is like compute.cancel it should not be processed as a template later.
         // Take them out here. Have to avoid concurrent modification exception, so stash them
         Collection<String> requestedCapabilities = new ArrayList<>();
-
-
-        Collection<String> requestedScopes = (txRecord != null && txRecord.hasScopes()) ? txRecord.getScopes() : transaction.getScopes();
+        Collection<String> requestedScopes = null;
+        if(isQuery){
+            // It is possible that the user sends along scopes in the intial request and still overrides them in the
+            // call to the token endpoint.
+            requestedScopes = (txRecord != null && txRecord.hasScopes()) ? txRecord.getScopes() : transaction.getScopes();
+        } else {
+            // Fix for https://github.com/ncsa/oa4mp/issues/165
+            requestedScopes = (txRecord != null && txRecord.hasScopes()) ? txRecord.getScopes() : transaction.getATReturnedOriginalScopes();
+        }
         Collection<String> badRequests = new ArrayList<>();
         Collection<String> foundCapabilities = new ArrayList<>();
         /*
@@ -295,30 +301,10 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
                 }
             }
         }
-        //actualScopes.addAll(relativeScopes); // add back in relative computed scopes.
+
         // now we convert to a scope string.
-
         String s = OA2Scopes.ScopeUtil.toString(actualScopes);
-        if(!isQuery ){
-
-        }
-/*
-        String s = "";
-        boolean firstPass = true;
-        for (String x : actualScopes) {
-            if (firstPass) {
-                firstPass = false;
-                s = x;
-            } else {
-                s = s + " " + x;
-            }
-        }
-        if (isTrivial(s)) {
-            return null;
-        }
-*/
         return s;
-
     }
 
 

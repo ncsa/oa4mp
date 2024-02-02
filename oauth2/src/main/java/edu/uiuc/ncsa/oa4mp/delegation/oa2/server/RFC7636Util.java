@@ -27,9 +27,10 @@ public class RFC7636Util {
             case METHOD_PLAIN:
                 return verifier;
         }
-        throw new IllegalArgumentException("unkown method type");
+        throw new IllegalArgumentException("unknown method type");
 
     }
+
 
     static SecureRandom secureRandom = new SecureRandom();
     public static int byteCount = 48; //  = 384 bits

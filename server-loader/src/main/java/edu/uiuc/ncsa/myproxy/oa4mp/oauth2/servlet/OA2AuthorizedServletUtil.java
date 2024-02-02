@@ -111,16 +111,7 @@ public class OA2AuthorizedServletUtil {
             are stashed and forwarded at the correct time.
              */
             OA2ServletUtils.processXAs(req, transaction, resolvedClient);
-/*
-            if (resolvedClient.hasExtendedAttributeSupport()) {
-                ExtendedParameters xp = new ExtendedParameters();
-                // Take the parameters and parse them into configuration objects,
-                JSONObject extAttr = xp.snoopParameters(req.getParameterMap());
-                if (extAttr != null && !extAttr.isEmpty()) {
-                    transaction.setExtendedAttributes(extAttr);
-                }
-            }
-*/
+
             agResponse.setServiceTransaction(transaction);
             transaction = (OA2ServiceTransaction) verifyAndGet(agResponse);
             transaction.setAuthTime(new Date()); // have to set the time to now.
@@ -131,7 +122,9 @@ public class OA2AuthorizedServletUtil {
             to get state, callback etc.
              */
             String codeChallenge = req.getParameter(RFC7636Util.CODE_CHALLENGE);
-            if (StringUtils.isTrivial(codeChallenge)) {
+            String codeChallengeMethod = req.getParameter(RFC7636Util.CODE_CHALLENGE_METHOD);
+            setupPKCE(codeChallenge,codeChallengeMethod,oa2se,transaction,resolvedClient,debugger);
+    /*        if (StringUtils.isTrivial(codeChallenge)) {
                 if (oa2se.isRfc7636Required() && resolvedClient.isPublicClient()) {
                     throw new OA2RedirectableError(OA2Errors.ACCESS_DENIED,
                             "access denied",
@@ -143,13 +136,12 @@ public class OA2AuthorizedServletUtil {
             } else {
                 debugger.trace(this, "Setting code challenge to codeChallenge");
                 transaction.setCodeChallenge(codeChallenge);
-                String codeChallengeMethod = req.getParameter(RFC7636Util.CODE_CHALLENGE_METHOD);
                 if (StringUtils.isTrivial(codeChallengeMethod)) {
                     transaction.setCodeChallengeMethod(RFC7636Util.METHOD_PLAIN);
                 } else {
                     transaction.setCodeChallengeMethod(codeChallengeMethod);
                 }
-            }
+            }*/
 
             Map<String, String> params = agResponse.getParameters();
             XMLMap backup = GenericStoreUtils.toXML(getServiceEnvironment().getTransactionStore(), transaction);
@@ -166,6 +158,33 @@ public class OA2AuthorizedServletUtil {
                 DebugUtil.warn(this, "Unapproved client: " + client.getIdentifierString());
             }
             throw t;
+        }
+    }
+
+    public static void setupPKCE(String codeChallenge,
+                                 String codeChallengeMethod,
+                                 OA2SE oa2se,
+                                 OA2ServiceTransaction transaction,
+                                 OA2Client resolvedClient,
+                                 MetaDebugUtil debugger
+    ) {
+        if (StringUtils.isTrivial(codeChallenge)) {
+            if (oa2se.isRfc7636Required() && resolvedClient.isPublicClient()) {
+                throw new OA2RedirectableError(OA2Errors.ACCESS_DENIED,
+                        "access denied",
+                        HttpStatus.SC_UNAUTHORIZED,
+                        transaction.getRequestState(),
+                        transaction.getCallback());
+
+            }
+        } else {
+            debugger.trace("Setting code challenge to codeChallenge");
+            transaction.setCodeChallenge(codeChallenge);
+            if (StringUtils.isTrivial(codeChallengeMethod)) {
+                transaction.setCodeChallengeMethod(RFC7636Util.METHOD_PLAIN);
+            } else {
+                transaction.setCodeChallengeMethod(codeChallengeMethod);
+            }
         }
     }
 
@@ -270,10 +289,11 @@ public class OA2AuthorizedServletUtil {
      * This will take the {@link HttpServletRequest} and pull out the response_type.
      * If the response type is not supported (e.g. implicit flow),
      * an error is raised.
+     *
      * @param httpServletRequest
      * @return
      */
-    protected List<String> getAndCheckResponseTypes(HttpServletRequest httpServletRequest){
+    protected List<String> getAndCheckResponseTypes(HttpServletRequest httpServletRequest) {
         JSONArray array = new JSONArray();
         String requestState = httpServletRequest.getParameter(OA2Constants.STATE);
 
@@ -312,12 +332,13 @@ public class OA2AuthorizedServletUtil {
             // response type of code is all we support. They may also ask for a response
             // type of id_token
         }
-            DebugUtil.trace(this, "unrecognized response type \"" + httpServletRequest.getParameter(RESPONSE_TYPE));
-            throw new OA2GeneralError(OA2Errors.UNSUPPORTED_RESPONSE_TYPE,
-                    "The given " + RESPONSE_TYPE + " is not supported.",
-                    HttpStatus.SC_BAD_REQUEST,
-                    requestState);
+        DebugUtil.trace(this, "unrecognized response type \"" + httpServletRequest.getParameter(RESPONSE_TYPE));
+        throw new OA2GeneralError(OA2Errors.UNSUPPORTED_RESPONSE_TYPE,
+                "The given " + RESPONSE_TYPE + " is not supported.",
+                HttpStatus.SC_BAD_REQUEST,
+                requestState);
     }
+
     /**
      * In this case, a previous request to the token endpoint returned an ID token. If this is sent to
      * this endpoint, we are to check that there is an active logon for the user (=there is a transaction
@@ -386,7 +407,7 @@ public class OA2AuthorizedServletUtil {
                             HttpStatus.SC_BAD_REQUEST,
                             t.getRequestState(),
                             t.getCallback(),
-                    t.getClient());
+                            t.getClient());
                 }
                 httpServletResponse.setStatus(HttpStatus.SC_OK);
                 // The spec does not state that anything is returned, just a positive response.
@@ -403,7 +424,7 @@ public class OA2AuthorizedServletUtil {
         throw new OA2GeneralError(OA2Errors.LOGIN_REQUIRED,
                 "Login required.",
                 HttpStatus.SC_UNAUTHORIZED,
-                null, t==null?null:t.getClient());
+                null, t == null ? null : t.getClient());
 
     }
 
@@ -638,11 +659,12 @@ public class OA2AuthorizedServletUtil {
      *
      * @param state
      */
-    public  void figureOutAudienceAndResource(TransactionState state) {
+    public void figureOutAudienceAndResource(TransactionState state) {
         figureOutAudienceAndResource((OA2ServiceTransaction) state.getTransaction(),
                 state.getRequest().getParameterValues(RFC8693Constants.RESOURCE),
                 state.getRequest().getParameterValues(RFC8693Constants.AUDIENCE));
     }
+
     public static void figureOutAudienceAndResource(OA2ServiceTransaction t, String[] rawResource,
                                                     String[] rawAudience) {
 
@@ -731,7 +753,7 @@ public class OA2AuthorizedServletUtil {
         Collection<String> scopes = resolveScopes(transactionState, client);
         t.setScopes(scopes);
         t.setValidatedScopes(scopes);
-        t.setRequestedIDTLifetime(ClientUtils.computeIDTLifetime(t, client, (OA2SE)getServiceEnvironment()));
+        t.setRequestedIDTLifetime(ClientUtils.computeIDTLifetime(t, client, (OA2SE) getServiceEnvironment()));
         transactionState.getResponse().setHeader("X-Frame-Options", "DENY");
     }
 }

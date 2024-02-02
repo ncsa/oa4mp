@@ -30,4 +30,4 @@ claims. := clc#claims();
 ⊨claims.'sub' == 'threepwood' : 'wrong subject, got ' + (claims.'sub');
 ⊨∄claims.'is_memberOf' : 'got an is member of claim';
 ⊨exp < claims.'exp' : 'incorrect expiration, got ' + exp + ', expected ' + (claims.'exp');
-say('ok: test scope for leaking or extra user information');
+say('ok: OIDC test scope for leaking or extra user information');
