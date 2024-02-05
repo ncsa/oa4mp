@@ -13,7 +13,7 @@ cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token 
 params.'a' := {
  'org.oa4mp:/tokens/access/lifetime' : 1000000,
                   'org.oa4mp:/roles' : 'admin,all-user',
-                    'code_challenge' : 'N_zjM2czxZIWNar-lWUiuS7-Pacwh-k-L_Akpje6AmY',
+                    'code_challenge' : 'N_zjM2czxZIWNar-lWUiuS7-Pacwh-k-L_Akpje6AmY  ',
              'code_challenge_method' : 'S256'};
 
 params.'token' := {'code_verifier' : 'qBdfP8Wmpomgkq6aJwcvZQMHx553RK4P7LAYxmzMAkmo8cM7MlE8ViJSOx38nlHr' };

@@ -1905,6 +1905,12 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(client);
         printAllParameters(request, debugger);
         String rawRefreshToken = request.getParameter(OA2Constants.REFRESH_TOKEN);
+        if(StringUtils.isTrivial(rawRefreshToken)){
+            // Then this request is, in fact, invalid.
+            // Fix https://github.com/ncsa/oa4mp/issues/166
+            throw new OA2ATException(OA2Errors.INVALID_REQUEST, "missing refresh token");
+
+        }
         if (client == null) {
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, "Could not find the client associated with refresh token \"" + rawRefreshToken + "\"");
         }

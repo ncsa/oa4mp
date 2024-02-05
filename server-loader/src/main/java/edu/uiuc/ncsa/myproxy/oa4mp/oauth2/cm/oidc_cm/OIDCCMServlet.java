@@ -226,7 +226,7 @@ public class OIDCCMServlet extends EnvServlet {
     private void handleServerQuery(AdminClient adminClient, List<String> queries, HttpServletRequest request, HttpServletResponse response) throws IOException {
         JSONObject jsonObject = new JSONObject();
         // improvement for https://github.com/ncsa/oa4mp/issues/154
-        if (queries.contains("org.oa4mp:/server/defaults")) {
+        if (queries.contains("org.oa4mp:/server#defaults")) {
             // most of the other server configuration information (such as scopes supported)
             // are in the well-known page, but there is no place for these.
             jsonObject.put(REFRESH_LIFETIME, getOA2SE().getRefreshTokenLifetime() / 1000);

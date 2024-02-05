@@ -17,4 +17,4 @@ h. := {'Authorization': 'Bearer ' + bearer_token(admin.'id', admin.'secret'),
 http#headers(h.);
 http#open(true);
 // need more graceful error handling here at some point.
-return(http#get({'query':'org.oa4mp:/server/defaults'})\content);
+return(http#get({'query':'org.oa4mp:/server#defaults'})\content);
