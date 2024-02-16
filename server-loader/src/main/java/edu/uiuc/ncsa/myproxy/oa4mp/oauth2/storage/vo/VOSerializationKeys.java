@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo;
 
-import edu.uiuc.ncsa.security.storage.data.MonitoredKeys;
+import edu.uiuc.ncsa.security.storage.monitored.MonitoredKeys;
 
 import java.util.List;
 

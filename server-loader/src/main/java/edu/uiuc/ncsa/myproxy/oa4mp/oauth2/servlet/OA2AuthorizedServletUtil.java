@@ -114,7 +114,10 @@ public class OA2AuthorizedServletUtil {
 
             agResponse.setServiceTransaction(transaction);
             transaction = (OA2ServiceTransaction) verifyAndGet(agResponse);
-            transaction.setAuthTime(new Date()); // have to set the time to now.
+            Date now = new Date();
+            transaction.setAuthTime(now); // have to set the time to now.
+            resolvedClient.setLastAccessed(now);
+            client.setLastAccessed(now);
 
             debugger.info(this, "Saved new transaction with id=" + transaction.getIdentifierString());
             /*

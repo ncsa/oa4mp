@@ -1,12 +1,8 @@
 package edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc;
 
-import edu.uiuc.ncsa.security.core.Identifier;
-import edu.uiuc.ncsa.security.core.util.Iso8601;
-
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.Date;
 
 /**
  * Typical configuration example:
@@ -15,6 +11,7 @@ import java.util.List;
  *                                 alarms="6:00"
  *                                 deleteVersions="false"
  *                                 enabled="true"
+ *                                 createdNotBefore=ISO 8601 time
  *                                 interval="1 hr"&gt;
  *      &lt;whitelist&gt;
  *         &lt;clientID&gt;id...&lt;/clientID&gt;
@@ -40,17 +37,183 @@ public class UUCConfiguration {
     public boolean testMode = false; // internally set flag to only return items to delete.
     public Collection<LocalTime> alarms = null;
 
+    public static final int UNUSED_RULE = 100;
+    public static final int ABANDONED_RULE =101;
+    public static final int BLACKLIST_RULE =102;
+    public static final int WHITELIST_RULE =103;
+
+    public static final int[] allRules = new int[]{UNUSED_RULE,ABANDONED_RULE,BLACKLIST_RULE,WHITELIST_RULE};
+    public RuleFilter getFilter(int rule){
+        switch (rule){
+            case UNUSED_RULE:
+                return getUnusedRule().getFilter();
+            case ABANDONED_RULE:
+                return getAbandonedRule().getFilter();
+            case WHITELIST_RULE:
+                return getWhiteList().getFilter();
+            case BLACKLIST_RULE:
+                return getBlackList().getFilter();
+            default:
+                return null;
+        }
+    }
+    public boolean hasFilter(int rule){
+        return getFilter(rule) != null;
+    }
+
+    public boolean hasSubFilter(){
+       for(int r : allRules){
+           if(hasFilter(r)) return true;
+       }
+       return false;
+    }
+
+    public MetaRule getRule(int rule){
+        switch (rule){
+            case UNUSED_RULE:
+                return getUnusedRule();
+            case ABANDONED_RULE:
+                return getAbandonedRule();
+            case WHITELIST_RULE:
+                return getWhiteList();
+            case BLACKLIST_RULE:
+                return getBlackList();
+            default:
+                return null;
+        }
+    }
+    public boolean hasRule(int rule){
+        switch (rule){
+            case UNUSED_RULE:
+                return hasUnusedRule();
+            case ABANDONED_RULE:
+                return hasAbandonedRule();
+            case WHITELIST_RULE:
+                return hasWhitelist();
+            case BLACKLIST_RULE:
+                return hasBlacklist();
+            default:
+                return false;
+        }
+    }
+    public static final String ACTION_TEST="test";
+    public static final String ACTION_ARCHIVE="archive";
+    public static final String ACTION_DELETE="delete";
+
+    public RuleFilter getFilter() {
+        return filter;
+    }
+
+    public void setFilter(RuleFilter filter) {
+        this.filter = filter;
+    }
+
+    RuleFilter filter = null;
+
+    public boolean hasFilter(){
+        return filter != null;
+    }
+
+    public ListRule getBlackList() {
+        return blackList;
+    }
+
+    public void setBlackList(ListRule blackList) {
+        this.blackList = blackList;
+    }
+
+    ListRule blackList;
+    public void setWhiteList(ListRule whiteList) {
+        this.whiteList = whiteList;
+    }
+
+    public ListRule getWhiteList() {
+        return whiteList;
+    }
+   public boolean hasWhitelist(){
+        return whiteList != null;
+   }
+   public boolean hasBlacklist(){
+        return blackList!=null;
+   }
+    ListRule whiteList;
+    public boolean isLastAccessedNever() {
+        return lastAccessedNever;
+    }
+
+    public void setLastAccessedNever(Boolean lastAccessedNever) {
+        this.lastAccessedNever = lastAccessedNever;
+    }
+
+    Boolean lastAccessedNever = null;
+
+    boolean hasLastAccessedNever(){
+        return lastAccessedNever != null;
+    }
+    public boolean getDebugOn() {
+        return debugOn;
+    }
+
+    public void setDebugOn(boolean debugOn) {
+        this.debugOn = debugOn;
+    }
+
+    boolean debugOn = false;
+    /**
+     * Do not process clients whose creation date is before this. The intent is that systems that
+     * are introducing UUC may have several  older clients that may be used infrequently or in the case of
+     * upgrading the system from a much older version of OA4MP, the information simply has not had time
+     * to accrue.
+     *
+     * @return
+     */
+    public Date getCreatedAfter() {
+        return createdAfter;
+    }
+
+    public void setCreatedAfter(Date createdAfter) {
+        this.createdAfter = createdAfter;
+    }
+
+    Date createdAfter = null;
+
+    public boolean hasCreatedAfter() {
+        return createdAfter != null;
+    }
+
+    public Date getCreatedBefore() {
+        return createdBefore;
+    }
+
+    public void setCreatedBefore(Date createdBefore) {
+        this.createdBefore = createdBefore;
+    }
+
+    Date createdBefore = null;
+
+    public boolean hasCreatedBefore() {
+        return createdBefore != null;
+    }
+
     public boolean hasAlarms() {
         return alarms != null;
     }
 
     public boolean deleteVersions = false;
-    public List<Identifier> whiteList = null;
+
+    public boolean hasUnusedRule(){
+        return unusedRule != null;
+    }
+    public boolean hasAbandonedRule(){
+        return abandonedRule != null;
+    }
+/*    public List<Identifier> whiteList = null;
     public List<Identifier> blacklist = null;
 
     public List<String> whitelistRegex = null;
-    public List<String> blacklistRegex = null;
+    public List<String> blacklistRegex = null;*/
 
+/*
     public void whiteList(Identifier id) {
         getWhiteList().add(id);
     }
@@ -61,7 +224,9 @@ public class UUCConfiguration {
         }
         return whiteList;
     }
+*/
 
+/*
     public List<Identifier> getBlacklist() {
         if (blacklist == null) {
             blacklist = new ArrayList<>();
@@ -82,20 +247,23 @@ public class UUCConfiguration {
         }
         return blacklistRegex;
     }
+*/
 
-    public Long getLastAccessed() {
-        return lastAccessed;
+/*
+    public Long getLastAccessedBefore() {
+        return lastAccessedBefore;
     }
+*/
 
     /**
      * If set, this will be the upper bound on the last access date. Therefore, for a client whose
      * last accesed timestamp is L
-     * <pre>L ∈ [lastAccessedAfter, lastAccessed]</pre>
+     * <pre>L ∈ [lastAccessedAfter, lastAccessedBefore]</pre>
      */
-    public Long lastAccessed = null;
+    public Long lastAccessedBefore = null;
 
-    public boolean unusedClientsOnly(){
-        return lastAccessed == null || lastAccessed == UUC_LAST_ACCESSED_NEVER_VALUE;
+    public boolean unusedClientsOnly() {
+        return lastAccessedBefore == null || lastAccessedBefore == UUC_LAST_ACCESSED_NEVER_VALUE;
     }
 
     /**
@@ -103,9 +271,15 @@ public class UUCConfiguration {
      * unused clients last accessed after this date.
      */
     public Long lastAccessedAfter = null;
-    public boolean hasLastAccessedAfter(){
-        return lastAccessedAfter!=null;
+
+    public boolean hasLastAccessedAfter() {
+        return lastAccessedAfter != null;
     }
+
+    public boolean hasLastAccessedBefore() {
+        return lastAccessedBefore != null;
+    }
+/*
     public void whiteList(String regex) {
         getWhitelistRegex().add(regex);
     }
@@ -133,25 +307,52 @@ public class UUCConfiguration {
     public boolean hasBlacklistRegex() {
         return blacklistRegex != null;
     }
+*/
 
-    @Override
-    public String toString() {
-      return toString(false);
-    }
-
+    /*   @Override
+       public String toString() {
+         return toString(false);
+       }
+   */
     public String toString(boolean prettyPrint) {
-        return "UUCConfiguration{" +
-                (prettyPrint ? "\n   " : "") + "enabled=" + enabled +
-                (prettyPrint ? "\n   " : "") + "lastAccessed=" + (lastAccessed==null?"never": Iso8601.date2String(lastAccessed)) +
-                (prettyPrint ? ",\n   " : "") + "gracePeriod=" + gracePeriod +
-                (prettyPrint ? ",\n   " : "") + "interval=" + interval +
-                (prettyPrint ? ",\n   " : "") + "testMode=" + testMode +
-                (prettyPrint ? ",\n   " : "") + "alarms=" + alarms +
-                (prettyPrint ? ",\n   " : "") + "deleteVersions=" + deleteVersions +
-                (prettyPrint ? ",\n   " : "") + "whiteList=" + whiteList +
-                (prettyPrint ? ",\n   " : "") + "blacklist=" + blacklist +
-                (prettyPrint ? ",\n   " : "") + "whitelistRegex=" + whitelistRegex +
-                (prettyPrint ? ",\n   " : "") + "blacklistRegex=" + blacklistRegex +
-                "\n}";
+        if (!prettyPrint) return toString();
+       return null;
     }
+
+    public UnusedRule getUnusedRule() {
+        return unusedRule;
+    }
+
+    public void setUnusedRule(UnusedRule unusedRule) {
+        this.unusedRule = unusedRule;
+    }
+
+    UnusedRule unusedRule = null;
+
+    public AbandonedRule getAbandonedRule() {
+        return abandonedRule;
+    }
+
+    public void setAbandonedRule(AbandonedRule abandonedRule) {
+        this.abandonedRule = abandonedRule;
+    }
+
+    AbandonedRule abandonedRule = null;
+
+
 }
+
+/*
+
+ "        alarms=" + alarms + ",\n" +
+ "     blacklist=" +  + ",\n" +
+ "blacklistRegex=" +  + ",\n" +
+ "deleteVersions=" +  + ",\n" +
+ "       enabled=" +  + ",\n" +
+ "   gracePeriod=" +  + ",\n" +
+ "      interval=" +  + ",\n" +
+ "  lastAccessed=" +  + ",\n" +
+ "      testMode=" +  + ",\n" +
+ "     whiteList=" +  + ",\n" +
+ "whitelistRegex=" +
+ */

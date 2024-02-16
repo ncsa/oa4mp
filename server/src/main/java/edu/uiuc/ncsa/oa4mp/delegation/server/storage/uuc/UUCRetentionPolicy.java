@@ -3,10 +3,10 @@ package edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.cache.RetentionPolicy;
-import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.storage.cli.StoreArchiver;
 
-import java.sql.Timestamp;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -20,7 +20,7 @@ public class UUCRetentionPolicy implements RetentionPolicy {
     }
 
     public StoreArchiver getStoreArchiver() {
-        if(storeArchiver == null){
+        if (storeArchiver == null) {
             storeArchiver = new StoreArchiver(store);
         }
         return storeArchiver;
@@ -30,41 +30,67 @@ public class UUCRetentionPolicy implements RetentionPolicy {
     UUCConfiguration config;
     Store store;
 
-    public boolean retain(String id, Timestamp create, Timestamp lastAccessed, Timestamp lastModified) {
-        return retain(BasicIdentifier.newID(id), create.getTime(),
-                lastAccessed==null?UUCConfiguration.UUC_LAST_ACCESSED_NEVER_VALUE:lastAccessed.getTime() ,
-                lastModified.getTime());
+    /**
+     * Retention call. This returns an array of object. The zero-th element is always a boolean
+     * with the value (1 = retain, 0 = do not retain) and <b>if false</b> the second
+     * value is the name of the rule that was invoked, see {@link UUCConfiguration}.
+     * @param id
+     * @param create
+     * @param lastAccessed
+     * @param lastModified
+     * @return
+     */
+    public int[] retain(Identifier id, Date create, Date lastAccessed, Date lastModified) {
+        Long created = create==null?null:create.getTime();
+        Long accessed = lastAccessed==null?null: lastAccessed.getTime();
+        Long modified = lastModified==null?null: lastModified.getTime();
+        if(config.hasFilter()){
+            HashMap<String, DateThingy> createdDates = config.getFilter().getByType(RuleFilter.TYPE_CREATED);
+            boolean applies = false;
+            if(createdDates.containsKey(RuleFilter.WHEN_AFTER)){
+                DateThingy dateThingy = createdDates.get(RuleFilter.WHEN_AFTER);
+                if(dateThingy.isRelative()){
+                     applies = created + dateThingy.relativeDate <= System.currentTimeMillis();
+                } else{
+                     applies = created <= dateThingy.iso8601.getTime();
+                }
+            }
+            if(createdDates.containsKey(RuleFilter.WHEN_BEFORE)){
+                DateThingy dateThingy = createdDates.get(RuleFilter.WHEN_BEFORE);
+                if(dateThingy.isRelative()){
+                     applies = applies && (  System.currentTimeMillis() <= created + dateThingy.relativeDate);
+                } else{
+                     applies = applies && (  dateThingy.iso8601.getTime() <= created);
+                }
+            }
+            if(applies) return new int[]{1};
+        }
+        if (config.hasCreatedAfter()) {
+            if (created <= config.createdAfter.getTime()) return new int[]{1};
+        }
+/*        if ((!config.deleteVersions) && getStoreArchiver().isVersion(id)) {
+            return true;
+        }*/
+
+        if(config.hasWhitelist()){
+            if(config.getWhiteList().applies(id)) return new int[]{1};
+        }
+
+        if(config.hasUnusedRule()){
+            if(config.getUnusedRule().applies(created, accessed, modified)) return new int[]{0,UUCConfiguration.UNUSED_RULE};
+        }
+
+        if(config.hasAbandonedRule()){
+            if(config.getAbandonedRule().applies(created, accessed, modified)) return new int[]{0, UUCConfiguration.ABANDONED_RULE};
+        }
+
+        if(config.hasBlacklist()){
+            if(config.getBlackList().applies(id)) return new int[]{0, UUCConfiguration.BLACKLIST_RULE};
+        }
+
+        return new int[]{1};
     }
 
-    public boolean retain(Identifier id, long create, long lastAccessed, long lastModified) {
-       if((!config.deleteVersions)  && getStoreArchiver().isVersion(id)){
-           return true;
-        }
-       if(config.hasWhitelist()){
-           if(config.getWhiteList().contains(id)) return true;
-       }
-       if(config.hasWhitelistRegex()){
-           for(String rx : config.getWhitelistRegex()){
-               if(id.toString().matches(rx)){return true;}
-           }
-       }
-       if(config.hasBlacklist()){
-           if(config.getBlacklist().contains(id)){return false;}
-       }
-       if(config.hasBlacklistRegex()){
-           for(String rx : config.getBlacklistRegex()){
-               if(id.toString().matches(rx)){return false;}
-           }
-       }
-        boolean keepIt = true;
-       long now = System.currentTimeMillis();
-       // Only look for unused clients
-       if(lastAccessed <=0){
-           //return now<(create+config.gracePeriod);
-           keepIt = (now<(lastModified + config.gracePeriod)) && (now<(create+config.gracePeriod));
-       }
-        return keepIt;
-    }
 
     @Override
     public boolean retain(Object key, Object value) {

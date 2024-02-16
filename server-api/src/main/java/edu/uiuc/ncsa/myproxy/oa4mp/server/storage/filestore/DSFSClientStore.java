@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.storage.filestore;
 
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.UUCResponse;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.impl.GenericClientStoreUtils;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.UUCConfiguration;
 import edu.uiuc.ncsa.security.core.util.IdentifiableProviderImpl;

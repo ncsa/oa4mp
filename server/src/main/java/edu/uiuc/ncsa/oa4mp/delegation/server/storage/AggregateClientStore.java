@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.oa4mp.delegation.server.storage;
 
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.UUCConfiguration;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.UUCResponse;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;

@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients;
 
-import edu.uiuc.ncsa.security.storage.data.MonitoredKeys;
+import edu.uiuc.ncsa.security.storage.monitored.MonitoredKeys;
 
 import java.util.List;
 

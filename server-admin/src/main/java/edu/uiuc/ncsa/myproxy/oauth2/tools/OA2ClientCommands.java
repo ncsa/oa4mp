@@ -13,6 +13,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClient;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.BaseClientStore;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.UUCResponse;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.UUCConfiguration;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
@@ -773,7 +774,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
             inputLine.removeSwitchAndValue(UUC_FLAG_TEST);
         }
         BaseClientStore clientStore = (BaseClientStore) getStore();
-        BaseClientStore.UUCResponse response = clientStore.unusedClientCleanup(getUucConfiguration());
+        UUCResponse response = clientStore.unusedClientCleanup(getUucConfiguration());
         say("Stats are " + response);
         if (writeOutput) {
             FileWriter fw = new FileWriter(outputFilename);

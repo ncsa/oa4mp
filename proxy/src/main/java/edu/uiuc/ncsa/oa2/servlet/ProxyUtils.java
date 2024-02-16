@@ -165,7 +165,8 @@ public class ProxyUtils {
 
     /**
      * Takes the user code in the service transaction (which has been found) and does
-     * the redirect to the proxy for login. For RFC8628
+     * the redirect to the proxy for login. For RFC8628. After this call, the user's
+     * browser is on the proxy site.
      *
      * @param oa2SE
      * @param t
@@ -185,7 +186,6 @@ public class ProxyUtils {
         debugger.trace(ProxyUtils.class, "userCodeToProxyRedirect got DF response, raw callback =" + rawCB);
         debugger.trace(ProxyUtils.class, "userCodeToProxyRedirect wrapper committed? " + wrapper.isCommitted());
         wrapper.sendRedirect(rawCB);
-
     }
 
     /**

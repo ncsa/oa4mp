@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Base64;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,7 +44,7 @@ public class ProxyCallbackServlet extends OA2AuthorizationServer {
 
     /**
      * Processes the callback <i>from the proxy</i>. This will take the proxy's callback and transform it
-     * into the correct transactioin at our end, then get the access token from the proxy.
+     * into the correct transaction at our end, then get the access token from the proxy.
      * <br/>
      * The access token also includes the user's meta data (such as subject) and the is used to
      * populate the username in the server. When this is done, the server is ready to do its callback.
@@ -54,10 +55,6 @@ public class ProxyCallbackServlet extends OA2AuthorizationServer {
      */
     @Override
     protected void doIt(HttpServletRequest request, HttpServletResponse response) throws Throwable {
-        //https://localhost:9443/client/not-ready?
-        // code=NB2HI4DTHIXS6ZDFOYXGG2LMN5TW63RON5ZGOL3PMF2XI2BSF4YTANTGGBQWMNBRMU3WEOLFMQ4TQNTGGE3WGMZYGYYTOZRZMFSGKP3UPFYGKPLBOV2GQ6SHOJQW45BGORZT2MJWGQ3DGNBWG42DGNRUGATHMZLSONUW63R5OYZC4MBGNRUWMZLUNFWWKPJZGAYDAMBQ&
-        // state=dXJuOmlkOjUyZjBjMGU3LWE4YzYtNDIxNy05Y2YxLWJjOTJmNzQwNGQ2NQ%3D%3D
-
         Map<String, String[]> parameters = request.getParameterMap();
 
         if (!parameters.containsKey(OA2Constants.STATE)) {
@@ -99,7 +96,9 @@ public class ProxyCallbackServlet extends OA2AuthorizationServer {
         JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2SE, t, resolvedClient.getConfig()));
         OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, t, resolvedClient, request);
         XMLMap backup = GenericStoreUtils.toXML(getTransactionStore(), t);
-
+        Date now  = new Date();
+        t.setAuthTime(now);
+        t.getClient().setLastAccessed(now);
         try {
             jwtRunner.doAuthClaims();
         } catch (Throwable throwable) {

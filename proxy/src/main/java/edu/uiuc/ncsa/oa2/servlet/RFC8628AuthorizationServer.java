@@ -34,6 +34,7 @@ import java.util.*;
 import static edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractAuthorizationServlet.UserLoginException;
 
 /**
+ * This does the authorization for the device flow.
  * <p>Created by Jeff Gaynor<br>
  * on 2/12/21 at  6:19 AM
  */

@@ -1,0 +1,90 @@
+/*
+  Registry is at https://comanage.sdcc.bnl.gov/registry/
+
+*/
+
+/*
+    As per https://github.com/cilogon/bnl-policies/blob/main/BNL-SDCC_Policy_Specification.md
+     for EIC-Services:
+
+* OIDC client ID on PROD is currently
+    *  cilogon:/client_id/4e2db9f5551bdcf44109b6d3d3a43a83
+* OIDC client on TEST is currently
+    * None
+* Policy:
+    * Use OIDC tokens
+    * Refresh token is not required.
+    * Access token can be just an opaque string.
+    * Audience for ID token should be set to OIDC client ID.
+    * ID token “sub” claim should be set to “sdccid” of logged in user. This number is currently provisioned into the “voPersonID” field of LDAP. (:speech_balloon: **COMMENT** from Scott Koranda, Mar 22, 2023: The voPersonID just changed from employeeNumber, but has been reconciled and is same in TEST and PROD LDAPs.)
+    * ID token claim “isMemberOf” should contain a list of Registry groups to which the logged in user belongs. This is currently provisioned into “isMemberOf” in LDAP
+    * The following scopes are allowed openid, profile, email, org.cilogon.userinfo
+    * ID token “acr” claim should convey information from the IDP as to whether the user logged in with Single Factor Authorization(SFA) or Multifactor Authorization(MFA)
+    * Users that are denied authorization at the issuer should be redirected to the help page located at [https://www.sdcc.bnl.gov/registry-login-error.php](https://www.sdcc.bnl.gov/registry-login-error.php)
+        * The following get parameters should be sent
+            * error
+                * Same as would normally go to client callback uri
+            * error_description
+                * Same as would normally go to client callback uri
+            * serviceid
+                * “EIC-Services” (:speech_balloon: **COMMENT** from Scott Koranda, Mar 22, 2023:
+                  This is a literal string with value "EIC-Services".)
+    * The allowed IDP list for this client should only include:
+        * All IDPs maintained by CILogon with exclusion of open IDPs like Google, Microsoft, ORCID,  and State Sponsor of Terrorism (anything in Syria,Cuba,Iran, or North Korea)
+
+*/
+/*
+    Access token support for Jefferson Lab's EIC-Services client. Typical configuration for the client
+    is
+tokens {
+    identity {
+         type = "identity"
+        qdl {
+            load="bnl/eic/v1/id-token.qdl"
+            xmd {
+                "exec_phase"=["post_auth"]
+            }
+    }}}
+
+Note that this runs in the post_auth phase only since the sub claim is over-written
+AND the only place that the redirect from the error makes sense is during the auth
+phase since there is a browser to redirect.
+
+{"tokens": {"identity": {
+                             "qdl":  {
+                              "load": "bnl/eic/v1/id-token.qdl",
+                              "xmd": {"exec_phase": ["post_auth"]}
+                             },
+                             "type": "identity"
+                            }}}
+    // Note. No refresh tokens!
+*/
+//script_load('bnl/acl.qdl');
+script_load('utils/init.qdl'); // set up stuff
+
+   debugger(1);
+     DEBUG := true; // set false everywhere but on my test server.
+ // Robert Hancock's uid.
+  if [DEBUG]
+then [// Note that this does reset these every time called, so the get_user always works
+      // unlike production, where the sub gets reset on the first pass.
+      claims.'eppn':='hancock@bnl.gov';
+      claims.'sub' := 'http://cilogon.org/serverA/users/1774626';
+     ];
+bnl_eic := 'BNL EIC-Services'; // moniker for debugging
+user := claims.sub;
+trace(bnl_eic,'starting id-token for user =' + user);
+
+
+results. := script_load('bnl/drupal/v1/get_user.qdl', user); // user == claims.sub
+ trace(bnl_eic,'result of user query =' + to_string(results.));
+
+  if [∄results.'sdccid']
+then [uri :='https://www.sdcc.bnl.gov/registry-login-error.php'+
+            '?error=access_denied' +
+            '&error_description=' + encode('user not found',1) +
+            '&serviceid=EIC-Services';
+    err_uri('user not found',uri);
+    ];
+
+          claims.'sub' := results.'sdccid';

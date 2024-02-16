@@ -5,10 +5,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
     <title>The Service Tag.</title>
-    <!--#include virtual="../../head.html" -->
 </head>
 <body class="composite">
-<!--#include virtual="../../header.html" -->
 
 <h2>The Service Tag.</h2>
 
@@ -495,7 +493,7 @@
     </tbody>
 </table>
 
-<h2>A note on time and units</h2>
+<h2 id="NoteOnUnits">A note on time and units</h2>
 <p>As of 5.1, all the times for grants, access tokens and refresh tokens may have units
     specified. So this is a perfectly acceptable snipped from a configuration file:</p>
 <pre>
@@ -504,29 +502,90 @@
              enableTwoFactorSupport="false"
              authorizationGrantLifetime="12345"
              defaultAccessTokenLifetime="1009000 ms"
-             maxAccessTokenLifetime="1800 sec"
+             maxAccessTokenLifetime="30 mins."
              maxClientRefreshTokenLifetime="2592000 sec"
-             maxRefreshTokenLifetime="1000000s."
+             maxRefreshTokenLifetime="2 weeks"
              refreshTokenEnabled="true"
              enableTokenExchange="true"
              serverDN="CN=localhost2"
     &lt;!-- lots of stuff --&gt;
 </pre>
 <p>Note that, in order to maintain backwards compatibility, the assumption is that all of these <i>without</i>
-    units are in <b>seconds</b>. Blanks before and after units are allowed. Acceptable units are</p>
+    units are in <b>seconds</b>. Blanks before and after units are allowed. Units may be plural as needed and short forms may
+    optionally end with a period. They are also case insensitive. So all of these are the same:</p>
 <ul>
-    <li>"ms.", "ms" for milliseconds, e.g. "1000 ms."</li>
-    <li>"sec.", "sec", "s.", "s" for seconds, e.g., "300 sec"</li>
-    <li>"min.", "min", "mins.", "mins" for minutes, e.g. "20 min."</li>
-    <li>"hr.", "hr", "hrs.", "hrs" for hours, "e.g. 2 hrs."</li>
-    <li>"day", "days" for days, e.g. "1 day", "10 days"</li>
+    <li>3600 s</li>
+    <li>3600s</li>
+    <li>3600 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;s</li>
+    <li>3600 s.</li>
+    <li>3600 sec</li>
+    <li>3600 sec.</li>
+    <li>3600 secs</li>
+    <li>3600 secs.</li>
+    <li>3600 Secs.</li>
+    <li>3600 seconds</li>
+    <li>3600 seconDs</li>
 </ul>
+<h3>Table of allowed units:</h3>
+<table style="text-align: left; width: 100%;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    <tr>
+        <td style="vertical-align: top;horiz-align: center"><b>Short</b></td>
+        <td style="vertical-align: top;horiz-align: center"><b>Long</b></td>
+        <td style="vertical-align: top;horiz-align: center"><b>Description</b></td>
+    </tr>
+    <tr id="ms">
+        <td style="vertical-align: top;">ms</td>
+        <td style="vertical-align: top;">millisecond</td>
+        <td style="vertical-align: top;">milliseconds</td>
+    </tr>
+
+    <tr id="sec">
+        <td style="vertical-align: top;">s or sec</td>
+        <td style="vertical-align: top;">second</td>
+        <td style="vertical-align: top;">seconds</td>
+    </tr>
+    <tr id="minutes">
+        <td style="vertical-align: top;">min</td>
+        <td style="vertical-align: top;">minute</td>
+        <td style="vertical-align: top;">minutes</td>
+    </tr>
+    <tr id="hours">
+        <td style="vertical-align: top;">hr</td>
+        <td style="vertical-align: top;">hour</td>
+        <td style="vertical-align: top;">hours, defined as 3600 seconds</td>
+    </tr>
+    <tr id="days">
+        <td style="vertical-align: top;">d</td>
+        <td style="vertical-align: top;">day</td>
+        <td style="vertical-align: top;">days, one day is 24 hours</td>
+    </tr>
+    <tr id="weeks">
+        <td style="vertical-align: top;">wk</td>
+        <td style="vertical-align: top;">week</td>
+        <td style="vertical-align: top;">weeks, one week is 7 days</td>
+    </tr>
+    <tr id="month">
+        <td style="vertical-align: top;">mo</td>
+        <td style="vertical-align: top;">month</td>
+        <td style="vertical-align: top;">months, one month is 30 days</td>
+    </tr>
+    <tr id="year">
+        <td style="vertical-align: top;">yr</td>
+        <td style="vertical-align: top;">year</td>
+        <td style="vertical-align: top;">year, one year is 365.25 days</td>
+    </tr>
+
+    </tbody>
+</table>
+
 
 <h2>Notes</h2>
 <p>The <span style="font-weight: bold;">name</span> can be anything. The name of the configuration to use may be
     specified in the deployment descriptor (web.xml) file. If there is a single configuration in the file, that will be
     used. If there are multiple configurations and no name is specified, an exception is raised.</p>
 
+<!-- Not supported by NCSA any more. Should remove once I check it is never ever coming back.
 <h3>A Note on using Two Factor Authentication</h3>
 
 <p>Due to the way Two Factor works, this effectively allows you to get only a single certificate once.
@@ -537,7 +596,7 @@
     and then exchange the next token. This is impossible to do within the delegation service, so if
     Two Factor requires this, get certs will fail with an "invalid password" message until further notice.
 </p>
-
+-->
 <h3>Example 1.</h3>
 <pre>
 &lt;config&gt;
@@ -577,7 +636,6 @@
     SPP were omitted, then the default would be used and the resulting id would be
 </p>
 <pre>cern:oa4mp,2012:/client_id/....</pre>
-<!--#include virtual="../../footer.html" -->
 
 </body>
 </html>

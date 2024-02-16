@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.oa4mp.delegation.common.storage.monitored;
 
-import edu.uiuc.ncsa.security.storage.data.MonitoredKeys;
+import edu.uiuc.ncsa.security.storage.monitored.MonitoredKeys;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnDescriptorEntry;
 import edu.uiuc.ncsa.security.storage.sql.internals.Table;

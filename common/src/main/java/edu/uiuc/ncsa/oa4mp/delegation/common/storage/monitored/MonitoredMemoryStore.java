@@ -6,7 +6,7 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.storage.AbstractListeningStore;
 import edu.uiuc.ncsa.security.storage.ListeningStoreInterface;
 import edu.uiuc.ncsa.security.storage.MemoryStore;
-import edu.uiuc.ncsa.security.storage.data.Monitored;
+import edu.uiuc.ncsa.security.storage.monitored.Monitored;
 import edu.uiuc.ncsa.security.storage.events.IDMap;
 import edu.uiuc.ncsa.security.storage.events.LastAccessedEventListener;
 

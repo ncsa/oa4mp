@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.ClientConverter;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.monitored.MonitoredMemoryStore;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.UUCResponse;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.UUCConfiguration;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.Identifier;

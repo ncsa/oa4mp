@@ -82,6 +82,7 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
             LastAccessedEventListener lastAccessedEventListener = new LastAccessedEventListener();
             String name = "last accessed monitor";
             LastAccessedThread lastAccessedThread = new LastAccessedThread(name, oa2SE.getMyLogger(), lastAccessedEventListener);
+            lastAccessedThread.setDebugOn(oa2SE.getUucConfiguration().getDebugOn());
             addMonitoredStores(oa2SE, lastAccessedEventListener);
             if(oa2SE.hasMonitorAlarams()){
                 lastAccessedThread.setAlarms(oa2SE.getMonitorAlarms());

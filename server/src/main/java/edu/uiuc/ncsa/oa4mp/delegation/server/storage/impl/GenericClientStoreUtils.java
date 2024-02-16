@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.ClientApprovalKeys;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.BaseClientStore;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApprovalStore;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.UUCResponse;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.UUCConfiguration;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.UUCRetentionPolicy;
 import edu.uiuc.ncsa.security.core.Identifier;
@@ -67,9 +68,9 @@ public class GenericClientStoreUtils extends GenericStoreUtils {
         return getByField(store, caKeys.approver(), approver, caStore);
     }
 
-    public static BaseClientStore.UUCResponse unusedClientCleanup(BaseClientStore store, UUCConfiguration uucConfiguration) {
+    public static UUCResponse unusedClientCleanup(BaseClientStore store, UUCConfiguration uucConfiguration) {
         UUCRetentionPolicy uucRetentionPolicy = new UUCRetentionPolicy(store, uucConfiguration);
-        BaseClientStore.UUCResponse response = new BaseClientStore.UUCResponse();
+        UUCResponse response = new UUCResponse();
         int total = 0;
         int processed = 0;
         int skipped = 0;
@@ -81,10 +82,11 @@ public class GenericClientStoreUtils extends GenericStoreUtils {
             }
 
             total++;
-            if (uucRetentionPolicy.retain(baseClient.getIdentifier(),
-                    baseClient.getCreationTS().getTime(),
-                    baseClient.getLastAccessed().getTime(),
-                    baseClient.getLastModifiedTS().getTime())) {
+            int[] rc = uucRetentionPolicy.retain(baseClient.getIdentifier(),
+                                baseClient.getCreationTS(),
+                                baseClient.getLastAccessed(),
+                                baseClient.getLastModifiedTS());
+            if (rc[0] == 1) {
                 // do nothing for now.
                 skipped++;
             }else{
@@ -97,7 +99,6 @@ public class GenericClientStoreUtils extends GenericStoreUtils {
             }
         }
         response.found = foundIds;
-        response.success = processed;
         response.total = total;
         response.skipped = skipped;
         return response;
@@ -119,11 +120,11 @@ public class GenericClientStoreUtils extends GenericStoreUtils {
         long la = lastAccessed.getTime();
         if(uucConfiguration.hasLastAccessedAfter()){
             // so look for a date between
-            return uucConfiguration.lastAccessedAfter<=la && la <= uucConfiguration.lastAccessed;
+            return uucConfiguration.lastAccessedAfter<=la && la <= uucConfiguration.lastAccessedBefore;
 
         }else{
             // only dates before last accessed
-            return  la <= uucConfiguration.lastAccessed;
+            return  la <= uucConfiguration.lastAccessedBefore;
         }
     }
 }

@@ -123,7 +123,10 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
         }
         if (state.getState() == AbstractAuthorizationServlet.AUTHORIZATION_ACTION_OK) {
             AuthorizedState authorizedState = (AuthorizedState) state;
-            ((OA2ServiceTransaction) authorizedState.getTransaction()).setAuthTime(new Date());
+            OA2ServiceTransaction st = (OA2ServiceTransaction)authorizedState.getTransaction();
+            Date now = new Date();
+            st.setAuthTime(now);
+            st.getClient().setLastAccessed(now);
         }
     }
 

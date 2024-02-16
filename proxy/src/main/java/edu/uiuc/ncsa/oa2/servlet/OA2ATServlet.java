@@ -270,7 +270,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         serviceTransaction.setRequestState(state);
         serviceTransaction.setNonce(nonce);
         serviceTransaction.setClient(client);
-        serviceTransaction.setAuthTime(new Date()); // auth time is now.
+        Date now = new Date();
+        serviceTransaction.setAuthTime(now); // auth time is now.
+        client.setLastAccessed(now);
         String user = jsonRequest.getString(OA2Claims.SUBJECT);
         if (client.getServiceClientUsers().contains("*")) {
             serviceTransaction.setUsername(user);

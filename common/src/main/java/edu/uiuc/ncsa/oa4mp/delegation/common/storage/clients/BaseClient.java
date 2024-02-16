@@ -2,7 +2,7 @@ package edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients;
 
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.DateUtils;
-import edu.uiuc.ncsa.security.storage.data.Monitored;
+import edu.uiuc.ncsa.security.storage.monitored.Monitored;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 
 import java.net.URI;

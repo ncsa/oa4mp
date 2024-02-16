@@ -57,7 +57,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.server.issuers.ATIssuer;
 import edu.uiuc.ncsa.oa4mp.delegation.server.issuers.PAIssuer;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.UUCConfiguration;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.*;
 import edu.uiuc.ncsa.qdl.config.QDLConfigurationConstants;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.Identifier;
@@ -68,6 +68,8 @@ import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.*;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
+import edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConfigUtils;
+import edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConfiguration;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPoolProvider;
 import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
@@ -107,20 +109,37 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     public static final String MONITOR_INTERVAL = "monitorInterval";
     public static final String MONITOR_ALARMS = "monitorAlarms";
 
-    public static final String UUC_TAG = "unusedClientCleanup";
-    public static final String UUC_ENABLED = "enabled";
-    public static final String UUC_TEST_MODE_ON = "testModeOn";
-    public static final String UUC_INTERVAL = "interval";
+
     public static final String UUC_ALARMS = "alarms";
-    public static final String UUC_GRACE_PERIOD = "gracePeriod";
-    public static final String UUC_DELETE_VERSION_FLAG = "deleteVersions";
-    public static final String UUC_LAST_ACCESSED = "lastAccessed";
-    public static final String UUC_LAST_ACCESSED_AFTER = "lastAccessedAfter";
-    public static final String UUC_LAST_ACCESSED_NEVER = "never";
-    public static final String UUC_WHITELIST = "whitelist";
     public static final String UUC_BLACKLIST = "blacklist";
+    public static final String UUC_DELETE_VERSION_FLAG = "deleteVersions";
+    public static final String UUC_DEBUG_ON = "debug";
+    public static final String UUC_ENABLED = "enabled";
+    public static final String UUC_GRACE_PERIOD = "gracePeriod";
+    public static final String UUC_INTERVAL = "interval";
+    public static final String UUC_LAST_ACCESSED_BEFORE = "lastAccessedBefore";
+    public static final String UUC_LAST_ACCESSED_AFTER = "lastAccessedAfter";
+    public static final String UUC_LAST_ACCESSED_NEVER = "lastAccessedNever";
     public static final String UUC_LIST_ITEM = "clientID";
     public static final String UUC_LIST_REGEX = "regex";
+    public static final String UUC_CREATED_AFTER = "createdAfter";
+    public static final String UUC_CREATED_BEFORE = "createdBefore";
+    public static final String UUC_ACTION_TAG = "action";
+    public static final String UUC_TAG = "unusedClientCleanup";
+    public static final String UUC_TEST_MODE_ON = "testModeOn";
+    public static final String UUC_WHITELIST = "whitelist";
+    public static final String UUC_FILTER_TAG = "filter";
+    public static final String UUC_FILTER_ALLOW_OVERRIDE = "allowOverride";
+    public static final String UUC_FILTER_VERSION = "version";
+    public static final String UUC_FILTER_DATE = "date";
+    public static final String UUC_FILTER_DATE_WHEN = "when";
+    public static final String UUC_FILTER_DATE_TYPE = "type";
+    public static final String UUC_FILTER_DATE_VALUE = "value";
+    public static final String UUC_RULE_UNUSED_GRACE_PERIOD = "gracePeriod";
+    public static final String UUC_RULE_UNUSED_TAG = "unused";
+    public static final String UUC_RULE_ABANDONED_TAG = "abandoned";
+    public static final String UUC_RULE_ABANDONED_GRACE_PERIOD = "gracePeriod";
+
 
     public static final String RFC7636_REQUIRED_TAG = "rfc7636Required";
     public static final String DEMO_MODE_TAG = "demoModeEnabled";
@@ -262,24 +281,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
      * @return
      */
     public Collection<LocalTime> getAlarms(ConfigurationNode node, String tag) {
-        Collection<LocalTime> alarms = null;
-        String raw = getFirstAttribute(node, tag);
-        if (!StringUtils.isTrivial(raw)) {
-            alarms = new TreeSet<>();  // sorts them.
-            String[] ta = raw.split(",");
-            // get all the times that parse correctly
-            for (String time : ta) {
-                try {
-                    alarms.add(LocalTime.parse(time.trim()));
-                } catch (Throwable t) {
-                    getMyLogger().warn("cannot parse alarm date \"" + ta + "\"");
-                    // do nothing
-                }
-            }
-            DebugUtil.trace(this, tag + " found: " + alarms);
-        }
-        return alarms;
-
+        return Configurations.getAlarms(node, tag);
     }
 
     /**
@@ -289,7 +291,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
      * @return
      */
     public Collection<LocalTime> getAlarms(String tag) {
-        return getAlarms(cn, tag);
+        return Configurations.getAlarms(cn, tag);
     }
 
 
@@ -506,6 +508,96 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     UUCConfiguration uucConfiguration = null;
 
     public UUCConfiguration getUucConfiguration() {
+        return NEWgetUUCConfiguration();
+    }
+
+    public UUCConfiguration NEWgetUUCConfiguration() {
+        if (uucConfiguration == null) {
+            uucConfiguration = new UUCConfiguration();
+            ConfigurationNode node = getFirstNode(cn, UUC_TAG);
+            uucConfiguration.enabled = getFirstBooleanValue(node, UUC_ENABLED, false);
+            uucConfiguration.setDebugOn(getFirstBooleanValue(node,UUC_DEBUG_ON, false));
+            uucConfiguration.testMode = Configurations.getFirstBooleanValue(node, UUC_TEST_MODE_ON, false);
+            String raw = getFirstAttribute(node, UUC_INTERVAL);
+            if (StringUtils.isTrivial(raw)) {
+                uucConfiguration.interval = UUC_INTERVAL_DEFAULT;
+            } else {
+                uucConfiguration.interval = XMLConfigUtil.getValueSecsOrMillis(raw, true);
+            }
+            uucConfiguration.alarms = getAlarms(node, UUC_ALARMS);
+            // Fix https://github.com/ncsa/oa4mp/issues/139
+            uucConfiguration.setWhiteList(createLR(getFirstNode(node, UUC_WHITELIST), true));
+            uucConfiguration.setBlackList(createLR(getFirstNode(node, UUC_BLACKLIST), false));
+            uucConfiguration.setUnusedRule((UnusedRule) createGPR(getFirstNode(node, UUC_RULE_UNUSED_TAG), true));
+            uucConfiguration.setAbandonedRule((AbandonedRule) createGPR(getFirstNode(node, UUC_RULE_ABANDONED_TAG), false));
+
+            // Finally, set up filter for the UUC itself.
+            ConfigurationNode filterNode = getFirstNode(node, UUC_FILTER_TAG);
+            if (filterNode != null) {
+                uucConfiguration.setFilter(getRuleFilter(filterNode));
+            }
+        }
+        return uucConfiguration;
+    }
+
+    protected ListRule createLR(ConfigurationNode node, boolean isWhiteList){
+        if(node == null)return null;
+        ListRule listRule = new ListRule();
+        listRule.setBlackList(false);
+        List[] outList = processUUCList(node);
+        listRule.setIdList(outList[0]);
+        listRule.setRegexList(outList[1]);
+        listRule.setRuleFilter(getRuleFilter(getFirstNode(node, UUC_FILTER_TAG)));
+        return listRule;
+    }
+    protected GPRule createGPR(ConfigurationNode node, boolean isUnused) {
+        if (node == null) {
+            return null;
+        }
+        GPRule gpRule;
+        if (isUnused) {
+            gpRule = new UnusedRule();
+        } else {
+            gpRule = new AbandonedRule();
+        }
+        gpRule.setFilter(getRuleFilter(getFirstNode(node, UUC_FILTER_TAG)));
+        gpRule.setAction(getFirstAttribute(node, UUC_ACTION_TAG));
+        String rawDate = getFirstAttribute(node, UUC_RULE_UNUSED_GRACE_PERIOD);
+        if (StringUtils.isTrivial(rawDate)) {
+            throw new IllegalArgumentException("Missing " + UUC_RULE_UNUSED_GRACE_PERIOD + " attribute.");
+        }
+        gpRule.setGracePeriod(XMLConfigUtil.getValueSecsOrMillis(rawDate, true));
+
+        return gpRule;
+    }
+
+    protected RuleFilter getRuleFilter(ConfigurationNode node) {
+        if (node == null) {
+            return null;
+        }
+        RuleFilter filter = new RuleFilter();
+        String raw = getFirstAttribute(node, UUC_FILTER_VERSION);
+        if (!StringUtils.isTrivial(raw)) {
+            filter.setVersion(raw);
+        }
+        raw = getFirstAttribute(node, UUC_FILTER_ALLOW_OVERRIDE);
+        try {
+            filter.setAllowOverride(Boolean.parseBoolean(raw));
+        } catch (Throwable t) {
+            filter.setAllowOverride(true);
+        }
+        List<ConfigurationNode> kids = node.getChildren(UUC_FILTER_DATE);
+        for (ConfigurationNode n : kids) {
+            String when = getFirstAttribute(n, UUC_FILTER_DATE_WHEN);
+            String type = getFirstAttribute(n, UUC_FILTER_DATE_TYPE);
+            String value = getFirstAttribute(n, UUC_FILTER_DATE_VALUE);
+            filter.add(when, type, value); // let the method figure it out.
+        }
+        return filter;
+    }
+
+
+    public UUCConfiguration OLDgetUucConfiguration() {
         if (uucConfiguration == null) {
             uucConfiguration = new UUCConfiguration();
 
@@ -523,6 +615,38 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
             } else {
                 uucConfiguration.gracePeriod = XMLConfigUtil.getValueSecsOrMillis(raw, true);
             }
+            raw = getFirstAttribute(node, UUC_CREATED_AFTER);
+            if (!StringUtils.isTrivial(raw)) {
+                try {
+                    uucConfiguration.setCreatedAfter(Iso8601.string2Date(raw).getTime());
+                } catch (ParseException e) {
+                    warn("unable to parse " + UUC_CREATED_AFTER + " date. To prevent catastrophic loss, UUC disabled");
+                    uucConfiguration.enabled = false;
+                    return uucConfiguration;
+                }
+            }
+  /*          raw = getFirstAttribute(node, UUC_CREATED_BEFORE);
+            if (!StringUtils.isTrivial(raw)) {
+                try {
+                    uucConfiguration.setCreatedBefore(Iso8601.string2Date(raw).getTime());
+                } catch (ParseException e) {
+                    warn("unable to parse " + UUC_CREATED_BEFORE + " date. To prevent catastrophic loss, UUC disabled");
+                    uucConfiguration.enabled = false;
+                    return uucConfiguration;
+                }
+            }*/
+            raw = getFirstAttribute(node, UUC_DEBUG_ON);
+            if (StringUtils.isTrivial(raw)) {
+                try {
+                    Boolean b = Boolean.parseBoolean(raw);
+                    uucConfiguration.setDebugOn(b);
+                } catch (Throwable t) {
+                    warn("unable to interpret debug value of \"" + raw + "\". Debug disabled");
+                }
+            } else {
+                uucConfiguration.setDebugOn(false); // do NOT enable this casually.
+            }
+
             raw = getFirstAttribute(node, UUC_INTERVAL);
             if (StringUtils.isTrivial(raw)) {
                 uucConfiguration.interval = UUC_INTERVAL_DEFAULT;
@@ -533,19 +657,27 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
             uucConfiguration.deleteVersions = Configurations.getFirstBooleanValue(node, UUC_DELETE_VERSION_FLAG, false);
             uucConfiguration.testMode = Configurations.getFirstBooleanValue(node, UUC_TEST_MODE_ON, false);
             uucConfiguration.alarms = getAlarms(node, UUC_ALARMS);
-            String x = Configurations.getFirstAttribute(node, UUC_LAST_ACCESSED);
-            if (StringUtils.isTrivial(x) || x.equalsIgnoreCase(UUC_LAST_ACCESSED_NEVER)) {
-                uucConfiguration.lastAccessed = UUCConfiguration.UUC_LAST_ACCESSED_NEVER_VALUE;
-            } else {
+            String x = Configurations.getFirstAttribute(node, UUC_LAST_ACCESSED_NEVER);
+            if (!StringUtils.isTrivial(x)) {
                 try {
-                    uucConfiguration.lastAccessed = Iso8601.string2Date(x).getTimeInMillis();
-                    if (uucConfiguration.lastAccessed < 0L) {
+                    Boolean b = Boolean.parseBoolean(x);
+                    uucConfiguration.setLastAccessedNever(b);
+                } catch (Throwable t) {
+                    warn("unable to interpret boolean value \"" + x + "\" for " + UUC_LAST_ACCESSED_NEVER + " attribute. default is false.");
+                    uucConfiguration.setLastAccessedNever(false);
+                }
+            }
+/*
+            x = Configurations.getFirstAttribute(node, UUC_LAST_ACCESSED_BEFORE);
+            if (!StringUtils.isTrivial(x)) {
+                try {
+                    uucConfiguration.lastAccessedBefore = Iso8601.string2Date(x).getTimeInMillis();
+                    if (uucConfiguration.lastAccessedBefore < 0L) {
                         throw new IllegalArgumentException("error processing last access date for unused client cleanup. Illegal date '" + x + "'");
                     }
                 } catch (ParseException e) {
-                    warn("unable to interpret date " + x + " for last accessed in unused client cleanup. Cleanup disabled!!.\n" +
+                    warn("unable to interpret date " + x + " for " + UUC_LAST_ACCESSED_BEFORE + " in unused client cleanup. Cleanup disabled!!.\n" +
                             "parsing failed at position " + e.getErrorOffset() + ": '" + e.getMessage() + "'");
-                    ;
                     uucConfiguration.enabled = false;
                     if (DebugUtil.isEnabled()) {
                         e.printStackTrace();
@@ -559,7 +691,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                 try {
                     uucConfiguration.lastAccessedAfter = Iso8601.string2Date(x).getTimeInMillis();
                 } catch (ParseException e) {
-                    warn("unable to interpret date " + x + " for last accessed after in unused client cleanup. Cleanup disabled!!.\n" +
+                    warn("unable to interpret date " + x + " for " + UUC_LAST_ACCESSED_AFTER + " in unused client cleanup. Cleanup disabled!!.\n" +
                             "parsing failed at position " + e.getErrorOffset() + ": '" + e.getMessage() + "'");
                     ;
                     uucConfiguration.enabled = false;
@@ -569,19 +701,20 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     return uucConfiguration;
                 }
             }
-            ConfigurationNode whiteListNode = getFirstNode(node, UUC_WHITELIST);
+*/
+    /*        ConfigurationNode whiteListNode = getFirstNode(node, UUC_WHITELIST);
             // Fix https://github.com/ncsa/oa4mp/issues/139
             if (whiteListNode != null) {
                 List[] outList = processUUCList(whiteListNode);
                 uucConfiguration.whiteList = outList[0];
                 uucConfiguration.whitelistRegex = outList[1];
-            }
-            ConfigurationNode blackListNode = getFirstNode(node, UUC_BLACKLIST);
+            }*/
+     /*       ConfigurationNode blackListNode = getFirstNode(node, UUC_BLACKLIST);
             if (blackListNode != null) {
                 List[] outList = processUUCList(blackListNode);
                 uucConfiguration.blacklist = outList[0];
                 uucConfiguration.blacklistRegex = outList[1];
-            }
+            }*/
         }
         return uucConfiguration;
     }
@@ -1154,8 +1287,10 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         }
         return atLifetime;
     }
+
     // fixes https://github.com/ncsa/oa4mp/issues/152
-        long rtLifetime =-1L;
+    long rtLifetime = -1L;
+
     protected long getRTLifetime() {
         if (rtLifetime < 0) {
             String x = getFirstAttribute(cn, DEFAULT_REFRESH_TOKEN_LIFETIME);
@@ -1175,6 +1310,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         }
         return rtLifetime;
     }
+
     long maxAGLifetime = -1L;
 
     public long getMaxAGLifetime() {
@@ -1447,6 +1583,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         if (csp == null) {
             OA2ClientConverter converter = new OA2ClientConverter(getClientProvider());
             csp = new OA2MultiDSClientStoreProvider(cn, isDefaultStoreDisabled(), getMyLogger(), null, null, getClientProvider());
+            UpkeepConfiguration upkeepConfiguration = UpkeepConfigUtils.processUpkeep(cn);
 
             csp.addListener(new DSFSClientStoreProvider(cn, converter, getClientProvider()));
             csp.addListener(new OA2ClientSQLStoreProvider(getMySQLConnectionPoolProvider(),
