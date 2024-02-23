@@ -26,9 +26,11 @@ public class SQLVOStoreProvider<T extends SQLVOStore> extends SQLStoreProvider<T
 
     @Override
     public T newInstance(Table table) {
-        return (T) new SQLVOStore(getConnectionPool(),
+        T t = (T) new SQLVOStore(getConnectionPool(),
                 (VOTable) table,
                 VOProvider, (VOConverter) converter);
+        t.setUpkeepConfiguration(getUpkeepConfiguration());
+        return t;
     }
 
     @Override

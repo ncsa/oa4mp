@@ -7,7 +7,6 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2ExceptionHandler;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.TokenExchangeRecordRetentionPolicy;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenRetentionPolicy;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenStore;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.UUCThread;
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.OA2State;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientStoreProviders;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.SATFactory;
@@ -17,6 +16,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientNotifier;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.ClientConverter;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSourceFactory;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.upkeep.UpkeepThread;
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.functions.FStack;
@@ -25,16 +25,21 @@ import edu.uiuc.ncsa.qdl.module.MTStack;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.StateUtils;
 import edu.uiuc.ncsa.qdl.variables.VStack;
+import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.cache.LockingCleanup;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.servlet.ExceptionHandler;
-import edu.uiuc.ncsa.security.storage.ListeningStoreInterface;
+import edu.uiuc.ncsa.security.storage.MonitoredStoreInterface;
 import edu.uiuc.ncsa.security.storage.events.LastAccessedEventListener;
 import edu.uiuc.ncsa.security.storage.events.LastAccessedThread;
+import edu.uiuc.ncsa.security.storage.sql.SQLStore;
+import edu.uiuc.ncsa.security.storage.sql.derby.DerbyConnectionPool;
 import edu.uiuc.ncsa.security.util.mail.MailUtil;
 
 import javax.servlet.ServletException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.AbstractAccessTokenServlet2.txRecordCleanup;
 
@@ -66,6 +71,14 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
         System.setProperty("LOG4J_FORMAT_MSG_NO_LOOKUPS", "true");
 
         OA2SE oa2SE = (OA2SE) getEnvironment();
+        if (oa2SE.getClientStore() instanceof SQLStore) {
+            if (((SQLStore) oa2SE.getClientStore()).getConnectionPool() instanceof DerbyConnectionPool) {
+                DerbyConnectionPool dcp = (DerbyConnectionPool) ((SQLStore) oa2SE.getClientStore()).getConnectionPool();
+                if (dcp.getConnectionParameters().isCreateOne()) {
+                    dcp.createStore();
+                }
+            }
+        }
         DebugUtil.setInstance(oa2SE.getDebugger()); // sets global debugger.
         DebugUtil.setPrintTS(oa2SE.isPrintTSInDebug());
         // Let the older myproxy connection clean up use alarms.
@@ -82,19 +95,35 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
             LastAccessedEventListener lastAccessedEventListener = new LastAccessedEventListener();
             String name = "last accessed monitor";
             LastAccessedThread lastAccessedThread = new LastAccessedThread(name, oa2SE.getMyLogger(), lastAccessedEventListener);
-            lastAccessedThread.setDebugOn(oa2SE.getUucConfiguration().getDebugOn());
+            lastAccessedThread.setDebugOn(oa2SE.isDebugOn());
             addMonitoredStores(oa2SE, lastAccessedEventListener);
-            if(oa2SE.hasMonitorAlarams()){
+            if (oa2SE.hasMonitorAlarams()) {
                 lastAccessedThread.setAlarms(oa2SE.getMonitorAlarms());
                 DebugUtil.trace(this, "starting \"" + name + "\" with alarms:" + oa2SE.getMonitorAlarms());
-            } else{
+            } else {
                 lastAccessedThread.setCleanupInterval(oa2SE.getMonitorInterval()); // there is always a default clenup interval
-                DebugUtil.trace(this, "starting \"" + name  + "\" with interval:" + oa2SE.getMonitorInterval() + " ms.");
+                DebugUtil.trace(this, "starting \"" + name + "\" with interval:" + oa2SE.getMonitorInterval() + " ms.");
             }
             lastAccessedThread.setStopThread(false);
             lastAccessedThread.start();
         }
-        if(oa2SE.getUucConfiguration().enabled && MultiAuthServlet.uucThread == null){
+        if (MultiAuthServlet.upkeepThreadList == null) {
+            List<UpkeepThread> upkeepThreads = new ArrayList<>();
+            for (Store store : oa2SE.getAllStores()) {
+                if (store instanceof MonitoredStoreInterface) {
+                    MonitoredStoreInterface MonitoredStoreInterface = (MonitoredStoreInterface) store;
+                    if (MonitoredStoreInterface.getUpkeepConfiguration() != null && MonitoredStoreInterface.getUpkeepConfiguration().isEnabled()) {
+                        UpkeepThread upkeepThread = new UpkeepThread("upkeep thread for " + MonitoredStoreInterface.getClass().getSimpleName(),
+                                oa2SE.getMyLogger(), MonitoredStoreInterface);
+                        upkeepThread.setStopThread(false);
+                        upkeepThread.start();
+                        upkeepThreads.add(upkeepThread);
+                    }
+                }
+            }
+            MultiAuthServlet.upkeepThreadList = upkeepThreads;
+        }
+/*        if(oa2SE.getUucConfiguration().enabled && MultiAuthServlet.uucThread == null){
             UUCThread uucThread = new UUCThread("Unused client cleanup thread",
                     oa2SE.getMyLogger(),
                     oa2SE.getClientStore(),
@@ -104,7 +133,7 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
              uucThread.setStopThread(false);
             MultiAuthServlet.uucThread = uucThread;
             uucThread.start();
-        }
+        }*/
         if (oa2SE.isRefreshTokenEnabled()) {
             MyProxyDelegationServlet.transactionCleanup.getRetentionPolicies().clear(); // We need a different set of policies than the original one.
             if (oa2SE.hasCleanupAlarms()) {
@@ -177,9 +206,12 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
             }
         });
     }
-    protected void addMonitoredStores(OA2SE oa2SE, LastAccessedEventListener lastAccessedEventListener){
-        ((ListeningStoreInterface) oa2SE.getClientStore()).addLastAccessedEventListener(lastAccessedEventListener);
-        ((ListeningStoreInterface) oa2SE.getAdminClientStore()).addLastAccessedEventListener(lastAccessedEventListener);
-        ((ListeningStoreInterface) oa2SE.getVOStore()).addLastAccessedEventListener(lastAccessedEventListener);
+
+    protected void addMonitoredStores(OA2SE oa2SE, LastAccessedEventListener lastAccessedEventListener) {
+        for (Store store : oa2SE.getAllStores()) {
+            if (store instanceof MonitoredStoreInterface) {
+                ((MonitoredStoreInterface) store).addLastAccessedEventListener(lastAccessedEventListener);
+            }
+        }
     }
 }

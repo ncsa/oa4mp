@@ -2,9 +2,11 @@ package edu.uiuc.ncsa.myproxy.oa4mp.server.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl;
 import edu.uiuc.ncsa.security.core.Store;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.servlet.AbstractServlet;
 import edu.uiuc.ncsa.security.servlet.NotificationListener;
 import edu.uiuc.ncsa.security.storage.sql.SQLStore;
+import edu.uiuc.ncsa.security.storage.sql.derby.DerbyConnectionPool;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -68,6 +70,13 @@ public abstract class EnvServlet extends AbstractServlet {
     public void processStoreCheck(Store store) throws SQLException {
         if (store instanceof SQLStore) {
             SQLStore sqlStore = (SQLStore) store;
+            if ((sqlStore.getConnectionPool() instanceof DerbyConnectionPool)) {
+                // Can't update Derby stores since they do not support the metadata
+                // operations other stores do.
+                DebugUtil.trace("Cannot update derby stores at boot. You may have to do these manually");
+                return;
+            }
+
             sqlStore.checkTable();
             sqlStore.checkColumns();
         }

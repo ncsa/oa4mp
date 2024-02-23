@@ -39,8 +39,5 @@ public class AggregateClientStore<V extends ClientStore> extends AggregateStore<
         throw new NotImplementedException("Error: No single converter for an aggregate store is possible");
     }
 
-    @Override
-    public UUCResponse unusedClientCleanup(UUCConfiguration uucConfiguration) {
-        return null;
-    }
+
 }

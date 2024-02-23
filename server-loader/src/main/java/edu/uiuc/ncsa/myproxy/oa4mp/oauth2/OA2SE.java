@@ -4,7 +4,6 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.BasicClaimsSourceImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.CMConfigs;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628ServletConfig;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.UUCConfiguration;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VOStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VirtualOrganization;
@@ -15,6 +14,16 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionsStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AuthorizationServletConfig;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.TransactionStore;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.TokenForge;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Scopes;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSource;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfiguration;
+import edu.uiuc.ncsa.oa4mp.delegation.server.issuers.AGIssuer;
+import edu.uiuc.ncsa.oa4mp.delegation.server.issuers.ATIssuer;
+import edu.uiuc.ncsa.oa4mp.delegation.server.issuers.PAIssuer;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApprovalStore;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
@@ -23,16 +32,6 @@ import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.oa4mp.delegation.server.issuers.AGIssuer;
-import edu.uiuc.ncsa.oa4mp.delegation.server.issuers.ATIssuer;
-import edu.uiuc.ncsa.oa4mp.delegation.server.issuers.PAIssuer;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApprovalStore;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.TransactionStore;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.TokenForge;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Scopes;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSource;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfiguration;
 import edu.uiuc.ncsa.security.servlet.UsernameTransformer;
 import edu.uiuc.ncsa.security.util.json.JSONEntry;
 import edu.uiuc.ncsa.security.util.json.JSONStore;
@@ -41,6 +40,7 @@ import edu.uiuc.ncsa.security.util.mail.MailUtilProvider;
 
 import javax.inject.Provider;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -110,8 +110,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  boolean isMonitorEnabled,
                  long monitorInterval,
                  Collection<LocalTime> monitorAlarms,
-                 MetaDebugUtil debugger,
-                 UUCConfiguration uucConfiguration) {
+                 MetaDebugUtil debugger) {
 
         super(logger,
                 mfp,
@@ -189,7 +188,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.monitorInterval = monitorInterval;
         this.monitorAlarms = monitorAlarms;
         this.monitorEnabled = isMonitorEnabled;
-        this.uucConfiguration = uucConfiguration;
+//        this.uucConfiguration = uucConfiguration;
         this.cleanupFailOnErrors = cleanupFailOnErrors;
     }
 
@@ -199,11 +198,13 @@ public class OA2SE extends ServiceEnvironmentImpl {
 
     boolean cleanupFailOnErrors;
 
+/*
     public UUCConfiguration getUucConfiguration() {
         return uucConfiguration;
     }
 
     UUCConfiguration uucConfiguration;
+*/
 
     public boolean isMonitorEnabled() {
         return monitorEnabled;
@@ -615,7 +616,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
                 DebugUtil.trace(this, "got admin client " + ac.getIdentifierString());
                 VirtualOrganization vo = (VirtualOrganization) getVOStore().get(ac.getVirtualOrganization());
                 DebugUtil.trace(this, "got vo  " + (vo == null ? "(none)" : vo.getIdentifierString()));
-                if(!vo.isValid()){
+                if (!vo.isValid()) {
                     throw new GeneralException("invalid virtual organization \"" + vo.getIdentifierString() + "\"");
                 }
                 if (vo != null) {
@@ -670,4 +671,24 @@ public class OA2SE extends ServiceEnvironmentImpl {
     }
 
     boolean useProxyForCerts = false;
+   protected  List<Store> storeList = null;
+
+    /**
+     * A list of all stores. This is used in bootstrapping the system and initializing it.
+     * @return
+     */
+
+    public List<Store> getAllStores() {
+        if (storeList == null) {
+            storeList = new ArrayList<>();
+            storeList.add(getAdminClientStore());
+            storeList.add(getClientStore());
+            storeList.add(getClientApprovalStore());
+            storeList.add(getTransactionStore());
+            storeList.add(getVOStore());
+            storeList.add(getTxStore());
+            storeList.add(getPermissionStore());
+        }
+        return storeList;
+    }
 }

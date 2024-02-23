@@ -34,6 +34,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.oa4mp.delegation.server.request.ATRequest;
 import edu.uiuc.ncsa.oa4mp.delegation.server.request.IssuerResponse;
 import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.exceptions.TransactionNotFoundException;
 import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
@@ -42,6 +43,8 @@ import edu.uiuc.ncsa.security.servlet.ServiceClientHTTPException;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.XMLMap;
+import edu.uiuc.ncsa.security.storage.sql.SQLStore;
+import edu.uiuc.ncsa.security.storage.sql.derby.DerbyConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
 import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
@@ -74,6 +77,14 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
     public void destroy() {
         super.destroy();
         shutdownCleanup(AbstractAccessTokenServlet2.txRecordCleanup); // try to shutdown cleanly
+        for(Store s : getOA2SE().getAllStores()){
+               if(s instanceof SQLStore){
+                   SQLStore sqlStore = (SQLStore) s;
+                   if(sqlStore.getConnectionPool() instanceof DerbyConnectionPool){
+                       sqlStore.getConnectionPool().shutdown();
+                   }
+               }
+        }
     }
 
     @Override

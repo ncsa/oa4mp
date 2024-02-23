@@ -51,12 +51,12 @@ public class UUCThread extends MyThread {
              //   info("next iteration for " + getName() + " scheduled for " + nextRun);
                 sleep(nextCleanup);
 
-            UUCResponse uucResponse = baseClientStore.unusedClientCleanup(uucConfiguration);
+        /*    UUCResponse uucResponse = baseClientStore.unusedClientCleanup(uucConfiguration);
             if(uucConfiguration.testMode){
                 info(getName() + " in test mode. Clients to remove: " + uucResponse.found);
                 info(getName() + " in test mode. Client stats: \n" + uucResponse.toString(true));
             }
-        //    info(getName() + ": tried=" + uucResponse.attempted + ", success =" + (uucResponse.success + uucResponse.no_info));
+        *///    info(getName() + ": tried=" + uucResponse.attempted + ", success =" + (uucResponse.success + uucResponse.no_info));
             } catch (InterruptedException e) {
                 setStopThread(true); // just in case.
                 warn("Cleanup for " + getName() + " interrupted, stopping thread...");

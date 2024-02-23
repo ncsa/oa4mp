@@ -1,10 +1,10 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo;
 
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.monitored.MonitoredMemoryStore;
 import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
+import edu.uiuc.ncsa.security.storage.monitored.MonitoredMemoryStore;
 
 import java.util.Date;
 import java.util.HashMap;

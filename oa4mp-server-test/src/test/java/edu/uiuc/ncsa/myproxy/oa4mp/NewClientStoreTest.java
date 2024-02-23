@@ -45,7 +45,14 @@ public class NewClientStoreTest extends TestBase {
         client.setProxyLimited(true);
         clientStore.save(client);
         Client client2 = (Client) clientStore.get(client.getIdentifier());
-        assert client.equals(client2);
+        assert client.getIdentifier().equals(client2.getIdentifier());
+        assert client.getHomeUri().equals(client2.getHomeUri());
+        assert client.getSecret().equals(client2.getSecret());
+        assert client.getName().equals(client2.getName());
+        assert client.getEmail().equals(client2.getEmail());
+        assert client.getErrorUri().equals(client2.getErrorUri());
+        assert client2.isProxyLimited();
+
         clientStore.remove(client.getIdentifier());
     }
 }

@@ -2,16 +2,14 @@ package edu.uiuc.ncsa.oa4mp.delegation.server.storage.impl;
 
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.ClientConverter;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.monitored.MonitoredMemoryStore;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.UUCResponse;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.UUCConfiguration;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
+import edu.uiuc.ncsa.security.storage.monitored.MonitoredMemoryStore;
 
 import java.util.Date;
 import java.util.List;
@@ -20,7 +18,6 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 1/18/12 at  11:12 AM
  */
-//public  class ClientMemoryStore<V extends Client> extends MemoryStore<V> implements ClientStore<V> {
 public  class ClientMemoryStore<V extends Client> extends MonitoredMemoryStore<V> implements ClientStore<V> {
     @Override
     public List<V> getMostRecent(int n, List<String> attributes) {
@@ -54,10 +51,5 @@ public  class ClientMemoryStore<V extends Client> extends MonitoredMemoryStore<V
     @Override
     public List<Identifier> getByApprover(String approver, ClientApprovalStore clientApprovalStore) {
         return GenericClientStoreUtils.getByApprover(this, approver, clientApprovalStore);
-    }
-
-    @Override
-    public UUCResponse unusedClientCleanup(UUCConfiguration uucConfiguration) {
-        return GenericClientStoreUtils.unusedClientCleanup(this, uucConfiguration);
     }
 }

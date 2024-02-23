@@ -145,7 +145,7 @@ public class OA2Commands extends BaseCommands {
                     getOA2SE().getPermissionStore());
             oa2ClientCommands.setRefreshTokensEnabled(getOA2SE().isRefreshTokenEnabled());
             oa2ClientCommands.setSupportedScopes(getOA2SE().getScopes());
-            oa2ClientCommands.setUucConfiguration(getOA2SE().getUucConfiguration());
+     //       oa2ClientCommands.setUucConfiguration(getOA2SE().getUucConfiguration());
             oa2ClientCommands.setOA2SE(getOA2SE());
         }
         return oa2ClientCommands;

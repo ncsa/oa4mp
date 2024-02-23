@@ -4,12 +4,14 @@ import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import edu.uiuc.ncsa.security.storage.AbstractListeningStore;
-import edu.uiuc.ncsa.security.storage.ListeningStoreInterface;
+import edu.uiuc.ncsa.security.storage.MonitoredStoreDelegate;
+import edu.uiuc.ncsa.security.storage.MonitoredStoreInterface;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.monitored.MonitoredKeys;
 import edu.uiuc.ncsa.security.storage.events.IDMap;
 import edu.uiuc.ncsa.security.storage.events.LastAccessedEventListener;
+import edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConfiguration;
+import edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepResponse;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionRecord;
 import edu.uiuc.ncsa.security.storage.sql.SQLStore;
@@ -26,17 +28,18 @@ import java.util.UUID;
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 3/29/23 at  10:24 AM
+ * @deprecated Use {@link edu.uiuc.ncsa.security.storage.monitored.MonitoredSQLStore} in Sec Lib
  */
-public abstract class MonitoredSQLStore<V extends Identifiable> extends SQLStore<V> implements ListeningStoreInterface<V> {
-    public MonitoredSQLStore(ConnectionPool connectionPool, Table table, Provider<V> identifiableProvider, MapConverter<V> converter) {
+public abstract class OLDMonitoredSQLStore<V extends Identifiable> extends SQLStore<V> implements MonitoredStoreInterface<V> {
+    public OLDMonitoredSQLStore(ConnectionPool connectionPool, Table table, Provider<V> identifiableProvider, MapConverter<V> converter) {
         super(connectionPool, table, identifiableProvider, converter);
     }
 
-    public MonitoredSQLStore() {
+    public OLDMonitoredSQLStore() {
     }
 
 
-    AbstractListeningStore<V> listeningStore = new AbstractListeningStore<>();
+    MonitoredStoreDelegate<V> listeningStore = new MonitoredStoreDelegate<>();
 
     @Override
     public List<V> getMostRecent(int n, List<String> attributes) {
@@ -59,7 +62,7 @@ public abstract class MonitoredSQLStore<V extends Identifiable> extends SQLStore
     }
 
     @Override
-    public void fireLastAccessedEvent(ListeningStoreInterface store, Identifier identifier) {
+    public void fireLastAccessedEvent(MonitoredStoreInterface store, Identifier identifier) {
         listeningStore.fireLastAccessedEvent(store, identifier);
     }
 
@@ -91,7 +94,7 @@ public abstract class MonitoredSQLStore<V extends Identifiable> extends SQLStore
                 pStmt.setLong(3, idMap.get(id));
                 pStmt.addBatch();
                 if(DEEP_DEBUG){
-                    System.out.println("MonitoredSQLStore: updating id=" + id + ", access time=" + idMap.get(id));
+                    System.out.println("OLDMonitoredSQLStore: updating id=" + id + ", access time=" + idMap.get(id));
                 }
             }
             int[] affectedRecords = pStmt.executeBatch();
@@ -138,5 +141,21 @@ public abstract class MonitoredSQLStore<V extends Identifiable> extends SQLStore
         V v = super.get(o);
         listeningStore.fireLastAccessedEvent(this, (Identifier) o);
         return v;
+    }
+
+    public UpkeepConfiguration getUpkeepConfiguration() {
+        return upkeepConfiguration;
+    }
+
+    @Override
+    public void setUpkeepConfiguration(UpkeepConfiguration upkeepConfiguration) {
+        this.upkeepConfiguration = upkeepConfiguration;
+    }
+
+    UpkeepConfiguration upkeepConfiguration;
+
+    @Override
+    public UpkeepResponse doUpkeep() {
+        return null;
     }
 }

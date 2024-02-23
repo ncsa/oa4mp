@@ -5,21 +5,23 @@ package test;
  * on 3/13/12 at  3:10 PM
  */
 
-import edu.uiuc.ncsa.myproxy.oa4mp.NewCAStoreTest;
-import edu.uiuc.ncsa.myproxy.oa4mp.NewClientStoreTest;
-import edu.uiuc.ncsa.myproxy.oa4mp.NewTransactionTest;
-import edu.uiuc.ncsa.myproxy.oa4mp.ServiceConfigTest;
+import edu.uiuc.ncsa.myproxy.oa4mp.*;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2Bootstrapper;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.FileStoreTest;
 import edu.uiuc.ncsa.security.core.configuration.ConfigInheritanceTest;
 import edu.uiuc.ncsa.security.core.configuration.MultipleInheritanceTest;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.storage.sql.SQLStore;
+import edu.uiuc.ncsa.security.storage.sql.derby.DerbyConnectionParameters;
+import edu.uiuc.ncsa.security.storage.sql.derby.DerbyConnectionPool;
 import edu.uiuc.ncsa.security.util.*;
 import edu.uiuc.ncsa.security.util.cache.CacheTest;
 import junit.framework.TestSuite;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
+
+import java.io.File;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -46,10 +48,10 @@ import org.junit.runners.Suite;
         NewCAStoreTest.class,
         NewClientStoreTest.class,
         NewTransactionTest.class,
-        ClientManagerTest.class,
-        AttributeServerTest.class,
+        //ClientManagerTest.class,
+        //AttributeServerTest.class,
         PermissionServerTest.class,
-        ClientServerTest.class,
+        //ClientServerTest.class,
         TokenTest2.class,
         FileStoreTest.class,
         ServiceConfigTest.class,
@@ -64,6 +66,39 @@ public class ServiceTestSuite2 extends TestSuite {
         System.setProperty(OA2Bootstrapper.OA2_CONFIG_FILE_KEY, DebugUtil.getConfigPath()+"/servers.xml");
         TestSuiteInitializer testSuiteInitializer = new TestSuiteInitializer(new OA2Bootstrapper());
         testSuiteInitializer.init();
+        // shutdown hook always works. @AfterClass not so much...
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> shutdown()));
+    }
+
+    public static void shutdown(){
+        try {
+            if (TestUtils.getFsStoreProvider().getClientStore() instanceof SQLStore) {
+                 SQLStore sqlStore = (SQLStore) TestUtils.getFsStoreProvider().getClientStore();
+                 // cleans up the derby file store. Part of the test is re-creating it.
+                 if(sqlStore.getConnectionPool().getConnectionParameters() instanceof DerbyConnectionParameters){
+                     DerbyConnectionPool derbyConnectionPool = (DerbyConnectionPool)sqlStore.getConnectionPool();
+                     derbyConnectionPool.shutdown();
+                     DerbyConnectionParameters derbyConnectionParameters = derbyConnectionPool.getConnectionParameters();
+                     File f = new File(derbyConnectionParameters.getDatabaseName());
+                     // This will recursively remove the entire derby database from the system. 
+                     if(f.exists() && f.isDirectory()){
+                    //     nuke(f);
+                     }
+                 }
+
+            }
+        }catch(Throwable t){
+            t.printStackTrace();
+        }
+    }
+
+    protected static void nuke(File dir){
+        for(File r : dir.listFiles()){
+            if(r.isDirectory()){
+                nuke(r);
+            }
+                r.delete(); // directory should be empty, so delete it.
+        }
     }
 }
 

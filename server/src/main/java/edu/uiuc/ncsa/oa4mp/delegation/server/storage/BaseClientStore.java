@@ -1,8 +1,6 @@
 package edu.uiuc.ncsa.oa4mp.delegation.server.storage;
 
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClient;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.UUCConfiguration;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.UUCResponse;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 
@@ -28,9 +26,7 @@ public interface BaseClientStore<V extends BaseClient> extends Store<V> {
      * not access time and the number that satisfy the expiration
      */
     // Fixes https://github.com/ncsa/oa4mp/issues/80 and https://github.com/ncsa/oa4mp/issues/93
-    UUCResponse unusedClientCleanup(UUCConfiguration uucConfiguration);
-
-
+ //   UUCResponse unusedClientCleanup(UUCConfiguration uucConfiguration);
 }
 /*
  */

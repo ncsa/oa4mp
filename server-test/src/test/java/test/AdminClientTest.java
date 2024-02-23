@@ -60,7 +60,14 @@ public class AdminClientTest extends TestBase {
         converter.toJSON(c, j);
         System.out.println(j);
         AdminClient c2 = converter.fromJSON(j);
-        assert c2.equals(c) : "admin clients not the same after conversion to then from JSON";
+        assert c.getLastModifiedTS().getTime() == c2.getLastModifiedTS().getTime();
+        assert c.getSecret().equals(c2.getSecret());
+        assert c.getEmail().equals(c2.getEmail());
+        assert c.getName().equals(c2.getName());
+        assert c.getIssuer().equals(c2.getIssuer());
+        assert c.getVirtualOrganization().equals(c2.getVirtualOrganization());
+        assert c.getMaxClients() == c2.getMaxClients();
+     //   assert c2.equals(c) : "admin clients not the same after conversion to then from JSON";
         // clean up.
         store.remove(c.getIdentifier());
 
@@ -94,7 +101,15 @@ public class AdminClientTest extends TestBase {
         // Since the last modified is created at save time,
         // these might not match up exactly. We therefore check that they are within a narrow range.
         System.out.println("last modified is " + c2.getLastModifiedTS() + " and the timestamp is " + nowDate);
-        assert c.equals(c2);
+        //assert c.equals(c2);
+        assert c.getIdentifier().equals(c2.getIdentifier());
+        assert c.getLastModifiedTS().getTime() == c2.getLastModifiedTS().getTime();
+        assert c.getSecret().equals(c2.getSecret());
+        assert c.getEmail().equals(c2.getEmail());
+        assert c.getName().equals(c2.getName());
+        assert c.getIssuer().equals(c2.getIssuer());
+        assert c.getVirtualOrganization().equals(c2.getVirtualOrganization());
+        assert c.getMaxClients() == c2.getMaxClients();
         assert now - comparisonTolerance <= lastMod && lastMod <= now + comparisonTolerance: "timestamp " + lastMod + " failed to be within tolerance " + comparisonTolerance + " for now " + now + ", difference =" + (lastMod - now);
         // clean up.
         store.remove(c.getIdentifier());

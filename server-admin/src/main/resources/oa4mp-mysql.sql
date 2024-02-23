@@ -67,15 +67,57 @@ CREATE TABLE oauth2.adminClients
 
 CREATE TABLE permissions
 (
-    permission_id VARCHAR(255) PRIMARY KEY,
-    admin_id      VARCHAR(255),
-    client_id     VARCHAR(255),
-    can_approve   BOOLEAN,
-    can_create    BOOLEAN,
-    can_read      BOOLEAN,
-    can_remove    BOOLEAN,
-    can_write     BOOLEAN,
-    creation_ts   TIMESTAMP
+    admin_id       VARCHAR(255),
+    can_approve    BOOLEAN,
+    can_create     BOOLEAN,
+    can_read       BOOLEAN,
+    can_remove     BOOLEAN,
+    can_substitute tinyint(1) DEFAULT NULL,
+    can_write      BOOLEAN,
+    client_id      VARCHAR(255),
+    creation_ts    timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    description    text,
+    ersatz_id      text,
+    permission_id  VARCHAR(255) PRIMARY KEY,
+);
+
+CREATE TABLE oauth2.transactions
+(
+    access_token             TEXT,
+    access_token_valid       tinyint(1)         DEFAULT NULL,
+    at_jwt                   text,
+    auth_grant               text,
+    authz_grant_lifetime     bigint DEFAULT NULL,
+    auth_time                timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    callback_uri             TEXT,
+    certificate              TEXT,
+    certlifetime             BIGINT,
+    certreq                  TEXT,
+    client_id                TEXT,
+    expires_in               BIGINT,
+    id_token_identifier      text,
+    id_token_lifetime        bigint DEFAULT NULL,
+    is_rfc_8628              tinyint(1) DEFAULT NULL,
+    myproxyUsername          TEXT,
+    nonce                    text,
+    proxy_id                 text,
+    refresh_token            TEXT,
+    refresh_token_valid      BOOLEAN,
+    refresh_token_expires_at bigint DEFAULT NULL,
+    refresh_token_lifetime   bigint DEFAULT NULL,
+    req_state                text,
+    rt_jwt                   text,
+    scopes                   text,
+    states                   TEXT,
+    temp_token               VARCHAR(255) PRIMARY KEY,
+    temp_token_valid         BOOLEAN,
+   user_code                 text,
+    username                 TEXT,
+    validated_scopes         text,
+    verifier_token           TEXT,
+    UNIQUE INDEX verifier (verifier_token(255)),
+    UNIQUE INDEX accessToken (access_token(255)),
+    UNIQUE INDEX refreshToken (refresh_token(255))
 );
 
 CREATE TABLE oauth2.client_approvals
@@ -83,70 +125,48 @@ CREATE TABLE oauth2.client_approvals
     client_id   VARCHAR(255) PRIMARY KEY,
     approver    TEXT,
     approved    BOOLEAN,
+    description TEXT,
     status      TEXT,
     approval_ts TIMESTAMP
 );
 
-CREATE TABLE oauth2.transactions
-(
-    temp_token          VARCHAR(255) PRIMARY KEY,
-    temp_token_valid    BOOLEAN,
-    callback_uri        TEXT,
-    certreq             TEXT,
-    certlifetime        BIGINT,
-    client_id           TEXT,
-    verifier_token      TEXT,
-    access_token        TEXT,
-    refresh_token       TEXT,
-    refresh_token_valid BOOLEAN,
-    expires_in          BIGINT,
-    states              TEXT,
-    certificate         TEXT,
-    username            TEXT,
-    myproxyUsername     TEXT,
-    access_token_valid  tinyint(1)         DEFAULT NULL,
-    auth_time           timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    nonce               text,
-    scopes              text,
-    UNIQUE INDEX verifier (verifier_token(255)),
-    UNIQUE INDEX accessToken (access_token(255)),
-    UNIQUE INDEX refreshToken (refresh_token(255))
-);
-
 CREATE TABLE oauth2.tx_records
 (
-    token_id   VARCHAR(255) PRIMARY KEY,
-    lifetime   bigint,
-    issued_at  bigint,
-    expires_at bigint,
-    parent_id  text,
-    token_type text,
-    valid      boolean,
-    scopes     text,
-    audience   text,
-    issuer     text,
-    resource   text,
+    audience        text,
+    description     text,
+    expires_at      bigint,
+    issued_at       bigint,
+    issuer          text,
+    lifetime        bigint,
+    parent_id       text,
+    resource        text,
+    scopes          text,
+    state           text,
+    stored_token    text,
+    token_id        VARCHAR(255) PRIMARY KEY,
+    token_type      text,
+    token           text,
+    valid           boolean,
     INDEX parents (parent_id(255))
 );
 
 
+COMMIT;
 CREATE TABLE oauth2.virtual_organizations
 (
-    vo_id          VARCHAR(255) PRIMARY KEY,
-           created bigint,
+    at_issuer      text,
+    created        bigint,
     default_key_id text,
     discovery_path text,
-            issuer text,
-         at_issuer text,
-     json_web_keys text,
-     last_modified bigint,
-             title text,
-          resource text,
-             valid boolean,
-    UNIQUE INDEX parents (vo_id(255)),
+    issuer         text,
+    json_web_keys  text,
+    last_modified  bigint,
+    resource       text,
+    title          text,
+    valid          boolean,
+    vo_id          VARCHAR(255) PRIMARY KEY,
     INDEX discovery_path (discovery_path(255))
 );
-COMMIT;
 # Now to grant restricted access. The  tables have to exist before this step
 
 GRANT All ON oauth2.client_approvals TO 'oa4mp-server'@'localhost';

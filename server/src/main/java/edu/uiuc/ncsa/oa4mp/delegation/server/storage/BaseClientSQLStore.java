@@ -3,14 +3,15 @@ package edu.uiuc.ncsa.oa4mp.delegation.server.storage;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClient;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClientKeys;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.ClientApprovalKeys;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.monitored.MonitoredSQLStore;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.*;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.DateThingy;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.RuleFilter;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.UUCConfiguration;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import edu.uiuc.ncsa.security.storage.cli.StoreArchiver;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
+import edu.uiuc.ncsa.security.storage.monitored.MonitoredSQLStore;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionRecord;
 import edu.uiuc.ncsa.security.storage.sql.SQLStore;
@@ -206,7 +207,7 @@ select client_id, creation_ts, last_modified_ts, last_accessed from oauth2.clien
         return query;
     }
 
-    public UUCResponse unusedClientCleanup(UUCConfiguration uucConfiguration) {
+  /*  public UUCResponse unusedClientCleanup(UUCConfiguration uucConfiguration) {
         String query = createUUCQueryNEW(uucConfiguration);
         //String query = createUUCQueryOLD(uucConfiguration);
         BaseClientKeys keys = getKeys();
@@ -215,7 +216,6 @@ select client_id, creation_ts, last_modified_ts, last_accessed from oauth2.clien
         ConnectionRecord cr = getConnection();
         Connection c = cr.connection;
         StoreArchiver storeArchiver = new StoreArchiver(this);
-        long now = System.currentTimeMillis();
         int totalFound = 0;
         int numberProcessed = 0;
         int skipped = 0;
@@ -333,5 +333,5 @@ select client_id, creation_ts, last_modified_ts, last_accessed from oauth2.clien
                 = new ResultStats(success, noInfo, failed, unknown);
         return resultStats;
     }
-
+*/
 }

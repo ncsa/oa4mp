@@ -1,13 +1,10 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient;
 
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.UUCResponse;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.UUCConfiguration;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApprovalStore;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.impl.GenericClientStoreUtils;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.XMLConverter;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApprovalStore;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.impl.GenericClientStoreUtils;
-import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.MemoryStore;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
@@ -58,8 +55,8 @@ public class AdminClientMemoryStore<V extends AdminClient> extends MemoryStore<V
         return GenericStoreUtils.getMostRecent(this, n, attributes);
     }
 
-    @Override
+  /*  @Override
     public UUCResponse unusedClientCleanup(UUCConfiguration uucConfiguration) {
         throw new NotImplementedException();
-    }
+    }*/
 }

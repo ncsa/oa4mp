@@ -22,7 +22,9 @@ public class OA2ClientSQLStoreProvider<V extends SQLClientStore> extends DSClien
 
     @Override
     public V newInstance(Table table) {
-        return (V) new SQLClientStore<OA2Client>(getConnectionPool(), table, (Provider<OA2Client>) clientProvider, converter);
+        V v = (V) new SQLClientStore<OA2Client>(getConnectionPool(), table, (Provider<OA2Client>) clientProvider, converter);
+        v.setUpkeepConfiguration(getUpkeepConfiguration());
+        return v;
     }
     @Override
        public V get() {

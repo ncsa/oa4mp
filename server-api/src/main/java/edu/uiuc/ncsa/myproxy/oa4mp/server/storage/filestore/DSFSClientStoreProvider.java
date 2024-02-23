@@ -36,6 +36,7 @@ public class DSFSClientStoreProvider extends FSProvider<DSFSClientStore> impleme
         } else {
             System.err.println("Store contains " + store.size() + " entries.");
         }*/
+        store.setUpkeepConfiguration(getUpkeepConfiguration());
         return store;
     }
 }

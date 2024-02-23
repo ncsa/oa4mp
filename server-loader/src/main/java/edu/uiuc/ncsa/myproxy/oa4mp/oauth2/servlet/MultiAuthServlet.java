@@ -10,7 +10,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2ATException;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Errors;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2GeneralError;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC7523Constants;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.UUCThread;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.upkeep.UpkeepThread;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
@@ -21,6 +21,7 @@ import org.apache.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 import static edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants.CLIENT_SECRET;
 
@@ -40,7 +41,9 @@ public abstract class MultiAuthServlet extends MyProxyDelegationServlet {
      * This should be in the {@link MyProxyDelegationServlet}, but that would have to be moved
      * and refactored. It stays here for now.
      */
-    public static UUCThread uucThread = null;
+  //  public static UUCThread uucThread = null;
+
+    public static List<UpkeepThread> upkeepThreadList = null;
 
     /**
      * This gets the client from the request. Note that this does not check the client password.

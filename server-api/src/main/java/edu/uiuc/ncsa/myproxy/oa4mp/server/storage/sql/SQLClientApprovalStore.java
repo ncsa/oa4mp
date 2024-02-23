@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.sql.table.ClientApprovalTable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.core.util.DebugConstants;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.IdentifiableProviderImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
@@ -72,6 +73,10 @@ public class SQLClientApprovalStore extends SQLStore<ClientApproval> implements 
             stmt.close();
         } catch (SQLException e) {
             destroyConnection(cr);
+            if(DebugUtil.getDebugLevel() == DebugConstants.DEBUG_LEVEL_TRACE){
+                e.printStackTrace();
+            }
+            DebugUtil.trace("sql error", e);
             throw new GeneralException("Error getting the user ids", e);
         } finally {
             releaseConnection(cr);
@@ -98,6 +103,10 @@ public class SQLClientApprovalStore extends SQLStore<ClientApproval> implements 
             stmt.close();
         } catch (SQLException e) {
             destroyConnection(cr);
+            if(DebugUtil.getDebugLevel() == DebugConstants.DEBUG_LEVEL_TRACE){
+                e.printStackTrace();
+            }
+            DebugUtil.trace("sql error", e);
             throw new GeneralException("Error getting the user ids", e);
         } finally {
             releaseConnection(cr);

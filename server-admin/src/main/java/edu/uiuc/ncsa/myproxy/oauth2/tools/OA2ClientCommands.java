@@ -11,9 +11,7 @@ import edu.uiuc.ncsa.myproxy.oauth2.base.ClientApprovalStoreCommands;
 import edu.uiuc.ncsa.myproxy.oauth2.base.ClientStoreCommands;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClient;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfigurationUtil;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.BaseClientStore;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.UUCResponse;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.UUCConfiguration;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
@@ -22,14 +20,11 @@ import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.XMLMap;
-import edu.uiuc.ncsa.security.util.cli.BasicIO;
-import edu.uiuc.ncsa.security.util.cli.FormatUtil;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
-import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
 import java.util.*;
@@ -713,7 +708,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
     public static String UUC_FLAG_FOUND = "-found";
     public static String UUC_FLAG_ENABLE = "-enable";
 
-    public void uuc(InputLine inputLine) throws Throwable {
+  /*  public void uuc(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
             say("uuc [" +
                     UUC_FLAG_TEST + " on|true|off|false] [" +
@@ -791,7 +786,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
         }
         say("There were " + response.found.size() + " clients found to remove");
     }
-
+*/
     @Override
     protected BaseClient approvalMods(InputLine inputLine, BaseClient client) throws IOException {
         OA2Client oa2Client = (OA2Client) client;

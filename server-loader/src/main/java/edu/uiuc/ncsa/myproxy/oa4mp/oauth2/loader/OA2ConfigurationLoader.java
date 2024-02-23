@@ -68,8 +68,6 @@ import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.*;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
-import edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConfigUtils;
-import edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConfiguration;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPoolProvider;
 import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
@@ -255,8 +253,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     isMonitorEnabled(),
                     getMonitorInterval(),
                     getMonitorAlarms(),
-                    getDebugger(),
-                    getUucConfiguration()
+                    getDebugger()
             );
 
             if (getClaimSource() instanceof BasicClaimsSourceImpl) {
@@ -516,7 +513,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
             uucConfiguration = new UUCConfiguration();
             ConfigurationNode node = getFirstNode(cn, UUC_TAG);
             uucConfiguration.enabled = getFirstBooleanValue(node, UUC_ENABLED, false);
-            uucConfiguration.setDebugOn(getFirstBooleanValue(node,UUC_DEBUG_ON, false));
+            uucConfiguration.setDebugOn(getFirstBooleanValue(node, UUC_DEBUG_ON, false));
             uucConfiguration.testMode = Configurations.getFirstBooleanValue(node, UUC_TEST_MODE_ON, false);
             String raw = getFirstAttribute(node, UUC_INTERVAL);
             if (StringUtils.isTrivial(raw)) {
@@ -540,8 +537,8 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         return uucConfiguration;
     }
 
-    protected ListRule createLR(ConfigurationNode node, boolean isWhiteList){
-        if(node == null)return null;
+    protected ListRule createLR(ConfigurationNode node, boolean isWhiteList) {
+        if (node == null) return null;
         ListRule listRule = new ListRule();
         listRule.setBlackList(false);
         List[] outList = processUUCList(node);
@@ -550,6 +547,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         listRule.setRuleFilter(getRuleFilter(getFirstNode(node, UUC_FILTER_TAG)));
         return listRule;
     }
+
     protected GPRule createGPR(ConfigurationNode node, boolean isUnused) {
         if (node == null) {
             return null;
@@ -1583,8 +1581,6 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
         if (csp == null) {
             OA2ClientConverter converter = new OA2ClientConverter(getClientProvider());
             csp = new OA2MultiDSClientStoreProvider(cn, isDefaultStoreDisabled(), getMyLogger(), null, null, getClientProvider());
-            UpkeepConfiguration upkeepConfiguration = UpkeepConfigUtils.processUpkeep(cn);
-
             csp.addListener(new DSFSClientStoreProvider(cn, converter, getClientProvider()));
             csp.addListener(new OA2ClientSQLStoreProvider(getMySQLConnectionPoolProvider(),
                     OA4MPConfigTags.MYSQL_STORE,
@@ -1599,7 +1595,6 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     OA4MPConfigTags.DERBY_STORE,
                     converter, getClientProvider()));
             csp.addListener(new TypedProvider<ClientStore>(cn, OA4MPConfigTags.MEMORY_STORE, OA4MPConfigTags.CLIENTS_STORE) {
-
                 @Override
                 public Object componentFound(CfgEvent configurationEvent) {
                     if (checkEvent(configurationEvent)) {
@@ -1662,7 +1657,6 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     getMyLogger(),
                     null, null,
                     voProvider, voConverter);
-
             storeProvider.addListener(createSQLVOP(cn,
                     getMySQLConnectionPoolProvider(),
                     OA4MPConfigTags.MYSQL_STORE,

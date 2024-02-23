@@ -158,6 +158,7 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
         if(lastAccessedThread != null){
             lastAccessedThread.setStopThread(true);
         }
+
     }
 
     public TransactionStore getTransactionStore() throws IOException {
