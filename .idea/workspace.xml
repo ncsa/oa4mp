@@ -10,68 +10,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="https://github.com/ncsa/security-lib/issues/34">
-      <change afterPath="$PROJECT_DIR$/server-admin/src/main/resources/testing/derby-readme.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/server/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/server/storage/upkeep/UpkeepThread.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/common/storage/monitored/MonitoredFileStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/common/storage/monitored/OLDMonitoredFileStore.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/common/storage/monitored/MonitoredMemoryStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/common/storage/monitored/OLDMonitoredMemoryStore.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/common/storage/monitored/MonitoredSQLStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/common/storage/monitored/OLDMonitoredSQLStore.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/clients/OA2ClientMemoryStore.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/clients/OA2ClientMemoryStore.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/vo/SQLVOStore.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/vo/SQLVOStore.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/vo/VOFileStore.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/vo/VOFileStore.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/vo/VOMemoryStore.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/vo/VOMemoryStore.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/myproxy/oa4mp/server/admin/adminClient/AdminClientSQLStore.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/myproxy/oa4mp/server/admin/adminClient/AdminClientSQLStore.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/myproxy/oa4mp/server/storage/filestore/DSFSClientStore.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/myproxy/oa4mp/server/storage/filestore/DSFSClientStore.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/myproxy/oa4mp/server/storage/sql/SQLClientStore.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/myproxy/oa4mp/server/storage/sql/SQLClientStore.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/oa4mp/delegation/common/storage/monitored/MonitoredFileStore.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/oa4mp/delegation/common/storage/monitored/MonitoredFileStore.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/oa4mp/delegation/common/storage/monitored/MonitoredMemoryStore.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/oa4mp/delegation/common/storage/monitored/MonitoredMemoryStore.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/oa4mp/delegation/common/storage/monitored/MonitoredSQLStore.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/oa4mp/delegation/common/storage/monitored/MonitoredSQLStore.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/oa4mp/delegation/common/storage/monitored/class-use/MonitoredFileStore.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/oa4mp/delegation/common/storage/monitored/class-use/MonitoredFileStore.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/oa4mp/delegation/common/storage/monitored/class-use/MonitoredMemoryStore.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/oa4mp/delegation/common/storage/monitored/class-use/MonitoredMemoryStore.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/oa4mp/delegation/common/storage/monitored/class-use/MonitoredSQLStore.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/oa4mp/delegation/common/storage/monitored/class-use/MonitoredSQLStore.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/oa4mp/delegation/server/storage/BaseClientSQLStore.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/oa4mp/delegation/server/storage/BaseClientSQLStore.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/oa4mp/delegation/server/storage/impl/ClientMemoryStore.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/oa4mp/delegation/server/storage/impl/ClientMemoryStore.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/oa4mp/delegation/server/storage/impl/FSClientStore.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/oa4mp/delegation/server/storage/impl/FSClientStore.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/apidocs/serialized-form.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/serialized-form.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-test/src/test/java/edu/uiuc/ncsa/myproxy/oa4mp/NewClientStoreTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test/src/test/java/edu/uiuc/ncsa/myproxy/oa4mp/NewClientStoreTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proxy/src/main/java/edu/uiuc/ncsa/oa2/servlet/OA2ATServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/edu/uiuc/ncsa/oa2/servlet/OA2ATServlet.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2ClientCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2ClientCommands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2Commands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2Commands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/resources/oa4mp-derby.sql" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/resources/oa4mp-derby.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/resources/oa4mp-mysql.sql" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/resources/oa4mp-mysql.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/admin/adminClient/AdminClientFS.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/admin/adminClient/AdminClientFS.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/admin/adminClient/AdminClientMemoryStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/admin/adminClient/AdminClientMemoryStore.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/admin/adminClient/MultiDSAdminClientStoreProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/admin/adminClient/MultiDSAdminClientStoreProvider.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/servlet/EnvServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/servlet/EnvServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/servlet/MyProxyDelegationServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/servlet/MyProxyDelegationServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/storage/filestore/DSFSClientStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/storage/filestore/DSFSClientStore.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/storage/filestore/DSFSClientStoreProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/storage/filestore/DSFSClientStoreProvider.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/storage/sql/SQLClientApprovalStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/storage/sql/SQLClientApprovalStore.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/OA2SE.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/OA2SE.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/loader/OA2ConfigurationLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/loader/OA2ConfigurationLoader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/loader/OA2ServletInitializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/loader/OA2ServletInitializer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/servlet/MultiAuthServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/servlet/MultiAuthServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/clients/OA2ClientSQLStoreProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/clients/OA2ClientSQLStoreProvider.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/vo/SQLVOStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/vo/SQLVOStore.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/vo/SQLVOStoreProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/vo/SQLVOStoreProvider.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/vo/VOFileStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/vo/VOFileStore.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/vo/VOMemoryStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/vo/VOMemoryStore.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/vo/VOMultiStoreProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/storage/vo/VOMultiStoreProvider.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-test/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-test/src/test/java/test/AdminClientTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/test/java/test/AdminClientTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-test/src/test/java/test/ServiceTestSuite2.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/test/java/test/ServiceTestSuite2.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-test/src/test/java/test/TestSuiteInitializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/test/java/test/TestSuiteInitializer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/server/storage/AggregateClientStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/server/storage/AggregateClientStore.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/server/storage/BaseClientSQLStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/server/storage/BaseClientSQLStore.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/server/storage/BaseClientStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/server/storage/BaseClientStore.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/server/storage/impl/ClientMemoryStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/server/storage/impl/ClientMemoryStore.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/server/storage/impl/ClientStoreProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/server/storage/impl/ClientStoreProvider.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/server/storage/impl/FSClientStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/server/storage/impl/FSClientStore.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/server/storage/uuc/UUCThread.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/server/storage/uuc/UUCThread.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -485,7 +429,7 @@
       <workItem from="1706880135654" duration="15117000" />
       <workItem from="1707139936325" duration="1516000" />
       <workItem from="1707151189557" duration="119764000" />
-      <workItem from="1708022150534" duration="139571000" />
+      <workItem from="1708022150534" duration="143989000" />
     </task>
     <task id="LOCAL-00001" summary="Added option for file stores to delete files they cannot parse. Updated client loader too. &#10;https://github.com/ncsa/oa4mp/issues/151&#10;https://github.com/ncsa/oa4mp/issues/150&#10;https://github.com/ncsa/oa4mp/issues/149">
       <option name="closed" value="true" />
@@ -583,7 +527,15 @@
       <option name="project" value="LOCAL" />
       <updated>1708119615020</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="https://github.com/ncsa/oa4mp/issues/169&#10;https://github.com/ncsa/oa4mp/issues/170&#10;https://github.com/ncsa/oa4mp/issues/171&#10;&#10;Nice refactoring of some classes too.">
+      <option name="closed" value="true" />
+      <created>1708725423904</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1708725423904</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -593,6 +545,7 @@
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.cfg" />
   </component>
   <component name="VcsManagerConfiguration">
+    <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <MESSAGE value="Added option for file stores to delete files they cannot parse. Updated client loader too. &#10;https://github.com/ncsa/oa4mp/issues/151&#10;https://github.com/ncsa/oa4mp/issues/150&#10;https://github.com/ncsa/oa4mp/issues/149" />
     <MESSAGE value="Refactoring client configurations to allow for using a QDL ini file. Trying to decouple XML from configurations. Implemented QDL ini file parsing for the command line client." />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/153 get the issuer from the well-known page for the command line client since checks are now failing for the ID tokens." />
@@ -606,7 +559,8 @@
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/165 and https://github.com/ncsa/oa4mp/issues/164 Updated documentation." />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/166 check for missing/empty refresh token explicitly in refresh endpoint and fail immediately if it is not there." />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/34" />
-    <option name="LAST_COMMIT_MESSAGE" value="https://github.com/ncsa/security-lib/issues/34" />
+    <MESSAGE value="https://github.com/ncsa/oa4mp/issues/169&#10;https://github.com/ncsa/oa4mp/issues/170&#10;https://github.com/ncsa/oa4mp/issues/171&#10;&#10;Nice refactoring of some classes too." />
+    <option name="LAST_COMMIT_MESSAGE" value="https://github.com/ncsa/oa4mp/issues/169&#10;https://github.com/ncsa/oa4mp/issues/170&#10;https://github.com/ncsa/oa4mp/issues/171&#10;&#10;Nice refactoring of some classes too." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
@@ -764,7 +718,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/5.3-SNAPSHOT/storage-5.3-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/monitored/upkeep/UpkeepConfigUtils.java</url>
-          <line>215</line>
+          <line>212</line>
           <option name="timeStamp" value="252" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -789,7 +743,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/5.3-SNAPSHOT/storage-5.3-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/sql/derby/DerbyConnectionPool.java</url>
-          <line>133</line>
+          <line>138</line>
           <option name="timeStamp" value="309" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -824,17 +778,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/5.3-SNAPSHOT/storage-5.3-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/sql/derby/DerbyConnectionPool.java</url>
-          <line>114</line>
+          <line>119</line>
           <option name="timeStamp" value="341" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/5.3-SNAPSHOT/storage-5.3-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/sql/derby/DerbyConnectionPool.java</url>
-          <line>63</line>
+          <line>68</line>
           <option name="timeStamp" value="342" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/5.3-SNAPSHOT/storage-5.3-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/sql/derby/DerbyConnectionParameters.java</url>
-          <line>20</line>
+          <line>21</line>
           <option name="timeStamp" value="344" />
         </line-breakpoint>
       </breakpoints>

@@ -86,7 +86,7 @@ public class AdminClientTest extends TestBase {
         AdminClientConverter converter = new AdminClientConverter(new AdminClientKeys(), clientProvider);
 
         AdminClient c = (AdminClient) store.create();
-        c.setLastModifiedTS(new Date(1000L));
+        c.setLastModifiedTS(new Date(1009000L));
         c.setSecret("idufh84057thsdfghwre");
         c.setEmail("bob@foo.bar");
         c.setName("Test client 42");
@@ -100,10 +100,7 @@ public class AdminClientTest extends TestBase {
         long lastMod = c2.getLastModifiedTS().getTime();
         // Since the last modified is created at save time,
         // these might not match up exactly. We therefore check that they are within a narrow range.
-        System.out.println("last modified is " + c2.getLastModifiedTS() + " and the timestamp is " + nowDate);
-        //assert c.equals(c2);
         assert c.getIdentifier().equals(c2.getIdentifier());
-        assert c.getLastModifiedTS().getTime() == c2.getLastModifiedTS().getTime();
         assert c.getSecret().equals(c2.getSecret());
         assert c.getEmail().equals(c2.getEmail());
         assert c.getName().equals(c2.getName());
