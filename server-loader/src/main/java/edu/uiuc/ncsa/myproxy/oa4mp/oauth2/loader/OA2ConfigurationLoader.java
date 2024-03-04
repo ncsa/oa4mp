@@ -70,6 +70,8 @@ import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPoolProvider;
+import edu.uiuc.ncsa.security.storage.sql.SQLStore;
+import edu.uiuc.ncsa.security.storage.sql.derby.DerbyConnectionPoolProvider;
 import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
@@ -77,6 +79,7 @@ import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import javax.inject.Provider;
 import java.io.File;
+import java.io.InputStream;
 import java.net.URI;
 import java.text.ParseException;
 import java.time.LocalTime;
@@ -1176,6 +1179,28 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
             });
         }
         return casp;
+    }
+
+
+    @Override
+    public DerbyConnectionPoolProvider getDerbyConnectionPoolProvider(String databaseName, String schema) {
+        if (derbyConnectionPoolProvider == null) {
+            derbyConnectionPoolProvider = new DerbyConnectionPoolProvider(databaseName, schema);
+            // set the default create script
+            try {
+                InputStream inputStream = getClass().getClassLoader().getResourceAsStream("oa4mp-derby.sql");
+                if (inputStream != null) {
+                    List<String> createScript = SQLStore.crappySQLParser(FileUtil.readFileAsLines(inputStream));
+                    derbyConnectionPoolProvider.setCreateScript(createScript);
+                } else {
+                    getMyLogger().warn("Default Derby script not found");
+                }
+            } catch (Throwable t) {
+                getMyLogger().warn("Could not load default Derby script (" + t.getClass().getSimpleName() + "):" + t.getMessage(), t);
+            }
+
+        }
+        return derbyConnectionPoolProvider;
     }
 
     public class OA4MP2TProvider extends DSTransactionProvider<OA2ServiceTransaction> {

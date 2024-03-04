@@ -183,5 +183,40 @@
 
             </build>
         </profile>
+
+        <profile>
+              <id>migrate</id>
+              <build>
+                  <finalName>migrate</finalName>
+                  <plugins>
+                      <plugin>
+                          <artifactId>maven-assembly-plugin</artifactId>
+                          <version>3.1.0</version>
+                          <configuration>
+                              <archive>
+                                  <manifest>
+                                      <addClasspath>true</addClasspath>
+                                      <mainClass>edu.uiuc.ncsa.myproxy.oauth2.tools.migrate.FSMigrate</mainClass>
+                                  </manifest>
+                              </archive>
+                              <descriptorRefs>
+                                  <descriptorRef>jar-with-dependencies</descriptorRef>
+                              </descriptorRefs>
+                          </configuration>
+                          <executions>
+                              <execution>
+                                  <id>make-my-jar-with-dependencies</id>
+                                  <phase>package</phase>
+                                  <goals>
+                                      <goal>single</goal>
+                                  </goals>
+                              </execution>
+                          </executions>
+                      </plugin>
+                  </plugins>
+
+              </build>
+          </profile>
+
     </profiles>
 </project>

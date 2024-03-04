@@ -185,16 +185,6 @@ CREATE TABLE oauth2.virtual_organizations
 );
 create  INDEX discovery_path on oauth2.virtual_organizations (discovery_path);
 
-/*
-CREATE TABLE oauth2.migrate
-(
-   create_ts              timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-   import_ts              timestamp,
-   client_id              VARCHAR(255),
-   is_imported            boolean,
-   hashed                 VARCHAR(255) PRIMARY KEY
-);*/
-
 
 
 

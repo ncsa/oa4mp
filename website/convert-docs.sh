@@ -10,9 +10,10 @@ cd ${args[1]}  || exit
 
 echo "converting OA4MP docs to PDF"
 
-lowriter --headless --convert-to pdf ${args[0]}/qdl_oa4mp_store_access.odt        > /dev/null
-lowriter --headless --convert-to pdf ${args[0]}/creating_claim_sources2.odt       > /dev/null
-lowriter --headless --convert-to pdf ${args[0]}/claim_source_examples.odt         > /dev/null
-lowriter --headless --convert-to pdf ${args[0]}/token_handler_configuration.odt   > /dev/null
-lowriter --headless --convert-to pdf ${args[0]}/qdl_clc_ini.odt                   > /dev/null
+lowriter --headless --convert-to pdf ${args[0]}/qdl/src/main/docs/qdl_oa4mp_store_access.odt        > /dev/null
+lowriter --headless --convert-to pdf ${args[0]}/qdl/src/main/docs/creating_claim_sources2.odt       > /dev/null
+lowriter --headless --convert-to pdf ${args[0]}/qdl/src/main/docs/claim_source_examples.odt         > /dev/null
+lowriter --headless --convert-to pdf ${args[0]}/qdl/src/main/docs/token_handler_configuration.odt   > /dev/null
+lowriter --headless --convert-to pdf ${args[0]}/qdl/src/main/docs/qdl_clc_ini.odt                   > /dev/null
+lowriter --headless --convert-to pdf ${args[0]}/server-admin/src/main/docs/filestore-migration.odt  > /dev/null
 echo "    ... done with OA4MP docs"

@@ -96,11 +96,19 @@ if [[ $? -ne 0 ]] ; then
     exit 1
 fi
 
+mvn -P migrate package > migrate.log
+if [[ $? -ne 0 ]] ; then
+    echo "could not build migrate, see migrate.log"
+    exit 1
+fi
+
+
 cd $OA2_TOOLS/target
 echo "deploying OA4MP tools..."
 
 cp cli-jar-with-dependencies.jar $OA4MP_SERVER_DEPLOY/cli.jar
 cp jwt-jar-with-dependencies.jar $OA4MP_SERVER_DEPLOY/jwt.jar
+cp migrate-jar-with-dependencies.jar $OA4MP_SERVER_DEPLOY/fs-migrate.jar
 
 echo "building QDL OA4MP tools..."
 cd $QDL_OA2_TOOLS

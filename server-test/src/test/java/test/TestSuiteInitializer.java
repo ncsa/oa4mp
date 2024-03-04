@@ -55,6 +55,9 @@ public class TestSuiteInitializer extends AbstractTestSuiteInitializer {
         return "oa4mp.oa2.derby.filestore";
     }
 
+    public String getOLDFileStoreConfigName() {
+         return "oa4mp.oa2.fileStore";
+     }
     @Override
     public String getMemoryStoreConfigName() {
 //        return "oa4mp.oa2.memory";
@@ -107,6 +110,7 @@ public class TestSuiteInitializer extends AbstractTestSuiteInitializer {
         TestUtils.setMemoryStoreProvider(checkDerby(tspi));
         TestStoreProvider2 fsp = getTSP(getFileStoreConfigName()); // use this later to get its client converter. Any store would do.
         TestUtils.setFsStoreProvider(checkDerby(fsp));
+        TestUtils.setOLDfsStoreProvider(getTSP(getOLDFileStoreConfigName()));
         TestUtils.setMySQLStoreProvider(getTSP(getMySQLStoreConfigName()));
         TestUtils.setPgStoreProvider(getTSP(getPostgresStoreConfigName()));
         TestUtils.setDerbyStoreProvider(getTSP(getDerbyStoreConfigName()));

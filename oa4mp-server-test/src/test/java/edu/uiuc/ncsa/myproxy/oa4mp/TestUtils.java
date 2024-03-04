@@ -38,6 +38,7 @@ public class TestUtils {
 
     private static TestStoreProviderInterface memoryStoreProvider;
     private static TestStoreProviderInterface fsStoreProvider;
+    private static TestStoreProviderInterface OLDfsStoreProvider;
     private static TestStoreProviderInterface pgStoreProvider;
     private static TestStoreProviderInterface mySQLStoreProvider;
     private static TestStoreProviderInterface h2StoreProvider;
@@ -62,6 +63,14 @@ public class TestUtils {
 
     public static void setFsStoreProvider(TestStoreProviderInterface fsStoreProvider) {
         TestUtils.fsStoreProvider = fsStoreProvider;
+    }
+
+    public static TestStoreProviderInterface getOLDfsStoreProvider() {
+        return OLDfsStoreProvider;
+    }
+
+    public static void setOLDfsStoreProvider(TestStoreProviderInterface OLDfsStoreProvider) {
+        TestUtils.OLDfsStoreProvider = OLDfsStoreProvider;
     }
 
     public static TestStoreProviderInterface getMySQLStoreProvider() {

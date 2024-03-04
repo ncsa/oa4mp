@@ -182,11 +182,21 @@ public class AdminClient extends BaseClient {
     @Override
     public String toString() {
         return "AdminClient{" +
-                "virtualOrganization='" + virtualOrganization + '\'' +
+                "admin_id=" + getIdentifier() +
+                ", virtualOrganization=" + virtualOrganization +
                 ", issuer='" + issuer + '\'' +
+                ", externalVOName='" + externalVOName + '\'' +
                 ", maxClients=" + maxClients +
                 ", config=" + config +
-                ", new client notity=" + notifyOnNewClientCreate +
+                ", allowQDL=" + allowQDL +
+                ", allowQDLCodeBlocks=" + allowQDLCodeBlocks +
+                ", notifyOnNewClientCreate=" + notifyOnNewClientCreate +
+                ", listUsers=" + listUsers +
+                ", listUserInOtherClients=" + listUserInOtherClients +
+                ", allowCustomIDs=" + allowCustomIDs +
+                ", generateIDs=" + generateIDs +
+                ", idHead=" + idHead +
+                ", useTimestampInIDs=" + useTimestampInIDs +
                 '}';
     }
 

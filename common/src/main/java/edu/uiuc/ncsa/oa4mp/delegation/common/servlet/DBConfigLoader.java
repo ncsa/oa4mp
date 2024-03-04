@@ -76,11 +76,11 @@ public abstract class DBConfigLoader<T extends AbstractEnvironment> extends Logg
         return mariaDBConnectionPoolProvider;
     }
 
-    DerbyConnectionPoolProvider derbyConnectionPoolProvider;
+    protected DerbyConnectionPoolProvider derbyConnectionPoolProvider;
     // need no-arg constructor whose values will be overriden later from configuration.
 
     public DerbyConnectionPoolProvider getDerbyConnectionPoolProvider(){
-           return getDerbyConnectionPoolProvider("oa4mp", "oauth2");
+           return getDerbyConnectionPoolProvider("", "");
     }
     public DerbyConnectionPoolProvider getDerbyConnectionPoolProvider(String databaseName, String schema){
         if(derbyConnectionPoolProvider == null){

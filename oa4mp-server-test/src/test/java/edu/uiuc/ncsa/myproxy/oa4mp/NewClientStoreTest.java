@@ -1,8 +1,13 @@
 package edu.uiuc.ncsa.myproxy.oa4mp;
 
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
+import edu.uiuc.ncsa.security.core.util.Pacer;
+import edu.uiuc.ncsa.security.storage.FileStore;
 import edu.uiuc.ncsa.security.util.TestBase;
+import org.junit.Test;
+
+import java.util.Date;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -29,11 +34,7 @@ public class NewClientStoreTest extends TestBase {
         testBasic(TestUtils.getDerbyStoreProvider().getClientStore());
     }
 
-  /*  public void testAG() throws Exception {
-        testBasic(TestUtils.getAgStoreProvider().getClientStore());
-    }
 
-*/
     public void testBasic(ClientStore clientStore) throws Exception {
         Client client = (Client) clientStore.create();
         System.out.println("New client ID = " + client.getIdentifier());

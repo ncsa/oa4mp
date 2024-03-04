@@ -15,6 +15,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.TokenForge;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.Verifier;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
+import org.junit.Test;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
@@ -114,6 +115,7 @@ public class FileStoreTest extends BaseTransactionStoreTest {
 
         return testDir;
     }
+
 
     static TransactionStore fileStore = null;
     // since we need this to preserve state, we make a static instance of the store and manage that.

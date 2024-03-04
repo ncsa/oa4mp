@@ -872,6 +872,10 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 if (idToken != null) {
                     t = OA2TokenUtils.getTransactionFromTX(oa2se, idToken, debugger);
                 }
+                if(t!=null) {
+                    debugger.trace("found transaction from TX record.");
+                }
+
             } catch (OA2GeneralError oa2GeneralError) {
                 if (!(debugger instanceof ClientDebugUtil)) {
                     // last ditch effort to tell us what client is doing this.
