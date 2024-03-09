@@ -29,7 +29,7 @@ remove(idt_expected.'comment');
 
 // first part of test is to get tokens with the server defaults.
 
-// This funciton simply inherits everything at the point of call, allowing
+// This function simply inherits everything at the point of call, allowing
 // the same block of code to be repeated.
 verify()->
 block[ // set of basic verifications to run repeatedly.
@@ -67,3 +67,7 @@ verify();
 //say('refresh:\n'+print(clc#refresh()));
 //say('\nclaims:\n' + print(clc#claims()));
 say('ok: OIDC SciToken template test');
+
+
+
+

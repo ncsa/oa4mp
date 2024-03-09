@@ -1,0 +1,126 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   Tests the client with WLCG configuration
+   Client config 2023-06-16
+
+{"tokens": {
+ "access":  {
+  "audience": "https://wlcg.cern.ch/jwt/v1/any",
+  "templates": [  {
+   "aud": "https://æþelðryþe.edu",
+   "paths":    [
+        {
+     "op": "storage.read",
+     "path": "/home/${sub}"
+    },
+    {"op": "compute.create"},
+    {"op": "compute.modify"},
+        {
+     "op": "x.y",
+     "path": "/abc/def"
+    },
+        {
+     "op": "storage.write",
+     "path": "/data/${sub}/cluster"
+    }
+   ]
+  }],
+  "type": "wlcg"
+ },
+ "identity":  {
+  "qdl":   {
+   "load": "auto/server/idt.qdl",
+   "xmd": {"exec_phase": ["post_auth"]}
+  },
+  "type": "identity"
+ },
+ "refresh":  {
+  "audience": "https://wlcg.cern.ch/jwt/v1/refresh",
+  "type": "refresh"
+ }
+}}
+
+
+Look at the specification at
+
+https://indico.cern.ch/event/769180/contributions/3563095/attachments/1908176/3152124/WLCG_Common_JWT_Profiles.pdf
+
+*/
+user_id := 'worplesdon';
+ss := 'storage.read:/foo storage.read:/home/' + user_id  +
+       ' x.y:/abc/def/pqr' +
+       ' storage.write:/data/' + user_id + '/cluster/node47 ' +
+       ' compute.read' +
+       ' compute.create';
+// Parameters for the initial
+params. ≔ {'sub':user_id,
+           'scope':'openid profile email org.oa4mp:userinfo ' + ss,
+           'org.oa4mp:/templates':'https://æþelðryþe.edu'};
+test_id:= 'oidc.wlcg.template';
+// set up the client
+clc#init($$OA4MP_CLC_INI, test_id);
+refresh_params.'refresh' :=  {'scope': 'storage.read: storage.write:'}; // token exchange attempts to upscope.
+refresh_params.'exchange' :=  {'scope': 'storage.read:/home/'+user_id  + // granted
+                                ' storage.write:/home/'+user_id + // denied -- wrong path
+                                ' storage.read:/home/lsst/' + user_id + // denied -- not in original request
+                                ' x.y:/abc/def/pqr/foo' + // granted
+                                ' x.y:/abc/defpqr' + // denied since not a sub-scope
+                                ' compute.create compute.cancel'}; // only compute.create
+clc#set_param(refresh_params.);
+
+initialization := size(args())==1⇒args().0:import(load('test#/auto/utils/initialization.mdl'));
+checks:=initialization#checks();
+ini.:=initialization#get_client_ini(test_id);
+server_defaults.:=initialization# server_defaults();
+cc.:=initialization#get_client_config(test_id); // This is the client configuration from the server
+cc_at.:=cc.'cfg'.'tokens'.'access';
+cc_rt.:=cc.'cfg'.'tokens'.'refresh';
+
+idt_expected.:= from_json(file_read('test#/auto/server/test-claims.json')).params.'sub';
+remove(idt_expected.'comment');
+remove(idt_expected.'eduPersonEntitlement');
+
+verify()->
+block[ // set of basic verifications to run repeatedly.
+  checks#wlcg(claims., at_expected., at_asserted.);
+⊨ at_asserted.'sub' ≡ ((∃claims.'eppn')?claims.'eppn':user_id) : 'wrong AT subject'; // OA4MP policy is to return the eppn if present.
+⊨ rt_asserted.'aud' ≡ 'https://wlcg.cern.ch/jwt/v1/refresh' : 'wrong RT audience';
+⊨ at_asserted.'iss' ≡ server_defaults.'issuer' : 'wrong AT issuer';
+
+  checks#lifetime(server_defaults.'at_lifetime', at_asserted.);
+  checks#lifetime(server_defaults.'id_token_lifetime', claims.);
+  checks#claims(idt_expected.,claims.);
+];
+at_expected. :=  ['storage.read:/home/' + user_id ,
+                            'x.y:/abc/def/pqr',
+                            'storage.write:/data/' + user_id + '/cluster/node47',
+                            'compute.create'];
+
+
+ // Initial token exchange
+tokens. := clc#rfc7523(params.);
+at_asserted.:= tokens.'access_token'.'jwt';
+rt_asserted.:= tokens.'refresh_token'.'jwt';
+claims. := clc#claims();
+verify();
+
+try[
+   tokens. := clc#refresh();
+   ⊨ false : 'was able to upscope in the refresh';
+  ]catch[];
+
+at_asserted. := clc#exchange('-at','-subject','rt').'access_token'.'jwt';
+rt_asserted. := clc#exchange('-rt','-subject','rt').'refresh_token'.'jwt';
+     claims. := clc#exchange('-id','-subject','rt');
+at_expected. := ['storage.read:/home/' + user_id, // read
+                              'x.y:/abc/def/pqr/foo',  // works since it add component to path
+                              'compute.create'];
+claims. := clc#claims();
+verify();
+
+say('ok: OIDC WLCG template test');
+
+
+
+

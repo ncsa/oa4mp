@@ -177,6 +177,25 @@ body[
          ]; // end scitokens
 
 
+ wlcg(claims., at_expected. , at_asserted.)->
+ block[
+      issuer := 'https://localhost:9443/oauth2';
+      s. := tokenize(at_asserted.'scope', ' ');
+
+     //  ⊨ tokens.'access_token'.'lifetime' - 300000 < 2000 : 'wrong access token lifetime';
+       ⊨ ∃at_asserted.'wlcg.ver' : 'missing WLCG version';
+       ⊨ ∃at_asserted.'iat' : 'missing iat claim';
+       ⊨ ∃at_asserted.'exp' : 'missing exp claim';
+       ⊨ ∃at_asserted.'aud' : 'missing aud claim';
+       ⊨ ∃at_asserted.'iss' : 'missing iss claim';
+       ⊨ ∃at_asserted.'jti' : 'missing jti claim';
+       ⊨ ∃at_asserted.'sub' : 'missing sub claim';
+       ⊨ at_asserted.'wlcg.ver' ≡ '1.0' : 'wrong WLCG version';
+       ⊨ at_asserted.'aud' ≡ 'https://wlcg.cern.ch/jwt/v1/any' : 'wrong AT audience';
+       // We are setting the RT to be a JWT because it is a common use case.
+      // ⊨ tokens.'refresh_token'.'lifetime' - 900000 < 2000 : 'wrong refresh token lifetime';
+       ⊨ reduce(@∧, at_expected. ∈ s.) : 'incorrect AT scopes';
+]; //end WLCG check
 
     define[verify_scopes(expected., asserted)]
         [=== verify_scopes(expected., asserted) -- check a list of expected. scopes against the string of them

@@ -3,13 +3,14 @@ package edu.uiuc.ncsa.oa4mp.delegation.common.storage.monitored;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.storage.MonitoredStoreDelegate;
 import edu.uiuc.ncsa.security.storage.MonitoredStoreInterface;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
-import edu.uiuc.ncsa.security.storage.monitored.MonitoredKeys;
 import edu.uiuc.ncsa.security.storage.events.IDMap;
 import edu.uiuc.ncsa.security.storage.events.LastAccessedEventListener;
+import edu.uiuc.ncsa.security.storage.monitored.MonitoredKeys;
 import edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConfiguration;
 import edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepResponse;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
@@ -155,7 +156,12 @@ public abstract class OLDMonitoredSQLStore<V extends Identifiable> extends SQLSt
     UpkeepConfiguration upkeepConfiguration;
 
     @Override
-    public UpkeepResponse doUpkeep() {
+    public UpkeepResponse doUpkeep(AbstractEnvironment environment) {
         return null;
+    }
+
+    @Override
+    public void updateHook(String action, AbstractEnvironment environment, List<Identifier> identifiers) {
+
     }
 }

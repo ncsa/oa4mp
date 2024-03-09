@@ -196,7 +196,7 @@
                               <archive>
                                   <manifest>
                                       <addClasspath>true</addClasspath>
-                                      <mainClass>edu.uiuc.ncsa.myproxy.oauth2.tools.migrate.FSMigrate</mainClass>
+                                      <mainClass>edu.uiuc.ncsa.myproxy.oauth2.tools.migrate.FSMigrationTool</mainClass>
                                   </manifest>
                               </archive>
                               <descriptorRefs>

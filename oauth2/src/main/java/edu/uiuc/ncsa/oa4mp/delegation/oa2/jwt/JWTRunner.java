@@ -99,8 +99,8 @@ public class JWTRunner {
     public void initializeHandlers() throws Throwable {
         for (PayloadHandler h : handlers) {
             DebugUtil.trace(this, "Running init for handler " + h);
-            h.init();
-            h.setAccountingInformation();
+            h.init(); // includes setting account info
+        //    h.setAccountingInformation();
         }
     }
 
@@ -118,11 +118,11 @@ public class JWTRunner {
         doScript(SRE_EXEC_INIT);
         doScript(SRE_PRE_AUTH);
 
-        // now for the actual getting of the claims
 
-        //  getFromSources(transaction.getFlowStates(), SRE_PRE_AUTH, true);
 
         doScript(SRE_POST_AUTH);
+        // now for the actual getting of the claims
+        getFromSources(transaction.getFlowStates(), SRE_PRE_AUTH, true);
 
         for (PayloadHandler h : handlers) {
             h.saveState(SRE_POST_AUTH);

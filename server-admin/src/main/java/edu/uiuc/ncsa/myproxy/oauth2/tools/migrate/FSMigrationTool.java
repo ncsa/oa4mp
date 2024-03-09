@@ -25,6 +25,7 @@ import static edu.uiuc.ncsa.security.core.configuration.StorageConfigurationTags
 
 /**
  * Migration tool for old style file stores to (at this point) a Derby store.
+ * This loads or creates stores needed and then runs the {@link FSMigrater}
  * The issue is that a lot of installs have been using file stores which have
  * become immense -- hundreds of thousands of auto-registered clients -- most
  * of which are one-time use or similar. The Upkeep facility cannot stay ahead
@@ -35,14 +36,14 @@ import static edu.uiuc.ncsa.security.core.configuration.StorageConfigurationTags
  * on 2/24/24 at  7:09 AM
  */
 /*
-   This works by reading through everthing in the FS store directory and creating
+   This works by reading through everything in the FS store directory and creating
    a master database list of what to import, then making a pass in batches
    to do the work. Note that this is aimed at large file stores -- tens if not
    hundreds of thousands of entries -- which are causing routine operations to
    crash in OA4MP, Administrators therefore need a special tool to do the import
    that takes this into account.
  */
-public class FSMigrate extends CLITool {
+public class FSMigrationTool extends CLITool {
     public static final int DEFAULT_BATCH_SIZE = 500;
 
     @Override
@@ -55,15 +56,28 @@ public class FSMigrate extends CLITool {
         return null;
     }
 
+    public FSMigrater getMigrater() {
+        if (migrater == null) {
+            migrater = new FSMigrater(migrateStore);
+        }
+        return migrater;
+    }
+
+    public void setMigrater(FSMigrater migrater) {
+        this.migrater = migrater;
+    }
+
+    FSMigrater migrater = null;
+
     @Override
     public void doIt() throws Exception {
         long now = System.currentTimeMillis();
         if (doIngest) {
-           // say("done with setting up databases. You may now run this ");
+            // say("done with setting up databases. You may now run this ");
             //return;
-            migrateStore.ingest(sourceSE, isNoTransactions(), getBatchSize(), isPacerOn());
+            getMigrater().ingest(sourceSE, isNoTransactions(), getBatchSize(), isPacerOn());
         }
-        migrateStore.migrateAll(targetSE, isNoTransactions(), getBatchSize(), isUpkeepOn(), isPacerOn());
+        getMigrater().migrateAll(targetSE, isNoTransactions(), getBatchSize(), isUpkeepOn(), isPacerOn());
 
         say("TOTAL Processing time for all operations:" + StringUtils.formatElapsedTime(System.currentTimeMillis() - now));
     }
@@ -76,7 +90,7 @@ public class FSMigrate extends CLITool {
 
     OA2SE sourceSE;
     OA2SE targetSE;
-    MigrateStore<? extends MigrationEntry> migrateStore;
+    MigrateStore migrateStore;
 
     public void setSourceFile(String sourceFile) {
         this.sourceFile = sourceFile;
@@ -232,11 +246,11 @@ public class FSMigrate extends CLITool {
     }
 
 
-    public MigrateStore<? extends MigrationEntry> getMigrateStore() {
+    public MigrateStore getMigrateStore() {
         return migrateStore;
     }
 
-    public void setMigrateStore(MigrateStore<? extends MigrationEntry> migrateStore) {
+    public void setMigrateStore(MigrateStore migrateStore) {
         this.migrateStore = migrateStore;
     }
 
@@ -266,7 +280,7 @@ public class FSMigrate extends CLITool {
         int width = 20;
         String eq = " = ";
         String indent = "                       ";
-        say(FSMigrate.class.getSimpleName() + ": a tool to migrate an existing filestore to another store");
+        say(FSMigrationTool.class.getSimpleName() + ": a tool to migrate an existing filestore to another store");
         say("The scenario is that you have a possible enormous filestore with thousands of entries and need");
         say("to move the contents to a different type of OA4MP store. Such a migration should be done separately, ");
         say("not when the server is running since the load could be quite high. ");
@@ -431,14 +445,14 @@ public class FSMigrate extends CLITool {
 
     public static void main(String[] args) throws Throwable {
         String[] v = new String[1 + args.length];
-        v[0] = FSMigrate.class.getSimpleName();// need a dummy argument for input line
+        v[0] = FSMigrationTool.class.getSimpleName();// need a dummy argument for input line
         System.arraycopy(args, 0, v, 1, args.length);
         InputLine inputLine = new InputLine(v);
         if (args.length == 0 || inputLine.hasArg(HELP_LONG_OPTION)) {
             showHelp();
             return;
         }
-        FSMigrate fsm = new FSMigrate();
+        FSMigrationTool fsm = new FSMigrationTool();
         fsm.doCleanup = inputLine.hasArg(CONFIG_CLEANUP);
         if (fsm.doCleanup) {
             fsm.removeMigrationDB(inputLine);  // this can also show help, do before showing general help
@@ -446,7 +460,7 @@ public class FSMigrate extends CLITool {
         }
 
         if (inputLine.hasArg(CONFIG_HELP)) {
-            FSMigrate.showHelp();
+            FSMigrationTool.showHelp();
             return;
         }
         if (!fsm.getArgs(inputLine)) {

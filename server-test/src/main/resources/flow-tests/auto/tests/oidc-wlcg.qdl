@@ -4,14 +4,14 @@
    Basic SciToken test. This will do the exchanges with all defaults -- no overrides -- and
    is the most basic possible
 */
-params. ≔ {'sub':'threepwood',
-           'scope':'openid org.oa4mp:userinfo read: queue: execute:',
+params. ≔ {'sub':'worplesdon',
+           'scope':'openid org.oa4mp:userinfo storage.read: storage.create: compute.modify  compute.create',
            'org.oa4mp:/rt/value/foo':'woof'};
-test_id:= 'oidc.scitokens.qdl';
+test_id:= 'oidc.wlcg.qdl';
 // set up the client
 clc#init($$OA4MP_CLC_INI, test_id);
-refresh_params.'refresh' :=  {'scope': 'execute:/home/threepwood/vo3/bin read:/public/vo3 queue:/staging/vo3-production-queue'};
-refresh_params.'exchange' :=  {'scope': 'execute:/home/threepwood/vo3/bin read:/public/vo3 queue:/staging/vo3-production-queue'};
+refresh_params.'refresh' :=  {'scope': 'compute.create compute.foo compute.modify'};
+refresh_params.'exchange' :=  {'scope': 'storage.read:/home/worplesdon/vo3 storage.create:/home/worplesdon/vo3  storage.create:/public/vo3'};
 clc#set_param(refresh_params.);
 
 initialization := size(args())==1⇒args().0:import(load('test#/auto/utils/initialization.mdl'));
@@ -23,11 +23,20 @@ cc_at.:=cc.'cfg'.'tokens'.'access';
 cc_idt.:=cc.'cfg'.'tokens'.'identity';
 cc_rt.:=cc.'cfg'.'tokens'.'refresh';
 // first part of test is to get tokens with the server defaults.
-at_expected.:={'iss':server_defaults.'at_issuer',
+/*at_expected.:={'iss':server_defaults.'at_issuer',
                'sub':params.'sub',
                'ver':'scitoken:2.0',
                'aud':cc_at.'audience',
-               'scopes':['execute:/home/threepwood/vo3/bin', 'read:/public/vo3', 'queue:/staging/vo3-production-queue']};
+               'scopes':['storage.read:/home/worplesdon/vo3',
+                         'storage.create:/home/worplesdon/vo3',
+                         'compute.create',
+                         'storage.create:/public/vo3',
+                         'compute.modify']};*/
+at_expected.:=['storage.read:/home/worplesdon/vo3',
+               'storage.create:/home/worplesdon/vo3',
+               'compute.create',
+               'storage.create:/public/vo3',
+               'compute.modify'];
 idt_expected.:={'sub':params.'sub',
                 'aud':ini.'id',
                 'iss':server_defaults.'issuer'};
@@ -37,7 +46,7 @@ idt_expected.:={'sub':params.'sub',
 // the same block of code to be repeated.
 verify()->
 block[ // set of basic verifications to run repeatedly.
-  checks#scitokens(at_expected., at_asserted.);
+  checks#wlcg(claims., at_expected., at_asserted.);
   checks#lifetime(cc_at.'lifetime', at_asserted.);
   checks#lifetime(cc_idt.'lifetime', claims.);
   checks#claims(idt_expected.,claims.);
@@ -53,6 +62,9 @@ verify();
 
 // Refresh
 tokens. := clc#refresh();
+at_expected.:=['compute.create',
+               'compute.modify'];
+
 at_asserted.:= tokens.'access_token'.'jwt';
 rt_asserted.:= tokens.'refresh_token'.'jwt';
     claims. := clc#claims();
@@ -62,7 +74,9 @@ verify();
 at_asserted. := clc#exchange('-at','-subject','rt').'access_token'.'jwt';
 rt_asserted. := clc#exchange('-rt','-subject','rt').'refresh_token'.'jwt';
      claims. := clc#exchange('-id','-subject','rt');
+at_expected.:=['storage.read:/home/worplesdon/vo3',
+               'storage.create:/home/worplesdon/vo3',
+               'storage.create:/public/vo3'];
+
 verify();
-//say('refresh:\n'+print(clc#refresh()));
-//say('\nclaims:\n' + print(clc#claims()));
-say('ok: OIDC SciToken QDL test');
+say('ok: OIDC WLCG QDL Test');

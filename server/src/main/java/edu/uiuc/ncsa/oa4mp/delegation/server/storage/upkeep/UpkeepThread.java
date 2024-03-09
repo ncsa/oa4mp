@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.oa4mp.delegation.server.storage.upkeep;
 
 import edu.uiuc.ncsa.security.core.cache.MyThread;
-import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.storage.MonitoredStoreInterface;
 import edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConfiguration;
 import edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepResponse;
@@ -14,13 +14,23 @@ import java.util.Date;
  */
 public class UpkeepThread extends MyThread {
     public UpkeepThread(String name,
-                        MyLoggingFacade logger,
+                        AbstractEnvironment environment,
                         MonitoredStoreInterface store) {
-        super(name, logger);
+        super(name, environment.getMyLogger());
         this.monitoredStore = store;
+        this.environment = environment;
         init();
     }
 
+    public AbstractEnvironment getEnvironment() {
+        return environment;
+    }
+
+    public void setEnvironment(AbstractEnvironment environment) {
+        this.environment = environment;
+    }
+
+    AbstractEnvironment environment;
     protected void init() {
         if (getCfg().hasAlarms()) {
             setAlarms(getCfg().getAlarms());
@@ -67,7 +77,7 @@ public class UpkeepThread extends MyThread {
                 sleep(nextCleanup);
 
                 try {
-                    UpkeepResponse upkeepResponse = monitoredStore.doUpkeep();
+                    UpkeepResponse upkeepResponse = monitoredStore.doUpkeep(getEnvironment());
                     if (getCfg().isTestOnly()) {
                         info(getName() + " in test mode. Upkeep stats:" + upkeepResponse.report(true));
                     }

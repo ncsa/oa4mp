@@ -1,7 +1,9 @@
 #! /usr/bin/env -S qdl-run
 
 /*
-   Tests the client with WLCG configuration
+   Tests the client with WLCG configuration and the device flow -- a common idiom.
+   There is a newer auto test that should be run as well.
+
    Client config 2023-06-16
 {"tokens": {
  "access":  {

@@ -61,12 +61,11 @@
   },
   "worplesdon": {
     "comment": [
-      "Record for Dahlia Worplesdon at St. Æþelðryþe's college in Cnobheresburg.",
+      "Record for Dahlia Worplesdon at St. Æþelðryþe's college in Giggleswick.",
       "This is for testing the WLCG token protocol. The access token handler gets this",
       "and then peels off the eduPersonEntitlement, each entry is a and may be returned in the scopes",
       "claim of the access token."
     ],
-    "dn": "voPersonID=MESS2468,ou=people,o=MESS,o=CO,dc=cilogon,dc=org",
     "first_name": "Dolly",
     "full_name": "Dahlia Worplesdon",
     "given_name": "Dahlia",
@@ -81,7 +80,7 @@
       "CO:COU:MESS Employee:members:active",
       "CO:COU:MESS Employee:members:all"
     ],
-    "voPersonExternalID": "threepwood@wærstan.edu",
+    "voPersonExternalID": "worplesdon@æþelðryþe.edu",
     "voPersonID": "MESS2468",
     "eduPersonEntitlement": [
       "storage.read:/home/${sub}/vo3",

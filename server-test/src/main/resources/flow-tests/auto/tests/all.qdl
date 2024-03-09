@@ -13,6 +13,8 @@ test.:= [
           [path + 'auto/tests/' +'oidc-id-token.qdl',initialization],
           [path + 'auto/tests/' +'oidc-scitokens.qdl',initialization],
           [path + 'auto/tests/' +'oidc-scitokens-template.qdl',initialization],
+          [path + 'auto/tests/' +'oidc-wlcg-template.qdl',initialization],
+          [path + 'auto/tests/' +'oidc-wlcg.qdl',initialization],
           [path + 'auto/tests/' +'rfc7523-grant.qdl'],
           [path + 'auto/tests/' +'rtx_exchanges.qdl', initialization],
           [path + 'auto/tests/' +'rtx_refreshes.qdl', initialization],

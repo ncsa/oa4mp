@@ -114,7 +114,7 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
                     MonitoredStoreInterface MonitoredStoreInterface = (MonitoredStoreInterface) store;
                     if (MonitoredStoreInterface.getUpkeepConfiguration() != null && MonitoredStoreInterface.getUpkeepConfiguration().isEnabled()) {
                         UpkeepThread upkeepThread = new UpkeepThread("upkeep thread for " + MonitoredStoreInterface.getClass().getSimpleName(),
-                                oa2SE.getMyLogger(), MonitoredStoreInterface);
+                                oa2SE, MonitoredStoreInterface);
                         upkeepThread.setStopThread(false);
                         upkeepThread.start();
                         upkeepThreads.add(upkeepThread);

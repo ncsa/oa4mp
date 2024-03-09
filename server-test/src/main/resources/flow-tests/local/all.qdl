@@ -1,4 +1,8 @@
 #! /usr/bin/env -S qdl-run
+/*
+    Tests code and device flows for various token types and such. Event hough there are
+    automated tests, the code paths initially are very different and must be tested.
+*/
 path:='test#/';
 test.:=(path + 'local/') + ['test_qdl.qdl',
                              'cil1550.qdl',
@@ -14,7 +18,7 @@ test.:=(path + 'local/') + ['test_qdl.qdl',
                              'scitokens2.qdl',
                              'test_ncsa.qdl',
                              'vo_test.qdl',
-                             'wlcg.qdl',
+                              'wlcg.qdl',
                              'fnal-0.qdl',
                              'fnal-1.qdl',
                              'fnal-2.qdl',

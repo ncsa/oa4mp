@@ -61,7 +61,8 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
         return OA4MPConfigTags.COMPONENT;
     }
 
-        protected  String logoName = "times";
+    protected String logoName = "times";
+
     /**
      * command line arguments are <br>
      * <ul>
@@ -75,6 +76,7 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
      *     None = none (same as -noLogo).
      *     Times is the default.</li>
      * </ul>
+     *
      * @param args
      * @throws Exception
      */
@@ -82,13 +84,13 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
         InputLine inputLine = new InputLine(args);
         showLogo = !inputLine.hasArg("-noLogo");
         showHeader = !inputLine.hasArg("-noHeader");
-        if(inputLine.hasArg("-silent")){
+        if (inputLine.hasArg("-silent")) {
             showHeader = false;
             showLogo = false;
         }
         boolean printStartup = inputLine.hasArg("-v");
-        if(inputLine.hasArg("-logo")){
-               logoName = inputLine.getNextArgFor("-logo").toLowerCase();
+        if (inputLine.hasArg("-logo")) {
+            logoName = inputLine.getNextArgFor("-logo").toLowerCase();
         }
 
         about();
@@ -101,13 +103,15 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
             return;
         }
         // pipe startup messages to dev null:
-        PrintStream out = System.out;
-        PrintStream err = System.err;
-        System.setOut(new PrintStream(OutputStream.nullOutputStream()));
-        System.setErr(new PrintStream(OutputStream.nullOutputStream()));
-        initialize();
-        System.setOut(out);
-        System.setErr(err);
+        if(getIOInterface() instanceof BasicIO) {
+            PrintStream out = System.out;
+            PrintStream err = System.err;
+            System.setOut(new PrintStream(OutputStream.nullOutputStream()));
+            System.setErr(new PrintStream(OutputStream.nullOutputStream()));
+            initialize();
+            System.setOut(out);
+            System.setErr(err);
+        }
     }
 
 

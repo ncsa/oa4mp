@@ -77,13 +77,13 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
     public void destroy() {
         super.destroy();
         shutdownCleanup(AbstractAccessTokenServlet2.txRecordCleanup); // try to shutdown cleanly
-        for(Store s : getOA2SE().getAllStores()){
-               if(s instanceof SQLStore){
-                   SQLStore sqlStore = (SQLStore) s;
-                   if(sqlStore.getConnectionPool() instanceof DerbyConnectionPool){
-                       sqlStore.getConnectionPool().shutdown();
-                   }
-               }
+        for (Store s : getOA2SE().getAllStores()) {
+            if (s instanceof SQLStore) {
+                SQLStore sqlStore = (SQLStore) s;
+                if (sqlStore.getConnectionPool() instanceof DerbyConnectionPool) {
+                    sqlStore.getConnectionPool().shutdown();
+                }
+            }
         }
     }
 
@@ -295,17 +295,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             }
         }
         OA2ServletUtils.processXAs(jsonRequest, serviceTransaction, client);
-/*
-        ExtendedParameters xp = new ExtendedParameters();
-        // Take the parameters and parse them into configuration objects,
-        JSONObject extAttr = xp.snoopParameters(jsonRequest);
-        // allow for setting templates
-        if (client.hasExtendedAttributeSupport()) {
-            if (extAttr != null && !extAttr.isEmpty()) {
-                serviceTransaction.setExtendedAttributes(extAttr);
-            }
-        }
-*/
+
         JSONObject claims = new JSONObject();
         claims.put(OA2Claims.SUBJECT, serviceTransaction.getUsername());
         serviceTransaction.setUserMetaData(claims); // set this so it exists for later.
@@ -391,6 +381,14 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         // This, among other things, runs QDL scripts.
         IssuerTransactionState issuerTransactionState = new IssuerTransactionState(request, response, new HashMap<>(),
                 serviceTransaction, backup, atiResponse2);
+        // Do the auth claims.
+        JWTRunner jwtRunner = new JWTRunner(serviceTransaction, ScriptRuntimeEngineFactory.createRTE(getOA2SE(), serviceTransaction, client.getConfig()));
+        OA2ClientUtils.setupHandlers(jwtRunner, getOA2SE(), serviceTransaction, client, null, null, null, request);
+        try {
+            jwtRunner.doAuthClaims();
+        } catch (Throwable throwable) {
+            OA2ServletUtils.handleScriptEngineException(this, getOA2SE(), throwable, createDebugger(serviceTransaction.getClient()), serviceTransaction, new XMLMap());
+        }
         issuerTransactionState = doAT(issuerTransactionState, client);
         // Now, get the right signing key
         VirtualOrganization vo = getOA2SE().getVO(client.getIdentifier());
@@ -872,7 +870,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 if (idToken != null) {
                     t = OA2TokenUtils.getTransactionFromTX(oa2se, idToken, debugger);
                 }
-                if(t!=null) {
+                if (t != null) {
                     debugger.trace("found transaction from TX record.");
                 }
 
@@ -1922,7 +1920,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(client);
         printAllParameters(request, debugger);
         String rawRefreshToken = request.getParameter(OA2Constants.REFRESH_TOKEN);
-        if(StringUtils.isTrivial(rawRefreshToken)){
+        if (StringUtils.isTrivial(rawRefreshToken)) {
             // Then this request is, in fact, invalid.
             // Fix https://github.com/ncsa/oa4mp/issues/166
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, "missing refresh token");
@@ -2515,7 +2513,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         try {
             // Fix https://github.com/ncsa/oa4mp/issues/164
             String verifier = request.getParameter(RFC7636Util.CODE_VERIFIER);
-             checkCodeChallenge(transaction, client, verifier);
+            checkCodeChallenge(transaction, client, verifier);
             doAT(issuerTransactionState, client);
         } catch (Throwable t) {
             rollback(backup);

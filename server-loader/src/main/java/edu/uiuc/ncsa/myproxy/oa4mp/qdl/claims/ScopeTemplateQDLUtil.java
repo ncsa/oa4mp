@@ -53,14 +53,14 @@ public class ScopeTemplateQDLUtil implements Serializable {
             }
 
             if (!(objects[0] instanceof QDLStem)) {
-                throw new IllegalArgumentException(" The first argument (for the computed scopes) must be a stem.");
+                throw new IllegalArgumentException(" " + getName() +"(0)  (computed scopes) must be a stem, got a '" + objects[0] + "'");
             }
             QDLStem allowedStem = (QDLStem) objects[0];
             if(allowedStem.isEmpty()){
                 return new QDLStem();
             }
             if (!(objects[1] instanceof QDLStem)) {
-                throw new IllegalArgumentException(" The second argument (for the requested scopes) must be a stem.");
+                throw new IllegalArgumentException(" " + getName() + "(1) (requested scopes)  must be a stem, got a '" + objects[1] + "'");
             }
 
             QDLStem requestedStem = (QDLStem) objects[1];
@@ -68,7 +68,7 @@ public class ScopeTemplateQDLUtil implements Serializable {
                 return new QDLStem();
             }
             if (!(objects[2] instanceof Boolean)) {
-                throw new IllegalArgumentException(" The third argument (if the operation queries available scopes) must be a boolean.");
+                throw new IllegalArgumentException(" " + getName() + "(2) (queries available scopes?)  must be a boolean, got '" + objects[2] + "'.");
             }
 
             Boolean isQuery = (Boolean) objects[2];

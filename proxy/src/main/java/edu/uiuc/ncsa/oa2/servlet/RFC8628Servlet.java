@@ -39,7 +39,7 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * Servlet that <b>starts</b> RFC 8628 a.a device flow .This issues a user code that the user
+ * Servlet that <b>starts</b> the RFC 8628 device flow .This issues a user code that the user
  * must present to an authorization endpoint.
  * <p>Created by Jeff Gaynor<br>
  * on 2/9/21 at  11:21 AM

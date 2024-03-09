@@ -681,13 +681,15 @@ public class OA2SE extends ServiceEnvironmentImpl {
     public List<Store> getAllStores() {
         if (storeList == null) {
             storeList = new ArrayList<>();
+            //Note that the admins then the clients should always come first.
+            // To extend this, append to it.
             storeList.add(getAdminClientStore());
             storeList.add(getClientStore());
             storeList.add(getClientApprovalStore());
-            storeList.add(getTransactionStore());
-            storeList.add(getVOStore());
-            storeList.add(getTxStore());
             storeList.add(getPermissionStore());
+            storeList.add(getVOStore());
+            storeList.add(getTransactionStore());
+            storeList.add(getTxStore());
         }
         return storeList;
     }

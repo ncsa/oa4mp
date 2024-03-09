@@ -5,6 +5,8 @@ import edu.uiuc.ncsa.security.core.util.IdentifiableImpl;
 
 import java.util.Date;
 
+import static edu.uiuc.ncsa.myproxy.oauth2.tools.migrate.MigrationConstants.IMPORT_CODE_NOT_DONE;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 2/25/24 at  7:50 AM
@@ -91,7 +93,7 @@ public class MigrationEntry extends IdentifiableImpl {
 
     boolean is_imported= false;
 
-    int importCode = MigrateStore.IMPORT_CODE_NOT_DONE;
+    int importCode = IMPORT_CODE_NOT_DONE;
 
     String error_message = null;
 

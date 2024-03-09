@@ -90,9 +90,9 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
     @Override
     public void init() throws Throwable {
         // set some standard claims.
-        if (getPayload().isEmpty()) {
+        //if (getPayload().isEmpty()) {
             setAccountingInformation();
-        }
+        //}
     }
 
     @Override

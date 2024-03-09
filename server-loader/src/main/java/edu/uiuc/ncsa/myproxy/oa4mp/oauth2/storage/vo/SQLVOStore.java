@@ -1,6 +1,5 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo;
 
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.monitored.OLDMonitoredSQLStore;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.monitored.MonitoredSQLStore;

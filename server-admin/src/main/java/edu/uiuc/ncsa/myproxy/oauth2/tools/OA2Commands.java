@@ -7,6 +7,11 @@ import edu.uiuc.ncsa.myproxy.oauth2.Banners;
 import edu.uiuc.ncsa.myproxy.oauth2.base.BaseCommands;
 import edu.uiuc.ncsa.myproxy.oauth2.base.ClientStoreCommands;
 import edu.uiuc.ncsa.myproxy.oauth2.base.CopyCommands;
+import edu.uiuc.ncsa.sas.SASCLIDriver;
+import edu.uiuc.ncsa.sas.StringIO;
+import edu.uiuc.ncsa.sas.thing.response.LogonResponse;
+import edu.uiuc.ncsa.sas.webclient.Client;
+import edu.uiuc.ncsa.sas.webclient.ResponseDeserializer;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import edu.uiuc.ncsa.security.core.util.LoggingConfigLoader;
@@ -24,6 +29,8 @@ import java.util.LinkedList;
  * on 4/3/14 at  1:23 PM
  */
 public class OA2Commands extends BaseCommands {
+
+
     public static final String PERMISSIONS = "permissions";
     public static final String ADMINS = "admins";
     public static final String TOKENS = "tokens";
@@ -52,9 +59,10 @@ public class OA2Commands extends BaseCommands {
     }
 
     protected ConfigurationLoader<? extends AbstractEnvironment> loader = null;
+
     @Override
     public ConfigurationLoader<? extends AbstractEnvironment> getLoader() {
-        if(loader == null) {
+        if (loader == null) {
             ConfigurationNode node =
                     XMLConfigUtil.findConfiguration(getConfigFile(), getConfigName(), getComponentName());
             loader = new OA2ConfigurationLoader<>(node, getMyLogger());
@@ -80,6 +88,11 @@ public class OA2Commands extends BaseCommands {
 
     public static void main(String[] args) {
         try {
+            InputLine inputLine = new InputLine(args);
+            if (inputLine.hasArg("-sas")) {
+                setupSAS(inputLine);
+                return;
+            }
             OA2Commands oa2Commands = new OA2Commands(null);
             oa2Commands.start(args); // read the command line options and such to set the state
             CLIDriver cli = new CLIDriver(oa2Commands); // actually run the driver that parses commands and passes them along
@@ -87,6 +100,17 @@ public class OA2Commands extends BaseCommands {
         } catch (Throwable t) {
             t.printStackTrace();
         }
+    }
+
+
+    protected static void setupSAS(InputLine inputLine) throws Throwable {
+        Client sasClient = Client.newInstance(inputLine);
+        sasClient.setResponseDeserializer(new ResponseDeserializer());
+        LogonResponse logonResponse = (LogonResponse) sasClient.doLogon();
+        SASCLIDriver sascliDriver = new SASCLIDriver(new StringIO(""));
+        OA2Commands oa2Commands = new OA2Commands(null);
+        sascliDriver.addCommands(oa2Commands);
+        sascliDriver.start();
     }
 
     @Override
@@ -110,19 +134,24 @@ public class OA2Commands extends BaseCommands {
     public void about() {
         about(showLogo, showHeader);
     }
+
     public void about(boolean showBanner, boolean showHeader) {
         int width = 60;
-        String banner=Banners.TIMES; // default
-        if(logoName.equals("roman")) banner = Banners.ROMAN;
-        if(logoName.equals("os2")) banner = Banners.OS2;
-        if(logoName.equals("times")) banner = Banners.TIMES;
-        if(logoName.equals("fraktur")) banner = Banners.FRAKTUR;
-        if(logoName.equals("plain")) banner = Banners.PLAIN;
-        if(logoName.equals("none")) {showBanner = false;}
+        String banner = Banners.TIMES; // default
+        if (logoName.equals("roman")) banner = Banners.ROMAN;
+        if (logoName.equals("os2")) banner = Banners.OS2;
+        if (logoName.equals("times")) banner = Banners.TIMES;
+        if (logoName.equals("fraktur")) banner = Banners.FRAKTUR;
+        if (logoName.equals("plain")) banner = Banners.PLAIN;
+        if (logoName.equals("none")) {
+            showBanner = false;
+        }
 
         String stars = StringUtils.rightPad("", width + 1, "*");
-        if(showBanner){say(banner);}
-        if(showHeader) {
+        if (showBanner) {
+            say(banner);
+        }
+        if (showHeader) {
             say(stars);
             say(padLineWithBlanks("* OA4MP CLI (Command Line Interpreter)", width) + "*");
             say(padLineWithBlanks("* Version " + LoggingConfigLoader.VERSION_NUMBER, width) + "*");
@@ -136,7 +165,7 @@ public class OA2Commands extends BaseCommands {
     OA2ClientCommands oa2ClientCommands = null;
 
     @Override
-    public ClientStoreCommands getNewClientStoreCommands() throws Throwable{
+    public ClientStoreCommands getNewClientStoreCommands() throws Throwable {
         if (oa2ClientCommands == null) {
             oa2ClientCommands = new OA2ClientCommands(getMyLogger(),
                     "  ",
@@ -145,7 +174,7 @@ public class OA2Commands extends BaseCommands {
                     getOA2SE().getPermissionStore());
             oa2ClientCommands.setRefreshTokensEnabled(getOA2SE().isRefreshTokenEnabled());
             oa2ClientCommands.setSupportedScopes(getOA2SE().getScopes());
-     //       oa2ClientCommands.setUucConfiguration(getOA2SE().getUucConfiguration());
+            //       oa2ClientCommands.setUucConfiguration(getOA2SE().getUucConfiguration());
             oa2ClientCommands.setOA2SE(getOA2SE());
         }
         return oa2ClientCommands;
@@ -250,7 +279,9 @@ public class OA2Commands extends BaseCommands {
     public void bootstrap() throws Throwable {
 
     }
-      HelpUtil helpUtil = new HelpUtil();
+
+    HelpUtil helpUtil = new HelpUtil();
+
     @Override
     public HelpUtil getHelpUtil() {
         return helpUtil;
@@ -258,12 +289,12 @@ public class OA2Commands extends BaseCommands {
 
     @Override
     public void setLoader(ConfigurationLoader<? extends AbstractEnvironment> loader) {
-   this.loader = loader;
+        this.loader = loader;
     }
 
     @Override
     protected ConfigurationLoader<? extends AbstractEnvironment> figureOutLoader(String fileName, String configName) throws Throwable {
-        ConfigLoaderTool configLoaderTool= new ConfigLoaderTool();
+        ConfigLoaderTool configLoaderTool = new ConfigLoaderTool();
         return configLoaderTool.figureOutServerLoader(fileName, configName, getComponentName());
     }
 }
