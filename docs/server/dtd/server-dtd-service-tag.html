@@ -48,7 +48,7 @@
     
         
                     <div class="xleft">
-            Last Published: 2023-11-09
+            Last Published: 2024-03-13
                                 </div>
                 <div class="xright">            
     
@@ -58,7 +58,7 @@
                         
     
         
-                         Version: 5.3-SNAPSHOT
+                         Version: 5.5
             </div>
     <div class="clear">
         <hr/>
@@ -91,6 +91,10 @@
               
     <li class="none">
                         <a href="../../common/configuration/supported-specifications.html">Supported specification</a>
+            </li>
+              
+    <li class="none">
+                        <a href="https://github.com/ncsa/oa4mp" class="externalLink">Source</a>
             </li>
               
     <li class="none">
@@ -138,7 +142,6 @@
 <div id="bodyColumn">
     <div id="contentBox">
         
-
 
 
 
@@ -327,14 +330,15 @@
         
 <td style="vertical-align: top;">N</td>
         
-<td style="vertical-align: top;">900</td>
+<td style="vertical-align: top;">900 sec</td>
         
-<td style="vertical-align: top;"><span style="background-color: #ff6600;">OAuth 2</span>
-            specific. This will set the lifetime of access tokens, in seconds, issued by
+<td style="vertical-align: top;">
+            specific. This will set the lifetime of access tokens issued by
             the server. The default is 900 seconds = 15 minutes. Note that generally access tokens should have
             much shorter lifetime than refresh tokens. The reason is that access tokens allow access to a resource
             and refresh tokens let a client get access tokens. Best practices is that an access token is gotten
-            for a specific task and should be therefore short lived. Clients may request different lifetimes, but
+            for a specific task and should be therefore short lived. Clients may set this to -1
+            which means to use this value. Clients may request different lifetimes, but
             are limited to the maximum value as set below. See note below on units.
         </td>
     </tr>
@@ -345,16 +349,34 @@
         
 <td style="vertical-align: top;">N</td>
         
-<td style="vertical-align: top;">900</td>
+<td style="vertical-align: top;">900 sec</td>
         
-<td style="vertical-align: top;"><span style="background-color: #ff6600;">OAuth 2</span>
-            specific. This will set the lifetime of id tokens, in seconds, issued by
+<td style="vertical-align: top;">
+            specific. This will set the lifetime of id tokens issued by
             the server. The default is 900 seconds = 15 minutes. Clients may request different lifetimes, but
-            are limited to the maximum value as st below. See note below on units.
+            are limited to the maximum value as st below. See note below on units. Clients may set this to -1
+            which means to use this value.
         </td>
     </tr>
     
-<tr class="b" id="demoModeEnabled">
+<tr class="b" id="defaultRefreshTokenLifetime">
+        
+<td style="vertical-align: top;">defaultRefreshTokenLifetime</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">1296000 sec</td>
+        
+<td style="vertical-align: top;">
+            specific. This will set the lifetime of refresh tokens issued by
+            the server. The default is 129600 seconds = 15 days.  Clients may request different lifetimes, but
+            are limited to the maximum value as set below. See note below on units. Clients may also
+            set their value to 0 (zero) which disabled refresh tokens or -1 which means to use
+            this value.
+        </td>
+    </tr>
+    
+<tr class="a" id="demoModeEnabled">
         
 <td style="vertical-align: top;">demoModeEnabled</td>
         
@@ -368,7 +390,7 @@
         </td>
     </tr>
     
-<tr class="a" id="disableDefaultStores">
+<tr class="b" id="disableDefaultStores">
         
 <td style="vertical-align: top;">disableDefaultStores</td>
         
@@ -377,16 +399,15 @@
 <td style="vertical-align: top;">true</td>
         
 <td style="vertical-align: top;">Allow the server
-            to use memory stores if no other store is explicitly set. If set to true, this will make the server throw
-            an
-            exception if there is no store configured. The default is true precisely to force you to explicitly enable
-            this,
+            to use memory stores if no other store is explicitly set. If set to true, this will
+            make the server throw an exception if there is no store configured. The default is
+            true precisely to force you to explicitly enable this,
             since otherwise a store misconfiguration might be a silent error and everything (such as client
             registrations, approvals, etc.) might end up in memory where they would vanish at service restart.
         </td>
     </tr>
     
-<tr class="b" id="enableDeviceFlow">
+<tr class="a" id="enableDeviceFlow">
         
 <td style="vertical-align: top;">enableDeviceFlow</td>
         
@@ -403,7 +424,7 @@
     </tr>
 
     
-<tr class="a" id="enableTokenExchange">
+<tr class="b" id="enableTokenExchange">
         
 <td style="vertical-align: top;">enableTokenExchange</td>
         
@@ -416,7 +437,7 @@
         </td>
     </tr>
     
-<tr class="b" id="enableTwoFactorSupport">
+<tr class="a" id="enableTwoFactorSupport">
         
 <td style="vertical-align: top;">enableTwoFactorSupport</td>
         
@@ -428,7 +449,7 @@
         </td>
     </tr>
     
-<tr class="a" id="issuer">
+<tr class="b" id="issuer">
         
 <td style="vertical-align: top;">issuer</td>
         
@@ -442,7 +463,7 @@
         </td>
     </tr>
     
-<tr class="b" id="maxAccessTokenLifetime">
+<tr class="a" id="maxAccessTokenLifetime">
         
 <td style="vertical-align: top;">maxAccessTokenLifetime</td>
         
@@ -458,7 +479,7 @@
         </td>
     </tr>
     
-<tr class="a" id="maxAllowedNewClientRequests">
+<tr class="b" id="maxAllowedNewClientRequests">
         
 <td style="vertical-align: top;">maxAllowedNewClientRequests</td>
         
@@ -474,7 +495,7 @@
         </td>
     </tr>
     
-<tr class="b" id="maxAuthorizationGrantLifetime">
+<tr class="a" id="maxAuthorizationGrantLifetime">
         
 <td style="vertical-align: top;">maxAuthorizationGrantLifetime</td>
         
@@ -492,7 +513,7 @@
         </td>
     </tr>
     
-<tr class="a" id="maxIDTokenLifetime">
+<tr class="b" id="maxIDTokenLifetime">
         
 <td style="vertical-align: top;">maxIDTokenLifetime</td>
         
@@ -509,7 +530,7 @@
         </td>
     </tr>
     
-<tr class="b" id="maxClientRefreshTokenLifetime">
+<tr class="a" id="maxClientRefreshTokenLifetime">
         
 <td style="vertical-align: top;">maxClientRefreshTokenLifetime</td>
         
@@ -525,7 +546,7 @@
         </td>
     </tr>
     
-<tr class="a" id="maxRefreshTokenLifetime">
+<tr class="b" id="maxRefreshTokenLifetime">
         
 <td style="vertical-align: top;">maxRefreshTokenLifetime</td>
         
@@ -540,7 +561,7 @@
         </td>
     </tr>
     
-<tr class="b" id="enableMonitor">
+<tr class="a" id="enableMonitor">
         
 <td style="vertical-align: top;">monitorEnable</td>
         
@@ -556,7 +577,7 @@
         </td>
     </tr>
     
-<tr class="a" id="monitorInterval">
+<tr class="b" id="monitorInterval">
         
 <td style="vertical-align: top;">monitorInterval</td>
         
@@ -567,7 +588,7 @@
 <td style="vertical-align: top;">How often should the monitor thread run.</td>
     </tr>
     
-<tr class="b" id="monitorAlarms">
+<tr class="a" id="monitorAlarms">
         
 <td style="vertical-align: top;">monitorAlarms</td>
         
@@ -589,7 +610,7 @@
 
     
     
-<tr class="a" id="name">
+<tr class="b" id="name">
         
 <td style="vertical-align: top;">name</td>
         
@@ -602,7 +623,7 @@
         </td>
     </tr>
     
-<tr class="b" id="OIDCEnabled">
+<tr class="a" id="OIDCEnabled">
         
 <td style="vertical-align: top;">OIDCEnabled</td>
         
@@ -618,7 +639,7 @@
         </td>
     </tr>
     
-<tr class="a" id="pingable">
+<tr class="b" id="pingable">
         
 <td style="vertical-align: top;">pingable</td>
         
@@ -634,7 +655,7 @@
     </tr>
 
     
-<tr class="b" id="pollingDirectory">
+<tr class="a" id="pollingDirectory">
         
 <td style="vertical-align: top;">pollingDirectory</td>
         
@@ -650,7 +671,7 @@
         </td>
     </tr>
     
-<tr class="a" id="pollingInterval">
+<tr class="b" id="pollingInterval">
         
 <td style="vertical-align: top;">pollingInterval</td>
         
@@ -664,7 +685,7 @@
     </tr>
 
     
-<tr class="b" id="printTSInDebug">
+<tr class="a" id="printTSInDebug">
         
 <td style="vertical-align: top;">printTSInDebug</td>
         
@@ -680,7 +701,7 @@
     </tr>
 
     
-<tr class="a" id="qdlConfigName">
+<tr class="b" id="qdlConfigName">
         
 <td style="vertical-align: top;">qdlConfigName</td>
         
@@ -696,7 +717,7 @@
         </td>
     </tr>
     
-<tr class="b" id="refreshTokenEnabled">
+<tr class="a" id="refreshTokenEnabled">
         
 <td style="vertical-align: top;">refreshTokenEnabled</td>
         
@@ -712,7 +733,7 @@
         </td>
     </tr>
     
-<tr class="a" id="refreshTokenLifetime">
+<tr class="b" id="refreshTokenLifetime">
         
 <td style="vertical-align: top;">refreshTokenLifetime</td>
         
@@ -724,7 +745,7 @@
         </td>
     </tr>
     
-<tr class="b" id="rfc7636Required">
+<tr class="a" id="rfc7636Required">
         
 <td style="vertical-align: top;">rfc7636Required</td>
         
@@ -740,7 +761,7 @@
         </td>
     </tr>
     
-<tr class="a" id="rtGracePeriod">
+<tr class="b" id="rtGracePeriod">
         
 <td style="vertical-align: top;">rtGracePeriod</td>
         
@@ -757,7 +778,7 @@
         </td>
     </tr>
     
-<tr class="b" id="safe_gc">
+<tr class="a" id="safe_gc">
         
 <td style="vertical-align: top;">safe_gc</td>
         
@@ -773,7 +794,7 @@
         </td>
     </tr>
     
-<tr class="a" id="scheme">
+<tr class="b" id="scheme">
         
 <td style="vertical-align: top;">scheme</td>
         
@@ -789,7 +810,7 @@
         </td>
     </tr>
     
-<tr class="b" id="schemeSpecificPart">
+<tr class="a" id="schemeSpecificPart">
         
 <td style="vertical-align: top;">schemeSpecificPart</td>
         
@@ -802,7 +823,7 @@
         </td>
     </tr>
     
-<tr class="a" id="serverDN">
+<tr class="b" id="serverDN">
         
 <td style="vertical-align: top;">serverDN</td>
         
@@ -818,7 +839,7 @@
     </tr>
 
     
-<tr class="b" id="version">
+<tr class="a" id="version">
         
 <td style="vertical-align: top;">version</td>
         
@@ -833,8 +854,8 @@
     </tbody>
 </table>
 
-</section><section>
-<h2><a name="A_note_on_time_and_units"></a>A note on time and units</h2>
+</section><section id="NoteOnUnits">
+<h2 id="NoteOnUnits">A note on time and units</h2>
 
 <p>As of 5.1, all the times for grants, access tokens and refresh tokens may have units
     specified. So this is a perfectly acceptable snipped from a configuration file:</p>
@@ -846,9 +867,9 @@
              enableTwoFactorSupport=&quot;false&quot;
              authorizationGrantLifetime=&quot;12345&quot;
              defaultAccessTokenLifetime=&quot;1009000 ms&quot;
-             maxAccessTokenLifetime=&quot;1800 sec&quot;
+             maxAccessTokenLifetime=&quot;30 mins.&quot;
              maxClientRefreshTokenLifetime=&quot;2592000 sec&quot;
-             maxRefreshTokenLifetime=&quot;1000000s.&quot;
+             maxRefreshTokenLifetime=&quot;2 weeks&quot;
              refreshTokenEnabled=&quot;true&quot;
              enableTokenExchange=&quot;true&quot;
              serverDN=&quot;CN=localhost2&quot;
@@ -856,42 +877,134 @@
 </pre></div>
 
 <p>Note that, in order to maintain backwards compatibility, the assumption is that all of these <i>without</i>
-    units are in <b>seconds</b>. Blanks before and after units are allowed. Acceptable units are</p>
+    units are in <b>seconds</b>. Blanks before and after units are allowed. Units may be plural as needed and short forms may
+    optionally end with a period. They are also case insensitive. So all of these are the same:</p>
 
 <ul>
     
-<li>&quot;ms.&quot;, &quot;ms&quot; for milliseconds, e.g. &quot;1000 ms.&quot;</li>
+<li>3600 s</li>
     
-<li>&quot;sec.&quot;, &quot;sec&quot;, &quot;s.&quot;, &quot;s&quot; for seconds, e.g., &quot;300 sec&quot;</li>
+<li>3600s</li>
     
-<li>&quot;min.&quot;, &quot;min&quot;, &quot;mins.&quot;, &quot;mins&quot; for minutes, e.g. &quot;20 min.&quot;</li>
+<li>3600 &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;s</li>
     
-<li>&quot;hr.&quot;, &quot;hr&quot;, &quot;hrs.&quot;, &quot;hrs&quot; for hours, &quot;e.g. 2 hrs.&quot;</li>
+<li>3600 s.</li>
     
-<li>&quot;day&quot;, &quot;days&quot; for days, e.g. &quot;1 day&quot;, &quot;10 days&quot;</li>
+<li>3600 sec</li>
+    
+<li>3600 sec.</li>
+    
+<li>3600 secs</li>
+    
+<li>3600 secs.</li>
+    
+<li>3600 Secs.</li>
+    
+<li>3600 seconds</li>
+    
+<li>3600 seconDs</li>
 </ul>
+<section>
+<h3><a name="Table_of_allowed_units:"></a>Table of allowed units:</h3>
 
-</section><section>
+<table class="bodyTable" style="text-align: left; width: 100%;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;horiz-align: center"><b>Short</b></td>
+        
+<td style="vertical-align: top;horiz-align: center"><b>Long</b></td>
+        
+<td style="vertical-align: top;horiz-align: center"><b>Description</b></td>
+    </tr>
+    
+<tr class="b" id="ms">
+        
+<td style="vertical-align: top;">ms</td>
+        
+<td style="vertical-align: top;">millisecond</td>
+        
+<td style="vertical-align: top;">milliseconds</td>
+    </tr>
+
+    
+<tr class="a" id="sec">
+        
+<td style="vertical-align: top;">s or sec</td>
+        
+<td style="vertical-align: top;">second</td>
+        
+<td style="vertical-align: top;">seconds</td>
+    </tr>
+    
+<tr class="b" id="minutes">
+        
+<td style="vertical-align: top;">min</td>
+        
+<td style="vertical-align: top;">minute</td>
+        
+<td style="vertical-align: top;">minutes</td>
+    </tr>
+    
+<tr class="a" id="hours">
+        
+<td style="vertical-align: top;">hr</td>
+        
+<td style="vertical-align: top;">hour</td>
+        
+<td style="vertical-align: top;">hours, defined as 3600 seconds</td>
+    </tr>
+    
+<tr class="b" id="days">
+        
+<td style="vertical-align: top;">d</td>
+        
+<td style="vertical-align: top;">day</td>
+        
+<td style="vertical-align: top;">days, one day is 24 hours</td>
+    </tr>
+    
+<tr class="a" id="weeks">
+        
+<td style="vertical-align: top;">wk</td>
+        
+<td style="vertical-align: top;">week</td>
+        
+<td style="vertical-align: top;">weeks, one week is 7 days</td>
+    </tr>
+    
+<tr class="b" id="month">
+        
+<td style="vertical-align: top;">mo</td>
+        
+<td style="vertical-align: top;">month</td>
+        
+<td style="vertical-align: top;">months, one month is 30 days</td>
+    </tr>
+    
+<tr class="a" id="year">
+        
+<td style="vertical-align: top;">yr</td>
+        
+<td style="vertical-align: top;">year</td>
+        
+<td style="vertical-align: top;">year, one year is 365.25 days</td>
+    </tr>
+
+    </tbody>
+</table>
+
+
+</section></section><section>
 <h2><a name="Notes"></a>Notes</h2>
 
 <p>The <span style="font-weight: bold;">name</span> can be anything. The name of the configuration to use may be
     specified in the deployment descriptor (web.xml) file. If there is a single configuration in the file, that will be
     used. If there are multiple configurations and no name is specified, an exception is raised.</p>
 
+
 <section>
-<h3><a name="A_Note_on_using_Two_Factor_Authentication"></a>A Note on using Two Factor Authentication</h3>
-
-
-<p>Due to the way Two Factor works, this effectively allows you to get only a single certificate once.
-    Because Two Factor generates a one time password that is very short lived (typically only a minute or perhaps 2
-    at the most), it is possible to wait too long before logging in (done when getting the cert) and have this fail.
-    Also, as stated elsewhere and worth repeating that ever so often, Two Factor offers a challenge that requires you to
-    log on to the RSA self-service console (For the NCSA, this is located at <a class="externalLink" href="https://otp.ncsa.illinois.edu/">otp</a>)
-    and then exchange the next token. This is impossible to do within the delegation service, so if
-    Two Factor requires this, get certs will fail with an &quot;invalid password&quot; message until further notice.
-</p>
-
-</section><section>
 <h3><a name="Example_1."></a>Example 1.</h3>
 
 <div>
@@ -945,7 +1058,6 @@
 <div>
 <pre>cern:oa4mp,2012:/client_id/....</pre></div>
 
-
 </section></section>
 
     </div>
@@ -955,7 +1067,7 @@
 </div>
 <div id="footer">
     <div class="xright">&#169;    
-                    2023
+                    2024
         
                     
     

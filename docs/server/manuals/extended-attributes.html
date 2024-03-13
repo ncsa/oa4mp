@@ -48,7 +48,7 @@
     
         
                     <div class="xleft">
-            Last Published: 2023-12-06
+            Last Published: 2024-03-13
                                 </div>
                 <div class="xright">            
     
@@ -58,7 +58,7 @@
                         
     
         
-                         Version: 5.4.2
+                         Version: 5.5
             </div>
     <div class="clear">
         <hr/>
@@ -91,6 +91,10 @@
               
     <li class="none">
                         <a href="../../common/configuration/supported-specifications.html">Supported specification</a>
+            </li>
+              
+    <li class="none">
+                        <a href="https://github.com/ncsa/oa4mp" class="externalLink">Source</a>
             </li>
               
     <li class="none">
@@ -151,17 +155,28 @@ of the OAuth flow. They are of the form</p>
     org.oa4mp:X=Y
 </pre></div>
 
-<p>Where x is a name or a path and Y is the intended value. You may multiple values. Note
+<p>Where x is a name or a path and Y is the intended value. You may send multiple values. Note
 the policy for sending these: They simply replace what is there or add it if nothing
 was there. It is therefore best to send them in the initial request and be done with it.</p>
 <section>
 <h2><a name="What_do_they_do.3F"></a>What do they do?</h2>
 
 <p>They allow for a namespace-qualified way to send specific parameters to an OA4MP server's
-    policy engine (i.e., <a class="externalLink" href="https://qdl-lang.org">QDL</a>). Now, none of them are directly used by OA4MP, so if your scripts
-    do not use them, they are ignored.
+    policy engine (i.e., <a class="externalLink" href="https://qdl-lang.org">QDL</a>). Now, none of them are
+    directly used by OA4MP, so if your scripts  do not use them, they are ignored.
     They are made available to QDL in the <b>xas.</b> stem.</p>
-</section><section>
+<section>
+<h3><a name="Clients_need_to_have_support_enabled"></a>Clients need to have support enabled</h3>
+
+<p>Clients need to have support for extended attributes enabled, either in the CLI using the ea_support
+command or when registering the client dynamically, sending the boolean-valued
+ea_support parameter. See <a href="dynamic-client-registration.html">dynamic client registration</a>
+    for more details. Failing to do so will simply have them stripped from the
+request and ignored.</p>
+
+<p>There is a sample QDL script that simply processed certain ones and echos the
+values in tokens. See <a class="externalLink" href="https://github.com/ncsa/oa4mp/blob/master/server-test/src/main/resources/flow-tests/auto/server/process-xas.qdl">process-xas.qdl</a>.</p>
+</section></section><section>
 <h2><a name="Example"></a>Example</h2>
 
 <p>Let us say you made the following request to the authorization end point:</p>
@@ -212,7 +227,7 @@ are treated as individual entries.</p>
 </div>
 <div id="footer">
     <div class="xright">&#169;    
-                    2023
+                    2024
         
                     
     
