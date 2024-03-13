@@ -1316,6 +1316,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
 
     protected long getRTLifetime() {
         if (rtLifetime < 0) {
+            // Fixes https://github.com/ncsa/oa4mp/issues/152
             String x = getFirstAttribute(cn, DEFAULT_REFRESH_TOKEN_LIFETIME);
             if (isTrivial(x)) {
                 // Old way

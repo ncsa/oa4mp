@@ -9,7 +9,6 @@
 */
 path := 'test#/cm-tests/';
 script_path(path ~ script_path());
-say( script_path());
 test.:= path + ['cm-basic.qdl',
                 'cm-private-key.qdl',
                 'cm-extra.qdl',
@@ -21,7 +20,6 @@ test.:= path + ['cm-basic.qdl',
                 'anon-cfg.qdl',
                 'anon-extra.qdl',
                 'cm-cleanup.qdl'];
-say(print(test.));
 say('Running all client management tests');
 say('--------------------');
 http := j_load('http');

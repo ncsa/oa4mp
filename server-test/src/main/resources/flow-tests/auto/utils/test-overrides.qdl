@@ -1,0 +1,133 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   Tests a client for overrides. this does not test scopes, spec
+   compliance or a host of other things, just that passing in overrides
+   works vis-a-vis the server defaults and the client.
+   The AT and IDT max lifetimes in the client are larger than the
+   server max so these check if the logic is applied on the server.
+
+   Note that this will get the client configuration from the server and
+   test against that.
+
+   Arguments are
+   0 - the initialization module for this client
+   1 - the client id
+   2 - the specific parameters for the test.
+
+*/
+
+       test_id := args().0;
+       params. := args().1;
+initialization := args().2;
+
+/*
+params. ≔ {'sub':'jeff', 'scope':'openid'};
+test_id:= 'oidc.conf.overrides';
+clc#init($$OA4MP_CLC_INI, test_id);
+initialization := size(args())==1⇒args().0:import(load('test#/auto/utils/initialization.mdl'));
+*/
+
+clc#init($$OA4MP_CLC_INI, test_id);
+ini.:=initialization#get_client_ini(test_id);
+server_defaults.:=initialization# server_defaults();
+client.:=initialization#get_client_config(test_id); // This is the client configuration from the server
+
+// first part of test is to get tokens with the server defaults.
+λat()->test_util#at_lifetime(server_defaults., client.);
+λat(requested)->test_util#at_lifetime(server_defaults., client., requested);
+
+λrt()->test_util#rt_lifetime(server_defaults., client.);
+λrt(requested)->test_util#rt_lifetime(server_defaults., client., requested);
+
+λidt()->test_util#idt_lifetime(server_defaults., client.);
+λidt(requested)->test_util#idt_lifetime(server_defaults., client., requested);
+
+
+tokens. := clc#rfc7523(params.);
+//say('client:\n' + print(client\['at_lifetime','max_at_lifetime','rt_lifetime','max_rt_lifetime','idt_lifetime','max_id_token_lifetime']));
+//say('client:\n' + print(client.));
+//say('server:\n' + print(server_defaults.));
+//say('at =' + (tokens.'access_token'.'lifetime') + ', λ=' + λat());
+//say('server=' + (1000*client.'at_lifetime'));
+
+⊨ tokens.'access_token'.'lifetime' == λat() : 'wrong initial access token lifetime, expected ' + (tokens.'access_token'.'lifetime') + ', got ' + lt('at_lifetime');
+⊨ ∃tokens.'refresh_token' : 'should  get a refresh token.';
+⊨ tokens.'refresh_token'.'lifetime' == λrt() : 'wrong initial refresh token lifetime, expected ' + (tokens.'refresh_token'.'lifetime') + ', got ' + lt('rt_lifetime') ;
+claims. := clc#claims();
+idt_lifetime := (claims.'exp' - claims.'iat')*1000;
+//⊨ idt_lifetime == 1000*client.'id_token_lifetime' : 'wrong id token lifetime, got '+ idt_lifetime;
+⊨ size(clc#claims()) != 0 : ' did not get claims';
+
+// Part 2: client maxes
+// set them to twice what they should be allowed to be and check the
+// right value is used
+params.'at_lifetime':=2000*client.'max_at_lifetime'; // client fields are in sec.
+params.'rt_lifetime':=2000*client.'max_rt_lifetime';
+params.'id_token_lifetime':=2000*client.'max_id_token_lifetime';
+tokens. := clc#rfc7523(params.);
+claims. := clc#claims();
+//say('claims:\n' + print(claims.));
+idt_lifetime := (claims.'exp' - claims.'iat')*1000;
+
+//say('at =' + (tokens.'access_token'.'lifetime') + ', λ = ' + λat(params.'at_lifetime'));
+//say('rt =' + (tokens.'refresh_token'.'lifetime')+ ', λ = ' + λrt(params.'rt_lifetime'));
+//say('idt =' + idt_lifetime + ', λ = ' + λidt(params.'id_token_lifetime'));
+//say('Past checks 0');
+//say(params.'at_lifetime');
+//say('Past checks 0.5');
+//say(λat(params.'at_lifetime'));
+//say('Past checks 0.75');
+//say(λat(4000000));
+//say(tokens.'access_token'.'lifetime' == λat(params.'at_lifetime'));
+
+⊨ tokens.'access_token'.'lifetime' == λat(params.'at_lifetime') : 'wrong access token initial max lifetime';
+⊨ tokens.'refresh_token'.'lifetime' ==  λrt(params.'rt_lifetime') : 'wrong refresh token initial max lifetime';
+⊨ idt_lifetime == λidt(params.'id_token_lifetime') : 'wrong id token initial max lifetime, expected ' + idt_lifetime + ', got ' + λidt(params.'id_token_lifetime');
+
+// check these persist
+tokens.:=clc#refresh();
+claims. := clc#claims();
+idt_lifetime := (claims.'exp' - claims.'iat')*1000;
+// The client max AT is 2000 sec. and server is 1800 sec., so server is enforced.
+⊨ tokens.'access_token'.'lifetime' == λat(params.'at_lifetime') : 'wrong access token refresh max lifetime';
+⊨ tokens.'refresh_token'.'lifetime' ==  λrt(params.'rt_lifetime') : 'wrong refresh token refresh max lifetime';
+⊨ idt_lifetime == λidt(params.'id_token_lifetime') : 'wrong id token refresh max lifetime';
+
+at. := clc#exchange('-at','-subject','rt').'access_token';
+rt. := clc#exchange('-rt','-subject','rt').'refresh_token';
+     claims. := clc#exchange('-id','-subject','rt');
+idt_lifetime := (claims.'exp' - claims.'iat')*1000;
+⊨ at.'lifetime' == λat(params.'at_lifetime') : 'wrong access token exchange max lifetime';
+⊨ rt.'lifetime' ==  λrt(params.'rt_lifetime') : 'wrong refresh token exchange max lifetime';
+⊨ idt_lifetime == λidt(params.'id_token_lifetime') : 'wrong id token exchange max lifetime';
+
+
+
+// Part 3, check that overrides work
+params.'at_lifetime':='1483 sec.';
+params.'rt_lifetime':='3433 sec.';
+params.'id_token_lifetime':='967 sec.';
+tokens. := clc#rfc7523(params.);
+claims. := clc#claims();
+idt_lifetime := (claims.'exp' - claims.'iat')*1000;
+⊨ tokens.'access_token'.'lifetime' == 1483000 : 'wrong access token initial override lifetime';
+⊨ tokens.'refresh_token'.'lifetime' == 3433000 : 'wrong refresh token initial override lifetime';
+⊨ idt_lifetime == 967000 : 'wrong id token initial override lifetime';
+
+// check these persist
+tokens.:=clc#refresh();
+claims. := clc#claims();
+idt_lifetime := (claims.'exp' - claims.'iat')*1000;
+⊨ tokens.'access_token'.'lifetime' == 1483000 : 'wrong access token refresh override lifetime';
+⊨ tokens.'refresh_token'.'lifetime' == 3433000 : 'wrong refresh token refresh override lifetime';
+⊨ idt_lifetime == 967000 : 'wrong id token refresh override lifetime';
+
+at. := clc#exchange('-at','-subject','rt').'access_token';
+rt. := clc#exchange('-rt','-subject','rt').'refresh_token';
+     claims. := clc#exchange('-id','-subject','rt');
+idt_lifetime := (claims.'exp' - claims.'iat')*1000;
+⊨ at.'lifetime' == 1483000 : 'wrong access token  exchange override  lifetime';
+⊨ rt.'lifetime' == 3433000 : 'wrong refresh token exchange override  lifetime';
+⊨ idt_lifetime == 967000 : 'wrong id token exchange override  lifetime';
+

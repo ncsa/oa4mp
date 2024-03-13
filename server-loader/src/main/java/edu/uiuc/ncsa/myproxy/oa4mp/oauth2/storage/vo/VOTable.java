@@ -6,8 +6,6 @@ import edu.uiuc.ncsa.security.storage.sql.internals.Table;
 
 import java.sql.Types;
 
-import static java.sql.Types.TIMESTAMP;
-
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 2/16/21 at  9:05 AM

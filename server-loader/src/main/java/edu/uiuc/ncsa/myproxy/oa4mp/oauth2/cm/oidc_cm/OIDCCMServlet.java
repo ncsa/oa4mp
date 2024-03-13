@@ -121,7 +121,7 @@ public class OIDCCMServlet extends EnvServlet {
             AdminClient adminClient = null;
             try {
                 adminClient = getAndCheckAdminClient(httpServletRequest); // Need this to verify admin client.
-            } catch (GeneralException ge) {
+            } catch (Throwable ge) {
                 if (!getOA2SE().getCmConfigs().getRFC7591Config().anonymousOK) {
                     throw ge;
                 }
@@ -235,6 +235,7 @@ public class OIDCCMServlet extends EnvServlet {
             jsonObject.put(MAX_REFRESH_LIFETIME, getOA2SE().getMaxRTLifetime() / 1000);
             jsonObject.put(MAX_ACCESS_TOKEN_LIFETIME, getOA2SE().getMaxATLifetime() / 1000);
             jsonObject.put(MAX_ID_TOKEN_LIFETIME, getOA2SE().getMaxIdTokenLifetime() / 1000);
+            jsonObject.put("idt_max_lifetime", getOA2SE().getMaxIdTokenLifetime() / 1000); // same tag as in client cfg
             jsonObject.put(AUTH_GRANT_TOKEN_LIFETIME, getOA2SE().getAuthorizationGrantLifetime() / 1000);
             jsonObject.put("use_server_default", OA2Client.USE_SERVER_DEFAULT);
             jsonObject.put(OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_TAG, getOA2SE().getRtGracePeriod() / 1000);

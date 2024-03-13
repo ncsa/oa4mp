@@ -9,6 +9,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -66,6 +67,8 @@ public class ClientApprovalStoreCommands extends StoreCommands2 {
         info("Starting update for client approval id=" + identifiable.getIdentifierString());
         sayi("Enter the information for the client approval");
         clientApproval.setApprover(getPropertyHelp(keys.approver(),"name of the approver", clientApproval.getApprover()));
+        // Fix https://github.com/ncsa/oa4mp/issues/168
+        clientApproval.setApprovalTimestamp(new Date());
         boolean isapproved = isOk(getPropertyHelp(keys.approved(),"set approved?", clientApproval.isApproved() ? "y" : "n"));
         if (isapproved) {
             clientApproval.setApproved(true);

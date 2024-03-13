@@ -31,6 +31,8 @@ public class VOConverter<V extends VirtualOrganization> extends MapConverter<V> 
 
         vo.setCreationTS(new Date(map.getLong(vok().creationTS())));
         vo.setLastModifiedTS(new Date(map.getLong(vok().lastModifiedTS())));
+
+        // Fixes https://github.com/ncsa/oa4mp/issues/149
         vo.setLastAccessed(new Date(map.getLong(vok().lastAccessed())));
         vo.setValid(map.getBoolean(vok().valid()));
 
@@ -69,6 +71,7 @@ public class VOConverter<V extends VirtualOrganization> extends MapConverter<V> 
         data.put(vok().creationTS(), value.getCreationTS().getTime());
         data.put(vok().lastModifiedTS(), value.getLastModifiedTS().getTime());
         if(value.getLastAccessed()!=null) {
+            // Fixes https://github.com/ncsa/oa4mp/issues/149
             data.put(vok().lastAccessed(), value.getLastAccessed().getTime());
         }
         if(!isTrivial(value.getIssuer())){

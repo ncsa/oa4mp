@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.oa2.qdl;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.util.JWTModule;
+import edu.uiuc.ncsa.oa2.qdl.testUtils.TestUtilModule;
 import edu.uiuc.ncsa.qdl.extensions.QDLLoader;
 import edu.uiuc.ncsa.qdl.module.Module;
 
@@ -20,6 +21,7 @@ public class QDLToolsLoader implements QDLLoader {
         modules.add(new JWTModule().newInstance(null));
         modules.add(new ClientManagementModule().newInstance(null));
         modules.add(new CLCModule().newInstance(null));
+        modules.add(new TestUtilModule().newInstance(null));
         return modules;
     }
 }

@@ -13,6 +13,8 @@ import java.io.File;
 import java.io.FileReader;
 
 /**
+ * This is the extension of the {@link OA2CommandLineClient} that is able to read QDL configuration files. The
+ * QDL modules is {@link edu.uiuc.ncsa.oa2.qdl.CLC}.
  * <p>Created by Jeff Gaynor<br>
  * on 12/19/23 at  3:32 PM
  */

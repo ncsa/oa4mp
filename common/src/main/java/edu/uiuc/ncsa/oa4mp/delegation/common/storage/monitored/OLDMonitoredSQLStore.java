@@ -161,7 +161,7 @@ public abstract class OLDMonitoredSQLStore<V extends Identifiable> extends SQLSt
     }
 
     @Override
-    public void updateHook(String action, AbstractEnvironment environment, List<Identifier> identifiers) {
-
+    public long updateHook(String action, AbstractEnvironment environment, List<Identifier> identifiers) {
+        return 0L;
     }
 }

@@ -9,14 +9,15 @@ import edu.uiuc.ncsa.security.storage.sql.internals.Table;
 
 import javax.inject.Provider;
 import java.io.File;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 2/25/24 at  7:44 AM
  */
 public class MigrateStore extends SQLStore<MigrationEntry> {
-
-
 
     public MigrateStore(ConnectionPool connectionPool, Table table, Provider identifiableProvider, MapConverter converter) {
         super(connectionPool, table, identifiableProvider, converter);
@@ -110,8 +111,22 @@ public class MigrateStore extends SQLStore<MigrationEntry> {
         return f.exists();
     }
 
-    @Override
-    public void destroyConnection(ConnectionRecord c) {
-        super.destroyConnection(c);
+    public void resetImportCodes() throws SQLException {
+        ConnectionRecord connectionRecord = getConnectionPool().pop();
+        String resetCodeStatement = "update " + getTable().getFQTablename() + " set " + getKeys().import_code() + " = 0";
+        String resetMessageStatement = "update " + getTable().getFQTablename() + " set " + getKeys().error_message() + "=NULL";
+        Connection connection = getConnection().connection;
+        try {
+            Statement statement = connection.createStatement();
+            statement.execute(resetCodeStatement);
+            statement.execute(resetMessageStatement);
+            statement.close();
+            connection.close();
+            releaseConnection(connectionRecord);
+        } catch (SQLException sqlException) {
+           destroyConnection(connectionRecord);
+           throw sqlException;
+        }
     }
+
 }

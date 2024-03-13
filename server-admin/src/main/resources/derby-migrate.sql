@@ -6,7 +6,7 @@
    It is a derby store because we can just create one on the fly anduse it.
 
  */
-CREATE TABLE oauth2.migrate
+CREATE TABLE oauth2.ingest
 (
    create_ts              timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
    import_ts              timestamp,

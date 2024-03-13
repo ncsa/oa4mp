@@ -123,6 +123,7 @@ public class FSMigrater implements MigrationConstants {
         dbg("      total file count : " + ingestionCounter);
         dbg("       total bad files : " + badIngestionCounter);
         dbg("      total byte count : " + totalByteCount);
+        dbg("             files/sec : "  + computeHerz(ingestionCounter, startTime));
     }
 
     long ingestionCounter = 0L;
@@ -139,10 +140,10 @@ public class FSMigrater implements MigrationConstants {
             System.err.println("");
         }
     }
-
+      String caput = "  ";
     void dbg(String x) {
         if (DEEP_DEBUG) {
-            System.err.println(getClass().getSimpleName() + ":" + x);
+            System.err.println(caput + ":" + x);
         }
     }
 
@@ -243,7 +244,7 @@ public class FSMigrater implements MigrationConstants {
             }
             totalByteCount += totalBytes; // total of all reads
             long startBatch = System.currentTimeMillis();
-            dbg("updating migration database...");
+            dbg("updating ingestion database...");
             int[] rcs = pStmt.executeBatch();
             dbg("       store : " + component);
             dbg("       total : " + rcs.length);
@@ -270,7 +271,7 @@ public class FSMigrater implements MigrationConstants {
         }
     }
 
-    protected String computeHerz(int value, long startTime) {
+    protected String computeHerz(long value, long startTime) {
         // rcs.length * 1000 / (System.currentTimeMillis() - startBatch) + " Hz"
         long duration = System.currentTimeMillis() - startTime;
         if (duration == 0) {
@@ -369,7 +370,7 @@ public class FSMigrater implements MigrationConstants {
     }
 
     protected void setIDs(SQLStore sqlStore, HashSet<Identifier> ids) throws SQLException {
-        ConnectionRecord connectionRecord = migrateStore.getConnection();
+        ConnectionRecord connectionRecord = sqlStore.getConnection();
         Connection connection = connectionRecord.connection;
         try {
             Statement statement = connection.createStatement();
@@ -380,11 +381,13 @@ public class FSMigrater implements MigrationConstants {
             }
             rs.close();
             statement.close();
-            migrateStore.releaseConnection(connectionRecord);
+            sqlStore.releaseConnection(connectionRecord);
 
         } catch (SQLException sqlException) {
-            migrateStore.destroyConnection(connectionRecord);
-            sqlException.printStackTrace();
+            sqlStore.destroyConnection(connectionRecord);
+            if(DEEP_DEBUG) {
+                sqlException.printStackTrace();
+            }
             throw sqlException;
         }
     }
@@ -480,16 +483,19 @@ public class FSMigrater implements MigrationConstants {
                     }
                     if (0 == me.getImportCode()) {
                         if (runUpkeep) {
-                            if (targetStore instanceof MonitoredStoreInterface) {
-                                doUpkeep(((MonitoredStoreInterface) targetStore).getUpkeepConfiguration(),
-                                        me,
-                                        (Monitored) value);
-                                if (me.getImportCode() < 0) {
-                                    upkept++; // update the stats
+
+                            if (targetStore instanceof MonitoredStoreInterface ) {
+                                MonitoredStoreInterface monitoredStoreInterface= (MonitoredStoreInterface) targetStore;
+                                if(monitoredStoreInterface.hasUpkeepConfiguration()){
+                                    doUpkeep(monitoredStoreInterface.getUpkeepConfiguration(),
+                                            me,
+                                            (Monitored) value);
+                                    if (me.getImportCode() < 0) {
+                                        upkept++; // update the stats
+                                    }
                                 }
                             }
                         }
-
                     }
 
                     if (0 <= me.getImportCode()) {
@@ -510,7 +516,7 @@ public class FSMigrater implements MigrationConstants {
                         if (pacerOn) {
                             pacer.pace(attemptedCount, (100 * attemptedCount / totalRecords) + "% of files migrated in " +
                                     component + " @ " +
-                                    (100000 / (System.currentTimeMillis() - hzTime)) + " Hz");
+                                    (100000 / (System.currentTimeMillis() - hzTime)) + " Hz" +(runUpkeep?(" upkept=" + upkept):""));
                             hzTime = System.currentTimeMillis();
                         }
                     }
@@ -555,7 +561,7 @@ public class FSMigrater implements MigrationConstants {
                 pacer.pace(attemptedCount, " files migrated in " +
                         component + ", rejected=" +
                         localBadCount + " @ " +
-                        (100000 / (System.currentTimeMillis() - hzTime)) + " Hz");
+                        (100000 / (System.currentTimeMillis() - hzTime)) + " Hz" +(runUpkeep?(" upkept=" + upkept):""));
                 hzTime = System.currentTimeMillis();
             }
             if (0 < importCount) {  // It is possible that, e.g. all entries are unreadable.
@@ -582,7 +588,8 @@ public class FSMigrater implements MigrationConstants {
         }
         dbg();
         dbg("       total : " + attemptedCount);
-        dbg("    rejected : " + localBadCount);
+        dbg("   bad files : " + localBadCount);
+        dbg("      upkept : " + upkept);
         dbg("        time : " + StringUtils.formatElapsedTime(System.currentTimeMillis() - startTime));
         dbg("   av. speed : " + computeHerz(attemptedCount, startTime));
         interpretErrorCode(importErrorCodes);
@@ -623,6 +630,9 @@ public class FSMigrater implements MigrationConstants {
     protected boolean doUpkeep(UpkeepConfiguration upkeepConfiguration,
                                MigrationEntry me,
                                Monitored monitored) throws SQLException {
+        if(upkeepConfiguration == null){
+            return false;
+        }
         String[] rcs = upkeepConfiguration.applies(monitored);
         switch (rcs[0]) {
             case ACTION_NONE:

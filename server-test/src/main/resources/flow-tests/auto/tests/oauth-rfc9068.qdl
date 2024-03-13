@@ -31,7 +31,6 @@ at_expected.:={'iss':server_defaults.'at_issuer',
                'scopes':['storage.read:/home/davenport/vo3', 'compute.create', 'storage.modify:/public/pendav/vo3', 'storage.modify:/public/davenport/vo3']};
 
 
-
 // This function simply inherits everything at the point of call, allowing
 // the same block of code to be repeated.
 verify()->

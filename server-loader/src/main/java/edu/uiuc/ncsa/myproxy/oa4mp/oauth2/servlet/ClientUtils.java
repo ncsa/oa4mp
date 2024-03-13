@@ -83,6 +83,8 @@ public class ClientUtils {
      *     <li>If configured client lifetime =-1, return the server default </li>
      *     <li>Determine what the lifetime is. The order is client lifetime, script lifetime, requested lifetime</li>
      * </ol>
+     *
+     * This is the single point where all lifetime logic is handled.
      * @param serverMaxLifetime
      * @param defaultServerLifetime
      * @param clientLifetime
@@ -91,14 +93,21 @@ public class ClientUtils {
      * @param requestLifetime
      * @return
      */
-    protected static long computeTokenLifetime(long serverMaxLifetime,
+    public static long computeTokenLifetime(long serverMaxLifetime,
                                                long defaultServerLifetime,
                                                long clientLifetime,
                                                long clientMaxLifetime,
                                                AbstractPayloadConfig config,
                                                long requestLifetime) {
+        return computeTokenLifetime(serverMaxLifetime,
+                defaultServerLifetime,
+                clientLifetime,
+                clientMaxLifetime,
+                config == null ? null : config.getLifetime(),
+                requestLifetime);
         // If the server default is <= 0 that implies there is some misconfiguration. Better to find that out here than
         // get squirrelly results later.
+/*
         if (serverMaxLifetime <= 0) {
             throw new NFWException("the server-wide default for the token lifetime has not been set.");
         }
@@ -128,9 +137,60 @@ public class ClientUtils {
             lifetime = Math.min(requestLifetime, maxLifetime);
         }
         return lifetime;
+*/
 
     }
 
+    /**
+     * Does all the actual computation for lifetimes. It is public thanks to Java package visibility
+     * requirements, but generally should not be called directly.
+     * @param serverMaxLifetime
+     * @param defaultServerLifetime
+     * @param clientLifetime
+     * @param clientMaxLifetime
+     * @param clientConfiguredLifetime
+     * @param requestLifetime
+     * @return
+     */
+    public static long computeTokenLifetime(long serverMaxLifetime,
+                                               long defaultServerLifetime,
+                                               long clientLifetime,
+                                               long clientMaxLifetime,
+                                               Long clientConfiguredLifetime,
+                                               long requestLifetime) {
+        // If the server default is <= 0 that implies there is some misconfiguration. Better to find that out here than
+        // get squirrelly results later.
+        if (serverMaxLifetime <= 0) {
+            throw new NFWException("the server-wide default for the token lifetime has not been set.");
+        }
+        long maxLifetime = serverMaxLifetime;
+        if (0 < clientMaxLifetime) {
+            maxLifetime = Math.min(clientMaxLifetime, serverMaxLifetime);
+        }
+//        OA2Client client = (OA2Client) st2.getClient();
+        long lifetime = -1L;
+        if (0 < clientLifetime) {
+            lifetime = Math.min(clientLifetime, maxLifetime);
+        } else {
+            // client lifetime <= 0
+            lifetime = defaultServerLifetime;
+        }
+
+        if (clientConfiguredLifetime != null) {
+            if (0 < clientConfiguredLifetime) {
+                lifetime = Math.min(clientConfiguredLifetime, maxLifetime);
+            }
+        }
+
+        // If the transaction has a specific request, take it in to account.
+        if (0 < requestLifetime) {
+            // IF they specified an  access token lifetime in the request, take the minimum of that
+            // and whatever they client is allowed.
+            lifetime = Math.min(requestLifetime, maxLifetime);
+        }
+        return lifetime;
+
+    }
 
     public static long computeRTGracePeriod(OA2Client client, OA2SE oa2SE) {
         if (!oa2SE.isRTGracePeriodEnabled()) {
@@ -161,6 +221,7 @@ public class ClientUtils {
 
     /**
      * For cases where you <b>know</b> that the client is not overridden.
+     *
      * @param st2
      * @param oa2SE
      * @return

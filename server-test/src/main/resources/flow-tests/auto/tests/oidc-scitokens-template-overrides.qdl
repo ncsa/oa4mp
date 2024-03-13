@@ -1,0 +1,16 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   Basic SciToken test. This will do the exchanges with all defaults -- no overrides -- and
+   is the most basic possible
+*/
+params. ≔ {'sub':'pilbeam',
+           'scope':'openid profile email org.oa4mp:userinfo read: write: execute',
+           'org.oa4mp:/templates':'https://wærstan.edu'};
+test_id:= 'oidc.scitokens.template';
+initialization := size(args())==1⇒args().0:import(load('test#/auto/utils/initialization.mdl'));
+
+
+script_load('test#/auto/utils/test-overrides.qdl', test_id, params., initialization );
+
+say('ok: OIDC Scitokens overrides');

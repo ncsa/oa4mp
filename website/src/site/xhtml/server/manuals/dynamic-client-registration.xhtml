@@ -57,6 +57,32 @@
     If you do a GET with no client id, then a list of all client ids and names
     known to this admin will be returned.</p>
 
+<h3>Getting server defaults</h3>
+<p>You may also get defaults for the service by issuing a request with the query parameter set to org.oa4mp:/server#defaults.
+For instance on my local server</p>
+<pre>
+    curl -k --get --data-urlencode "query=org.oa4mp:/server#defaults"  https://localhost:9443/oauth2/oidc-cm
+{
+    "rt_lifetime":1296000,
+    "at_lifetime":900,
+    "id_token_lifetime":900,
+    "max_rt_lifetime":2592000,
+    "max_at_lifetime":1800,
+    "max_id_token_lifetime":1800,
+    "idt_max_lifetime":1800,
+    "auth_grant_lifetime":750,
+    "use_server_default":-1,
+    "rtGracePeriod":3600,
+    "issuer":"https://localhost:9443/oauth2",
+    "at_issuer":"https://localhost:9443/oauth2"
+}
+
+</pre>
+<p>where all time values are in seconds.  This includes other information, such as teh user_server_default value which
+you may use for any lifetime to indicate that the current server values are to be used. If you omit setting these
+when creating your client, you will see they are taken as the default. max_id_token_lifetime and idt_max_lifetime are
+always the same and are used because of version differences. The parameter for client registrations is max_id_token_lifetime.</p>
+
 <h3>The toolkit</h3>
 <p>Included with the latest release on <a href="https://github.com/ncsa/oa4mp">GitHub</a>
     are a suite of associated command line scripts in oidc-cm-scripts.tar aka the <b><i>toolkit</i></b>

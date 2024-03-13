@@ -12,6 +12,7 @@ import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
 import edu.uiuc.ncsa.qdl.extensions.QDLModuleMetaClass;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.QDLList;
+import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.DateUtils;
@@ -21,6 +22,7 @@ import edu.uiuc.ncsa.security.util.cli.InputLine;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import java.net.URI;
 import java.util.*;
 
 /**
@@ -271,7 +273,36 @@ public class CLC implements QDLModuleMetaClass {
             return dd;
         }
     }
+    protected String CURRENT_URI = "current_uri";
+    public class GetCurrentURI implements QDLFunction{
+        @Override
+        public String getName() {
+            return CURRENT_URI;
+        }
 
+        @Override
+        public int[] getArgCount() {
+            return new int[]{0};
+        }
+
+        @Override
+        public Object evaluate(Object[] objects, State state) throws Throwable {
+            checkInit();
+            URI c =  clcCommands.getCurrentURI();
+            if(c == null){
+                return QDLNull.getInstance();
+            }
+            return c.toString();
+        }
+
+        @Override
+        public List<String> getDocumentation(int argCount) {
+            List<String> d = new ArrayList<>();
+            d.add(getName() + "() - get the current URI or null if there is none");
+            d.add("You should call " + URI_NAME + " first.");
+            return d;
+        }
+    }
 
     protected String URI_NAME = "uri";
 
@@ -290,6 +321,7 @@ public class CLC implements QDLModuleMetaClass {
         public Object evaluate(Object[] objects, State state) throws Throwable {
             checkInit();
             clcCommands.uri(argsToInputLine(getName(), objects));
+
             return clcCommands.getCurrentURI().toString();
         }
 

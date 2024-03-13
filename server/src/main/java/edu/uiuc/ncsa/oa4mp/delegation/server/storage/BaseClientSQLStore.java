@@ -207,7 +207,7 @@ select client_id, creation_ts, last_modified_ts, last_accessed from oauth2.clien
         return query;
     }
 
-  /*  public UUCResponse unusedClientCleanup(UUCConfiguration uucConfiguration) {
+/*  public UUCResponse unusedClientCleanup(UUCConfiguration uucConfiguration) {
         String query = createUUCQueryNEW(uucConfiguration);
         //String query = createUUCQueryOLD(uucConfiguration);
         BaseClientKeys keys = getKeys();

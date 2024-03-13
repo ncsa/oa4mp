@@ -177,8 +177,15 @@ body[
          ]; // end scitokens
 
 
- wlcg(claims., at_expected. , at_asserted.)->
- block[
+ wlcg(claims., at_scopes. , at_asserted.)->
+ block[=== wlcg(claims., at_scopes. , at_asserted.) check a WLCG token for spec compliance
+       === This applies to any WLCG token.
+       === claims. = the claims
+       === at_scopes. = the scopes that are expected to be in the access token
+       === at_asserted. = the access token returned i.e. asserted by the service.
+       === The claims are used to check the asserted AT as are the scopes.
+       === This does not check specific values such as lifetimes but aims for
+       === spec and policies.
       issuer := 'https://localhost:9443/oauth2';
       s. := tokenize(at_asserted.'scope', ' ');
 
@@ -194,7 +201,7 @@ body[
        ⊨ at_asserted.'aud' ≡ 'https://wlcg.cern.ch/jwt/v1/any' : 'wrong AT audience';
        // We are setting the RT to be a JWT because it is a common use case.
       // ⊨ tokens.'refresh_token'.'lifetime' - 900000 < 2000 : 'wrong refresh token lifetime';
-       ⊨ reduce(@∧, at_expected. ∈ s.) : 'incorrect AT scopes';
+       ⊨ reduce(@∧, at_scopes. ∈ s.) : 'incorrect AT scopes';
 ]; //end WLCG check
 
     define[verify_scopes(expected., asserted)]

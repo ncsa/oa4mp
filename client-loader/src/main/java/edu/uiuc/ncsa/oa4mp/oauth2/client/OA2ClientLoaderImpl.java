@@ -53,6 +53,8 @@ public abstract class OA2ClientLoaderImpl<T extends OA2ClientEnvironment> implem
      * @return
      */
     public String getWellKnownString(String key) {
+        // Fixes https://github.com/ncsa/oa4mp/issues/138 so that the config file can
+        // just use the server's well-known endpoint
         if (getWellKnownConfiguration().containsKey(key)) {
             return getWellKnownConfiguration().getString(key);
         }

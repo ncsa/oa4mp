@@ -3,6 +3,8 @@ package edu.uiuc.ncsa.myproxy.oa4mp.server;
 import edu.uiuc.ncsa.myproxy.MyProxyServiceFacade;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientStore;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.Permission;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionsStore;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AuthorizationServletConfig;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.TransactionStore;
@@ -146,4 +148,6 @@ public interface ServiceEnvironment extends Logable {
      * @return
      */
     List<Store> listStores();
+
+    PermissionsStore<Permission> getPermissionStore();
 }

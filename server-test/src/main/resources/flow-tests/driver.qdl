@@ -49,11 +49,15 @@ flow_ok := 1;
     while[true]
        do[
          try[
-           out :=  scan('copy the callback uri to clipboard and hit any key when done or q to abort, s to skip.');
+           out :=  scan('copy the callback uri to clipboard and hit any key when done or q to abort, u to print uri, s to skip.');
            flow_ok := size(trim(out))==0?'ok':out;
-           if[flow_ok != 'ok'][return(flow_ok);];
-           clc#grant();
-           return(flow_ok);
+             if[flow_ok=='u']
+           then[say(clc#current_uri());]
+           else[
+              if[flow_ok != 'ok'][return(flow_ok);];
+              clc#grant();
+              return(flow_ok);
+           ];
           ]catch[
              say('uh-oh that didn\'t work, try again:' + error_message);
           ];  //end catch
