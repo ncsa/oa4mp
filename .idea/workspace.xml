@@ -11,36 +11,38 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/sqldialects.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/server-admin/src/main/docs/filestore-migration.odt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/migrate/FSMigrate.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/migrate/MEProvider.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/migrate/MigrateKeys.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/migrate/MigrateStore.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/migrate/MigrateTable.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/migrate/MigrationEntry.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/migrate/MigrationEntryConverter.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/server-admin/src/main/resources/derby-migrate.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sqldialects.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sqldialects.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.sh" beforeDir="false" afterPath="$PROJECT_DIR$/build.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/common/servlet/DBConfigLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/common/servlet/DBConfigLoader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/src/test/java/edu/uiuc/ncsa/oa4mp/delegation/common/storage/FileStoreTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/test/java/edu/uiuc/ncsa/oa4mp/delegation/common/storage/FileStoreTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-test/src/test/java/edu/uiuc/ncsa/myproxy/oa4mp/NewClientStoreTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test/src/test/java/edu/uiuc/ncsa/myproxy/oa4mp/NewClientStoreTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-test/src/test/java/edu/uiuc/ncsa/myproxy/oa4mp/TestUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test/src/test/java/edu/uiuc/ncsa/myproxy/oa4mp/TestUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proxy/src/main/java/edu/uiuc/ncsa/oa2/servlet/OA2ATServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/edu/uiuc/ncsa/oa2/servlet/OA2ATServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client-api/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/client-api/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client-loader/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/client-loader/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client-oauth2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/client-oauth2/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client-test/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/client-test/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client-webapp/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/client-webapp/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/client/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/common/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/myproxy-logon/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/myproxy-logon/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/myproxy-website/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/myproxy-website/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-test/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-webapp/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-webapp/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oauth2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oauth2/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proxy/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qdl/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-admin/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/resources/oa4mp-derby.sql" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/resources/oa4mp-derby.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/ui-test/ui-test.json" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/ui-test/ui-test.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/admin/adminClient/AdminClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/admin/adminClient/AdminClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/loader/OA2ConfigurationLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/loader/OA2ConfigurationLoader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-test/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/local/rfc7523-pkce.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/local/rfc7523-pkce.qdl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-test/src/test/java/test/AdminClientTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/test/java/test/AdminClientTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-test/src/test/java/test/TestSuiteInitializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/test/java/test/TestSuiteInitializer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/website/convert-docs.sh" beforeDir="false" afterPath="$PROJECT_DIR$/website/convert-docs.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/website/src/site/xhtml/server/index.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/xhtml/server/index.xhtml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-api/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-loader/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-test/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/server/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/skin/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/skin/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/website/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/website/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/website/src/site/apt/index.apt" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/apt/index.apt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/website/src/site/site.xml" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/site.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/website/src/site/xhtml/client/manuals/api-reference.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/xhtml/client/manuals/api-reference.xhtml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/website/src/site/xhtml/client/manuals/getting-started.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/xhtml/client/manuals/getting-started.xhtml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/website/src/site/xhtml/server/dtd/server-dtd-content-tags.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/xhtml/server/dtd/server-dtd-content-tags.xhtml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/website/src/site/xhtml/server/manuals/cli.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/xhtml/server/manuals/cli.xhtml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -61,7 +63,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="5.4.3" />
+        <entry key="$PROJECT_DIR$" value="master" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -103,42 +105,42 @@
     <option name="showMembers" value="true" />
     <option name="showModules" value="false" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/ncsa/dev/ncsa-git/oa4mp/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/FSMigrate.java&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Libraries&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.48910892&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.fileTypes&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests/auto/tests",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Libraries",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.48910892",
+    "settings.editor.selected.configurable": "preferences.fileTypes",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
-      &quot;JAVA&quot;,
-      &quot;SQL&quot;
+  "keyToStringList": {
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "JAVA",
+      "SQL"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/server-admin/src/main/resources/qdl/bnl" />
-      <recent name="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/auto/clients" />
-      <recent name="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/local" />
       <recent name="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/auto/tests" />
+      <recent name="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/auto/utils" />
       <recent name="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/auto/server" />
+      <recent name="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/local" />
+      <recent name="$PROJECT_DIR$/server-admin/src/main/resources/qdl/bnl" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/server-admin/src/main" />
       <recent name="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/auto/tests" />
+      <recent name="$PROJECT_DIR$/server-admin/src/main" />
       <recent name="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/auto/server" />
       <recent name="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/auto/utils" />
       <recent name="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/auto" />
@@ -150,7 +152,7 @@
       <recent name="edu.uiuc.ncsa.oa4mp.delegation.server.storage.upkeep" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.CLI">
+  <component name="RunManager" selected="Application.FSMigrate">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="WIDTH" value="400" />
       <option name="HEIGHT" value="300" />
@@ -185,7 +187,7 @@
     <configuration name="FSMigrate" type="Application" factoryName="Application">
       <option name="ALTERNATIVE_JRE_PATH" value="11 (2)" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
-      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.myproxy.oauth2.tools.migrate.FSMigrate" />
+      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.myproxy.oauth2.tools.migrate.FSMigrationTool" />
       <module name="server-admin" />
       <option name="PROGRAM_PARAMETERS" value="-src $PROJECT_DIR$/../../csd/config/server-oa2.xml -srcName oa4mp.oa2.fileStore -targetName oa4mp.oa2.derby.migrate -v " />
       <option name="VM_PARAMETERS" value="-Xms1G -Xmx2G" />
@@ -277,7 +279,7 @@
     <configuration name="setup migration DB" type="Application" factoryName="Application">
       <option name="ALTERNATIVE_JRE_PATH" value="11 (2)" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
-      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.myproxy.oauth2.tools.migrate.FSMigrate" />
+      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.myproxy.oauth2.tools.migrate.FSMigrationTool" />
       <module name="server-admin" />
       <option name="PROGRAM_PARAMETERS" value="-setup -src $PROJECT_DIR$/../../csd/config/server-oa2.xml -srcName oa4mp.oa2.fileStore -targetName oa4mp.oa2.derby.migrate -v" />
       <method v="2">
@@ -479,6 +481,10 @@
       <workItem from="1707139936325" duration="1516000" />
       <workItem from="1707151189557" duration="119764000" />
       <workItem from="1708022150534" duration="267781000" />
+      <workItem from="1709525258063" duration="478000" />
+      <workItem from="1709555439562" duration="3593000" />
+      <workItem from="1709564678701" duration="6621000" />
+      <workItem from="1709644678234" duration="123710000" />
     </task>
     <task id="LOCAL-00001" summary="Added option for file stores to delete files they cannot parse. Updated client loader too. &#10;https://github.com/ncsa/oa4mp/issues/151&#10;https://github.com/ncsa/oa4mp/issues/150&#10;https://github.com/ncsa/oa4mp/issues/149">
       <option name="closed" value="true" />
@@ -592,7 +598,31 @@
       <option name="project" value="LOCAL" />
       <updated>1708730907732</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="Update before travel">
+      <option name="closed" value="true" />
+      <created>1709525421225</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1709525421225</updated>
+    </task>
+    <task id="LOCAL-00016" summary="Added automated tests for WLCG. general cleanup before release.">
+      <option name="closed" value="true" />
+      <created>1709993543298</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1709993543298</updated>
+    </task>
+    <task id="LOCAL-00017" summary="Improvements in the FS migration tool. Updated the documentation, sql scripts. Added a test utility for QDL flow tests.">
+      <option name="closed" value="true" />
+      <created>1710360270627</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1710360270627</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -618,7 +648,10 @@
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/34" />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/169&#10;https://github.com/ncsa/oa4mp/issues/170&#10;https://github.com/ncsa/oa4mp/issues/171&#10;&#10;Nice refactoring of some classes too." />
     <MESSAGE value="Another test update" />
-    <option name="LAST_COMMIT_MESSAGE" value="Another test update" />
+    <MESSAGE value="Update before travel" />
+    <MESSAGE value="Added automated tests for WLCG. general cleanup before release." />
+    <MESSAGE value="Improvements in the FS migration tool. Updated the documentation, sql scripts. Added a test utility for QDL flow tests." />
+    <option name="LAST_COMMIT_MESSAGE" value="Improvements in the FS migration tool. Updated the documentation, sql scripts. Added a test utility for QDL flow tests." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
@@ -700,11 +733,6 @@
           <option name="timeStamp" value="174" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/tokens/WLCGTokenHandler.java</url>
-          <line>70</line>
-          <option name="timeStamp" value="177" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/proxy/src/main/java/edu/uiuc/ncsa/oa2/servlet/ProxyUtils.java</url>
           <line>278</line>
           <option name="timeStamp" value="183" />
@@ -731,7 +759,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/loader/OA2ConfigurationLoader.java</url>
-          <line>1625</line>
+          <line>1626</line>
           <option name="timeStamp" value="220" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -741,12 +769,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/common/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/common/storage/monitored/OLDMonitoredSQLStore.java</url>
-          <line>145</line>
+          <line>146</line>
           <option name="timeStamp" value="228" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/common/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/common/storage/monitored/OLDMonitoredSQLStore.java</url>
-          <line>150</line>
+          <line>151</line>
           <option name="timeStamp" value="229" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -771,17 +799,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/5.3-SNAPSHOT/storage-5.3-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/monitored/upkeep/UpkeepConfigUtils.java</url>
-          <line>214</line>
+          <line>232</line>
           <option name="timeStamp" value="252" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/5.3-SNAPSHOT/storage-5.3-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/monitored/MonitoredSQLStore.java</url>
-          <line>254</line>
+          <line>262</line>
           <option name="timeStamp" value="254" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/server/storage/upkeep/UpkeepThread.java</url>
-          <line>74</line>
+          <line>84</line>
           <option name="timeStamp" value="260" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -831,18 +859,13 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/proxy/src/main/java/edu/uiuc/ncsa/oa2/servlet/OA2ATServlet.java</url>
-          <line>1609</line>
+          <line>1607</line>
           <option name="timeStamp" value="346" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/proxy/src/main/java/edu/uiuc/ncsa/oa2/servlet/OA2ATServlet.java</url>
-          <line>1616</line>
+          <line>1614</line>
           <option name="timeStamp" value="347" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/migrate/MigrateStore.java</url>
-          <line>389</line>
-          <option name="timeStamp" value="379" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/5.3-SNAPSHOT/storage-5.3-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/FileStore.java</url>
@@ -855,42 +878,12 @@
           <option name="timeStamp" value="381" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/migrate/MigrateStore.java</url>
-          <line>338</line>
-          <option name="timeStamp" value="382" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/migrate/MigrateStore.java</url>
-          <line>634</line>
-          <option name="timeStamp" value="393" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/migrate/MigrateStore.java</url>
-          <line>554</line>
-          <option name="timeStamp" value="394" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/migrate/MigrateStore.java</url>
-          <line>663</line>
-          <option name="timeStamp" value="396" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/migrate/MigrationEntryConverter.java</url>
-          <line>39</line>
-          <option name="timeStamp" value="402" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/5.3-SNAPSHOT/storage-5.3-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/sql/derby/DerbyConnectionPool.java</url>
           <line>136</line>
           <option name="timeStamp" value="403" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/migrate/MigrateStore.java</url>
-          <line>525</line>
-          <option name="timeStamp" value="404" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/migrate/FSMigrate.java</url>
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/migrate/FSMigrationTool.java</url>
           <line>60</line>
           <option name="timeStamp" value="405" />
         </line-breakpoint>
@@ -900,9 +893,67 @@
           <option name="timeStamp" value="406" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/migrate/FSMigrate.java</url>
-          <line>211</line>
-          <option name="timeStamp" value="407" />
+          <url>file://$PROJECT_DIR$/proxy/src/main/java/edu/uiuc/ncsa/oa2/servlet/RFC8628AuthorizationServer.java</url>
+          <line>136</line>
+          <option name="timeStamp" value="415" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/proxy/src/main/java/edu/uiuc/ncsa/oa2/servlet/OA2ATServlet.java</url>
+          <line>2373</line>
+          <option name="timeStamp" value="416" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/testUtils/TestUtils.java</url>
+          <line>103</line>
+          <option name="timeStamp" value="423" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/testUtils/TestUtils.java</url>
+          <line>73</line>
+          <properties>
+            <option name="lambda-ordinal" value="-1" />
+          </properties>
+          <option name="timeStamp" value="424" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/testUtils/TestUtils.java</url>
+          <line>46</line>
+          <option name="timeStamp" value="426" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/qdl/language/1.5-QDL-SNAPSHOT/language-1.5-QDL-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/qdl/expressions/ModuleExpression.java</url>
+          <line>184</line>
+          <option name="timeStamp" value="431" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/qdl/language/1.5-QDL-SNAPSHOT/language-1.5-QDL-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/qdl/expressions/ModuleExpression.java</url>
+          <line>149</line>
+          <option name="timeStamp" value="433" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/qdl/language/1.5-QDL-SNAPSHOT/language-1.5-QDL-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/qdl/expressions/ModuleExpression.java</url>
+          <line>166</line>
+          <option name="timeStamp" value="434" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/qdl/language/1.5-QDL-SNAPSHOT/language-1.5-QDL-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/qdl/expressions/ModuleExpression.java</url>
+          <line>448</line>
+          <option name="timeStamp" value="435" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/cm/oidc_cm/OIDCCMServlet.java</url>
+          <line>111</line>
+          <option name="timeStamp" value="436" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/migrate/FSMigrater.java</url>
+          <line>529</line>
+          <option name="timeStamp" value="438" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/migrate/FSMigrater.java</url>
+          <line>487</line>
+          <option name="timeStamp" value="442" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
