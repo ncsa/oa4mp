@@ -4,7 +4,7 @@
 OA4MP_ROOT=$NCSA_DEV_INPUT/oa4mp
 
 GITHUB_ROOT=$OA4MP_ROOT/docs
-./convert-docs.sh $OA4MP_ROOT/qdl/src/main/docs $GITHUB_ROOT/pdf
+./convert-docs.sh $OA4MP_ROOT $GITHUB_ROOT/pdf
 
 
 cd $OA4MP_ROOT || exit
