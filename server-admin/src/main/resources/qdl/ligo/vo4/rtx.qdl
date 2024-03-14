@@ -7,7 +7,10 @@
  requested_scopes. := (0 < size(tx_scopes.))?tx_scopes.:scopes.;
  trace('IGWN', 'requested scopes = ' + to_string(requested_scopes.));
  trace('IGWN', 'original scopes = ' + to_string(original_scopes.));
- permissions. := resolve_templates(scopes., requested_scopes., false); // Only grant scopes already granted
+ // Only grant scopes already granted, fixes CIL-1784, CIL-1828
+ σ()→ (∃original_scopes. ∧ !is_null(original_scopes.))⇒original_scopes.:scopes.;
+ permissions. := resolve_templates(σ(), requested_scopes., false);
+ //permissions. := resolve_templates(scopes., requested_scopes., false);
  trace('IGWN', 'permissions = ' + to_string(permissions.));
  //permissions. := ~mask(permissions., !'write:/staging.*' =~ permissions.);
  permissions. := ~(!'write:/staging/.*|'+robot_caput+'.*'=~permissions.)⌆permissions.; // CIL-1886 fix
