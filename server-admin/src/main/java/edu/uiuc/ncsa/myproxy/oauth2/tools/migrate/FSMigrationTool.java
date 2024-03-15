@@ -44,7 +44,7 @@ import static edu.uiuc.ncsa.security.core.configuration.StorageConfigurationTags
    that takes this into account.
  */
 public class FSMigrationTool extends CLITool {
-    public static final int DEFAULT_BATCH_SIZE = 500;
+    public static final int DEFAULT_BATCH_SIZE = 15000;
 
     @Override
     public String getComponentName() {
@@ -77,7 +77,11 @@ public class FSMigrationTool extends CLITool {
             //return;
             getMigrater().ingest(sourceSE, isNoTransactions(), getBatchSize(), isPacerOn());
         }
-        getMigrater().migrateAll(targetSE, isNoTransactions(), getBatchSize(), isUpkeepOn(), isPacerOn());
+        if(storeName == null){
+            getMigrater().migrateAll(targetSE, isNoTransactions(), getBatchSize(), isUpkeepOn(), isPacerOn());
+        } else {
+            getMigrater().migrate(targetSE, getBatchSize(), isUpkeepOn(), storeName, isPacerOn());
+        }
 
         say("TOTAL Processing time for all operations:" + StringUtils.formatElapsedTime(System.currentTimeMillis() - now));
     }
@@ -87,7 +91,7 @@ public class FSMigrationTool extends CLITool {
     public void help() {
 
     }
-
+    String storeName = null;
     OA2SE sourceSE;
     OA2SE targetSE;
     MigrateStore migrateStore;
@@ -195,12 +199,14 @@ public class FSMigrationTool extends CLITool {
                     DerbyConnectionPool dcp = (DerbyConnectionPool) ((SQLStore) targetSE.getClientStore()).getConnectionPool();
                     if (showConnect) {
                         say("target database connection string:");
-                        say(dcp.getConnectionParameters().getDerbyConnectionString());
+                        say("  " + dcp.getConnectionParameters().getDerbyConnectionString());
                     }
                     if (dcp.getConnectionParameters().isCreateOne()) {
+                        say("creating target store");
                         dcp.createStore();
+                        say("...done!");
                         if (setup) {
-                            say("done creating target store. Exiting.");
+                            say("...exiting.");
                             return false;
                         }
                     }
@@ -223,23 +229,23 @@ public class FSMigrationTool extends CLITool {
                 setRootDirectory(clientStore.getStorageDirectory().getParentFile().getParent()).
                 setDatabase(dbDir.getAbsolutePath());
         DerbyConnectionPool pool = (DerbyConnectionPool) derbyConnectionPoolProvider.get();
-        sayv(getClass().getSimpleName() + " database file=" + pool.getConnectionParameters().getDatabaseName());
+        if (showConnect) {
+            say("ingestion database connection string:");
+            say("  " + pool.getConnectionParameters().getDerbyConnectionString());
+        }
         if (dbDir.exists()) {
-            say(INGESTION_FILE_NAME + " database exists");
-
+            sayv("ingestion database exists");
         } else {
+            say("ingestion database not found");
             // Set up the ingestion database. This will create it if it does not exist.
             try {
                 InputStream inputStream = getClass().getClassLoader().getResourceAsStream("derby-migrate.sql");
                 createScript = SQLStore.crappySQLParser(FileUtil.readFileAsLines(inputStream));
                 pool.setCreateScript(createScript);
-                say("   creating ingestion database");
+                say("creating ingestion database");
                 pool.createStore();
-                say("   done!");
-                if (showConnect) {
-                    say("connection string for ingestion database:");
-                    say("connect '" + pool.getConnectionParameters().getJdbcUrl() + "';");
-                }
+                say("...done!");
+
                 doIngest = true;
             } catch (Throwable t) {
                 t.printStackTrace();
@@ -256,8 +262,9 @@ public class FSMigrationTool extends CLITool {
         if (resetIngestDB) {
             try {
                 sayv("resetting ingest DB...");
-                migrateStore.resetImportCodes();
-                sayv("   ... done!");
+              int updateCount =   migrateStore.resetImportCodes(storeName);
+                sayv("...done! Update " + updateCount + " records.");
+
             } catch (Throwable t) {
                 if (isVerbose) {
                     t.printStackTrace();
@@ -310,33 +317,44 @@ public class FSMigrationTool extends CLITool {
     public static final String CONFIG_HELP = "--help";
     public static final String CONFIG_SETUP = "-setup";
     public static final String CONFIG_RESET = "-reset";
+    public static final String CONFIG_STORE_NAME = "-storeName";
 
     public static void showHelp() {
         int width = 20;
-        String eq = " = ";
-        String indent = "                       ";
+        String eq = " : ";
+        String indent = StringUtils.getBlanks(width + 1+2*eq.length());
         say(FSMigrationTool.class.getSimpleName() + ": a tool to migrate an existing filestore to another store");
         say("The scenario is that you have a possible enormous filestore with thousands of entries and need");
         say("to move the contents to a different type of OA4MP store. Such a migration should be done separately, ");
         say("not when the server is running since the load could be quite high. ");
-        say(StringUtils.RJustify(CONFIG_BATCH_SIZE, 20) + eq + "  The number of files to process at once. Default is " + DEFAULT_BATCH_SIZE);
-        say(StringUtils.RJustify(CONFIG_CLEANUP, 20) + eq + "removes the migration database. Overrides all other options! This will be executed, then the application will exit.");
-        say(StringUtils.RJustify(CONFIG_DO_UPKEEP, 20) + eq + "Applies upkeep in the target store to all entries on import. Default is true");
-        say(StringUtils.RJustify(CONFIG_HELP, 20) + eq + "  show the help.");
-        say(StringUtils.RJustify(CONFIG_NO_TRANSACTIONS, 20) + eq + "does not migrate any pending transfers. This means");
+        say("Type key: I = integer, F = flag (no arg), B = boolean (true | false), S = string");
+        say("");
+        say(StringUtils.RJustify("     Flag     ",20) + eq + "T" + eq + "                           Description");
+        say(StringUtils.RJustify(CONFIG_BATCH_SIZE, 20) + eq + "I" + eq +"The number of files to process at once. Default is no batching.");
+        say(StringUtils.RJustify(CONFIG_CLEANUP, 20) + eq + "F" + eq + "Removes the ingestion database. This will be executed, then the application will exit.");
+        say(indent + "Since Derby does not have a nice way to clean databases up, it is included as a utility.");
+        say(StringUtils.RJustify(CONFIG_HELP, 20) + eq + "F" + eq + "Show the help. Overrides all other flags. Note double hypen!");
+        say(StringUtils.RJustify(CONFIG_NO_TRANSACTIONS, 20) + eq + "F" + eq + "Does not migrate any pending transfers. This means");
         say(indent + "any pending transfers are lost. Default is false.");
-        say(StringUtils.RJustify(CONFIG_PACE_OFF, 20) + eq + "disables the pacer (status bar thingy.) default is true");
-        say(StringUtils.RJustify(CONFIG_SOURCE_CFG, 20) + eq + "  the full path to the source config file.");
-        say(StringUtils.RJustify(CONFIG_RESET, 20) + eq + "flag. if the ingest table exists, reset all of the entries to being un-imported.");
+        say(StringUtils.RJustify(CONFIG_PACE_OFF, 20) + eq + "B" + eq +"Disables the pacer (status bar thingy.) default is true");
+        say(StringUtils.RJustify(CONFIG_RESET, 20) + eq + "F" + eq + "If the ingest table exists, reset all of the entries to being un-imported.");
         say(indent + "This is useful if the import failed and you want to restart all over without re-ingesting");
-        say(StringUtils.RJustify(CONFIG_SHOW_CONNECT, 20) + eq + "  show the Derby connection string. Useful if you have Derby installed. Default is false.");
-        say(StringUtils.RJustify(CONFIG_SETUP, 20) + eq + "  creates any required databases. Run this before anything else!.");
-        say(StringUtils.RJustify(CONFIG_SOURCE_CFG_NAME, 20) + eq + "  the name of the configuration. Must be a file store.");
-        say(StringUtils.RJustify(CONFIG_TARGET_CFG, 20) + eq + "  the full path to the configuration file.");
+        say(indent + "Note that this may be used with " + CONFIG_STORE_NAME + " to do a single component.");
+        say(StringUtils.RJustify(CONFIG_SETUP, 20) + eq + "F" + eq +"Creates any required databases. This creates any databases then exits.");
+        say(indent+"If omitted, the databases are created as needed and the migration is done.");
+        say(StringUtils.RJustify(CONFIG_SHOW_CONNECT, 20) + eq + "F" + eq +"Show the Derby connection strings. Useful if you have Derby installed. Default is not to show.");
+        say(StringUtils.RJustify(CONFIG_SOURCE_CFG, 20) + eq + "S" + eq + "The full path to the source config file.");
+        say(StringUtils.RJustify(CONFIG_SOURCE_CFG_NAME, 20) + eq + "S" + eq +"The name of the configuration. Must be a file store.");
+        say(StringUtils.RJustify(CONFIG_STORE_NAME, 20) + eq + "S" + eq + "The name of a single store component (these are the tag names in the XML");
+        say(indent + "file). If you supply this, exactly that one component will be imported and nothing else. Used in conjuntion with");
+        say(indent + CONFIG_RESET + ", resets only that named components.");
+        say(StringUtils.RJustify(CONFIG_TARGET_CFG, 20) + eq + "S" +eq + "The full path to the configuration file.");
         say(indent + "If omitted, assumed to be the same as " + CONFIG_SOURCE_CFG);
-        say(StringUtils.RJustify(CONFIG_TARGET_CFG_NAME, 20) + eq + "  the name of the target configuration");
-        say(StringUtils.RJustify(CONFIG_VERBOSE, 20) + eq + "makes the operation much chattier. Default is false");
+        say(StringUtils.RJustify(CONFIG_TARGET_CFG_NAME, 20) + eq + "F"+eq +"The name of the target configuration");
+        say(StringUtils.RJustify(CONFIG_DO_UPKEEP, 20) + eq + "B" + eq + "Applies upkeep in the target store to all entries on import. Default is true");
+        say(StringUtils.RJustify(CONFIG_VERBOSE, 20) + eq + "F" + eq +"Makes the operation much chattier. Default is none.");
     }
+
 
 
     public boolean isNoTransactions() {
@@ -375,7 +393,10 @@ public class FSMigrationTool extends CLITool {
         } else {
             say("missing " + CONFIG_SOURCE_CFG_NAME + " parameter.");
         }
-
+        if(inputLine.hasArg(CONFIG_STORE_NAME)){
+            storeName = inputLine.getNextArgFor(CONFIG_STORE_NAME).toLowerCase();
+            inputLine.removeSwitchAndValue(CONFIG_STORE_NAME);
+        }
         File dbDir = getDBDir();
 
         if (!dbDir.exists()) {
@@ -436,6 +457,8 @@ public class FSMigrationTool extends CLITool {
             setVerbose(true);
             inputLine.removeSwitch(CONFIG_VERBOSE);
         }
+        resetIngestDB = inputLine.hasArg(CONFIG_RESET);
+        inputLine.removeSwitch(CONFIG_RESET);
         if (inputLine.hasArg(CONFIG_SOURCE_CFG)) {
             setSourceFile(inputLine.getNextArgFor(CONFIG_SOURCE_CFG));
             inputLine.removeSwitchAndValue(CONFIG_SOURCE_CFG);
@@ -492,11 +515,12 @@ public class FSMigrationTool extends CLITool {
         v[0] = FSMigrationTool.class.getSimpleName();// need a dummy argument for input line
         System.arraycopy(args, 0, v, 1, args.length);
         InputLine inputLine = new InputLine(v);
-        if (args.length == 0 || inputLine.hasArg(HELP_LONG_OPTION)) {
+        if (args.length == 0 || inputLine.hasArg(CONFIG_HELP)) {
             showHelp();
             return;
         }
         FSMigrationTool fsm = new FSMigrationTool();
+        // Do the cleanup as a separate task and exit.
         fsm.doCleanup = inputLine.hasArg(CONFIG_CLEANUP);
         fsm.showConnect = inputLine.hasArg(CONFIG_SHOW_CONNECT);
         inputLine.removeSwitch(CONFIG_SHOW_CONNECT);
@@ -505,12 +529,8 @@ public class FSMigrationTool extends CLITool {
             fsm.removeMigrationDB(inputLine);  // this can also show help, do before showing general help
             return;
         }
-        fsm.resetIngestDB = inputLine.hasArg(CONFIG_RESET);
-        inputLine.removeSwitch(CONFIG_RESET);
-        if (inputLine.hasArg(CONFIG_HELP)) {
-            FSMigrationTool.showHelp();
-            return;
-        }
+
+
         if (!fsm.getArgs(inputLine)) {
             return;
         }

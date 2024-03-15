@@ -123,7 +123,7 @@ public class FSMigrater implements MigrationConstants {
         dbg("      total file count : " + ingestionCounter);
         dbg("       total bad files : " + badIngestionCounter);
         dbg("      total byte count : " + totalByteCount);
-        dbg("             files/sec : "  + computeHerz(ingestionCounter, startTime));
+        dbg("             files/sec : " + computeHerz(ingestionCounter, startTime));
     }
 
     long ingestionCounter = 0L;
@@ -140,7 +140,9 @@ public class FSMigrater implements MigrationConstants {
             System.err.println("");
         }
     }
-      String caput = "  ";
+
+    String caput = "  ";
+
     void dbg(String x) {
         if (DEEP_DEBUG) {
             System.err.println(caput + ":" + x);
@@ -212,7 +214,7 @@ public class FSMigrater implements MigrationConstants {
 
                 pStmt.setString(1, dString);
                 pStmt.setString(2, f.getName());
-                pStmt.setString(3, component);
+                pStmt.setString(3, component.toLowerCase()); // normalize to lower case
                 int importCode = getImportCode(f);
                 if (importCode < 0) {
                     int index = importErrorCodes[Math.abs(importCode)];
@@ -230,7 +232,7 @@ public class FSMigrater implements MigrationConstants {
                 pStmt.addBatch();
                 if (pacerOn) {
                     if (1 < i && 0 == i % pacerIncrement) {
-                        pacer.pace(i, " files ingested @ " + computeHerz((int) pacerIncrement, hzTime));
+                        pacer.pace(i, " files read @ " + computeHerz((int) pacerIncrement, hzTime));
                         hzTime = System.currentTimeMillis();
                     }
                 }
@@ -238,13 +240,13 @@ public class FSMigrater implements MigrationConstants {
             dbg();
             if (pacerOn) {
                 if (1 < ingestionCounter && 0 == ingestionCounter % pacerIncrement) {
-                    pacer.pace(ingestionCounter, " files ingested @ " + computeHerz((int) pacerIncrement, hzTime));
+                    pacer.pace(ingestionCounter, " files read @ " + computeHerz((int) pacerIncrement, hzTime));
                     hzTime = System.currentTimeMillis();
                 }
             }
             totalByteCount += totalBytes; // total of all reads
             long startBatch = System.currentTimeMillis();
-            dbg("updating ingestion database...");
+            dbg("ingesting...");
             int[] rcs = pStmt.executeBatch();
             dbg("       store : " + component);
             dbg("       total : " + rcs.length);
@@ -271,14 +273,16 @@ public class FSMigrater implements MigrationConstants {
         }
     }
 
+    /**
+     * Adds blanks to the output since the units may vary widely at times.  This way if this is
+     * used by pacer, there are not odd artifacts at the end of the line.
+     * @param value
+     * @param startTime
+     * @return
+     */
     protected String computeHerz(long value, long startTime) {
-        // rcs.length * 1000 / (System.currentTimeMillis() - startBatch) + " Hz"
-        long duration = System.currentTimeMillis() - startTime;
-        if (duration == 0) {
-            return "0 Hz";
-        }
-        // trailing blanks are because Hz can vary considerable in length.
-        return value * 1000 / duration + " Hz     ";
+        // trailing blanks are because Hz can vary considerably in length.
+      return   StringUtils.formatHerz(value, startTime) + "          ";
     }
 
 
@@ -314,6 +318,53 @@ public class FSMigrater implements MigrationConstants {
         return importCode;
     }
 
+    public void migrate(OA2SE targetSE,
+                        int batchSize,
+                        boolean runUpkeep,
+                        String name,
+                        boolean pacerOn
+    ) {
+        Store store = null;
+        // name is lower case
+        if (name.equalsIgnoreCase(TRANSACTIONS_STORE)) {
+            store = targetSE.getTransactionStore();
+        }
+        if (name.equalsIgnoreCase(CLIENTS_STORE)) {
+            store = targetSE.getClientStore();
+        }
+        if (name.equalsIgnoreCase(CLIENT_APPROVAL_STORE)) {
+            store = targetSE.getClientApprovalStore();
+        }
+        if (name.equalsIgnoreCase(ADMIN_CLIENT_STORE)) {
+            store = targetSE.getAdminClientStore();
+        }
+        if (name.equalsIgnoreCase(VIRTUAL_ORGANIZATION_STORE)) {
+            store = targetSE.getVOStore();
+        }
+        if (name.equalsIgnoreCase(TOKEN_EXCHANGE_RECORD_STORE)) {
+            store = targetSE.getTxStore();
+        }
+        if (name.equalsIgnoreCase(PERMISSION_STORE)) {
+            store = targetSE.getPermissionStore();
+        }
+
+        if (store == null) {
+            dbg("sorry, but " + name + " is not a recognized store");
+            return;
+        }
+        if (!(store instanceof SQLStore)) {
+            dbg("sorry, but " + name + " is not an SQL store");
+            return;
+        }
+        long startTime = System.currentTimeMillis();
+        try {
+            migrate((SQLStore) store, runUpkeep, getStoreComponent(store), batchSize, pacerOn);
+        } catch (Throwable t) {
+            dbg("Error migrating " + name + ": " + t.getMessage());
+        }
+        dbg("total elapsed time : " + StringUtils.formatElapsedTime(System.currentTimeMillis() - startTime));
+
+    }
 
     /**
      * Main entry point for migration. This will resume where it left off as needed.
@@ -336,7 +387,7 @@ public class FSMigrater implements MigrationConstants {
         for (Store store : stores) {
             try {
                 if (isSQLStore(store, noTransactions)) {
-                    migrate((SQLStore) store, runUpkeep, getStoreComponent(store), batchSize);
+                    migrate((SQLStore) store, runUpkeep, getStoreComponent(store), batchSize, pacerOn);
                     // The next two need to be current. It is possible this gets stopped and restarted,
                     // so ask the store after import has finished.
                     if (store instanceof ClientStore) {
@@ -385,7 +436,7 @@ public class FSMigrater implements MigrationConstants {
 
         } catch (SQLException sqlException) {
             sqlStore.destroyConnection(connectionRecord);
-            if(DEEP_DEBUG) {
+            if (DEEP_DEBUG) {
                 sqlException.printStackTrace();
             }
             throw sqlException;
@@ -404,7 +455,8 @@ public class FSMigrater implements MigrationConstants {
     protected void migrate(SQLStore targetStore,
                            boolean runUpkeep,
                            String component,
-                           int batchSize) throws SQLException {
+                           int batchSize,
+                           boolean pacerOn) throws SQLException {
         String stmt = migrateStore.getFetchStatement(batchSize);
         ConnectionRecord cr = migrateStore.getConnectionPool().pop();
         Connection migrateConnection = cr.connection;
@@ -440,7 +492,7 @@ public class FSMigrater implements MigrationConstants {
                 migrateStore.releaseConnection(cr);
                 return; // nix to do
             }
-            dbg("starting to migrate " + totalRecords + " items for " + component);
+            dbg("migrating " + totalRecords + " items for " + component);
             migrateConnection.setAutoCommit(false);
             targetConnection.setAutoCommit(false);
 
@@ -484,9 +536,9 @@ public class FSMigrater implements MigrationConstants {
                     if (0 == me.getImportCode()) {
                         if (runUpkeep) {
 
-                            if (targetStore instanceof MonitoredStoreInterface ) {
-                                MonitoredStoreInterface monitoredStoreInterface= (MonitoredStoreInterface) targetStore;
-                                if(monitoredStoreInterface.hasUpkeepConfiguration()){
+                            if (targetStore instanceof MonitoredStoreInterface) {
+                                MonitoredStoreInterface monitoredStoreInterface = (MonitoredStoreInterface) targetStore;
+                                if (monitoredStoreInterface.hasUpkeepConfiguration()) {
                                     doUpkeep(monitoredStoreInterface.getUpkeepConfiguration(),
                                             me,
                                             (Monitored) value);
@@ -503,7 +555,7 @@ public class FSMigrater implements MigrationConstants {
                         // Positive means migrate, but with special note already set in me.
                         targetStore.doRegisterStatement(registerEntryStmt, value);
                         registerEntryStmt.addBatch();
-                        if(0==me.getImportCode()) {
+                        if (0 == me.getImportCode()) {
                             // was nots et elsewhere, do it here. No message needed
                             me.setImportCode(IMPORT_CODE_SUCCESS);
                         }
@@ -512,13 +564,11 @@ public class FSMigrater implements MigrationConstants {
                         importCount++;
                     }
 
-                    if (0 < attemptedCount && 0 == attemptedCount % 100) {
-                        if (pacerOn) {
-                            pacer.pace(attemptedCount, (100 * attemptedCount / totalRecords) + "% of files migrated in " +
+                    if (pacerOn && (0 < attemptedCount && 0 == attemptedCount % 100)) {
+                            pacer.pace(attemptedCount, (100 * attemptedCount / totalRecords) + "% of files read in " +
                                     component + " @ " +
-                                    (100000 / (System.currentTimeMillis() - hzTime)) + " Hz" +(runUpkeep?(" upkept=" + upkept):""));
+                                    (100000 / (System.currentTimeMillis() - hzTime)) + " Hz" + (runUpkeep ? (" upkept=" + upkept) : ""));
                             hzTime = System.currentTimeMillis();
-                        }
                     }
                 } catch (FileNotFoundException fnf) {
                     setImportMessage(me, IMPORT_CODE_FILE_NOT_FOUND, fnf);
@@ -527,6 +577,7 @@ public class FSMigrater implements MigrationConstants {
                 } catch (IOException e) {
                     setImportMessage(me, IMPORT_CODE_COULD_NOT_READ, e);
                 } catch (Throwable t) {
+                    t.printStackTrace();
                     setImportMessage(me, IMPORT_CODE_OTHER_ERROR, t);
                 }
                 //  update  oauth2.migrate  set is_imported=?,import_code=?,error_message=?,import_ts=? where filename=? AND store_type=?
@@ -539,14 +590,18 @@ public class FSMigrater implements MigrationConstants {
                 }
                 meUpdateStmt.setDate(4, new java.sql.Date(me.getImportTS().getTime()));
                 meUpdateStmt.setString(5, me.getFilename());
-                meUpdateStmt.setString(6, me.getStoreType());
+                meUpdateStmt.setString(6, me.getStoreType().toLowerCase());
                 meUpdateStmt.addBatch();
                 if (me.getImportCode() < 0) {
                     int index = importErrorCodes[Math.abs(me.getImportCode())];
                     importErrorCodes[index] = 1 + importErrorCodes[index];
                     localBadCount++;
                 }
-                if (0 < attemptedCount && attemptedCount % 15000 == 0) {
+                if (0 < batchSize && 0 < attemptedCount && attemptedCount % batchSize == 0) {
+                    if(pacerOn){
+                        pacer.clear();
+                        pacer.pace(batchSize,"updating store...");
+                    }
                     registerEntryStmt.executeBatch();
                     rcs = meUpdateStmt.executeBatch();
                     migrateConnection.commit();
@@ -561,7 +616,7 @@ public class FSMigrater implements MigrationConstants {
                 pacer.pace(attemptedCount, " files migrated in " +
                         component + ", rejected=" +
                         localBadCount + " @ " +
-                        (100000 / (System.currentTimeMillis() - hzTime)) + " Hz" +(runUpkeep?(" upkept=" + upkept):""));
+                        (100000 / (System.currentTimeMillis() - hzTime)) + " Hz" + (runUpkeep ? (" upkept=" + upkept) : ""));
                 hzTime = System.currentTimeMillis();
             }
             if (0 < importCount) {  // It is possible that, e.g. all entries are unreadable.
@@ -588,8 +643,9 @@ public class FSMigrater implements MigrationConstants {
         }
         dbg();
         dbg("       total : " + attemptedCount);
-        dbg("   bad files : " + localBadCount);
         dbg("      upkept : " + upkept);
+        dbg("   bad files : " + localBadCount);
+        dbg("   net files : " + importCount);
         dbg("        time : " + StringUtils.formatElapsedTime(System.currentTimeMillis() - startTime));
         dbg("   av. speed : " + computeHerz(attemptedCount, startTime));
         interpretErrorCode(importErrorCodes);
@@ -630,7 +686,7 @@ public class FSMigrater implements MigrationConstants {
     protected boolean doUpkeep(UpkeepConfiguration upkeepConfiguration,
                                MigrationEntry me,
                                Monitored monitored) throws SQLException {
-        if(upkeepConfiguration == null){
+        if (upkeepConfiguration == null) {
             return false;
         }
         String[] rcs = upkeepConfiguration.applies(monitored);
