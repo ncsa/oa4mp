@@ -513,6 +513,7 @@ public class FSMigrationTool extends CLITool {
                         }
                     }
                     echoFile.delete();
+                    say("logging to " + echoFile.getAbsolutePath());
                     echoWriter = new FileWriter(echoFile);
                 } else {
                     say("warning \"" + echoFile + "\" is a directory. No echoing can be done.");
