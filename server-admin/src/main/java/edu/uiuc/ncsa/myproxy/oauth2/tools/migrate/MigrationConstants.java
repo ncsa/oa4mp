@@ -41,6 +41,7 @@ public interface MigrationConstants {
     String IMPORT_MESSAGE_MISSING_ID = "missing identifier: entry improperly structured";
 
     int IMPORT_CODE_UPKEEP_DELETED = -11;
+    String IMPORT_MESSAGE_UPKEEP_DELETED = "deleted by upkeep";
     int IMPORT_CODE_NO_CORRESPONDING_ENTRY = -12;
     String IMPORT_MESSAGE_NO_CORRESPONDING_ENTRY = "no main entry for this object";
 
@@ -84,6 +85,8 @@ public interface MigrationConstants {
                 return IMPORT_MESSAGE_NO_CORRESPONDING_ENTRY;
             case IMPORT_CODE_UPKEEP_SKIPPED:
                 return IMPORT_MESSAGE_UPKEEP_SKIPPED;
+            case IMPORT_CODE_UPKEEP_DELETED:
+                return IMPORT_MESSAGE_UPKEEP_DELETED;
             default:
                 return IMPORT_MESSAGE_UNKNOWN_ERROR_CODE;
         }

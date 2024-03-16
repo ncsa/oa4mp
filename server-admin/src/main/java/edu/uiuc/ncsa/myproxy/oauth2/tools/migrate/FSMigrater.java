@@ -27,10 +27,7 @@ import edu.uiuc.ncsa.security.storage.sql.SQLDatabase;
 import edu.uiuc.ncsa.security.storage.sql.SQLStore;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.sql.*;
 import java.util.HashSet;
 import java.util.List;
@@ -43,8 +40,9 @@ import static edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConstants.*;
  * on 3/5/24 at  7:20 AM
  */
 public class FSMigrater implements MigrationConstants {
-    public FSMigrater(MigrateStore migrateStore) {
+    public FSMigrater(MigrateStore migrateStore, Writer echoWriter) {
         this.migrateStore = migrateStore;
+        this.echoWriter = echoWriter;
     }
 
     MigrateStore migrateStore;
@@ -145,7 +143,16 @@ public class FSMigrater implements MigrationConstants {
 
     void dbg(String x) {
         if (DEEP_DEBUG) {
-            System.err.println(caput + ":" + x);
+            String message =  caput + ":" + x;
+            System.err.println(message);
+            if(hasEchoWriter()){
+                try {
+                    echoWriter.write(message + "\n");
+                } catch (IOException e) {
+                    System.err.println("warning: echoing failed. echo is disabled:" + e.getMessage());
+                    echoWriter = null;
+                }
+            }
         }
     }
 
@@ -399,10 +406,6 @@ public class FSMigrater implements MigrationConstants {
                         setIDs((SQLStore) store, adminIDs);
                     }
                 }
-
-            } catch (SQLNonTransientConnectionException y) {
-                System.err.println("JDBC URL = " + migrateStore.getConnectionPool().getConnectionParameters().getJdbcUrl());
-                y.printStackTrace();
             } catch (SQLException sqlException) {
                 sqlException.printStackTrace();
             }
@@ -480,7 +483,7 @@ public class FSMigrater implements MigrationConstants {
             PreparedStatement counterStmt = migrateConnection.prepareStatement(countStmt);
             counterStmt.setBoolean(1, false);
             counterStmt.setInt(2, 0);
-            counterStmt.setString(3, component);
+            counterStmt.setString(3, component.toLowerCase());
             rs = counterStmt.executeQuery();
             // rs.next();
             if (rs.next()) {
@@ -492,6 +495,7 @@ public class FSMigrater implements MigrationConstants {
                 migrateStore.releaseConnection(cr);
                 return; // nix to do
             }
+            dbg();
             dbg("migrating " + totalRecords + " items for " + component);
             migrateConnection.setAutoCommit(false);
             targetConnection.setAutoCommit(false);
@@ -544,6 +548,7 @@ public class FSMigrater implements MigrationConstants {
                                             (Monitored) value);
                                     if (me.getImportCode() < 0) {
                                         upkept++; // update the stats
+                                        localBadCount--; // don't count upkept as bad.
                                     }
                                 }
                             }
@@ -597,7 +602,8 @@ public class FSMigrater implements MigrationConstants {
                     importErrorCodes[index] = 1 + importErrorCodes[index];
                     localBadCount++;
                 }
-                if (0 < batchSize && 0 < attemptedCount && attemptedCount % batchSize == 0) {
+                if (0 < batchSize && 0 < importCount && importCount % batchSize == 0) {
+                    // only triggers a batch when there are enough
                     if(pacerOn){
                         pacer.clear();
                         pacer.pace(batchSize,"updating store...");
@@ -613,7 +619,7 @@ public class FSMigrater implements MigrationConstants {
             } //end loop
             rs.close();
             if (pacerOn) { // get that last pace so the file totals look right
-                pacer.pace(attemptedCount, " files migrated in " +
+                pacer.pace(importCount, " files migrated in " +
                         component + ", rejected=" +
                         localBadCount + " @ " +
                         (100000 / (System.currentTimeMillis() - hzTime)) + " Hz" + (runUpkeep ? (" upkept=" + upkept) : ""));
@@ -720,4 +726,8 @@ public class FSMigrater implements MigrationConstants {
     }
 
     String spacer = ": ";
+    Writer echoWriter = null;
+    protected boolean hasEchoWriter(){
+        return echoWriter != null;
+    }
 }

@@ -15,9 +15,7 @@ import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.List;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPConfigTags.COMPONENT;
@@ -58,7 +56,7 @@ public class FSMigrationTool extends CLITool {
 
     public FSMigrater getMigrater() {
         if (migrater == null) {
-            migrater = new FSMigrater(migrateStore);
+            migrater = new FSMigrater(migrateStore, echoWriter);
         }
         return migrater;
     }
@@ -77,13 +75,14 @@ public class FSMigrationTool extends CLITool {
             //return;
             getMigrater().ingest(sourceSE, isNoTransactions(), getBatchSize(), isPacerOn());
         }
-        if(storeName == null){
+        if (storeName == null) {
             getMigrater().migrateAll(targetSE, isNoTransactions(), getBatchSize(), isUpkeepOn(), isPacerOn());
         } else {
             getMigrater().migrate(targetSE, getBatchSize(), isUpkeepOn(), storeName, isPacerOn());
         }
 
         say("TOTAL Processing time for all operations:" + StringUtils.formatElapsedTime(System.currentTimeMillis() - now));
+
     }
 
 
@@ -91,6 +90,7 @@ public class FSMigrationTool extends CLITool {
     public void help() {
 
     }
+
     String storeName = null;
     OA2SE sourceSE;
     OA2SE targetSE;
@@ -262,7 +262,7 @@ public class FSMigrationTool extends CLITool {
         if (resetIngestDB) {
             try {
                 sayv("resetting ingest DB...");
-              int updateCount =   migrateStore.resetImportCodes(storeName);
+                int updateCount = migrateStore.resetImportCodes(storeName);
                 sayv("...done! Update " + updateCount + " records.");
 
             } catch (Throwable t) {
@@ -318,43 +318,65 @@ public class FSMigrationTool extends CLITool {
     public static final String CONFIG_SETUP = "-setup";
     public static final String CONFIG_RESET = "-reset";
     public static final String CONFIG_STORE_NAME = "-storeName";
+    public static final String CONFIG_ECHO_FILE = "-echoFile";
+
+    String echoFileName = null;
+    static Writer echoWriter = null;
+
+    public static void say(String x) {
+        //    System.out.println(x);
+        getIoInterface().println(x);
+        if (echoOn()) {
+            try {
+
+                echoWriter.write(x + "\n");
+            } catch (IOException e) {
+                echoWriter = null; // disables it.
+                getIoInterface().println("warning: echoing failed. echo is disabled:" + e.getMessage());
+            }
+        }
+    }
+
+    protected static boolean echoOn() {
+        return echoWriter != null;
+    }
 
     public static void showHelp() {
         int width = 20;
         String eq = " : ";
-        String indent = StringUtils.getBlanks(width + 1+2*eq.length());
+        String indent = StringUtils.getBlanks(width + 1 + 2 * eq.length());
         say(FSMigrationTool.class.getSimpleName() + ": a tool to migrate an existing filestore to another store");
         say("The scenario is that you have a possible enormous filestore with thousands of entries and need");
         say("to move the contents to a different type of OA4MP store. Such a migration should be done separately, ");
         say("not when the server is running since the load could be quite high. ");
         say("Type key: I = integer, F = flag (no arg), B = boolean (true | false), S = string");
         say("");
-        say(StringUtils.RJustify("     Flag     ",20) + eq + "T" + eq + "                           Description");
-        say(StringUtils.RJustify(CONFIG_BATCH_SIZE, 20) + eq + "I" + eq +"The number of files to process at once. Default is no batching.");
+        say(StringUtils.RJustify("     Flag     ", 20) + eq + "T" + eq + "                           Description");
+        say(StringUtils.RJustify(CONFIG_BATCH_SIZE, 20) + eq + "I" + eq + "The number of files to process at once. Default is no batching.");
         say(StringUtils.RJustify(CONFIG_CLEANUP, 20) + eq + "F" + eq + "Removes the ingestion database. This will be executed, then the application will exit.");
         say(indent + "Since Derby does not have a nice way to clean databases up, it is included as a utility.");
+        say(StringUtils.RJustify(CONFIG_ECHO_FILE, 20) + eq + "S" + eq + "Path to a file (always overwritten) that echos the console output.");
         say(StringUtils.RJustify(CONFIG_HELP, 20) + eq + "F" + eq + "Show the help. Overrides all other flags. Note double hypen!");
         say(StringUtils.RJustify(CONFIG_NO_TRANSACTIONS, 20) + eq + "F" + eq + "Does not migrate any pending transfers. This means");
         say(indent + "any pending transfers are lost. Default is false.");
-        say(StringUtils.RJustify(CONFIG_PACE_OFF, 20) + eq + "B" + eq +"Disables the pacer (status bar thingy.) default is true");
+        say(StringUtils.RJustify(CONFIG_PACE_OFF, 20) + eq + "B" + eq + "Disables the pacer (status bar thingy.) default is true");
         say(StringUtils.RJustify(CONFIG_RESET, 20) + eq + "F" + eq + "If the ingest table exists, reset all of the entries to being un-imported.");
         say(indent + "This is useful if the import failed and you want to restart all over without re-ingesting");
         say(indent + "Note that this may be used with " + CONFIG_STORE_NAME + " to do a single component.");
-        say(StringUtils.RJustify(CONFIG_SETUP, 20) + eq + "F" + eq +"Creates any required databases. This creates any databases then exits.");
-        say(indent+"If omitted, the databases are created as needed and the migration is done.");
-        say(StringUtils.RJustify(CONFIG_SHOW_CONNECT, 20) + eq + "F" + eq +"Show the Derby connection strings. Useful if you have Derby installed. Default is not to show.");
+        say(StringUtils.RJustify(CONFIG_SETUP, 20) + eq + "F" + eq + "Creates any required databases. This creates any databases then exits.");
+        say(indent + "If omitted, the databases are created as needed and the migration is done.");
+        say(StringUtils.RJustify(CONFIG_SHOW_CONNECT, 20) + eq + "F" + eq + "Show the Derby connection strings. Useful if you have Derby installed. Default is not to show.");
         say(StringUtils.RJustify(CONFIG_SOURCE_CFG, 20) + eq + "S" + eq + "The full path to the source config file.");
-        say(StringUtils.RJustify(CONFIG_SOURCE_CFG_NAME, 20) + eq + "S" + eq +"The name of the configuration. Must be a file store.");
+        say(StringUtils.RJustify(CONFIG_SOURCE_CFG_NAME, 20) + eq + "S" + eq + "The name of the configuration. Must be a file store.");
         say(StringUtils.RJustify(CONFIG_STORE_NAME, 20) + eq + "S" + eq + "The name of a single store component (these are the tag names in the XML");
         say(indent + "file). If you supply this, exactly that one component will be imported and nothing else. Used in conjuntion with");
         say(indent + CONFIG_RESET + ", resets only that named components.");
-        say(StringUtils.RJustify(CONFIG_TARGET_CFG, 20) + eq + "S" +eq + "The full path to the configuration file.");
+        say(StringUtils.RJustify(CONFIG_TARGET_CFG, 20) + eq + "S" + eq + "The full path to the configuration file.");
         say(indent + "If omitted, assumed to be the same as " + CONFIG_SOURCE_CFG);
-        say(StringUtils.RJustify(CONFIG_TARGET_CFG_NAME, 20) + eq + "F"+eq +"The name of the target configuration");
+        say(StringUtils.RJustify(CONFIG_TARGET_CFG_NAME, 20) + eq + "F" + eq + "The name of the target configuration");
         say(StringUtils.RJustify(CONFIG_DO_UPKEEP, 20) + eq + "B" + eq + "Applies upkeep in the target store to all entries on import. Default is true");
-        say(StringUtils.RJustify(CONFIG_VERBOSE, 20) + eq + "F" + eq +"Makes the operation much chattier. Default is none.");
+        say(StringUtils.RJustify(CONFIG_VERBOSE, 20) + eq + "F" + eq + "Makes the operation much chattier. Default is none.");
     }
-
 
 
     public boolean isNoTransactions() {
@@ -393,7 +415,7 @@ public class FSMigrationTool extends CLITool {
         } else {
             say("missing " + CONFIG_SOURCE_CFG_NAME + " parameter.");
         }
-        if(inputLine.hasArg(CONFIG_STORE_NAME)){
+        if (inputLine.hasArg(CONFIG_STORE_NAME)) {
             storeName = inputLine.getNextArgFor(CONFIG_STORE_NAME).toLowerCase();
             inputLine.removeSwitchAndValue(CONFIG_STORE_NAME);
         }
@@ -452,7 +474,7 @@ public class FSMigrationTool extends CLITool {
         dir.delete();
     }
 
-    protected boolean getArgs(InputLine inputLine) {
+    protected boolean getArgs(InputLine inputLine) throws IOException {
         if (inputLine.hasArg(CONFIG_VERBOSE)) {
             setVerbose(true);
             inputLine.removeSwitch(CONFIG_VERBOSE);
@@ -477,7 +499,26 @@ public class FSMigrationTool extends CLITool {
             sayv("No explicit target configuration, using the source configuration for both.");
         }
 
-
+        if (inputLine.hasArg(CONFIG_ECHO_FILE)) {
+            echoFileName = inputLine.getNextArgFor(CONFIG_ECHO_FILE);
+            File echoFile = new File(echoFileName);
+            if (echoFile.exists()) {
+                if (echoFile.isFile()) {
+                    say("warning -- echo file \"" + echoFileName + "\" exists and will be overwritten");
+                    if (isVerbose()) {
+                        say("Continue?(y/n)?");
+                        if (!readline().equals("y")) {
+                            say("aborting...");
+                            return false;
+                        }
+                    }
+                    echoFile.delete();
+                    echoWriter = new FileWriter(echoFile);
+                } else {
+                    say("warning \"" + echoFile + "\" is a directory. No echoing can be done.");
+                }
+            }
+        }
         if (inputLine.hasArg(CONFIG_SOURCE_CFG_NAME)) {
             setSourceConfigName(inputLine.getNextArgFor(CONFIG_SOURCE_CFG_NAME));
             inputLine.removeSwitchAndValue(CONFIG_SOURCE_CFG_NAME);
@@ -537,6 +578,10 @@ public class FSMigrationTool extends CLITool {
         if (fsm.loadEnvironments()) { // returns true
             fsm.doIt();
         }
+        if(echoOn()){
+              echoWriter.flush();
+              echoWriter.close();
+          }
     }
 
 }
