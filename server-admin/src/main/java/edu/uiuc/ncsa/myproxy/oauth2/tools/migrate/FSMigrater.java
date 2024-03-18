@@ -29,10 +29,12 @@ import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
 
 import java.io.*;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPConfigTags.*;
+import static edu.uiuc.ncsa.security.core.util.StringUtils.RJustify;
 import static edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConstants.*;
 
 /**
@@ -209,7 +211,7 @@ public class FSMigrater implements MigrationConstants {
         long totalBytes = 0L; // bytes read here
         long localBadCount = 0L; // files rejected here
         long startTime = System.currentTimeMillis();
-        int[] importErrorCodes = new int[ALL_FAILURE_CODES.length];
+        int[] importErrorCodes = new int[1+ALL_FAILURE_CODES.length];
         long hzTime = startTime;
 
         try {
@@ -224,7 +226,7 @@ public class FSMigrater implements MigrationConstants {
                 pStmt.setString(3, component.toLowerCase()); // normalize to lower case
                 int importCode = getImportCode(f);
                 if (importCode < 0) {
-                    int index = importErrorCodes[Math.abs(importCode)];
+                    int index = Math.abs(importCode);
                     importErrorCodes[index] = 1 + importErrorCodes[index];
                     localBadCount++;
                 }
@@ -255,14 +257,23 @@ public class FSMigrater implements MigrationConstants {
             long startBatch = System.currentTimeMillis();
             dbg("ingesting...");
             int[] rcs = pStmt.executeBatch();
-            dbg("       store : " + component);
-            dbg("       total : " + rcs.length);
-            dbg("    rejected : " + localBadCount);
-            dbg("update speed : " + computeHerz(rcs.length, startBatch));
-            dbg("       bytes : " + StringUtils.formatByteCount(totalBytes));
-            dbg("  total time : " + StringUtils.formatElapsedTime(System.currentTimeMillis() - startTime));
-            interpretErrorCode(importErrorCodes);
-            //   pStmt.clearBatch();
+            // reporting
+            int width=12;
+            String spacer =" : ";
+            dbg(RJustify("store",width) + spacer + component);
+            dbg(RJustify("total",width) + spacer + rcs.length);
+            dbg(RJustify("rejected",width) + spacer + localBadCount);
+            dbg(RJustify("update speed",width) + spacer + computeHerz(rcs.length, startBatch));
+            dbg(RJustify("bytes",width) + spacer + StringUtils.formatByteCount(totalBytes));
+            dbg(RJustify("total time",width) + spacer + StringUtils.formatElapsedTime(System.currentTimeMillis() - startTime));
+            List<String> err = interpretErrorCode(importErrorCodes);
+            if(!err.isEmpty()){
+                String indent =  StringUtils.getBlanks(width + spacer.length());
+                dbg(RJustify("error codes", width) + spacer + err.get(0) );
+                for(int i =1 ; i < err.size(); i++) {
+                    dbg(indent + err.get(i));
+                }
+            }
             c.commit();
             pStmt.close();
             c.setAutoCommit(true); // don't leave it with auto-commit off.
@@ -279,7 +290,12 @@ public class FSMigrater implements MigrationConstants {
             throw sqlException;
         }
     }
-
+     protected boolean hasErrorCodes(int[] importErrorCodes){
+        for(int i = 0; i < importErrorCodes.length; i++){
+            if(0 < importErrorCodes[i]) return true;
+        }
+        return false;
+     }
     /**
      * Adds blanks to the output since the units may vary widely at times.  This way if this is
      * used by pacer, there are not odd artifacts at the end of the line.
@@ -300,12 +316,14 @@ public class FSMigrater implements MigrationConstants {
      * @param errorCodes
      */
 
-    void interpretErrorCode(int[] errorCodes) {
+    List<String> interpretErrorCode(int[] errorCodes) {
+        List<String> out = new ArrayList<>();
         for (int i = 0; i < errorCodes.length; i++) {
             if (0 < errorCodes[i]) {
-                dbg("    " + getImportMessage(-errorCodes[i]) + ":" + errorCodes[i]);
+                out.add(getImportMessage(-i) + ":" + errorCodes[i]);
             }
         }
+        return out;
     }
 
     private static int getImportCode(File f) {
@@ -411,7 +429,7 @@ public class FSMigrater implements MigrationConstants {
             }
         } // end for
         dbg();
-        dbg("total elapsed time : " + StringUtils.formatElapsedTime(System.currentTimeMillis() - startTime));
+        dbg("total elapsed migration time : " + StringUtils.formatElapsedTime(System.currentTimeMillis() - startTime));
     }
 
     HashSet<Identifier> adminIDs = new HashSet<>();
@@ -503,7 +521,7 @@ public class FSMigrater implements MigrationConstants {
             PreparedStatement meStmt = migrateConnection.prepareStatement(stmt);
             meStmt.setBoolean(1, false);
             meStmt.setInt(2, 0);
-            meStmt.setString(3, component);
+            meStmt.setString(3, component.toLowerCase());
             PreparedStatement meUpdateStmt = migrateConnection.prepareStatement(migrateStore.getUpdateStatement());
             PreparedStatement registerEntryStmt = targetConnection.prepareStatement(targetStore.getTable().createInsertStatement());
 
@@ -598,8 +616,8 @@ public class FSMigrater implements MigrationConstants {
                 meUpdateStmt.setString(6, me.getStoreType().toLowerCase());
                 meUpdateStmt.addBatch();
                 if (me.getImportCode() < 0) {
-                    int index = importErrorCodes[Math.abs(me.getImportCode())];
-                    importErrorCodes[index] = 1 + importErrorCodes[index];
+                    int index = Math.abs(me.getImportCode());
+                    importErrorCodes[index] = 1 + importErrorCodes[index]; // increment counter
                     localBadCount++;
                 }
                 if (0 < batchSize && 0 < importCount && importCount % batchSize == 0) {
@@ -648,13 +666,22 @@ public class FSMigrater implements MigrationConstants {
 
         }
         dbg();
-        dbg("       total : " + attemptedCount);
-        dbg("      upkept : " + upkept);
-        dbg("   bad files : " + localBadCount);
-        dbg("   net files : " + importCount);
-        dbg("        time : " + StringUtils.formatElapsedTime(System.currentTimeMillis() - startTime));
-        dbg("   av. speed : " + computeHerz(attemptedCount, startTime));
-        interpretErrorCode(importErrorCodes);
+        int width = 12;
+        String spacer = " : ";
+        dbg(RJustify("total",width) +spacer + attemptedCount);
+        dbg(RJustify("upkept",width) +spacer + upkept);
+        dbg(RJustify("bad files",width) +spacer + localBadCount);
+        dbg(RJustify("net files",width) +spacer + importCount);
+        dbg(RJustify("time",width) +spacer + StringUtils.formatElapsedTime(System.currentTimeMillis() - startTime));
+        dbg(RJustify("av. speed",width) +spacer + computeHerz(attemptedCount, startTime));
+        List<String> err = interpretErrorCode(importErrorCodes);
+        if(!err.isEmpty()){
+            String indent =  StringUtils.getBlanks(width + spacer.length());
+            dbg(RJustify("error codes", width) + spacer + err.get(0) );
+            for(int i =1 ; i < err.size(); i++) {
+                dbg(indent + err.get(i));
+            }
+        }
     }
 
     protected boolean doCheck(Identifiable identifiable) {

@@ -5,7 +5,6 @@ import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import edu.uiuc.ncsa.security.core.util.FileUtil;
-import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.FileStore;
 import edu.uiuc.ncsa.security.storage.sql.SQLStore;
 import edu.uiuc.ncsa.security.storage.sql.derby.DerbyConnectionPool;
@@ -16,10 +15,12 @@ import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import java.io.*;
-import java.util.List;
+import java.lang.reflect.Field;
+import java.util.*;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPConfigTags.COMPONENT;
 import static edu.uiuc.ncsa.security.core.configuration.StorageConfigurationTags.DERBY_STORE_TYPE_FILE;
+import static edu.uiuc.ncsa.security.core.util.StringUtils.*;
 
 /**
  * Migration tool for old style file stores to (at this point) a Derby store.
@@ -71,8 +72,6 @@ public class FSMigrationTool extends CLITool {
     public void doIt() throws Exception {
         long now = System.currentTimeMillis();
         if (doIngest) {
-            // say("done with setting up databases. You may now run this ");
-            //return;
             getMigrater().ingest(sourceSE, isNoTransactions(), getBatchSize(), isPacerOn());
         }
         if (storeName == null) {
@@ -81,7 +80,7 @@ public class FSMigrationTool extends CLITool {
             getMigrater().migrate(targetSE, getBatchSize(), isUpkeepOn(), storeName, isPacerOn());
         }
 
-        say("TOTAL Processing time for all operations:" + StringUtils.formatElapsedTime(System.currentTimeMillis() - now));
+        say("TOTAL Processing time for all operations:" + formatElapsedTime(System.currentTimeMillis() - now));
 
     }
 
@@ -319,6 +318,7 @@ public class FSMigrationTool extends CLITool {
     public static final String CONFIG_RESET = "-reset";
     public static final String CONFIG_STORE_NAME = "-storeName";
     public static final String CONFIG_ECHO_FILE = "-echoFile";
+    public static final String CONFIG_ECHO_APPEND = "-echoAppend";
 
     String echoFileName = null;
     static Writer echoWriter = null;
@@ -341,41 +341,170 @@ public class FSMigrationTool extends CLITool {
         return echoWriter != null;
     }
 
-    public static void showHelp() {
-        int width = 20;
-        String eq = " : ";
-        String indent = StringUtils.getBlanks(width + 1 + 2 * eq.length());
+    protected static Map<String, HelpEntry> helpMap = null;
+
+    protected static class HelpEntry {
+        public HelpEntry(String name, String type, String defaultValue, String description) {
+            this.name = name;
+            this.type = type;
+            this.description = description;
+            this.defaultValue = defaultValue;
+        }
+
+        String name;
+        String type;
+        String description;
+        String[] description2;
+        String defaultValue="-";
+    }
+
+    /**
+     * Creates the help map. This adds the entry by key. Later these are alphabetized, formatted, etc.
+     *
+     * @return
+     */
+    protected static Map<String, HelpEntry> getHelpMap() {
+        if (helpMap == null) {
+            helpMap = new HashMap<>();
+            addHelpEntry(CONFIG_BATCH_SIZE, "I", "0", "The number of files to process at once. Default (0) is no batching.");
+            addHelpEntry(CONFIG_CLEANUP, "F", "-", "Removes the ingestion database. This will be executed, then the application will exit.",
+                    new String[]{"Since Derby does not have a nice way to clean databases up, it is included as a utility."});
+            addHelpEntry(CONFIG_ECHO_APPEND, "B", "true", "If echoing, append to the echo file. Default is true. If false, the file is overwritten.");
+            addHelpEntry(CONFIG_ECHO_FILE, "S", "Path to a file (always overwritten) that echos the console output.");
+            addHelpEntry(CONFIG_HELP, "F", "Show the help. Overrides all other flags. Note double hypen!");
+            addHelpEntry(CONFIG_NO_TRANSACTIONS, "F", "Does not migrate any pending transfers. This means",
+                    new String[]{"any pending transfers are lost. Default is false."});
+            addHelpEntry(CONFIG_PACE_OFF, "B", "true", "Disables the pacer (status bar thingy.) default is true");
+            addHelpEntry(CONFIG_RESET, "F", "If the ingest table exists, reset all of the entries to being un-imported.",
+                    new String[]{"This is useful if the import failed and you want to restart all over without re-ingesting",
+                            "Note that this may be used with " + CONFIG_STORE_NAME + " to do a single component."});
+            addHelpEntry(CONFIG_SETUP, "F", "Creates any required databases. This creates any databases then exits.",
+                    new String[]{"If omitted, the databases are created as needed and the migration is done."});
+            addHelpEntry(CONFIG_SHOW_CONNECT, "F", "Show the Derby connection strings. Useful if you have Derby installed. Default is not to show.");
+            addHelpEntry(CONFIG_SOURCE_CFG, "S", "The full path to the source config file.");
+            addHelpEntry(CONFIG_SOURCE_CFG_NAME, "S", "The name of the configuration. Must be a file store.");
+            addHelpEntry(CONFIG_STORE_NAME, "S", "The name of a single store component (these are the tag names in the XML",
+                    new String[]{"file). If you supply this, exactly that one component will be imported and nothing else.",
+                            "Used in conjuntion with " + CONFIG_RESET + ", resets only that named components."});
+            addHelpEntry(CONFIG_TARGET_CFG, "S", "The full path to the configuration file.",
+                    new String[]{"If omitted, assumed to be the same as " + CONFIG_SOURCE_CFG});
+            addHelpEntry(CONFIG_TARGET_CFG_NAME, "F", "The name of the target configuration");
+            addHelpEntry(CONFIG_DO_UPKEEP, "B", "Applies upkeep in the target store to all entries on import. Default is true");
+            addHelpEntry(CONFIG_VERBOSE, "F", "Makes the operation much chattier. Default is none.");
+        }
+        return helpMap;
+    }
+
+    protected static void addHelpEntry(String name, String type, String description) {
+        addHelpEntry(name, type, "-", description, null);
+    }
+
+    protected static void addHelpEntry(String name, String type, String description,
+                                       String[] description2) {
+        addHelpEntry(name, type, "-", description, description2);
+    }
+
+    protected static void addHelpEntry(String name,
+                                       String type,
+                                       String defaultValue,
+                                       String description) {
+        addHelpEntry(name, type, defaultValue, description, null);
+    }
+
+    protected static void addHelpEntry(String name,
+                                       String type,
+                                       String defaultValue,
+                                       String description,
+                                       String[] description2) {
+        HelpEntry helpEntry = new HelpEntry(name, type, defaultValue, description);
+        if (description2 != null && 0 < description2.length) {
+            helpEntry.description2 = description2;
+        }
+        helpMap.put(name, helpEntry);
+
+    }
+
+    public static void showHelp() throws IllegalAccessException {
+
         say(FSMigrationTool.class.getSimpleName() + ": a tool to migrate an existing filestore to another store");
         say("The scenario is that you have a possible enormous filestore with thousands of entries and need");
         say("to move the contents to a different type of OA4MP store. Such a migration should be done separately, ");
         say("not when the server is running since the load could be quite high. ");
         say("Type key: I = integer, F = flag (no arg), B = boolean (true | false), S = string");
+        say("If there is a default value, given, otherwise there is a \"-\"");
         say("");
-        say(StringUtils.RJustify("     Flag     ", 20) + eq + "T" + eq + "                           Description");
-        say(StringUtils.RJustify(CONFIG_BATCH_SIZE, 20) + eq + "I" + eq + "The number of files to process at once. Default is no batching.");
-        say(StringUtils.RJustify(CONFIG_CLEANUP, 20) + eq + "F" + eq + "Removes the ingestion database. This will be executed, then the application will exit.");
+
+     //   oldHelp();
+      //  say("=======================================");
+        newHelp();
+    }
+
+    /**
+     * This will take the help entries and format them. The {@link #oldHelp()}  was just getting to be a huge
+     * mess to update.
+     */
+    private static void newHelp() throws IllegalAccessException {
+        // next involve some introspection and setup. These only run once.
+        getAllConfigNames();
+        getHelpMap();
+        int width = 0;
+        for (String name : ALL_CONFIG_NAMES) {
+            width = Math.max(width, name.length());
+        }
+        String spacer = "|";
+        int typeWidth = 3; // how much space to leave for type
+        int defaultWidth = 5; // how much space to leave for default.
+        String indent =
+                getBlanks(width +  typeWidth + defaultWidth + 3 * spacer.length()-1);
+        String title = center("Name", width) + spacer +
+                center("T", typeWidth) + spacer +
+                center("Def", defaultWidth) + spacer +
+                center("Description", 40);
+        say(title);
+        for (String configName : ALL_CONFIG_NAMES) {
+            HelpEntry he = helpMap.get(configName);
+            String line = RJustify(configName, width) + spacer + center(he.type, typeWidth) + spacer + center(he.defaultValue, defaultWidth) + spacer + " " + he.description;
+            say(line);
+            if(he.description2!=null){
+                for(String d : he.description2){
+                    say(indent + spacer + " " + d);
+                }
+            }
+        }
+    }
+
+    private static void oldHelp() {
+        int width = 20;
+        String eq = " : ";
+        String indent = getBlanks(width + 1 + 2 * eq.length());
+        say("Type key: I = integer, F = flag (no arg), B = boolean (true | false), S = string");
+        say("");
+        say(RJustify("     Flag     ", 20) + eq + "T" + eq + "                           Description");
+        say(RJustify(CONFIG_BATCH_SIZE, 20) + eq + "I" + eq + "The number of files to process at once. Default is no batching.");
+        say(RJustify(CONFIG_CLEANUP, 20) + eq + "F" + eq + "Removes the ingestion database. This will be executed, then the application will exit.");
         say(indent + "Since Derby does not have a nice way to clean databases up, it is included as a utility.");
-        say(StringUtils.RJustify(CONFIG_ECHO_FILE, 20) + eq + "S" + eq + "Path to a file (always overwritten) that echos the console output.");
-        say(StringUtils.RJustify(CONFIG_HELP, 20) + eq + "F" + eq + "Show the help. Overrides all other flags. Note double hypen!");
-        say(StringUtils.RJustify(CONFIG_NO_TRANSACTIONS, 20) + eq + "F" + eq + "Does not migrate any pending transfers. This means");
+        say(RJustify(CONFIG_ECHO_APPEND, 20) + eq + "B" + eq + "If echoing, append to the echo file. Default is true. If false, the file is overwritten.");
+        say(RJustify(CONFIG_ECHO_FILE, 20) + eq + "S" + eq + "Path to a file (always overwritten) that echos the console output.");
+        say(RJustify(CONFIG_HELP, 20) + eq + "F" + eq + "Show the help. Overrides all other flags. Note double hypen!");
+        say(RJustify(CONFIG_NO_TRANSACTIONS, 20) + eq + "F" + eq + "Does not migrate any pending transfers. This means");
         say(indent + "any pending transfers are lost. Default is false.");
-        say(StringUtils.RJustify(CONFIG_PACE_OFF, 20) + eq + "B" + eq + "Disables the pacer (status bar thingy.) default is true");
-        say(StringUtils.RJustify(CONFIG_RESET, 20) + eq + "F" + eq + "If the ingest table exists, reset all of the entries to being un-imported.");
+        say(RJustify(CONFIG_PACE_OFF, 20) + eq + "B" + eq + "Disables the pacer (status bar thingy.) default is true");
+        say(RJustify(CONFIG_RESET, 20) + eq + "F" + eq + "If the ingest table exists, reset all of the entries to being un-imported.");
         say(indent + "This is useful if the import failed and you want to restart all over without re-ingesting");
         say(indent + "Note that this may be used with " + CONFIG_STORE_NAME + " to do a single component.");
-        say(StringUtils.RJustify(CONFIG_SETUP, 20) + eq + "F" + eq + "Creates any required databases. This creates any databases then exits.");
+        say(RJustify(CONFIG_SETUP, 20) + eq + "F" + eq + "Creates any required databases. This creates any databases then exits.");
         say(indent + "If omitted, the databases are created as needed and the migration is done.");
-        say(StringUtils.RJustify(CONFIG_SHOW_CONNECT, 20) + eq + "F" + eq + "Show the Derby connection strings. Useful if you have Derby installed. Default is not to show.");
-        say(StringUtils.RJustify(CONFIG_SOURCE_CFG, 20) + eq + "S" + eq + "The full path to the source config file.");
-        say(StringUtils.RJustify(CONFIG_SOURCE_CFG_NAME, 20) + eq + "S" + eq + "The name of the configuration. Must be a file store.");
-        say(StringUtils.RJustify(CONFIG_STORE_NAME, 20) + eq + "S" + eq + "The name of a single store component (these are the tag names in the XML");
+        say(RJustify(CONFIG_SHOW_CONNECT, 20) + eq + "F" + eq + "Show the Derby connection strings. Useful if you have Derby installed. Default is not to show.");
+        say(RJustify(CONFIG_SOURCE_CFG, 20) + eq + "S" + eq + "The full path to the source config file.");
+        say(RJustify(CONFIG_SOURCE_CFG_NAME, 20) + eq + "S" + eq + "The name of the configuration. Must be a file store.");
+        say(RJustify(CONFIG_STORE_NAME, 20) + eq + "S" + eq + "The name of a single store component (these are the tag names in the XML");
         say(indent + "file). If you supply this, exactly that one component will be imported and nothing else. Used in conjuntion with");
         say(indent + CONFIG_RESET + ", resets only that named components.");
-        say(StringUtils.RJustify(CONFIG_TARGET_CFG, 20) + eq + "S" + eq + "The full path to the configuration file.");
+        say(RJustify(CONFIG_TARGET_CFG, 20) + eq + "S" + eq + "The full path to the configuration file.");
         say(indent + "If omitted, assumed to be the same as " + CONFIG_SOURCE_CFG);
-        say(StringUtils.RJustify(CONFIG_TARGET_CFG_NAME, 20) + eq + "F" + eq + "The name of the target configuration");
-        say(StringUtils.RJustify(CONFIG_DO_UPKEEP, 20) + eq + "B" + eq + "Applies upkeep in the target store to all entries on import. Default is true");
-        say(StringUtils.RJustify(CONFIG_VERBOSE, 20) + eq + "F" + eq + "Makes the operation much chattier. Default is none.");
+        say(RJustify(CONFIG_TARGET_CFG_NAME, 20) + eq + "F" + eq + "The name of the target configuration");
+        say(RJustify(CONFIG_DO_UPKEEP, 20) + eq + "B" + eq + "Applies upkeep in the target store to all entries on import. Default is true");
+        say(RJustify(CONFIG_VERBOSE, 20) + eq + "F" + eq + "Makes the operation much chattier. Default is none.");
     }
 
 
@@ -499,27 +628,7 @@ public class FSMigrationTool extends CLITool {
             sayv("No explicit target configuration, using the source configuration for both.");
         }
 
-        if (inputLine.hasArg(CONFIG_ECHO_FILE)) {
-            echoFileName = inputLine.getNextArgFor(CONFIG_ECHO_FILE);
-            File echoFile = new File(echoFileName);
-            if (echoFile.exists()) {
-                if (echoFile.isFile()) {
-                    say("warning -- echo file \"" + echoFileName + "\" exists and will be overwritten");
-                    if (isVerbose()) {
-                        say("Continue?(y/n)?");
-                        if (!readline().equals("y")) {
-                            say("aborting...");
-                            return false;
-                        }
-                    }
-                    echoFile.delete();
-                    say("logging to " + echoFile.getAbsolutePath());
-                    echoWriter = new FileWriter(echoFile);
-                } else {
-                    say("warning \"" + echoFile + "\" is a directory. No echoing can be done.");
-                }
-            }
-        }
+        //if (setupEcho(inputLine)) return false;
         if (inputLine.hasArg(CONFIG_SOURCE_CFG_NAME)) {
             setSourceConfigName(inputLine.getNextArgFor(CONFIG_SOURCE_CFG_NAME));
             inputLine.removeSwitchAndValue(CONFIG_SOURCE_CFG_NAME);
@@ -550,7 +659,51 @@ public class FSMigrationTool extends CLITool {
         return true;
     }
 
+    private void setupEcho(InputLine inputLine) throws IOException {
+        if (inputLine.hasArg(CONFIG_ECHO_APPEND)) {
+            setEchoAppend(inputLine.getNextArgFor(CONFIG_ECHO_APPEND).equals("true"));
+            inputLine.removeSwitchAndValue(CONFIG_ECHO_APPEND);
+        }
+
+        if (inputLine.hasArg(CONFIG_ECHO_FILE)) {
+            echoFileName = inputLine.getNextArgFor(CONFIG_ECHO_FILE);
+            File echoFile = new File(echoFileName);
+            boolean doEcho = false;
+            if (echoFile.exists()) {
+                if (echoFile.isFile()) {
+                    if (!isEchoAppend()) {
+                        echoFile.delete();
+                    }
+                    doEcho = true;
+                } else {
+                    doEcho = false;
+                    say("warning \"" + echoFile + "\" is a directory. No echoing can be done.");
+                }
+            } else {
+                doEcho = true;
+            }
+            if (doEcho) {
+                say("logging to \"" + echoFile.getAbsolutePath() + "\", append mode = " + (isEchoAppend() ? "on" : "off"));
+                echoWriter = new FileWriter(echoFile, isEchoAppend());
+                echoWriter.write("\n" + RunSpacer + "\n");
+                echoWriter.write("Starting migration at " + (new Date()) + "\n");
+                echoWriter.write(RunSpacer + "\n");
+            }
+        }
+    }
+
+    protected static String RunSpacer = "===================================================";
     boolean showConnect = false;
+
+    public boolean isEchoAppend() {
+        return echoAppend;
+    }
+
+    public void setEchoAppend(boolean echoAppend) {
+        this.echoAppend = echoAppend;
+    }
+
+    boolean echoAppend = true;
 
     public static void main(String[] args) throws Throwable {
         String[] v = new String[1 + args.length];
@@ -562,6 +715,7 @@ public class FSMigrationTool extends CLITool {
             return;
         }
         FSMigrationTool fsm = new FSMigrationTool();
+        fsm.setupEcho(inputLine);
         // Do the cleanup as a separate task and exit.
         fsm.doCleanup = inputLine.hasArg(CONFIG_CLEANUP);
         fsm.showConnect = inputLine.hasArg(CONFIG_SHOW_CONNECT);
@@ -579,10 +733,33 @@ public class FSMigrationTool extends CLITool {
         if (fsm.loadEnvironments()) { // returns true
             fsm.doIt();
         }
-        if(echoOn()){
-              echoWriter.flush();
-              echoWriter.close();
-          }
+        if (echoOn()) {
+            echoWriter.write(RunSpacer+"\n");
+            echoWriter.write("End of migration run at " + (new Date()) + "\n");
+            echoWriter.write(RunSpacer+"\n");
+            echoWriter.flush();
+            echoWriter.close();
+        }
     }
 
+    static List<String> ALL_CONFIG_NAMES = null;
+
+    public static List<String> getAllConfigNames() throws IllegalAccessException {
+        if (ALL_CONFIG_NAMES == null) {
+            ALL_CONFIG_NAMES = new ArrayList<>();
+            Field[] declaredFields = FSMigrationTool.class.getDeclaredFields();
+            for (Field field : declaredFields) {
+                if (java.lang.reflect.Modifier.isStatic(field.getModifiers())) {
+                    if (field.getName().startsWith("CONFIG_")) {
+                        ALL_CONFIG_NAMES.add(field.get(FSMigrationTool.class).toString());
+                    }
+                }
+
+            }
+            Collections.sort(ALL_CONFIG_NAMES);
+        }
+        return ALL_CONFIG_NAMES;
+    }
 }
+
+
