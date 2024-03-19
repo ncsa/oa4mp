@@ -37,7 +37,7 @@ public class MigrationEntry extends IdentifiableImpl {
     }
 
     public void setStoreType(String store_type) {
-        this.store_type = store_type;
+        this.store_type = store_type.toLowerCase();
     }
 
     public String getPath() {
@@ -100,16 +100,3 @@ public class MigrationEntry extends IdentifiableImpl {
     String filename  = null;
 }
 
-
-/*
-CREATE TABLE oauth2.migrate
-(
-   create_ts              timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-   import_ts              timestamp,
-   store_type             varchar(255),
-   path                   clob,
-   is_imported            boolean,
-   import_ok              boolean,
-   error_message          clob,
-   filename               VARCHAR(255) PRIMARY KEY,
-);*/

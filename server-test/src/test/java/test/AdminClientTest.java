@@ -122,7 +122,7 @@ public class AdminClientTest extends TestBase {
     }
 
     public void testBigAdminClientStore() throws Exception {
-        // This method is for debugging a massive file store. The next conditioinal
+        // This method is for debugging a massive file store. The next conditional
         // means this is always skipped unless you comment it out. It makes a
         // quarter of a million file in about half a minute.
 

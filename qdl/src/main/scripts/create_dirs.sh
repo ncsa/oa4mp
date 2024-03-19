@@ -27,6 +27,6 @@ OA4MP_QDL_DEPLOY=${2:-$DEFAULT_OA4MP_QDL_DEPLOY}
 cd $QDL_ROOT/language/src/main/scripts || exit
 ./create_dirs.sh $QDL_ROOT $OA4MP_QDL_DEPLOY
 # Now that there is a place, put the OA4MP specific documents in the docs directory
-$OA4MP_ROOT/website/convert-docs.sh  $OA4MP_ROOT/qdl/src/main/docs $OA4MP_QDL_DEPLOY/docs
+$OA4MP_ROOT/website/convert-docs.sh  $OA4MP_ROOT $OA4MP_QDL_DEPLOY/docs
 
 

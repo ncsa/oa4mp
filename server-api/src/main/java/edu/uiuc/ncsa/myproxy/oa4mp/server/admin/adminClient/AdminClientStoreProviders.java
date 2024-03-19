@@ -115,6 +115,7 @@ public class AdminClientStoreProviders {
         @Override
         public AdminClientSQLStore newInstance(Table table) {
             AdminClientSQLStore store = new AdminClientSQLStore(getConnectionPool(), table, getAdminClientProvider(), converter);
+            store.setUpkeepConfiguration(getUpkeepConfiguration());
             return store;
         }
 

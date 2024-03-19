@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oauth2.tools.migrate;
 
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionRecord;
@@ -9,9 +10,7 @@ import edu.uiuc.ncsa.security.storage.sql.internals.Table;
 
 import javax.inject.Provider;
 import java.io.File;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -111,18 +110,28 @@ public class MigrateStore extends SQLStore<MigrationEntry> {
         return f.exists();
     }
 
-    public void resetImportCodes() throws SQLException {
+    public int resetImportCodes(String component) throws SQLException {
+        String resetCodeStatement = "update " + getTable().getFQTablename() + " set " + getKeys().import_code() + "=?";
+        resetCodeStatement = resetCodeStatement + ", " + getKeys().error_message() + "=?";
+        boolean hasComponent = !StringUtils.isTrivial(component);
+        if(hasComponent){
+            resetCodeStatement  = resetCodeStatement + " where " + getKeys().store_type() + "=?";
+        }
         ConnectionRecord connectionRecord = getConnectionPool().pop();
-        String resetCodeStatement = "update " + getTable().getFQTablename() + " set " + getKeys().import_code() + " = 0";
-        String resetMessageStatement = "update " + getTable().getFQTablename() + " set " + getKeys().error_message() + "=NULL";
         Connection connection = getConnection().connection;
+        int out = 0;
         try {
-            Statement statement = connection.createStatement();
-            statement.execute(resetCodeStatement);
-            statement.execute(resetMessageStatement);
-            statement.close();
+            PreparedStatement p  = connection.prepareStatement(resetCodeStatement);
+            p.setInt(1, 0);
+            p.setNull(2, Types.LONGVARCHAR);
+            if(hasComponent) {
+                p.setString(3, component.toLowerCase());
+            }
+            out = p.executeUpdate();
+            p.close();
             connection.close();
             releaseConnection(connectionRecord);
+            return out;
         } catch (SQLException sqlException) {
            destroyConnection(connectionRecord);
            throw sqlException;
