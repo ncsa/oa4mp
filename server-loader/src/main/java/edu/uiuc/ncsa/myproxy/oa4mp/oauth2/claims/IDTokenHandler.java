@@ -316,6 +316,7 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
         for (String r : requiredClaims) {
             setCurrentClaim(c, finalClaims, r);
         }
+        // Fix for https://github.com/ncsa/oa4mp/issues/158 follows.
         // As per OIDC spec, if present MUST contain the identifier for the client
         finalClaims.put(AUTHORIZED_PARTY, transaction.getClient().getIdentifierString());
         if (scopes.contains(OA2Scopes.SCOPE_OPENID)) {
@@ -354,29 +355,7 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
             for(String claim : USER_INFO_CLAIMS){
                 setCurrentClaim(c, finalClaims, claim);
             }
-/*
-            setCurrentClaim(c, finalClaims, IDP);
-            setCurrentClaim(c, finalClaims, EPPN);
-            setCurrentClaim(c, finalClaims, EPTID);
-            setCurrentClaim(c, finalClaims, CERT_SUBJECT_DN);
-            setCurrentClaim(c, finalClaims, PAIRWISE_ID);
-            setCurrentClaim(c, finalClaims, SUBJECT_ID);
-            setCurrentClaim(c, finalClaims, OIDC);
-            setCurrentClaim(c, finalClaims, OPENID);
-            setCurrentClaim(c, finalClaims, OU);
-            setCurrentClaim(c, finalClaims, AFFILIATION);
-            setCurrentClaim(c, finalClaims, ENTITLEMENT);
-            setCurrentClaim(c, finalClaims, IS_MEMBER_OF);
-            setCurrentClaim(c, finalClaims, VO_PERSON_ID);
-            setCurrentClaim(c, finalClaims, VO_PERSON_EXTERNALID);
-            setCurrentClaim(c, finalClaims, EDU_PERSON_ENTITLEMENT);
-            setCurrentClaim(c, finalClaims, EDU_PERSON_ASSURANCE);
-            setCurrentClaim(c, finalClaims, EDU_PERSON_ORCID);
-            setCurrentClaim(c, finalClaims, UID_NUMBER);
-            setCurrentClaim(c, finalClaims, I_TRUST_UIN);
-*/
-        }
-        //transaction.setUserMetaData(finalClaims);
+     }
     }
 
     /**
