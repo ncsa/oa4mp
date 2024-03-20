@@ -1091,12 +1091,20 @@ public class OA2ClientCommands extends ClientStoreCommands {
         }
 
           List<Identifier> admins = getPermissionsStore().getAdmins(x.getIdentifier());
-          if(1<admins.size()){
-              sayi("too many admins, remove permission manually and specify both admin and client ids");
-              return;
-          }
-          PermissionList permissions = getPermissionsStore().get(admins.get(0), x.getIdentifier());
-          getPermissionsStore().remove(permissions); // removes all the permission objects
-          sayi("permissions removed:" + permissions.size());
+        // Fix https://github.com/ncsa/oa4mp/issues/174
+        switch (admins.size()){
+            case 0:
+                // no admins, nothing to do.
+                sayi("done");
+                break;
+            case 1:
+                // Fix https://github.com/ncsa/oa4mp/issues/163
+                PermissionList permissions = getPermissionsStore().get(admins.get(0), x.getIdentifier());
+                getPermissionsStore().remove(permissions); // removes all the permission objects
+                sayi("permissions removed:" + permissions.size());
+                break;
+            default:
+                sayi("too many admins, remove permission manually and specify both admin and client ids");
+        }
     }
 }

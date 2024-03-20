@@ -316,6 +316,7 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
         for (String r : requiredClaims) {
             setCurrentClaim(c, finalClaims, r);
         }
+        // Fix for https://github.com/ncsa/oa4mp/issues/158 follows.
         // As per OIDC spec, if present MUST contain the identifier for the client
         finalClaims.put(AUTHORIZED_PARTY, transaction.getClient().getIdentifierString());
         if (scopes.contains(OA2Scopes.SCOPE_OPENID)) {
