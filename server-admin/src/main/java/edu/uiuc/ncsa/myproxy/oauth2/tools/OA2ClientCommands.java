@@ -1098,6 +1098,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
                 sayi("done");
                 break;
             case 1:
+                // Fix https://github.com/ncsa/oa4mp/issues/163
                 PermissionList permissions = getPermissionsStore().get(admins.get(0), x.getIdentifier());
                 getPermissionsStore().remove(permissions); // removes all the permission objects
                 sayi("permissions removed:" + permissions.size());
