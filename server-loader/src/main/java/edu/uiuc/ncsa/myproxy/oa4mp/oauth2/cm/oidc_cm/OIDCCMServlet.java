@@ -36,6 +36,7 @@ import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.servlet.ExceptionHandlerThingie;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.storage.XMLMap;
+import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JWKUtil2;
 import net.sf.json.*;
@@ -238,11 +239,13 @@ public class OIDCCMServlet extends EnvServlet {
             jsonObject.put("idt_max_lifetime", getOA2SE().getMaxIdTokenLifetime() / 1000); // same tag as in client cfg
             jsonObject.put(AUTH_GRANT_TOKEN_LIFETIME, getOA2SE().getAuthorizationGrantLifetime() / 1000);
             jsonObject.put("use_server_default", OA2Client.USE_SERVER_DEFAULT);
+            jsonObject.put("rt_lifetime_create_default", getOA2SE().getCmConfigs().getRFC7591Config().getDefaultRefreshTokenLifetime());
+            jsonObject.put("rt_lifetime_update_default", getOA2SE().getCmConfigs().getRFC7592Config().getDefaultRefreshTokenLifetime());
             jsonObject.put(OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_TAG, getOA2SE().getRtGracePeriod() / 1000);
-            if(adminClient==null){
+            if (adminClient == null) {
                 jsonObject.put("issuer", getOA2SE().getIssuer());
                 jsonObject.put("at_issuer", getOA2SE().getIssuer());
-            }else{
+            } else {
                 VirtualOrganization vo = (VirtualOrganization) getOA2SE().getVOStore().get(adminClient.getVirtualOrganization());
                 jsonObject.put("issuer", vo.getIssuer());
                 jsonObject.put("at_issuer", vo.getAtIssuer());
@@ -324,7 +327,7 @@ public class OIDCCMServlet extends EnvServlet {
             json.put(JWKS_URI, client.getJwksURI().toString());
         }
         if (client.hasJWKS()) {
-            if(gotJWKSURI){
+            if (gotJWKSURI) {
                 throw new IllegalStateException("The specification explicitly forbids having both keys and a jwks uri. Request rejected");
             }
             JSONObject jwks = JSONWebKeyUtil.toJSON(client.getJWKS());
@@ -350,6 +353,7 @@ public class OIDCCMServlet extends EnvServlet {
         json.put(MAX_ID_TOKEN_LIFETIME, lifetimeToSec(client.getMaxIDTLifetime()));
         json.put(ACCESS_TOKEN_LIFETIME, lifetimeToSec(client.getAtLifetime()));
         json.put(MAX_ACCESS_TOKEN_LIFETIME, lifetimeToSec(client.getMaxATLifetime()));
+        // Always assert these.
         json.put(REFRESH_LIFETIME, lifetimeToSec(client.getRtLifetime()));
         json.put(MAX_REFRESH_LIFETIME, lifetimeToSec(client.getMaxRTLifetime()));
         json.put(EA_SUPPORT, client.hasExtendedAttributeSupport());
@@ -407,7 +411,7 @@ public class OIDCCMServlet extends EnvServlet {
         if (client.hasOIDC_CM_Attributes()) {
             // add them back
             for (Object key : client.getOIDC_CM_Attributes().keySet()) {
-                if(!key.equals(OA2Constants.CLIENT_ID)) {
+                if (!key.equals(OA2Constants.CLIENT_ID)) {
                     // had a case where a client uploaded client_id as an extra attribute
                     // Don't allow the user to hot-rod the client id even by accident.
                     json.put(key, client.getOIDC_CM_Attributes().get(key));
@@ -1285,37 +1289,45 @@ public class OIDCCMServlet extends EnvServlet {
 
         if (jsonRequest.containsKey(REFRESH_LIFETIME)) {
             // NOTE this is sent in seconds but is recorded as ms., so convert to milliseconds here.
-            // If the value is <=0 then they are asking for the server default (-1) or disablinf
+            // If the value is <=0 then they are asking for the server default (-1) or disabling
             // refresh tokens (0).
             // It is possible to set up refresh token lifetimes by specifying the grant type of refresh_token,
             // but passing in this parameter overrides that.
-            client.setRtLifetime(lifetimeFromSec(jsonRequest.getLong(REFRESH_LIFETIME)));
+            client.setRtLifetime(lifetimeFromParameter(jsonRequest.get(REFRESH_LIFETIME)));
             jsonRequest.remove(REFRESH_LIFETIME);
+        } else {
+            // Fix for https://github.com/ncsa/oa4mp/issues/176
+            // always set new clients to default if not asserted.
+            // if client already has this zero-ed and it is not asserted, ignore it.
+            // Otherwise, it would make clients that don't want refresh tokens manage
+            // refresh token lifetimes with every update.
+            if (newClient) {
+                client.setRtLifetime(getOA2SE().getCmConfigs().getRFC7591Config().getDefaultRefreshTokenLifetime());
+            } else {
+                client.setRtLifetime(getOA2SE().getCmConfigs().getRFC7592Config().getDefaultRefreshTokenLifetime());
+            }
         }
         if (jsonRequest.containsKey(MAX_REFRESH_LIFETIME)) {
-            // NOTE this is sent in seconds but is recorded as ms., so convert to milliseconds here.
-            client.setMaxRTLifetime(lifetimeFromSec(jsonRequest.getLong(MAX_REFRESH_LIFETIME)));
+            client.setMaxRTLifetime(lifetimeFromParameter(jsonRequest.get(MAX_REFRESH_LIFETIME)));
             jsonRequest.remove(MAX_REFRESH_LIFETIME);
         }
         if (jsonRequest.containsKey(ACCESS_TOKEN_LIFETIME)) {
-            // NOTE this is sent in seconds but is recorded as ms., so convert to milliseconds here.
-            client.setAtLifetime(lifetimeFromSec(jsonRequest.getLong(ACCESS_TOKEN_LIFETIME)));
+            client.setAtLifetime(lifetimeFromParameter(jsonRequest.get(ACCESS_TOKEN_LIFETIME)));
             jsonRequest.remove(ACCESS_TOKEN_LIFETIME);
         }
         if (jsonRequest.containsKey(MAX_ACCESS_TOKEN_LIFETIME)) {
-            // NOTE this is sent in seconds but is recorded as ms., so convert to milliseconds here.
-            client.setMaxATLifetime(lifetimeFromSec(jsonRequest.getLong(MAX_ACCESS_TOKEN_LIFETIME)));
+            client.setMaxATLifetime(lifetimeFromParameter(jsonRequest.get(MAX_ACCESS_TOKEN_LIFETIME)));
             jsonRequest.remove(MAX_ACCESS_TOKEN_LIFETIME);
         }
 
         if (jsonRequest.containsKey(ID_TOKEN_LIFETIME)) {
             // NOTE this is sent in seconds but is recorded as ms., so convert to milliseconds here.
-            client.setIdTokenLifetime(lifetimeFromSec(jsonRequest.getLong(ID_TOKEN_LIFETIME)));
+            client.setIdTokenLifetime(lifetimeFromParameter(jsonRequest.get(ID_TOKEN_LIFETIME)));
             jsonRequest.remove(ID_TOKEN_LIFETIME);
         }
         if (jsonRequest.containsKey(MAX_ID_TOKEN_LIFETIME)) {
             // NOTE this is sent in seconds but is recorded as ms., so convert to milliseconds here.
-            client.setMaxIDTLifetime(lifetimeFromSec(jsonRequest.getLong(MAX_ID_TOKEN_LIFETIME)));
+            client.setMaxIDTLifetime(lifetimeFromParameter(jsonRequest.get(MAX_ID_TOKEN_LIFETIME)));
             jsonRequest.remove(MAX_ID_TOKEN_LIFETIME);
         }
 
@@ -1330,9 +1342,9 @@ public class OIDCCMServlet extends EnvServlet {
                 client.setPrototypes(prototypes);
             }
             // Fix  https://github.com/ncsa/oa4mp/issues/159
-            if(jsonRequest.containsKey(clientKeys.rtGracePeriod())){
-                client.setRtGracePeriod(jsonRequest.getLong(clientKeys.rtGracePeriod()));
-            }else{
+            if (jsonRequest.containsKey(clientKeys.rtGracePeriod())) {
+                client.setRtGracePeriod(lifetimeFromParameter(jsonRequest.get(clientKeys.rtGracePeriod())));
+            } else {
                 // if missing, set it to use whatever the server default is.
                 client.setRtGracePeriod(OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_USE_SERVER_DEFAULT);
             }
@@ -1345,7 +1357,7 @@ public class OIDCCMServlet extends EnvServlet {
             if (jsonRequest.containsKey(clientKeys.ersatzInheritIDToken())) {
                 client.setErsatzInheritIDToken(jsonRequest.getBoolean(clientKeys.ersatzInheritIDToken()));
             }
-            if(jsonRequest.containsKey(EA_SUPPORT)){
+            if (jsonRequest.containsKey(EA_SUPPORT)) {
                 client.setExtendedAttributeSupport(jsonRequest.getBoolean(EA_SUPPORT));
             }
             if (jsonRequest.containsKey(ERSATZ_CLIENT_PROVISIONERS)) {
@@ -1417,6 +1429,23 @@ public class OIDCCMServlet extends EnvServlet {
         }
         return client;
 
+    }
+
+    /**
+     * So clients can send strings of values with units, e.g. "1 month". OA4MP supports this for its
+     * own values.
+     *
+     * @param raw
+     * @return
+     */
+    protected long lifetimeFromParameter(Object raw) {
+        if (raw instanceof Integer) {
+            return lifetimeFromSec((Integer) raw);
+        }
+        if (raw instanceof Long) {
+            return lifetimeFromSec((Long) raw);
+        }
+        return XMLConfigUtil.getValueSecsOrMillis(raw.toString(), true);
     }
 
     protected JSONArray toJSONArray(JSONObject jsonRequest,
@@ -1544,11 +1573,22 @@ public class OIDCCMServlet extends EnvServlet {
             // If the refresh token is requested, then the rtLifetime may be specified. if not, use server default.
             if (requestedRT) {
                 if (jsonRequest.containsKey(keys.rtLifetime())) {
-                    client.setRtLifetime(jsonRequest.getLong(keys.rtLifetime()));
+                    Object raw = jsonRequest.get(keys.rtLifetime());
+                    if (raw instanceof Integer) {
+                        client.setRtLifetime(((Integer) raw) * 1000L);
+                    } else {
+                        if (raw instanceof Long) {
+                            // assumption is they are sending it in seconds
+                            client.setRtLifetime(((Long) raw) * 1000L);
+                        } else {
+                            client.setRtLifetime(XMLConfigUtil.getValueSecsOrMillis(raw.toString(), true));
+                        }
+                    }
                 } else {
-                    // check if there is no RT lifetime specified, set it to the server max.
-                    client.setRtLifetime(-1);// server default
-                    //client.setRtLifetime(getOA2SE().getMaxClientRefreshTokenLifetime());
+                    // Fix for https://github.com/ncsa/oa4mp/issues/176
+                    // Case is that the grant is given requesting refresh tokens, but no actual
+                    // value is set.
+                    client.setRtLifetime(OA2Client.USE_SERVER_DEFAULT);// server default
                 }
             }
         } else {

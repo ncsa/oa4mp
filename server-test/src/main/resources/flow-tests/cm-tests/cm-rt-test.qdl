@@ -1,0 +1,33 @@
+#! /usr/bin/env -S qdl-run  
+
+script_load('init.qdl', args(0));
+
+server_defaults.:=http#get({'query':'org.oa4mp:/server#defaults'})\content;
+
+// Case 1: Create a client with the server default and check it is indeed the server default
+payload. := from_json(file_read(ini.'payloads' + 'create.json'));
+remove(payload.'rt_lifetime');
+resp. := http#post(payload.);
+//⊨ resp.'status'.'code' == ini.'status' : logger(4,say('incorrect returned status of ' + resp.'status'.'code'));
+⊨ resp.'status'.'code' == ini.'status' : 'incorrect returned status: expected '+ ini.'status' +' but got ' + resp.'status'.'code';
+c. := http#get({'client_id':resp.'content'.'client_id'})\content;
+// check that the returned values correspond to the requested ones.
+⊨ ⊗∧⊙(payload.==(c.\keys(c.,true))) : 'scalar value returned is incorrect';
+⊨ ⊗∧⊙payload.'redirect_uris'∈c.'redirect_uris' : 'incorrect callback';
+⊨ ⊗∧⊙payload.'scope'∈c.'scope' : 'incorrect callback';
+⊨ c.'rt_lifetime' == server_defaults.'rt_lifetime_create_default' : 'wrong lifetime';
+
+// now update it and check that that works.
+update. := from_json(file_read(ini.'payloads' + 'update.json'));
+update.'client_id' := resp.'content'.'client_id';
+update.'rt_lifetime':='1 week';
+
+resp2. := http#put(update.);
+⊨ resp2.'status'.'code' == 200 : logger(4,say('incorrect returned status of ' + resp.'status'.'code'));
+c. := http#get({'client_id':resp.'content'.'client_id'})\content;
+⊨ c.'rt_lifetime' == 7*24*3600; // 1 week in seconds
+r. := http#delete({'client_id':resp.'content'.'client_id'});
+
+
+say('ok: Admin refresh token lifetime test');
+

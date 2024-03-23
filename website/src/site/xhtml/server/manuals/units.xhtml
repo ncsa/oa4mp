@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Units</title>
+</head>
+<body>
+<h2 id="NoteOnUnits">A note on time and units</h2>
+<p>As of 5.1, all the times for grants, access tokens and refresh tokens may have units
+    specified. So this is a perfectly acceptable snipped from a configuration file:</p>
+<pre>
+    &lt;service name="localhost:oa4mp.oa2.mariadb"
+             disableDefaultStores="true"
+             enableTwoFactorSupport="false"
+             authorizationGrantLifetime="12345"
+             defaultAccessTokenLifetime="1009000 ms"
+             maxAccessTokenLifetime="30 mins."
+             maxClientRefreshTokenLifetime="2592000 sec"
+             maxRefreshTokenLifetime="2 weeks"
+             refreshTokenEnabled="true"
+             enableTokenExchange="true"
+             serverDN="CN=localhost2"
+    &lt;!-- lots of stuff --&gt;
+</pre>
+<p>Note that, in order to maintain backwards compatibility, the assumption is that all of these <i>without</i>
+    units are in <b>seconds</b>. Blanks before and after units are allowed. Units may be plural as needed and short forms may
+    optionally end with a period. They are also case insensitive. So all of these are the same:</p>
+<ul>
+    <li>3600 s</li>
+    <li>3600s</li>
+    <li>3600 &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;s</li>
+    <li>3600 s.</li>
+    <li>3600 sec</li>
+    <li>3600 sec.</li>
+    <li>3600 secs</li>
+    <li>3600 secs.</li>
+    <li>3600 Secs.</li>
+    <li>3600 seconds</li>
+    <li>3600 seconDs</li>
+</ul>
+<h3>Table of allowed units:</h3>
+<table style="text-align: left; width: 100%;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    <tr>
+        <td style="vertical-align: top;horiz-align: center"><b>Short</b></td>
+        <td style="vertical-align: top;horiz-align: center"><b>Long</b></td>
+        <td style="vertical-align: top;horiz-align: center"><b>Description</b></td>
+    </tr>
+    <tr id="ms">
+        <td style="vertical-align: top;">ms</td>
+        <td style="vertical-align: top;">millisecond</td>
+        <td style="vertical-align: top;">milliseconds</td>
+    </tr>
+
+    <tr id="sec">
+        <td style="vertical-align: top;">s or sec</td>
+        <td style="vertical-align: top;">second</td>
+        <td style="vertical-align: top;">One second is 1,000 milliseconds</td>
+    </tr>
+    <tr id="minutes">
+        <td style="vertical-align: top;">min</td>
+        <td style="vertical-align: top;">minute</td>
+        <td style="vertical-align: top;">One minute is 60 seconds</td>
+    </tr>
+    <tr id="hours">
+        <td style="vertical-align: top;">hr</td>
+        <td style="vertical-align: top;">hour</td>
+        <td style="vertical-align: top;">One hour is 3600 seconds</td>
+    </tr>
+    <tr id="days">
+        <td style="vertical-align: top;">d</td>
+        <td style="vertical-align: top;">day</td>
+        <td style="vertical-align: top;">One day is 24 hours</td>
+    </tr>
+    <tr id="weeks">
+        <td style="vertical-align: top;">wk</td>
+        <td style="vertical-align: top;">week</td>
+        <td style="vertical-align: top;">One week is 7 days</td>
+    </tr>
+    <tr id="month">
+        <td style="vertical-align: top;">mo</td>
+        <td style="vertical-align: top;">month</td>
+        <td style="vertical-align: top;">One month is 30 days</td>
+    </tr>
+    <tr id="year">
+        <td style="vertical-align: top;">yr</td>
+        <td style="vertical-align: top;">year</td>
+        <td style="vertical-align: top;">One year is 365.25 days</td>
+    </tr>
+
+    </tbody>
+</table>
+
+</body>
+</html>

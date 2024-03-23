@@ -69,4 +69,6 @@ public interface ClientManagementConstants {
      * than the OA4MP server, or if there is some other reason to do so.
      */
     public String FULL_URL_ATTRIBUTE = "url";
+
+    String DEFAULT_REFRESH_TOKEN_LIFETIME = "defaultRefreshTokenLifetime";
 }

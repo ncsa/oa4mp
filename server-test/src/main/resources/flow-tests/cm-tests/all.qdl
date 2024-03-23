@@ -9,12 +9,15 @@
 */
 path := 'test#/cm-tests/';
 script_path(path ~ script_path());
-test.:= path + ['cm-basic.qdl',
+test.:= path + [
+                'cm-basic.qdl',
                 'cm-private-key.qdl',
                 'cm-extra.qdl',
                 'cm-public.qdl',
                 'cm-public-update.qdl',
                 'cm-update.qdl',
+                'cm-rt-test.qdl',
+                'cm-rt-test2.qdl',
                 'anon-public.qdl',
                 'anon-basic.qdl',
                 'anon-cfg.qdl',
@@ -36,13 +39,14 @@ while[x∈test.][
   suite =='cm_dev' && '.*anon\\-.*'=~x?continue():''; // DEV does not support anonymous access.
 try[
   script_load(x,suite);
-  http#close(); // extra close is benign, so do it here to be sure.
   counter.'pass' += 1;
   ]catch[
      say('error running script ' + x);
      say('error message:' + error_message);
     counter.'fail' += 1;
   ];
+  http#close(); // extra close is benign, so do it here to be sure.
+  
 ];
 
 say(counter.'pass' + ' passed');

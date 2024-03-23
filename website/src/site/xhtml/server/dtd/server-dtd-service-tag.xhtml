@@ -57,7 +57,7 @@
             the server. The default is 900 seconds = 15 minutes. As long as the grant has not expired,
             the second leg of the exchange (getting an access token) can be done. If there is too
             long a gap between authentication and getting an access token, it will fail. Generally
-            the default is quite reasonable. See note below on units.
+            the default is quite reasonable. See note  on <a href="../manuals/units.html">units</a>.
         </td>
     </tr>
     <tr id="cleanupInterval">
@@ -139,7 +139,7 @@
             and refresh tokens let a client get access tokens. Best practices is that an access token is gotten
             for a specific task and should be therefore short lived. Clients may set this to -1
             which means to use this value. Clients may request different lifetimes, but
-            are limited to the maximum value as set below. See note below on units.
+            are limited to the maximum value as set below. See note  on <a href="../manuals/units.html">units</a>.
         </td>
     </tr>
     <tr id="defaultIDTokenLifetime">
@@ -149,7 +149,8 @@
         <td style="vertical-align: top;">
             specific. This will set the lifetime of id tokens issued by
             the server. The default is 900 seconds = 15 minutes. Clients may request different lifetimes, but
-            are limited to the maximum value as st below. See note below on units. Clients may set this to -1
+            are limited to the maximum value as st below. See note  on <a href="../manuals/units.html">units</a>.
+            Clients may set this to -1
             which means to use this value.
         </td>
     </tr>
@@ -160,7 +161,7 @@
         <td style="vertical-align: top;">
             specific. This will set the lifetime of refresh tokens issued by
             the server. The default is 129600 seconds = 15 days.  Clients may request different lifetimes, but
-            are limited to the maximum value as set below. See note below on units. Clients may also
+            are limited to the maximum value as set below. See note  on <a href="../manuals/units.html">units</a>. Clients may also
             set their value to 0 (zero) which disabled refresh tokens or -1 which means to use
             this value.
         </td>
@@ -230,7 +231,7 @@
             permit,
             regardless of what is requested. Contrast this with the defaultAccessTokenLifetime property
             which is used if clients specify nothing. The default is 30 minutes or 1800 seconds.
-            See note below on units.
+            See note  on <a href="../manuals/units.html">units</a>.
         </td>
     </tr>
     <tr id="maxAllowedNewClientRequests">
@@ -254,7 +255,7 @@
             regardless of what is requested. Note that there is no way for clients to request this
             except as part of a device flow. Contrast this with the defaultAuthorizationGrantLifetime property
             which is used if clients specify nothing. The default is 30 minutes or 1800 seconds.
-            See note below on units.
+            See note  on <a href="../manuals/units.html">units</a>s.
         </td>
     </tr>
     <tr id="maxIDTokenLifetime">
@@ -266,7 +267,7 @@
             regardless of what is requested. Contrast this with the defaultIDTokenLifetime property
             which is used if clients specify nothing. The default is the same as for access tokens
             since that most often conforms to use patterns.
-            See note below on units.
+            See note  on <a href="../manuals/units.html">units</a>.
         </td>
     </tr>
     <tr id="maxClientRefreshTokenLifetime">
@@ -287,7 +288,7 @@
         <td style="vertical-align: top;">This is the largest refresh token lifetime in seconds that the server will
             permit,
             regardless of what is requested. Default is 30 days or 2592000 seconds.
-            See note below on units.
+            See note  on <a href="../manuals/units.html">units</a>.
         </td>
     </tr>
     <tr id="enableMonitor">
@@ -438,7 +439,7 @@
             If the value is 0, this invalidates the token immediately. A value of -1 means to simply let
             the tokens age with their current lifetimes. Each client may have this set as well which will
             override the server setting. The client default is to use whatever the server has configured.<br/>
-            See note below on units.
+            See note  on <a href="../manuals/units.html">units</a>.
         </td>
     </tr>
     <tr id="safe_gc">
@@ -493,88 +494,6 @@
     </tbody>
 </table>
 
-<h2 id="NoteOnUnits">A note on time and units</h2>
-<p>As of 5.1, all the times for grants, access tokens and refresh tokens may have units
-    specified. So this is a perfectly acceptable snipped from a configuration file:</p>
-<pre>
-    &lt;service name="localhost:oa4mp.oa2.mariadb"
-             disableDefaultStores="true"
-             enableTwoFactorSupport="false"
-             authorizationGrantLifetime="12345"
-             defaultAccessTokenLifetime="1009000 ms"
-             maxAccessTokenLifetime="30 mins."
-             maxClientRefreshTokenLifetime="2592000 sec"
-             maxRefreshTokenLifetime="2 weeks"
-             refreshTokenEnabled="true"
-             enableTokenExchange="true"
-             serverDN="CN=localhost2"
-    &lt;!-- lots of stuff --&gt;
-</pre>
-<p>Note that, in order to maintain backwards compatibility, the assumption is that all of these <i>without</i>
-    units are in <b>seconds</b>. Blanks before and after units are allowed. Units may be plural as needed and short forms may
-    optionally end with a period. They are also case insensitive. So all of these are the same:</p>
-<ul>
-    <li>3600 s</li>
-    <li>3600s</li>
-    <li>3600 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;s</li>
-    <li>3600 s.</li>
-    <li>3600 sec</li>
-    <li>3600 sec.</li>
-    <li>3600 secs</li>
-    <li>3600 secs.</li>
-    <li>3600 Secs.</li>
-    <li>3600 seconds</li>
-    <li>3600 seconDs</li>
-</ul>
-<h3>Table of allowed units:</h3>
-<table style="text-align: left; width: 100%;" border="1" cellspacing="2" cellpadding="2">
-    <tbody>
-    <tr>
-        <td style="vertical-align: top;horiz-align: center"><b>Short</b></td>
-        <td style="vertical-align: top;horiz-align: center"><b>Long</b></td>
-        <td style="vertical-align: top;horiz-align: center"><b>Description</b></td>
-    </tr>
-    <tr id="ms">
-        <td style="vertical-align: top;">ms</td>
-        <td style="vertical-align: top;">millisecond</td>
-        <td style="vertical-align: top;">milliseconds</td>
-    </tr>
-
-    <tr id="sec">
-        <td style="vertical-align: top;">s or sec</td>
-        <td style="vertical-align: top;">second</td>
-        <td style="vertical-align: top;">seconds</td>
-    </tr>
-    <tr id="minutes">
-        <td style="vertical-align: top;">min</td>
-        <td style="vertical-align: top;">minute</td>
-        <td style="vertical-align: top;">minutes</td>
-    </tr>
-    <tr id="hours">
-        <td style="vertical-align: top;">hr</td>
-        <td style="vertical-align: top;">hour</td>
-        <td style="vertical-align: top;">hours, defined as 3600 seconds</td>
-    </tr>
-    <tr id="days">
-        <td style="vertical-align: top;">d</td>
-        <td style="vertical-align: top;">day</td>
-        <td style="vertical-align: top;">days, one day is 24 hours</td>
-    </tr>
-    <tr id="weeks">
-        <td style="vertical-align: top;">wk</td>
-        <td style="vertical-align: top;">week</td>
-        <td style="vertical-align: top;">weeks, one week is 7 days</td>
-    </tr>
-    <tr id="month">
-        <td style="vertical-align: top;">mo</td>
-        <td style="vertical-align: top;">month</td>
-        <td style="vertical-align: top;">months, one month is 30 days</td>
-    </tr>
-    <tr id="year">
-        <td style="vertical-align: top;">yr</td>
-        <td style="vertical-align: top;">year</td>
-        <td style="vertical-align: top;">year, one year is 365.25 days</td>
-    </tr>
 
     </tbody>
 </table>

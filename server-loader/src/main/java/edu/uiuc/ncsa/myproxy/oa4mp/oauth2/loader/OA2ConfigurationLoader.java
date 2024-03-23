@@ -990,8 +990,12 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                                 getFirstAttribute(sn, ClientManagementConstants.RFC_7591_AUTO_APPROVE),
                                 getFirstAttribute(sn, ClientManagementConstants.RFC_7591_AUTO_APPROVER_NAME)
                         );
+                        String raw = getFirstAttribute(sn, ClientManagementConstants.DEFAULT_REFRESH_TOKEN_LIFETIME);
+                        if (!StringUtils.isTrivial(raw)) {
+                            cfg.setDefaultRefreshTokenLifetime(XMLConfigUtil.getValueSecsOrMillis(raw, false));
+                        }
                         if (cfg instanceof CM7591Config) {
-                            CM7591Config ccc = (CM7591Config) cfg;
+                            CM7591Config ccc = (CM7591Config)cfg;
                             String allowed = getFirstAttribute(sn, ClientManagementConstants.RFC_7591_AUTO_APPROVE_ALLOWED_DOMAINS);
                             if (ccc.autoApprove) {
                                 if (allowed == null) {

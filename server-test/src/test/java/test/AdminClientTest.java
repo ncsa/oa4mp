@@ -175,7 +175,7 @@ public class AdminClientTest extends TestBase {
         System.out.println("\n"+count + " files processed in " + (System.currentTimeMillis() - startTime) + "ms.");
     }
 
-    boolean doBigStore = true;
+    boolean doBigStore = false;
 
     public void testBigClientStore() throws Exception {
         // This method is for debugging a massive file store.  It makes a

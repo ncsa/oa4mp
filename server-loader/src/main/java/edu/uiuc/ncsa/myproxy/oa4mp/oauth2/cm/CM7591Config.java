@@ -8,6 +8,8 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client.USE_SERVER_DEFAULT;
+
 /**
  * Configuration object for RFC 7591 (dynamic client registration) support. This operates
  * at the server level, not as an attribute of a given client.
@@ -31,6 +33,7 @@ public class CM7591Config extends CMConfig {
     public boolean anonymousOK = false;
     public boolean autoApprove = false;
     public String autoApproverName = "auto-approved"; // default
+
 
     @Override
     public String toString() {
