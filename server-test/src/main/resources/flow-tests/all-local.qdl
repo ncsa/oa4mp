@@ -1,0 +1,20 @@
+#! /usr/bin/env -S qdl-run
+/*
+   Run all local automated tests for OA4MP.
+*/
+  if['--help' ∈ args()]
+then[
+  say('all-local.qdl {-flow} -- run all local automated tests.');
+  say('-flow = optional switch to run the flow tests, which are interactive.');
+  say('The flow tests take some little while to run and require you start the');
+  say('NCSA VPN.');
+  return();
+  ];
+all_test_start:=date_ms();
+script_load('test#/auto/tests/all.qdl');
+script_load('test#/cm-tests/all.qdl');
+
+  if['-flow' ∈ args()]
+then[script_load('test#/local/all.qdl');];
+
+say('\nAll tests runtime =' + ((date_ms() - all_test_start)/1000) + ' sec.');
