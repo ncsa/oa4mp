@@ -29,7 +29,7 @@ http := j_load('http');
 
 q:=load('test#/utils/cm.mdl');
 use(q);
-
+start_time := date_ms();
 default_suite:='cm_local';
 suite := 0<size(args())?args(0):default_suite;
 say('suite=' + suite);
@@ -51,4 +51,6 @@ try[
 
 say(counter.'pass' + ' passed');
 say(counter.'fail' + ' failed');
-say('total tests run = ' + (counter.'pass' + counter.'fail'));
+say('CM tests run = ' + (counter.'pass' + counter.'fail'));
+say('     runtime = ' + script_run('test#/utils/pp_elapsed.qdl', test_start));
+
