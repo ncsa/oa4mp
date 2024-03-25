@@ -1,0 +1,10 @@
+// pp_elapsed(start_time) - pretty print (format) elapsed time in hr min and sec for an event.
+//args().0 == start time of event;
+duration  := date_ms() - args().0;
+       d. := duration%(60^[;3]*1000); // yields [sec, min hrs]
+      hrs := d.2;
+     mins := d.1 - 60*d.2;
+      sec := d.0 - 60*d.1;
+       ms := duration - 1000*d.0;
+         hh:= 0<hrs?(hrs+' hrs '):'';
+return(hh  + mins + ' min ' + sec+'.'+ms + ' sec.');

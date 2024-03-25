@@ -34,5 +34,6 @@ test.:= [
 
 say('**** Automated test suite for OA4MP. ****');
 script_load('runner.qdl', test., true); // Dont' skip lines between tests
-numeric_digits(4); // make the next bit look better.
-say('total elapsed time =' + ((date_ms()-start)/1000) + ' sec.');
+//numeric_digits(4); // make the next bit look better.
+//say('total elapsed time =' + ((date_ms()-start)/1000) + ' sec.');
+say('\nAuto test elapsed time  = ' + script_run('test#/utils/pp_elapsed.qdl', start));

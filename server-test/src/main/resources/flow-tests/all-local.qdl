@@ -1,0 +1,39 @@
+#! /usr/bin/env -S qdl-run
+/*
+   Run all local automated tests for OA4MP.
+*/
+  if['--help' ∈ args()]
+then[
+  say('all-local.qdl {-flow} {-local | -dev | -test} -- run all local automated tests.');
+  say('-flow = optional switch to run the flow tests, which are interactive.');
+  say('The flow tests take some little while to run and require you start the');
+  say('NCSA VPN.');
+  say('You may specify multiple test suites, but if you specify nothing, only local tests run.');
+  return();
+  ];
+
+all_test_start:=date_ms();
+do_flows := '-flow' ∈ args();
+suites. := ['-dev', '-test', '-local']∈args();
+say(suites.);
+if[suites.0][
+    script_load('test#/cm-tests/all.qdl','cm_dev');
+      if[do_flows]
+    then[script_load('test#/dev/all.qdl');];
+ ];
+
+if[suites.1][
+    script_load('test#/cm-tests/all.qdl','cm_test');
+      if[do_flows]
+    then[script_load('test#/test/all.qdl');];
+ ];
+
+   if[suites.2 || (true ∉ suites.)]
+ then[
+    script_load('test#/auto/tests/all.qdl');
+    script_load('test#/cm-tests/all.qdl');
+      if[do_flows]
+    then[script_load('test#/local/all.qdl');];
+ ];
+// print it nice
+say('\nAll tests runtime = ' + script_run('test#/utils/pp_elapsed.qdl', all_test_start));

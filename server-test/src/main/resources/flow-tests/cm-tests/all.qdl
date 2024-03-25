@@ -9,12 +9,15 @@
 */
 path := 'test#/cm-tests/';
 script_path(path ~ script_path());
-test.:= path + ['cm-basic.qdl',
+test.:= path + [
+                'cm-basic.qdl',
                 'cm-private-key.qdl',
                 'cm-extra.qdl',
                 'cm-public.qdl',
                 'cm-public-update.qdl',
                 'cm-update.qdl',
+                'cm-rt-test.qdl',
+                'cm-rt-test2.qdl',
                 'anon-public.qdl',
                 'anon-basic.qdl',
                 'anon-cfg.qdl',
@@ -26,7 +29,7 @@ http := j_load('http');
 
 q:=load('test#/utils/cm.mdl');
 use(q);
-
+start_time := date_ms();
 default_suite:='cm_local';
 suite := 0<size(args())?args(0):default_suite;
 say('suite=' + suite);
@@ -43,8 +46,12 @@ try[
      say('error message:' + error_message);
     counter.'fail' += 1;
   ];
+  http#close(); // extra close is benign, so do it here to be sure.
+
 ];
 
 say(counter.'pass' + ' passed');
 say(counter.'fail' + ' failed');
-say('total tests run = ' + (counter.'pass' + counter.'fail'));
+say('CM tests run = ' + (counter.'pass' + counter.'fail'));
+say('     runtime = ' + script_run('test#/utils/pp_elapsed.qdl', test_start));
+

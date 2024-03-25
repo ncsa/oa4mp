@@ -1,0 +1,27 @@
+#! /usr/bin/env -S qdl-run  
+
+script_load('init.qdl', args(0));
+
+server_defaults.:=http#get({'query':'org.oa4mp:/server#defaults'})\content;
+payload. := from_json(file_read(ini.'payloads' + 'create.json'));
+
+// part 2. Create with a RT lifetime, then remove it. It should revert to the server default
+payload.'rt_lifetime' :=  '3 days';
+resp. := http#post(payload.);
+⊨ resp.'status'.'code' == ini.'status' : 'incorrect returned status: expected '+ ini.'status' +' but got ' + resp.'status'.'code';
+c. := http#get({'client_id':resp.'content'.'client_id'})\content;
+⊨ c.'rt_lifetime' == 3*24*3600; // 3 days in seconds
+
+// now update it and check that that works.
+update. := from_json(file_read(ini.'payloads' + 'update.json'));
+update.'client_id' := resp.'content'.'client_id';
+remove(update.'rt_lifetime');
+resp2. := http#put(update.);
+⊨ resp2.'status'.'code' == 200 : logger(4,say('incorrect returned status of ' + resp.'status'.'code'));
+c. := http#get({'client_id':resp.'content'.'client_id'})\content;
+⊨ c.'rt_lifetime' == server_defaults.'rt_lifetime_update_default' : 'wrong lifetime';
+
+r. := http#delete({'client_id':resp.'content'.'client_id'});
+
+say('ok: Admin remove refresh token lifetime token');
+

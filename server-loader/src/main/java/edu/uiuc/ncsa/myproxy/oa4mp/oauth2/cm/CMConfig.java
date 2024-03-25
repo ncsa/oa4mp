@@ -2,6 +2,8 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm;
 
 import java.net.URI;
 
+import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client.USE_SERVER_DEFAULT;
+
 /**
  * Entry for the Client management configuration map.
  * A client management configuration consists of a protocol (such as rfc7591 or oa4mp), whether it is enabled
@@ -36,4 +38,24 @@ public class CMConfig {
     public boolean enabled = false;
     public boolean isConfigured = false; // if this has been properly configured.
 
+    /**
+     * For client registrations, if there is <b><i>no</i></b> refresh token lifetime
+     * given in the request,this is what should be done. The reasonable options are
+     * 0 (disable, so no refresh tokens unless a client specifically requests one) or
+     * {@link edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client#USE_SERVER_DEFAULT}
+     * to use the server default lifetime. <br/><br/>
+     * For updates, this is the behavior if the refresh token lifetime is removed from the request.
+     * Some installs may want, <i>e.g.</i> to have remove = disable, some may want remove = server default.
+     *
+     * @return
+     */
+    public Long getDefaultRefreshTokenLifetime() {
+        return defaultRefreshTokenLifetime;
+    }
+
+    public void setDefaultRefreshTokenLifetime(Long defaultRefreshTokenLifetime) {
+        this.defaultRefreshTokenLifetime = defaultRefreshTokenLifetime;
+    }
+
+    Long defaultRefreshTokenLifetime = USE_SERVER_DEFAULT;
 }
