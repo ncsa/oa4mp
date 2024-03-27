@@ -1,0 +1,34 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   Tests the client with no configuration
+
+*/
+path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests';
+if[path∉script_path()][script_path(path ~ script_path());];
+cfg.'id'  := 'dev:/test/comanage';
+cfg.'idp'  := 'NCSA';
+cfg.'file' := $$OA4MP_CLC_XML_INI;
+cfg.'description' :=  'Test COmanage basic id token. Critical regression test.';
+cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
+
+rc := script_load('driver.qdl', cfg.);
+if[rc!='ok'][return(rc);];
+
+tokens. := clc#access();
+claims. := clc#claims();
+
+VOP :='vo_person_id';
+IMO := 'is_member_of';
+
+⊨ claims.'aud' == cfg.'id' : 'wrong audience';
+⊨ ∃claims.IMO : 'missing ' + IMO;
+groups. := claims.IMO;
+⊨ groups. << List : IMO+' claim is not a group';
+⊨ groups.0 << String : IMO + ' claim is not a flat list';
+⊨ tokens.'access_token'.'lifetime' == 900000 : 'wrong access token lifetime';
+⊨ ∄tokens.'refresh_token' : 'no refresh token expected';
+⊨ ∃claims.VOP : 'missing ' + VOP;
+⊨ claims.VOP == 'CIL1000009' : 'wrong ' + VO;
+say('ok: Basic COmanage test');
+

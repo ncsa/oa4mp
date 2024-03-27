@@ -1,6 +1,7 @@
 #! /usr/bin/env -S qdl-run
 path:='test#/';
 test.:=(path + 'dev/') + ['df.qdl',
+                           'comanage.qdl',
                            'functor.qdl',
                            'ncsa_qdl.qdl',
                            'no_config.qdl',

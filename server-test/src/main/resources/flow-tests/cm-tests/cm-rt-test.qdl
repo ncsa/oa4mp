@@ -1,9 +1,8 @@
 #! /usr/bin/env -S qdl-run  
 
-script_load('init.qdl', args(0));
+script_load('test#/cm-tests/init.qdl', args(0));
 
 server_defaults.:=http#get({'query':'org.oa4mp:/server#defaults'})\content;
-
 // Case 1: Create a client with the server default and check it is indeed the server default
 payload. := from_json(file_read(ini.'payloads' + 'create.json'));
 remove(payload.'rt_lifetime');
