@@ -28,6 +28,7 @@ import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.exceptions.IllegalAccessException;
 import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
@@ -108,7 +109,9 @@ public class OIDCCMServlet extends EnvServlet {
     @Override
     public void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws ServletException, IOException {
 
-
+          //ServletDebugUtil.printAllParameters(getClass(), httpServletRequest, true); // ∈
+          // E.g. IF anonymous access is allowed on the server:
+        // curl -k -X GET  https://localhost:9443/oauth2/oidc-cm?query=org.oa4mp%3A%2Fserver%23defaults
         try {
             if (!(getOA2SE().getCmConfigs().hasRFC7592Config() && getOA2SE().getCmConfigs().getRFC7592Config().enabled) && getOA2SE().getCmConfigs().isEnabled()) {
                 throw new IllegalAccessError("RFC 7592 not supported on this server. Request rejected.");
@@ -122,14 +125,21 @@ public class OIDCCMServlet extends EnvServlet {
             AdminClient adminClient = null;
             try {
                 adminClient = getAndCheckAdminClient(httpServletRequest); // Need this to verify admin client.
-            } catch (Throwable ge) {
+            } catch(IllegalArgumentException iax){
                 if (!getOA2SE().getCmConfigs().getRFC7591Config().anonymousOK) {
-                    throw ge;
+                    IllegalAccessException illegalAccessException =
+                            new IllegalAccessException(iax.getMessage() + ", anonymous access denied",iax.getCause());
+                    throw illegalAccessException;
                 }
                 isAnonymous = true;
+
+            } catch (Throwable ge) {
+                DebugUtil.trace(ge.getMessage(), ge);
             }
             String[] query = httpServletRequest.getParameterValues(QUERY_PARAMETER);
+          //  System.err.println(getClass().getSimpleName() + "query =" + Arrays.toString(query)); // ∈
             if (query != null && query.length != 0) {
+         //       System.err.println(getClass().getSimpleName() + "checking server query"); // ∈
                 handleServerQuery(adminClient, Arrays.asList(query), httpServletRequest, httpServletResponse);
                 return;
             }
@@ -138,8 +148,12 @@ public class OIDCCMServlet extends EnvServlet {
             if (isAnonymous) {
                 // Here's the logic: If we allow anonymous access, then a client can get itself.
                 // If the client is administered, then the request must come with an admin client
-                // Do not allow an administered client to query anything.
-                oa2Client = getAndCheckOA2Client(httpServletRequest);
+                // Do not allow an un-administered client to query anything.
+                try {
+                    oa2Client = getAndCheckOA2Client(httpServletRequest);
+                }catch(IllegalArgumentException iax){
+                    throw new IllegalArgumentException("Anonymous queries are not supported");
+                }
                 if (!getOA2SE().getPermissionStore().getAdmins(oa2Client.getIdentifier()).isEmpty()) {
                     throw new IllegalArgumentException("administered clients cannot query their properties, only their administrator can.");
                 }
@@ -205,6 +219,7 @@ public class OIDCCMServlet extends EnvServlet {
             debugger.trace(this, "GET returns payload\n" + json.toString(2));
             writeOK(httpServletResponse, json); //send it back with an ok.
         } catch (Throwable t) {
+          //  t.printStackTrace(); // ∈
             handleException(new ExceptionHandlerThingie(t, httpServletRequest, httpServletResponse));
         }
     }
@@ -242,7 +257,8 @@ public class OIDCCMServlet extends EnvServlet {
             jsonObject.put("rt_lifetime_create_default", getOA2SE().getCmConfigs().getRFC7591Config().getDefaultRefreshTokenLifetime());
             jsonObject.put("rt_lifetime_update_default", getOA2SE().getCmConfigs().getRFC7592Config().getDefaultRefreshTokenLifetime());
             jsonObject.put(OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_TAG, getOA2SE().getRtGracePeriod() / 1000);
-            if (adminClient == null) {
+            if (adminClient == null || !adminClient.hasVirtualOrganization()) {
+                // Fix https://github.com/ncsa/oa4mp/issues/177
                 jsonObject.put("issuer", getOA2SE().getIssuer());
                 jsonObject.put("at_issuer", getOA2SE().getIssuer());
             } else {

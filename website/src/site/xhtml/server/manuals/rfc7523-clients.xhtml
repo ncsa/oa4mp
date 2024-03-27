@@ -49,7 +49,7 @@ a service client must use client authentication. This is in addition to it signi
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">--</td>
         <td style="vertical-align: top;">Request time for the access token to be valid. Note this is subject to
-            server restrictions. See note below about times.
+            server restrictions. See note  on <a href="../manuals/units.html">units</a>.
         </td>
     </tr>
     <tr id="audience">
@@ -75,7 +75,7 @@ a service client must use client authentication. This is in addition to it signi
         <td style="vertical-align: top;">N</td>
         <td style="vertical-align: top;">--</td>
         <td style="vertical-align: top;">Request time for the refresh token to be valid. Note this is subject to
-            server restrictions. See note below about times.
+            server restrictions. See note  on <a href="../manuals/units.html">units</a>.
         </td>
     </tr>
     <tr id="scope">
@@ -86,16 +86,6 @@ a service client must use client authentication. This is in addition to it signi
     </tr>
     </tbody>
 </table>
-<h2>About times</h2>
-<p>Note that the assumption is that all of these <i>without</i>
-units are in <b>seconds</b>. Blanks before and after units are allowed. Acceptable units are</p>
-<ul>
-    <li>"ms.", "ms" for milliseconds, e.g. "1000 ms."</li>
-    <li>"sec.", "sec", "s.", "s" for seconds, e.g., "300 sec"</li>
-    <li>"min.", "min", "mins.", "mins" for minutes, e.g. "20 min."</li>
-    <li>"hr.", "hr", "hrs.", "hrs" for hours, "e.g. 2 hrs."</li>
-    <li>"day", "days" for days, e.g. "1 day", "10 days"</li>
-</ul>
 <h2>Example</h2>
 <p>A typical JSON request would be</p>
 <pre>
@@ -112,7 +102,8 @@ units are in <b>seconds</b>. Blanks before and after units are allowed. Acceptab
         "email"
       ],
       "oa4mp:/roles": "admin,all-user",
-      "oa4mp:/tokens/access/lifetime": 1000000,
+      "at_lifetime": 1000000,
+      "rt_lifetime":"10 days",
       "redirect_uri": "https://oauth.bigstate.edu/client2/ready",
       "nonce": "1yv5JQ5sElsxDHTcObWhJGBp6uy0i4VwMgV4vCHou1I"
     }

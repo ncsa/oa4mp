@@ -48,7 +48,7 @@
     
         
                     <div class="xleft">
-            Last Published: 2024-03-19
+            Last Published: 2024-03-25
                                 </div>
                 <div class="xright">            
     
@@ -144,7 +144,6 @@
         
 
 
-
 <h1>Dynamic Client Registration</h1>
 
 <p>The <a class="externalLink" href="https://openid.net/specs/openid-connect-registration-1_0.html">dynamic client registration</a>
@@ -218,27 +217,142 @@ For instance on my local server</p>
 <pre>
     curl -k --get --data-urlencode &quot;query=org.oa4mp:/server#defaults&quot;  https://localhost:9443/oauth2/oidc-cm
 {
-    &quot;rt_lifetime&quot;:1296000,
+    &quot;at_issuer&quot;:&quot;https://localhost:9443/oauth2&quot;,
     &quot;at_lifetime&quot;:900,
+    &quot;auth_grant_lifetime&quot;:750,
     &quot;id_token_lifetime&quot;:900,
-    &quot;max_rt_lifetime&quot;:2592000,
+    &quot;idt_max_lifetime&quot;:1800,
+    &quot;issuer&quot;:&quot;https://localhost:9443/oauth2&quot;,
     &quot;max_at_lifetime&quot;:1800,
     &quot;max_id_token_lifetime&quot;:1800,
-    &quot;idt_max_lifetime&quot;:1800,
-    &quot;auth_grant_lifetime&quot;:750,
-    &quot;use_server_default&quot;:-1,
+    &quot;max_rt_lifetime&quot;:2592000,
     &quot;rtGracePeriod&quot;:3600,
-    &quot;issuer&quot;:&quot;https://localhost:9443/oauth2&quot;,
-    &quot;at_issuer&quot;:&quot;https://localhost:9443/oauth2&quot;
+    &quot;rt_lifetime&quot;:1296000,
+    &quot;rt_lifetime_create_default&quot;:-1,
+    &quot;rt_lifetime_update_default&quot;:0,
+    &quot;use_server_default&quot;:-1
 }
-
 </pre></div>
 
-<p>where all time values are in seconds.  This includes other information, such as teh user_server_default value which
-you may use for any lifetime to indicate that the current server values are to be used. If you omit setting these
-when creating your client, you will see they are taken as the default. max_id_token_lifetime and idt_max_lifetime are
-always the same and are used because of version differences. The parameter for client registrations is max_id_token_lifetime.</p>
+<p>where all time values are in seconds.  The following table summarizes these. Note that
+if you have an admin client and send the credentials, the values for the issuer will
+reflect the values in the virtual organization. Otherwise, they are for the server
+generally. All lifetimes are in seconds. It is true that <i>some</i> of these are on the
+well-known page, however many are not and since there is no canonical way to represent
+them there, a separate call was created.</p>
 
+
+<table class="bodyTable" border="2"><caption>Valid values</caption>
+    
+    
+<tr class="a">
+        
+<th>Name</th>
+        
+<th>Comments</th>
+    </tr>
+    
+<tr class="b" align="left" valign="top">
+        
+<td>at_issuer</td>
+        
+<td>The default access token issuer, used in access tokens that are JWTs. </td>
+    </tr>
+    
+<tr class="a" align="left" valign="top">
+        
+<td>at_lifetime</td>
+        
+<td>The default access token lifetime for the server. If a client's at_lifetime is set to -1,
+        this is used.</td>
+    </tr>
+    
+<tr class="b" align="left" valign="top">
+        
+<td>auth_grant_lifetime</td>
+        
+<td>The default lifetime of authorization grants. </td>
+    </tr>
+    
+<tr class="a" align="left" valign="top">
+        
+<td>id_token_lifetime</td>
+        
+<td>The default id token lifetime.</td>
+    </tr>
+    
+<tr class="b" align="left" valign="top">
+        
+<td>id_token_max_lifetime</td>
+        
+<td>The server maximum id token lifetime. This is identical to max_id_token_lifetime.</td>
+    </tr>
+    
+<tr class="a" align="left" valign="top">
+        
+<td>issuer</td>
+        
+<td>The default issuer asserted in id tokens.</td>
+    </tr>
+    
+<tr class="b" align="left" valign="top">
+        
+<td>max_at_lifetime</td>
+        
+<td>The server's maximum allowed access token lifetime.</td>
+    </tr>
+    
+<tr class="a" align="left" valign="top">
+        
+<td>max_id_token_lifetime</td>
+        
+<td>The server's maximum allowed id token lifetime.</td>
+    </tr>
+    
+<tr class="b" align="left" valign="top">
+        
+<td>max_rt_lifetime</td>
+        
+<td>The server's maximum allowed refresh token lifetime.</td>
+    </tr>
+
+    
+<tr class="a" align="left" valign="top">
+        
+<td>rtGracePeriod</td>
+        
+<td>The server's default grace period.</td>
+    </tr>
+    
+<tr class="b" align="left" valign="top">
+        
+<td>rt_lifetime</td>
+        
+<td>The default refresh token lifetime. If a client's rt_lifetime is set to -1, this is used.</td>
+    </tr>
+    
+<tr class="a" align="left" valign="top">
+        
+<td>rt_lifetime_create_default</td>
+        
+<td>If there is no rt_lifetime parameter asserted at client creation, use this.</td>
+    </tr>
+    
+<tr class="b" align="left" valign="top">
+        
+<td>rt_lifetime_update_default</td>
+        
+<td>If there is no rt_lifetime parameter asserted at client update, use this.</td>
+    </tr>
+    
+<tr class="a" align="left" valign="top">
+        
+<td>use_server_default</td>
+        
+<td>The value (usually -1) that means &quot;use the server's default here&quot;. Typically when listing a
+        client this will be the value for any lifetimes that were not explicitly set at creation.</td>
+    </tr>
+</table>
 </section><section>
 <h3><a name="The_toolkit"></a>The toolkit</h3>
 
@@ -289,7 +403,7 @@ always the same and are used because of version differences. The parameter for c
 </section><section>
 <h2><a name="Standard_attributes"></a>Standard attributes</h2>
 
-<table border="0" class="bodyTable"><caption>Valid values</caption>
+<table class="bodyTable" border="2"><caption>Valid values</caption>
     
     
 <tr class="a">
@@ -352,9 +466,10 @@ always the same and are used because of version differences. The parameter for c
             <br />urn:ietf:params:grant_type:token_exchange (for token exchange)
         </td>
         
-<td>If omitted, the assumption is authorization_code. If the refresh token lifetime (rt_lifetime) is specified,
-            then
-            refresh_token is added to the list of accepted grants.
+<td>If omitted, the assumption is authorization_code. If you assert this grant, then
+            the server default for refresh tokens is used. You may also specify a value using the
+            OA4MP <b>rt_lifetime</b> parameter (see below). If you send <b>rt_lifetime</b>
+            you do not need to assert the refresh token grant.
         </td>
     </tr>
 
@@ -427,7 +542,7 @@ always the same and are used because of version differences. The parameter for c
     In particular, note the <b>Anon?</b> column which if <b>Y</b> means than an anonymous client
     can set this.</p>
 
-<table border="0" class="bodyTable"><caption>Valid values</caption>
+<table class="bodyTable" border="1"><caption>Valid values</caption>
     
     
 <tr class="a">
@@ -455,7 +570,7 @@ always the same and are used because of version differences. The parameter for c
         
 <td>Y</td>
         
-<td>Integer (in seconds)</td>
+<td>Integer (in seconds) or <a href="units.html">unit</a></td>
         
 <td>This sets the access token lifetime for all subsequent access tokens. Note
             that is <i>must be less than or equal to the server's default</i>. You should only set this if
@@ -585,11 +700,11 @@ always the same and are used because of version differences. The parameter for c
         
 <td>Y</td>
         
-<td>Integer (in seconds)</td>
+<td>Integer (in seconds) or <a href="units.html">unit</a></td>
         
-<td>This sets the id token lifetime. Note
+<td>This sets the id token lifetime.  Note
             that is <i>must be less than or equal to the server's default</i>. You should only set this if
-            you have a specific need for it an knowledge of what values will work. The default means to use
+            you have a specific need for it an knowledge of what values will work. The default of -1 means to use
             the server default.
         </td>
     </tr>
@@ -620,9 +735,9 @@ always the same and are used because of version differences. The parameter for c
         
 <td>Y</td>
         
-<td>Integer (in seconds)</td>
+<td>Integer (in seconds) or <a href="units.html">unit</a></td>
         
-<td>This sets the maximum access token lifetime. This means that request may ask for a different
+<td>This sets the maximum access token lifetime.  This means that request may ask for a different
             lifetime than in the configuration, but it cannot exceed this. The server default is the
             absolute maximum.
         </td>
@@ -638,7 +753,7 @@ always the same and are used because of version differences. The parameter for c
         
 <td>Y</td>
         
-<td>Integer (in seconds)</td>
+<td>Integer (in seconds) or <a href="units.html">unit</a></td>
         
 <td>This sets the maximum identity token lifetime. This means that request may ask for a different
             lifetime than in the configuration, but it cannot exceed this. The server default is the
@@ -726,6 +841,26 @@ always the same and are used because of version differences. The parameter for c
     </tr>
     
 <tr class="a" align="left" valign="top">
+          
+<td>rt_grace_period</td>
+          
+<td>N</td>
+          
+<td>-2</td>
+          
+<td>Y</td>
+          
+<td>Integer (in seconds) or <a href="units.html">unit</a></td>
+          
+<td>If you have enabled refresh tokens, this specifies the maximum grace period for
+              token refreshes. That is to say, when a refresh token is refreshed or exchanged,
+              the previous token remains active for this period of time. Setting this zero immediately
+              invalidates the previous token. Specific values are 0 for disabled, -1 for disabling
+              grace periods (equivalent to 0) or -2 to use whatever the server default is for grace periods.
+          </td>
+      </tr>
+    
+<tr class="b" align="left" valign="top">
         
 <td>rt_lifetime</td>
         
@@ -735,17 +870,18 @@ always the same and are used because of version differences. The parameter for c
         
 <td>Y</td>
         
-<td>Integer (in seconds)</td>
+<td>Integer (in seconds) or <a href="units.html">unit</a></td>
         
 <td>If you request a grant_type of refresh_token, this specifies the maximum lifetime,
             in seconds, that
-            it will be valid. Normally this is set for a very long time, as in weeks if not months. If this is omitted
-            or set to 0 (zero) then no refresh tokens will be created. The default value means to use whatever the
-            server deefaults are.
+            it will be valid. Normally this is set for a very long time,
+            as in weeks if not months. If this is omitted then the server policy will be applied. This is
+            typically using the server default refresh lifetime or perhaps disabling it. A value of 0
+            disables refresh tolens and a value of -1 means using whatever the server's default lifetime is.
         </td>
     </tr>
     
-<tr class="b" align="left" valign="top">
+<tr class="a" align="left" valign="top">
         
 <td>service_client_users</td>
         
@@ -762,7 +898,7 @@ always the same and are used because of version differences. The parameter for c
         </td>
     </tr>
     
-<tr class="a" align="left" valign="top">
+<tr class="b" align="left" valign="top">
         
 <td>skip_server_scripts</td>
         
@@ -778,7 +914,7 @@ always the same and are used because of version differences. The parameter for c
         </td>
     </tr>
     
-<tr class="b" align="left" valign="top">
+<tr class="a" align="left" valign="top">
         
 <td>strict_scopes</td>
         

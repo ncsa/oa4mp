@@ -70,7 +70,7 @@ public class AdminClient extends BaseClient {
         super(identifier);
     }
 
-    Identifier virtualOrganization;
+    Identifier virtualOrganization = null;
     String issuer;
 
     public String getIssuer() {
@@ -105,6 +105,9 @@ public class AdminClient extends BaseClient {
         this.virtualOrganization = virtualOrganization;
     }
 
+    public boolean hasVirtualOrganization(){
+        return virtualOrganization!=null;
+    }
     int maxClients = DEFAULT_MAX_NUMBER_OF_OIDC_CLIENTS;
      JSONObject config;
 

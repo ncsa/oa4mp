@@ -53,5 +53,5 @@ try[
 say(counter.'pass' + ' passed');
 say(counter.'fail' + ' failed');
 say('CM tests run = ' + (counter.'pass' + counter.'fail'));
-say('     runtime = ' + script_run('test#/utils/pp_elapsed.qdl', test_start));
+say('     runtime = ' + script_run('test#/utils/pp_elapsed.qdl', start_time));
 
