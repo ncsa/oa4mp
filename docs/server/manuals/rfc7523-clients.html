@@ -48,7 +48,7 @@
     
         
                     <div class="xleft">
-            Last Published: 2024-03-25
+            Last Published: 2024-03-27
                                 </div>
                 <div class="xright">            
     
@@ -204,7 +204,7 @@ a service client must use client authentication. This is in addition to it signi
 <td style="vertical-align: top;">--</td>
         
 <td style="vertical-align: top;">Request time for the access token to be valid. Note this is subject to
-            server restrictions. See note below about times.
+            server restrictions. See note  on <a href="../manuals/units.html">units</a>.
         </td>
     </tr>
     
@@ -250,7 +250,7 @@ a service client must use client authentication. This is in addition to it signi
 <td style="vertical-align: top;">--</td>
         
 <td style="vertical-align: top;">Request time for the refresh token to be valid. Note this is subject to
-            server restrictions. See note below about times.
+            server restrictions. See note  on <a href="../manuals/units.html">units</a>.
         </td>
     </tr>
     
@@ -266,24 +266,6 @@ a service client must use client authentication. This is in addition to it signi
     </tr>
     </tbody>
 </table>
-</section><section>
-<h2><a name="About_times"></a>About times</h2>
-
-<p>Note that the assumption is that all of these <i>without</i>
-units are in <b>seconds</b>. Blanks before and after units are allowed. Acceptable units are</p>
-
-<ul>
-    
-<li>&quot;ms.&quot;, &quot;ms&quot; for milliseconds, e.g. &quot;1000 ms.&quot;</li>
-    
-<li>&quot;sec.&quot;, &quot;sec&quot;, &quot;s.&quot;, &quot;s&quot; for seconds, e.g., &quot;300 sec&quot;</li>
-    
-<li>&quot;min.&quot;, &quot;min&quot;, &quot;mins.&quot;, &quot;mins&quot; for minutes, e.g. &quot;20 min.&quot;</li>
-    
-<li>&quot;hr.&quot;, &quot;hr&quot;, &quot;hrs.&quot;, &quot;hrs&quot; for hours, &quot;e.g. 2 hrs.&quot;</li>
-    
-<li>&quot;day&quot;, &quot;days&quot; for days, e.g. &quot;1 day&quot;, &quot;10 days&quot;</li>
-</ul>
 </section><section>
 <h2><a name="Example"></a>Example</h2>
 
@@ -304,7 +286,8 @@ units are in <b>seconds</b>. Blanks before and after units are allowed. Acceptab
         &quot;email&quot;
       ],
       &quot;oa4mp:/roles&quot;: &quot;admin,all-user&quot;,
-      &quot;oa4mp:/tokens/access/lifetime&quot;: 1000000,
+      &quot;at_lifetime&quot;: 1000000,
+      &quot;rt_lifetime&quot;:&quot;10 days&quot;,
       &quot;redirect_uri&quot;: &quot;https://oauth.bigstate.edu/client2/ready&quot;,
       &quot;nonce&quot;: &quot;1yv5JQ5sElsxDHTcObWhJGBp6uy0i4VwMgV4vCHou1I&quot;
     }
