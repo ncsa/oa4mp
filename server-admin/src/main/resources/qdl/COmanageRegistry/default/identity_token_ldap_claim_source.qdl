@@ -1,0 +1,41 @@
+// Argument 0 should be a JSON object containing LDAP configuration
+// details that will be converted into a stem.
+//
+// An example is
+//
+// {
+//  "server_fqdn": "ldap.cilogon.org",
+//  "server_port": 636,
+//  "bind_dn": "uid=oa4mp_user,ou=system,o=MESS,o=CO,dc=cilogon,dc=org",
+//  "bind_password": "XXXXXXXX",
+//  "search_base": "ou=people,o=MESS,o=CO,dc=cilogon,dc=org",
+//  "search_attribute": "uid",
+//  "return_attributes": ["isMemberOf","voPersonID"],
+//  "list_attributes": ["isMemberOf"];
+//  }
+
+// Load the LDAP configuration parameters.
+ldap_config_params. := script_args(0);
+
+// Configure a LDAP client.
+ldap_client. := new_template('ldap');
+ldap_client.type := 'ldap';
+ldap_client.address := ldap_config_params.server_fqdn;
+ldap_client.port := ldap_config_params.server_port;
+ldap_client.auth_type := 'simple';
+ldap_client.username := ldap_config_params.bind_dn;
+ldap_client.password := ldap_config_params.bind_password;
+ldap_client.search_base := ldap_config_params.search_base;
+ldap_client.claim_name := 'sub';
+ldap_client.ldap_name := ldap_config_params.search_attribute;
+ldap_client.search_attributes. := ldap_config_params.return_attributes;
+ldap_client.list. := ldap_config_params.list_attributes;
+
+// Create an LDAP claim source.
+ldap_claim_source. := create_source(ldap_client.);
+
+// Get claims from the LDAP claim source.
+ldap_query_results. := get_claims(ldap_claim_source., claims.sub);
+
+// Add the LDAP query results to claims.
+claims. := claims. ~ ldap_query_results.;

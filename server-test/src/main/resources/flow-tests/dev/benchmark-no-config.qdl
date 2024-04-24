@@ -1,0 +1,28 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   Tests the client with no configuration
+
+*/
+ path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests';
+ if[path∉script_path()][script_path(path ~ script_path());];
+cfg.'id'  := 'dev:test/no_cfg';
+cfg.'idp'  := 'ANY';
+cfg.'file' := $$OA4MP_CLC_XML_INI;
+cfg.'description' :=  'Test with no configuration -- most basic test.';
+cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
+
+rc := script_load('driver.qdl', cfg.);
+if[rc!='ok'][return(rc);];
+
+tokens. := clc#access();
+start_time:=date_ms();
+count := 100;
+i:=0;
+while[i++<count][
+ clc#exchange();
+];
+end_time := date_ms();
+say('elapsed time = ' + (end_time - start_time));
+say('av. time is = ' + (count*1000/(end_time - start_time)) + ' Hz');
+return();

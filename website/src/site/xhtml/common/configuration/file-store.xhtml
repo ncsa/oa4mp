@@ -10,6 +10,11 @@
 <body class="composite">
 <!--#include virtual="../../header.html" -->
 <h2>The File Store Configuration.</h2>
+<p><b><i>This is almost deprecated, since it has performance issues for all but
+small stores. Yo should probably consider using a <a href="derby-store.html">Derby store</a>
+in file mode instead. If you have a large existing file store and need to change to a
+Derby store, use the <a href="https://oa4mp.org/pdf/filestore-migration.pdf">migration tool</a>.</i></b></p>
+
 <p>Scope: client and server, all versions.</p>
 
 <p>A file store will persist items in a local file system. It requires either</p>

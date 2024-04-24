@@ -1,0 +1,25 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   Benchmarking test using templates. This simply starts a flow, does 10,000
+   refreshes and reports how long that took.
+*/
+params. ≔ {'sub':'pilbeam',
+           'scope':'openid',
+           'org.oa4mp:/templates':'https://wærstan.edu'};
+//test_id:= 'oidc.scitokens.template';
+test_id:= 'oidc.conf.overrides';
+
+// set up the client
+clc#init($$OA4MP_CLC_INI, test_id);
+tokens. := clc#rfc7523(params.);
+start_time:=date_ms();
+count := 100;
+i:=0;
+while[i++<count][
+ clc#exchange();
+];
+elasped_sec := (date_ms() - start_time)/1000;
+say('elapsed time = ' + elasped_sec + ' sec.');
+say('av. time is = ' + (count/elasped_sec) + ' Hz');
+return();

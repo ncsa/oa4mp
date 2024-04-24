@@ -1,0 +1,5 @@
+{
+  "redirect_uris": ["https://client.example.org/callback"],
+  "client_name": "Minimal example",
+  "token_endpoint_auth_method": "client_secret_basic"
+}

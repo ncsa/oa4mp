@@ -369,9 +369,14 @@ public class OIDCCMServlet extends EnvServlet {
         json.put(MAX_ID_TOKEN_LIFETIME, lifetimeToSec(client.getMaxIDTLifetime()));
         json.put(ACCESS_TOKEN_LIFETIME, lifetimeToSec(client.getAtLifetime()));
         json.put(MAX_ACCESS_TOKEN_LIFETIME, lifetimeToSec(client.getMaxATLifetime()));
-        // Always assert these.
-        json.put(REFRESH_LIFETIME, lifetimeToSec(client.getRtLifetime()));
-        json.put(MAX_REFRESH_LIFETIME, lifetimeToSec(client.getMaxRTLifetime()));
+        OA2ClientKeys clientKeys = (OA2ClientKeys) getOA2SE().getClientStore().getMapConverter().getKeys();
+        // Always assert these if non-zero
+        // Fix https://jira.ncsa.illinois.edu/browse/CIL-1975
+        if(lifetimeToSec(client.getRtLifetime()) != 0) {
+            json.put(REFRESH_LIFETIME, lifetimeToSec(client.getRtLifetime()));
+            json.put(MAX_REFRESH_LIFETIME, lifetimeToSec(client.getMaxRTLifetime()));
+            json.put(clientKeys.rtGracePeriod(), client.getRtGracePeriod());
+        }
         json.put(EA_SUPPORT, client.hasExtendedAttributeSupport());
         if (client.hasJWKS()) {
             json.put(JWKS, JSONWebKeyUtil.toJSON(client.getJWKS()));
@@ -381,7 +386,9 @@ public class OIDCCMServlet extends EnvServlet {
         }
         JSONArray scopes = new JSONArray();
         scopes.addAll(client.getScopes());
-        json.put(OA2Constants.SCOPE, scopes);
+        if(!scopes.isEmpty()) {
+            json.put(OA2Constants.SCOPE, scopes);
+        }
         json.put(OIDCCMConstants.CLIENT_URI, client.getHomeUri());
         json.put(OA2Constants.ERROR_URI, client.getErrorUri());
         // CIL-931 fix.
@@ -389,18 +396,20 @@ public class OIDCCMServlet extends EnvServlet {
         json.put(SKIP_SERVER_SCRIPTS, client.isSkipServerScripts());
         // Note that a contact email is something specific to OA4MP and does not occur in
         // either RFC 7591 or 7592.
+        json.put("email", client.getEmail());
         // CIL-1221
-        json.put(PROXY_CLAIMS_LIST, client.getProxyClaimsList());
+        if(!client.getProxyClaimsList().isEmpty()) {
+            json.put(PROXY_CLAIMS_LIST, client.getProxyClaimsList());
+        }
         json.put(FORWARD_REQUEST_SCOPES_TO_PROXY, client.isForwardScopesToProxy());
-        json.put(PROXY_REQUEST_SCOPES, client.getProxyRequestScopes());
+        if(!client.getProxyRequestScopes().isEmpty()) {
+            json.put(PROXY_REQUEST_SCOPES, client.getProxyRequestScopes());
+        }
         json.put(IS_SERVICE_CLIENT, client.isServiceClient());
         JSONArray array = new JSONArray();
         array.addAll(client.getServiceClientUsers());
         json.put(SERVICE_CLIENT_USERS, array);
-        json.put("email", client.getEmail());
-        OA2ClientKeys clientKeys = (OA2ClientKeys) getOA2SE().getClientStore().getMapConverter().getKeys();
         // Fix https://github.com/ncsa/oa4mp/issues/159
-        json.put(clientKeys.rtGracePeriod(), client.getRtGracePeriod());
         json.put(clientKeys.extendsProvisioners(), client.isExtendsProvisioners());
         json.put(clientKeys.ersatzClient(), client.isErsatzClient());
         json.put(clientKeys.ersatzInheritIDToken(), client.isErsatzInheritIDToken());
@@ -605,7 +614,6 @@ public class OIDCCMServlet extends EnvServlet {
             }
             //have to check that certain key/values are excluded from the update.
             if (jsonRequest.containsKey(OIDCCMConstants.REGISTRATION_ACCESS_TOKEN) ||
-                    jsonRequest.containsKey(OIDCCMConstants.CLIENT_SECRET_EXPIRES_AT) ||
                     jsonRequest.containsKey(OIDCCMConstants.CLIENT_SECRET_EXPIRES_AT) ||
                     jsonRequest.containsKey(OIDCCMConstants.CLIENT_ID_ISSUED_AT)) {
                 throw new OA2JSONException(OA2Errors.INVALID_REQUEST,

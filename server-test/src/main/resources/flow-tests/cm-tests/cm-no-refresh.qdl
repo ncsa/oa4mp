@@ -1,0 +1,18 @@
+#! /usr/bin/env -S qdl-run  
+// CIL-1975 regression test: Creating with a zero refresh token lifetime should not
+// assert any rt values on get (or COmanage misinterprets this as a change).
+script_load('test#/cm-tests/init.qdl', args(0));
+payload. := from_json(file_read(ini.'payloads' + 'create-minimal.json'));
+payload.'client_id' := custom_id();
+payload.rt_lifetime := 0;
+server_defaults.:=http#get({'query':'org.oa4mp:/server#defaults'})\content;
+resp. := http#post(payload.);
+r. := http#get({'client_id':resp.'content'.'client_id'});
+client. := r.'content';
+// unlike the cm-minimal test, this explicitly tests for rt_lifetime := 0
+⊨ ∄client.'rt_lifetime' : 'no refresh token asserts rt_lifetime on get';
+⊨ ∄client.'max_rt_lifetime' : 'no refresh token asserts rt_lifetime on get';
+⊨ ∄client.'rt_grace_period' : 'no refresh token asserts rt_lifetime on get';
+r. := http#delete({'client_id':client.'client_id'});
+say('ok: Admin check disabled refresh tokens');
+

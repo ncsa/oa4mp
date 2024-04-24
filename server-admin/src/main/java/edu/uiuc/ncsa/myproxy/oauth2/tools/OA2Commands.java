@@ -172,10 +172,11 @@ public class OA2Commands extends BaseCommands {
                     getServiceEnvironment().getClientStore(),
                     getNewClientApprovalStoreCommands(),
                     getOA2SE().getPermissionStore());
+
             oa2ClientCommands.setRefreshTokensEnabled(getOA2SE().isRefreshTokenEnabled());
             oa2ClientCommands.setSupportedScopes(getOA2SE().getScopes());
             //       oa2ClientCommands.setUucConfiguration(getOA2SE().getUucConfiguration());
-            oa2ClientCommands.setOA2SE(getOA2SE());
+            oa2ClientCommands.setEnvironment(getOA2SE());
         }
         return oa2ClientCommands;
     }
@@ -190,7 +191,7 @@ public class OA2Commands extends BaseCommands {
     protected CommonCommands getTokenCommands() throws Throwable {
         if (tokenStoreCommands == null) {
             tokenStoreCommands = new TokenStoreCommands(getMyLogger(), "  ", getOA2SE().getTxStore());
-            tokenStoreCommands.setOA2SE(getOA2SE());
+            tokenStoreCommands.setEnvironment(getOA2SE());
         }
 
         return tokenStoreCommands;
@@ -201,7 +202,7 @@ public class OA2Commands extends BaseCommands {
     protected VOCommands getVOCommands() throws Throwable {
         if (voCommands == null) {
             voCommands = new VOCommands(getMyLogger(), "  ", getOA2SE().getVOStore());
-            voCommands.setOA2SE(getOA2SE());
+            voCommands.setEnvironment(getOA2SE());
         }
         return voCommands;
     }
@@ -214,7 +215,7 @@ public class OA2Commands extends BaseCommands {
             transactionStoreCommands = new TransactionStoreCommands(getMyLogger(),
                     "  ",
                     getOA2SE());
-            transactionStoreCommands.setOA2SE(getOA2SE());
+            transactionStoreCommands.setEnvironment(getOA2SE());
         }
 
         return transactionStoreCommands;
@@ -231,7 +232,7 @@ public class OA2Commands extends BaseCommands {
                     getNewClientApprovalStoreCommands(),
                     getOA2SE().getPermissionStore(),
                     getOA2SE().getClientStore());
-            oa2AdminClientCommands.setOA2SE(getOA2SE());
+            oa2AdminClientCommands.setEnvironment(getOA2SE());
         }
         return oa2AdminClientCommands;
     }
@@ -241,7 +242,7 @@ public class OA2Commands extends BaseCommands {
     public OA2PermissionCommands getPermissionCommands() throws Throwable {
         if (oa2PermissionCommands == null) {
             oa2PermissionCommands = new OA2PermissionCommands(getMyLogger(), "  ", getOA2SE().getPermissionStore());
-            oa2PermissionCommands.setOA2SE(getOA2SE());
+            oa2PermissionCommands.setEnvironment(getOA2SE());
         }
         return oa2PermissionCommands;
     }

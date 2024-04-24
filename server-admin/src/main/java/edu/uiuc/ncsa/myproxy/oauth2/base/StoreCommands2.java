@@ -29,15 +29,13 @@ public abstract class StoreCommands2 extends StoreCommands {
         super(logger, store);
     }
 
-    public OA2SE getOA2SE() {
-        return oa2SE;
+
+
+    @Override
+    public OA2SE getEnvironment() {
+        return (OA2SE)super.getEnvironment();
     }
 
-    public void setOA2SE(OA2SE oa2SE) {
-        this.oa2SE = oa2SE;
-    }
-
-    OA2SE oa2SE = null;
     static final String BASE_32_FLAG = "-32";
 
     public void encode(InputLine inputLine) throws Throwable {

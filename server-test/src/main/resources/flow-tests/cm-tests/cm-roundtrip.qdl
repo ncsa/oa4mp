@@ -1,0 +1,35 @@
+#! /usr/bin/env -S qdl-run  
+
+script_load('test#/cm-tests/init.qdl', args(0));
+payload. := from_json(file_read(ini.'payloads' + 'create-minimal.json'));
+payload.'client_id' := custom_id();
+server_defaults.:=http#get({'query':'org.oa4mp:/server#defaults'})\content;
+resp. := http#post(payload.);
+r. := http#get({'client_id':resp.'content'.'client_id'});
+client. := r.'content';
+// Next couple of attrbiutes don't matter, so get rid of them
+remove(client.'client_id_issued_at');
+remove(client.'registration_client_uri');
+
+client2. := from_json(to_json(client.)); // clone it
+count := 5;
+i := 0;
+while[i++ < count]
+   do[
+     client2.'client_id' := client.'client_id';
+     resp2. := http#put(client2.);
+     ⊨ resp2.'status'.'code' == 200 : logger(4,say('incorrect returned status of ' + resp.'status'.'code'));
+     client2. := http#get({'client_id':resp2.'content'.'client_id'}).'content';
+     remove(client2.'client_id_issued_at');
+     remove(client2.'registration_client_uri');
+     ];
+
+k. := keys(client., true);
+k2. := keys(client2., true);
+⊨ size(k.) == size(k2.) : 'key size mismatch';
+while[i ∈ k.]
+   do[
+     ⊨ client.i == client2.i: 'value check failed for key ' + i;
+     ];
+r. := http#delete({'client_id':client.'client_id'});
+say('ok: Admin check roundtrip');

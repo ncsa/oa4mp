@@ -1,0 +1,25 @@
+#! /usr/bin/env -S qdl-run  
+
+script_load('test#/cm-tests/init.qdl', args(0));
+payload. := from_json(file_read(ini.'payloads' + 'create-minimal.json'));
+payload.'client_id' := custom_id();
+server_defaults.:=http#get({'query':'org.oa4mp:/server#defaults'})\content;
+resp. := http#post(payload.);
+r. := http#get({'client_id':resp.'content'.'client_id'});
+client. := r.'content';
+⊨ client.'at_lifetime' == server_defaults.'use_server_default' : 'wrong access token lifetime default';
+⊨ client.'max_at_lifetime' == server_defaults.'use_server_default' : 'wrong max access token lifetime default';
+⊨ client.'id_token_lifetime' == server_defaults.'use_server_default' : 'wrong id token lifetime default';
+⊨ client.'max_id_token_lifetime' == server_defaults.'use_server_default' : 'wrong max id token lifetime default';
+  if[server_defaults.'rt_lifetime_create_default' == 0]
+then[
+     ⊨ ∄client.'rt_lifetime' : 'no refresh token asserts rt_lifetime on get';
+     ⊨ ∄client.'max_rt_lifetime' : 'no refresh token asserts max rt_lifetime on get';
+     ⊨ ∄client.'rt_grace_period' : 'no refresh token asserts rt grace period on get';
+    ]
+else[
+     ⊨ client.'rt_lifetime' == server_defaults.'use_server_default' : 'wrong refresh token lifetime default';
+     ⊨ client.'max_rt_lifetime' == server_defaults.'use_server_default' : 'wrong max refresh token lifetime default';
+   ];
+r. := http#delete({'client_id':client.'client_id'});
+say('ok: Admin check disabled refresh tokens');

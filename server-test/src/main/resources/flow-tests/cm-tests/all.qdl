@@ -10,6 +10,9 @@
 path := 'test#/cm-tests/';
 script_path(path ~ script_path());
 test.:= path + [
+                'cm-roundtrip.qdl',
+                'cm-minimal.qdl',
+                'cm-no-refresh.qdl',
                 'cm-basic.qdl',
                 'cm-private-key.qdl',
                 'cm-extra.qdl',
