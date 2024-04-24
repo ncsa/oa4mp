@@ -1213,7 +1213,7 @@ public class OA2CLCCommands extends CommonCommands {
         say("   decoded token:" + tokenImpl.getJti());
         if (tokenImpl.getExpiresAt() < System.currentTimeMillis()) {
             Date d = new Date(tokenImpl.getExpiresAt());
-            say("   token expired at" + d + "\n");
+            say("   token expired at " + d + "\n");
         } else {
             say("   expires in = " + tokenImpl.getLifetime() + " ms.");
             say("   valid until " + (new Date(tokenImpl.getExpiresAt())) + "\n");

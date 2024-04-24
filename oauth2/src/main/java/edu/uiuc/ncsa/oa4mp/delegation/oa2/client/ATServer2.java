@@ -134,7 +134,12 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
         }
         AccessTokenImpl at = TokenFactory.createAT(jsonObject.getString(ACCESS_TOKEN));
         if(jsonObject.containsKey(EXPIRES_IN)) {
-            at.setExpiresAt(jsonObject.getLong(EXPIRES_IN) * 1000); // This is authoritative
+            // It is possible that the response asserts an expires_in value.
+            // If it is different from the lifetime, use that.
+            if(at.getLifetime()/1000 != jsonObject.getLong(EXPIRES_IN)){
+                at.setLifetime(jsonObject.getLong(EXPIRES_IN)*1000);
+                at.setExpiresAt(at.getIssuedAt() + at.getLifetime());
+            }
         }
         //AccessTokenImpl at = new AccessTokenImpl(URI.create(jsonObject.getString(ACCESS_TOKEN)));
         RefreshTokenImpl rt = null;

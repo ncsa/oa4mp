@@ -1003,7 +1003,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
             // Check that the ersatz clients are administered by this admin and, if not
             // set them to be so.
             PermissionList pList = getPermissionsStore().get(adminID, id);
-            OA2Client e = (OA2Client) getOA2SE().getClientStore().get(id);
+            OA2Client e = (OA2Client) getEnvironment().getClientStore().get(id);
             if (e != null) {
                 e.setErsatzClient(true);
             }

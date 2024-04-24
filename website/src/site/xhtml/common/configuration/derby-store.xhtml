@@ -5,10 +5,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
     <title>OAuth for MyProxy: MySQL Configuration</title>
-    <!--#include virtual="../../head.html" -->
 </head>
 <body  class="composite">
-<!--#include virtual="../../header.html" -->
 <h2>OAuth for MyProxy: MySQL Configuration</h2>
 
 <p>Scope: client and server, all versions.</p>
@@ -17,6 +15,148 @@
     full-featured, with support for standard SQL. It is much less work than one of the big databases (e.g. MySQL)
     to maintain.
 </p>
+<p>As of version 5.5, OA4MP support Derby in various modes:</p>
+<ul>
+    <li><b><a href="#standard">standard</a></b> If you have Derby installed and running on your system as you SQL database server, simply
+    add an OA4MP database with tables and use that.</li>
+    <li><b>file</b> If you want local storage, use this. You may supply a user name and password to lock it down,
+    and it will be created and managed by the system. It resides locally. The downside (this is a limitation of
+    Derby itself) is that only a single process can access the database at once.</li>
+    <li><b>memory</b> This creates the database and it resides wholly in memory. It is again managed by OA4MP.
+    This does not persist between server restarts.</li>
+</ul>
+
+<h1 id="file">File mode</h1>
+<p>In this case, you do not need to have Derby installed at all. OA4MP will handle the details. All
+you need to do is set up access to it. If you do not supply credentials, default credentials will
+be used. Since there is no external access from outside the system, as long as you have the correct permissions
+set for the directory where the file store resides it should be secure.</p>
+
+<table style="text-align: left; width: 100%;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    <tr>
+        <td style="vertical-align: top;">Attribute</td>
+        <td style="vertical-align: top;">Required?</td>
+        <td style="vertical-align: top;">Default</td>
+        <td style="vertical-align: top;">Description</td>
+    </tr>
+    <tr>
+        <td>createScript</td>
+        <td>N</td>
+        <td>--</td>
+        <td>If you do not create this and want the system to do so, then specify the script here that
+        contains all of the tables. If you do not specify it, the system will use whatever the current
+        release version of this script is automatically (which is included in the OA4MP distro.) This
+        must be the full path on your system.</td>
+    </tr>
+    <tr>
+        <td>path</td>
+        <td>Y</td>
+        <td>--</td>
+        <td>The physical path to the database file store. Note that this is the directory where the database resides.
+        If you do not specify it explicitly as the database property.  </td>
+    </tr>
+    <tr>
+        <td>storeType</td>
+        <td>Y</td>
+        <td>file</td>
+        <td>This is required and is what tells OA4MP to use Derby as file store mode. If it is missing,
+        the assumption is that it is a standard database. It may also have the value of <i>memory</i>
+        for a memory store.</td>
+    </tr>
+    </tbody>
+</table>
+<h2>Notes</h2>
+<ul>
+    <li>The <b>database</b> property if present is the full path to the database. If it is missing,
+        then it is constructed from the path property as path+"/derby". Note that if this directory
+    exists, it is assumed that the database has been created and resides there. If you want the system
+    to create the database, be sure that directory does not exist.</li>
+    <li>The path property is not optional. Generally it is suggested to be the parent directory
+    of the database (and will be if you do not specify the database property).</li>
+    <li>The create script is simply what you would type at the command line.
+    A very simple-minded parser is invoked that breaks it up into commands and issues
+    those sequentially. If you have a sophisticated script for creation, you should
+    probably just create the database (same steps for a standard database, see below)
+    and just use that.</li>
+</ul>
+
+<h3>Example setting the username, password and boot password. Note that since this is a database,
+the standard parameters such as schema are still supported.</h3>
+<pre>
+&lt;derby username=&quot;oa4mp&quot;
+       password=&quot;6eXSbO_W&quot;
+       bootPassword=&quot;o7MtXykd&quot;
+       storeType=&quot;file&quot;
+       path=&quot;/opt/oa4mp/test&quot;
+       schema=&quot;oauth2&quot;&gt;
+    &lt;!-- all the stores --&gt;
+&lt;derby/&gt;
+</pre>
+
+<h3>Most minimal configuration</h3>
+<pre>
+    &lt;derby storeType="file"
+           path="/opt/oa4mp"
+           &gt;
+    &lt;!-- all the stores --&gt;
+    &lt;/derby&gt;
+</pre>
+<p>This creates a file store which resides at "/opt/oa4mp/derby".</p>
+
+<h1 id="memory">Memory Mode</h1>
+<p>In this mode, the database is created and resides wholly in memory. It is not
+persistent between server restarts. </p>
+<table style="text-align: left; width: 100%;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    <tr>
+        <td style="vertical-align: top;">Attribute</td>
+        <td style="vertical-align: top;">Required?</td>
+        <td style="vertical-align: top;">Default</td>
+        <td style="vertical-align: top;">Description</td>
+    </tr>
+    <tr>
+        <td>createScript</td>
+        <td>N</td>
+        <td>--</td>
+        <td>If you do not create this and want the system to do so, then specify the script here that
+        contains all of the tables. If you do not specify it, the system will use whatever the current
+        release version of this script is automatically (which is included in the OA4MP distro.) This
+        must be the full path on your system.</td>
+    </tr>
+    <tr>
+        <td>storeType</td>
+        <td>Y</td>
+        <td>memory</td>
+        <td>This is required and is what tells OA4MP to use Derby in memory store mode. If it is missing,
+        the assumption is that it is a standard database.</td>
+    </tr>
+    </tbody>
+</table>
+<h2>Notes</h2>
+<ul>
+    <li>The <b>database</b> property is the name of the database. This is not a path. If it is
+    not supplied, the name "derby" is used.</li>
+</ul>
+<h3>Minimal example</h3>
+<pre>
+    &lt;derby storeType="memory"&gt;
+    &lt;!-- all the stores --&gt;
+    &lt;/derby&gt;
+</pre>
+<h3>A more elaborate example</h3>
+<pre>
+    &lt;derby storeType="memory"
+           database="oa4mp"
+           createScript="/opt/oa4mp/etc/oa4mp-derby.sql"
+           schema="oauth2"&gt;
+        &lt;!-- all the stores --&gt;
+    &lt;/derby&gt;
+</pre>
+<p>In this case, a database named oa4mp is created from a custom script. The schema is
+specified (which is used in the script.</p>
+
+<h1 id="standard">Standard mode</h1>
 <p>
     Generally the schema, tablename and such use the default. Any option prefixed with a * in the table will
     have its default used. Note that there may be many  stores for a configuration if each of them, <i>e.g.</i>
@@ -161,7 +301,9 @@ have some form of package manager) and install that. There are
 </pre>
 <p>
      Then issue the following commands. This sets up the database and will create the user above
-     (Note that the user name and password are set as properties, so do substitute).
+     (Note that the user name and password are set as Java properties, so do substitute).
+     When he datqbase is shut down, these values are stored for subsequent usage and you
+     then put them in the JDBC connection string.
      Even though the user does not exist yet, you must  connect with the
      user name so that they are the owner of the database.
 </p>
@@ -185,7 +327,7 @@ have some form of package manager) and install that. There are
      worked. You don't need to issue the create schema command below.
 </p>
 <p>
-     At this point, exit Derby. Initial setup is done. You must connect again as the user
+     At this point, exit Derby normally. Initial setup is done. You must connect again as the user
      that runs this because creating the tables below will automatically assign the
      current user as the table owner, so no other permissions (which can get complicated)
      are needed.
@@ -201,7 +343,7 @@ have some form of package manager) and install that. There are
      <p>and either paste in the rest of this file OR just run the whole thing from inside ij</p>
 
 <pre>
-    run '/full/path/to/oauth2-derby.qdl';
+    run '/full/path/to/oa4mp-derby.qdl';
 </pre>
 <p>At this point, your database is ready for use.</p>
 
