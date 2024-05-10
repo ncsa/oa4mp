@@ -7,10 +7,9 @@ server_defaults.:=http#get({'query':'org.oa4mp:/server#defaults'})\content;
 resp. := http#post(payload.);
 r. := http#get({'client_id':resp.'content'.'client_id'});
 client. := r.'content';
-// Next couple of attrbiutes don't matter, so get rid of them
+// Next couple of attributes don't matter, so get rid of them
 remove(client.'client_id_issued_at');
 remove(client.'registration_client_uri');
-
 client2. := from_json(to_json(client.)); // clone it
 count := 5;
 i := 0;

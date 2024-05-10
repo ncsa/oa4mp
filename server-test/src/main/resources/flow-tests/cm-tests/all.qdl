@@ -6,12 +6,18 @@
    Note this is quite similar to the standard runner, but just enough off that
    it cannot use it since the scripts called have different signatures from other tests.
 
+   *************************************
+   * This suite can be run against     *
+   * CILogon. The cm-minimal will fail *
+   *************************************
+
 */
 path := 'test#/cm-tests/';
 script_path(path ~ script_path());
 test.:= path + [
                 'cm-roundtrip.qdl',
-                'cm-minimal.qdl',
+                'cm-minimal-v5_5.qdl',
+                'cm-minimal-v5_4.qdl',
                 'cm-no-refresh.qdl',
                 'cm-basic.qdl',
                 'cm-private-key.qdl',
