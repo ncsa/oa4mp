@@ -49,7 +49,7 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>oidc-cm</servlet-name>
-        <url-pattern>/oidc-cm</url-pattern>
+        <url-pattern>/oidc-cm/*</url-pattern>
     </servlet-mapping>
 
 

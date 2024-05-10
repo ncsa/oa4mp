@@ -1,0 +1,39 @@
+/*
+  Access token support for client Rusio client: https://github.com/cilogon/jlab-policies/blob/main/jlab-oidc-client-policies.md
+
+     tokens{
+       access{
+          type=wlcg
+          audience="https://wlcg.cern.ch/jwt/v1/any"
+          lifetime="1 hr"
+          qdl{
+             load="jlab/rucio_client/v1/access.qdl"
+              xmd={exec_phase=["post_token","post_refresh","post_exchange"]}
+          } //end QDL
+       } // end access token
+     } //end tokens
+
+Note that as per the WLCG spec. file:///home/ncsa/Downloads/WLCG_Common_JWT_Profiles_1.0-4.pdf,
+if wlcg_groups is requested as a scope, it must be asserted in both id token and access token.
+It is assumed that the stored isMemberOf information is the content of this claim. N.B. The WLCG spec asserts
+FQAN format (described in the section "Scope-based Group Selection") for all such groups.
+
+*/
+
+DEBUG := true; // set false everywhere but on my test server.
+user := DEBUG?'http://cilogon.org/serverT/users/27326098':claims.sub;
+results. := script_load('jlab/get_user.qdl', user); // user == claims.sub
+debugger(1);
+debugger(1, '*** Rucio client result of query:\n' + print(results.));
+if[∄results.'isMemberOf'][raise_error('no group memberships found.', oa4mp_error, {'error_type' :'access_denied'});];
+debugger(1,'*** Rucio client results.isMemberOf =' + to_string(results.'isMemberOf'));
+results.'isMemberOf' :=  results.'isMemberOf' ~'CO:COU:eic:members:active';
+if['CO:COU:eic:members:active'∉results.'isMemberOf'][raise_error('not a member', oa4mp_error, {'error_type' :'access_denied'});];
+  // as per policy, if they are in the appropriate group, assert the following:
+access_token.'scope' := 'fts';
+// WLCG groups are asserted in the ID token.
+// The policy states they are asserted no matter what other scopes are requested.
+access_token.'wlcg_groups':= results.'isMemberOf';
+// WLCG spec says to assert groups in both id token and access token if specifically requested.
+if['wlcg_groups'∈scopes.][claims.'wlcg_groups':= results.'isMemberOf';];
+return(access_token.);

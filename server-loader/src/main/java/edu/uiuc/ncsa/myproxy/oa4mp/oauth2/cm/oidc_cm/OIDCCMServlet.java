@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.oidc_cm;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.CM7591Config;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.CMConfig;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.permissions.AddClientRequest;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.permissions.PermissionServer;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.permissions.RemoveClientRequest;
@@ -29,6 +30,7 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.IllegalAccessException;
+import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
@@ -82,6 +84,16 @@ public class OIDCCMServlet extends EnvServlet {
     public static final String IS_SERVICE_CLIENT = "is_service_client";
     public static final String SERVICE_CLIENT_USERS = "service_client_users";
     public static final String ERSATZ_CLIENT_PROVISIONERS = "org.oa4mp:/ersatz/provisioners";
+   // Version
+    public static final String API_VERSION_LATEST = "latest";
+    /**
+     * They sent nothing explicit.
+     */
+    public static final String API_VERSION_NONE = "none";
+    public static final String API_VERSION_5_4 = "v5.4";
+    public static final String API_VERSION_5_5 = "v5.5";
+    public static final String API_VERSION_KEY = "api_version";
+
 
     @Override
     public void storeUpdates() throws IOException, SQLException {
@@ -97,6 +109,7 @@ public class OIDCCMServlet extends EnvServlet {
 
     public static final String QUERY_PARAMETER = "query";
 
+
     /**
      * Return information about the client. Note that we do not return the client secret in this call,
      * since among other reasons, we do not have it.
@@ -108,6 +121,7 @@ public class OIDCCMServlet extends EnvServlet {
      */
     @Override
     public void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws ServletException, IOException {
+        String version = getVersion(getOA2SE().getCmConfigs().getRFC7592Config(), httpServletRequest);
 
           //ServletDebugUtil.printAllParameters(getClass(), httpServletRequest, true); // ∈
           // E.g. IF anonymous access is allowed on the server:
@@ -167,7 +181,7 @@ public class OIDCCMServlet extends EnvServlet {
             }
             String rawID = getFirstParameterValue(httpServletRequest, OA2Constants.CLIENT_ID);
             if (rawID == null || rawID.isEmpty()) {
-                // CIL-1092
+                // CIL-1092 : An unqualified GET from an admin returns a list of administered clients and names
                 debugger.trace(this, "id = \"" + rawID + "\" for client listing");
                 List<Identifier> clients = getOA2SE().getPermissionStore().getClients(adminClient.getIdentifier());
                 JSONObject jsonObject = new JSONObject();
@@ -208,8 +222,7 @@ public class OIDCCMServlet extends EnvServlet {
 
             // One major difference is that we have an email that we store and this has to be
             // converted to a contacts array or we run the risk of inadvertantly losing this.
-
-            JSONObject json = toJSONObject(oa2Client);
+            JSONObject json = toJSONObject(oa2Client, version, true);
             // This next block would turn on messages every time a get is issued. Since
             // COManage has a groovy GUI that lets people surf clients, the output
             // was getting intolerable. Maybe someday re-enable this? Maybe.
@@ -256,6 +269,13 @@ public class OIDCCMServlet extends EnvServlet {
             jsonObject.put("use_server_default", OA2Client.USE_SERVER_DEFAULT);
             jsonObject.put("rt_lifetime_create_default", getOA2SE().getCmConfigs().getRFC7591Config().getDefaultRefreshTokenLifetime());
             jsonObject.put("rt_lifetime_update_default", getOA2SE().getCmConfigs().getRFC7592Config().getDefaultRefreshTokenLifetime());
+            jsonObject.put("api_version_default", getDefaultAPIVersion()); // default version.
+            JSONArray versions = new JSONArray();
+            versions.add(API_VERSION_LATEST);
+            versions.add(API_VERSION_5_5);
+            versions.add(API_VERSION_5_4);
+            jsonObject.put("api_versions", versions);  // version list supported on this server
+            jsonObject.put(OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_TAG, getOA2SE().getRtGracePeriod() / 1000);
             jsonObject.put(OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_TAG, getOA2SE().getRtGracePeriod() / 1000);
             if (adminClient == null || !adminClient.hasVirtualOrganization()) {
                 // Fix https://github.com/ncsa/oa4mp/issues/177
@@ -326,7 +346,18 @@ public class OIDCCMServlet extends EnvServlet {
      * @param client
      * @return
      */
-    protected JSONObject toJSONObject(OA2Client client) {
+    protected JSONObject toJSONObject(OA2Client client, String version, boolean isGet) {
+           switch (version){
+               case API_VERSION_5_4:
+                   return toJSONObject5_4(client,  isGet);
+               case API_VERSION_5_5:
+               case API_VERSION_LATEST:
+               default:
+                   return toJSONObject5_5(client, getDefaultAPIVersion(),  isGet);
+           }
+
+    }
+    protected JSONObject toJSONObject5_5(OA2Client client, String version, boolean isGet) {
         JSONObject json = new JSONObject();
         String registrationURI = getOA2SE().getCmConfigs().getRFC7591Config().uri.toString();
         // Next, we have to construct the registration URI by adding in the client ID.
@@ -369,14 +400,28 @@ public class OIDCCMServlet extends EnvServlet {
         json.put(MAX_ID_TOKEN_LIFETIME, lifetimeToSec(client.getMaxIDTLifetime()));
         json.put(ACCESS_TOKEN_LIFETIME, lifetimeToSec(client.getAtLifetime()));
         json.put(MAX_ACCESS_TOKEN_LIFETIME, lifetimeToSec(client.getMaxATLifetime()));
-        OA2ClientKeys clientKeys = (OA2ClientKeys) getOA2SE().getClientStore().getMapConverter().getKeys();
-        // Always assert these if non-zero
-        // Fix https://jira.ncsa.illinois.edu/browse/CIL-1975
-        if(lifetimeToSec(client.getRtLifetime()) != 0) {
-            json.put(REFRESH_LIFETIME, lifetimeToSec(client.getRtLifetime()));
-            json.put(MAX_REFRESH_LIFETIME, lifetimeToSec(client.getMaxRTLifetime()));
-            json.put(clientKeys.rtGracePeriod(), client.getRtGracePeriod());
+        switch (version){
+            case API_VERSION_NONE:
+            case API_VERSION_LATEST:
+            case API_VERSION_5_5:
+                json.put(REFRESH_LIFETIME, lifetimeToSec(client.getRtLifetime()));
+                json.put(MAX_REFRESH_LIFETIME, lifetimeToSec(client.getMaxRTLifetime()));
+                break;
+
+            case API_VERSION_5_4:
+            if(isGet){
+                if(0<client.getRtLifetime()){
+                    json.put(REFRESH_LIFETIME, lifetimeToSec(client.getRtLifetime()));
+                    json.put(MAX_REFRESH_LIFETIME, lifetimeToSec(client.getMaxRTLifetime()));
+                }
+            }else{
+                json.put(REFRESH_LIFETIME, lifetimeToSec(client.getRtLifetime()));
+                json.put(MAX_REFRESH_LIFETIME, lifetimeToSec(client.getMaxRTLifetime()));
+            }
         }
+        // Always assert these.
+        json.put(REFRESH_LIFETIME, lifetimeToSec(client.getRtLifetime()));
+        json.put(MAX_REFRESH_LIFETIME, lifetimeToSec(client.getMaxRTLifetime()));
         json.put(EA_SUPPORT, client.hasExtendedAttributeSupport());
         if (client.hasJWKS()) {
             json.put(JWKS, JSONWebKeyUtil.toJSON(client.getJWKS()));
@@ -409,7 +454,9 @@ public class OIDCCMServlet extends EnvServlet {
         JSONArray array = new JSONArray();
         array.addAll(client.getServiceClientUsers());
         json.put(SERVICE_CLIENT_USERS, array);
+        OA2ClientKeys clientKeys = (OA2ClientKeys) getOA2SE().getClientStore().getMapConverter().getKeys();
         // Fix https://github.com/ncsa/oa4mp/issues/159
+        json.put(clientKeys.rtGracePeriod(), client.getRtGracePeriod());
         json.put(clientKeys.extendsProvisioners(), client.isExtendsProvisioners());
         json.put(clientKeys.ersatzClient(), client.isErsatzClient());
         json.put(clientKeys.ersatzInheritIDToken(), client.isErsatzInheritIDToken());
@@ -445,6 +492,122 @@ public class OIDCCMServlet extends EnvServlet {
         }
         return json;
     }
+
+    protected JSONObject toJSONObject5_4(OA2Client client, boolean isGet) {
+          JSONObject json = new JSONObject();
+          String registrationURI = getOA2SE().getCmConfigs().getRFC7591Config().uri.toString();
+          // Next, we have to construct the registration URI by adding in the client ID.
+          // Spec says we can add parameters here, but not elsewhere.
+          json.put(OIDCCMConstants.REGISTRATION_CLIENT_URI, registrationURI + "?" + OA2Constants.CLIENT_ID + "=" + client.getIdentifierString());
+          json.put(OA2Constants.CLIENT_ID, client.getIdentifierString());
+          json.put(OIDCCMConstants.CLIENT_NAME, client.getName());
+          JSONArray cbs = new JSONArray();
+          cbs.addAll(client.getCallbackURIs());
+          json.put(OIDCCMConstants.REDIRECT_URIS, cbs);
+          if (client.hasJWKSURI()) {
+              json.put(JWKS_URI, client.getJwksURI().toString());
+          }
+          if (client.hasJWKS()) {
+              JSONObject jwks = JSONWebKeyUtil.toJSON(client.getJWKS());
+              json.put(JWKS, jwks);
+          }
+          if (client.getGrantTypes().isEmpty()) {
+              /*JSONArray grants = new JSONArray();
+              grants.add(OA2Constants.GRANT_TYPE_AUTHORIZATION_CODE);
+              if (client.isRTLifetimeEnabled()) {
+                  grants.add(OA2Constants.REFRESH_TOKEN);
+              }*/
+          } else {
+              json.put(OIDCCMConstants.GRANT_TYPES, client.getGrantTypes());
+          }
+          if (!client.getResponseTypes().isEmpty()) {
+
+              json.put(RESPONSE_TYPES, client.getResponseTypes());
+          }
+          if (client.isPublicClient()) {
+              json.put(TOKEN_ENDPOINT_AUTH_METHOD, TOKEN_ENDPOINT_AUTH_NONE);
+          }
+          if (0 < client.getRtLifetime()) {
+              // Stored in ms., sent/received in sec. Convert to seconds.
+              json.put(REFRESH_LIFETIME, client.getRtLifetime() / 1000);
+          } else {
+              if(!isGet) {
+                  json.put(REFRESH_LIFETIME, 0L);
+              }// otherwise, omit in get if 0.
+          }
+          if (0 < client.getAtLifetime()) {
+              // Stored in ms., sent/received in sec. Convert to seconds.
+              json.put(ACCESS_TOKEN_LIFETIME, client.getAtLifetime() / 1000);
+          } else {
+              json.put(ACCESS_TOKEN_LIFETIME, 0L);
+          }
+          if (client.hasJWKS()) {
+              json.put(JWKS, JSONWebKeyUtil.toJSON(client.getJWKS()));
+          }
+          if (client.hasJWKSURI()) {
+              json.put(JWKS_URI, client.getJwksURI().toString());
+          }
+          JSONArray scopes = new JSONArray();
+          scopes.addAll(client.getScopes());
+          json.put(OA2Constants.SCOPE, scopes);
+          json.put(OIDCCMConstants.CLIENT_URI, client.getHomeUri());
+          json.put(OA2Constants.ERROR_URI, client.getErrorUri());
+          // CIL-931 fix.
+          json.put(STRICT_SCOPES, client.useStrictScopes());
+          json.put(SKIP_SERVER_SCRIPTS, client.isSkipServerScripts());
+          // Note that a contact email is something specific to OA4MP and does not occur in
+          // either RFC 7591 or 7592.
+          // CIL-1221
+          json.put(PROXY_CLAIMS_LIST, client.getProxyClaimsList());
+          json.put(FORWARD_REQUEST_SCOPES_TO_PROXY, client.isForwardScopesToProxy());
+          json.put(PROXY_REQUEST_SCOPES, client.getProxyRequestScopes());
+          json.put(IS_SERVICE_CLIENT, client.isServiceClient());
+          JSONArray array = new JSONArray();
+          array.addAll(client.getServiceClientUsers());
+          json.put(SERVICE_CLIENT_USERS, array);
+          json.put("email", client.getEmail());
+          OA2ClientKeys clientKeys = (OA2ClientKeys) getOA2SE().getClientStore().getMapConverter().getKeys();
+          json.put(clientKeys.extendsProvisioners(), client.isExtendsProvisioners());
+          json.put(clientKeys.ersatzClient(), client.isErsatzClient());
+          json.put(clientKeys.ersatzInheritIDToken(), client.isErsatzInheritIDToken());
+          //CIL-1321 inheritance
+          if (client.hasPrototypes()) {
+              JSONArray jsonArray = new JSONArray();
+              for (Identifier id : client.getPrototypes()) {
+                  jsonArray.add(id.toString());
+              }
+              json.put(clientKeys.prototypes(), jsonArray);
+          }
+          // This is in seconds since the epoch
+          json.put(OIDCCMConstants.CLIENT_ID_ISSUED_AT, client.getCreationTS().getTime() / 1000);
+          if (client.getConfig() != null && !client.getConfig().isEmpty()) {
+
+              json.put("cfg", client.getConfig());
+          }
+          if (json.containsKey(clientKeys.email())) {
+              JSONArray jsonArray = new JSONArray();
+              jsonArray.add(json.get(clientKeys.email()));
+              json.remove(clientKeys.email());
+              json.put(OIDCCMConstants.CONTACTS, jsonArray);
+          }
+          if (client.hasOIDC_CM_Attributes()) {
+              // add them back
+              for (Object key : client.getOIDC_CM_Attributes().keySet()) {
+                  json.put(key, client.getOIDC_CM_Attributes().get(key));
+              }
+          }
+          return json;
+      }
+
+    public static String getDefaultAPIVersion() {
+        return defaultAPIVersion;
+    }
+
+    public static void setDefaultAPIVersion(String defaultAPIVersion) {
+        OIDCCMServlet.defaultAPIVersion = defaultAPIVersion;
+    }
+
+    static String defaultAPIVersion = API_VERSION_LATEST;
 
     /**
      * Used in serializing the client to JSON. lifetime that are positive
@@ -482,6 +645,7 @@ public class OIDCCMServlet extends EnvServlet {
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         //     printAllParameters(req);
+        String version = getVersion(getOA2SE().getCmConfigs().getRFC7592Config(), req);
 
 
         try {
@@ -555,7 +719,26 @@ public class OIDCCMServlet extends EnvServlet {
         }
     }
 
-
+    protected String getVersion(CMConfig cmConfig, HttpServletRequest req){
+         if(null != req.getParameter(API_VERSION_KEY)){
+             return req.getParameter(API_VERSION_KEY);
+         }
+         String requestUri = req.getRequestURI();
+         String endpoint = cmConfig.getEndpoint();
+         if(StringUtils.isTrivial(endpoint)){
+             throw new NFWException("the endpoint for the " + cmConfig.protocol + " has not been configured.");
+         }
+         if(requestUri.endsWith("/")){
+             requestUri = requestUri.substring(0,requestUri.length()-1); // normalize. remove trailing /
+         }
+         // No component means send back "none" so the endpoint can resolve what to do.
+        // Note the fact that we are here in the first place is because
+        // they sent a proper request to Tomcat, so we know that the endpoint (e.g. oidc-cm) is in the URI.
+         if(requestUri.endsWith("/"+endpoint)) return API_VERSION_NONE;
+         // by this point, it ends with /version
+         String version= requestUri.substring(1+requestUri.lastIndexOf("/")); // return exactly API
+         return version;
+    }
     /**
      * Update a client. Note that as per the specification, all values that are sent over-write existing
      * values and omitted values are taken to mean the stored value is unset.
@@ -569,6 +752,8 @@ public class OIDCCMServlet extends EnvServlet {
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         AdminClient adminClient = null;
         OA2Client client = null;
+        String version = getVersion(getOA2SE().getCmConfigs().getRFC7592Config(), req);
+
         try {
             if (!(getOA2SE().getCmConfigs().hasRFC7592Config() && getOA2SE().getCmConfigs().getRFC7592Config().enabled) && getOA2SE().getCmConfigs().isEnabled()) {
                 throw new IllegalAccessError("RFC 7592 not supported on this server. Request rejected.");
@@ -699,7 +884,8 @@ public class OIDCCMServlet extends EnvServlet {
             newClient.setIdentifier(client.getIdentifier());
             newClient.setConfig(client.getConfig());
             try {
-                newClient = updateClient(newClient, adminClient, false, jsonRequest, false, resp);
+                
+                newClient = updateClient(newClient, adminClient, false, jsonRequest, false, version);
                 if (adminClient.isDebugOn()) {
                     // CIL-607
                     // Never an anonymous client for a put.
@@ -707,7 +893,7 @@ public class OIDCCMServlet extends EnvServlet {
                 }
                 newClient.setDebugOn(isDebugOn); // CIL-1538
                 getOA2SE().getClientStore().save(newClient);
-                writeOK(resp, toJSONObject(newClient));
+                writeOK(resp, toJSONObject(newClient, version, false));
                 //     writeOK(resp, resp);
 
             } catch (Throwable t) {
@@ -845,10 +1031,18 @@ public class OIDCCMServlet extends EnvServlet {
         }
     }
 
+    /**
+     * The workhorse method for POST.
+     * @param httpServletRequest
+     * @param httpServletResponse
+     * @throws Throwable
+     */
     protected void doIt2(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable {
         if (!getOA2SE().getCmConfigs().isEnabled()) {
             throw new ServletException("unsupported service");
         }
+        String version = getVersion(getOA2SE().getCmConfigs().getRFC7591Config(), httpServletRequest);
+
         CM7591Config cm7591Config = getOA2SE().getCmConfigs().getRFC7591Config();
         boolean isAnonymous = false;
         String host = httpServletRequest.getRemoteHost();
@@ -909,7 +1103,7 @@ public class OIDCCMServlet extends EnvServlet {
             returnStringScopes = true;
         }
 
-        OA2Client newClient = processRegistrationRequest(jsonRequest, adminClient, isAnonymous, httpServletResponse, template);
+        OA2Client newClient = processRegistrationRequest(jsonRequest, adminClient, isAnonymous, template, version);
         if (isAnonymous) {
             // All anonymous requests send a notification.
             fireMessage(isAnonymous, getOA2SE(), defaultReplacements(httpServletRequest, adminClient, newClient));
@@ -972,6 +1166,14 @@ public class OIDCCMServlet extends EnvServlet {
             JSONArray xxx = new JSONArray();
             xxx.addAll(newClient.getScopes());
             jsonResp.put(SCOPE, xxx);
+        }
+        switch (version){
+            case API_VERSION_NONE:
+            case API_VERSION_5_4:
+                // do not set anything
+                break;
+            default:
+                newClient.getOIDC_CM_Attributes().put(API_VERSION_KEY, version);
         }
         debugger.trace(this, "saving this client");
         getOA2SE().getClientStore().save(newClient);
@@ -1067,7 +1269,7 @@ public class OIDCCMServlet extends EnvServlet {
                                      boolean isAnonymous,
                                      JSONObject jsonRequest,
                                      boolean newClient,
-                                     HttpServletResponse httpResponse) {
+                                     String version) {
         OA2ClientKeys keys = new OA2ClientKeys();
 
         /*
@@ -1664,10 +1866,10 @@ public class OIDCCMServlet extends EnvServlet {
     protected OA2Client processRegistrationRequest(JSONObject jsonRequest,
                                                    AdminClient adminClient,
                                                    boolean isAnonymous,
-                                                   HttpServletResponse httpResponse,
-                                                   OA2Client client) {
+                                                   OA2Client client,
+                                                   String version) {
 
-        return updateClient(client, adminClient, isAnonymous, jsonRequest, true, httpResponse);
+        return updateClient(client, adminClient, isAnonymous, jsonRequest, true, version);
     }
 
     SecureRandom random = new SecureRandom();

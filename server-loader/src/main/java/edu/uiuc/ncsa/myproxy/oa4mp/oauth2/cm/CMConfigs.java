@@ -62,7 +62,9 @@ public class CMConfigs extends HashMap<String, CMConfig> implements ClientManage
             // fine. Ignore it
         }
 
-        return new CMConfig(protocol, uri, isEnabled);
+        CMConfig cmConfig = new CMConfig(protocol, uri, isEnabled);
+        cmConfig.setEndpoint(endpoint);
+        return cmConfig;
     }
 
     public static CMConfig createConfigEntry(String protocol,
@@ -102,6 +104,7 @@ public class CMConfigs extends HashMap<String, CMConfig> implements ClientManage
             default:
                 throw new IllegalArgumentException("Error: unknown protocol");
         }
+
     }
 
     protected static CM7591Config create7591ConfigEntry(String protocol,
@@ -152,6 +155,7 @@ public class CMConfigs extends HashMap<String, CMConfig> implements ClientManage
             config.autoApproverName = rawAutoApproverName;
         }
 
+        config.setEndpoint(endpoint);
         return config;
     }
 

@@ -7,9 +7,8 @@ block[
 
     // ini. := file_read('vfs#/scripts/jlab/ldap.ini',2);
     ini. := file_read('/home/ncsa/dev/csd/config/ini/jlab-ldap.ini',2).'jlab';
-    say(to_string(ini.));
     user := script_args(0);
-                       jlab_cfg. := new_template('ldap');
+                       jlab_cfg. := claims#new_template('ldap');
               jlab_cfg.auth_type := 'simple';
                 jlab_cfg.address := ini.'address';
                    jlab_cfg.port := 636;
@@ -21,7 +20,7 @@ block[
      jlab_cfg.search_attributes. :=  ['sn','dn','voPersonID','isMemberOf'];
                jlab_cfg.username := ini.'name';
                jlab_cfg.password := ini.'pwd';
-     return(get_claims(create_source(jlab_cfg.), user));
+     return(claims#get_claims(claims#create_source(jlab_cfg.), user));
 ];
 
 

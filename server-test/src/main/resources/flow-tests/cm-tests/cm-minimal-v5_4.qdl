@@ -1,0 +1,21 @@
+#! /usr/bin/env -S qdl-run  
+/*
+   Tests minimal creation for version 5.4
+
+*/
+script_load('test#/cm-tests/init.qdl', args(0), 'v5.4');
+payload. := from_json(file_read(ini.'payloads' + 'create-minimal.json'));
+payload.'client_id' := custom_id();
+server_defaults.:=http#get({'query':'org.oa4mp:/server#defaults'})\content;
+resp. := http#post(payload.);
+r. := http#get({'client_id':resp.'content'.'client_id'});
+client. := r.'content';
+⊨ client.'at_lifetime' == 0 : 'wrong access token lifetime default';
+⊨ ∄client.'max_at_lifetime' : 'max access token lifetime asserted';
+⊨ ∄client.'id_token_lifetime' : 'id token lifetime asserted';
+⊨ ∄client.'max_id_token_lifetime' : 'max id token lifetime asserted';
+⊨ ∄client.'rt_lifetime' : 'wrong refresh token lifetime default';
+⊨ ∄client.'max_rt_lifetime' : 'max refresh token lifetime asserted';
+
+r. := http#delete({'client_id':client.'client_id'});
+say('ok: Version 5.4 check');

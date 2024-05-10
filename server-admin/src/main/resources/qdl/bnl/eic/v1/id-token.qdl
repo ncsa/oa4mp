@@ -18,6 +18,7 @@
     * Audience for ID token should be set to OIDC client ID.
     * ID token “sub” claim should be set to “sdccid” of logged in user. This number is currently provisioned into the “voPersonID” field of LDAP. (:speech_balloon: **COMMENT** from Scott Koranda, Mar 22, 2023: The voPersonID just changed from employeeNumber, but has been reconciled and is same in TEST and PROD LDAPs.)
     * ID token claim “isMemberOf” should contain a list of Registry groups to which the logged in user belongs. This is currently provisioned into “isMemberOf” in LDAP
+    * ID token claim "orcid" should contain the authenticated orcid of the user if present in COPerson profile. This is currently provisioned into LDAP field eduPersonOrcid
     * The following scopes are allowed openid, profile, email, org.cilogon.userinfo
     * ID token “acr” claim should convey information from the IDP as to whether the user logged in with Single Factor Authorization(SFA) or Multifactor Authorization(MFA)
     * Users that are denied authorization at the issuer should be redirected to the help page located at [https://www.sdcc.bnl.gov/registry-login-error.php](https://www.sdcc.bnl.gov/registry-login-error.php)
@@ -72,11 +73,11 @@ then [// Note that this does reset these every time called, so the get_user alwa
       claims.'sub' := 'http://cilogon.org/serverA/users/1774626';
      ];
 bnl_eic := 'BNL EIC-Services'; // moniker for debugging
-user := claims.sub;
+user := claims.'sub';
 trace(bnl_eic,'starting id-token for user =' + user);
 
 
-results. := script_load('bnl/drupal/v1/get_user.qdl', user); // user == claims.sub
+results. := script_load('bnl/eic/v1/get_user.qdl', user); // user == claims.sub
  trace(bnl_eic,'result of user query =' + to_string(results.));
 
   if [∄results.'sdccid']
@@ -87,4 +88,6 @@ then [uri :='https://www.sdcc.bnl.gov/registry-login-error.php'+
     err_uri('user not found',uri);
     ];
 
-          claims.'sub' := results.'sdccid';
+ claims.'sub' := results.'sdccid';
+  if [∃results.'orcid']
+then [ claims.'ordic' := results.'orcid';];

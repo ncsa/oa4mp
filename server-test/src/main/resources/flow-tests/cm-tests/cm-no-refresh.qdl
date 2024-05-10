@@ -1,7 +1,7 @@
 #! /usr/bin/env -S qdl-run  
 // CIL-1975 regression test: Creating with a zero refresh token lifetime should not
 // assert any rt values on get (or COmanage misinterprets this as a change).
-script_load('test#/cm-tests/init.qdl', args(0));
+script_load('test#/cm-tests/init.qdl', args(0), 'v5.4');
 payload. := from_json(file_read(ini.'payloads' + 'create-minimal.json'));
 payload.'client_id' := custom_id();
 payload.rt_lifetime := 0;

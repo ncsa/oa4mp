@@ -35,7 +35,21 @@ public class CMConfig {
 
     public String protocol;
     public URI uri;
+    /**
+     * The last component of the uri. This is set as a convenience since it is used for
+     * determining the requested version of this API.
+     */
     public boolean enabled = false;
+
+    public String getEndpoint() {
+        return endpoint;
+    }
+
+    public void setEndpoint(String endpoint) {
+        this.endpoint = endpoint;
+    }
+
+    String endpoint;
     public boolean isConfigured = false; // if this has been properly configured.
 
     /**

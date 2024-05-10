@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.QDLRuntimeEngine;
 import edu.uiuc.ncsa.qdl.scripting.AnotherJSONUtil;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
+import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
 import edu.uiuc.ncsa.security.util.scripting.ScriptSet;
 import net.sf.json.JSON;
 import net.sf.json.JSONException;
@@ -60,7 +61,13 @@ public abstract class AbstractPayloadConfig implements Serializable {
 
     public void fromJSON(JSONObject jsonObject) {
         if (jsonObject.containsKey(LIFETIME_KEY)) {
-            lifetime = jsonObject.getLong(LIFETIME_KEY);
+            Object rawLifetime = jsonObject.get(LIFETIME_KEY);
+            if(rawLifetime instanceof String){
+                lifetime = XMLConfigUtil.getValueSecsOrMillis((String)rawLifetime, false);
+            }else {
+                // assume it is a long and let JSON figure it out
+                lifetime = jsonObject.getLong(LIFETIME_KEY);
+            }
         }
         if(jsonObject.containsKey(QDLRuntimeEngine.CONFIG_TAG)) {
             try{

@@ -33,8 +33,10 @@ import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientFunctorScriptsUt
 import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC8693Constants.AUDIENCE;
 
 /**
+ * Functor tests!
  * <p>Created by Jeff Gaynor<br>
  * on 4/18/18 at  11:19 AM
+ * @deprecated
  */
 public class ClientConfigurationTest extends TestBase {
     /*
