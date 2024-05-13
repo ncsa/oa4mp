@@ -48,7 +48,7 @@
     
         
                     <div class="xleft">
-            Last Published: 2024-03-27
+            Last Published: 2024-05-13
                                 </div>
                 <div class="xright">            
     
@@ -169,6 +169,12 @@
     must manage several OAuth clients to do so without having to resort to the usual vetting process.
 </p>
 <section>
+<h3><a name="Looking_for_how_to_configure_the_server.3F"></a>Looking for how to configure the server?</h3>
+
+<p>If you are running OA4MP, then this facility is configured on the server as per
+<a href="../configuration/client_management-configuration.html">client management configuration</a>.
+</p>
+</section><section>
 <h3><a name="How_to_become_an_admin"></a>How to become an admin</h3>
 
 <p>You must register an administrative client as per <a href="administrative-clients.html">here</a>.</p>
@@ -251,6 +257,24 @@ them there, a separate call was created.</p>
         
 <th>Comments</th>
     </tr>
+    
+<tr class="b" align="left" valign="top">
+        
+<td>api_versions</td>
+        
+<td>List of API versions supported on this server. The first is &quot;latest&quot; and equals the second, E.g.
+        [&quot;latest&quot;,&quot;v5.5&quot;,&quot;v5.4&quot;] means the maximum version is 5.5 and is a synonym with &quot;latest&quot;. Note that &quot;latest&quot;
+        will change with a server upgrade, so you can specify it and your clients will always use whatever
+        the server has deployed. If you specify nothing, then the default is used. </td>
+    </tr>
+    
+<tr class="a" align="left" valign="top">
+        
+<td>api_version_default</td>
+        
+<td>The default api version. If a client is created without specifying the version, this is used.</td>
+    </tr>
+
     
 <tr class="b" align="left" valign="top">
         
@@ -353,6 +377,36 @@ them there, a separate call was created.</p>
         client this will be the value for any lifetimes that were not explicitly set at creation.</td>
     </tr>
 </table>
+</section><section>
+<h3><a name="Versions"></a>Versions</h3>
+
+<p>
+    Since OA4MP supports various attributes that are not standard, the response from the server
+    for GET, PUT etc. can vary depending on the server version. The standard attributes are always
+    faithefully reported in all versions, so the version simply refers to the OA4MP extensions
+    reported. Note that if you query the server for its defaults, these are returned. Starting in OA4MP 5.5,
+    this may be explicitly specified in one of two ways.
+</p>
+
+<ul>
+    
+<li>as an additional component in the URL path, so a path of <b>https://myserver.org/oauth2/register/v5.5</b>
+    would set the API version to 5.5.</li>
+    
+<li>as a query parameter with key <b>api_version</b>. If present, this overrides the path component. E.g.
+        <b>https://myserver.org/oauth2/register?api_version=v5.5...</b></li>
+</ul>
+
+<p>The major versions are </p>
+
+<ul>
+    
+<li><b>v5.5</b> -- fully spec compliant and returns <i>all</i> values on the server, even those set as defaults. The aim is
+    to expose more to clients so they can roundtrip more fully.</li>
+    
+<li><b>v5.4</b> -- limited values, in particular, rt_lifetime and at_lifetime are never allowed to be negative, but
+    zero values for those are reported. (Negative -1 as a value means the client uses whatever the current server default is.)</li>
+</ul>
 </section><section>
 <h3><a name="The_toolkit"></a>The toolkit</h3>
 
@@ -877,7 +931,11 @@ them there, a separate call was created.</p>
             it will be valid. Normally this is set for a very long time,
             as in weeks if not months. If this is omitted then the server policy will be applied. This is
             typically using the server default refresh lifetime or perhaps disabling it. A value of 0
-            disables refresh tolens and a value of -1 means using whatever the server's default lifetime is.
+            disables refresh tolens and a value of -1 means using whatever the server's default lifetime is.<br /><br />
+            <b>Note</b> the the server default lifetime is set in the
+            <a href="../configuration/client_management-configuration.html">client management configuration</a>.
+            The OA4MP default is -1, but CILogon's policy on creation/update is to disable refresh tokens
+            unless explicitly granted, hence the default there is <b>0</b>.
         </td>
     </tr>
     
