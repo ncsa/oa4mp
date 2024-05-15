@@ -22,4 +22,5 @@ else[
      ⊨ client.'max_rt_lifetime' == server_defaults.'use_server_default' : 'wrong max refresh token lifetime default';
    ];
 r. := http#delete({'client_id':client.'client_id'});
+
 say('ok: Version 5.5 check');
