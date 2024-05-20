@@ -19,6 +19,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2GeneralError;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.JWTRunner;
 import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
+import edu.uiuc.ncsa.security.servlet.HeaderUtils;
 import edu.uiuc.ncsa.security.servlet.PresentableState;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -79,6 +80,12 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
     protected void doIt(HttpServletRequest request, HttpServletResponse response) throws Throwable {
 
         Map<String, String> map = getFirstParameters(request);
+        if(map.containsKey("action") && map.get("action").equals("ok")){
+            super.doIt(request, response);
+            logOK(request); //CIL-1722
+            return;
+        }
+
 
         if (!map.containsKey(OA2Constants.RESPONSE_TYPE)) {
             // As per both OIDC and OAuth 2 spec., this is required. OIDC compliance requires state is returned.
@@ -95,7 +102,7 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
         init.doDelegation(request, wrapper);
         if (wrapper.isExceptionEncountered()) {
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, wrapper.toString(), wrapper.getStatus(),
-                    getFirstParameterValue(request, OA2Constants.STATE));
+                    HeaderUtils.getFirstParameterValue(request, OA2Constants.STATE));
         } // something happened someplace else and the exception was handled.
         String content = wrapper.toString();
         // issue now is that the nonce was registered in the init servlet (as it should be for OA1)
@@ -150,8 +157,6 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
         // redirect back to the client.
         JWTRunner jwtRunner = new JWTRunner(st2, ScriptRuntimeEngineFactory.createRTE(oa2SE, st2, resolvedClient.getConfig()));
         OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, st2, resolvedClient, request);
-
-
         jwtRunner.doAuthClaims();
 
         getTransactionStore().save(st2);

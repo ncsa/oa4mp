@@ -66,7 +66,7 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
             throw new IllegalStateException(getName() + " must have the type of claim source");
         }
         QDLStem headers = null;
-        if (arg.getString(CS_DEFAULT_TYPE).equals(CS_TYPE_HEADERS)) {
+        if (arg.getString(CS_DEFAULT_TYPE).equals(CS_TYPE_FILTER_HEADERS)) {
             headers = (QDLStem) arg.get("headers.");
         }
         switch (arg.getString(CS_DEFAULT_TYPE)) {
@@ -76,12 +76,42 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
                 return doFS(arg, username, state);
             case CS_TYPE_LDAP:
                 return doLDAP(arg, username, state);
-            case CS_TYPE_HEADERS:
+            case CS_TYPE_FILTER_HEADERS:
                 return doHeaders(arg, username, headers, state);
+            case CS_TYPE_ALL_HEADERS:
+                return doQDLHeaders(arg, username, headers, state);
             case CS_TYPE_NCSA:
                 return doNCSA(arg, username, state);
         }
         return null;
+    }
+
+    /**
+     * Process the QDL utility for headers.
+     * @param arg
+     * @param username
+     * @param headers
+     * @param state
+     * @return
+     */
+    private QDLStem doQDLHeaders(QDLStem arg, String username, QDLStem headers, State state) {
+        OA2State oa2State = null;
+         if (state instanceof OA2State) {
+             oa2State = (OA2State) state;
+         }
+         QDLHeadersClaimsSource qdlHeaderClaimsSource = (QDLHeadersClaimsSource) getConfigToCS().convert(arg, oa2State == null ? null : oa2State.getOa2se());
+         if(state instanceof OA2State) {
+             qdlHeaderClaimsSource.setOa2State((OA2State) state);
+         }
+         OA2ServiceTransaction t = new OA2ServiceTransaction((Identifier) null);
+         t.setUsername(username);
+         JSONObject protoClaims = t.getUserMetaData();
+
+         TestHTTPRequest req = new TestHTTPRequest(headers);
+         JSONObject j = qdlHeaderClaimsSource.process(protoClaims, req, t);
+         QDLStem output = new QDLStem();
+         output.fromJSON(j);
+         return output;
     }
 
     protected QDLStem doCode(QDLStem arg, String username, QDLStem headers, State state) {

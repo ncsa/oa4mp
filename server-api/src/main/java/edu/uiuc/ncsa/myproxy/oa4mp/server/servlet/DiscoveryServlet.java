@@ -18,7 +18,7 @@ import java.io.PrintWriter;
  */
 public class DiscoveryServlet extends MyProxyDelegationServlet implements OIDCDiscoveryTags {
 
-
+   public static  final String DEFAULT_REGISTRATION_ENDPOINT = "oidc-cm";
     public static final String DISCOVERY_PATH = ".well-known";
 
     @Override
@@ -52,7 +52,7 @@ public class DiscoveryServlet extends MyProxyDelegationServlet implements OIDCDi
         //jsonObject.put(REGISTRATION_ENDPOINT, requestURI + "/register");
         // The next line points to the RFC 7591/7592 protocol.
         // Should be the same as in ClientManagementConstants.DEFAULT_RFC7591_ENDPOINT
-        jsonObject.put(REGISTRATION_ENDPOINT, requestURI + "/oidc-cm");
+        jsonObject.put(REGISTRATION_ENDPOINT, requestURI + "/" + DEFAULT_REGISTRATION_ENDPOINT);
         return jsonObject;
     }
 

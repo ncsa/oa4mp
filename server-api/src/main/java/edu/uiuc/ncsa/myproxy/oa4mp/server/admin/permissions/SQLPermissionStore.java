@@ -109,7 +109,7 @@ public class SQLPermissionStore<V extends Permission> extends SQLStore<V> implem
     @Override
     public PermissionList getErsatzChains(Identifier adminID, Identifier clientID) {
         PermissionList allOfThem = new PermissionList();
-        if(clientID == null){
+        if(clientID == null){  // Fix for https://github.com/ncsa/oa4mp/issues/184
             return allOfThem;
         }
         ConnectionRecord cr = getConnection();

@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.ClientUtils;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2DiscoveryServlet;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2HeaderUtils;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VirtualOrganization;
@@ -192,6 +193,13 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
     public void addRequestState(ScriptRunRequest req) throws Throwable {
         req.getArgs().put(SRE_REQ_CLAIM_SOURCES, getSources());
         req.getArgs().put(SRE_REQ_CLAIMS, getUserMetaData());
+        if (getPhCfg().request != null) {
+            JSONObject json  = OA2HeaderUtils.headerToJSON(getPhCfg().request,
+                    Arrays.asList(new String[]{"authorization", "cookie", "host"}));
+            if (!json.isEmpty()) {
+                req.getArgs().put(SRE_REQ_AUTH_HEADERS, json);
+            }
+        }
 /*
         req.getArgs().put(SRE_REQ_EXTENDED_ATTRIBUTES, getExtendedAttributes()); // so its a map*/
     }
@@ -264,7 +272,7 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
         x.retainAll(basicScopes);
         x.retainAll(transaction.getClient().getScopes());
         // All we want is the scopes allowed to this client
-        if (x.contains(OA2Scopes.SCOPE_CILOGON_INFO)  || !((OA2Client) transaction.getClient()).useStrictScopes()) {
+        if (x.contains(OA2Scopes.SCOPE_CILOGON_INFO) || !((OA2Client) transaction.getClient()).useStrictScopes()) {
             permissiveFinish(x, execPhase);
             return;
         }
@@ -284,7 +292,7 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
             if (hasTXRecord() && getTXRecord().getScopes() != null && !getTXRecord().getScopes().isEmpty()) {
                 scopes = getTXRecord().getScopes();
                 Collection<String> metadataScopes = OA2Scopes.ScopeUtil.intersection(OA2Scopes.ScopeUtil.getBasicScopes(), scopes);
-                if(metadataScopes.size() == 0){
+                if (metadataScopes.size() == 0) {
                     // So the user sent a bunch of scopes and these are not related to user meta data.
                     // Treat this as if they had sent NO scopes, and return the original set.
                     // If there is even one meta data scope, assume they are trying to downscope and let them.
@@ -308,54 +316,56 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
      */
     protected void restrictiveFinish(Collection<String> scopes, String execPhase) throws Throwable {
         JSONObject finalClaims = new JSONObject();
-        JSONObject c = new JSONObject();
+        JSONObject currentClaims = new JSONObject();
         //Collection<String> scopes = getScopes();
-        c.putAll(getUserMetaData());
+        currentClaims.putAll(getUserMetaData());
         // These are to present in every ID token.
         String[] requiredClaims = new String[]{ISSUER, AUDIENCE, EXPIRATION, ISSUED_AT, JWT_ID, NONCE, AUTHORIZATION_TIME};
         for (String r : requiredClaims) {
-            setCurrentClaim(c, finalClaims, r);
+            setCurrentClaim(currentClaims, finalClaims, r);
         }
+        // The strategy is that only what is allowed may be returned.
         // Fix for https://github.com/ncsa/oa4mp/issues/158 follows.
         // As per OIDC spec, if present MUST contain the identifier for the client
         finalClaims.put(AUTHORIZED_PARTY, transaction.getClient().getIdentifierString());
         if (scopes.contains(OA2Scopes.SCOPE_OPENID)) {
-            setCurrentClaim(c, finalClaims, SUBJECT);
-            setCurrentClaim(c, finalClaims, AUTHENTICATION_CLASS_REFERENCE);
-            setCurrentClaim(c, finalClaims, AUTHENTICATION_METHOD_REFERENCE);
+            setCurrentClaim(currentClaims, finalClaims, SUBJECT);
+            setCurrentClaim(currentClaims, finalClaims, AUTHENTICATION_CLASS_REFERENCE);
+            setCurrentClaim(currentClaims, finalClaims, AUTHENTICATION_METHOD_REFERENCE);
         }
         // CIL-1411 -- remove any claims not specifically requested by the user.
         // We need this here since a policy set  may add claims that the user
         // did not request.
         if (scopes.contains(SCOPE_EMAIL)) {
-            setCurrentClaim(c, finalClaims, EMAIL);
-            setCurrentClaim(c, finalClaims, EMAIL_VERIFIED); // we usually don't do this though.
+            setCurrentClaim(currentClaims, finalClaims, EMAIL);
+            setCurrentClaim(currentClaims, finalClaims, EMAIL_VERIFIED); // we usually don't do this though.
         }
         if (scopes.contains(SCOPE_PHONE)) {
-            setCurrentClaim(c, finalClaims, PHONE_NUMBER);
-            setCurrentClaim(c, finalClaims, PHONE_NUMBER_VERIFIED);
+            setCurrentClaim(currentClaims, finalClaims, PHONE_NUMBER);
+            setCurrentClaim(currentClaims, finalClaims, PHONE_NUMBER_VERIFIED);
         }
 
         if (scopes.contains(OA2Scopes.SCOPE_PROFILE)) {
-            setCurrentClaim(c, finalClaims, NAME);
-            setCurrentClaim(c, finalClaims, GIVEN_NAME);
-            setCurrentClaim(c, finalClaims, FAMILY_NAME);
-            setCurrentClaim(c, finalClaims, MIDDLE_NAME);
-            setCurrentClaim(c, finalClaims, NICKNAME);
-            setCurrentClaim(c, finalClaims, DISPLAY_NAME);
-            setCurrentClaim(c, finalClaims, PREFERRED_USERNAME);
+            setCurrentClaim(currentClaims, finalClaims, NAME);
+            setCurrentClaim(currentClaims, finalClaims, GIVEN_NAME);
+            setCurrentClaim(currentClaims, finalClaims, FAMILY_NAME);
+            setCurrentClaim(currentClaims, finalClaims, MIDDLE_NAME);
+            setCurrentClaim(currentClaims, finalClaims, NICKNAME);
+            setCurrentClaim(currentClaims, finalClaims, DISPLAY_NAME);
+            setCurrentClaim(currentClaims, finalClaims, PREFERRED_USERNAME);
         }
         if (scopes.contains(OA2Scopes.SCOPE_ADDRESS)) {
-            setCurrentClaim(c, finalClaims, ADDRESS);
+            setCurrentClaim(currentClaims, finalClaims, ADDRESS);
         }
 
         // these are things that may be returned as user information
         // Fix for https://github.com/ncsa/oa4mp/issues/112
         if (scopes.contains(OA2Scopes.SCOPE_USER_INFO)) {
-            for(String claim : USER_INFO_CLAIMS){
-                setCurrentClaim(c, finalClaims, claim);
+            for (String claim : USER_INFO_CLAIMS) {
+                setCurrentClaim(currentClaims, finalClaims, claim);
             }
-     }
+        }
+        setUserMetaData(finalClaims);
     }
 
     /**
@@ -373,6 +383,8 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
         if (oa2se.isOIDCEnabled()) {
             checkClaim(getUserMetaData(), SUBJECT);
         }
+        // The strategy is that th is subtractive: the current metadata may have certain things
+        // removed, but everything else is returned.
         //Collection<String> scopes = getScopes();
         // CIL-1411 -- remove any claims not specifically requested by the user.
         // We need this here since a policy set  may add claims that the user
@@ -397,11 +409,11 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
         // Not having the CILogon userinfo scope but also allowing other scopes means
         // removing specific scopes and letting other scopes -- such COManage memberships -- through.
         // Fix for https://github.com/ncsa/oa4mp/issues/158
-        if(scopes.contains(OA2Scopes.SCOPE_CILOGON_INFO)){
+        if (scopes.contains(OA2Scopes.SCOPE_CILOGON_INFO)) {
             return; // contract for this is kitchen sink -- return everything not prohibited.
         }
         if (!scopes.contains(OA2Scopes.SCOPE_USER_INFO)) {
-            for(String claim: USER_INFO_CLAIMS){
+            for (String claim : USER_INFO_CLAIMS) {
                 getUserMetaData().remove(claim);
             }
         }

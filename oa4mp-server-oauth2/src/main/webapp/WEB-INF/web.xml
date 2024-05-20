@@ -185,12 +185,12 @@
           </user-data-constraint>
       </security-constraint>
     <!--
-       Uncomment the next section if you are replacing the built-in authorization module with your own.
-       Look here for the details: http://grid.ncsa.illinois.edu/myproxy/oauth/server/manuals/remote-user.xhtml
+       Uncomment the next sections if you are replacing the built-in authorization module with your own.
+       Look here for the details: https://oa4mp.org/server/manuals/remote-user.html
     -->
-<!--      <security-constraint>
+     <security-constraint>
          <web-resource-collection>
-           <web-resource-name>OAuth Security</web-resource-name>
+           <web-resource-name>OAuth Security Device Flow</web-resource-name>
            <url-pattern>/authorize</url-pattern>
            <http-method>POST</http-method>
            <http-method>GET</http-method>
@@ -201,9 +201,9 @@
          <user-data-constraint>
            <transport-guarantee>NONE</transport-guarantee>
          </user-data-constraint>
-       </security-constraint>-->
+       </security-constraint>
 
-<!--
+ <!-- the next block allows log ins for testing REMOTE_USER with device flow-->
     <security-constraint>
         <web-resource-collection>
           <web-resource-name>OAuth Security</web-resource-name>
@@ -218,11 +218,11 @@
           <transport-guarantee>NONE</transport-guarantee>
         </user-data-constraint>
       </security-constraint>
-
+ <!-- no matter which security constraint(s) are allowed, this next bit has to be
+      ucommented to since it is what allows for loging -->
        <login-config>
           <auth-method>BASIC</auth-method>
         </login-config>
--->
 
     <resource-ref>
         <description>

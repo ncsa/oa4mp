@@ -8,7 +8,7 @@ use('/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/utils/cm.mdl')
 // Note that reloading the http module closes the connection then reopens at ea
 
 custom_id()->ini.'caput' + ':' + random_string(16);
-suite := size(args()) == 1 ? args(0):'cm_local';//which test to run. Default is cm for local test
+suite := 0 < size(args()) ? args(0):'cm_local';//which test to run. Default is cm for local test
 version := size(args()) == 2 ? args(1):null;//which test to run. Default is cm for local test
 
 ini. := file_read('/home/ncsa/dev/csd/config/ini/cm-test.ini',2).suite;

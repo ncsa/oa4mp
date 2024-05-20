@@ -51,8 +51,10 @@ public class CreateSourceConfig implements QDLFunction, CSConstants {
                 return doNCSA(arg, output);
             case CS_TYPE_LDAP:
                 return doLDAP(arg, output);
-            case CS_TYPE_HEADERS:
+            case CS_TYPE_FILTER_HEADERS:
                 return doHeaders(arg, output);
+            case CS_TYPE_ALL_HEADERS:
+                return doQDLHeaders(arg, output);
             case CS_TYPE_CODE:
                 return doCode(arg, output);
         }
@@ -116,7 +118,9 @@ public class CreateSourceConfig implements QDLFunction, CSConstants {
         return output.union(arg);
     }
 
-
+    private QDLStem doQDLHeaders(QDLStem arg, QDLStem output) {
+    return arg;
+}
     protected QDLStem doLDAP(QDLStem arg, QDLStem output) {
         if (!arg.containsKey(CS_LDAP_SERVER_ADDRESS)) {
             throw new IllegalArgumentException("Error:" + CS_LDAP_SERVER_ADDRESS + " is required for ldap configurations");

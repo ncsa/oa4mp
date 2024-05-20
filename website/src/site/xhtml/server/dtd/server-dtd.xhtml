@@ -235,12 +235,15 @@
 &lt;!ATTLIST
     defaultKeyID CDATA #IMPLIED&gt;
 &lt;!ELEMENT path (#PCDATA)&gt;
-&lt;!ELEMENT <a href="../../common/configuration/scopes.html">scopes</a>(scope)&gt;
+&lt;!ELEMENT <a href="../../common/configuration/scopes.html">scopes</a>(scope)*&gt;
+&lt;!ATTLIST scopes
+    <a href="../../common/configuration/scopes.html#handler">handler</a> CDATA #IMPLIED&gt;
 &lt;!ELEMENT <a href="../../common/configuration/scopes.html">scope</a>(#PCDATA)&gt;
 &lt;!ATTLIST <a href="../../common/configuration/scopes.html">scope</a>
      enabled CDATA #IMPLIED&gt;
 ]&gt;
 </pre>
+
 <p>A few examples</p>
 
 <h3>Example 1. A quick &amp; dirty configuration for debugging/evaluation.</h3>

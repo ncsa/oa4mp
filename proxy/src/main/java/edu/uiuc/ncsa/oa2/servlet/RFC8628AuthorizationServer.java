@@ -1,18 +1,23 @@
 package edu.uiuc.ncsa.oa2.servlet;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2ClientUtils;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628Constants2;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC8628State;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ScriptRuntimeEngineFactory;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RFC8628Store;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractAuthorizationServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.EnvServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.PresentationState;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.util.ClientDebugUtil;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AuthorizationGrantImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenFactory;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2ATException;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Errors;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2GeneralError;
+import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.JWTRunner;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
@@ -31,7 +36,10 @@ import java.security.GeneralSecurityException;
 import java.sql.SQLException;
 import java.util.*;
 
-import static edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractAuthorizationServlet.UserLoginException;
+import static edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceConstantKeys.TOKEN_KEY;
+import static edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractAuthorizationServlet.*;
+import static edu.uiuc.ncsa.oa2.servlet.OA2AuthorizationServer.scopesToString;
+import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
 
 /**
  * This does the authorization for the device flow.
@@ -71,10 +79,10 @@ public class RFC8628AuthorizationServer extends EnvServlet {
     public void prepare(PresentableState state) throws Throwable {
         PendingState pendingState = (PendingState) state;
         switch (pendingState.getState()) {
-            case AbstractAuthorizationServlet.AUTHORIZATION_ACTION_OK:
+            case AUTHORIZATION_ACTION_OK:
                 // nothing to do, really
                 return;
-            case AbstractAuthorizationServlet.AUTHORIZATION_ACTION_START:
+            case AUTHORIZATION_ACTION_START:
                 info("3.a. Starting authorization device");
                 //Mess of information for the form
                 setClientRequestAttributes(pendingState);
@@ -115,11 +123,11 @@ public class RFC8628AuthorizationServer extends EnvServlet {
 
     protected void setClientRequestAttributes(PendingState pendingState) {
         HttpServletRequest request = pendingState.getRequest();
-        request.setAttribute(AbstractAuthorizationServlet.AUTHORIZATION_USER_NAME_KEY, AbstractAuthorizationServlet.AUTHORIZATION_USER_NAME_KEY);
-        request.setAttribute(AbstractAuthorizationServlet.AUTHORIZATION_PASSWORD_KEY, AbstractAuthorizationServlet.AUTHORIZATION_PASSWORD_KEY);
-        request.setAttribute(AbstractAuthorizationServlet.AUTHORIZATION_ACTION_KEY, AbstractAuthorizationServlet.AUTHORIZATION_ACTION_KEY);
+        request.setAttribute(AUTHORIZATION_USER_NAME_KEY, AUTHORIZATION_USER_NAME_KEY);
+        request.setAttribute(AUTHORIZATION_PASSWORD_KEY, AUTHORIZATION_PASSWORD_KEY);
+        request.setAttribute(AUTHORIZATION_ACTION_KEY, AUTHORIZATION_ACTION_KEY);
         request.setAttribute(USER_CODE_KEY, USER_CODE_KEY);
-        request.setAttribute("actionOk", AbstractAuthorizationServlet.AUTHORIZATION_ACTION_OK_VALUE);
+        request.setAttribute("actionOk", AUTHORIZATION_ACTION_OK_VALUE);
         request.setAttribute("identifier", pendingState.id);
         request.setAttribute("count", Integer.toString(pendingState.count));
     }
@@ -134,8 +142,30 @@ public class RFC8628AuthorizationServer extends EnvServlet {
         DebugUtil.trace(this, " starting with response committed #1?" + response.isCommitted());
         PendingState pendingState = null;
 
-        switch (AbstractAuthorizationServlet.getState(request)) {
-            case AbstractAuthorizationServlet.AUTHORIZATION_ACTION_OK:
+        switch (getState(request)) {
+            case AUTHORIZATION_ACTION_OK:
+                String pageType = request.getParameter("page_type"); // since we may either have an authz page or just the consent page
+                if(!StringUtils.isTrivial(pageType)){
+                    if(pageType.equals("consent")){
+                        String ag = request.getParameter("code");
+                        if(StringUtils.isTrivial(ag)){
+                            throw new IllegalStateException("the token for the device consent page is missing");
+                        }
+                        AuthorizationGrantImpl authorizationGrant = TokenFactory.createAG(ag);
+                        OA2SE oa2SE = (OA2SE) MyProxyDelegationServlet.getServiceEnvironment();
+
+                        OA2ServiceTransaction trans = (OA2ServiceTransaction) oa2SE.getTransactionStore().get(authorizationGrant);
+                        OA2Client resolvedClient = (OA2Client) trans.getClient(); // no ersatz possible at this point.
+                        JWTRunner jwtRunner = new JWTRunner(trans, ScriptRuntimeEngineFactory.createRTE(getServiceEnvironment(), trans, resolvedClient.getConfig()));
+                        OA2ClientUtils.setupHandlers(jwtRunner, getServiceEnvironment(), trans, resolvedClient, request);
+                        jwtRunner.doAuthClaims();
+                        oa2SE.getTransactionStore().save(trans);
+                        logOK(request); //CIL-1722
+                        JSPUtil.fwd(request, response, getOkPage());
+
+                        return;
+                    }
+                }
                 DebugUtil.trace(this, "in RFC 8628 Authz server: auth ok");
                 cleanupPending(); // get rid of any old ones before looking.
                 try {
@@ -165,8 +195,8 @@ public class RFC8628AuthorizationServer extends EnvServlet {
                 } catch (GeneralSecurityException t) {
                     // Generic failure
                     info("Prompting user to retry login");
-                    request.setAttribute(AbstractAuthorizationServlet.RETRY_MESSAGE, getServiceEnvironment().getMessages().get(AbstractAuthorizationServlet.RETRY_MESSAGE));
-                    pendingState.setState(AbstractAuthorizationServlet.AUTHORIZATION_ACTION_START);
+                    request.setAttribute(RETRY_MESSAGE, getServiceEnvironment().getMessages().get(RETRY_MESSAGE));
+                    pendingState.setState(AUTHORIZATION_ACTION_START);
                     prepare(pendingState);
                 } catch (TooManyRetriesException userErrorCodeException) {
                     info("Too many retries for user code, aborting.");
@@ -177,15 +207,15 @@ public class RFC8628AuthorizationServer extends EnvServlet {
                     if (DebugUtil.isEnabled()) {
                         userLoginException.printStackTrace();
                     }
-                    request.setAttribute(AbstractAuthorizationServlet.RETRY_MESSAGE, userLoginException.getMessage());
-                    pendingState.setState(AbstractAuthorizationServlet.AUTHORIZATION_ACTION_START);
+                    request.setAttribute(RETRY_MESSAGE, userLoginException.getMessage());
+                    pendingState.setState(AUTHORIZATION_ACTION_START);
                     prepare(pendingState);
                 }
                 break;
-            case AbstractAuthorizationServlet.AUTHORIZATION_ACTION_START:
+            case AUTHORIZATION_ACTION_START:
                 DebugUtil.trace(this, "Authz action start");
                 String id = BasicIdentifier.randomID().toString();
-                pendingState = new PendingState(AbstractAuthorizationServlet.getState(request),
+                pendingState = new PendingState(getState(request),
                         request,
                         response,
                         id);
@@ -264,6 +294,22 @@ public class RFC8628AuthorizationServer extends EnvServlet {
                                   boolean checkCount) throws Throwable {
         ServletDebugUtil.trace(this, "starting servlet");
         ServletDebugUtil.trace(this, " starting, pending state response committed?" + pendingState.getResponse().isCommitted());
+        Map<String, String> map = getFirstParameters(request);
+/*        if (map.containsKey("action") && map.get("action").equals("ok")) {
+            String ag = request.getParameter("authorizationGrant");
+            AuthorizationGrantImpl authorizationGrant = TokenFactory.createAG(ag);
+            OA2SE oa2SE = (OA2SE) MyProxyDelegationServlet.getServiceEnvironment();
+
+            OA2ServiceTransaction trans = (OA2ServiceTransaction) oa2SE.getTransactionStore().get(authorizationGrant);
+            OA2Client resolvedClient = (OA2Client) trans.getClient(); // no ersatz possible at this point.
+            JWTRunner jwtRunner = new JWTRunner(trans, ScriptRuntimeEngineFactory.createRTE(getServiceEnvironment(), trans, resolvedClient.getConfig()));
+            OA2ClientUtils.setupHandlers(jwtRunner, getServiceEnvironment(), trans, resolvedClient, request);
+            jwtRunner.doAuthClaims();
+            logOK(request); //CIL-1722
+            return;
+        }*/
+
+
         String userName = null;
         String password = null;
         String userCode = null;
@@ -324,14 +370,14 @@ public class RFC8628AuthorizationServer extends EnvServlet {
             } else {
                 // So the score card is that the header is not required though use it if there for the username
                 if (StringUtils.isTrivial(userName)) {
-                    userName = request.getParameter(AbstractAuthorizationServlet.AUTHORIZATION_USER_NAME_KEY);
+                    userName = request.getParameter(AUTHORIZATION_USER_NAME_KEY);
                 }
             }
         } else {
             if (!getServiceEnvironment().getAuthorizationServletConfig().isUseProxy()) {
                 // Headers, proxy not used, just pull it off the form the user POSTs.
-                userName = request.getParameter(AbstractAuthorizationServlet.AUTHORIZATION_USER_NAME_KEY);
-                password = request.getParameter(AbstractAuthorizationServlet.AUTHORIZATION_PASSWORD_KEY);
+                userName = request.getParameter(AUTHORIZATION_USER_NAME_KEY);
+                password = request.getParameter(AUTHORIZATION_PASSWORD_KEY);
                 if (DEBUG_LOGIN) {
                     debugCheckUser(userName, password);
                 } else {
@@ -398,7 +444,13 @@ public class RFC8628AuthorizationServer extends EnvServlet {
         trans.setRFC8628State(rfc8628State);
         pending.remove(pendingState.id); // clean that out
         trans.setValidatedScopes(trans.getScopes()); // At this point they accepted the scopes on the consent page, so stash them.
+/*        OA2Client resolvedClient = (OA2Client)trans.getClient(); // no ersatz possible at this point.
+        JWTRunner jwtRunner = new JWTRunner(trans, ScriptRuntimeEngineFactory.createRTE(getServiceEnvironment(), trans, resolvedClient.getConfig()));
+        OA2ClientUtils.setupHandlers(jwtRunner, getServiceEnvironment(), trans, resolvedClient, request);
+        jwtRunner.doAuthClaims();*/
         getServiceEnvironment().getTransactionStore().save(trans);
+        setClientConsentAttributes(request, trans);
+        JSPUtil.fwd(request, pendingState.getResponse(), getConsentPage());
     }
 
     public static class TooManyRetriesException extends GeneralException {
@@ -457,11 +509,7 @@ public class RFC8628AuthorizationServer extends EnvServlet {
         postprocess(pendingState);
 
         switch (pendingState.getState()) {
-            case AbstractAuthorizationServlet.AUTHORIZATION_ACTION_START:
-    /*            if (getServiceEnvironment().getAuthorizationServletConfig().isUseProxy()) {
-                    ProxyUtils.doProxy(getServiceEnvironment(), pendingState);
-                    return;
-                }*/
+            case AUTHORIZATION_ACTION_START:
                 String initPage = getInitialPage();
                 info("*** STARTING present");
                 if (getServiceEnvironment().getAuthorizationServletConfig().isUseHeader()) {
@@ -494,7 +542,7 @@ public class RFC8628AuthorizationServer extends EnvServlet {
                         //getTransactionStore().save(aState.getTransaction());
 
                         // make it display pretty as per usual conventions. This is never reused, however.
-                        pendingState.getRequest().setAttribute(AbstractAuthorizationServlet.AUTHORIZATION_USER_NAME_VALUE, StringEscapeUtils.escapeHtml(x));
+                        pendingState.getRequest().setAttribute(AUTHORIZATION_USER_NAME_VALUE, StringEscapeUtils.escapeHtml(x));
                     }
                 } else {
                     info("*** PRESENT: Use headers DISABLED.");
@@ -503,7 +551,7 @@ public class RFC8628AuthorizationServer extends EnvServlet {
                 JSPUtil.fwd(state.getRequest(), state.getResponse(), initPage);
                 info("3.a. User information obtained for grant = " + pendingState.id);
                 break;
-            case AbstractAuthorizationServlet.AUTHORIZATION_ACTION_OK:
+            case AUTHORIZATION_ACTION_OK:
                 JSPUtil.fwd(state.getRequest(), state.getResponse(), getOkPage());
                 break;
             default:
@@ -529,4 +577,29 @@ public class RFC8628AuthorizationServer extends EnvServlet {
 
         }
     }
+
+    protected void setClientConsentAttributes(HttpServletRequest request, OA2ServiceTransaction t) {
+       /*request.setAttribute(AUTHORIZATION_USER_NAME_KEY, AUTHORIZATION_USER_NAME_KEY);
+        request.setAttribute(AUTHORIZATION_PASSWORD_KEY, AUTHORIZATION_PASSWORD_KEY);*/
+        request.setAttribute(AUTHORIZATION_ACTION_KEY, AUTHORIZATION_ACTION_KEY);
+        request.setAttribute("actionOk", AUTHORIZATION_ACTION_OK_VALUE);
+        request.setAttribute("authorizationGrant", t.getIdentifierString());
+        request.setAttribute("tokenKey", CONST(TOKEN_KEY));
+        // OAuth 2.0 specific values that must be preserved.
+        request.setAttribute("stateKey", "state");
+        request.setAttribute("authorizationState", t.getRequestState());
+
+        request.setAttribute("clientHome", escapeHtml(t.getClient().getHomeUri()));
+        request.setAttribute("clientName", escapeHtml(t.getClient().getName()));
+        request.setAttribute("clientScopes", StringEscapeUtils.escapeHtml(scopesToString(t)));
+
+        request.setAttribute("actionToTake", request.getContextPath() + "/device");
+    }
+
+    public static String CONSENT_PAGE = "/device-consent.jsp";
+
+    protected String getConsentPage() {
+        return CONSENT_PAGE;
+    }
+
 }

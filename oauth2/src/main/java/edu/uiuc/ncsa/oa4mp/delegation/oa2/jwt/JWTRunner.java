@@ -412,7 +412,8 @@ public class JWTRunner {
                           between iterations in this loop so forward the UMD on to the next handler.
                          */
                         if(h instanceof IDTokenHandlerInterface){
-                            ((IDTokenHandlerInterface)h).setUserMetaData(((IDTokenHandlerInterface)previousHandler).getUserMetaData());
+                            IDTokenHandlerInterface h2 = (IDTokenHandlerInterface)h;
+                            h2.setUserMetaData(((IDTokenHandlerInterface)previousHandler).getUserMetaData());
                         }
                     }
                     h.addRequestState(req);

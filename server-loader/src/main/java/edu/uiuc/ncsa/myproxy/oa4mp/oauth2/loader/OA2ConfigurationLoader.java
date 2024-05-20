@@ -29,6 +29,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.MultiDSAdminClientSt
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.DSTransactionProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.OA4MPIdentifierProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractConfigurationLoader;
+import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.DiscoveryServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.MultiDSClientApprovalStoreProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.MultiDSClientStoreProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.storage.filestore.DSFSClientApprovalStoreProvider;
@@ -979,10 +980,13 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
             for (ConfigurationNode sn : kids) {
                 if (sn.getName().equals(ClientManagementConstants.API_TAG)) {
                     try {
+                        // If the endpoint is not configured, just use whatever the system defaults to.
+                        String endpoint = getFirstAttribute(sn, ClientManagementConstants.ENDPOINT_ATTRIBUTE);
+                        endpoint = StringUtils.isTrivial(endpoint)? DiscoveryServlet.DEFAULT_REGISTRATION_ENDPOINT:endpoint;
                         CMConfig cfg = CMConfigs.createConfigEntry(
                                 getFirstAttribute(sn, ClientManagementConstants.PROTOCOL_ATTRIBUTE),
                                 serverAddress,
-                                getFirstAttribute(sn, ClientManagementConstants.ENDPOINT_ATTRIBUTE),
+                                endpoint,
                                 getFirstAttribute(sn, ClientManagementConstants.FULL_URL_ATTRIBUTE),
                                 getFirstAttribute(sn, ClientManagementConstants.ENABLE_SERVICE),
                                 getFirstAttribute(sn, ClientManagementConstants.RFC_7591_TEMPLATE),
@@ -1514,6 +1518,13 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                                 "interface and therefore cannot be used to handle scopes.");
                     }
                     claimSource = (ClaimSource) x;
+                    // Note that somewhere in the late 4.x's configuration objects were introduced.
+                    // This meant that any global claim source would not have a configuration and
+                    // is instantly disabled. The solution is to set a basic configuration here.
+                    // Fixes https://github.com/ncsa/oa4mp/issues/180
+                        ClaimSourceConfiguration configuration = new ClaimSourceConfiguration();
+                        configuration.setEnabled(true);
+                        claimSource.setConfiguration(configuration);
                 } else {
                     info("Scope handler attribute found in configuration, but no value was found for it. Skipping custom loaded scope handling.");
                 }

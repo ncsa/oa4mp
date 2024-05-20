@@ -2,13 +2,13 @@ package edu.uiuc.ncsa.myproxy.oa4mp.server.servlet;
 
 import edu.uiuc.ncsa.myproxy.MyProxyLogon;
 import edu.uiuc.ncsa.myproxy.NoUsableMyProxyServerFoundException;
+import edu.uiuc.ncsa.oa4mp.delegation.common.servlet.TransactionState;
+import edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant;
+import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
+import edu.uiuc.ncsa.oa4mp.delegation.server.request.IssuerResponse;
 import edu.uiuc.ncsa.security.core.exceptions.ConnectionException;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.DateUtils;
-import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
-import edu.uiuc.ncsa.oa4mp.delegation.server.request.IssuerResponse;
-import edu.uiuc.ncsa.oa4mp.delegation.common.servlet.TransactionState;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.servlet.JSPUtil;
 import edu.uiuc.ncsa.security.servlet.Presentable;
 import edu.uiuc.ncsa.security.servlet.PresentableState;
@@ -214,7 +214,7 @@ public abstract class AbstractAuthorizationServlet extends CRServlet implements 
                 info("*** STARTING present");
                 if (getServiceEnvironment().getAuthorizationServletConfig().isUseHeader()) {
                     initPage = getRemoteUserInitialPage();
-
+                    ServletDebugUtil.printAllParameters(getClass(), state.getRequest(), true);
                     info("*** PRESENT: Use headers enabled.");
                     String x = null;
                     if (getServiceEnvironment().getAuthorizationServletConfig().getHeaderFieldName().equals("REMOTE_USER")) {

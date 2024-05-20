@@ -63,6 +63,7 @@ import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.oidc_cm.OIDCCMConstants.CLIE
 import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.oidc_cm.OIDCCMConstants.*;
 import static edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants.*;
 import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC8693Constants.GRANT_TYPE_TOKEN_EXCHANGE;
+import static edu.uiuc.ncsa.security.servlet.HeaderUtils.getFirstParameterValue;
 
 /**
  * Note that in all of these calls, the assumption is that an admin client has been requested and
@@ -884,7 +885,7 @@ public class OIDCCMServlet extends EnvServlet {
             newClient.setIdentifier(client.getIdentifier());
             newClient.setConfig(client.getConfig());
             try {
-                
+
                 newClient = updateClient(newClient, adminClient, false, jsonRequest, false, version);
                 if (adminClient.isDebugOn()) {
                     // CIL-607

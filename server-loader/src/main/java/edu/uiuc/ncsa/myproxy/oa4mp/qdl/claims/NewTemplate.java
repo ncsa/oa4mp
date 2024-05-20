@@ -54,9 +54,12 @@ public class NewTemplate implements QDLFunction, CSConstants {
             case CS_TYPE_NCSA:
                 output.put(CS_DEFAULT_TYPE, CS_TYPE_NCSA); // That's it!
                 return output;
-            case CS_TYPE_HEADERS:
-                output.put(CS_DEFAULT_TYPE, CS_TYPE_HEADERS);
+            case CS_TYPE_FILTER_HEADERS:
+                output.put(CS_DEFAULT_TYPE, CS_TYPE_FILTER_HEADERS);
                 output.put(CS_HEADERS_PREFIX, REQUIRED_TEMPLATE);
+                return output;
+            case CS_TYPE_ALL_HEADERS:
+                output.put(CS_DEFAULT_TYPE, CS_TYPE_ALL_HEADERS);
                 return output;
             case CS_TYPE_CODE:
                 output.put(CS_DEFAULT_TYPE, CS_TYPE_CODE);
@@ -75,7 +78,8 @@ public class NewTemplate implements QDLFunction, CSConstants {
         doc.add("testing it or adding it as a claim source.");
         doc.add("Supported types are:");
         doc.add(CS_TYPE_FILE + " - for file-based claims");
-        doc.add(CS_TYPE_HEADERS + " - for claims that are delivered in the HTTP headers");
+        //doc.add(CS_TYPE_FILTER_HEADERS + " - for claims that are delivered in the HTTP headers. This allows for filtering by prefix.");
+        doc.add(CS_TYPE_ALL_HEADERS + " - retrieve all of the headers.");
         doc.add(CS_TYPE_LDAP + " - to get claims from a generic LDAP");
         doc.add(CS_TYPE_NCSA + " - to get claims from the NCSA LDAP (NOTE requires you be on the NCSA internal network!)");
         doc.add(CS_TYPE_CODE + " - for custom written claim sources. (Note: The class must be available in the JVM.)");

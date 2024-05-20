@@ -16,6 +16,7 @@ import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
+import edu.uiuc.ncsa.security.servlet.HeaderUtils;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import org.apache.http.HttpStatus;
 
@@ -124,7 +125,7 @@ public abstract class MultiAuthServlet extends MyProxyDelegationServlet {
     }
 
     protected String getClientSecret(HttpServletRequest request) {
-        return ClientUtils.getClientSecret(request, getFirstParameterValue(request, CLIENT_SECRET));
+        return ClientUtils.getClientSecret(request, HeaderUtils.getFirstParameterValue(request, CLIENT_SECRET));
     }
 
     public AdminClient getAdminClient(HttpServletRequest request) {

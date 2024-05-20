@@ -1,0 +1,38 @@
+/*
+   This is a test for the user info endpoint. What should happen is that this
+   file is called in the post_auth phase, It only sets up a file claim source
+   and adds it to the list of sources.
+   Then in the access, refresh and user_info phases, the process.qdl file is called.
+
+
+ tokens{
+  identity{
+     type=identity
+     qdl{
+         load="ui-test/header-test.qdl"
+         xmd={exec_phase="post_auth"}
+       }// end qdl
+     } //end identity token
+   } //end tokens
+
+*/
+
+cfg. := new_template('header');
+cfg.'prefix' := 'x_';
+say('starting header test');
+say('headers:\n' + print(auth_headers.));
+// since the claim source uses the auth-headers, we can hot-rod it.
+auth_headers. := auth_headers. ~ {'x_foo' :'bar', 'x_arf':'woof', 'y_oink':'oink'};
+/*
+
+   ╔══════════════════════════════════════════════════════════════════════════════╗
+   ║  NOTE: This will get all of the headers for the user. It isup to the         ║
+   ║  script to sort them out. This is in contract to the filter claim source     ║
+   ║  which filters headers by a prefix and only returns those that match         ║
+   ╚══════════════════════════════════════════════════════════════════════════════╝
+
+*/
+cfg. := claims#create_source(cfg.);
+headers. := claims#get_claims(cfg., claims.'sub');
+say('headers:\n' + print(headers.));
+claims. := claims. ~ headers.;

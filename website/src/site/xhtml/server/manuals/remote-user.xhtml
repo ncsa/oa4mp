@@ -162,29 +162,37 @@ block in the configuration file to tell your install that you are replacing the 
 <pre>  &lt;user username="testuser1" password="testpassword1" roles="testuser"/&gt;</pre>
 <pre>  &lt;user username="testuser2" password="testpassword2" roles="testuser"/&gt; </pre>
 <p>This is what we added to the web.xml file</p>
-<pre>&lt;security-constraint&gt;</pre>
-<pre>  &lt;web-resource-collection&gt;</pre>
-<pre>    &lt;web-resource-name&gt;OAuth Security&lt;/web-resource-name&gt;</pre>
-<pre>    &lt;url-pattern&gt;/authorize&lt;/url-pattern&gt;</pre>
-<pre>    &lt;http-method&gt;POST&lt;/http-method&gt;</pre>
-<pre>    &lt;http-method&gt;GET&lt;/http-method&gt;</pre>
-<pre>  &lt;/web-resource-collection&gt;</pre>
-<pre>  &lt;auth-constraint&gt;</pre>
-<pre>    &lt;role-name&gt;oa4mp&lt;/role-name&gt;</pre>
-<pre>  &lt;/auth-constraint&gt;</pre>
-<pre>  &lt;user-data-constraint&gt;</pre>
-<pre>  &lt;!-- transport-guarantee can be CONFIDENTIAL, INTEGRAL, or NONE --&gt;</pre>
-<pre>  &lt;transport-guarantee&gt;NONE&lt;/transport-guarantee&gt;</pre>
-<pre>  &lt;/user-data-constraint&gt;</pre>
-<pre>&lt;/security-constraint&gt;</pre>
-<pre>&lt;login-config&gt;</pre>
-<pre>&lt;auth-method&gt;BASIC&lt;/auth-method&gt;</pre>
-<pre>&lt;/login-config&gt;</pre>
+<pre>&lt;security-constraint&gt;
+  &lt;web-resource-collection&gt; 
+    &lt;web-resource-name&gt;OAuth Security&lt;/web-resource-name&gt; 
+    &lt;url-pattern&gt;/authorize&lt;/url-pattern&gt; 
+    &lt;http-method&gt;POST&lt;/http-method&gt; 
+    &lt;http-method&gt;GET&lt;/http-method&gt; 
+  &lt;/web-resource-collection&gt; 
+  &lt;auth-constraint&gt; 
+    &lt;role-name&gt;oa4mp&lt;/role-name&gt; 
+  &lt;/auth-constraint&gt; 
+  &lt;user-data-constraint&gt; 
+  &lt;!-- transport-guarantee can be CONFIDENTIAL, INTEGRAL, or NONE --&gt; 
+  &lt;transport-guarantee&gt;NONE&lt;/transport-guarantee&gt; 
+  &lt;/user-data-constraint&gt; 
+&lt;/security-constraint&gt; 
+&lt;login-config&gt; 
+&lt;auth-method&gt;BASIC&lt;/auth-method&gt; 
+&lt;/login-config&gt;
+</pre>
+<p><strong>Nota Bene:</strong> This enables remote user for the authorize endpoint. If you wanted to use this
+for the device endpoint, you would have another set the url-pattern accordingly to </p>
+<pre>
+    &lt;url-pattern&gt;/device&lt;/url-pattern&gt;
+
+</pre>
 <p id="Troubleshooting">Note that redeploying OA4MP (e.g., a fresh version) may overwrite the web.xml file, so we
     recommend backing it up somewhere secure.</p>
 
 <h2>Troubleshooting </h2>
-
+ <p><strong>"Error: configuration required using the header "REMOTE_USER" but this was not set. Cannot continue."</strong><br/><br/>
+ This means that the security-constraint in the web.xml file is somehow not correct. You may use </p>
 <p><strong>MyProxy</strong></p>
 
 <p>Attempt to connect to MyProxy server directly. You can do this using myproxy-logon. The GUI is documented at <a

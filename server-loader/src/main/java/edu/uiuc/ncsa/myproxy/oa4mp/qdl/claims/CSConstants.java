@@ -24,7 +24,8 @@ public interface CSConstants {
     public String CS_TYPE_FILE = "file";
     public String CS_TYPE_LDAP = "ldap";
     public String CS_TYPE_NCSA = "ncsa";
-    public String CS_TYPE_HEADERS = "http";
+    public String CS_TYPE_FILTER_HEADERS = "filter";
+    public String CS_TYPE_ALL_HEADERS = "header";
     public String CS_TYPE_CODE = "code";
     public String CS_TYPE_BASIC = "basic";
     /*
@@ -49,6 +50,7 @@ public interface CSConstants {
     HTTP headers based claim sources
      */
     public String CS_HEADERS_PREFIX = "prefix";
+    public String CS_HEADERS_REGEX = "regex";
 
     /*
     LDAP based claim sources

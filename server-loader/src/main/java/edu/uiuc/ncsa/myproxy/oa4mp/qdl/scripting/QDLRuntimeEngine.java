@@ -325,6 +325,11 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         return createSRResponse();
     }
 
+    /**
+     * Error handling in scripts, where by an error code is set and returned.
+     *
+     * @param raiseErrorException
+     */
     void processSRX(RaiseErrorException raiseErrorException) {
         if (raiseErrorException.getErrorCode() == QDLRuntimeEngine.OA4MP_ERROR_CODE) {
             QDLStem sysErr = raiseErrorException.getState();
@@ -392,6 +397,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
     public static String CLAIM_SOURCES_VAR = "claim_sources" + STEM_INDEX_MARKER;
     public static String ACCESS_CONTROL = "access_control" + STEM_INDEX_MARKER;
     public static String AT_ORIGINAL_SCOPES = "at_original_scopes" + STEM_INDEX_MARKER;
+    public static String AUTH_HEADERS_VAR = "auth_headers" + STEM_INDEX_MARKER;
 
     public static Long OA4MP_ERROR_CODE = 1000L; // reserved error code by OA4MP.
     public static String OA4MP_ERROR_CODE_NAME = "oa4mp_error";
@@ -459,13 +465,16 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         QDLStem proxyClaimsStem = new QDLStem();
         proxyClaimsStem.fromJSON(proxyClaims);
         state.setValue(PROXY_CLAIMS_VAR, proxyClaimsStem);
-
+        QDLStem authHeaders = new QDLStem();
+        if(req.getArgs().containsKey(SRE_REQ_AUTH_HEADERS)){
+            authHeaders.fromJSON((JSONObject) req.getArgs().get(SRE_REQ_AUTH_HEADERS));
+        }
+        state.setValue(AUTH_HEADERS_VAR, authHeaders);
         if (req.getArgs().containsKey(SRE_REQ_ACCESS_TOKEN)) {
             JSONObject at = (JSONObject) req.getArgs().get(SRE_REQ_ACCESS_TOKEN);
             QDLStem atStem = new QDLStem();
             atStem.fromJSON(at);
             state.setValue(ACCESS_TOKEN_VAR, atStem);
-
         }
         if (req.getArgs().containsKey(SRE_REQ_REFRESH_TOKEN)) {
             JSONObject at = (JSONObject) req.getArgs().get(SRE_REQ_REFRESH_TOKEN);

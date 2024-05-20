@@ -17,11 +17,17 @@ import static edu.uiuc.ncsa.security.core.util.DebugUtil.trace;
 
 /**
  * This is for the specific case that claims are passed through the headers. Each starts with the caput
- * and every claim with this caput is processed and added. E.g.
+ * and every claim with this caput is processed (caput is removed) and added. E.g.
  * <pre>
  *     OIDC_CLAIM_sub
  * </pre>
  * sets the "sub" claim.
+ * <p>In short, this filters headers based on a configurable prefix.. Any prefixed header has the
+ * prefix removed and the key-value pair returned as a claim. So if there is a header </p>
+ * <pre>OIDC_CLAIM_my_claim = foo</pre>
+ * <p>Then a claim of "my_claim" with a value of "foo" will be asserted.</p>
+ * <h2>Caveat</h2>
+ * <p>This may be set in the handler attribute of the server</p>
  * <p>Created by Jeff Gaynor<br>
  * on 3/15/17 at  2:41 PM
  */
@@ -116,7 +122,7 @@ public class HTTPHeaderClaimsSource extends BasicClaimsSourceImpl {
     @Override
     public QDLStem toQDL() {
         QDLStem arg = super.toQDL();
-        arg.put(CS_DEFAULT_TYPE, CS_TYPE_HEADERS);
+        arg.put(CS_DEFAULT_TYPE, CS_TYPE_FILTER_HEADERS);
         if (!StringUtils.isTrivial(getCaput())) {
             arg.put(CS_HEADERS_PREFIX, getCaput());
         }

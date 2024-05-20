@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.BasicClaimsSourceImpl;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.FSClaimSource;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.HTTPHeaderClaimsSource;
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.QDLHeadersClaimsSource;
 import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSource;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSourceConfiguration;
@@ -64,10 +65,19 @@ public class ClaimSourceConfigConverter implements CSConstants {
                     stem.put(CS_DEFAULT_CLAIM_NAME_KEY, fsClaimSource.getDefaultClaimName());
                 }
                 break;
-            case CS_TYPE_HEADERS:
+            case CS_TYPE_FILTER_HEADERS:
                 if (cfg.getProperty(HTTPHeaderClaimsSource.PREFIX_KEY) != null) {
                     stem.put(CS_HEADERS_PREFIX, cfg.getProperty(HTTPHeaderClaimsSource.PREFIX_KEY));
                 }
+                break;
+            case CS_TYPE_ALL_HEADERS:
+                if (cfg.getProperty(QDLHeadersClaimsSource.PREFIX_KEY) != null) {
+                    stem.put(CS_HEADERS_PREFIX, cfg.getProperty(QDLHeadersClaimsSource.PREFIX_KEY));
+                }
+                if (cfg.getProperty(QDLHeadersClaimsSource.REGEX_KEY) != null) {
+                    stem.put(CS_HEADERS_REGEX, cfg.getProperty(QDLHeadersClaimsSource.REGEX_KEY));
+                }
+
                 break;
             case CS_TYPE_NCSA:
                 cfg2 = (LDAPConfiguration) claimsSource.getConfiguration();
@@ -85,9 +95,9 @@ public class ClaimSourceConfigConverter implements CSConstants {
                 stem.put(CS_LDAP_PORT, new Long(cfg2.getPort()));
                 stem.put(CS_LDAP_AUTHZ_TYPE, cUtil.getAuthName(cfg2.getAuthType()));
                 stem.put(CS_LDAP_SEARCH_FILTER_ATTRIBUTE, cfg2.getSearchFilterAttribute());
-                 if(cfg2.hasSearchScope()){
-                     stem.put(CS_LDAP_SEARCH_SCOPE, cfg2.getSearchScope());
-                 }
+                if (cfg2.hasSearchScope()) {
+                    stem.put(CS_LDAP_SEARCH_SCOPE, cfg2.getSearchScope());
+                }
                 if (cfg2.getAuthType() == LDAPConfigurationUtil.LDAP_AUTH_SIMPLE_KEY) {
                     stem.put(CS_LDAP_PASSWORD, cfg2.getPassword());
                     stem.put(CS_LDAP_SECURITY_PRINCIPAL, cfg2.getSecurityPrincipal());
@@ -179,7 +189,7 @@ public class ClaimSourceConfigConverter implements CSConstants {
                 if (arg.containsKey(CS_LDAP_SEARCH_FILTER_ATTRIBUTE)) {
                     ldapCfg.setSearchFilterAttribute(arg.getString(CS_LDAP_SEARCH_FILTER_ATTRIBUTE));
                 }
-                if(arg.containsKey(CS_LDAP_SEARCH_SCOPE)){
+                if (arg.containsKey(CS_LDAP_SEARCH_SCOPE)) {
                     ldapCfg.setSearchScope(arg.getString(CS_LDAP_SEARCH_SCOPE));
                 }
 
@@ -276,7 +286,7 @@ public class ClaimSourceConfigConverter implements CSConstants {
                 }
 
                 return ldapCfg;
-            case CS_TYPE_HEADERS:
+            case CS_TYPE_FILTER_HEADERS:
                 cfg = new ClaimSourceConfiguration();
                 setDefaultsinCfg(arg, cfg);
                 if (arg.containsKey(CS_HEADERS_PREFIX)) {
@@ -284,21 +294,36 @@ public class ClaimSourceConfigConverter implements CSConstants {
                 }
                 cfg.setProperties(xp);
                 return cfg;
+            case CS_TYPE_ALL_HEADERS:
+                cfg = new ClaimSourceConfiguration();
+                setDefaultsinCfg(arg, cfg);
+                if (arg.containsKey(CS_HEADERS_PREFIX)) {
+                    xp.put(QDLHeadersClaimsSource.PREFIX_KEY, arg.getString(CS_HEADERS_PREFIX));
+                }
+                if (arg.containsKey(CS_HEADERS_REGEX)) {
+                    xp.put(QDLHeadersClaimsSource.REGEX_KEY, arg.getString(CS_HEADERS_PREFIX));
+                }
 
+                cfg.setProperties(xp);
+                return cfg;
             case CS_TYPE_NCSA:
                 // nothing to convert here.
         }
         return null;
     }
-    
+
     protected static void setDefaultsinCfg(QDLStem arg, ClaimSourceConfiguration cfg) {
         if (arg.containsKey(CS_DEFAULT_ID)) cfg.setId(arg.getString(CS_DEFAULT_ID));
         if (arg.containsKey(CS_DEFAULT_FAIL_ON_ERROR)) cfg.setFailOnError(arg.getBoolean(CS_DEFAULT_FAIL_ON_ERROR));
         if (arg.containsKey(CS_DEFAULT_NOTIFY_ON_FAIL)) cfg.setNotifyOnFail(arg.getBoolean(CS_DEFAULT_NOTIFY_ON_FAIL));
         if (arg.containsKey(CS_DEFAULT_IS_ENABLED)) cfg.setEnabled(arg.getBoolean(CS_DEFAULT_IS_ENABLED));
         if (arg.containsKey(CS_DEFAULT_NAME)) cfg.setName(arg.getString(CS_DEFAULT_NAME));
-        if(arg.containsKey(CS_LDAP_MAX_RETRY_SLEEP)){cfg.setMaxWait(arg.getLong(CS_LDAP_MAX_RETRY_SLEEP));}
-        if(arg.containsKey(CS_LDAP_RETRY_COUNT)){cfg.setRetryCount(Math.toIntExact(arg.getLong(CS_LDAP_RETRY_COUNT)));}
+        if (arg.containsKey(CS_LDAP_MAX_RETRY_SLEEP)) {
+            cfg.setMaxWait(arg.getLong(CS_LDAP_MAX_RETRY_SLEEP));
+        }
+        if (arg.containsKey(CS_LDAP_RETRY_COUNT)) {
+            cfg.setRetryCount(Math.toIntExact(arg.getLong(CS_LDAP_RETRY_COUNT)));
+        }
     }
 
     protected static void setDefaultsInStem(ClaimSourceConfiguration cfg, QDLStem arg) {
@@ -307,7 +332,7 @@ public class ClaimSourceConfigConverter implements CSConstants {
         arg.put(CS_DEFAULT_IS_ENABLED, cfg.isEnabled());
         arg.put(CS_DEFAULT_NOTIFY_ON_FAIL, cfg.isNotifyOnFail());
         arg.put(CS_DEFAULT_NAME, cfg.getName());
-        arg.put(CS_LDAP_RETRY_COUNT, (long)cfg.getRetryCount());
+        arg.put(CS_LDAP_RETRY_COUNT, (long) cfg.getRetryCount());
         arg.put(CS_LDAP_MAX_RETRY_SLEEP, cfg.getMaxWait());
 
     }

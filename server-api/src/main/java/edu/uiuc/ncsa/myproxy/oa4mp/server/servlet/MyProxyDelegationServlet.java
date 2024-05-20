@@ -29,6 +29,7 @@ import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugConstants;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
+import edu.uiuc.ncsa.security.servlet.HeaderUtils;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.storage.events.LastAccessedThread;
 import edu.uiuc.ncsa.security.util.pkcs.KeyPairPopulationThread;
@@ -36,7 +37,6 @@ import edu.uiuc.ncsa.security.util.pkcs.KeyPairPopulationThread;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -321,14 +321,13 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
      * @param req
      * @return
      */
-    protected Map<String, String> getFirstParameters(HttpServletRequest req) {
-        HashMap<String, String> map = new HashMap<>();
-        for (Object key : req.getParameterMap().keySet()) {
-            map.put(key.toString(), getFirstParameterValue(req, key.toString()));
-        }
-        return map;
+    public static Map<String, String> getFirstParameters(HttpServletRequest req) {
+        return HeaderUtils.getFirstParameters(req);
     }
 
+    public String getFirstParameterValue(HttpServletRequest req, String key){
+        return HeaderUtils.getFirstParameterValue(req, key);
+    }
     /**
      * Just for low-level debugging.
      *
