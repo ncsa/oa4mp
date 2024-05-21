@@ -1,12 +1,18 @@
 #! /usr/bin/env -S qdl-run
 
 /*
-   Basic SciToken test. This will do the exchanges with all defaults -- no overrides -- and
-   is the most basic possible
+  This tests the server-side scripts are working, and that extended attribute
+  values are as well. It is the same as the basic SciToken
+  test but does not test that, it merely uses the fact that JWTs are returned for
+  the access adn refresh tokens and checks that the server's scripts inject the expected
+  default values.
 */
 params. ≔ {'sub':'threepwood',
            'scope':'openid org.oa4mp:userinfo read: queue: execute:',
-           'org.oa4mp:/rt/value/foo':'woof'};
+           'org.oa4mp:/idt/value/xa_idt_key':'xa_idt_value',
+           'org.oa4mp:/rt/value/xa_rt_key':'xa_rt_value',
+           'org.oa4mp:/at/value/xa_at_key':'xa_at_value'
+           };
 test_id:= 'oidc.scitokens.qdl';
 // set up the client
 clc#init($$OA4MP_CLC_INI, test_id);
@@ -22,25 +28,19 @@ cc.:=initialization#get_client_config(test_id); // This is the client configurat
 cc_at.:=cc.'cfg'.'tokens'.'access';
 cc_idt.:=cc.'cfg'.'tokens'.'identity';
 cc_rt.:=cc.'cfg'.'tokens'.'refresh';
-// first part of test is to get tokens with the server defaults.
-at_expected.:={'iss':server_defaults.'at_issuer',
-               'sub':params.'sub',
-               'ver':'scitoken:2.0',
-               'aud':cc_at.'audience',
-               'scopes':['execute:/home/threepwood/vo3/bin', 'read:/public/vo3', 'queue:/staging/vo3-production-queue']};
-idt_expected.:={'sub':params.'sub',
-                'aud':ini.'id',
-                'iss':server_defaults.'issuer'};
+
 
 
 // This function simply inherits everything at the point of call, allowing
 // the same block of code to be repeated.
 verify()->
 block[ // set of basic verifications to run repeatedly.
-  checks#scitokens(at_expected., at_asserted.);
-  checks#lifetime(cc_at.'lifetime', at_asserted.);
-  checks#lifetime(cc_idt.'lifetime', claims.);
-  checks#claims(idt_expected.,claims.);
+⊨ ∃claims.'ϑ': 'missing claim from server script \'ϑ\'';
+⊨ claims.'ϑ'=='my-ϑ': 'wrong claim value for \'ϑ\'';
+⊨ ∃at_asserted.'my_at_claim': 'missing claim from server script \'my_at_claim\'';
+⊨ at_asserted.'my_at_claim' == 'my_at_claim': 'missing claim from server script \'my_at_claim\'';
+⊨ ∃rt_asserted.'my_rt_claim': 'missing claim from server script \'my_rt_claim\'';
+⊨ rt_asserted.'my_rt_claim' == 'my_rt_claim': 'missing claim from server script \'my_at_claim\'';
 ];
 
 // Initial token exchange
@@ -48,7 +48,8 @@ tokens. := clc#rfc7523(params.);
 at_asserted.:= tokens.'access_token'.'jwt';
 rt_asserted.:= tokens.'refresh_token'.'jwt';
     claims. := clc#claims();
-//say('rt:\n' + print(rt_asserted.));
+
+// Check that the server-side scripting is working.
 verify();
 
 // Refresh
@@ -65,4 +66,4 @@ rt_asserted. := clc#exchange('-rt','-subject','rt').'refresh_token'.'jwt';
 verify();
 //say('refresh:\n'+print(clc#refresh()));
 //say('\nclaims:\n' + print(clc#claims()));
-say('ok: OIDC SciToken QDL test');
+say('ok: Server QDL scripts');

@@ -191,10 +191,21 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
 
     @Override
     public void addRequestState(ScriptRunRequest req) throws Throwable {
+        // If there are server scripts, there may be claims already set.
+        // check and just integrate them
+        if (req.getArgs().containsKey(SRE_REQ_CLAIMS)) {
+            getUserMetaData().putAll((Map) req.getArgs().get(SRE_REQ_CLAIMS));
+        }
+        if (req.getArgs().containsKey(SRE_REQ_CLAIM_SOURCES)) {
+            List<ClaimSource> sources = (List<ClaimSource>) req.getArgs().get(SRE_REQ_CLAIM_SOURCES);
+            sources.addAll(transaction.getClaimSources(oa2se));
+            transaction.setClaimsSources(sources);
+        }
+        // Now grab the complete information this handler knows about.
         req.getArgs().put(SRE_REQ_CLAIM_SOURCES, getSources());
         req.getArgs().put(SRE_REQ_CLAIMS, getUserMetaData());
         if (getPhCfg().request != null) {
-            JSONObject json  = OA2HeaderUtils.headerToJSON(getPhCfg().request,
+            JSONObject json = OA2HeaderUtils.headerToJSON(getPhCfg().request,
                     Arrays.asList(new String[]{"authorization", "cookie", "host"}));
             if (!json.isEmpty()) {
                 req.getArgs().put(SRE_REQ_AUTH_HEADERS, json);

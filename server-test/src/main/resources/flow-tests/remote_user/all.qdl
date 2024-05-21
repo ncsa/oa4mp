@@ -1,0 +1,20 @@
+#! /usr/bin/env -S qdl-run
+/*
+    Tests code and device flows for various token types and such. Event hough there are
+    automated tests, the code paths initially are very different and must be tested.
+*/
+say(
+'╔══════════════════════════════════════════════════════════════════════════════╗\n'+
+'║  NOTE: This will test the machinery for using tomcat as the authorization    ║\n'+
+'║  method and as well getting claims using the claim source function.          ║\n'+
+'║  It also verifies (in the script) that auth_headers. is set in the           ║\n'+
+'║  runtime. BE SURE you have followed the readme.txt in this directory         ║\n'+
+'║  first before running these tests or they will fail.                         ║\n'+
+'╚══════════════════════════════════════════════════════════════════════════════╝');
+
+path:='test#/';
+test.:=(path + 'remote_user/') + ['header-df.qdl',
+                                  'header-uri.qdl'
+];
+say('**** Flow test suite for OA4MP using Tomcat for authorization. ****');
+script_load('runner.qdl', test.);

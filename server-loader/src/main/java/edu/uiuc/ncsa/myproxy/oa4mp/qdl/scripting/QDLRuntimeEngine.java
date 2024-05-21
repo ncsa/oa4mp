@@ -471,6 +471,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         }
         state.setValue(AUTH_HEADERS_VAR, authHeaders);
         if (req.getArgs().containsKey(SRE_REQ_ACCESS_TOKEN)) {
+            // Fixes https://github.com/ncsa/oa4mp/issues/188
             JSONObject at = (JSONObject) req.getArgs().get(SRE_REQ_ACCESS_TOKEN);
             QDLStem atStem = new QDLStem();
             atStem.fromJSON(at);

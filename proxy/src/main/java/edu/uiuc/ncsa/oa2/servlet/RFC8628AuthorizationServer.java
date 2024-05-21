@@ -147,6 +147,7 @@ public class RFC8628AuthorizationServer extends EnvServlet {
                 String pageType = request.getParameter("page_type"); // since we may either have an authz page or just the consent page
                 if(!StringUtils.isTrivial(pageType)){
                     if(pageType.equals("consent")){
+                        // Fixes https://github.com/ncsa/oa4mp/issues/187
                         String ag = request.getParameter("code");
                         if(StringUtils.isTrivial(ag)){
                             throw new IllegalStateException("the token for the device consent page is missing");

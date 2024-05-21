@@ -26,6 +26,8 @@ debugger(1,'xas.=' + input_form(xas.));
  if[size(xas.) == 0][return();];
 
 debugger(1,'exec_phase='+exec_phase);
+debugger(1,'access_token:\n'+print(access_token.));
+debugger(1,'refresh_token:\n'+print(refresh_token.));
 oa4mp.:=xas.'org.oa4mp';
 z.:=null;
 // This uses the fact that a list is an index, viz.,
@@ -35,8 +37,12 @@ while[k∋oa4mp.][z.tokenize(k,'/'):=oa4mp.k;]; // convert to a stem
 debugger(1,'z:\n' + print(z.));
 
 define[set_claims(token., key, values.)][
+  debugger(1,input_form(token.));
+  debugger(1,key);
+  debugger(1,input_form(values.));
   debugger(1,'set_claims: values.\n' + print(values.));
   λ. := values\key\'value'; // a stem of {claim:value} pairs
+  debugger(1,'λ.:\n' + print(λ.));
   while[k∋λ.][λ.k := (size(λ.k)==1)?(λ.k.0):λ.k;];
   debugger(1,'set_claims: for ' + key + ' λ.\n' + print(λ.));
   while[k∋λ.][token.k := λ.k;]; // set the claims en masse
@@ -57,6 +63,7 @@ if[exec_phase∈['post_token', 'post_refresh', 'post_exchange']][
    if[∃access_token.][
      debugger(1,'at:\n' + print(access_token.));
      set_claims(access_token., 'at', z.);
+     debugger(1, 'at after setting\n' + print(access_token.));
    ];
    // might not be a refresh token depending on the configuration.
    if[∃refresh_token.][

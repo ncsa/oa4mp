@@ -97,6 +97,12 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
 
     @Override
     public void addRequestState(ScriptRunRequest req) throws Throwable {
+        if (req.getArgs().containsKey(SRE_REQ_CLAIMS)) {
+            getUserMetaData().putAll((Map) req.getArgs().get(SRE_REQ_CLAIMS));
+        }
+        if (req.getArgs().containsKey(SRE_REQ_ACCESS_TOKEN)) {
+            getPayload().putAll((Map) req.getArgs().get(SRE_REQ_ACCESS_TOKEN));
+        }
         req.getArgs().put(SRE_REQ_ACCESS_TOKEN, getPayload());
         req.getArgs().put(SRE_REQ_CLAIMS, getUserMetaData());
     }

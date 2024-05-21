@@ -15,6 +15,11 @@ rc := script_load('driver.qdl', cfg.);
 if[rc!='ok'][return(rc);];
 
 tokens. := clc#access();
+claims. := clc#claims();
+say('claims:\n' + print(claims.));
+// Check that the server-side scripting is working.
+⊨ ∃claims.'ϑ': 'missing claim from server script \'ϑ\'';
+⊨ claims.'ϑ'=='my-ϑ': 'wrong claim value for \'ϑ\'';
 ⊨ tokens.'access_token'.'lifetime' == 1009000 : 'wrong access token lifetime';
 ⊨ tokens.'refresh_token'.'lifetime' == 950400000 : 'wrong refresh token lifetime';
 ⊨clc#claims().'aud' == cfg.'id' : 'wrong audience';

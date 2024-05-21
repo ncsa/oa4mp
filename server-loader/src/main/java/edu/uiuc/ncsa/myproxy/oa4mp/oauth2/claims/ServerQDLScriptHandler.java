@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims;
 
+import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2HeaderUtils;
 import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenImpl;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.PayloadHandler;
@@ -12,6 +13,7 @@ import edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse;
 import net.sf.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse.RC_NOT_RUN;
@@ -57,6 +59,13 @@ public class ServerQDLScriptHandler implements PayloadHandler {
         req.getArgs().put(SRE_REQ_CLAIMS, getUserMetaData());
         req.getArgs().put(SRE_REQ_ACCESS_TOKEN, getAtData());
         req.getArgs().put(SRE_REQ_REFRESH_TOKEN, getRTData());
+        if (getPhCfg().request != null) {
+            JSONObject json  = OA2HeaderUtils.headerToJSON(getPhCfg().request,
+                    Arrays.asList(new String[]{"authorization", "cookie", "host"}));
+            if (!json.isEmpty()) {
+                req.getArgs().put(SRE_REQ_AUTH_HEADERS, json);
+            }
+        }
     }
 
 
@@ -154,7 +163,7 @@ public class ServerQDLScriptHandler implements PayloadHandler {
     }
 
     @Override
-    public PayloadHandlerConfig getPhCfg() {
+    public ServerQDLScriptHandlerConfig getPhCfg() {
         return cfg;
     }
 

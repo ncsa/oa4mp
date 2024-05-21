@@ -5,6 +5,7 @@ path:='test#/';
 initialization := import(load('test#/auto/utils/initialization.mdl'));
 start:=date_ms();
 test.:= [
+          [path + 'auto/tests/' +'server-script.qdl', initialization],
           [path + 'auto/tests/' +'oauth-with-refresh.qdl', initialization],
           [path + 'auto/tests/' +'oauth-basic-no-refresh.qdl',initialization],
           [path + 'auto/tests/' +'oauth-rfc9068.qdl',initialization],

@@ -53,6 +53,11 @@ public class TF2Test extends TestBase {
         }
 
         @Override
+        public JSONObject getRTData() {
+            return null;
+        }
+
+        @Override
         public void setATData(JSONObject atData) {
 
         }

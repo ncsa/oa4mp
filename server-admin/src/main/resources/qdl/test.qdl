@@ -27,9 +27,10 @@
 // Note in test mode, the server mode flag is set to false so we can look at
 // the output.
 say('*** QDL test script');
+say('auth_headers:\n' + print(auth_headers.));
 z.'sub' := 'foo';
 z.'baz' := 'bar';
 say('test z: ' + to_string(z.));
 say('script args: ' +to_string(size(args())));
-claims.'ϑ' := 'my-ϑ';
+claims.'ϑ' := 'my-ϑ'; // funky character so we can find this output in the logs fast.
 say('set claims to ' + to_string(claims.));

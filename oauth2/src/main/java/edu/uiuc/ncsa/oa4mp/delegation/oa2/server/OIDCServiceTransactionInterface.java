@@ -20,7 +20,7 @@ public interface OIDCServiceTransactionInterface {
 
     Collection<String> getScopes();
     void setClaimsSources(List<ClaimSource> sources);
-
+    JSONObject getRTData();
     void setScopes(Collection<String> scopes);
 
     List<String> getAudience();

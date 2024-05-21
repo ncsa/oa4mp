@@ -1,0 +1,35 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   Tests the header aware client in the device flow
+
+*/
+
+cfg.'id'  := 'localhost:test/headers';
+cfg.'idp'  := 'ANY';
+cfg.'file' := $$OA4MP_CLC_XML_INI;
+cfg.'description' :=  'Test Tomcat authorization and header claim sources';
+cfg.'flow_type' := 'df'; 
+
+rc := script_load('driver.qdl', cfg.);
+define[test_claims(claims.)][
+   ⊨ ∃claims.'ϑ': 'missing claim from server script \'ϑ\'';
+   ⊨ claims.'ϑ'=='my-ϑ': 'wrong claim value for \'ϑ\'';
+   ⊨ ∃claims.'foo': 'missing claim from headers \'foo\'';
+   ⊨ claims.'foo'=='bar': 'wrong claim value for \'foo\'';
+   ⊨ ∃claims.'arf': 'missing claim from headers \'arf\'';
+   ⊨ claims.'arf'=='woof': 'wrong claim value for \'arf\'';
+];
+
+if[rc!='ok'][return(rc);];
+tokens. := clc#access();
+claims. := clc#claims();
+test_claims(claims.);
+
+// The claims are set from the headers. In refreshes, the headers are not present
+// but the system should retain these. Regression test that they do not go away somehow.
+clc#refresh(); // need to repeat this test
+claims. := clc#claims();
+test_claims(claims.);
+
+say('ok: Remote user + header using device flow');

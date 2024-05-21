@@ -119,16 +119,6 @@
         <url-pattern>/register</url-pattern>
     </servlet-mapping>
 
-<!--    <servlet>
-        <servlet-name>client</servlet-name>
-        <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.ClientServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>client</servlet-name>
-        <url-pattern>/clients</url-pattern>
-    </servlet-mapping>-->
-
     <servlet>
         <servlet-name>userInfo</servlet-name>
         <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.UserInfoServlet</servlet-class>
@@ -188,7 +178,7 @@
        Uncomment the next sections if you are replacing the built-in authorization module with your own.
        Look here for the details: https://oa4mp.org/server/manuals/remote-user.html
     -->
-     <security-constraint>
+   <!--  <security-constraint>
          <web-resource-collection>
            <web-resource-name>OAuth Security Device Flow</web-resource-name>
            <url-pattern>/authorize</url-pattern>
@@ -201,10 +191,10 @@
          <user-data-constraint>
            <transport-guarantee>NONE</transport-guarantee>
          </user-data-constraint>
-       </security-constraint>
+       </security-constraint>-->
 
  <!-- the next block allows log ins for testing REMOTE_USER with device flow-->
-    <security-constraint>
+<!--    <security-constraint>
         <web-resource-collection>
           <web-resource-name>OAuth Security</web-resource-name>
           <url-pattern>/device</url-pattern>
@@ -217,13 +207,13 @@
         <user-data-constraint>
           <transport-guarantee>NONE</transport-guarantee>
         </user-data-constraint>
-      </security-constraint>
+      </security-constraint>-->
  <!-- no matter which security constraint(s) are allowed, this next bit has to be
       ucommented to since it is what allows for loging -->
-       <login-config>
+  <!--     <login-config>
           <auth-method>BASIC</auth-method>
         </login-config>
-
+-->
     <resource-ref>
         <description>
             Resource reference to a factory for javax.mail.Session

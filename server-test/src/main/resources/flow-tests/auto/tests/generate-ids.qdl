@@ -18,7 +18,7 @@ template.:=[{'aud':'https://localhost/fermilab',
 
 qdl.'at':={'load':'process-xas.qdl', 'xmd':{'exec_phase':['post_token','post_refresh','post_exchange']}};
 qdl.'id':={'load':'process-xas.qdl', 'xmd':{'exec_phase':['post_auth','post_user_info']}};
-qdl:'rt'={'load':'process-xas.qdl', 'xmd':{'exec_phase':['post_token','post_refresh','post_exchange']}}
+qdl.'rt'={'load':'process-xas.qdl', 'xmd':{'exec_phase':['post_token','post_refresh','post_exchange']}}
 
 token_create(caput,types.,cfg.)->local[
 clone(x.)->interpret(input_form(x.));

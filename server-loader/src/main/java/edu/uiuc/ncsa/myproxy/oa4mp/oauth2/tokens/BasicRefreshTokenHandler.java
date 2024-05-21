@@ -21,6 +21,7 @@ import net.sf.json.JSONObject;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims.*;
 import static edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse.RC_NOT_RUN;
@@ -116,6 +117,10 @@ public class BasicRefreshTokenHandler extends AbstractPayloadHandler implements 
 
     @Override
     public void addRequestState(ScriptRunRequest req) throws Throwable {
+        // in case there is a default system handler that adds stuff.
+        if (req.getArgs().containsKey(SRE_REQ_REFRESH_TOKEN)) {
+            getPayload().putAll((Map) req.getArgs().get(SRE_REQ_REFRESH_TOKEN));
+        }
         req.getArgs().put(SRE_REQ_REFRESH_TOKEN, getPayload());
     }
 

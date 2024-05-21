@@ -26,7 +26,7 @@ auth_headers. := auth_headers. ~ {'x_foo' :'bar', 'x_arf':'woof', 'y_oink':'oink
 /*
 
    ╔══════════════════════════════════════════════════════════════════════════════╗
-   ║  NOTE: This will get all of the headers for the user. It isup to the         ║
+   ║  NOTE: This will get all of the headers for the user. It is up to the        ║
    ║  script to sort them out. This is in contract to the filter claim source     ║
    ║  which filters headers by a prefix and only returns those that match         ║
    ╚══════════════════════════════════════════════════════════════════════════════╝

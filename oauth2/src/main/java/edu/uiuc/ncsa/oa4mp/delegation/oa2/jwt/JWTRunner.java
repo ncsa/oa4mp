@@ -100,7 +100,7 @@ public class JWTRunner {
         for (PayloadHandler h : handlers) {
             DebugUtil.trace(this, "Running init for handler " + h);
             h.init(); // includes setting account info
-        //    h.setAccountingInformation();
+            //    h.setAccountingInformation();
         }
     }
 
@@ -117,7 +117,6 @@ public class JWTRunner {
          */
         doScript(SRE_EXEC_INIT);
         doScript(SRE_PRE_AUTH);
-
 
 
         doScript(SRE_POST_AUTH);
@@ -229,16 +228,16 @@ public class JWTRunner {
                         isRunAtAuthz = !claimSource.isRunOnlyAtAuthorization();
                     }*/
                     if (isRunAtAuthz) {
-                    // There may be mutliple ID Token handlers. Chain them, but don't just
-                    // get claims for every handler since finish runs at the end of this call
-                    // and you can over-write reduced claims with the full set.
-                    //if (h instanceof IDTokenHandlerInterface) {
+                        // There may be mutliple ID Token handlers. Chain them, but don't just
+                        // get claims for every handler since finish runs at the end of this call
+                        // and you can over-write reduced claims with the full set.
+                        //if (h instanceof IDTokenHandlerInterface) {
                         DebugUtil.trace(this, "executing get claims");
-                        if(claimSource.isRunOnlyAtAuthorization()){
-                            if(execPhase.endsWith("_auth")){
+                        if (claimSource.isRunOnlyAtAuthorization()) {
+                            if (execPhase.endsWith("_auth")) {
                                 claims = h.execute(claimSource, claims);
                             }
-                        }else{
+                        } else {
                             claims = h.execute(claimSource, claims);
                         }
 /*
@@ -300,21 +299,32 @@ public class JWTRunner {
         ScriptRunRequest initReq = new ScriptRunRequest() {
             HashMap<String, Object> map = new HashMap<>();
             boolean isPopulated = false;
-            void populate(){
-                if(isPopulated){
+
+            void populate() {
+                if (isPopulated) {
                     return;
                 }
                 // Fix for https://github.com/ncsa/oa4mp/issues/137
                 if (transaction.getProxyState().containsKey("asset")) {
                     JSONObject idt = transaction.getProxyState().getJSONObject("asset").getJSONObject("id_token");
-                    if(idt != null) {
+                    if (idt != null) {
                         IDTokenImpl idToken = TokenFactory.createIDT(idt);
                         map.put(SRE_REQ_PROXY_CLAIMS, idToken.getPayload());
-                    }else{
+                    } else {
                         map.put(SRE_REQ_PROXY_CLAIMS, new JSONObject());
                     }
                 } else {
                     map.put(SRE_REQ_PROXY_CLAIMS, new JSONObject());
+                }
+                if (!transaction.getUserMetaData().isEmpty()) {
+                    map.put(SRE_REQ_CLAIMS, transaction.getUserMetaData());
+                }
+
+                if (!transaction.getATData().isEmpty()) {
+                    map.put(SRE_REQ_ACCESS_TOKEN, transaction.getATData());
+                }
+                if (!transaction.getRTData().isEmpty()) {
+                    map.put(SRE_REQ_REFRESH_TOKEN, transaction.getRTData());
                 }
                 // Any claim sources are injected by the appropriate handler since they typically
                 // require a great deal of state that is not available yet.
@@ -322,12 +332,13 @@ public class JWTRunner {
                 map.put(SRE_REQ_AUDIENCE, transaction.getAudience());
                 map.put(SRE_REQ_EXTENDED_ATTRIBUTES, transaction.getExtendedAttributes());
                 map.put(SRE_REQ_FLOW_STATES, transaction.getFlowStates()); // so its a map
-                        isPopulated = true;
+                isPopulated = true;
 
             }
+
             @Override
             public Map<String, Object> getArgs() {
-                if(!isPopulated){
+                if (!isPopulated) {
                     populate();
                 }
                 return map;
@@ -406,14 +417,14 @@ public class JWTRunner {
             for (PayloadHandler h : handlers) {
                 if (h.getPhCfg().isLegacyHandler() || (h.hasScript() && h.getPhCfg().getScriptSet().get(Scripts.EXEC_PHASE, phase) != null)) {
                     ScriptRunRequest req = newSRR(transaction, phase);
-                    if(previousHandler != null && previousHandler instanceof IDTokenHandlerInterface){
+                    if (previousHandler != null && previousHandler instanceof IDTokenHandlerInterface) {
                         /*
                           Handlers are processed in order, IDTokenHandler, Access then refresh. UserMeta data can be updated
                           between iterations in this loop so forward the UMD on to the next handler.
                          */
-                        if(h instanceof IDTokenHandlerInterface){
-                            IDTokenHandlerInterface h2 = (IDTokenHandlerInterface)h;
-                            h2.setUserMetaData(((IDTokenHandlerInterface)previousHandler).getUserMetaData());
+                        if (h instanceof IDTokenHandlerInterface) {
+                            IDTokenHandlerInterface h2 = (IDTokenHandlerInterface) h;
+                            h2.setUserMetaData(((IDTokenHandlerInterface) previousHandler).getUserMetaData());
                         }
                     }
                     h.addRequestState(req);
