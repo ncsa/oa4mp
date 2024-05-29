@@ -47,14 +47,15 @@
                                 <manifest>
                                     <addClasspath>true</addClasspath>
                                     <mainClass>edu.uiuc.ncsa.qdl.workspace.QDLWorkspace</mainClass>
-                                    <!--<mainClass>edu.uiuc.ncsa.qdl.gui.QDLGUIWorkspace</mainClass> -->
                                 </manifest>
                                 <manifestEntries>
                                     <application-version>${project.version}</application-version>
                                     <application-name>${project.name}</application-name>
+                                    <application-title>OA4MP</application-title>
                                     <build-time>${timestamp}</build-time>
                                     <implementation-version>1.5-QDL-SNAPSHOT</implementation-version>
                                     <implementation-build>${buildNumber}</implementation-build>
+                                    <implementation-title>QDL</implementation-title>
                                 </manifestEntries>
                             </archive>
                             <descriptorRefs>

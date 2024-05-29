@@ -121,7 +121,7 @@ claims. := clc#claims();
 idt_lifetime := (claims.'exp' - claims.'iat')*1000;
 ⊨ tokens.'access_token'.'lifetime' == 1483000 : 'wrong access token refresh override lifetime';
 ⊨ tokens.'refresh_token'.'lifetime' == 3433000 : 'wrong refresh token refresh override lifetime';
-⊨ idt_lifetime == 967000 : 'wrong id token refresh override lifetime';
+⊨ idt_lifetime == 967000 : 'wrong id token  override lifetime on refresh';
 
 at. := clc#exchange('-at','-subject','rt').'access_token';
 rt. := clc#exchange('-rt','-subject','rt').'refresh_token';

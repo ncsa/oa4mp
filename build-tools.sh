@@ -59,11 +59,11 @@ fi
 
 echo "deploying OA4MP QDL installer"
 
-
 if [ -z ${QDL_HOME+x} ];  then
     echo "no QDL install, skipping..."
   else
   # If there is a local QDL install, update it.
+#   java -jar "$OA4MP_QDL_DEPLOY/qdl-installer.jar" -u -dir $QDL_HOME;
     cp "$OA4MP_QDL_DEPLOY/lib/qdl.jar" $QDL_HOME/lib;
     cp "$OA4MP_QDL_DEPLOY/lib/build-info.txt" $QDL_HOME/lib ;
 fi

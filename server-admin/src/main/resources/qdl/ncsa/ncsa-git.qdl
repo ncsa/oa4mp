@@ -1,14 +1,18 @@
 /*
     Simple assertion any NCSA client that requires a uid claim be asserted
-      tokens{
-        identity{
-        type=identity
-        qdl{
-            load="ncsa/ncsa-git.qdl"
-            xmd={exec_phase=["post_token"]}
-          }// end qdl
-        } //end identity token
-      } //end tokens
+{
+  "tokens": {
+    "identity": {
+      "qdl": {
+        "load": "ncsa/ncsa-git.qdl",
+        "xmd": {
+          "exec_phase": ["post_token"]
+        }
+      },
+      "type": "identity"
+    }
+  }
+}
 
 */
 script_load('utils/init.qdl');

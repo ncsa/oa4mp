@@ -147,7 +147,7 @@ public class QDLHeadersClaimsSource extends BasicClaimsSourceImpl {
 
         ClaimSourceConfiguration cfg = new ClaimSourceConfiguration();
         if (arg.containsKey(CS_HEADERS_PREFIX)) {
-            setPrefix(arg.getString(CS_HEADERS_PREFIX));
+            setPrefix(arg.getString(CS_HEADERS_PREFIX).toLowerCase());
             xp.put(PREFIX_KEY, arg.getString(CS_HEADERS_PREFIX));
         }
         if(arg.containsKey(CS_HEADERS_REGEX)){

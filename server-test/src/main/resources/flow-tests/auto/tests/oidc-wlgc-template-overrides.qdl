@@ -16,5 +16,5 @@ initialization := size(args())==1⇒args().0:import(load('test#/auto/utils/initi
 
 
 script_load('test#/auto/utils/test-overrides.qdl', test_id, params., initialization );
-say('ok: OIDC WLCG overrides');
+say('ok: OIDC WLCG template overrides');
 

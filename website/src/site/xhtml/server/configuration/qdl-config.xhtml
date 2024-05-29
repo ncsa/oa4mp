@@ -169,7 +169,7 @@ server scripts</a></p>
         &lt;/scripts&gt;
     &lt;/qdl&gt;
 </pre>
-<h3>QDL Exegesis</h3>
+<h3>QDL Script Exegesis</h3>
 <p>The configuration sets the runtime environment for every QDL workspace. The script path is set,
     the virtual file system mounted and a couple of modules are loaded into every workspace.
     The two specified
@@ -183,5 +183,16 @@ server scripts</a></p>
     is because clients have no access to them. The standard caveat applies to code blocks. Keep
     them very simple or just run a script.</p>
 <p>Finally, clients may be configured individually to not have these scripts run.</p>
+<h2>Modules</h2>
+<p>The module system was revised and in proved in QDL 1.5. The major innovation is that before,
+modules</p>
+<ul>
+    <li>Were imported into the workspace. They were not scoped consistently vis a vis other modules</li>
+    <li>Aliases of module were not variables, but treated differently</li>
+    <li>The scope policy of inheriting the current state at module creation time did allow for easy initialization, then
+    limited their use as the current state changed.</li>
+</ul>
+<h2>Setting the modules in the configuration.</h2>
+<p></p>
 </body>
 </html>

@@ -22,29 +22,4 @@ while[i∈[1;20]]
    else[clc#refresh();];
  ]; // end while
 
-/*
-clc#refresh();
-clc#refresh();
-clc#refresh();
-clc#refresh();
-clc#exchange();
-clc#exchange();
-clc#exchange();
-clc#exchange();
-clc#exchange();
-clc#exchange();
-clc#exchange('-rt');
-clc#refresh();
-clc#exchange();
-clc#exchange('-rt'); 
-clc#exchange();
-clc#exchange('-rt');
-clc#exchange('-rt');
-clc#exchange('-rt');
-clc#refresh();
-clc#exchange();
-clc#exchange();
-clc#refresh();
-*/
-
 say('ok: multiple exchanges and refreshes');

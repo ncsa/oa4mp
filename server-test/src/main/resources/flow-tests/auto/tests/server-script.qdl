@@ -39,6 +39,8 @@ block[ // set of basic verifications to run repeatedly.
 ⊨ claims.'ϑ'=='my-ϑ': 'wrong claim value for \'ϑ\'';
 ⊨ ∃at_asserted.'my_at_claim': 'missing claim from server script \'my_at_claim\'';
 ⊨ at_asserted.'my_at_claim' == 'my_at_claim': 'missing claim from server script \'my_at_claim\'';
+⊨ ∃rt_asserted.'xa_rt_key': 'missing claim from extended attribute \'xa_rt_key\'';
+⊨ rt_asserted.'xa_rt_key' == 'xa_rt_value': 'missing claim from extended attribute \'xa_rt_key\'';
 ⊨ ∃rt_asserted.'my_rt_claim': 'missing claim from server script \'my_rt_claim\'';
 ⊨ rt_asserted.'my_rt_claim' == 'my_rt_claim': 'missing claim from server script \'my_at_claim\'';
 ];

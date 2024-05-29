@@ -19,6 +19,7 @@
    then in the id token claims there would be a claim named foo
    with the value of woof asserted.
 
+
 */
 
 debugger(1);
@@ -60,6 +61,8 @@ if[exec_phase∈['post_auth','post_user_info']][
 
 if[exec_phase∈['post_token', 'post_refresh', 'post_exchange']][
    // might not be an access token depending on the configuration.
+   // In particular, if this is only called in the refresh token handler
+   // the access token is not updateable from that handler!!
    if[∃access_token.][
      debugger(1,'at:\n' + print(access_token.));
      set_claims(access_token., 'at', z.);
