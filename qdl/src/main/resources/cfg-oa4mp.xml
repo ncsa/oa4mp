@@ -1,0 +1,86 @@
+<config>
+    <!--
+    A few example configurations.
+    "default" : uses an alias that points to one of the other configurations.
+                aliases are a great tool that lets you experiment between
+                various configurations easily
+     "basic" : just an editor and basic WS formatting. It starts in ANSI mode
+     "run-it" : for QDL shell scripts. This turns off, e.g. echoing to the console
+
+    Be sure to read  the documentation, qdl_configuration.pdf,  in the
+    ${QDL_HOME}/docs directory of this distribution
+    or on the main website: https://qdl-lang.org/pdf/qdl_configuration.pdf
+
+    There are OA4MP specific modules loaded for all workspaces.
+    -->
+    <qdl name="default" alias="basic"/>
+    <qdl name="basic"
+         module_path="${QDL_HOME}etc/modules/">
+        <workspace logo="times"
+                   editor_name="${EDITOR}"
+                   use_editor="true"
+                   prettyPrint="true"
+                   tty="ansi"
+                   echoModeOn="true">
+            <home_dir>${QDL_HOME}</home_dir>
+            <env>etc/qdl.properties</env>
+        </workspace>
+        ${EDITORS}
+        <logging
+                logFileName="${QDL_HOME}log/qdl.log"
+                logName="qdl"
+                logSize="100000"
+                logFileCount="2"
+                debug="false"/>
+        <modules  lib_loader="edu.uiuc.ncsa.oa2.qdl.OA2LibLoader2"
+                  version="2.0">
+              <module type="java"
+                      import_on_start="true">
+                  <class_name>edu.uiuc.ncsa.myproxy.oa4mp.qdl.OA2QDLLoader</class_name>
+              </module>
+              <module type="java"
+                      import_on_start="true">
+                  <class_name>edu.uiuc.ncsa.oa2.qdl.QDLToolsLoader</class_name>
+              </module>
+            <!-- See $QDL_HOME/docs/qdl_oa4mp_store_access.pdf -->
+              <module type="java"
+                      import_on_start="false">
+                  <class_name>edu.uiuc.ncsa.oa2.qdl.storage.StoreAccessLoader</class_name>
+              </module>
+        </modules>
+
+    </qdl>
+
+
+    <qdl name="run-it"
+         module_path="${QDL_HOME}etc/modules/">
+           <workspace echoModeOn="false"
+                      prettyPrint="false">
+               <home_dir>${QDL_HOME}</home_dir>
+               <env>etc/qdl.properties</env>
+           </workspace>
+           ${EDITORS}
+            <logging
+                   logFileName="${QDL_HOME}log/qdl.log"
+                   logName="run-it"
+                   disableLog4j="true"
+                   logSize="100000"
+                   logFileCount="2"
+                   debug="false"/>
+        <modules  lib_loader="edu.uiuc.ncsa.oa2.qdl.OA2LibLoader2"
+                  version="2.0">
+              <module type="java"
+                      import_on_start="true">
+                  <class_name>edu.uiuc.ncsa.myproxy.oa4mp.qdl.OA2QDLLoader</class_name>
+              </module>
+              <module type="java"
+                      import_on_start="true">
+                  <class_name>edu.uiuc.ncsa.oa2.qdl.QDLToolsLoader</class_name>
+              </module>
+              <module type="java"
+                      import_on_start="false">
+                  <class_name>edu.uiuc.ncsa.oa2.qdl.storage.StoreAccessLoader</class_name>
+              </module>
+        </modules>
+    </qdl>
+</config>

@@ -1,0 +1,11 @@
+#!/bin/bash
+# The script to invoke the QDL interpreter.
+# This allows for overrides at the command line.
+QDL_HOME="."
+JAR_LIB="$QDL_HOME/lib/cp/*"
+CFG_FILE="$QDL_HOME/etc/cfg-oa4mp.xml"
+QDL_JAR="$QDL_HOME/lib/qdl.jar"
+overrides=( "$@" )
+defaults=("-cfg"  "$CFG_FILE" "-name" "default" "-home_dir" "$QDL_HOME" )
+qqq=( "${overrides[@]}" "${defaults[@]}" )
+java -cp $JAR_LIB -jar $QDL_JAR  "${qqq[@]}"

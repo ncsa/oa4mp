@@ -43,8 +43,8 @@ public class TestUtilModule extends JavaModule {
     @Override
     public List<String> getDescription() {
         List<String> a = new ArrayList<>();
-        a.add("TestUtils is charged with making certain server-side utilities ");
-        a.add("such as computing lifetimes of tokens, available to QDL scripts that");
+        a.add("TestUtils is charged with exposing certain server-side utilities ");
+        a.add("such as computing lifetimes of tokens, making them available to QDL scripts that");
         a.add("do testing. The logic for these is often complex and rewriting them");
         a.add("in QDL would just end up being a maintenance headache eventually.");
         return a;

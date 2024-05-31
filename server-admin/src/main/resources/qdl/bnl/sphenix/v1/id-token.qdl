@@ -31,7 +31,7 @@
       "issuer": "https://cilogon.org/bnlsdcc",
       "lifetime": 3600000,
       "qdl": {
-        "load": "bnl/sphenix/v1/access.qdl",
+        "load": "bnl/F/v1/access.qdl",
         "xmd": {
           "exec_phase": [
             "post_token",

@@ -104,7 +104,7 @@ fi
 
 
 cd $OA2_TOOLS/target
-echo "deploying OA4MP tools..."
+echo "   deploying OA4MP tools..."
 
 cp cli-jar-with-dependencies.jar $OA4MP_SERVER_DEPLOY/cli.jar
 cp jwt-jar-with-dependencies.jar $OA4MP_SERVER_DEPLOY/jwt.jar

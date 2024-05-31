@@ -30,7 +30,7 @@ Documentation
     *{{{./client/index.html}Client}} Documentation for the client.
 
 
-OA4MP Extensions to {{{https://qdl-lang.org/}QDL}}
+{{{https://qdl-lang.org/}QDL}} Extensions to OA4MP
 
     *{{{./pdf/creating_claim_sources2.pdf}Creating claims in server scripting.}}
 
@@ -41,6 +41,8 @@ OA4MP Extensions to {{{https://qdl-lang.org/}QDL}}
     *{{{./pdf/qdl_oa4mp_store_access.pdf}Accessing OA4MP stores via QDL.}}
 
     *{{{./pdf/qdl_clc_ini.pdf}Using the QDL ini files with the command line client module.}}
+
+    *{{{./pdf/oa4mp_modules.pdf}Overview of all modules for OA4MP.}}
 
 Related Resources
 

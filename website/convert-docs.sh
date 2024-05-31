@@ -15,6 +15,7 @@ lowriter --headless --convert-to pdf ${args[0]}/qdl/src/main/docs/creating_claim
 lowriter --headless --convert-to pdf ${args[0]}/qdl/src/main/docs/claim_source_examples.odt         > /dev/null
 lowriter --headless --convert-to pdf ${args[0]}/qdl/src/main/docs/token_handler_configuration.odt   > /dev/null
 lowriter --headless --convert-to pdf ${args[0]}/qdl/src/main/docs/qdl_clc_ini.odt                   > /dev/null
+lowriter --headless --convert-to pdf ${args[0]}/qdl/src/main/docs/oa4mp_modules.odt                 > /dev/null
 lowriter --headless --convert-to pdf ${args[0]}/server-admin/src/main/docs/filestore-migration.odt  > /dev/null
 lowriter --headless --convert-to pdf ${args[0]}/website/src/main/doc/oa2-client.odt                 > /dev/null
 lowriter --headless --convert-to pdf ${args[0]}/website/src/main/doc/scopes.odt                     > /dev/null

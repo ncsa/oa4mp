@@ -10,9 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This is the class charged with getting all the modules created and is referenced to pull
- * everything in to your workspace.  This is a convenience for one-stop shopping of OA4MP
- * tools.
+ * This is the class charged with getting all the modules created in this Java package
+ * and is referenced to pull everything in to your workspace.
  * <p>Created by Jeff Gaynor<br>
  * on 2/11/20 at  7:05 AM
  */

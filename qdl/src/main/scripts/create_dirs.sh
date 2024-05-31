@@ -25,8 +25,12 @@ OA4MP_QDL_DEPLOY=${2:-$DEFAULT_OA4MP_QDL_DEPLOY}
 # with the documentation, QDL native modules etc. These have to be part of a distro
 
 cd $QDL_ROOT/language/src/main/scripts || exit
+
 ./create_dirs.sh $QDL_ROOT $OA4MP_QDL_DEPLOY
 # Now that there is a place, put the OA4MP specific documents in the docs directory
+cp $OA4MP_ROOT/qdl/src/main/resources/cfg-oa4mp.xml $OA4MP_QDL_DEPLOY/etc/cfg-oa4mp.xml
+cp $OA4MP_ROOT/qdl/src/main/scripts/qdl $OA4MP_QDL_DEPLOY/bin/qdl
+
 $OA4MP_ROOT/website/convert-docs.sh  $OA4MP_ROOT $OA4MP_QDL_DEPLOY/docs
 
 
