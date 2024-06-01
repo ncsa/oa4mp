@@ -347,6 +347,9 @@ public class OIDCCMServlet extends EnvServlet {
      * @return
      */
     protected JSONObject toJSONObject(OA2Client client, String version, boolean isGet) {
+        if(version.equals(API_VERSION_NONE)){
+            version = getDefaultAPIVersion();
+        }
            switch (version){
                case API_VERSION_5_4:
                    return toJSONObject5_4(client,  isGet);
