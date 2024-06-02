@@ -179,6 +179,7 @@ public class OIDCCMServlet extends EnvServlet {
             if (debugger.getDebugLevel() == MetaDebugUtil.DEBUG_LEVEL_TRACE) {
                 printAllParameters(httpServletRequest);
             }
+            // comment
             String rawID = getFirstParameterValue(httpServletRequest, OA2Constants.CLIENT_ID);
             if (rawID == null || rawID.isEmpty()) {
                 // CIL-1092 : An unqualified GET from an admin returns a list of administered clients and names
@@ -355,12 +356,13 @@ public class OIDCCMServlet extends EnvServlet {
                    return toJSONObject5_4(client,  isGet);
                case API_VERSION_5_5:
                case API_VERSION_LATEST:
+                   return toJSONObject5_5(client,  isGet);
                default:
-                   return toJSONObject5_5(client, getDefaultAPIVersion(),  isGet);
+                   throw new IllegalArgumentException("unknown api version \"" + version + "\"");
            }
 
     }
-    protected JSONObject toJSONObject5_5(OA2Client client, String version, boolean isGet) {
+    protected JSONObject toJSONObject5_5(OA2Client client, boolean isGet) {
         JSONObject json = new JSONObject();
         String registrationURI = getOA2SE().getCmConfigs().getRFC7591Config().uri.toString();
         // Next, we have to construct the registration URI by adding in the client ID.
@@ -399,32 +401,13 @@ public class OIDCCMServlet extends EnvServlet {
         if (client.isPublicClient()) {
             json.put(TOKEN_ENDPOINT_AUTH_METHOD, TOKEN_ENDPOINT_AUTH_NONE);
         }
-        json.put(ID_TOKEN_LIFETIME, lifetimeToSec(client.getIdTokenLifetime()));
+        json.put(REFRESH_LIFETIME, lifetimeToSec(client.getRtLifetime()));
+        json.put(MAX_REFRESH_LIFETIME, lifetimeToSec(client.getMaxRTLifetime()));
         json.put(MAX_ID_TOKEN_LIFETIME, lifetimeToSec(client.getMaxIDTLifetime()));
         json.put(ACCESS_TOKEN_LIFETIME, lifetimeToSec(client.getAtLifetime()));
         json.put(MAX_ACCESS_TOKEN_LIFETIME, lifetimeToSec(client.getMaxATLifetime()));
-        switch (version){
-            case API_VERSION_NONE:
-            case API_VERSION_LATEST:
-            case API_VERSION_5_5:
-                json.put(REFRESH_LIFETIME, lifetimeToSec(client.getRtLifetime()));
-                json.put(MAX_REFRESH_LIFETIME, lifetimeToSec(client.getMaxRTLifetime()));
-                break;
+        json.put(ID_TOKEN_LIFETIME, lifetimeToSec(client.getIdTokenLifetime()));
 
-            case API_VERSION_5_4:
-            if(isGet){
-                if(0<client.getRtLifetime()){
-                    json.put(REFRESH_LIFETIME, lifetimeToSec(client.getRtLifetime()));
-                    json.put(MAX_REFRESH_LIFETIME, lifetimeToSec(client.getMaxRTLifetime()));
-                }
-            }else{
-                json.put(REFRESH_LIFETIME, lifetimeToSec(client.getRtLifetime()));
-                json.put(MAX_REFRESH_LIFETIME, lifetimeToSec(client.getMaxRTLifetime()));
-            }
-        }
-        // Always assert these.
-        json.put(REFRESH_LIFETIME, lifetimeToSec(client.getRtLifetime()));
-        json.put(MAX_REFRESH_LIFETIME, lifetimeToSec(client.getMaxRTLifetime()));
         json.put(EA_SUPPORT, client.hasExtendedAttributeSupport());
         if (client.hasJWKS()) {
             json.put(JWKS, JSONWebKeyUtil.toJSON(client.getJWKS()));
@@ -534,9 +517,7 @@ public class OIDCCMServlet extends EnvServlet {
               // Stored in ms., sent/received in sec. Convert to seconds.
               json.put(REFRESH_LIFETIME, client.getRtLifetime() / 1000);
           } else {
-              if(!isGet) {
                   json.put(REFRESH_LIFETIME, 0L);
-              }// otherwise, omit in get if 0.
           }
           if (0 < client.getAtLifetime()) {
               // Stored in ms., sent/received in sec. Convert to seconds.
