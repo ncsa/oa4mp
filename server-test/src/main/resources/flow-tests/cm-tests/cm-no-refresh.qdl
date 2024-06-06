@@ -10,9 +10,9 @@ resp. := http#post(payload.);
 r. := http#get({'client_id':resp.'content'.'client_id'});
 client. := r.'content';
 // unlike the cm-minimal test, this explicitly tests for rt_lifetime := 0
-⊨ ∄client.'rt_lifetime' : 'no refresh token asserts rt_lifetime on get';
-⊨ ∄client.'max_rt_lifetime' : 'no refresh token asserts rt_lifetime on get';
-⊨ ∄client.'rt_grace_period' : 'no refresh token asserts rt_lifetime on get';
+⊨ client.'rt_lifetime' == 0 : 'wrong refresh token asserted  on get';
+⊨ ∄client.'max_rt_lifetime' : 'no max refresh token asserted on get';
+⊨ ∄client.'rt_grace_period' : 'no rt grace period refresh token asserted  on get';
 r. := http#delete({'client_id':client.'client_id'});
 say('ok: Admin check disabled refresh tokens');
 

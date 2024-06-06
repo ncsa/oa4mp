@@ -10,6 +10,7 @@ import edu.uiuc.ncsa.qdl.functions.FStack;
 import edu.uiuc.ncsa.qdl.module.MIStack;
 import edu.uiuc.ncsa.qdl.module.MTStack;
 import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.qdl.variables.VStack;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
@@ -219,5 +220,10 @@ public class OA2State extends State {
                 assertionsOn,
                 isStrictACLs(),
                 getJsonWebKeys());
+    }
+
+    @Override
+    protected QDLStem addManifestConstants(String path) {
+        return super.addManifestConstants(path);
     }
 }

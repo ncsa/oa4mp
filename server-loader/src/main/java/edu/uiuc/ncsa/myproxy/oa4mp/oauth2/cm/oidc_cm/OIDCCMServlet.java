@@ -38,6 +38,7 @@ import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.servlet.ExceptionHandlerThingie;
+import edu.uiuc.ncsa.security.servlet.HeaderUtils;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
@@ -86,7 +87,7 @@ public class OIDCCMServlet extends EnvServlet {
     public static final String IS_SERVICE_CLIENT = "is_service_client";
     public static final String SERVICE_CLIENT_USERS = "service_client_users";
     public static final String ERSATZ_CLIENT_PROVISIONERS = "org.oa4mp:/ersatz/provisioners";
-   // Version
+    // Version
     public static final String API_VERSION_LATEST = "latest";
     /**
      * They sent nothing explicit.
@@ -125,8 +126,8 @@ public class OIDCCMServlet extends EnvServlet {
     public void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws ServletException, IOException {
         String version = getVersion(getOA2SE().getCmConfigs().getRFC7592Config(), httpServletRequest);
 
-          //ServletDebugUtil.printAllParameters(getClass(), httpServletRequest, true); // ∈
-          // E.g. IF anonymous access is allowed on the server:
+        //ServletDebugUtil.printAllParameters(getClass(), httpServletRequest, true); // ∈
+        // E.g. IF anonymous access is allowed on the server:
         // curl -k -X GET  https://localhost:9443/oauth2/oidc-cm?query=org.oa4mp%3A%2Fserver%23defaults
         try {
             if (!(getOA2SE().getCmConfigs().hasRFC7592Config() && getOA2SE().getCmConfigs().getRFC7592Config().enabled) && getOA2SE().getCmConfigs().isEnabled()) {
@@ -139,12 +140,16 @@ public class OIDCCMServlet extends EnvServlet {
 
             boolean isAnonymous = false;  // Meaning that a client is trying to get information
             AdminClient adminClient = null;
+            String rawID = getFirstParameterValue(httpServletRequest, OA2Constants.CLIENT_ID);
             try {
                 adminClient = getAndCheckAdminClient(httpServletRequest); // Need this to verify admin client.
-            } catch(IllegalArgumentException iax){
+                isAnonymous = adminClient==null; // might return a null
+            } catch (IllegalArgumentException | UnknownClientException iax) {
+                // N.B. "anonymous" means that users may anonymously create clients, which are then
+                // given ids and passwords.
                 if (!getOA2SE().getCmConfigs().getRFC7591Config().anonymousOK) {
                     IllegalAccessException illegalAccessException =
-                            new IllegalAccessException(iax.getMessage() + ", anonymous access denied",iax.getCause());
+                            new IllegalAccessException(iax.getMessage() + ", anonymous access denied", iax.getCause());
                     throw illegalAccessException;
                 }
                 isAnonymous = true;
@@ -152,22 +157,62 @@ public class OIDCCMServlet extends EnvServlet {
             } catch (Throwable ge) {
                 DebugUtil.trace(ge.getMessage(), ge);
             }
+
             String[] query = httpServletRequest.getParameterValues(QUERY_PARAMETER);
-          //  System.err.println(getClass().getSimpleName() + "query =" + Arrays.toString(query)); // ∈
+            //  System.err.println(getClass().getSimpleName() + "query =" + Arrays.toString(query)); // ∈
             if (query != null && query.length != 0) {
-         //       System.err.println(getClass().getSimpleName() + "checking server query"); // ∈
+                //       System.err.println(getClass().getSimpleName() + "checking server query"); // ∈
                 handleServerQuery(adminClient, Arrays.asList(query), httpServletRequest, httpServletResponse);
                 return;
             }
             OA2Client oa2Client = null;
             MetaDebugUtil debugger;
+
             if (isAnonymous) {
+                 // A client may get itself. It presents either bearer or basic header.
+                // RFC 7592 -- only bearer token allowed
+            if(!HeaderUtils.hasBearerHeader(httpServletRequest)){
+                    throw new IllegalAccessException("Unsupported authorization method.");
+                }
+                String[] creds = HeaderUtils.getCredentialsFromHeaders(httpServletRequest, HeaderUtils.BEARER_HEADER);
+                Identifier clientID = BasicIdentifier.newID(creds[HeaderUtils.ID_INDEX]);
+                if (StringUtils.isTrivial(rawID)) {
+                    throw new IllegalAccessException("missing client id");
+                }
+                if (!rawID.equals(clientID.toString())) {
+                    throw new IllegalAccessException("client id does not match requested id");
+                }
+                // finally after all of that, make sure they have the right password
+                getClient(httpServletRequest);
+                oa2Client = (OA2Client) getOA2SE().getClientStore().get(clientID);
+                if(oa2Client == null){
+                    throw new UnknownClientException();
+                }
+                if(!getOA2SE().getClientApprovalStore().isApproved(clientID)){
+                    throw new UnapprovedClientException("unapproved client", oa2Client);
+                }
+                if(!oa2Client.isPublicClient()){
+                    String secret = creds[HeaderUtils.SECRET_INDEX];
+                    String hashedSecret = DigestUtils.sha1Hex(secret);
+                    if (!oa2Client.getSecret().equals(hashedSecret)) {
+                        throw new WrongPasswordException("client and secret do not match");
+                    }
+
+                }
+                JSONObject json = toJSONObject(oa2Client, version, true);
+                debugger = MyProxyDelegationServlet.createDebugger(oa2Client);
+                debugger.trace(this, "GET returns payload\n" + json.toString(2));
+                writeOK(httpServletResponse, json); //send it back with an ok.
+                 return;
+            }
+
+/*            if (isAnonymous) {
                 // Here's the logic: If we allow anonymous access, then a client can get itself.
                 // If the client is administered, then the request must come with an admin client
                 // Do not allow an un-administered client to query anything.
                 try {
                     oa2Client = getAndCheckOA2Client(httpServletRequest);
-                }catch(IllegalArgumentException iax){
+                } catch (IllegalArgumentException iax) {
                     throw new IllegalArgumentException("Anonymous queries are not supported");
                 }
                 if (!getOA2SE().getPermissionStore().getAdmins(oa2Client.getIdentifier()).isEmpty()) {
@@ -176,12 +221,12 @@ public class OIDCCMServlet extends EnvServlet {
                 debugger = MyProxyDelegationServlet.createDebugger(oa2Client);
             } else {
                 debugger = MyProxyDelegationServlet.createDebugger(adminClient);
-            }
+            }*/
+            debugger = MyProxyDelegationServlet.createDebugger(adminClient);
             debugger.trace(this, "Starting get");
             if (debugger.getDebugLevel() == MetaDebugUtil.DEBUG_LEVEL_TRACE) {
                 printAllParameters(httpServletRequest);
             }
-            String rawID = getFirstParameterValue(httpServletRequest, OA2Constants.CLIENT_ID);
             if (rawID == null || rawID.isEmpty()) {
                 // CIL-1092 : An unqualified GET from an admin returns a list of administered clients and names
                 debugger.trace(this, "id = \"" + rawID + "\" for client listing");
@@ -212,6 +257,9 @@ public class OIDCCMServlet extends EnvServlet {
                     throw new IllegalAccessException("clients cannot access information about any other client");
                 }
             } else {
+                if (!getOA2SE().getPermissionStore().getClients(adminClient.getIdentifier()).contains(id)) {
+                    throw new IllegalAccessException("this admin client does not administer the client with ID \"" + id + "\".");
+                }
                 // so it's adminstered and is legit
                 oa2Client = (OA2Client) getOA2SE().getClientStore().get(id);
             }
@@ -234,7 +282,7 @@ public class OIDCCMServlet extends EnvServlet {
             debugger.trace(this, "GET returns payload\n" + json.toString(2));
             writeOK(httpServletResponse, json); //send it back with an ok.
         } catch (Throwable t) {
-          //  t.printStackTrace(); // ∈
+            //  t.printStackTrace(); // ∈
             handleException(new ExceptionHandlerThingie(t, httpServletRequest, httpServletResponse));
         }
     }
@@ -350,20 +398,22 @@ public class OIDCCMServlet extends EnvServlet {
      * @return
      */
     protected JSONObject toJSONObject(OA2Client client, String version, boolean isGet) {
-        if(version.equals(API_VERSION_NONE)){
+        if (version.equals(API_VERSION_NONE)) {
             version = getDefaultAPIVersion();
         }
-           switch (version){
-               case API_VERSION_5_4:
-                   return toJSONObject5_4(client,  isGet);
-               case API_VERSION_5_5:
-               case API_VERSION_LATEST:
-               default:
-                   return toJSONObject5_5(client, getDefaultAPIVersion(),  isGet);
-           }
+        switch (version) {
+            case API_VERSION_5_4:
+                return toJSONObject5_4(client, isGet);
+            case API_VERSION_5_5:
+            case API_VERSION_LATEST:
+                return toJSONObject5_5(client, isGet);
+            default:
+                throw new IllegalArgumentException("unknown api version \"" + version + "\"");
+        }
 
     }
-    protected JSONObject toJSONObject5_5(OA2Client client, String version, boolean isGet) {
+
+    protected JSONObject toJSONObject5_5(OA2Client client, boolean isGet) {
         JSONObject json = new JSONObject();
         String registrationURI = getOA2SE().getCmConfigs().getRFC7591Config().uri.toString();
         // Next, we have to construct the registration URI by adding in the client ID.
@@ -402,32 +452,15 @@ public class OIDCCMServlet extends EnvServlet {
         if (client.isPublicClient()) {
             json.put(TOKEN_ENDPOINT_AUTH_METHOD, TOKEN_ENDPOINT_AUTH_NONE);
         }
-        json.put(ID_TOKEN_LIFETIME, lifetimeToSec(client.getIdTokenLifetime()));
+        json.put(REFRESH_LIFETIME, lifetimeToSec(client.getRtLifetime()));
+        json.put(MAX_REFRESH_LIFETIME, lifetimeToSec(client.getMaxRTLifetime()));
         json.put(MAX_ID_TOKEN_LIFETIME, lifetimeToSec(client.getMaxIDTLifetime()));
         json.put(ACCESS_TOKEN_LIFETIME, lifetimeToSec(client.getAtLifetime()));
         json.put(MAX_ACCESS_TOKEN_LIFETIME, lifetimeToSec(client.getMaxATLifetime()));
-        switch (version){
-            case API_VERSION_NONE:
-            case API_VERSION_LATEST:
-            case API_VERSION_5_5:
-                json.put(REFRESH_LIFETIME, lifetimeToSec(client.getRtLifetime()));
-                json.put(MAX_REFRESH_LIFETIME, lifetimeToSec(client.getMaxRTLifetime()));
-                break;
+        json.put(ID_TOKEN_LIFETIME, lifetimeToSec(client.getIdTokenLifetime()));
 
-            case API_VERSION_5_4:
-            if(isGet){
-                if(0<client.getRtLifetime()){
-                    json.put(REFRESH_LIFETIME, lifetimeToSec(client.getRtLifetime()));
-                    json.put(MAX_REFRESH_LIFETIME, lifetimeToSec(client.getMaxRTLifetime()));
-                }
-            }else{
-                json.put(REFRESH_LIFETIME, lifetimeToSec(client.getRtLifetime()));
-                json.put(MAX_REFRESH_LIFETIME, lifetimeToSec(client.getMaxRTLifetime()));
-            }
-        }
+
         // Always assert these.
-        json.put(REFRESH_LIFETIME, lifetimeToSec(client.getRtLifetime()));
-        json.put(MAX_REFRESH_LIFETIME, lifetimeToSec(client.getMaxRTLifetime()));
         json.put(EA_SUPPORT, client.hasExtendedAttributeSupport());
         if (client.hasJWKS()) {
             json.put(JWKS, JSONWebKeyUtil.toJSON(client.getJWKS()));
@@ -437,7 +470,7 @@ public class OIDCCMServlet extends EnvServlet {
         }
         JSONArray scopes = new JSONArray();
         scopes.addAll(client.getScopes());
-        if(!scopes.isEmpty()) {
+        if (!scopes.isEmpty()) {
             json.put(OA2Constants.SCOPE, scopes);
         }
         json.put(OIDCCMConstants.CLIENT_URI, client.getHomeUri());
@@ -449,11 +482,11 @@ public class OIDCCMServlet extends EnvServlet {
         // either RFC 7591 or 7592.
         json.put("email", client.getEmail());
         // CIL-1221
-        if(!client.getProxyClaimsList().isEmpty()) {
+        if (!client.getProxyClaimsList().isEmpty()) {
             json.put(PROXY_CLAIMS_LIST, client.getProxyClaimsList());
         }
         json.put(FORWARD_REQUEST_SCOPES_TO_PROXY, client.isForwardScopesToProxy());
-        if(!client.getProxyRequestScopes().isEmpty()) {
+        if (!client.getProxyRequestScopes().isEmpty()) {
             json.put(PROXY_REQUEST_SCOPES, client.getProxyRequestScopes());
         }
         json.put(IS_SERVICE_CLIENT, client.isServiceClient());
@@ -500,110 +533,108 @@ public class OIDCCMServlet extends EnvServlet {
     }
 
     protected JSONObject toJSONObject5_4(OA2Client client, boolean isGet) {
-          JSONObject json = new JSONObject();
-          String registrationURI = getOA2SE().getCmConfigs().getRFC7591Config().uri.toString();
-          // Next, we have to construct the registration URI by adding in the client ID.
-          // Spec says we can add parameters here, but not elsewhere.
-          json.put(OIDCCMConstants.REGISTRATION_CLIENT_URI, registrationURI + "?" + OA2Constants.CLIENT_ID + "=" + client.getIdentifierString());
-          json.put(OA2Constants.CLIENT_ID, client.getIdentifierString());
-          json.put(OIDCCMConstants.CLIENT_NAME, client.getName());
-          JSONArray cbs = new JSONArray();
-          cbs.addAll(client.getCallbackURIs());
-          json.put(OIDCCMConstants.REDIRECT_URIS, cbs);
-          if (client.hasJWKSURI()) {
-              json.put(JWKS_URI, client.getJwksURI().toString());
-          }
-          if (client.hasJWKS()) {
-              JSONObject jwks = JSONWebKeyUtil.toJSON(client.getJWKS());
-              json.put(JWKS, jwks);
-          }
-          if (client.getGrantTypes().isEmpty()) {
+        JSONObject json = new JSONObject();
+        String registrationURI = getOA2SE().getCmConfigs().getRFC7591Config().uri.toString();
+        // Next, we have to construct the registration URI by adding in the client ID.
+        // Spec says we can add parameters here, but not elsewhere.
+        json.put(OIDCCMConstants.REGISTRATION_CLIENT_URI, registrationURI + "?" + OA2Constants.CLIENT_ID + "=" + client.getIdentifierString());
+        json.put(OA2Constants.CLIENT_ID, client.getIdentifierString());
+        json.put(OIDCCMConstants.CLIENT_NAME, client.getName());
+        JSONArray cbs = new JSONArray();
+        cbs.addAll(client.getCallbackURIs());
+        json.put(OIDCCMConstants.REDIRECT_URIS, cbs);
+        if (client.hasJWKSURI()) {
+            json.put(JWKS_URI, client.getJwksURI().toString());
+        }
+        if (client.hasJWKS()) {
+            JSONObject jwks = JSONWebKeyUtil.toJSON(client.getJWKS());
+            json.put(JWKS, jwks);
+        }
+        if (client.getGrantTypes().isEmpty()) {
               /*JSONArray grants = new JSONArray();
               grants.add(OA2Constants.GRANT_TYPE_AUTHORIZATION_CODE);
               if (client.isRTLifetimeEnabled()) {
                   grants.add(OA2Constants.REFRESH_TOKEN);
               }*/
-          } else {
-              json.put(OIDCCMConstants.GRANT_TYPES, client.getGrantTypes());
-          }
-          if (!client.getResponseTypes().isEmpty()) {
+        } else {
+            json.put(OIDCCMConstants.GRANT_TYPES, client.getGrantTypes());
+        }
+        if (!client.getResponseTypes().isEmpty()) {
 
-              json.put(RESPONSE_TYPES, client.getResponseTypes());
-          }
-          if (client.isPublicClient()) {
-              json.put(TOKEN_ENDPOINT_AUTH_METHOD, TOKEN_ENDPOINT_AUTH_NONE);
-          }
-          if (0 < client.getRtLifetime()) {
-              // Stored in ms., sent/received in sec. Convert to seconds.
-              json.put(REFRESH_LIFETIME, client.getRtLifetime() / 1000);
-          } else {
-              if(!isGet) {
-                  json.put(REFRESH_LIFETIME, 0L);
-              }// otherwise, omit in get if 0.
-          }
-          if (0 < client.getAtLifetime()) {
-              // Stored in ms., sent/received in sec. Convert to seconds.
-              json.put(ACCESS_TOKEN_LIFETIME, client.getAtLifetime() / 1000);
-          } else {
-              json.put(ACCESS_TOKEN_LIFETIME, 0L);
-          }
-          if (client.hasJWKS()) {
-              json.put(JWKS, JSONWebKeyUtil.toJSON(client.getJWKS()));
-          }
-          if (client.hasJWKSURI()) {
-              json.put(JWKS_URI, client.getJwksURI().toString());
-          }
-          JSONArray scopes = new JSONArray();
-          scopes.addAll(client.getScopes());
-          json.put(OA2Constants.SCOPE, scopes);
-          json.put(OIDCCMConstants.CLIENT_URI, client.getHomeUri());
-          json.put(OA2Constants.ERROR_URI, client.getErrorUri());
-          // CIL-931 fix.
-          json.put(STRICT_SCOPES, client.useStrictScopes());
-          json.put(SKIP_SERVER_SCRIPTS, client.isSkipServerScripts());
-          // Note that a contact email is something specific to OA4MP and does not occur in
-          // either RFC 7591 or 7592.
-          // CIL-1221
-          json.put(PROXY_CLAIMS_LIST, client.getProxyClaimsList());
-          json.put(FORWARD_REQUEST_SCOPES_TO_PROXY, client.isForwardScopesToProxy());
-          json.put(PROXY_REQUEST_SCOPES, client.getProxyRequestScopes());
-          json.put(IS_SERVICE_CLIENT, client.isServiceClient());
-          JSONArray array = new JSONArray();
-          array.addAll(client.getServiceClientUsers());
-          json.put(SERVICE_CLIENT_USERS, array);
-          json.put("email", client.getEmail());
-          OA2ClientKeys clientKeys = (OA2ClientKeys) getOA2SE().getClientStore().getMapConverter().getKeys();
-          json.put(clientKeys.extendsProvisioners(), client.isExtendsProvisioners());
-          json.put(clientKeys.ersatzClient(), client.isErsatzClient());
-          json.put(clientKeys.ersatzInheritIDToken(), client.isErsatzInheritIDToken());
-          //CIL-1321 inheritance
-          if (client.hasPrototypes()) {
-              JSONArray jsonArray = new JSONArray();
-              for (Identifier id : client.getPrototypes()) {
-                  jsonArray.add(id.toString());
-              }
-              json.put(clientKeys.prototypes(), jsonArray);
-          }
-          // This is in seconds since the epoch
-          json.put(OIDCCMConstants.CLIENT_ID_ISSUED_AT, client.getCreationTS().getTime() / 1000);
-          if (client.getConfig() != null && !client.getConfig().isEmpty()) {
+            json.put(RESPONSE_TYPES, client.getResponseTypes());
+        }
+        if (client.isPublicClient()) {
+            json.put(TOKEN_ENDPOINT_AUTH_METHOD, TOKEN_ENDPOINT_AUTH_NONE);
+        }
+        if (0 < client.getRtLifetime()) {
+            // Stored in ms., sent/received in sec. Convert to seconds.
+            json.put(REFRESH_LIFETIME, client.getRtLifetime() / 1000);
+        } else {
+            json.put(REFRESH_LIFETIME, 0L);
+        }
+        if (0 < client.getAtLifetime()) {
+            // Stored in ms., sent/received in sec. Convert to seconds.
+            json.put(ACCESS_TOKEN_LIFETIME, client.getAtLifetime() / 1000);
+        } else {
+            json.put(ACCESS_TOKEN_LIFETIME, 0L);
+        }
+        if (client.hasJWKS()) {
+            json.put(JWKS, JSONWebKeyUtil.toJSON(client.getJWKS()));
+        }
+        if (client.hasJWKSURI()) {
+            json.put(JWKS_URI, client.getJwksURI().toString());
+        }
+        JSONArray scopes = new JSONArray();
+        scopes.addAll(client.getScopes());
+        json.put(OA2Constants.SCOPE, scopes);
+        json.put(OIDCCMConstants.CLIENT_URI, client.getHomeUri());
+        json.put(OA2Constants.ERROR_URI, client.getErrorUri());
+        // CIL-931 fix.
+        json.put(STRICT_SCOPES, client.useStrictScopes());
+        json.put(SKIP_SERVER_SCRIPTS, client.isSkipServerScripts());
+        // Note that a contact email is something specific to OA4MP and does not occur in
+        // either RFC 7591 or 7592.
+        // CIL-1221
+        json.put(PROXY_CLAIMS_LIST, client.getProxyClaimsList());
+        json.put(FORWARD_REQUEST_SCOPES_TO_PROXY, client.isForwardScopesToProxy());
+        json.put(PROXY_REQUEST_SCOPES, client.getProxyRequestScopes());
+        json.put(IS_SERVICE_CLIENT, client.isServiceClient());
+        JSONArray array = new JSONArray();
+        array.addAll(client.getServiceClientUsers());
+        json.put(SERVICE_CLIENT_USERS, array);
+        json.put("email", client.getEmail());
+        OA2ClientKeys clientKeys = (OA2ClientKeys) getOA2SE().getClientStore().getMapConverter().getKeys();
+        json.put(clientKeys.extendsProvisioners(), client.isExtendsProvisioners());
+        json.put(clientKeys.ersatzClient(), client.isErsatzClient());
+        json.put(clientKeys.ersatzInheritIDToken(), client.isErsatzInheritIDToken());
+        //CIL-1321 inheritance
+        if (client.hasPrototypes()) {
+            JSONArray jsonArray = new JSONArray();
+            for (Identifier id : client.getPrototypes()) {
+                jsonArray.add(id.toString());
+            }
+            json.put(clientKeys.prototypes(), jsonArray);
+        }
+        // This is in seconds since the epoch
+        json.put(OIDCCMConstants.CLIENT_ID_ISSUED_AT, client.getCreationTS().getTime() / 1000);
+        if (client.getConfig() != null && !client.getConfig().isEmpty()) {
 
-              json.put("cfg", client.getConfig());
-          }
-          if (json.containsKey(clientKeys.email())) {
-              JSONArray jsonArray = new JSONArray();
-              jsonArray.add(json.get(clientKeys.email()));
-              json.remove(clientKeys.email());
-              json.put(OIDCCMConstants.CONTACTS, jsonArray);
-          }
-          if (client.hasOIDC_CM_Attributes()) {
-              // add them back
-              for (Object key : client.getOIDC_CM_Attributes().keySet()) {
-                  json.put(key, client.getOIDC_CM_Attributes().get(key));
-              }
-          }
-          return json;
-      }
+            json.put("cfg", client.getConfig());
+        }
+        if (json.containsKey(clientKeys.email())) {
+            JSONArray jsonArray = new JSONArray();
+            jsonArray.add(json.get(clientKeys.email()));
+            json.remove(clientKeys.email());
+            json.put(OIDCCMConstants.CONTACTS, jsonArray);
+        }
+        if (client.hasOIDC_CM_Attributes()) {
+            // add them back
+            for (Object key : client.getOIDC_CM_Attributes().keySet()) {
+                json.put(key, client.getOIDC_CM_Attributes().get(key));
+            }
+        }
+        return json;
+    }
 
     public static String getDefaultAPIVersion() {
         return defaultAPIVersion;
@@ -725,26 +756,27 @@ public class OIDCCMServlet extends EnvServlet {
         }
     }
 
-    protected String getVersion(CMConfig cmConfig, HttpServletRequest req){
-         if(null != req.getParameter(API_VERSION_KEY)){
-             return req.getParameter(API_VERSION_KEY);
-         }
-         String requestUri = req.getRequestURI();
-         String endpoint = cmConfig.getEndpoint();
-         if(StringUtils.isTrivial(endpoint)){
-             throw new NFWException("the endpoint for the " + cmConfig.protocol + " has not been configured.");
-         }
-         if(requestUri.endsWith("/")){
-             requestUri = requestUri.substring(0,requestUri.length()-1); // normalize. remove trailing /
-         }
-         // No component means send back "none" so the endpoint can resolve what to do.
+    protected String getVersion(CMConfig cmConfig, HttpServletRequest req) {
+        if (null != req.getParameter(API_VERSION_KEY)) {
+            return req.getParameter(API_VERSION_KEY);
+        }
+        String requestUri = req.getRequestURI();
+        String endpoint = cmConfig.getEndpoint();
+        if (StringUtils.isTrivial(endpoint)) {
+            throw new NFWException("the endpoint for the " + cmConfig.protocol + " has not been configured.");
+        }
+        if (requestUri.endsWith("/")) {
+            requestUri = requestUri.substring(0, requestUri.length() - 1); // normalize. remove trailing /
+        }
+        // No component means send back "none" so the endpoint can resolve what to do.
         // Note the fact that we are here in the first place is because
         // they sent a proper request to Tomcat, so we know that the endpoint (e.g. oidc-cm) is in the URI.
-         if(requestUri.endsWith("/"+endpoint)) return API_VERSION_NONE;
-         // by this point, it ends with /version
-         String version= requestUri.substring(1+requestUri.lastIndexOf("/")); // return exactly API
-         return version;
+        if (requestUri.endsWith("/" + endpoint)) return API_VERSION_NONE;
+        // by this point, it ends with /version
+        String version = requestUri.substring(1 + requestUri.lastIndexOf("/")); // return exactly API
+        return version;
     }
+
     /**
      * Update a client. Note that as per the specification, all values that are sent over-write existing
      * values and omitted values are taken to mean the stored value is unset.
@@ -1039,6 +1071,7 @@ public class OIDCCMServlet extends EnvServlet {
 
     /**
      * The workhorse method for POST.
+     *
      * @param httpServletRequest
      * @param httpServletResponse
      * @throws Throwable
@@ -1173,7 +1206,7 @@ public class OIDCCMServlet extends EnvServlet {
             xxx.addAll(newClient.getScopes());
             jsonResp.put(SCOPE, xxx);
         }
-        switch (version){
+        switch (version) {
             case API_VERSION_NONE:
             case API_VERSION_5_4:
                 // do not set anything

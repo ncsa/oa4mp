@@ -179,8 +179,12 @@ public class StoreFacade implements QDLModuleMetaClass {
         }
 
         /*
-        module_import('oa2:/qdl/store', 'c')
-        c#init('/home/ncsa/dev/csd/config/server-oa2.xml', 'localhost:oa4mp.oa2.mariadb', 'client')
+        Quick modules 2.0 test.
+        client := import('oa2:/qdl/store')
+        client#init('/home/ncsa/dev/csd/config/server-oa2.xml', 'localhost:oa4mp.oa2.mariadb', 'client')
+        client#count();
+        client#keys()
+        client#read('localhost:command.line2')
 
         cli. :=  c#read('localhost:command.line')
 
@@ -598,12 +602,12 @@ public class StoreFacade implements QDLModuleMetaClass {
         }
     }
 
-    protected String SIZE_NAME = "size";
+    protected String COUNT_NAME = "count";
 
-    public class Size implements QDLFunction {
+    public class Count implements QDLFunction {
         @Override
         public String getName() {
-            return SIZE_NAME;
+            return COUNT_NAME;
         }
 
         @Override
@@ -619,7 +623,7 @@ public class StoreFacade implements QDLModuleMetaClass {
                 if (objects[0] instanceof Boolean) {
                     includeVersions = (Boolean) objects[0];
                 } else {
-                    throw new IllegalArgumentException("The first argument of " + SIZE_NAME + ", if present, must be a boolean.");
+                    throw new IllegalArgumentException("The first argument of " + COUNT_NAME + ", if present, must be a boolean.");
                 }
             }
                 return getStoreAccessor().size(includeVersions);
@@ -671,7 +675,7 @@ public class StoreFacade implements QDLModuleMetaClass {
             List<String> doxx = new ArrayList<>();
             switch (argCount) {
                 case 0:
-                    doxx.add(getName() + "() - list the keys (names of properties) for the objects in the store.");
+                    doxx.add(getName() + "() - list the column names  for the objects in the store.");
                     break;
                 case 1:
                     doxx.add(getName() + "(show_primary_key) - list the primary keys this store.");
@@ -787,7 +791,7 @@ public class StoreFacade implements QDLModuleMetaClass {
                 s.append(REMOVE_NAME + " Remove an object from the store by identifier.\n");
                 s.append(SAVE_NAME + " Save an object to the store. If the object exists, it is updated, otherwise a new object is created in the store.\n");
                 s.append(SEARCH_NAME + " Search the store by key and value for all objects. This returns a list of stems (which may be huge -- plan your queries!)\n");
-                s.append(SIZE_NAME + " The size of the store, i.e., number of objects in the store\n");
+                s.append(COUNT_NAME + " The size of the store, i.e., number of objects in the store\n");
                 s.append(TO_XML_NAME + " Serialize a stem object into XML (as a string).\n");
                 s.append(UPDATE_NAME + " Updates an existing object. This will fail if the object does not exist.\n");
                 s.append("*" + PermissionStoreFacade.ADMINS_NAME + " Lists the admins for a given client\n");

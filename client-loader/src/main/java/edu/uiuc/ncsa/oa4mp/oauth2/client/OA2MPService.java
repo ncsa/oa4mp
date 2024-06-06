@@ -634,7 +634,6 @@ public class OA2MPService extends OA4MPService {
         request.setKeyID(getEnvironment().getKid());
         request.setClient(getEnvironment().getClient());
         request.setParameters(parameters);
-        ;
         DS2 ds2 = (DS2) getEnvironment().getDelegationService();
         RFC7523Response response = ds2.rfc7523(request);
         JSONObject json = response.getResponse();

@@ -1,7 +1,10 @@
 #! /usr/bin/env -S qdl-run
 
 /*
-   Tests the client with no configuration
+   This is a clone of Scott Koranda's COmanage test client. It runs
+   the basic scripts that all COmanage clients have access to and is
+   a check that those scripts still work. Otherwise, it is not very deep
+   or clever.
 
 */
 path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests';
@@ -18,6 +21,7 @@ if[rc!='ok'][return(rc);];
 tokens. := clc#access();
 claims. := clc#claims();
 
+say('claims:\n' + print(claims.));
 VOP :='vo_person_id';
 IMO := 'is_member_of';
 

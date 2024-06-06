@@ -45,6 +45,9 @@ public class StoreAccessModule extends JavaModule {
 
         storeAccessModule.storeFacade = newStoreFacade();
         doIt(storeAccessModule, state);
+        if (state != null) {
+            storeAccessModule.init(state);
+        }
         setupModule(storeAccessModule);
         return storeAccessModule;
     }
@@ -83,7 +86,7 @@ public class StoreAccessModule extends JavaModule {
         functions.add(sf.new Remove());
         functions.add(sf.new SaveObject());
         functions.add(sf.new Search());
-        functions.add(sf.new Size());
+        functions.add(sf.new Count());
         functions.add(sf.new ToXML());
         functions.add(sf.new UpdateObject());
         functions.add(sf.new VCreate());
@@ -91,7 +94,7 @@ public class StoreAccessModule extends JavaModule {
         functions.add(sf.new VGetVersions());
         functions.add(sf.new VRemove());
         functions.add(sf.new VRestore());
-    //    functions.add(sf.new Diff());
+        //    functions.add(sf.new Diff());
         return functions;
     }
 

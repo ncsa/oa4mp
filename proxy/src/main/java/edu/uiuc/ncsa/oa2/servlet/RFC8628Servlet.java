@@ -54,7 +54,7 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
     protected void doIt(HttpServletRequest req, HttpServletResponse resp) throws Throwable {
         ServletDebugUtil.trace(this, "starting device flow");
         OA2SE oa2SE = (OA2SE) MyProxyDelegationServlet.getServiceEnvironment();
-
+       ServletDebugUtil.printAllParameters(getClass(), req, true);
         if (!oa2SE.isRfc8628Enabled()) {
             ServletDebugUtil.trace(this, "device flow not enabled onthis server");
             throw new OA2ATException(OA2Errors.ACCESS_DENIED,

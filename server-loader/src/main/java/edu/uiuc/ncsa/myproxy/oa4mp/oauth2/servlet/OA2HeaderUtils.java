@@ -59,8 +59,9 @@ public class OA2HeaderUtils extends HeaderUtils {
      * @param request
      */
     public static OA2Client getAndVerifyRFC7523Client(HttpServletRequest request, OA2SE oa2SE) throws NoSuchAlgorithmException, InvalidKeySpecException {
-           return getAndVerifyRFC7523Client(request, oa2SE, false); // default is to use token endpoint
+        return getAndVerifyRFC7523Client(request, oa2SE, false); // default is to use token endpoint
     }
+
     public static OA2Client getAndVerifyRFC7523Client(HttpServletRequest request, OA2SE oa2SE, boolean isDeviceFlow) throws NoSuchAlgorithmException, InvalidKeySpecException {
 
         String raw = request.getParameter(RFC7523Constants.CILENT_ASSERTION);
@@ -105,13 +106,13 @@ public class OA2HeaderUtils extends HeaderUtils {
 
         if (json.containsKey(AUDIENCE)) {
             String serverName = oa2SE.getServiceAddress().toString();
-            if(isDeviceFlow){
+            if (isDeviceFlow) {
                 serverName = serverName + (serverName.endsWith("/") ? "" : "/") + RFC8628Constants.DEVICE_AUTHORIZATION_ENDPOINT; // construct the device_authorization endpoint
-            }else{
+            } else {
                 serverName = serverName + (serverName.endsWith("/") ? "" : "/") + "token"; // construct the token endpoint
             }
             if (!json.getString(AUDIENCE).equals(serverName)) {
-                throw new IllegalArgumentException("wrong " + AUDIENCE);
+                throw new IllegalArgumentException("wrong " + AUDIENCE); // as per spec.
             }
         } else {
             throw new IllegalArgumentException("missing " + AUDIENCE);
@@ -180,70 +181,70 @@ public class OA2HeaderUtils extends HeaderUtils {
     public static void verifyRFC7523Client(OA2Client client, HttpServletRequest request, OA2SE oa2SE) throws NoSuchAlgorithmException, InvalidKeySpecException {
         String raw = request.getParameter(RFC7523Constants.CILENT_ASSERTION);
         if (StringUtils.isTrivial(raw)) {
-                // throw an exception
-                throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
-                        "missing " + RFC7523Constants.CILENT_ASSERTION,
-                        HttpStatus.SC_BAD_REQUEST, null);
+            // throw an exception
+            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                    "missing " + RFC7523Constants.CILENT_ASSERTION,
+                    HttpStatus.SC_BAD_REQUEST, null);
 
-            }
-            JSONObject[] hp;
-            try {
-                hp = MyOtherJWTUtil2.readJWT(raw);
-            } catch (IllegalArgumentException iax) {
-                // means this is sent as a JWT, but is not one
-                throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, RFC7523Constants.CILENT_ASSERTION + " is not a JWT", HttpStatus.SC_BAD_REQUEST, null);
-            } catch (Throwable t) {
-                // In this case, it is something like an unsupported algorithm
-                throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "could not decode JWT:" + t.getMessage(), HttpStatus.SC_BAD_REQUEST, null);
-            }
-            JSONObject json = hp[1];
+        }
+        JSONObject[] hp;
+        try {
+            hp = MyOtherJWTUtil2.readJWT(raw);
+        } catch (IllegalArgumentException iax) {
+            // means this is sent as a JWT, but is not one
+            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, RFC7523Constants.CILENT_ASSERTION + " is not a JWT", HttpStatus.SC_BAD_REQUEST, null);
+        } catch (Throwable t) {
+            // In this case, it is something like an unsupported algorithm
+            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "could not decode JWT:" + t.getMessage(), HttpStatus.SC_BAD_REQUEST, null);
+        }
+        JSONObject json = hp[1];
         String state = json.containsKey(OA2Constants.STATE) ? json.getString(OA2Constants.STATE) : null;
 
-          if (!client.hasJWKS()) {
-              throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "client does not support RFC 7523", HttpStatus.SC_BAD_REQUEST, state);
-          }
-  // Finally. We can verify the JWT
-          try {
-              MyOtherJWTUtil2.verifyAndReadJWT(raw, client.getJWKS());
-          } catch (Throwable t) {
-              // We read the token before without verifying it because we could not. The only error(s) left are if the signature fails.
-              throw new OA2GeneralError(OA2Errors.INVALID_TOKEN, "failed to verify token", HttpStatus.SC_BAD_REQUEST, state);
-          }
+        if (!client.hasJWKS()) {
+            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "client does not support RFC 7523", HttpStatus.SC_BAD_REQUEST, state);
+        }
+        // Finally. We can verify the JWT
+        try {
+            MyOtherJWTUtil2.verifyAndReadJWT(raw, client.getJWKS());
+        } catch (Throwable t) {
+            // We read the token before without verifying it because we could not. The only error(s) left are if the signature fails.
+            throw new OA2GeneralError(OA2Errors.INVALID_TOKEN, "failed to verify token", HttpStatus.SC_BAD_REQUEST, state);
+        }
 
-          if (json.containsKey(AUDIENCE)) {
-              String serverName = oa2SE.getServiceAddress().toString();
-              serverName = serverName + (serverName.endsWith("/") ? "" : "/") + "token"; // construct the token endpoint
-              if (!json.getString(AUDIENCE).equals(serverName)) {
-                  throw new IllegalArgumentException("wrong " + AUDIENCE);
-              }
-          } else {
-              throw new IllegalArgumentException("missing " + AUDIENCE);
-          }
-          // Not clear what the issuer should be, aside from the OIDC spec., so we accept that as
-          // reasonable and assume it is just the client
-          if (json.containsKey(ISSUER)) {
-              Identifier id = BasicIdentifier.newID(json.getString(ISSUER));
-              if (!client.getIdentifier().equals(id)) {
-                  throw new UnknownClientException("unknown " + ISSUER + " with id \"" + id + "\"");
-              }
+        if (json.containsKey(AUDIENCE)) {
+            String serverName = oa2SE.getServiceAddress().toString();
+            serverName = serverName + (serverName.endsWith("/") ? "" : "/") + "token"; // construct the token endpoint
+            if (!json.getString(AUDIENCE).equals(serverName)) {
+                throw new IllegalArgumentException("wrong " + AUDIENCE);
+            }
+        } else {
+            throw new IllegalArgumentException("missing " + AUDIENCE);
+        }
+        // Not clear what the issuer should be, aside from the OIDC spec., so we accept that as
+        // reasonable and assume it is just the client
+        if (json.containsKey(ISSUER)) {
+            Identifier id = BasicIdentifier.newID(json.getString(ISSUER));
+            if (!client.getIdentifier().equals(id)) {
+                throw new UnknownClientException("unknown " + ISSUER + " with id \"" + id + "\"");
+            }
 
-          } else {
-              throw new IllegalArgumentException("missing " + ISSUER);
-          }
-          if (json.containsKey(EXPIRATION)) {
-              if (json.getLong(EXPIRATION) * 1000 < System.currentTimeMillis()) {
-                  throw new IllegalArgumentException("Expired token ");
-              }
-          } else {
-              throw new IllegalArgumentException("missing " + EXPIRATION);
-          }
-          // issued at does not concern us at this time. Might limit it by
-          // policy in the future.
-          if (json.containsKey(NOT_VALID_BEFORE)) {
-              if (System.currentTimeMillis() < json.getLong(NOT_VALID_BEFORE) * 1000) {
-                  throw new IllegalArgumentException("Token is not valid yet");
-              }
-          }
+        } else {
+            throw new IllegalArgumentException("missing " + ISSUER);
+        }
+        if (json.containsKey(EXPIRATION)) {
+            if (json.getLong(EXPIRATION) * 1000 < System.currentTimeMillis()) {
+                throw new IllegalArgumentException("Expired token ");
+            }
+        } else {
+            throw new IllegalArgumentException("missing " + EXPIRATION);
+        }
+        // issued at does not concern us at this time. Might limit it by
+        // policy in the future.
+        if (json.containsKey(NOT_VALID_BEFORE)) {
+            if (System.currentTimeMillis() < json.getLong(NOT_VALID_BEFORE) * 1000) {
+                throw new IllegalArgumentException("Token is not valid yet");
+            }
+        }
     }
 
 

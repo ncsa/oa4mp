@@ -222,6 +222,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
      */
     protected void doRFC7523(HttpServletRequest request, HttpServletResponse response, OA2Client client) throws Throwable {
         JSONObject jsonRequest = null;
+        ServletDebugUtil.printAllParameters(getClass(), request, true);
         try {
             String raw = request.getParameter(RFC7523Constants.ASSERTION);
             if (StringUtils.isTrivial(raw)) {

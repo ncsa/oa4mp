@@ -10,11 +10,13 @@ import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import edu.uiuc.ncsa.security.util.jwk.JWKUtil2;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.nio.file.Files;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
@@ -74,9 +76,33 @@ public class SigningCommands extends CommonCommands {
         boolean retry = true;
         File publicKeyFile = null;
         boolean isInteractive = true;
-
+        if (inputLine.size() == 1  || inputLine.size() == 2 && inputLine.hasArg("-single")) {
+            boolean singleKeyOnly = inputLine.hasArg("-single");
+            JSONWebKeys keys = createJsonWebKeys();
+            StringWriter writer = new StringWriter();
+            JSONObject jwks = JSONWebKeyUtil.toJSON(keys);
+            if(singleKeyOnly){
+                JSONArray array = jwks.getJSONArray("keys");
+                JSONObject key = null;
+                for(int i = 0 ; i < array.size(); i++){
+                      if(array.getJSONObject(i).getString("alg").equals( "RS256")){
+                          key = array.getJSONObject(i);
+                          break;
+                      }
+                }
+                jwks = new JSONObject();
+                JSONArray array1 = new JSONArray();
+                array1.add(key);
+                jwks.put("keys", array1);
+            }
+            writer.write(jwks.toString(2));
+            writer.flush();
+            writer.close();
+            say(writer.toString());
+            return;
+        }
         if (1 < inputLine.size()) {
-            // a lot of command utils specify the fiule with this flag. Since everyone keeps
+            // a lot of command utils specify the file with this flag. Since everyone keeps
             // sending this, allow for it (otherwise people create a key file called -file in the
             // invocation directory, which is not intuitive and therefore not findable afterwards).
             if (inputLine.hasArg("-file")) {
@@ -159,7 +185,7 @@ public class SigningCommands extends CommonCommands {
      * @throws InvalidAlgorithmParameterException
      */
     public static JSONWebKeys createECJsonWebKeys() throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
-       JSONWebKey defaultKey = createECJWK(JWKUtil2.EC_CURVE_P_256, JWKUtil2.ES_256);
+        JSONWebKey defaultKey = createECJWK(JWKUtil2.EC_CURVE_P_256, JWKUtil2.ES_256);
         JSONWebKeys keys = new JSONWebKeys(defaultKey.id);
         keys.put(defaultKey);
         keys.put(createECJWK(JWKUtil2.EC_CURVE_P_384, JWKUtil2.ES_384));
@@ -170,6 +196,7 @@ public class SigningCommands extends CommonCommands {
     /**
      * Create a set of keys for a given curve using the 3 standard signing algorithms. If the parameter is
      * trivial, then it returns the default as per {@link #createECJsonWebKeys()};
+     *
      * @param curve
      * @return
      * @throws NoSuchAlgorithmException

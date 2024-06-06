@@ -14,7 +14,7 @@ client. := r.'content';
 ⊨ ∄client.'max_at_lifetime' : 'max access token lifetime asserted';
 ⊨ ∄client.'id_token_lifetime' : 'id token lifetime asserted';
 ⊨ ∄client.'max_id_token_lifetime' : 'max id token lifetime asserted';
-⊨ ∄client.'rt_lifetime' : 'wrong refresh token lifetime default';
+⊨ client.'rt_lifetime' == 0 : 'wrong refresh token lifetime default';
 ⊨ ∄client.'max_rt_lifetime' : 'max refresh token lifetime asserted';
 
 r. := http#delete({'client_id':client.'client_id'});

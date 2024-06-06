@@ -1,0 +1,10 @@
+module[
+     'oa2:/qdl/ext/scriptlets','scriptlets'
+    ]
+    body[
+» OA4MP specific tools for working with scripts and clients
+» This will allow you to load
+     use(load('anaphora')); // should be in the module path for any standard distro
+
+     ini. 
+    ]; //end module

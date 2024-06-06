@@ -235,7 +235,7 @@ public class JWKUtilCommands extends CommonCommands {
         }
         // Fingers and toes cases
         // #1 no arguments, create the keys and dump to std out
-        if (!inputLine.hasArgs()) {
+        if (!inputLine.hasArgs() || (inputLine.getArgCount()==1 && inputLine.hasArg(CREATE_SINGLE_KEY_FLAG))) {
             SigningCommands sg = createSG(null);
             sg.setBatchMode(isBatchMode());
             sg.create(inputLine);
