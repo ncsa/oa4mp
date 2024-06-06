@@ -48,7 +48,7 @@
     
         
                     <div class="xleft">
-            Last Published: 2023-11-09
+            Last Published: 2024-06-06
                                 </div>
                 <div class="xright">            
     
@@ -91,6 +91,10 @@
               
     <li class="none">
                         <a href="../../common/configuration/supported-specifications.html">Supported specification</a>
+            </li>
+              
+    <li class="none">
+                        <a href="https://github.com/ncsa/oa4mp" class="externalLink">Source</a>
             </li>
               
     <li class="none">
@@ -180,6 +184,7 @@
     <span style="background-color: #ff6600;"><a href="server-dtd-service-tag.html#clientSecretLength">clientSecretLength</a></span> CDATA #IMPLIED
     <a href="server-dtd-service-tag.html#debug">debug</a> CDATA #IMPLIED
     <a href="server-dtd-service-tag.html#defaultAccessTokenLifetime">defaultAccessTokenLifetime</a> CDATA #IMPLIED
+    <a href="server-dtd-service-tag.html#defaultRefreshTokenLifetime">defaultRefreshTokenLifetime</a> CDATA #IMPLIED
     <a href="server-dtd-service-tag.html#defaultIDTokenLifetime">defaultIDTokenLifetime</a> CDATA #IMPLIED
     <a href="server-dtd-service-tag.html#disableDefaultStores">disableDefaultStores</a> CDATA #IMPLIED
     <a href="server-dtd-service-tag.html#enableDeviceFlow">enableDeviceFlow</a> CDATA #IMPLIED
@@ -369,12 +374,15 @@
 &lt;!ATTLIST
     defaultKeyID CDATA #IMPLIED&gt;
 &lt;!ELEMENT path (#PCDATA)&gt;
-&lt;!ELEMENT <a href="../../common/configuration/scopes.html">scopes</a>(scope)&gt;
+&lt;!ELEMENT <a href="../../common/configuration/scopes.html">scopes</a>(scope)*&gt;
+&lt;!ATTLIST scopes
+    <a href="../../common/configuration/scopes.html#handler">handler</a> CDATA #IMPLIED&gt;
 &lt;!ELEMENT <a href="../../common/configuration/scopes.html">scope</a>(#PCDATA)&gt;
 &lt;!ATTLIST <a href="../../common/configuration/scopes.html">scope</a>
      enabled CDATA #IMPLIED&gt;
 ]&gt;
 </pre></div>
+
 
 <p>A few examples</p>
 
@@ -544,7 +552,7 @@
 </div>
 <div id="footer">
     <div class="xright">&#169;    
-                    2023
+                    2024
         
                     
     

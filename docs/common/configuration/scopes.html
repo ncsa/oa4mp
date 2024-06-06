@@ -48,7 +48,7 @@
     
         
                     <div class="xleft">
-            Last Published: 2023-11-09
+            Last Published: 2024-06-06
                                 </div>
                 <div class="xright">            
     
@@ -91,6 +91,10 @@
               
     <li class="none">
                         <a href="../../common/configuration/supported-specifications.html">Supported specification</a>
+            </li>
+              
+    <li class="none">
+                        <a href="https://github.com/ncsa/oa4mp" class="externalLink">Source</a>
             </li>
               
     <li class="none">
@@ -143,7 +147,6 @@
 
 <section>
 <h2><a name="Scopes"></a>Scopes</h2>
-
 
 
 <p> OA4MP supports the scope parameter for servers. Unfortunately, <i>scope</i>
@@ -212,7 +215,11 @@ a server or client to use scopes.</p>
     
 <li>profile - returns information about the user's profile</li>
     
-<li>org.cilogon.userinfo - This returns all enabled information about the user from the service and allows
+<li>org.oa4mp:userinfo - similar to org.cilgon.userinfo. The difference is that if the client is set to
+    use restricted scopes, only a restricted subset of scopes is returned. If the client is not so
+    restricted, this is equivalent to org.cilogon.userinfo.</li>
+    
+<li>org.cilogon.userinfo - returns all enabled information about the user from the service and allows
     access to the user information endpoint. </li>
     
 <li>edu.uiuc.ncsa.myproxy.getcert - <span style="background-color: #ff6600;">(deprecated!)</span>
@@ -238,8 +245,46 @@ a server or client to use scopes.</p>
 </p>
 
 <p>If you need a lot of flexibility in setting claims (such as for SciTokens or WLCG token requests
-that are asserted in the access token, set the <b>strict_scopes</b> to false. You can pass in anything
+that are asserted in the access token), set the <b>strict_scopes</b> to false. You can pass in anything
 at that point and the more standard OAuth 2 behvaior of just ignoring anything unknown will be in effect.</p>
+
+</section><section>
+<h2><a name="Setting_a_handler_.28server_configuration_only.21.29"></a>Setting a <a href="#handler">handler</a> (server configuration only!)</h2>
+
+<p>There is a handler attribute in the scopes tag. This allows you to specify a
+    <a class="externalLink" href="https://oa4mp.org/apidocs/edu/uiuc/ncsa/oa4mp/delegation/oa2/server/claims/ClaimSource.html">claim source</a>
+    implementation that will be invoked
+    automatically for every phase, adding the resulting claims to the set a class that has a no-argument. While there are claim
+    sources that are included in the standard OA4MP distribution, (such as for an LDAP claim source),
+    the aim is that you can write your own and have it run. Generally this <i>should not</i> be used, except as
+    a very specific custom extension to OA4MP. In particular, this contract has no way to pass along any
+    configuration to the handler.
+ </p>
+
+<p>If you want a claim source to be run automatically, the easiest way is in a QDL script to add it (with the
+<b>~ operator</b>) to the claim_sources. So a typical use in the pre or post_auth phase in your QDL script would be:</p>
+
+<div>
+<pre>
+              cfg. := claims#new_template('file');
+   cfg.'claim_key' := 'eppn'; // configures it as per <a class="externalLink" href="https://oa4mp.org/pdf/creating_claim_sources2.pdf">here</a>
+    claim_sources. := claim_sources. ~ [claims#create_source(cfg.)]; // automate getting claims by the system
+</pre></div>
+
+<p>This creates a file claim source and adds it to the list of claim sources the server runs. You need to add
+this once and it will be managed ever thereafter. The downsides to this approach are that you no longer have
+control over it and it may be invoked a great deal more that you would want or need. Generally, adding
+to the list of claim sources is discouraged. It is simply better the get the claims you want and add them
+where you want them, e.g. from the NCSA client script:</p>
+
+<div>
+<pre>
+    cfg. := claims#new_template('ncsa');
+    cfg. := claims#create_source(cfg.);
+ claims. := claims. ~ claims#get_claims(cfg., claims.'uid');
+</pre></div>
+
+<p>Which creates a claim source, gets the claim claims and adds them to the existing claims.</p>
 
 </section><section>
 <h2><a name="Setting_scopes_in_the_configuration"></a>Setting scopes in the configuration</h2>
@@ -355,7 +400,7 @@ do somethign with that scope is needed, e.g. QDL scripting.</p>
 </div>
 <div id="footer">
     <div class="xright">&#169;    
-                    2023
+                    2024
         
                     
     

@@ -48,7 +48,7 @@
     
         
                     <div class="xleft">
-            Last Published: 2023-11-09
+            Last Published: 2024-06-06
                                 </div>
                 <div class="xright">            
     
@@ -91,6 +91,10 @@
               
     <li class="none">
                         <a href="../../common/configuration/supported-specifications.html">Supported specification</a>
+            </li>
+              
+    <li class="none">
+                        <a href="https://github.com/ncsa/oa4mp" class="externalLink">Source</a>
             </li>
               
     <li class="none">
@@ -141,44 +145,65 @@
 
 
 
+<h1>Removing unused clients with the UUC</h1>
 
-<h1>Removing unused clients</h1>
-
-<p>There are many cases where automatic removal of clients is desireable. For
-instance, if OA4MP is configured to be a standalone issuer, it may permit
-only public clients and auto-approve them on registration. A common case though
-is that a user registers a client and then never actually uses it. This causes
-a massive accumulation of clients in the store and no easy way to remove them.
+<p>The UUC (Unused Client Cleanup) is a facility/tool for removing clients that
+    have either never been accessed or have not been access according to
+    various criteria. There are many cases where automatic removal of clients is desireable. For
+    instance, if OA4MP is configured to be a standalone issuer, it may permit
+    only public clients and auto-approve them on registration. A common case though
+    is that a user registers a client and then never actually uses it. This causes
+    a massive accumulation of clients in the store and no easy way to remove them.
+    It is suggested to enable this at the initial server deployment so that
+    it is not grafted onto an already running OA4MP install. See the <b>onlyCreatedAfter</b>
+    property below.
 </p>
 
-<p>What can it do?</p>
+<p>What can it do? Here are the supported rules that may be configured</p>
 
 <ul>
     
-<li>Supports whitelist by client ID and regex. Any client on the
-    whitelist is never removed. This lets you retain certain clients
-    (such as templates, or testing clients) that are rarely accessed but
-    need to stay.</li>
+<li><b>whitelist</b> by client ID and regex. Any client on the
+        whitelist is never removed. This lets you retain certain clients
+        (such as templates, or testing clients) that are rarely accessed but
+        need to stay. Whitelists are processed before any other rule.
+    </li>
     
-<li>Supports blacklist by client ID and regex. Any client
-    on the blacklist is always removed. This allows, for instance, an
-    adminstrator to make single use temporary clients with specific ids
-    and have them removed.</li>
+<li><b>blacklist</b> by client ID and regex. Any client
+        on the blacklist is always removed. This allows, for instance, an
+        adminstrator to make single use temporary clients with specific ids
+        and have them removed. The blacklist is processed after every other rule.
+    </li>
     
-<li>Clients may be removed if they have never been used or if their use date
-    is before or is between cutoff dates. </li>
+<li><b>unused</b> clients are defined
+    as being within a certain grace period of creation, but never having been accessed.</li>
+    
+<li><b>abandoned</b> clients are defined as not having been accessed after a certain date. E.g. clients
+    that have not been accessed in over a year.</li>
+    </ul>
+
+<p>In addition to the rules, each may have filtering applied to restrict the clients
+to which the rule applies. You may also set filtering at the top level for alll rules.</p>
+
+<ul>
+    
+<li>created only before or after a given date.</li>
+    
+<li>Allows for filtering clients that were last accessed only before or after a given date.</li>
     
 <li>Versioned clients may optionally be processed as well. Remember though that versioned
-    clients are accessed much less frequently (if ever) than active clients, so it
-    is quite likely setting this to true will remove more of them than you would like.</li>
+        clients are accessed much less frequently (if ever) than active clients, so it
+        is quite likely setting this to true will remove more of them than you would like.
+    </li>
     
 <li>May optionally be run on a thread either at intervals or by alarms.</li>
     
 <li>The CLI may be used to run this as well. Some administrators prefer to
-    only run this manually.</li>
+        only run this manually.
+    </li>
 </ul>
 <section>
-<h2><a name="The_XML_configuration."></a>The XML configuration.</h2>
+<h2><a name="The_XML_configuration._This_is_for_the_top-level_tag_unusedClientCleanup"></a>The XML configuration. This is for the top-level tag <b>unusedClientCleanup</b></h2>
 
 <table class="bodyTable" style="text-align: left; width: 100%;" border="1" cellspacing="2" cellpadding="2">
     <tbody>
@@ -196,7 +221,7 @@ a massive accumulation of clients in the store and no easy way to remove them.
     
 <tr class="b" id="alarms">
         
-<td style="vertical-align: top;">notifyACEmailAddresses</td>
+<td style="vertical-align: top;">alarms</td>
         
 <td style="vertical-align: top;">N</td>
         
@@ -209,20 +234,37 @@ a massive accumulation of clients in the store and no easy way to remove them.
         </td>
     </tr>
     
-<tr class="a" id="deleteVersions">
+<tr class="a" id="blacklist">
         
-<td style="vertical-align: top;">deleteVersions</td>
+<td style="vertical-align: top;">blacklist</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">-</td>
+        
+<td style="vertical-align: top;">A collection of either client_id elements or regex elements that are
+            <i>always</i>
+            deleted when found. See the note below on the syntax.
+        </td>
+    </tr>
+    
+<tr class="b" id="debug">
+        
+<td style="vertical-align: top;">debug</td>
         
 <td style="vertical-align: top;">N</td>
         
 <td style="vertical-align: top;">false</td>
         
-<td style="vertical-align: top;">If true, then versions of clients are also removed if they match the
-            criteria of the configuration.
+<td style="vertical-align: top;">This enabled low-level debugging of the thread used in the UUC.
+            It is intended for tracking down odd server behavior and will be <i>quite</i>
+            verbose, so don't enable this unless you really need to. Note especially that this
+            is entirely independent of the server debug/logging flags. the reason is that you
+            do not want this spitting out messages unless you plan it.
         </td>
     </tr>
     
-<tr class="b" id="enabled">
+<tr class="a" id="enabled">
         
 <td style="vertical-align: top;">enabled</td>
         
@@ -232,6 +274,22 @@ a massive accumulation of clients in the store and no easy way to remove them.
         
 <td style="vertical-align: top;">Whether or not to enable this. If disabled, then the thread on the server
             will not be run. In the CLI you can override this and run the cleanup manually.
+        </td>
+    </tr>
+    
+<tr class="b" id="gracePeriod">
+        
+<td style="vertical-align: top;">gracePeriod</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">6 hours</td>
+        
+<td style="vertical-align: top;">Specifies that time an unused client may be on the system before getting
+            removed. Default is in seconds, but you can specify any standard unit.
+            E.g. If this is 3600 (one hour), then unused clients
+            that were created/modified more than 3600 seconds ago are removed.
+            See <a class="externalLink" href="https://oa4mp.org/server/dtd/server-dtd-service-tag.html">A note on time and units</a>
         </td>
     </tr>
     
@@ -250,23 +308,7 @@ a massive accumulation of clients in the store and no easy way to remove them.
     </tr>
 
     
-<tr class="b" id="gracePeriod">
-        
-<td style="vertical-align: top;">gracePeriod</td>
-        
-<td style="vertical-align: top;">N</td>
-        
-<td style="vertical-align: top;">6 hours</td>
-        
-<td style="vertical-align: top;">Specifies that time an unused client may be on the system before getting
-            removed. Default is in seconds, but you can specify any standard unit.
-            E.g. If this is 3600 (one hour), then unused clients
-            that were created/modified more than 3600 seconds ago are removed.
-            See <a class="externalLink" href="https://oa4mp.org/server/dtd/server-dtd-service-tag.html">A note on time and units</a>
-        </td>
-    </tr>
-    
-<tr class="a" id="testModeOn">
+<tr class="b" id="testModeOn">
         
 <td style="vertical-align: top;">testModeOn</td>
         
@@ -274,15 +316,143 @@ a massive accumulation of clients in the store and no easy way to remove them.
         
 <td style="vertical-align: top;">false</td>
         
-<td style="vertical-align: top;">A boolean. If set to true, then no actual deletes are done.
+<td style="vertical-align: top;">A boolean. If set to true, then no actual deletes are done. This overrides all
+            configurations and allows you to toggle printing the results vs. having them executed.
             In the CLI you can print out the client ids that would have been removed.
+        </td>
+    </tr>
+    
+<tr class="a" id="whitelist">
+        
+<td style="vertical-align: top;">whitelist</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">-</td>
+        
+<td style="vertical-align: top;">A collection of either client_id elements or regex elements that are
+            <i>never</i>
+            deleted when found. See the note below on the syntax.
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</section><section>
+<h2><a name="Common_attributes_for_all_rules"></a>Common attributes for all rules</h2>
+
+<table class="bodyTable" style="text-align: left; width: 100%;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">Attribute</td>
+        
+<td style="vertical-align: top;">Required?</td>
+        
+<td style="vertical-align: top;">Default</td>
+        
+<td style="vertical-align: top;">Description</td>
+    </tr>
+    
+<tr class="b" id="action">
+        
+<td style="vertical-align: top;">action</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">delete</td>
+        
+<td style="vertical-align: top;">Specifies one of <b>delete</b>, <b>acrchive</b> or
+        <b>test</b> as the arctions for this rule. The results are
+        
+<ul>
+            
+<li><b>delete</b> = delete the client. Nothing of the client remains. Permissions are removed as well</li>
+            
+<li><b>archive</b> = archive the client. The client still remains, but is now in the archive for the store</li>
+            
+<li><b>test</b> = run the filter, print out what would have been done. <i>No changes to the store are made</i>.</li>
+        </ul></td>
+    </tr>
+
+    
+<tr class="a" id="deleteVersions">
+        
+<td style="vertical-align: top;">deleteVersions</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">false</td>
+        
+<td style="vertical-align: top;">If true, then versions of clients are also removed if they match the
+            criteria of the configuration.
         </td>
     </tr>
 
     </tbody>
 </table>
 
-<p>The whitelist and blacklist configurations have the same set of internal tags:</p>
+</section><section>
+<h2><a name="Filtering._This_is_for_the_tag_filter_which_may_be_in_any_rule_or_if_in_the_unusedClientCleanup.0Aelement.2C_applies_to_all_unless_overridden."></a>Filtering. This is for the tag <b>filter</b> which may be in any rule or if in the unusedClientCleanup
+element, applies to all unless overridden.</h2>
+
+<table class="bodyTable" style="text-align: left; width: 100%;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">Attribute</td>
+        
+<td style="vertical-align: top;">Required?</td>
+        
+<td style="vertical-align: top;">Default</td>
+        
+<td style="vertical-align: top;">Description</td>
+    </tr>
+    
+<tr class="b" id="archived">
+        
+<td style="vertical-align: top;">archived</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">--</td>
+        
+<td style="vertical-align: top;">Options are
+            
+<ul>
+                
+<li><b>only</b> = restrict processing to archived clients only</li>
+                
+<li><b>skip</b> = no archived clients are included in this rule</li>
+                
+<li><b>include</b> = archived clients are processed in this rule</li>
+            </ul>
+        </td>
+    </tr>
+    
+<tr class="a" id="date">
+        
+<td style="vertical-align: top;">date</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">--</td>
+        
+<td style="vertical-align: top;">Element that refers to a date.</td>
+    </tr>
+    </tbody>
+</table>
+
+<p>Note on absolute dates and <a class="externalLink" href="https://oa4mp.org/server/dtd/server-dtd-service-tag.html#NoteOnUnits">relative times</a>
+You may use either. Dates are ISO 8601, e.g., 2024-02-08T20:22:48-05:00 or 2024-02-07T14:12:11Z.</p>
+
+</section><section>
+<h2><a name="White_and_black_list_syntax"></a>White and black list syntax</h2>
+
+<p>The whitelist and blacklist configurations have the same set of internal tags. One reason for having them in tags is that
+they may be enclose in CDATA tags if there is an issue with escaping:</p>
 
 <table class="bodyTable" style="text-align: left; width: 100%;" border="1" cellspacing="2" cellpadding="2">
     <tbody>
@@ -323,8 +493,90 @@ a massive accumulation of clients in the store and no easy way to remove them.
     </tr>
     </tbody>
 </table>
+<section>
+<h3><a name="Dates"></a>Dates</h3>
 
+<table class="bodyTable" style="text-align: left; width: 100%;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">Attribute</td>
+        
+<td style="vertical-align: top;">Required?</td>
+        
+<td style="vertical-align: top;">Default</td>
+        
+<td style="vertical-align: top;">Description</td>
+    </tr>
+    
+<tr class="b" id="when">
+        
+<td style="vertical-align: top;">when</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">--</td>
+        
+<td style="vertical-align: top;">When to apply the date. Options are
+            
+<ul>
+                
+<li><b>after</b> = dates after the given date, inclusive</li>
+                
+<li><b>before</b> = dates before the given date, inclusive</li>
+            </ul>
+        </td>
+    </tr>
+    
+<tr class="a" id="type">
+        
+<td style="vertical-align: top;">type</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">N/a</td>
+        
+<td style="vertical-align: top;">The type of date. Options are
+            
+<ul>
+                
+<li><b>accessed</b> = last accessed date. This include if logins for the client </li>
+                
+<li><b>created</b> = the date of creation for the client</li>
+                
+<li><b>modifed</b> = the last actual modification, i.e., update to this client</li>
+            </ul>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+
+</section></section><section>
+<h2><a name="Adding_the_UUC_facility_to_your_existing_OA4MP_server"></a>Adding the UUC facility to your existing OA4MP server</h2>
+
+<p>A not uncommon situation is that you have had an OA4MP server running
+    for a long time and have noticed all manner of dead client. Obviously, this
+    facility is what you want, <b>but</b> if the version is older (so before 5.4.3)
+    then the statistics this facility needs are not in place and may cause problems.
+    There are two way to do this.</p>
+<section>
+<h3><a name="a.281.29_The_truly_safe_way"></a>(1) The truly safe way</h3>
+
+<p>Upgrade OA4MP, let it run for some specified period (a couple of weeks)
+    in which you are sure that everyone who is using the system would have logged
+    in, then enable the UUC. Probably in test mode initially (look in the logs for
+    the stats). </p>
 </section><section>
+<h3><a name="a.282.29_Another_way"></a>(2) Another way</h3>
+
+<p>You could enabled this moving forward, so just set the onlyCreatedAfter
+    value to the current date. No client created before this date will be
+    touched. This would allow you to vet those as needed while ensuring that
+    new clients are monitored and removed if they fit your criteria.</p>
+
+</section></section><section>
 <h2><a name="Typical_example_configurations"></a>Typical example configurations</h2>
 
 <div>
@@ -349,12 +601,11 @@ a massive accumulation of clients in the store and no easy way to remove them.
 <p>
     In this example, every 4 hours the thread wakes up and checks. If a client has been
     created and not used within the grace period (6 hours) then it is removed. Versions
-    are ignored. There is a white list consisting  of a few specific clients (such as templates
+    are ignored. There is a white list consisting of a few specific clients (such as templates
     for creating other clients), any client id that starts with localhost and any client
     for comanage. The blacklist removes a specific client (used for testing the registration
     endpoint only) as well as any client id's that start with test.
 </p>
-
 </section>
 
     </div>
@@ -364,7 +615,7 @@ a massive accumulation of clients in the store and no easy way to remove them.
 </div>
 <div id="footer">
     <div class="xright">&#169;    
-                    2023
+                    2024
         
                     
     

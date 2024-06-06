@@ -1,6 +1,7 @@
 edu.uiuc.ncsa.myproxy.oauth2
 edu.uiuc.ncsa.myproxy.oauth2.base
 edu.uiuc.ncsa.myproxy.oauth2.tools
+edu.uiuc.ncsa.myproxy.oauth2.tools.migrate
 edu.uiuc.ncsa.oa4mp.delegation.client
 edu.uiuc.ncsa.oa4mp.delegation.client.request
 edu.uiuc.ncsa.oa4mp.delegation.client.server
@@ -27,4 +28,5 @@ edu.uiuc.ncsa.oa4mp.delegation.server.request
 edu.uiuc.ncsa.oa4mp.delegation.server.storage
 edu.uiuc.ncsa.oa4mp.delegation.server.storage.impl
 edu.uiuc.ncsa.oa4mp.delegation.server.storage.support
+edu.uiuc.ncsa.oa4mp.delegation.server.storage.upkeep
 edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc
