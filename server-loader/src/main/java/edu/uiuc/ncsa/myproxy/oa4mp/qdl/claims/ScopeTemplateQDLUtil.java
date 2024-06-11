@@ -163,7 +163,7 @@ public class ScopeTemplateQDLUtil implements Serializable {
 
         @Override
         public int[] getArgCount() {
-            return new int[]{3};
+            return new int[]{2};
         }
 
         @Override

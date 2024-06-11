@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.myproxy.oauth2.Banners;
 import edu.uiuc.ncsa.myproxy.oauth2.base.BaseCommands;
 import edu.uiuc.ncsa.myproxy.oauth2.base.ClientStoreCommands;
 import edu.uiuc.ncsa.myproxy.oauth2.base.CopyCommands;
+import edu.uiuc.ncsa.oa4mp.OA4MPVersion;
 import edu.uiuc.ncsa.sas.SASCLIDriver;
 import edu.uiuc.ncsa.sas.StringIO;
 import edu.uiuc.ncsa.sas.thing.response.LogonResponse;
@@ -14,7 +15,6 @@ import edu.uiuc.ncsa.sas.webclient.Client;
 import edu.uiuc.ncsa.sas.webclient.ResponseDeserializer;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
-import edu.uiuc.ncsa.security.core.util.LoggingConfigLoader;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.cli.*;
 import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
@@ -154,7 +154,7 @@ public class OA2Commands extends BaseCommands {
         if (showHeader) {
             say(stars);
             say(padLineWithBlanks("* OA4MP CLI (Command Line Interpreter)", width) + "*");
-            say(padLineWithBlanks("* Version " + LoggingConfigLoader.VERSION_NUMBER, width) + "*");
+            say(padLineWithBlanks("* Version " + OA4MPVersion.VERSION_NUMBER, width) + "*");
             say(padLineWithBlanks("* By Jeff Gaynor  NCSA", width) + "*");
             say(padLineWithBlanks("* type 'help' for a list of commands", width) + "*");
             say(padLineWithBlanks("*      'exit', 'quit' or '/q' to end this session.", width) + "*");

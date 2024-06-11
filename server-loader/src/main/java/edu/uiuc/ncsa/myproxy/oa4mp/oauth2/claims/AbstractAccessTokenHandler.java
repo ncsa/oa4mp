@@ -413,7 +413,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
     public AccessTokenImpl getSignedPayload(JSONWebKey key, String headerType) {
         if (key == null) {
             oa2se.warn(" Null or missing key for signing encountered processing client \"" + client.getIdentifierString() + "\"");
-            throw new IllegalArgumentException(" Missing JSON web key. Cannto sign access token.");
+            throw new IllegalArgumentException(" Missing JSON web key. Cannot sign access token.");
         }
         if (getPayload().isEmpty()) return null;
            /*
@@ -438,9 +438,10 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
             }
-
+            // Edge case: It is possible for the JSON utility to blow up if something very odd was sent in a request.
+            // Spit the entire thing out so it does not get lost someplace else.
             e.printStackTrace();
-            throw new GeneralException("Could not create signed token", e);
+            throw new GeneralException("Could not create signed token for payload" + getPayload().toString(1), e);
         }
     }
 

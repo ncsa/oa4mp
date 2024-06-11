@@ -1,9 +1,9 @@
 package edu.uiuc.ncsa.myproxy.oauth2.tools;
 
 import edu.uiuc.ncsa.myproxy.oauth2.base.CommandLineClient;
+import edu.uiuc.ncsa.oa4mp.OA4MPVersion;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
-import edu.uiuc.ncsa.security.core.util.LoggingConfigLoader;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.cli.CLIDriver;
 import edu.uiuc.ncsa.security.util.cli.HelpUtil;
@@ -128,7 +128,7 @@ public class OA2CommandLineClient extends CommandLineClient {
         String stars = StringUtils.rightPad("", width + 1, "*");
         say(stars);
         say(padLineWithBlanks("* OA4MP CLC (command line client)", width) + "*");
-        say(padLineWithBlanks("* Version " + LoggingConfigLoader.VERSION_NUMBER, width) + "*");
+        say(padLineWithBlanks("* Version " + OA4MPVersion.VERSION_NUMBER, width) + "*");
         say(padLineWithBlanks("* By Jeff Gaynor  NCSA", width) + "*");
         say(padLineWithBlanks("*  (National Center for Supercomputing Applications)", width) + "*");
         say(padLineWithBlanks("*", width) + "*");

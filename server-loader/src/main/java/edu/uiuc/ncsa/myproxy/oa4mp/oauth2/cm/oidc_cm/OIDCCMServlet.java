@@ -17,6 +17,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.Permission;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.EnvServlet;
 import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet;
+import edu.uiuc.ncsa.oa4mp.OA4MPVersion;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Constants;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Errors;
@@ -28,7 +29,6 @@ import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
-import edu.uiuc.ncsa.security.core.Version;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.IllegalAccessException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
@@ -320,7 +320,7 @@ public class OIDCCMServlet extends EnvServlet {
             jsonObject.put("rt_lifetime_create_default", getOA2SE().getCmConfigs().getRFC7591Config().getDefaultRefreshTokenLifetime());
             jsonObject.put("rt_lifetime_update_default", getOA2SE().getCmConfigs().getRFC7592Config().getDefaultRefreshTokenLifetime());
             jsonObject.put("api_version_default", getDefaultAPIVersion()); // default version.
-            jsonObject.put("oa4mp_version", Version.VERSION_NUMBER); // OA4MP release version.
+            jsonObject.put("oa4mp_version", OA4MPVersion.VERSION_NUMBER); // OA4MP release version.
             JSONArray versions = new JSONArray();
             versions.add(API_VERSION_LATEST);
             versions.add(API_VERSION_5_5);

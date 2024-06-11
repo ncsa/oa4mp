@@ -380,7 +380,7 @@ public class FSMigrationTool extends CLITool {
                             "Note that this may be used with " + CONFIG_STORE_NAME + " to do a single component."});
             addHelpEntry(CONFIG_SETUP, "F", "Creates any required databases. This creates any databases then exits.",
                     new String[]{"If omitted, the databases are created as needed and the migration is done."});
-            addHelpEntry(CONFIG_SHOW_CONNECT, "F", "Show the Derby connection strings. Useful if you have Derby installed. Default is not to show.");
+            addHelpEntry(CONFIG_SHOW_CONNECT, "F", "false","Show the Derby connection strings. Useful if you have Derby installed. Default is not to show.");
             addHelpEntry(CONFIG_SOURCE_CFG, "S", "The full path to the source config file.");
             addHelpEntry(CONFIG_SOURCE_CFG_NAME, "S", "The name of the configuration. Must be a file store.");
             addHelpEntry(CONFIG_STORE_NAME, "S", "The name of a single store component (these are the tag names in the XML",
@@ -389,7 +389,7 @@ public class FSMigrationTool extends CLITool {
             addHelpEntry(CONFIG_TARGET_CFG, "S", "The full path to the configuration file.",
                     new String[]{"If omitted, assumed to be the same as " + CONFIG_SOURCE_CFG});
             addHelpEntry(CONFIG_TARGET_CFG_NAME, "F", "The name of the target configuration");
-            addHelpEntry(CONFIG_DO_UPKEEP, "B", "Applies upkeep in the target store to all entries on import. Default is true");
+            addHelpEntry(CONFIG_DO_UPKEEP, "B", "true", "Applies upkeep in the target store to all entries on import. Default is true");
             addHelpEntry(CONFIG_VERBOSE, "F", "Makes the operation much chattier. Default is none.");
         }
         return helpMap;
@@ -471,6 +471,12 @@ public class FSMigrationTool extends CLITool {
                 }
             }
         }
+        say("Column Key:");
+        say("T = type, Def = default");
+        say("Table entry key:");
+        say("B = boolean, true or false");
+        say("F = flag (present or not)");
+        say("S = String. Double quote as needed");
     }
 
     private static void oldHelp() {

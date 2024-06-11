@@ -68,6 +68,11 @@ if [ -z ${QDL_HOME+x} ];  then
   #  cp "$OA4MP_QDL_DEPLOY/lib/qdl.jar" $QDL_HOME/lib;
   #  cp "$OA4MP_QDL_DEPLOY/lib/build-info.txt" $QDL_HOME/lib ;
 fi
+echo "building OA4MP installer"
+cd "$OA4MP_ROOT/server-admin/src/main/scripts/installer"
+./create-installer.sh"
+echo "   ... done!"
+
 
 if [ -z ${OA4MP_HOME+x} ];  then
      echo "no OA4MP local install, skipping..."

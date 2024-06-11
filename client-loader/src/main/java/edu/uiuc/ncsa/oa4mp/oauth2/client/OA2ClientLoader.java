@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.myproxy.oa4mp.client.ClientXMLTags;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.OA4MPServiceProvider;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.loader.AbstractClientLoader;
 import edu.uiuc.ncsa.myproxy.oa4mp.client.storage.*;
+import edu.uiuc.ncsa.oa4mp.OA4MPVersion;
 import edu.uiuc.ncsa.oa4mp.delegation.client.DelegationService;
 import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
 import edu.uiuc.ncsa.oa4mp.delegation.common.token.TokenForge;
@@ -58,7 +59,7 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
 
     @Override
     public String getVersionString() {
-        return "OA4MP Client OAuth 2 configuration loader, version " + VERSION_NUMBER;
+        return "OA4MP Client OAuth 2 configuration loader, version " + OA4MPVersion.VERSION_NUMBER;
     }
 
     public OA4MPServiceProvider getServiceProvider() {

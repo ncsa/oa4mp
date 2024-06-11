@@ -1,0 +1,100 @@
+<config>
+    <service name="default" alias="oa4mp.derby.filestore"/>
+
+    <service
+            address="https://${OA4MP_HOST}/oauth2"
+            authorizationGrantLifetime="750 sec"
+            cleanupAlarms="09:30:00, 09:00:00, 16:00:00,  12:00:00"
+            cleanupFailOnErrors="false"
+            cleanupInterval="0"
+            clientSecretLength="64"
+            defaultAccessTokenLifetime="900 sec."
+            enableTokenExchange="true"
+            issuer="https://${OA4MP_HOST}/oauth2"
+            maxAccessTokenLifetime="20 min"
+            maxAllowedNewClientRequests="100"
+            maxClientRefreshTokenLifetime="1296000000 ms."
+            maxRefreshTokenLifetime="2592000 sec"
+            monitorEnable="true"
+            monitorInterval="60 sec"
+            name="oa4mp.derby.filestore"
+            qdlConfigName="qdl-default"
+            refreshTokenEnabled="true"
+            refreshTokenLifetime="30 days"
+            rtGracePeriod="3600 sec"
+            safe_gc="false"
+            scheme="oa4mp"
+            schemeSpecificPart=""
+            serverDN="CN=localhost2"
+            unusedClientCleanupEnable="true"
+            unusedClientCleanupInterval="1 min"
+    >
+        <logging
+                logFileName="${OA4MP_HOME}/log/server.log"
+                logName="oa4mp"
+                logSize="100000"
+                logFileCount="2"
+                debug="tue"/>
+        <JSONWebKey defaultKeyID="9k0HPG3moXENne">
+            <path><![CDATA[${OA4MP_HOME}/etc/keys.jwk]]></path>
+        </JSONWebKey>
+        <scopes>
+            <scope>openid</scope>
+            <scope>email</scope>
+            <scope>profile</scope>
+            <!--   <scope>org.cilogon.userinfo</scope> -->
+            <scope>org.oa4mp:userinfo</scope>
+        </scopes>
+
+        <derby storeType="file"
+               path="${OA4MP_HOME}/var/storage/server">
+            <transactions/>
+            <clients/>
+            <clientApprovals/>
+            <permissions/>
+            <adminClients/>
+            <txStore/>
+            <voStore/>
+        </derby>
+        <clientManagement>
+            <api protocol="rfc7591"
+                 enabled="true"
+                 anonymousOK="true"
+                 anonymousAllowedDomains="localhost,127.0.0.1"
+                 autoApprove="false"
+            />
+            <api protocol="rfc7592" enabled="true"/>
+        </clientManagement>
+        <qdl name="qdl-default"
+             enabled="true"
+             debug="info"
+             skipBadModulesOnLoad="true"
+             restricted_io="false"
+             strict_acls="false"
+             server_mode_on="false"
+             script_path="vfs#/scripts/">
+            <virtual_file_systems>
+                <vfs type="pass_through"
+                     access="rw">
+                    <root_dir>${OA4MP_HOME}/qdl/scripts</root_dir>
+                    <scheme><![CDATA[vfs]]></scheme>
+                    <mount_point>/scripts</mount_point>
+                </vfs>
+            </virtual_file_systems>
+            <modules version="2.0">
+                <module type="java"
+                        import_on_start="true">
+                    <class_name>edu.uiuc.ncsa.myproxy.oa4mp.qdl.OA2QDLLoader</class_name>
+                </module>
+            </modules>
+            <modules>
+                <module type="java"
+                        import_on_start="true">
+                    <class_name>edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims.TokenHandlerLoader</class_name>
+                </module>
+            </modules>
+        </qdl>
+
+    </service>
+
+</config>

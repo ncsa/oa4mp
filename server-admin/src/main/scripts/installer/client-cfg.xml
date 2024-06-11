@@ -1,0 +1,38 @@
+<config>
+    <client name="default" alias="example-client"/>
+    <client name="example-client">
+        <logging
+                logFileName="${OA4MP_HOME}/log/client.log"
+                logName="oa4mp"
+                logSize="100000"
+                logFileCount="2"
+                debug="true"/>
+        <id>YOUR ID GOES HERE</id>
+        <secret>YOUR SECRET GOES HERE</secret>
+        <serviceUri>https://${OA4MP_HOST}/oauth2</serviceUri>
+        <authorizeUri>https://${OA4MP_HOST}/authorize</authorizeUri>
+        <callbackUri>https://${OA4MP_HOST}/oauth2/not-ready</callbackUri>
+        <deviceAuthorizationUri>https://${OA4MP_HOST}/oauth2/device_authorization</deviceAuthorizationUri>
+        <wellKnownUri>https://${OA4MP_HOST}/oauth2/.well-known/openid-configuration</wellKnownUri>
+        <scopes>
+            <scope>email</scope>
+            <scope>openid</scope>
+            <scope>profile</scope>
+            <scope>org.cilogon.userinfo</scope>
+        </scopes>
+        <fileStore path="${OA4MP_HOME}/var/storage/client">
+            <assetStore/>
+        </fileStore>
+        <ssl debug="false"
+             useJavaTrustStore="true">
+            <trustStore>
+                <path>${OA4MP_HOME}/etc/cert.jks</path>
+                <password><![CDATA[YOUR PASSWORD HERE]]></password>
+                <type>JKS</type>
+                <certDN><![CDATA[CN=localhost]]></certDN>
+            </trustStore>
+        </ssl>
+
+    </client>
+
+</config>

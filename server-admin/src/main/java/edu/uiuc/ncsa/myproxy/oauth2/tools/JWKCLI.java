@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.myproxy.oauth2.tools;
 
+import edu.uiuc.ncsa.oa4mp.OA4MPVersion;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.*;
@@ -50,7 +51,7 @@ public class JWKCLI extends ConfigurableCommandsImpl {
         String stars = StringUtils.rightPad("", width + 1, "*");
         say(stars);
         say(padLineWithBlanks("* JSON Web Token CLI (Command Line Interpreter)", width) + "*");
-        say(padLineWithBlanks("* Version " + LoggingConfigLoader.VERSION_NUMBER, width) + "*");
+        say(padLineWithBlanks("* Version " + OA4MPVersion.VERSION_NUMBER, width) + "*");
         say(padLineWithBlanks("* By Jeff Gaynor  NCSA", width) + "*");
         say(padLineWithBlanks("*  (National Center for Supercomputing Applications)", width) + "*");
         say(padLineWithBlanks("*", width) + "*");

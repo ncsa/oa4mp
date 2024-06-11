@@ -1,10 +1,87 @@
+/*
+  Test ini lives at '/home/ncsa/dev/csd/config/scriptlet.ini'
+  Structure for ini file
+
+  [scriptlet]
+  description ≔ 'Configuration file for running the scriptlet module in OA4MP to get client configurations'
+  cfg_file ≔ '/home/ncsa/dev/csd/config/server-oa2.xml'
+  cfg_name ≔ 'localhost:oa4mp.oa2.mariadb'
+  type ≔ 'client'
+*/
 module[
      'oa2:/qdl/ext/scriptlets','scriptlets'
     ]
-    body[
-» OA4MP specific tools for working with scripts and clients
-» This will allow you to load
-     use(load('anaphora')); // should be in the module path for any standard distro
+body[
+     » OA4MP specific tools for working with scripts and clients
+     » This will allow you to load the cfg section of an OA4MP client
+     » configuration and run it as an anaphor.
+     » The ini. stem has two entries, cfg_file and cfg_name that determine
+     » the OA4MP server configuration and the name of the configuration.
+     » Be sure to load the base QDL module anaphora.mdl to execute these.
+     
+     __ini.≔null; // ini file.
 
-     ini. 
-    ]; //end module
+     ini(ini.)→__ini.≔ini.; // set it
+
+     ini()→__ini.; //return it
+
+     __check_ini()→__ini.==null ⇒ raise_error('module not initialized. Please run init(ini_file).');
+
+     init(ini_file, entry)→
+     block[
+       » init(ini_file, entry)-initialize the system by reading the entry in the ini_file
+       » Alternately, just set the ini itself directly with ini(ini.);
+        try[file_read(ini_file);]catch[say(ini_file+' does not exist');return();];
+        ini(file_read(ini_file, 2).entry);
+     ]; //end init
+
+
+     read_cfg(id)→
+     block[
+       __check_ini();
+       // Tiny bit of caution. the loader loads two modules for store and p-stores, so you cannot
+       // just use j_load -- you'll get an error that the argument to load must be a string, (not a list of them).
+       // You have to check if the module you want is loaded, then load them all
+       // and only then import what you need.
+         !loaded('oa2:/qdl/store') ⇒ load(info().'lib'.'oa2'.'client'.'store', 'java');
+         client ≔ import('oa2:/qdl/store');
+         client#init(ini().'cfg_file', ini().'cfg_name', 'client');
+         c. ≔ client#read(id);
+         ∃c.'cfg' ⇒ return(c.'cfg'):return([]);
+     ]; //end read_cfg
+
+     handlers(id)→
+     block[
+        » Get the handler's anaphora for the given id. This will return a stem of the
+        » keys identity, access and refresh (only if there are anaphora for these)
+         cfg. ≔ read_cfg(id);
+         out. ≔ [];
+       types. ≔ ['identity', 'access','refresh'];
+        while[t ∈ types.]
+          do[
+              ∃cfg.'tokens'.t.'qdl' ⇒ (out. ≔ out. ~ {t:cfg.'tokens'.t.'qdl'});
+            ]; //end while
+       
+        return(out.);
+     ]; //end handlers
+ ]; //end module
+
+/*
+)ws set java_trace on
+scriptlet.≔{'cfg_file':'/home/ncsa/dev/csd/config/server-oa2.xml',
+            'cfg_name':'localhost:oa4mp.oa2.mariadb',
+            'type':'client',
+            'description':'Configuration file for running the scriptlet module in OA4MP to get client configurations'};
+
+ ccc ≔ import(load('/home/ncsa/dev/ncsa-git/oa4mp/qdl/src/main/resources/modules/scriptlets.mdl'));
+ ccc#ini(scriptlet.);
+ ccc#read_cfg('localhost:command.line2');
+ ccc#handlers('localhost:test/fnal');
+
+// to reset the workspace, unload the module, remove the instance.
+
+ unload('oa2:/qdl/ext/scriptlets');
+ remove(ccc);
+
+
+*/
