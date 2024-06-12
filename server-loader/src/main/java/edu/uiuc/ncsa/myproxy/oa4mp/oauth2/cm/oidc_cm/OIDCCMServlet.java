@@ -171,6 +171,7 @@ public class OIDCCMServlet extends EnvServlet {
             if (isAnonymous) {
                  // A client may get itself. It presents either bearer or basic header.
                 // RFC 7592 -- only bearer token allowed
+                // Fix for https://github.com/ncsa/oa4mp/issues/117
             if(!HeaderUtils.hasBearerHeader(httpServletRequest)){
                     throw new IllegalAccessException("Unsupported authorization method.");
                 }
