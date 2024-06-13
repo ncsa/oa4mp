@@ -68,10 +68,10 @@
 
 <h3>Getting the trusted Roots</h3>
 
-<p>The OAuth for MyProxy server acts as a front-end to an existing <a href="http://myproxy.ncsa.uiuc.edu/"
+<p>The OA4MP server acts as a front-end to an existing <a href="http://myproxy.ncsa.uiuc.edu/"
                                                                       target="_blank">MyProxy</a> server. The OAuth
     server can run on the same system as the MyProxy server or they can run on separate systems. To connect securely to
-    the MyProxy server, the OAuth for MyProxy install must include a trusted CA certificates directory (in <code>/etc/grid-security/certificates</code>
+    the MyProxy server, the OA4MP install must include a trusted CA certificates directory (in <code>/etc/grid-security/certificates</code>
     or <code>$HOME/.globus/certificates</code>). Since we're installing as a regular system user, we use the <code>myproxy-get-trustroots</code>
     command to create our <code>$HOME/.globus/certificates</code> directory.
     Alternatively, you can manually setup a <code>$HOME/.globus/certificates</code> directory using a CA distribution

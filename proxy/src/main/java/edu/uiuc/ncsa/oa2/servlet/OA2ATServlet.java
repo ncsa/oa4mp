@@ -1342,6 +1342,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 } else {
                     rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getAccessToken().encodeToken()); // Required.
                 }
+                // https://jira.ncsa.illinois.edu/browse/CIL-2019
+                rfcClaims.put(EXPIRES_IN, rtiResponse.getAccessToken().getLifetime()/1000);
                 // create scope string  Remember that these may have been changed by a script,
                 // so here is the right place to set it.
                 rfcClaims.put(OA2Constants.SCOPE, listToString(newATTX.getScopes()));
@@ -1355,6 +1357,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                     rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getRefreshToken().encodeToken()); // Required
                     rfcClaims.put(OA2Constants.REFRESH_TOKEN, rtiResponse.getRefreshToken().encodeToken()); // Optional
                 }
+                // https://jira.ncsa.illinois.edu/browse/CIL-2019
+                rfcClaims.put(EXPIRES_IN, rtiResponse.getRefreshToken().getLifetime()/1000);
+
                 long gracePeriod = ClientUtils.computeRTGracePeriod(client, oa2se);
                 long expiresAt = System.currentTimeMillis() + gracePeriod;
                 if (rfc8693Thingie.oldRTTX == null) {
@@ -1373,6 +1378,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 md.put(JWT_ID, newIDTX.getIdentifier().toString()); // reset the returned ID.
                 debugger.trace(this, "Processed id token return type");
                 rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getIdToken().getToken());
+                // https://jira.ncsa.illinois.edu/browse/CIL-2019
+                rfcClaims.put(EXPIRES_IN, rtiResponse.getIdToken().getLifetime()/1000);
         }
 
         debugger.trace(this, "rfc claims returned:" + rfcClaims.toString(1));
@@ -1439,6 +1446,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         updateTransactionJWTFromTokenResponse(rtiResponse, t, client);
         getTransactionStore().save(t);
         PrintWriter osw = response.getWriter();
+        debugger.trace(this, "Token exchange JSON:\n" + rfcClaims.toString(2));
         rfcClaims.write(osw);
         osw.flush();
         osw.close();

@@ -9,6 +9,8 @@ import edu.uiuc.ncsa.oa4mp.OA4MPVersion;
 import edu.uiuc.ncsa.qdl.install.ListDistroFiles;
 
 import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -126,12 +128,12 @@ public class Installer {
 
     protected void doRemove() throws IOException {
         if (isQDL()) {
-            uninstallQDL(getRootDir());
+            uninstallOA4MP(getRootDir());
         }
 
     }
 
-    protected void uninstallQDL(File rootDir) {
+    protected void uninstallOA4MP(File rootDir) {
         if (rootDir == null) {
             say("you must explicitly specify the directory to be removed. exiting...");
         } else {
@@ -161,10 +163,10 @@ public class Installer {
     protected int port = 9443;
 
     private void showHelp() {
-        say("===============================================================");
-        say("java -jar qdl-installer.jar install operation arguments* flags*");
-        say("===============================================================");
-        say("This will install QDL to your system. Options are:");
+        say("=================================================================");
+        say("java -jar oa4mp-installer.jar install operation arguments* flags*");
+        say("=================================================================");
+        say("This will install OA4MP to your system. Options are:");
         say("(none) = same as help");
         say(INSTALL_OPTION + " = install");
         say(UPGRADE_OPTION + " = upgrade");
@@ -178,8 +180,8 @@ public class Installer {
         say("Flags are:");
         say(DEBUG_FLAG + " = debug mode -- print all messages from the installer as it runs. This is quite verbose.");
         say(HELP_FLAG + " = this help message");
-        say(OA4MP_FLAG + " = install support for QDL");
-        say(ALL_FLAG + " = do all components = QDL, nano and vim");
+        say(OA4MP_FLAG + " = install support for OA4MP");
+        say(ALL_FLAG + " = do all components");
         say(HOST_FLAG + " = the host for the service. Default is localhost");
         say(PORT_FLAG + " = the port for the service. Default is 9443. If you set it to -1, no port is used.");
         say("");
@@ -297,9 +299,9 @@ public class Installer {
         setupDirs(rootDir);
 
         for (String file : fileList) {
-            if (file.startsWith("/bin") || (file.startsWith("/etc") && file.endsWith(".xml"))) {
+            if (file.startsWith("/bin") || (file.startsWith("/etc") && !file.endsWith(".sql"))) {
                 // On upgrades, do NOT touch the bin or etc config files  since the files are
-                // edited in the installation and overwriting them breaks their QDL install.
+                // edited in the installation.
                 continue;
             }
             File f = new File(rootDir.getAbsolutePath() + file);
@@ -359,11 +361,8 @@ public class Installer {
             trace("  " + file + " --> " + f.getCanonicalPath());
             cp(file, f);
             if (file.startsWith("/bin/")) {
-                trace("   setting up oa4mp script to be executable");
+                trace("   setting up oa4mp script to be executable:" + file);
                 doSetupExec(f);
-            }
-            if (file.endsWith(".qdl")) {
-                doSetupScript(f);
             }
             if (file.startsWith("/etc/") && file.endsWith(".xml")) {
                 // process xml config files in /etc only.
@@ -389,13 +388,14 @@ public class Installer {
 
         }
         Files.write(f.toPath(), lines, Charset.defaultCharset());
+        trace("setting " + f.getAbsolutePath() + " to executable");
         f.setExecutable(true);
     }
 
     public static String SHEBANG = "#!";
 
     /**
-     * QDL files that start with a shebang (#!) should be set executable.
+     * Files that start with a shebang (#!) should be set executable.
      *
      * @param f
      * @throws IOException
@@ -545,7 +545,6 @@ public class Installer {
                     argMap.put(PORT_FLAG, args[i]);
                     break;
             }
-
         }
         if (!isShowHelp()) {
             if (!allOps.contains(getOperation())) {
@@ -621,5 +620,17 @@ public class Installer {
     public boolean isQDL() {
         return is(OA4MP_FLAG) || is(ALL_FLAG);
     }
-
+protected void download(URL url, File targetFile) throws IOException {
+    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+    DataInputStream dis = new DataInputStream(connection.getInputStream());
+    FileOutputStream fos = new FileOutputStream(targetFile);
+    byte[] buffer = new byte[1024];
+    int offset =0;
+    int bytes;
+    while(0 < (bytes = dis.read(buffer, offset, buffer.length)) ){
+        fos.write(buffer, 0, bytes);
+    }
+    fos.close();
+    dis.close();
+}
 }

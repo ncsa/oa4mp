@@ -53,7 +53,7 @@ cd "$OA4MP_ROOT/qdl/src/main/scripts"
 echo "building OA4MP QDL installer"
 ./create_installer.sh
 if [[ $? -ne 0 ]] ; then
-    echo "OA4MP create installer failed"
+    echo "create QDL installer failed"
     exit 1
 fi
 
@@ -63,14 +63,15 @@ if [ -z ${QDL_HOME+x} ];  then
     echo "no QDL install, skipping..."
   else
   # If there is a local QDL install, update it.
-   java -jar "$OA4MP_QDL_DEPLOY/qdl-installer.jar" upgrade -dir $QDL_HOME -all -debug;
-   # java -jar "$OA4MP_QDL_DEPLOY/qdl-installer.jar" help;
-  #  cp "$OA4MP_QDL_DEPLOY/lib/qdl.jar" $QDL_HOME/lib;
-  #  cp "$OA4MP_QDL_DEPLOY/lib/build-info.txt" $QDL_HOME/lib ;
+   java -jar "$OA4MP_QDL_DEPLOY/qdl-installer.jar" upgrade -dir $QDL_HOME -all;
 fi
 echo "building OA4MP installer"
 cd "$OA4MP_ROOT/server-admin/src/main/scripts/installer"
-./create-installer.sh"
+./create-installer.sh
+if [[ $? -ne 0 ]] ; then
+    echo "create OA4MP installer failed"
+    exit 1
+fi
 echo "   ... done!"
 
 
