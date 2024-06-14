@@ -110,6 +110,13 @@ cp cli-jar-with-dependencies.jar $OA4MP_SERVER_DEPLOY/cli.jar
 cp jwt-jar-with-dependencies.jar $OA4MP_SERVER_DEPLOY/jwt.jar
 cp migrate-jar-with-dependencies.jar $OA4MP_SERVER_DEPLOY/fs-migrate.jar
 
+echo "building web installer..."
+
+cd $OA4MP_ROOT/server-installer
+mvn -P installer package
+cp target/installer-jar-with-dependencies.jar OA4MP_SERVER_DEPLOY/installer.jar
+
+
 echo "building QDL OA4MP tools..."
 cd $QDL_OA2_TOOLS
 mvn -P client package > clc.log

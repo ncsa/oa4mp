@@ -10,17 +10,7 @@ jwtJar=$OA4MP_ROOT/lib/jwt.jar
 
 # End of user serviceable parts.
 
-if [[  "$1" = "--help" || $# -gt 2 ]];then
-  echo "cli [configName configFile environment"]
-  echo "Start the OAuth 2 forMyProxy command line admin tool with the"
-  echo "given configuration name in the given configuration file (full path)."
-  echo "No arguments means to use the config named '$DEFAULT_TARGET' in the file  '$DEFAULT_CONFIG'"
-  echo "and the default properties file at '$DEFAULT_ENV'"
-  echo "One argument is assumed to be the configuration name in the default config file."
-  exit 1
-fi
-
-java -jar $jwtJar
+java -jar $jwtJar  "$@"
 
 if [ $? != 0 ]; then
   exit 1

@@ -107,7 +107,7 @@ public class Installer {
 
     protected void doUpgrade() throws Exception {
         File rootDir = getRootDir();
-        if (isQDL()) {
+        if (isOA4MP()) {
             upgradeOA4MP(rootDir);
         }
 
@@ -115,7 +115,7 @@ public class Installer {
 
     protected void doInstall() throws Exception {
         File rootDir = getRootDir();
-        if (isQDL()) {
+        if (isOA4MP()) {
             installOA4MP(rootDir);
             say("Done! You should add");
             say("   export OA4MP_HOME=\"" + rootDir.getAbsolutePath() + "\"");
@@ -127,7 +127,7 @@ public class Installer {
     }
 
     protected void doRemove() throws IOException {
-        if (isQDL()) {
+        if (isOA4MP()) {
             uninstallOA4MP(getRootDir());
         }
 
@@ -493,12 +493,6 @@ public class Installer {
         System.out.println(x);
     }
 
-
-    protected HashMap<String, String> getFileList() {
-        HashMap<String, String> fileList = new HashMap<>();
-        return fileList;
-    }
-
     HashMap<String, Object> argMap;
     public String operationKey = "operation";
     public static String NO_PORT = "-1";
@@ -574,6 +568,12 @@ public class Installer {
 
     // Help functions. These SHOULD be in another class, but that would mean writing
     // a separate classloader for the executable jar -- way too much work
+
+    /**
+     * Checks that the key is a boolean
+     * @param key
+     * @return
+     */
     public Boolean is(String key) {
         if (!argMap.containsKey(key)) return false;
         return (Boolean) argMap.get(key);
@@ -617,7 +617,7 @@ public class Installer {
     }
 
 
-    public boolean isQDL() {
+    public boolean isOA4MP() {
         return is(OA4MP_FLAG) || is(ALL_FLAG);
     }
 protected void download(URL url, File targetFile) throws IOException {

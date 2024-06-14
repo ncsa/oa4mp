@@ -21,13 +21,13 @@
             schemeSpecificPart=""
     >
         <logging
-                logFileName="${OA4MP_HOME}/log/server.log"
+                logFileName="${OA4MP_HOME}log/server.log"
                 logName="oa4mp"
                 logSize="100000"
                 logFileCount="2"
                 debug="tue"/>
-        <JSONWebKey defaultKeyID="9k0HPG3moXENne">
-            <path><![CDATA[${OA4MP_HOME}/etc/keys.jwk]]></path>
+        <JSONWebKey defaultKeyID="PUT KEY ID HERE">
+            <path><![CDATA[${OA4MP_HOME}etc/keys.jwk]]></path>
         </JSONWebKey>
         <scopes>
             <scope>openid</scope>
@@ -38,7 +38,7 @@
         </scopes>
 
         <derby storeType="file"
-               path="${OA4MP_HOME}/var/storage/server">
+               path="${OA4MP_HOME}var/storage/server">
             <transactions/>
             <clients/>
             <clientApprovals/>
@@ -67,7 +67,7 @@
             <virtual_file_systems>
                 <vfs type="pass_through"
                      access="rw">
-                    <root_dir>${OA4MP_HOME}/qdl/scripts</root_dir>
+                    <root_dir>${OA4MP_HOME}qdl/scripts</root_dir>
                     <scheme><![CDATA[vfs]]></scheme>
                     <mount_point>/scripts</mount_point>
                 </vfs>

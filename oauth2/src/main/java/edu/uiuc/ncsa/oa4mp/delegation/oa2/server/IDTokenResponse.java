@@ -182,8 +182,6 @@ public abstract class IDTokenResponse extends IResponse2 {
         }
 
         JSONObject json = JSONObject.fromObject(m);
-        System.err.println("IDTokenResp:m \n" + m.toString());
-        System.err.println("IDTokenResp:json \n" + json.toString(2));
         response.setContentType("application/json;charset=UTF-8");
         response.setCharacterEncoding("UTF-8");
         Writer osw = response.getWriter();
