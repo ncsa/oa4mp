@@ -166,8 +166,11 @@ public class SigningCommands extends CommonCommands {
      * @throws NoSuchProviderException
      * @throws NoSuchAlgorithmException
      */
-    public static JSONWebKeys createRSAJsonWebKeys(int size) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+    public static JSONWebKeys createRSAJsonWebKeys(int size, String defaultKeyID) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
         JSONWebKey defaultKey = createRSAJWK(size, RS_256);
+        if(defaultKeyID != null){
+            defaultKey.id = defaultKeyID;
+        }
         JSONWebKeys keys = new JSONWebKeys(defaultKey.id);
         keys.put(defaultKey);
         keys.put(createRSAJWK(size, RS_384));
@@ -184,8 +187,11 @@ public class SigningCommands extends CommonCommands {
      * @throws NoSuchAlgorithmException
      * @throws InvalidAlgorithmParameterException
      */
-    public static JSONWebKeys createECJsonWebKeys() throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+    public static JSONWebKeys createECJsonWebKeys(String defaultKeyID) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
         JSONWebKey defaultKey = createECJWK(JWKUtil2.EC_CURVE_P_256, JWKUtil2.ES_256);
+        if(defaultKeyID != null){
+            defaultKey.id = defaultKeyID;
+        }
         JSONWebKeys keys = new JSONWebKeys(defaultKey.id);
         keys.put(defaultKey);
         keys.put(createECJWK(JWKUtil2.EC_CURVE_P_384, JWKUtil2.ES_384));
@@ -202,11 +208,14 @@ public class SigningCommands extends CommonCommands {
      * @throws NoSuchAlgorithmException
      * @throws InvalidAlgorithmParameterException
      */
-    public static JSONWebKeys createECJsonWebKeys(String curve) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+    public static JSONWebKeys createECJsonWebKeys(String curve, String defaultKeyID) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
         if (StringUtils.isTrivial(curve)) {
-            return createECJsonWebKeys();
+            return createECJsonWebKeys(defaultKeyID);
         }
         JSONWebKey defaultKey = createECJWK(curve, JWKUtil2.ES_256);
+        if(defaultKeyID != null){
+            defaultKey.id = defaultKeyID;
+        }
         JSONWebKeys keys = new JSONWebKeys(defaultKey.id);
         keys.put(defaultKey);
         keys.put(createECJWK(curve, JWKUtil2.ES_384));

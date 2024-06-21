@@ -1,0 +1,90 @@
+#! /usr/bin/env -S qdl-run
+convert ≔ j_load('convert');
+cfg.≔[]; // Yo!
+entry. ≔ [];
+docs. ≔[];
+docs1.≔[];
+setup.≔[];
+jar. ≔[];
+jar.'type'≔'jar';
+jar.'sourceURL'≔'https://github.com/ncsa/qdl/releases/tag/v1.5.5';
+jar_entry.0.'files'≔['qdl-installer.jar'];
+jar.'directories'≔jar_entry.;
+docs.'type'≔'file_set';
+docs.'sourceURL' := 'https://github.com/ncsa/oa4mp/blob/v5.5/docs/pdf/';
+d_entry.0.'target_dir'≔ '/docs';
+d_entry.0.'files' ≔ ['scopes.pdf',
+                     'oa2-client.pdf',
+                     'filestore-migration.pdf',
+                     'qdl_clc_ini.pdf',
+                     'token_handler_configuration.pdf',
+                     'claim_source_examples.pdf',
+                     'creating_claim_sources2.pdf',
+                     'qdl_oa4mp_store_access.pdf'
+                    ];
+docs.'directories'≔d_entry.;
+docs1.'type'≔'file_set';
+docs1.'sourceURL' := 'https://github.com/ncsa/oa4mp/blob/master/docs/pdf/'; // for now
+d1_entry.0.'target_dir'≔ '/docs';
+d1_entry.0.'files' ≔ ['rfc7523_intro.pdf','jwt-util.pdf'];
+docs1.'directories'≔d1_entry.;
+
+cfg.'type'≔'file_set';
+cfg.'sourceURL'≔'https://github.com/ncsa/oa4mp/releases/download/v5.5/';
+entry.0.'target_dir'≔'/etc';
+entry.0.'files'≔['oa4mp-derby.sql',
+                'oa4mp-mysql.sql',
+                'oa4mp-mariadb.sql',
+                'oa4mp-pg.sql',
+                'oa4mp-mariadb.sql',
+                'derby-migrate.sql',
+                'jwt-scripts.tar',
+                {'source':'cfg.xml','update':false, 'preprocess':true},
+                {'source':'create_keys.cmd','update':false, 'preprocess':true},
+                'oidc-cm-scripts.tar',
+                {'source':'oa4mp-message.template','update':false},
+                {'source':'oa4mp-subject.template','update':false}];
+
+entry.2.'target_dir'≔'/lib';
+entry.2.'files'≔['fs-migrate.jar',
+                'oauth2.war',
+                'jwt.jar',
+                'clc.jar',
+                'cli.jar'];
+entry.1.'target_dir'≔'/bin';
+entry.1.'files'≔[{'source':'cli', 'exec':true, 'preprocess':true },
+                {'source':'jwt', 'exec':true, 'preprocess':true },
+                {'source':'clc', 'exec':true, 'preprocess':true },
+                {'source':'migrate', 'exec':true, 'preprocess':true },
+                'qdl-installer.jar'];                
+entry.3.'target_dir'≔'/var/storage/server';                
+entry.4.'target_dir'≔'/log';
+entry.5.'target_dir'≔'/';
+entry.5.'files'≔['version.txt'];
+setup.'type'≔'setup';
+setup.'app_name'≔'NCSA sec-lib';
+setup.'fail_on_error'≔false;
+setup.'cleanup_on_fail'≔false;
+setup.'help'≔{'installer':'/help.txt',  'app':'/app_help.txt','success':'/success.txt'};
+setup.'versions' ≔ [{'name':'v1', 'file':'/base/test-cfg1.yaml','description':'single script set', 'notes':'readme.txt'},
+                    {'name':'v2', 'file':'/base/test-cfg2.yaml','description':'two script sets'},
+                    {'name':'latest', 'file':'v1','description':'latest release'}];
+cfg.'directories'≔entry.;
+
+return(convert#yaml_out([setup., jar., docs1., docs.,cfg.]));
+/*
+clc      client2.war       client-postgres.sql  fs-migrate.jar   oa4mp-derby.sql         oa4mp-mysql.sql         oauth2.war
+clc.jar  client-derby.sql  cli.jar              jwt.jar          oa4mp-mariadb.sql       oa4mp-pg.sql            oidc-cm-scripts.tar
+cli      client-mysql.sql  derby-migrate.sql    jwt-scripts.tar  oa4mp-message.template  oa4mp-subject.template
+
+'scopes.pdf'
+'oa2-client.pdf'
+'rfc7523_intro.pdf'
+'filestore-migration.pdf'
+'qdl_clc_ini.pdf'
+'token_handler_configuration.pdf'
+'claim_source_examples.pdf'
+'creating_claim_sources2.pdf'
+'qdl_oa4mp_store_access.pdf'
+
+ */

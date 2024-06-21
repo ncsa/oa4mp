@@ -3,6 +3,8 @@
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/client-api/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/client-api/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/client-installer/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/client-installer/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/client-loader/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/client-loader/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/client-oauth2/src/main/java" charset="UTF-8" />
@@ -35,6 +37,8 @@
     <file url="file://$PROJECT_DIR$/server-admin/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/server-api/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/server-api/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/server-installer/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/server-installer/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/server-loader/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/server-loader/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/server-test/src/main/java" charset="UTF-8" />

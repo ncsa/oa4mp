@@ -1,0 +1,8 @@
+- app_name: OA4MP
+  help: {success: /oa4mp/success.txt}
+  versions:
+  - {file: /oa4mp/v5_5.yaml, name: v5.5, description: Version 5.5, notes: /oa4mp/v5_5_notes.txt}
+  - {file: v5.5, name: latest, description: latest release}
+  cleanup_on_fail: false
+  fail_on_error: false
+  type: setup

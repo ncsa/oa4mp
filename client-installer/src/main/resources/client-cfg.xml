@@ -1,0 +1,66 @@
+<config>
+    <client name="default" alias="localhost:derby"/>
+    <!-- A configuration that runs on localhost and uses a derby store.
+         * This can be used as a template for others.
+         * It has the standard id and secret pair, which you set from
+           registering this client with an OA4MP server.
+         * Alternately, you can also set a JSON Web Key (JWK) for RFC 7523
+           authorization. Also set the key id (kid).
+         * Set the serviceUri to point to the OA4MP server.
+         * Set the callbackUri to be the same as you gave during registration.
+           You may have several, but this is the one active for a flow
+         * The derby setup has some random password. Since the store is managed
+           for you, these can be changed to anything before running the client.
+         * The SSL block is commented out. If you are running an OA4MP instance with your
+           own self-signed cert, you will need to point to that here.  The cert has a DN
+           set and that should be set in the certDN entry.
+         -->
+    <client name="localhost:derby"
+            debug="trace"
+            atServerDN="localhost">
+        <id>YOUR IDENTIFIER HERE</id>
+        <secret><![CDATA[YOUR CLIENT SECRET HERE]]></secret>
+        <!-- RFC 7523 support
+             See https://github.com/ncsa/oa4mp/blob/master/docs/pdf/rfc7523_intro.pdf
+
+       <kid>EC9FCFCB3716AC4C2279DF42EC98CABF</kid>
+       <jwksFile>/opt/oa4mp/client/etc/keys.jwk</jwksFile>
+       -->
+        <serviceUri>https://localhost:9443/oauth2</serviceUri>
+        <callbackUri>https://localhost:9443/client2/ready</callbackUri>
+        <!-- See https://oa4mp.org/common/configuration/derby-store.html -->
+        <derby username="oa4mp"
+               password="QHdmSNdA-o8"
+               bootPassword="Icg9OzvyZbo" 
+               storeType="file"
+               path="/opt/oa4mp/client/var/storage/derby"
+               database="/opt/oa4mp/client/var/storage/derby/client_oa4mp"
+               schema="oauth2">
+            <assetStore/>
+        </derby>
+        <!-- See https://oa4mp.org/common/configuration/logging.html -->
+        <logging
+                logFileName="/opt/oa4mp/client/log/oa4mp-client.xml"
+                logName="oa4mp-client"
+                logSize="100000"
+                logFileCount="2"/>
+        <!-- See https://oa4mp.org/common/configuration/scopes.html -->
+        <scopes>
+            <scope>openid</scope>
+            <scope>email</scope>
+            <scope>profile</scope>
+            <scope>org.cilogon.userinfo</scope>
+        </scopes>
+        <!-- See https://oa4mp.org/common/configuration/ssl.html -->
+<!--
+        <ssl useJavaTrustStore="true">
+            <trustStore>
+                <path>PATH TO YOU CERT</path>
+                <password><![CDATA[YOUR CERT PASSWORD HERE]]></password>
+                <type>JKS</type>
+                <certDN><![CDATA[CN=localhost]]></certDN>
+            </trustStore>
+        </ssl>
+        -->
+    </client>
+</config>

@@ -46,7 +46,7 @@
                             <archive>
                                 <manifest>
                                     <addClasspath>true</addClasspath>
-                                    <mainClass>edu.uiuc.ncsa.qdl.workspace.QDLWorkspace</mainClass>
+                                    <mainClass>edu.uiuc.ncsa.oa2.qdl.OA4MPQDLWorkspace</mainClass>
                                 </manifest>
                                 <manifestEntries>
                                     <application-version>${project.version}</application-version>

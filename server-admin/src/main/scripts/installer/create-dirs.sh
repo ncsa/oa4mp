@@ -18,7 +18,7 @@ if [[  "$1" = "--help" ]];then
   exit 1
 fi
 
-
+echo "  creating targer dirs for installer"
 # **IF** there are arguments for the target of this, use them. Otherwise use the default
 OA4MP_ROOT=${1:-$DEFAULT_OA4MP_ROOT}
 TARGET_ROOT=${2:-$DEFAULT_TARGET_ROOT}
@@ -38,7 +38,7 @@ if [ ! -d "$TARGET_ROOT" ]
     rm -Rf *
 fi
 
-cd $TARGET_ROOT
+cd $TARGET_ROOT || exit
 #rm -Rf *
 
 mkdir edu
@@ -47,7 +47,7 @@ mkdir edu/uiuc/ncsa
 mkdir edu/uiuc/ncsa/install
 
 
-cd $TARGET_ROOT
+cd $TARGET_ROOT || exit
 cp $DEFAULT_OA4MP_ROOT_SOURCES/src/main/scripts/installer/installer.mf .
 cp $DEFAULT_OA4MP_ROOT_SOURCES/src/main/scripts/installer/version.txt .
 # following class has to be installed here so it executes later.
@@ -55,14 +55,14 @@ cp "$DEFAULT_OA4MP_ROOT_SOURCES"/target/classes/edu/uiuc/ncsa/install/*.class ed
 
 # Now make the directories
 mkdir "bin"
-cd "bin"
+cd "bin" || exit
 cp $DEFAULT_OA4MP_ROOT_SOURCES/src/main/scripts/installer/clc .
 cp $DEFAULT_OA4MP_ROOT_SOURCES/src/main/scripts/installer/cli .
 cp $DEFAULT_OA4MP_ROOT_SOURCES/src/main/scripts/installer/jwt .
 cp $DEFAULT_OA4MP_ROOT_SOURCES/src/main/scripts/installer/migrate .
 cd ..
 mkdir "docs"
-cd "docs"
+cd "docs" || exit
 # assumes the website was created
 cp $OA4MP_ROOT/docs/pdf/*.pdf .
 cd ..
@@ -70,17 +70,18 @@ mkdir "etc"
 cd "etc"
 cp $DEFAULT_OA4MP_ROOT_SOURCES/src/main/scripts/installer/cfg.xml .
 cp $DEFAULT_OA4MP_ROOT_SOURCES/src/main/scripts/installer/client-cfg.xml .
+cp $DEFAULT_OA4MP_ROOT_SOURCES/src/main/scripts/installer/create_keys.cmd .
 cp $OA4MP_SERVER_DEPLOY/*.sql .
 cp $OA4MP_SERVER_DEPLOY/oa4mp-subject.template .
 cp $OA4MP_SERVER_DEPLOY/oa4mp-message.template .
 cd  ..
 
 mkdir "lib"
-cd lib
+cd lib || exit
 cp $OA4MP_SERVER_DEPLOY/*.jar .
 cd ..
 mkdir examples
-cd examples
+cd examples || exit
 cp $OA4MP_SERVER_DEPLOY/*.tar .
 cd ..
 mkdir "log"
@@ -93,7 +94,7 @@ mkdir qdl
 mkdir qdl/scripts
 
 mkdir "wars"
-cd wars
+cd wars || exit
 cp $OA4MP_SERVER_DEPLOY/*.war .
 
 echo "   ...done!"

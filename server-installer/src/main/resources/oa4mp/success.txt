@@ -1,0 +1,12 @@
+Done! You should add
+  export OA4MP_HOME="${ROOT}"
+to your environment and
+   $OA4MP_HOME/bin
+to your PATH
+Consider generating server keys by running:
+
+${OA4MP_HOME}bin/jwt -batchFile ${OA4MP_HOME}etc/create_keys.cmd
+
+When done, select one of the key ids ('kid') in the keys.jwk file for your
+default server signing key and set it in the defaultKeyID property of the
+${ROOT}etc/cfg.xml file.

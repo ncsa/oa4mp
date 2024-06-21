@@ -450,7 +450,8 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
         Object[] polling = loadPolling();
 
 
-        if (polling != null) {
+        if (polling != null && 0<(long)polling[1]) {
+            // only start polling if the polling interval is positive.
             info("Loading polling for " + polling[0]);
             AbstractCLIApprover.ClientApprovalThread cat = new AbstractCLIApprover.ClientApprovalThread(myLogger, se2, (File) polling[0], (Long) polling[1]);
             se2.setClientApprovalThread(cat);

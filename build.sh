@@ -50,21 +50,24 @@ if [ ! -d "$OA4MP_SERVER_DEPLOY" ]
     mkdir "$OA4MP_SERVER_DEPLOY"
    else
     echo "   deploy directory exists, cleaning..."
-    cd $OA4MP_SERVER_DEPLOY
+    cd $OA4MP_SERVER_DEPLOY || exit
     rm -Rf *
 fi
-
+if [[ $? -ne 0 ]] ; then
+    echo "could not create clean directories in $OA4MP_SERVER_DEPLOY"
+    exit 1
+fi
 
 
 
 # next line is so the profiles for the tools can be found in the source and built.
 OA2_TOOLS=$OA4MP_ROOT/server-admin
 
-cd $OA4MP_ROOT
+cd $OA4MP_ROOT || exit
 mvn clean install > maven.log
 
 if [[ $? -ne 0 ]] ; then
-    echo "OA4MP maven build failed, exiting..."
+    echo "OA4MP build failed, see $OA4MP_ROOT/maven.log"
     exit 1
 fi
 echo "      ... done!"
@@ -77,10 +80,10 @@ QDL_OA2_TOOLS=$OA4MP_ROOT/qdl
 
 
 echo "building OA4MP tools..."
-cd $OA2_TOOLS
+cd $OA2_TOOLS || exit
 mvn -P cli package > cli.log
 if [[ $? -ne 0 ]] ; then
-    echo "could not build cli, see cli/log"
+    echo "could not build cli, see $OA2_TOOLS/cli.log"
     exit 1
 fi
 
@@ -92,36 +95,49 @@ fi
 
 mvn -P jwt package > jwt.log
 if [[ $? -ne 0 ]] ; then
-    echo "could not build jwt, see jwt.log"
+    echo "could not build jwt, see $OA2_TOOLS/jwt.log"
     exit 1
 fi
 
 mvn -P migrate package > migrate.log
 if [[ $? -ne 0 ]] ; then
-    echo "could not build migrate, see migrate.log"
+    echo "could not build migrate, see $OA2_TOOLS/migrate.log"
     exit 1
 fi
 
 
-cd $OA2_TOOLS/target
+cd $OA2_TOOLS/target || exit
 echo "   deploying OA4MP tools..."
 
 cp cli-jar-with-dependencies.jar $OA4MP_SERVER_DEPLOY/cli.jar
 cp jwt-jar-with-dependencies.jar $OA4MP_SERVER_DEPLOY/jwt.jar
 cp migrate-jar-with-dependencies.jar $OA4MP_SERVER_DEPLOY/fs-migrate.jar
 
-echo "building web installer..."
+echo "building OA4MP server installer..."
 
-cd $OA4MP_ROOT/server-installer
-mvn -P installer package
-cp target/installer-jar-with-dependencies.jar OA4MP_SERVER_DEPLOY/installer.jar
+cd $OA4MP_ROOT/server-installer || exit
+mvn -P installer package > server-installer.log
+if [[ $? -ne 0 ]] ; then
+    echo "could not build server-installer. See $OA4MP_ROOT/server-installer/server-installer.log"
+    exit 1
+fi
+cp target/server-installer-jar-with-dependencies.jar $OA4MP_SERVER_DEPLOY/server-installer.jar
 
+echo "building OA4MP client installer..."
+
+cd $OA4MP_ROOT/client-installer || exit
+mvn -P installer package > client-installer.log
+if [[ $? -ne 0 ]] ; then
+    echo "could not build client-installer. See $OA4MP_ROOT/client-installer/client-installer.log"
+    exit 1
+fi
+cp target/client-installer-jar-with-dependencies.jar $OA4MP_SERVER_DEPLOY/client-installer.ja
 
 echo "building QDL OA4MP tools..."
-cd $QDL_OA2_TOOLS
-mvn -P client package > clc.log
+cd $QDL_OA2_TOOLS || exit
+mvn -P client package > tools.log
 if [[ $? -ne 0 ]] ; then
-    echo "could not build cli, see cli/log"
+    echo "could not build QDL tools, see $QDL_OA2_TOOLS/tools.log"
     exit 1
 fi
 cd target

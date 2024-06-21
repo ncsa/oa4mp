@@ -1,6 +1,19 @@
+<!--
+     Basic configuration for OA4MP. This almost works in that you need to set the authorization method
+     below.
+-->
 <config>
+    <!--
+         This sets an alias. You then can simply always point to "default" as the
+         name of your active configuration.
+    -->
     <service name="default" alias="oa4mp.derby.filestore"/>
 
+    <!--
+         See https://oa4mp.org/server/dtd/server-dtd-service-tag.html
+         This sets the most commonly used defaults, such as lifetimes,
+         and such.
+    -->
     <service
             address="https://${OA4MP_HOST}/oauth2"
             authorizationGrantLifetime="750 sec"
@@ -18,15 +31,18 @@
             refreshTokenLifetime="30 days"
             rtGracePeriod="3600 sec"
             scheme="oa4mp"
-            schemeSpecificPart=""
-    >
-        <logging
-                logFileName="${OA4MP_HOME}log/server.log"
-                logName="oa4mp"
-                logSize="100000"
-                logFileCount="2"
-                debug="tue"/>
-        <JSONWebKey defaultKeyID="PUT KEY ID HERE">
+            schemeSpecificPart="">
+        <!--
+             See https://oa4mp.org/server/configuration/signing.html
+             You should create a key by issuing.
+
+              ${OA4MP_HOME}bin/jwt -batchFile ${OA4MP_HOME}etc/create_keys.cmd
+
+              this calls the very useful key utility included with OA4MP. It will
+              list keys at various strength. Choose one of the id's as the default
+              and put it in below.
+        -->
+        <JSONWebKey defaultKeyID="${JWT_KEY_ID}">
             <path><![CDATA[${OA4MP_HOME}etc/keys.jwk]]></path>
         </JSONWebKey>
         <scopes>
@@ -36,7 +52,19 @@
             <!--   <scope>org.cilogon.userinfo</scope> -->
             <scope>org.oa4mp:userinfo</scope>
         </scopes>
-
+<!--
+                <authorizationServlet useHeader="true"
+                                      requireHeader="true"
+                                      headerFieldName="REMOTE_USER"
+                />
+-->
+<!--
+               <authorizationServlet useProxy="true"
+                                     cfgFile="${OA4MP_HOME}etc/client-oa2.xml"
+                                     cfgName="proxy-client"
+                                     authorizationURI="https://${OA4MP_HOST}oauth2/authorize"
+                                   />
+ -->
         <derby storeType="file"
                path="${OA4MP_HOME}var/storage/server">
             <transactions/>
@@ -56,6 +84,13 @@
             />
             <api protocol="rfc7592" enabled="true"/>
         </clientManagement>
+        <logging
+                logFileName="${OA4MP_HOME}log/server.log"
+                logName="oa4mp"
+                logSize="100000"
+                logFileCount="2"
+                debug="tue"/>
+
         <qdl name="qdl-default"
              enabled="true"
              debug="info"

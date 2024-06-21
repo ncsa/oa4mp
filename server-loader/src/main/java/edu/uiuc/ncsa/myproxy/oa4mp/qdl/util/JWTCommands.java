@@ -80,6 +80,7 @@ public class JWTCommands implements QDLModuleMetaClass {
     protected String CREATE_KEYS_NAME = "create_keys";
 
     public static String ARG_KEY_TYPE = "type";
+    public static String ARG_DEFAULT_KEY_ID = "default_key_id";
     public static String ARG_RSA_KEY_SIZE_TYPE = "size";
     public static String ARG_EC_CURVE_TYPE = "curve";
     public static String ARG_FILE_PATH_TYPE = "file";
@@ -105,6 +106,7 @@ public class JWTCommands implements QDLModuleMetaClass {
             String ecCurve = null;
             int rsaKeySize = 2048;
             String filePath = null;
+            String defaultKeyID = null;
             boolean overwriteFile = false;
             boolean setCurrent = false;
             boolean argTypeOk = false; // The argument passed to the function was not a stem |string(if monadic)
@@ -127,6 +129,13 @@ public class JWTCommands implements QDLModuleMetaClass {
                                 throw new IllegalArgumentException(getName() + " requires a string as the " + ARG_KEY_TYPE + " of the key.");
                             }
                             keyType = args.getString(ARG_KEY_TYPE);
+                        }
+                        if(args.containsKey(ARG_DEFAULT_KEY_ID)){
+                            if (!Constant.isString(args.get(ARG_DEFAULT_KEY_ID))) {
+                                throw new IllegalArgumentException(getName() + " requires a string as the " + ARG_DEFAULT_KEY_ID + " of the generated keys.");
+                            }
+                            defaultKeyID = args.getString(ARG_DEFAULT_KEY_ID);
+
                         }
                         if (args.containsKey(ARG_FILE_PATH_TYPE)) {
                             if (!Constant.isString(args.get(ARG_FILE_PATH_TYPE))) {
@@ -181,7 +190,7 @@ public class JWTCommands implements QDLModuleMetaClass {
                 JSONWebKeys newKeys = null;
                 if (keyType.equals("RSA")) {
 
-                    newKeys = getSigningCommands().createRSAJsonWebKeys(rsaKeySize);
+                    newKeys = getSigningCommands().createRSAJsonWebKeys(rsaKeySize, defaultKeyID);
                 }
                 if (keyType.equals("EC")) {
                     newKeys = getSigningCommands().createECJsonWebKeys(ecCurve);

@@ -2,7 +2,7 @@ A MUCH fuller version of this
 is at https://docs.google.com/document/d/1GmacW2R7IffZlgTpEMZAqRQsW139xwwplHSgS3hX-1s/edit?usp=sharing)
 
 This directory contains scripts that will generate various things for signed JWT (ok, JWT = JSON Web Tokens,
-but everyone now calls them ID Tokens).
+but everyone now wrongly calls them ID Tokens).
 
 Abbreviations
 JWT = Java Web Token conforms to RFC 7519: https://tools.ietf.org/html/rfc7519

@@ -10,11 +10,11 @@ TARGET_ROOT=$NCSA_DEV_OUTPUT/oa4mp-install
 JAR_NAME="oa4mp-installer.jar"
 
 echo 'creating OA4MP installer'
-cd $OA4MP_SOURCES/server-admin/src/main/scripts/installer
-./create-dirs.sh
+cd $OA4MP_SOURCES/server-admin/src/main/scripts/installer || exit
+./create-dirs.sh > installer.log
 if [ $? -ne 0 ]
 then
-  echo "error running create dirs. " >&2
+  echo "error running create dirs, see $OA4MP_SOURCES/server-admin/src/main/scripts/installer/installer.log " >&2
   exit 1;
 fi
 

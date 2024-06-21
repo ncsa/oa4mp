@@ -80,6 +80,7 @@ public class JWKUtilCommands extends CommonCommands {
         sayi(CL_IS_PUBLIC_FLAG + " - extract public keys from the file specified by " + CL_INPUT_FILE_FLAG);
         sayi(CL_IS_PRIVATE_FLAG + " - (implied) generate full set of keys. Cannot be specified with  " + CL_IS_PUBLIC_FLAG);
         sayi(FORCE_TO_STD_OUT_FLAG + " - write the keys to standard out.");
+        sayi(SET_DEFAULT_ID + " - specify the id of the default key (only at creation of a full set).");
         sayi(CL_OUTPUT_FILE_FLAG + " - write the keys to the given file.");
         sayi(CREATE_SINGLE_KEY_FLAG + " - create only a single RSA 256 key.");
         sayi(RSA_KEY_SIZE_FLAG + " - specify the key size for the RSA key. Default is 2048 and the value must be multiple of 256");
@@ -188,6 +189,7 @@ public class JWKUtilCommands extends CommonCommands {
     String FORCE_TO_STD_OUT_FLAG = "-o";
     String CREATE_SINGLE_KEY_FLAG = "-single";
     String CREATE_ELLIPTIC_KEY_FLAG = "-ec";
+    String SET_DEFAULT_ID = "-default_id";
     String ALGORITHM_KEY_FLAG = "-alg";
     String ELLIPTIC_CURVE_FLAG = "-curve";
     String RSA_KEY_SIZE_FLAG = "-size";
@@ -240,6 +242,12 @@ public class JWKUtilCommands extends CommonCommands {
             sg.setBatchMode(isBatchMode());
             sg.create(inputLine);
             return;
+        }
+        boolean hasDefaultID = inputLine.hasArg(SET_DEFAULT_ID);
+        String defaultID = null;
+        if(hasDefaultID){
+            defaultID = inputLine.getNextArgFor(SET_DEFAULT_ID);
+            inputLine.removeSwitchAndValue(SET_DEFAULT_ID);
         }
         boolean isCreateElliptic = inputLine.hasArg(CREATE_ELLIPTIC_KEY_FLAG);
         inputLine.removeSwitch(CREATE_ELLIPTIC_KEY_FLAG);
@@ -326,10 +334,11 @@ public class JWKUtilCommands extends CommonCommands {
                 }
             } else {
                 if(isCreateElliptic){
-                    keys = sg.createECJsonWebKeys(ellipticCurve); // make full set
+                    keys = sg.createECJsonWebKeys(ellipticCurve, defaultID); // make full set
                 }else{
-                    keys = sg.createRSAJsonWebKeys(keySize); // make full set
+                    keys = sg.createRSAJsonWebKeys(keySize, defaultID); // make full set
                 }
+
             }
             JSONObject jwks = getJwkUtil().toJSON(keys);
             if (hasOutputFile) {

@@ -217,7 +217,7 @@ public class VOCommands extends StoreCommands2 {
     }
 
     protected void newKeys(VirtualOrganization vo, int keySize) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
-        JSONWebKeys jsonWebKeys = SigningCommands.createRSAJsonWebKeys(keySize);
+        JSONWebKeys jsonWebKeys = SigningCommands.createRSAJsonWebKeys(keySize, null);
         vo.setJsonWebKeys(jsonWebKeys);
         printJWK(jsonWebKeys);
 
@@ -226,9 +226,9 @@ public class VOCommands extends StoreCommands2 {
     protected void newKeys(VirtualOrganization vo, String curve) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
         JSONWebKeys jsonWebKeys;
         if (StringUtils.isTrivial(curve)) {
-            jsonWebKeys = SigningCommands.createECJsonWebKeys();
+            jsonWebKeys = SigningCommands.createECJsonWebKeys(null);
         } else {
-            jsonWebKeys = SigningCommands.createECJsonWebKeys(curve);
+            jsonWebKeys = SigningCommands.createECJsonWebKeys(curve, null);
         }
         vo.setJsonWebKeys(jsonWebKeys);
         printJWK(jsonWebKeys);

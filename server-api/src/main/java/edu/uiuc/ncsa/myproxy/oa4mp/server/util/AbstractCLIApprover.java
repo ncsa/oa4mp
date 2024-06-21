@@ -1,13 +1,14 @@
 package edu.uiuc.ncsa.myproxy.oa4mp.server.util;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl;
+import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
+import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
 import edu.uiuc.ncsa.security.util.cli.CLITool;
+import net.sf.json.JSONObject;
 import org.apache.commons.cli.Options;
 
 import java.io.*;
@@ -16,6 +17,7 @@ import java.util.LinkedList;
 import java.util.Set;
 
 import static edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPConfigTags.COMPONENT;
+import static java.nio.file.Files.readAllBytes;
 
 /**
  * A command line approver. This has a couple of modes of operation.
@@ -43,7 +45,7 @@ import static edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPConfigTags.COMPONENT;
  * on 2/24/12 at  2:40 PM
  */
 public abstract class AbstractCLIApprover extends CLITool {
-  public static final String ANONYMOUS = "anonymous";
+    public static final String ANONYMOUS = "anonymous";
 
     public static class ClientApprovalThread extends Thread {
         public ClientApprovalThread(MyLoggingFacade myLogger, ServiceEnvironmentImpl se2, File pollingDir, Long pollingInterval) {
@@ -104,19 +106,24 @@ public abstract class AbstractCLIApprover extends CLITool {
                         for (File f : files) {
                             try {
                                 info(getClass().getSimpleName() + ": Checking file " + f);
-                                FileInputStream fis = new FileInputStream(f);
-                                ObjectInputStream ois = new ObjectInputStream(fis);
-
-                                ClientApproval ca = (ClientApproval) ois.readObject();
-                                ois.close();
-
+                                FileReader fileReader = new FileReader(f);
+                                String raw = new String(readAllBytes(f.toPath()));
+                                JSONObject jsonObject = JSONObject.fromObject(raw);
+                                ClientApproval ca = new ClientApproval(BasicIdentifier.newID(jsonObject.getString("id")));
+                                if (jsonObject.containsKey("approver")) {
+                                    ca.setApprover(jsonObject.getString("approver"));
+                                } else {
+                                    ca.setApprover("unknown");
+                                }
                                 info("processing id =\"" + ca.getIdentifierString() + "\", approver is \"" + ca.getApprover() + "\"");
                                 Client c = (Client) se.getClientStore().get(ca.getIdentifier()); // try and see if it really corresponds to a client
-                                if (c != null) {
+                                if (null == se.getClientStore().get(ca.getIdentifier())) {
+                                    if (null == se.getAdminClientStore().get(ca.getIdentifier())) {
+                                        logger.warn("Error! An attempt to approve client with id \"" + ca.getIdentifierString() + "\" was made, but no such client was found.");
+                                    }
+                                } else {
                                     se.getClientApprovalStore().save(ca);
                                     f.delete();
-                                } else {
-                                    logger.warn("Error! An attempt to alter client with id \"" + ca.getIdentifierString() + "\" was made, but no such client was found.");
                                 }
                             } catch (Throwable t) {
                                 // if not a serialized file, ignore it.
@@ -178,8 +185,8 @@ public abstract class AbstractCLIApprover extends CLITool {
                         say("Sorry, that index is out of range. Try again.");
                     }
                 } catch (NumberFormatException xx) {
-                    boolean noInput = inString == null || inString.length()==0;
-                    say("Woops. Didn't understand " + (noInput?"(empty)":"\"" + inString+"\"") + ". Try again.");
+                    boolean noInput = inString == null || inString.length() == 0;
+                    say("Woops. Didn't understand " + (noInput ? "(empty)" : "\"" + inString + "\"") + ". Try again.");
                 }
             }
         }
@@ -190,11 +197,11 @@ public abstract class AbstractCLIApprover extends CLITool {
             throw new GeneralException("Internal error: Somehow the client approval was not found. Fix that.");
         }
         Client client = (Client) se.getClientStore().get(ca.getIdentifier());
-        if(client == null){
+        if (client == null) {
             info("No client found for the given identifier. Aborting.");
             say("no client found for the id. You probably want to fix that.\nexiting...");
             return;
-        }else{
+        } else {
             say("You have chosen the following client");
             say(formatClient(client));
         }
@@ -212,7 +219,7 @@ public abstract class AbstractCLIApprover extends CLITool {
         if (inString != null && inString.toLowerCase().equals("a")) {
             ca.setApproved(true);
         }
-        info("Approver " + (ca.isApproved()?"denies":"allows") + " approval.");
+        info("Approver " + (ca.isApproved() ? "denies" : "allows") + " approval.");
         say("Commit changes? (y/n)");
         inString = readline();
         if (!inString.toLowerCase().equals("y")) {
@@ -237,7 +244,7 @@ public abstract class AbstractCLIApprover extends CLITool {
     }
 
 
-    protected String formatClient(Client client){
+    protected String formatClient(Client client) {
         String out = "";
         out = out + "  Name=\"" + client.getName() + "\"\n";
         out = out + "  email=\"" + client.getEmail() + "\"\n";
@@ -250,6 +257,7 @@ public abstract class AbstractCLIApprover extends CLITool {
     public String getComponentName() {
         return COMPONENT;
     }
+
     long pollingInt = 60000L;
 
     File pollingDir = null;
@@ -265,7 +273,7 @@ public abstract class AbstractCLIApprover extends CLITool {
     @Override
     public void help() {
         say("A command line tool to approve client requests");
-        say("usage: " + getClass().getSimpleName() +" options");
+        say("usage: " + getClass().getSimpleName() + " options");
         defaultHelp(true);
         say("Where the options are given as -x (fnord) = short option, (long option), and [] = optional. Other options: ");
         say("  [-" + CONFIG_NAME_OPTION + " (-" + CONFIG_NAME_LONG_OPTION + ") -- set the name of the configuration.]");
