@@ -90,7 +90,8 @@ public class OA2QDLEnvironment extends QDLEnvironment {
                 libLoader,
                 false,
                 logo,
-                WS_TERMINAL_TYPE_TEXT); // don't let anyone start in ANSI mode on the server since it will screw up logging.
+                WS_TERMINAL_TYPE_TEXT,
+                null); // don't let anyone start in ANSI mode on the server since it will screw up logging.
         if (serverScripts != null && !serverScripts.isEmpty()) {
             this.serverScripts = serverScripts;
         }

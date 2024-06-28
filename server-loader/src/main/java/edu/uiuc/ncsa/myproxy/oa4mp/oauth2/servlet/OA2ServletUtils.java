@@ -63,7 +63,9 @@ public class OA2ServletUtils {
         // rethrowing it) would mean that the transaction will complete
         // and the old tokens would be invalid, replaced by new ones, so don't do that.
         // Hard stop here and let someone have a chance to fix the issue.
-        rollback(oa2SE, tBackup, txRecord);
+        if(tBackup != null) { // some flows can't have a backup at certain times.
+            rollback(oa2SE, tBackup, txRecord);
+        }
         OA2ATException atException = null;
         String message = null;
         if (exception instanceof OA2ATException) {

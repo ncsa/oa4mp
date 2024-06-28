@@ -118,4 +118,8 @@ public class OA4MPServerInstaller extends WebInstaller {
         }
     }
 
+    @Override
+    protected String getSetup() {
+        return "/oa4mp/setup.yaml";
+    }
 }

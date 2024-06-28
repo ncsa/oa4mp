@@ -6,9 +6,14 @@ docs. ≔[];
 docs1.≔[];
 setup.≔[];
 jar. ≔[];
-jar.'type'≔'jar';
-jar.'sourceURL'≔'https://github.com/ncsa/qdl/releases/tag/v1.5.5';
+jar.'type'≔'zip';
+jar.'sourceURL'≔'https://github.com/ncsa/qdl/releases/download/v1.5.5/';
+jar_entry.0.'target_dir'≔ '/';
 jar_entry.0.'files'≔['qdl-installer.jar'];
+jar_entry.0.'ignore'≔['/META-INF/',
+                       '/edu/',
+                       '/dir_list.txt',
+                       '/file_list.txt'];
 jar.'directories'≔jar_entry.;
 docs.'type'≔'file_set';
 docs.'sourceURL' := 'https://github.com/ncsa/oa4mp/blob/v5.5/docs/pdf/';

@@ -131,7 +131,7 @@ if [[ $? -ne 0 ]] ; then
     echo "could not build client-installer. See $OA4MP_ROOT/client-installer/client-installer.log"
     exit 1
 fi
-cp target/client-installer-jar-with-dependencies.jar $OA4MP_SERVER_DEPLOY/client-installer.ja
+cp target/client-installer-jar-with-dependencies.jar $OA4MP_SERVER_DEPLOY/client-installer.jar
 
 echo "building QDL OA4MP tools..."
 cd $QDL_OA2_TOOLS || exit

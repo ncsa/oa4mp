@@ -65,7 +65,7 @@ if [ -z ${QDL_HOME+x} ];  then
   # If there is a local QDL install, update it.
    java -jar "$OA4MP_QDL_DEPLOY/qdl-installer.jar" upgrade -dir $QDL_HOME -all;
 fi
-echo "building OA4MP installer"
+echo "building OLD OA4MP installer"
 cd "$OA4MP_ROOT/server-admin/src/main/scripts/installer"
 ./create-installer.sh
 if [[ $? -ne 0 ]] ; then

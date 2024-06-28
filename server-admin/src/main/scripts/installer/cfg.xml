@@ -45,13 +45,32 @@
         <JSONWebKey defaultKeyID="${JWT_KEY_ID}">
             <path><![CDATA[${OA4MP_HOME}etc/keys.jwk]]></path>
         </JSONWebKey>
+        <!--
+             See https://oa4mp.org/server/configuration/device-flow-servlet-configuration.html
+        -->
+        <deviceFlowServlet
+              verificationURI="https://${OA4MP_HOST}/oauth2/device"
+              interval="5"
+              codeChars="0123456789ABCDEFX"
+              codeLength="12"
+              codeSeparator="+"
+              codePeriodLength="4"
+        />
+        <!--
+            See https://oa4mp.org/common/configuration/scopes.html
+        -->
         <scopes>
             <scope>openid</scope>
             <scope>email</scope>
             <scope>profile</scope>
-            <!--   <scope>org.cilogon.userinfo</scope> -->
-            <scope>org.oa4mp:userinfo</scope>
+            <scope>org.cilogon.userinfo</scope>
+            <!-- <scope>org.oa4mp:userinfo</scope> -->
         </scopes>
+        <!--
+            See https://oa4mp.org/server/configuration/authorization-servlet-configuration.html for a discussions
+            of these two possible authorization servlet configurations. The first is when using Tomcat
+            and the second is when proxying through another OAuth service (e.g. CILogon).
+        -->
 <!--
                 <authorizationServlet useHeader="true"
                                       requireHeader="true"
@@ -65,6 +84,11 @@
                                      authorizationURI="https://${OA4MP_HOST}oauth2/authorize"
                                    />
  -->
+        <!--
+            See https://oa4mp.org/common/configuration/derby-store.html
+             This uses a Derby file store. Note that this means you cannot use the CLI
+             when the service is running since the database can only have a single instance.
+        -->
         <derby storeType="file"
                path="${OA4MP_HOME}var/storage/server">
             <transactions/>
@@ -75,6 +99,9 @@
             <txStore/>
             <voStore/>
         </derby>
+        <!--
+             See https://oa4mp.org/server/configuration/client_management-configuration.html
+        -->
         <clientManagement>
             <api protocol="rfc7591"
                  enabled="true"
@@ -84,13 +111,18 @@
             />
             <api protocol="rfc7592" enabled="true"/>
         </clientManagement>
+        <!--
+             See https://oa4mp.org/common/configuration/logging.html
+        -->
         <logging
                 logFileName="${OA4MP_HOME}log/server.log"
                 logName="oa4mp"
                 logSize="100000"
                 logFileCount="2"
                 debug="tue"/>
-
+        <!--
+             See https://oa4mp.org/server/configuration/qdl-config.html
+        -->
         <qdl name="qdl-default"
              enabled="true"
              debug="info"
@@ -120,6 +152,18 @@
                 </module>
             </modules>
         </qdl>
+        <!--
+             See https://oa4mp.org/server/configuration/server-email.html
+        -->
+        <mail enabled="false"
+              username="YOUR_EMAIL_SERVER_LOGON_NAME"
+              password="YOUR_EMAIL_SERVER_PASSWORD"
+              server="YOUR_EMAIL_SERVER_ADDRESS"
+              recipients="RECIPIENT_0;RECIPIENT_1;...;RECIPIENT_N">
+          <messageTemplate>${OA4MP_HOME}etc/oa4mp-message.template</messageTemplate>
+          <subjectTemplate>${OA4P_HOME}etc/oa4mp-subject.template</subjectTemplate>
+        </mail>
+
 
     </service>
 

@@ -117,11 +117,12 @@ Much as the requirement that the Java Mail jar has to be deployed globally in To
          enabled="true"
          useSSL="false"
          password="mairzy-doats"
-                debug="false"
+         username="fionna@nazghul.org"
+         debug="false"
       	 server="smtp.super-secure-server.net"
-         recipients="admin@chem.bigstate.edu"&gt;
-         &lt;messageTemplate&gt;/var/www/config/oa4mp-message.template&lt;/messageTemplate&gt;
-         &lt;subjectTemplate&gt;/var/www/config/os4mp-subject.template&lt;/subjectTemplate&gt;
+         recipients="admin@chem.bigstate.edu;staff@it.bigstate.edu"&gt;
+         &lt;messageTemplate&gt;/opt/oa4mp/server/etc/oa4mp-message.template&lt;/messageTemplate&gt;
+         &lt;subjectTemplate&gt;/opt/oa4mp/server/etc/oa4mp-subject.template&lt;/subjectTemplate&gt;
       &lt;/mail&gt;
       &lt;!-- rest of configuration &gt;
    &lt;\server&gt;

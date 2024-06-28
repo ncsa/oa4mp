@@ -388,7 +388,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         try {
             jwtRunner.doAuthClaims();
         } catch (Throwable throwable) {
-            OA2ServletUtils.handleScriptEngineException(this, getOA2SE(), throwable, createDebugger(serviceTransaction.getClient()), serviceTransaction, new XMLMap());
+            // NOTE at this point there is no "backup" possible if there is an error since this is starting the flow.
+            // Sending a null cues in the handler not to rollback.
+            OA2ServletUtils.handleScriptEngineException(this, getOA2SE(), throwable, createDebugger(serviceTransaction.getClient()), serviceTransaction, null);
         }
         issuerTransactionState = doAT(issuerTransactionState, client);
         // Now, get the right signing key

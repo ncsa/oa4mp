@@ -7,4 +7,8 @@ import edu.uiuc.ncsa.security.installer.WebInstaller;
  * on 6/19/24 at  7:23 AM
  */
 public class OA4MPClientInstaller extends WebInstaller {
+    @Override
+    protected String getSetup() {
+        return "/oa4mp/setup.yaml";
+    }
 }

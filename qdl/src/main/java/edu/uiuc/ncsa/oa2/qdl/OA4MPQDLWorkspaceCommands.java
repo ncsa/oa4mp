@@ -29,6 +29,7 @@ public class OA4MPQDLWorkspaceCommands extends WorkspaceCommands {
             super.loadQE(inputLine, cfgName);
         } catch (MyConfigurationException mcx) {
              // try to process it as a server config
+            // https://github.com/ncsa/oa4mp/issues/196
             ConfigurationNode node = XMLConfigUtil.findConfiguration(inputLine.getNextArgFor(QDLConfigurationConstants.CONFIG_FILE_FLAG), cfgName, OA4MPConfigTags.COMPONENT);
             OA2ConfigurationLoader sourceLoader = new OA2ConfigurationLoader<>(node);
             OA2SE sourceSE = (OA2SE) sourceLoader.load();
