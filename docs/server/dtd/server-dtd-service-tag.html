@@ -48,7 +48,7 @@
     
         
                     <div class="xleft">
-            Last Published: 2024-06-06
+            Last Published: 2024-06-28
                                 </div>
                 <div class="xright">            
     
@@ -665,10 +665,15 @@
 <td style="vertical-align: top;">N/A</td>
         
 <td style="vertical-align: top;">This enables polling for client approvals. The meaning of this is
-            that if there is a command line interface (CLI) which approves a client, a specific file is written
+            that if an administrator needs to approve a client, a specific file is written
             to this directory which will be read at intervals by the server, telling it that a new approval has been
-            written. This is because once a client configuration is loaded, it stays in memory. To disable this feature,
-            do not set this. Note that the CLI should use the same configuration as the server.
+            written. This is useful in cases where the service cannot be easily called, such
+            as a derby file instance. To disable this feature,
+            do not set this. The file is a JSON object of the form {&quot;id&quot;:client_id,&quot;approver&quot;:approver}.
+            The approver element is optional. <b>Nota Bene:</b> If you enable this feature, then you must
+            carefully control access to the polling directory or you give adminstrative privileges to anyone
+            with access! Generally do not enable this unless you have an excellent reason for doing so and
+            have it configured properly.
         </td>
     </tr>
     
@@ -681,7 +686,8 @@
 <td style="vertical-align: top;">N/A</td>
         
 <td style="vertical-align: top;">How frequently the polling directory will be accessed for new approvals.
-            Note that this is ignored if polling is not enabled.
+            Note that this is ignored if polling is not enabled. Polling is only enabled if this
+            is present in the configuration and has a non-negative value.
         </td>
     </tr>
 

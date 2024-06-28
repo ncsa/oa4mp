@@ -48,7 +48,7 @@
     
         
                     <div class="xleft">
-            Last Published: 2024-06-06
+            Last Published: 2024-06-28
                                 </div>
                 <div class="xright">            
     
@@ -317,11 +317,12 @@ Much as the requirement that the Java Mail jar has to be deployed globally in To
          enabled=&quot;true&quot;
          useSSL=&quot;false&quot;
          password=&quot;mairzy-doats&quot;
-                debug=&quot;false&quot;
+         username=&quot;fionna@nazghul.org&quot;
+         debug=&quot;false&quot;
       	 server=&quot;smtp.super-secure-server.net&quot;
-         recipients=&quot;admin@chem.bigstate.edu&quot;&gt;
-         &lt;messageTemplate&gt;/var/www/config/oa4mp-message.template&lt;/messageTemplate&gt;
-         &lt;subjectTemplate&gt;/var/www/config/os4mp-subject.template&lt;/subjectTemplate&gt;
+         recipients=&quot;admin@chem.bigstate.edu;staff@it.bigstate.edu&quot;&gt;
+         &lt;messageTemplate&gt;/opt/oa4mp/server/etc/oa4mp-message.template&lt;/messageTemplate&gt;
+         &lt;subjectTemplate&gt;/opt/oa4mp/server/etc/oa4mp-subject.template&lt;/subjectTemplate&gt;
       &lt;/mail&gt;
       &lt;!-- rest of configuration &gt;
    &lt;\server&gt;
