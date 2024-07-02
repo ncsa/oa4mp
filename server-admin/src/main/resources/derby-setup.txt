@@ -1,0 +1,42 @@
+/*
+  You need to replace
+     BOOT_PASSWORD
+     USER_PASSWORD
+  with your passwords. These should be strings
+  like  6e_WXS_3O (i.e. mixture of cases, digits and _)
+
+  EXCEPT where indicated below. This sets two passwords which should prevent any
+  casual access to the database.
+
+  NOTE: This installs the database to /opt/oa4mp/var/storage/derby so if you want it elsewhere
+  change that.
+  start ij and enter
+*/
+
+connect 'jdbc:derby:/opt/oa4mp/var/storage/derby/server_oa4mp;create=true;dataEncryption=true;bootPassword=BOOT_PASSWORD;user=oa4mp';
+CALL SYSCS_UTIL.SYSCS_SET_DATABASE_PROPERTY('derby.connection.requireAuthentication', 'true');
+CALL SYSCS_UTIL.SYSCS_SET_DATABASE_PROPERTY('derby.database.sqlAuthorization','true');
+CALL SYSCS_UTIL.SYSCS_SET_DATABASE_PROPERTY('derby.authentication.provider', 'BUILTIN');
+/*
+  DO NOT CHANGE THE NEXT LINE! It must have 'USER_PASSWORD' with the single quotes
+  since it is setting that property by name.
+*/
+CALL SYSCS_UTIL.SYSCS_SET_DATABASE_PROPERTY('derby.user.oa4mp', 'USER_PASSWORD');
+CALL SYSCS_UTIL.SYSCS_SET_DATABASE_PROPERTY('derby.database.propertiesOnly', 'true');
+/*
+  test it worked with
+*/
+create schema oa4mp;
+show schemas;
+/*
+   exit ij with
+*/
+exit;
+/*
+   Now the full connection string is
+*/
+connect 'jdbc:derby:/home/ncsa/dev/derby/oa4mp/server_oa4mp;user=oa4mp;password=USER_PASSWORD;bootPassword=BOOT_PASSWORD';
+/*
+  restart ij and connect with the above string. You can create the database by issuing this in ij
+*/
+run '${OA4MP_HOME}etc/oauth2-derby.sql';

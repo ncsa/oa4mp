@@ -1,11 +1,11 @@
 
 /* Uncomment this if you did not do the test above and have already created the schema.
-CREATE SCHEMA oauth2;
+CREATE SCHEMA oa4mp;
 */
-CREATE SCHEMA oauth2;
+CREATE SCHEMA oa4mp;
 
 
-CREATE TABLE oauth2.transactions
+CREATE TABLE oa4mp.transactions
 (
     access_token              VARCHAR(255),
     access_token_valid        boolean,
@@ -42,10 +42,10 @@ CREATE TABLE oauth2.transactions
     verifier_token            varchar(255)
 );
 
-CREATE INDEX access_token on oauth2.transactions (access_token);
-CREATE INDEX refresh_token on oauth2.transactions (refresh_token);
+CREATE INDEX access_token on oa4mp.transactions (access_token);
+CREATE INDEX refresh_token on oa4mp.transactions (refresh_token);
 
-CREATE TABLE oauth2.client_approvals
+CREATE TABLE oa4mp.client_approvals
 (
    approval_ts                timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
    approved                   boolean,
@@ -55,7 +55,7 @@ CREATE TABLE oauth2.client_approvals
    status                     clob
 );
 
-CREATE TABLE oauth2.adminClients
+CREATE TABLE oa4mp.adminClients
 (
    admin_id                    VARCHAR(255) PRIMARY KEY,
    allow_custom_ids            boolean,
@@ -83,7 +83,7 @@ CREATE TABLE oauth2.adminClients
    vo_uri                      clob
 );
 
-CREATE TABLE oauth2.clients
+CREATE TABLE oa4mp.clients
 (
    at_lifetime               bigint,
    at_max_lifetime           bigint,
@@ -130,7 +130,7 @@ CREATE TABLE oauth2.clients
    strict_scopes             boolean
    );
 
-CREATE TABLE oauth2.permissions
+CREATE TABLE oa4mp.permissions
 (
    admin_id                 VARCHAR(255),
    can_approve              boolean,
@@ -145,9 +145,9 @@ CREATE TABLE oauth2.permissions
    ersatz_id                clob,
    permission_id            VARCHAR(255) PRIMARY KEY
 );
-CREATE INDEX p_client ON oauth2.permissions(client_id);
+CREATE INDEX p_client ON oa4mp.permissions(client_id);
 
-CREATE TABLE oauth2.tx_records
+CREATE TABLE oa4mp.tx_records
 (
    audience            clob,
    description         clob,
@@ -164,10 +164,10 @@ CREATE TABLE oauth2.tx_records
    token_type          clob,
    valid               boolean
 );
-CREATE INDEX  parents on oauth2.tx_records (parent_id);
+CREATE INDEX  parents on oa4mp.tx_records (parent_id);
 
 
-CREATE TABLE oauth2.virtual_organizations
+CREATE TABLE oa4mp.virtual_organizations
 (
    at_issuer              clob,
    created                bigint,
@@ -183,7 +183,7 @@ CREATE TABLE oauth2.virtual_organizations
    valid                  boolean,
    vo_id                  VARCHAR(255) PRIMARY KEY
 );
-create  INDEX discovery_path on oauth2.virtual_organizations (discovery_path);
+create  INDEX discovery_path on oa4mp.virtual_organizations (discovery_path);
 
 
 
@@ -237,6 +237,6 @@ create  INDEX discovery_path on oauth2.virtual_organizations (discovery_path);
 /*
  Darned use command for mysql equivalent SHow Create Tables for Derby
 
-describe oauth2.transactions
+describe oa4mp.transactions
 
  */

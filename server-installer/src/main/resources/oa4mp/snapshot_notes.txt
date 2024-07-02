@@ -1,0 +1,9 @@
+_____________________________________________
+Release notes for OA4MP version 5.4-SNAPSHOT
+‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+This is not a release but will install the most recent
+snapshot (ongoing development) for OA4MP. Generally
+this is only of interest to, for instance, developers
+who are testing specific features. It should not
+be installed for production purposes as there is not
+guarantee that it is wholly stable.

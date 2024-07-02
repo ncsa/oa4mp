@@ -81,24 +81,11 @@
                <authorizationServlet useProxy="true"
                                      cfgFile="${OA4MP_HOME}etc/client-oa2.xml"
                                      cfgName="proxy-client"
-                                     authorizationURI="https://${OA4MP_HOST}oauth2/authorize"
+                                     authorizationURI="https://${OA4MP_HOST}/oauth2/authorize"
                                    />
  -->
-        <!--
-            See https://oa4mp.org/common/configuration/derby-store.html
-             This uses a Derby file store. Note that this means you cannot use the CLI
-             when the service is running since the database can only have a single instance.
-        -->
-        <derby storeType="file"
-               path="${OA4MP_HOME}var/storage/server">
-            <transactions/>
-            <clients/>
-            <clientApprovals/>
-            <permissions/>
-            <adminClients/>
-            <txStore/>
-            <voStore/>
-        </derby>
+
+        ${STORE}
         <!--
              See https://oa4mp.org/server/configuration/client_management-configuration.html
         -->

@@ -1,4 +1,4 @@
-# This creates the directory structure for creating QDL from the sources.
+# This creates the directory structure for creating OA4MP from the sources.
 #
 #
 DEFAULT_OA4MP_ROOT=$NCSA_DEV_INPUT/oa4mp

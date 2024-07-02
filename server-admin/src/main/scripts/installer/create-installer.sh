@@ -1,4 +1,6 @@
-# This will create the installer for OA4MP's.
+# This will create the massive installer for OA4MP.
+# All the files (including wars and jars) are here.
+# The net result is a jar of over 200 Mb.
 # The QDL distro installer is in qdl/src/main/scripts.
 # This includes the basic files
 # for an installation, including qdl, qdl-run, a basic configuration file,

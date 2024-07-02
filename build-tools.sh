@@ -74,6 +74,15 @@ if [[ $? -ne 0 ]] ; then
 fi
 echo "   ... done!"
 
+echo "building OA4MP Web installer"
+cd "$OA4MP_ROOT/server-installer/src/main/scripts/"
+./create-distro.sh
+if [[ $? -ne 0 ]] ; then
+    echo "create OA4MP Web installer failed"
+    exit 1
+fi
+echo "   ... done!"
+
 
 if [ -z ${OA4MP_HOME+x} ];  then
      echo "no OA4MP local install, skipping..."

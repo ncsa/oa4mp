@@ -12,6 +12,7 @@ import edu.uiuc.ncsa.qdl.extensions.QDLVariable;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.util.QDLFileUtil;
 import edu.uiuc.ncsa.qdl.variables.Constant;
+import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
@@ -31,8 +32,30 @@ import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ExtendedParameters.OA4MP_
  */
 public class JWTCommands implements QDLModuleMetaClass {
     JWKUtil2 jwkUtil;
+    public boolean hasJWKS(){
+        return !((jwks == null) || jwks.isEmpty());
+    }
+    public JSONWebKeys getJwks() {
+        return jwks;
+    }
+
+    public void setJwks(JSONWebKeys jwks) {
+        if(jwks == null) {
+            jwkStem = null;
+        }else{
+            jwkStem = new QDLStem();
+            jwkStem.fromJSON(getJsonWebKeyUtil().toJSON(jwks));
+        }
+        this.jwks = jwks;
+    }
 
     JSONWebKeys jwks;
+
+    public QDLStem getJwkStem() {
+        return jwkStem;
+    }
+
+    QDLStem jwkStem;
 
     public JWKUtil2 getJwkUtil() {
         if (jwkUtil == null) {
@@ -130,7 +153,7 @@ public class JWTCommands implements QDLModuleMetaClass {
                             }
                             keyType = args.getString(ARG_KEY_TYPE);
                         }
-                        if(args.containsKey(ARG_DEFAULT_KEY_ID)){
+                        if (args.containsKey(ARG_DEFAULT_KEY_ID)) {
                             if (!Constant.isString(args.get(ARG_DEFAULT_KEY_ID))) {
                                 throw new IllegalArgumentException(getName() + " requires a string as the " + ARG_DEFAULT_KEY_ID + " of the generated keys.");
                             }
@@ -199,8 +222,8 @@ public class JWTCommands implements QDLModuleMetaClass {
                     throw new IllegalArgumentException("unsupported key type '" + keyType + "'");
                 }
 
-                if (setCurrent) {
-                    jwks = newKeys;
+                if (setCurrent || !hasJWKS()) {
+                    setJwks(newKeys);
                 }
                 if (!newKeys.hasDefaultKey()) {
                     for (String id : newKeys.keySet()) {
@@ -210,11 +233,14 @@ public class JWTCommands implements QDLModuleMetaClass {
                     }
                 }
                 JSONObject jsonObject = getJsonWebKeyUtil().toJSON(newKeys);
-                if (overwriteFile) {
-                    writeWebkeys(state, jsonObject, filePath);
-                } else {
-                    if (!QDLFileUtil.exists(state, filePath)) {
+                if (filePath != null) {
+                    // only try to do file stuff if they have set it up.
+                    if (overwriteFile) {
                         writeWebkeys(state, jsonObject, filePath);
+                    } else {
+                        if (!QDLFileUtil.exists(state, filePath)) {
+                            writeWebkeys(state, jsonObject, filePath);
+                        }
                     }
                 }
                 QDLStem outKeys = new QDLStem();
@@ -250,6 +276,8 @@ public class JWTCommands implements QDLModuleMetaClass {
                     doc.add("            " + ARG_FILE_PATH_TYPE + " = path to file (if missing no write is done)");
                     doc.add("            " + ARG_FILE_OVERWRITE_TYPE + " = overwrite file if present (default is false, ignore if no file)");
                     doc.add("            " + ARG_SET_TO_CURRENT_KEYS_TYPE + " = set to the current keys for this module.");
+                    doc.add("If there are no keys active, it will set the new keys to the current ones.");
+                    doc.add("Otherwise, you must tell it to do so.");
                     break;
                 case 2:
                     doc.add(getName() + "(file_path, true|false) - create a set of RSA JSON WebKeys, writes them to the given file.");
@@ -264,7 +292,7 @@ public class JWTCommands implements QDLModuleMetaClass {
                     return doc;
             }
 
-            doc.add("This also returns the newly generated set of keys as the output.");
+            doc.add("\nThis also returns the newly generated set of keys as the output.");
             doc.add("If you are replacing the current keys with the new one, the default is set to");
             doc.add("key with algorithm " + JWKUtil2.RS_256 + " (if RSA) or " + JWKUtil2.ES_256 + " (if elliptic)");
             doc.add("RSA keys follow https://www.rfc-editor.org/rfc/rfc7518.html#section-3.3");
@@ -304,7 +332,7 @@ public class JWTCommands implements QDLModuleMetaClass {
             try {
                 //String rawJSON = new String(Files.readAllBytes(f.toPath()));
                 String rawJSON = QDLFileUtil.readTextFile(state, filePath);
-                jwks = getJsonWebKeyUtil().fromJSON(rawJSON);
+                setJwks(getJsonWebKeyUtil().fromJSON(rawJSON));
             } catch (Throwable e) {
                 throw new QDLException("Error reading keys file:" + e.getMessage(), e);
             }
@@ -338,7 +366,7 @@ public class JWTCommands implements QDLModuleMetaClass {
             if (objects.length != 1) {
                 throw new IllegalArgumentException(getName() + " requires a file name.");
             }
-            if (jwks == null || jwks.isEmpty()) {
+            if (!hasJWKS()) {
                 throw new IllegalStateException(" No keys found to save.");
             }
             if (!Constant.isString(objects[0])) {
@@ -467,19 +495,19 @@ public class JWTCommands implements QDLModuleMetaClass {
 
         @Override
         public Object evaluate(Object[] objects, State state) {
-            if (jwks == null || jwks.isEmpty()) {
+            if (!hasJWKS()) {
                 return "";
             }
             if (objects.length == 0) {
-                return jwks.getDefaultKeyID();
+                return getJwks().getDefaultKeyID();
             }
             // so we have one.
             String newId = objects[0].toString();
-            if (!jwks.containsKey(newId)) {
+            if (!getJwks().containsKey(newId)) {
                 throw new IllegalArgumentException(" There is no such key in the collection.");
             }
-            String oldID = jwks.getDefaultKeyID();
-            jwks.setDefaultKeyID(newId);
+            String oldID = getJwks().getDefaultKeyID();
+            getJwks().setDefaultKeyID(newId);
             return oldID;
         }
 
@@ -494,6 +522,59 @@ public class JWTCommands implements QDLModuleMetaClass {
                     docs.add(getName() + "(new_id)  set the current default key used for signatures.");
             }
             return docs;
+        }
+    }
+
+    protected String CURRENT_KEYS = "jwks"; // would use "keys" but that clashes with QDL built-in
+
+    public class Keys implements QDLFunction {
+        @Override
+        public String getName() {
+            return CURRENT_KEYS;
+        }
+
+        @Override
+        public int[] getArgCount() {
+            return new int[]{0, 1};
+        }
+
+        @Override
+        public Object evaluate(Object[] objects, State state) throws Throwable {
+            if (objects.length == 0) {
+                // query current keys
+                if (jwks == null) {
+                    return QDLNull.getInstance();
+                }
+                QDLStem out = new QDLStem();
+                // improvement is to have a parallel version of this and just return it.
+                return out.fromJSON(getJsonWebKeyUtil().toJSON(jwks));
+            }
+            if (!(objects[0] instanceof QDLStem)) {
+                throw new IllegalArgumentException("no key specified");
+            }
+            QDLStem stem = (QDLStem) objects[0];
+            QDLStem old = getJwkStem();
+            setJwks(getJsonWebKeyUtil().fromJSON(stem.toJSON()));
+            if (old == null) {
+                return QDLNull.getInstance();
+            }
+            return old;
+        }
+
+
+        @Override
+        public List<String> getDocumentation(int argCount) {
+            List<String> doc = new ArrayList<>();
+            switch (argCount){
+                case 0:
+                    doc.add(getName() + "() - return current jwk set or none if there are none");
+                    break;
+                case 1:
+                    doc.add(getName() + "(keys.) - set the current keys to this stem");
+                    doc.add("this returns the previously active keys or null if there was none.");
+                    break;
+            }
+            return doc;
         }
     }
 
@@ -513,26 +594,26 @@ public class JWTCommands implements QDLModuleMetaClass {
         @Override
         public Object evaluate(Object[] objects, State state) {
             if (state instanceof OA2State) {
-                jwks = ((OA2State) state).getJsonWebKeys();
+                setJwks(((OA2State) state).getJsonWebKeys());
             }
-            if (jwks == null || jwks.isEmpty()) {
+            if (!hasJWKS()) {
                 throw new IllegalStateException(" no keys loaded.");
             }
             String kid = null;
             if (objects.length == 2) {
                 kid = objects[1].toString();
             } else {
-                if (!jwks.hasDefaultKey()) {
+                if (!getJwks().hasDefaultKey()) {
                     throw new IllegalStateException(" no default key.");
                 }
-                kid = jwks.getDefaultKeyID();
+                kid = getJwks().getDefaultKeyID();
 
             }
             QDLStem arg = (QDLStem) objects[0];
 
 
             try {
-                return JWTUtil.createJWT((JSONObject) arg.toJSON(), jwks.get(kid));
+                return JWTUtil.createJWT((JSONObject) arg.toJSON(), getJwks().get(kid));
 
             } catch (Throwable e) {
                 throw new QDLException("Error creating JWT:" + e.getMessage(), e);
@@ -575,15 +656,15 @@ public class JWTCommands implements QDLModuleMetaClass {
 
         @Override
         public Object evaluate(Object[] objects, State state) {
-            if (jwks == null || jwks.isEmpty()) {
+            if (!hasJWKS()) {
                 throw new IllegalStateException(" No keys have been set.");
             }
             QDLStem QDLStem = new QDLStem();
-            if (jwks.hasDefaultKey()) {
-                QDLStem.put("default", jwks.getDefaultKeyID());
+            if (getJwks().hasDefaultKey()) {
+                QDLStem.put("default", getJwks().getDefaultKeyID());
             }
-            for (String id : jwks.keySet()) {
-                JSONWebKey jwk = jwks.get(id);
+            for (String id : getJwks().keySet()) {
+                JSONWebKey jwk = getJwks().get(id);
                 QDLStem entry = new QDLStem();
                 entry.put(MyOtherJWTUtil2.ALGORITHM, jwk.algorithm);
                 entry.put(JWKUtil2.USE, jwk.use);
@@ -617,7 +698,7 @@ public class JWTCommands implements QDLModuleMetaClass {
 
         @Override
         public Object evaluate(Object[] objects, State state) {
-            if (jwks == null || jwks.isEmpty()) {
+            if (!hasJWKS()) {
                 throw new IllegalStateException(" No keys have been set.");
             }
             URI well_known = null;

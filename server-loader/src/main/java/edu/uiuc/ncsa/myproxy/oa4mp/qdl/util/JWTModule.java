@@ -52,6 +52,7 @@ public class JWTModule extends JavaModule {
         funcs.add(jwtCommands.new Create_UUID());
         funcs.add(jwtCommands.new SaveKeys());
         funcs.add(jwtCommands.new CreateJWT());
+        funcs.add(jwtCommands.new Keys());
         funcs.add(jwtCommands.new VerifyJWT());
         funcs.add(jwtCommands.new GetHeader());
         funcs.add(jwtCommands.new GetPayload());
@@ -100,7 +101,7 @@ public class JWTModule extends JavaModule {
                     switch (xe.asStartElement().getName().getLocalPart()) {
                         case JWT_COMMANDS_TAG:
                             try {
-                                jwtCommands.jwks = JSONWebKeyUtil.fromXML(xer);
+                                jwtCommands.setJwks(JSONWebKeyUtil.fromXML(xer));
                             } catch (Throwable e) {
                                 System.out.println(" Could not deserialize the JWT module. " + e.getMessage());
                             }
@@ -135,7 +136,7 @@ public class JWTModule extends JavaModule {
                                     // the tag is empty.
                                     return;
                                 }
-                                jwtCommands.jwks = jwkUtil2.fromJSON(raw);
+                                jwtCommands.setJwks(jwkUtil2.fromJSON(raw));
                                 //jwtCommands.jwks = JSONWebKeyUtil.fromXML(xer);
                             } catch (Throwable e) {
                                 System.out.println(" Could not deserialize the JWT module. " + e.getMessage());

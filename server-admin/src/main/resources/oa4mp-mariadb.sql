@@ -17,9 +17,9 @@ CREATE USER 'oa4mp-server'@'localhost' IDENTIFIED BY 'PASSWORD';
 Run the rest of this script. The user must exist before permissions are granted.
 */
 
-CREATE DATABASE oauth2
+CREATE DATABASE oa4mp
 DEFAULT CHARACTER SET utf8;
-USE oauth2;
+USE oa4mp;
 
 /*
 Some useful commands. Lst two list users and will show permissions for a single user on a machine.:
@@ -31,7 +31,7 @@ Some useful commands. Lst two list users and will show permissions for a single 
  change the value of any timestamp field on update, effectively rendering all of the "last modified"
  */
 
-CREATE TABLE oauth2.clients (
+CREATE TABLE oa4mp.clients (
   client_id          VARCHAR(255) PRIMARY KEY,
   public_key         TEXT,
   name               TEXT,
@@ -54,7 +54,7 @@ CREATE TABLE oauth2.clients (
 
 
 
-CREATE TABLE oauth2.adminClients (
+CREATE TABLE oa4mp.adminClients (
   admin_id     VARCHAR(255) PRIMARY KEY,
   name         TEXT,
   secret       TEXT,
@@ -66,7 +66,7 @@ CREATE TABLE oauth2.adminClients (
 );
 
 
-CREATE TABLE permissions (
+CREATE TABLE oa4mp.permissions (
   permission_id VARCHAR(255) PRIMARY KEY,
   admin_id      VARCHAR(255),
   client_id     VARCHAR(255),
@@ -78,7 +78,7 @@ CREATE TABLE permissions (
   creation_ts   TIMESTAMP DEFAULT NULL
 );
 
-CREATE TABLE oauth2.client_approvals (
+CREATE TABLE oa4mp.client_approvals (
   client_id   VARCHAR(255) PRIMARY KEY,
   approver    TEXT,
   approved    BOOLEAN,
@@ -86,7 +86,7 @@ CREATE TABLE oauth2.client_approvals (
   approval_ts TIMESTAMP DEFAULT NULL
 );
 
-CREATE TABLE oauth2.transactions (
+CREATE TABLE oa4mp.transactions (
   temp_token          VARCHAR(255) PRIMARY KEY,
   temp_token_valid    BOOLEAN,
   callback_uri        TEXT,
@@ -115,10 +115,10 @@ CREATE TABLE oauth2.transactions (
 COMMIT;
 # Now to grant restricted access. The  tables have to exist before this step
 
-GRANT All  ON oauth2.client_approvals TO 'oa4mp-server'@'localhost';
-GRANT ALL  ON oauth2.clients TO 'oa4mp-server'@'localhost';
-GRANT ALL  ON oauth2.adminClients TO 'oa4mp-server'@'localhost';
-GRANT ALL  ON oauth2.transactions TO 'oa4mp-server'@'localhost';
-GRANT ALL  ON oauth2.permissions TO 'oa4mp-server'@'localhost';
+GRANT All  ON oa4mp.client_approvals TO 'oa4mp-server'@'localhost';
+GRANT ALL  ON oa4mp.clients TO 'oa4mp-server'@'localhost';
+GRANT ALL  ON oa4mp.adminClients TO 'oa4mp-server'@'localhost';
+GRANT ALL  ON oa4mp.transactions TO 'oa4mp-server'@'localhost';
+GRANT ALL  ON oa4mp.permissions TO 'oa4mp-server'@'localhost';
 
 commit;

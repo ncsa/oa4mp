@@ -20,7 +20,6 @@ import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
-import javax.naming.CommunicationException;
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
@@ -131,10 +130,41 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
     }
 
     public void handleException(Throwable throwable, MetaDebugUtil debugger) {
+/*   All NamingException subclasses:
 
-        if (throwable instanceof CommunicationException) {
-            debugger.warn(this, "Communication exception talking to LDAP");
-            warn("Communication exception talking to LDAP.");
+     AttributeInUseException,
+     AttributeModificationException,
+     CannotProceedException,
+     CommunicationException,
+     ConfigurationException,
+     ContextNotEmptyException,
+     InsufficientResourcesException,
+     InterruptedNamingException,
+     InvalidAttributeIdentifierException,
+     InvalidAttributesException,
+     InvalidAttributeValueException,
+     InvalidNameException,
+     InvalidSearchControlsException,
+     InvalidSearchFilterException,
+     LimitExceededException,
+     LinkException,
+     NameAlreadyBoundException,
+     NameNotFoundException,
+     NamingSecurityException,
+     NoInitialContextException,
+     NoSuchAttributeException,
+     NotContextException,
+     OperationNotSupportedException,
+     PartialResultException,
+     ReferralException,
+     SchemaViolationException,
+     ServiceUnavailableException
+ */
+        if (throwable instanceof NamingException) {
+            // Fix for https://jira.ncsa.illinois.edu/browse/CIL-1943
+            String msg =  throwable.getClass().getSimpleName() + " talking to LDAP:" + throwable.getMessage();
+            debugger.warn(this, msg);
+            warn(msg);
             return;
         }
         debugger.error(this, "Error accessing LDAP", throwable);
@@ -210,7 +240,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
                 info("No search name encountered for LDAP query. No search performed.");
             }
             context.close();
-        } catch (Throwable throwable) {
+        }        catch (Throwable throwable) {
             debugger.trace(this, name + " Error getting search name \"" + throwable.getMessage() + "\"", throwable);
             handleException(throwable, debugger);
         } finally {
@@ -308,7 +338,8 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
                     return (LdapContext) dirContext.lookup(getLDAPCfg().getSearchBase());
                 } catch (Throwable e) {
                     // Do nothing. Allow for errors.
-                    debugger.trace(this, "failed to get any LDAP directory context, count # " + i, e);
+                    String msg = e.getClass().getSimpleName() + " failure for LDAP server # " + i + ": " + e.getMessage();
+                    debugger.trace(this, msg, e);
                 }
             }
            if(0 < getLDAPCfg().getMaxWait()){

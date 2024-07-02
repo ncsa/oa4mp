@@ -15,8 +15,8 @@
 \set oa4mpServerUserPassword '\'Password\''
 
 /* Probably don't have to change anything from here on down... */
-\set oa4mpDatabase oauth2
-\set oa4mpSchema oauth2
+\set oa4mpDatabase oa4mp
+\set oa4mpSchema oa4mp
 \set oa4mpTransactionTable transactions
 \set oa4mpClientTable clients
 \set oa4mpClientCallbackTable callbacks

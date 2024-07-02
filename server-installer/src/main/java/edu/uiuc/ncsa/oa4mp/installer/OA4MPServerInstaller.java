@@ -1,10 +1,16 @@
 package edu.uiuc.ncsa.oa4mp.installer;
 
+import edu.uiuc.ncsa.security.core.exceptions.NFWException;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.installer.WebInstaller;
+import org.apache.commons.codec.binary.Base64;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.Map;
 
@@ -15,14 +21,38 @@ import java.util.Map;
 public class OA4MPServerInstaller extends WebInstaller {
     static protected final String HOST_FLAG = "-host";
     static protected final String PORT_FLAG = "-port";
+    static protected final String STORE_FLAG = "-store";
+    static protected final String STORE_TYPE_DERBY_FILE = "derby_file";
+    static protected final String STORE_TYPE_FILE_STORE = "file_store";
+    static protected final String STORE_TYPE_MYSQL = "mysql";
+    static protected final String STORE_TYPE_MARIA_DB = "mariadb";
+    static protected final String STORE_TYPE_POSTGRES = "pg";
     public static String NO_PORT = "-1";
 
+    protected String getStoreFilename(String flag) {
+        if(flag == null){
+            flag = STORE_TYPE_DERBY_FILE; //sets default
+        }
+        switch (flag) {
+            case STORE_TYPE_MYSQL:
+                return "mysql.xml";
+            case STORE_TYPE_FILE_STORE:
+                return "fileStore.xml";
+            case STORE_TYPE_MARIA_DB:
+                return "mariadb.xml";
+            case STORE_TYPE_POSTGRES:
+                return "postgres.xml";
+            case STORE_TYPE_DERBY_FILE:
+            default:
+                return "derby_fs.xml";
+        }
+    }
 
     @Override
-    protected Map<String,String> setupTemplates() throws IOException {
+    protected Map<String, String> setupTemplates() throws IOException {
         super.setupTemplates();
         // Only process templates if there is a reason to. 
-        if(!(getArgMap().isInstall() || getArgMap().isUpgrade() || getArgMap().isRemove())){
+        if (!(getArgMap().isInstall() || getArgMap().isUpgrade() || getArgMap().isRemove())) {
             return getTemplates();
         }
         getTemplates().put("${OA4MP_HOME}", getRoot().getCanonicalPath() + File.separator);
@@ -30,27 +60,55 @@ public class OA4MPServerInstaller extends WebInstaller {
         if (hasPort()) {
             h = h + ":" + getPort();
         }
-        SecureRandom secureRandom = new SecureRandom();
-        byte[] ba = new byte[12];
+
+        getTemplates().put("${JWT_KEY_ID}", getID(12));
+        getTemplates().put("${DERBY_PASSWORD}", getSecret(8));
+        getTemplates().put("${DERBY_BOOT_PASSWORD}", getSecret(8));
+
+        getTemplates().put("${OA4MP_HOST}", h);
+        InputStream is = getClass().getResourceAsStream("/tiles/" + getStoreFilename(getArgMap().getString(STORE_FLAG)));
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        copyStream(is, baos);
+        String store = new String(baos.toString(StandardCharsets.UTF_8));
+        is.close();
+        // Now for a little trickery. Run the templates on the store
+        store = doReplace(store);
+        if (StringUtils.isTrivial(store)) {
+            throw new NFWException("missing tiles for store \"" + getArgMap().getString(STORE_FLAG) + "\"");
+        }
+        getTemplates().put("${STORE}", store);
+        return getTemplates();
+    }
+
+    SecureRandom secureRandom = new SecureRandom();
+
+    protected String getSecret(int length) {
+        byte[] ba = new byte[length];
+        secureRandom.nextBytes(ba);
+        return Base64.encodeBase64URLSafeString(ba);
+    }
+
+    protected String getID(int length) {
+        byte[] ba = new byte[length];
         secureRandom.nextBytes(ba);
         BigInteger bi = new BigInteger(ba);
-        String s=bi.toString(16).toUpperCase();
-
-        getTemplates().put("${JWT_KEY_ID}", s);
-        getTemplates().put("${OA4MP_HOST}", h);
-        return getTemplates();
+        return bi.toString(16).toUpperCase();
     }
 
     @Override
     protected void setupArgMap(String[] args) {
         super.setupArgMap(args);
-        for (String arg : args) {
+        for (int i = 0; i < args.length; i++) {
+            String arg = args[i];
             switch (arg) {
                 case HOST_FLAG:
                     getArgMap().put(HOST_FLAG, arg);
                     break;
                 case PORT_FLAG:
                     getArgMap().put(PORT_FLAG, arg);
+                    break;
+                case STORE_FLAG:
+                    getArgMap().put(STORE_FLAG, args[++i]);
                     break;
             }
         }
@@ -83,10 +141,16 @@ public class OA4MPServerInstaller extends WebInstaller {
         super.printMoreArgHelp();
         say(HOST_FLAG + " = the host for the service. Default is localhost");
         say(PORT_FLAG + " = the port for the service. Default is " + port + ". If you set it to -1, no port is used.");
+        say(STORE_FLAG + " = the storage for this service. You may use one of");
+        say(StringUtils.RJustify(STORE_TYPE_DERBY_FILE, 20) + " = (default) use an auto-configured Derby database locally");
+        say(StringUtils.RJustify(STORE_TYPE_MYSQL, 20) + " = use your MySQL database.");
+        say(StringUtils.RJustify(STORE_TYPE_MARIA_DB, 20) + " = use your MariaDB database.");
+        say(StringUtils.RJustify(STORE_TYPE_POSTGRES, 20) + " = use your PostgreSQL database.");
+        say(StringUtils.RJustify(STORE_TYPE_FILE_STORE, 20) + " = use a file store. (only for testing, really)");
     }
 
     @Override
-    protected void printMoreExamplesHelp() throws IOException{
+    protected void printMoreExamplesHelp() throws IOException {
         super.printMoreExamplesHelp();
         say("Example of doing an install");
         say("java -jar installer.jar " + INSTALL_OPTION + " " + DIR_ARG + " $OA4MP_HOME " + HOST_FLAG + " issuer.bgsu.edu" + PORT_FLAG + " -1");
@@ -108,7 +172,7 @@ public class OA4MPServerInstaller extends WebInstaller {
                 OA4MPServerInstaller.showHelp();
                 return;
             }
-            if(doProcessing){
+            if (doProcessing) {
                 OA4MPServerInstaller.process();
             }
             OA4MPServerInstaller.shutdown();
