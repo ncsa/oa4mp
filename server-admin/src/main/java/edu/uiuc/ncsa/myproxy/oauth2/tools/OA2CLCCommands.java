@@ -24,6 +24,7 @@ import edu.uiuc.ncsa.security.core.util.DateUtils;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
+import edu.uiuc.ncsa.security.servlet.ServiceClient;
 import edu.uiuc.ncsa.security.servlet.ServiceClientHTTPException;
 import edu.uiuc.ncsa.security.util.cli.CommonCommands;
 import edu.uiuc.ncsa.security.util.cli.ConfigurableCommandsImpl;
@@ -410,13 +411,22 @@ public class OA2CLCCommands extends CommonCommands {
             if (clipboard != null) {
                 StringSelection data = new StringSelection(target);
                 clipboard.setContents(data, data);
-                say(s);
+               say(s);
             }
         } catch (Throwable t) {
             // there was a problem with the clipboard. Skip it.
         }
     }
-
+    public void echo_request(InputLine inputLine) throws Exception {
+        if(showHelp(inputLine)){
+            say("echo_request on|off - echo the requests sent to the server.");
+            say("Do be aware that this is a very low-level development tool which is quite useful");
+            say("for seeing how the requests are being made. Sensitive information (such as the client");
+            say("password) will be shown, so you have been warned. Do not use this unless you have a need.");
+        }
+        ServiceClient.ECHO_REQUEST = inputLine.getLastArg().equalsIgnoreCase("on");
+        say("echo request mode set to " + (ServiceClient.ECHO_REQUEST?"on":"off"));
+    }
     protected String getFromClipboard(boolean silentMode) {
         // TODO Places where the clipboard is read have a lot of cases of prompting the user for the information. Refactor that to use this method?
         try {

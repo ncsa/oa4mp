@@ -11,45 +11,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="Update website">
-      <change afterPath="$PROJECT_DIR$/server-admin/src/main/resources/derby-setup.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/server-installer/src/main/resources/oa4mp/snapshot.yaml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/server-installer/src/main/resources/oa4mp/snapshot_notes.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/server-installer/src/main/resources/tiles/derby_fs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/server-installer/src/main/resources/tiles/fileStore.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/server-installer/src/main/resources/tiles/mariadb.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/server-installer/src/main/resources/tiles/mysql.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/server-installer/src/main/resources/tiles/postgres.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/server-installer/src/main/scripts/create-distro.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/server-installer/src/main/scripts/create_server_snapshot_cfg.qdl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build-tools.sh" beforeDir="false" afterPath="$PROJECT_DIR$/build-tools.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/pdf/claim_source_examples.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/claim_source_examples.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/pdf/creating_claim_sources2.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/creating_claim_sources2.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/pdf/filestore-migration.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/filestore-migration.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/pdf/oa2-client.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/oa2-client.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/pdf/qdl_clc_ini.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/qdl_clc_ini.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/pdf/qdl_oa4mp_store_access.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/qdl_oa4mp_store_access.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/pdf/rfc7523_intro.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/rfc7523_intro.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/pdf/scopes.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/scopes.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/pdf/token_handler_configuration.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/token_handler_configuration.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/myproxy-website/myproxy-website.iml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/oa4mp-server-oauth2.iml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/resources/derby-migrate.sql" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/resources/derby-migrate.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/resources/oa4mp-derby.sql" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/resources/oa4mp-derby.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/resources/oa4mp-mariadb.sql" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/resources/oa4mp-mariadb.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/resources/oa4mp-mysql.sql" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/resources/oa4mp-mysql.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/resources/oa4mp-pg.sql" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/resources/oa4mp-pg.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/scripts/installer/cfg.xml" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/scripts/installer/cfg.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/scripts/installer/create-dirs.sh" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/scripts/installer/create-dirs.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/scripts/installer/create-installer.sh" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/scripts/installer/create-installer.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/scripts/installer/create_keys.cmd" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/scripts/installer/create_keys.cmd" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/scripts/jwt-scripts.tar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/scripts/oidc-cm-scripts.tar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-installer/src/main/java/edu/uiuc/ncsa/oa4mp/installer/OA4MPServerInstaller.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-installer/src/main/java/edu/uiuc/ncsa/oa4mp/installer/OA4MPServerInstaller.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-installer/src/main/resources/oa4mp/setup.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/server-installer/src/main/resources/oa4mp/setup.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/claims/LDAPClaimsSource.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/claims/LDAPClaimsSource.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/qdl/util/JWTCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/qdl/util/JWTCommands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/qdl/util/JWTModule.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/qdl/util/JWTModule.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/docs/rfc7523_intro.odt" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/docs/rfc7523_intro.odt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2CLCCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2CLCCommands.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-test/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/buildNumber.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -114,35 +83,36 @@
     <option name="showMembers" value="true" />
     <option name="showModules" value="false" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;jdk.selected.JAVA_MODULE&quot;: &quot;11 (2)&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/ncsa/dev/ncsa-git/oa4mp/server-installer/src/main/resources/tiles&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Libraries&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.48910892&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.QDL CLC.executor": "Run",
+    "DefaultHtmlFileTemplate": "HTML File",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "git-widget-placeholder": "master",
+    "jdk.selected.JAVA_MODULE": "11 (2)",
+    "last_opened_file_path": "/home/ncsa/dev/ncsa-git/oa4mp/server-installer/src/main/resources/tiles",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Libraries",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.48910892",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
-      &quot;JSON&quot;,
-      &quot;JAVA&quot;,
-      &quot;SQL&quot;
+  "keyToStringList": {
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "JSON",
+      "JAVA",
+      "SQL"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/server-installer/src/main/resources/tiles" />
@@ -167,7 +137,7 @@
       <recent name="edu.uiuc.ncsa.oa4mp.delegation.server.storage.upkeep" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.OA4MPServerInstaller">
+  <component name="RunManager" selected="Application.QDL CLC">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="WIDTH" value="400" />
       <option name="HEIGHT" value="300" />
@@ -1498,11 +1468,6 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/OA2SE.java</url>
-          <line>619</line>
-          <option name="timeStamp" value="36" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/servlet/OA2ClientUtils.java</url>
           <line>85</line>
           <option name="timeStamp" value="78" />
@@ -1613,11 +1578,6 @@
           <option name="timeStamp" value="248" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/servlet/AbstractAuthorizationServlet.java</url>
-          <line>264</line>
-          <option name="timeStamp" value="251" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/server/storage/upkeep/UpkeepThread.java</url>
           <line>74</line>
           <option name="timeStamp" value="260" />
@@ -1633,11 +1593,6 @@
           <option name="timeStamp" value="295" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/proxy/src/main/java/edu/uiuc/ncsa/oa2/servlet/OA2ATServlet.java</url>
-          <line>83</line>
-          <option name="timeStamp" value="310" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/storage/sql/SQLClientApprovalStore.java</url>
           <line>108</line>
           <option name="timeStamp" value="311" />
@@ -1646,11 +1601,6 @@
           <url>file://$PROJECT_DIR$/server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/storage/sql/SQLClientApprovalStore.java</url>
           <line>78</line>
           <option name="timeStamp" value="312" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/loader/OA2ServletInitializer.java</url>
-          <line>75</line>
-          <option name="timeStamp" value="316" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-test/src/test/java/test/ServiceTestSuite2.java</url>
@@ -1666,16 +1616,6 @@
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/5.3-SNAPSHOT/storage-5.3-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/sql/derby/DerbyConnectionParameters.java</url>
           <line>20</line>
           <option name="timeStamp" value="344" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/proxy/src/main/java/edu/uiuc/ncsa/oa2/servlet/OA2ATServlet.java</url>
-          <line>1620</line>
-          <option name="timeStamp" value="346" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/proxy/src/main/java/edu/uiuc/ncsa/oa2/servlet/OA2ATServlet.java</url>
-          <line>1627</line>
-          <option name="timeStamp" value="347" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/migrate/MigrationEntryConverter.java</url>
@@ -1708,31 +1648,6 @@
           <option name="timeStamp" value="409" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/cm/oidc_cm/OIDCCMServlet.java</url>
-          <line>406</line>
-          <option name="timeStamp" value="418" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/cm/oidc_cm/OIDCCMServlet.java</url>
-          <line>536</line>
-          <option name="timeStamp" value="420" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/cm/oidc_cm/OIDCCMServlet.java</url>
-          <line>777</line>
-          <option name="timeStamp" value="422" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/servlet/AbstractAuthorizationServlet.java</url>
-          <line>230</line>
-          <option name="timeStamp" value="449" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/proxy/src/main/java/edu/uiuc/ncsa/oa2/servlet/RFC8628AuthorizationServer.java</url>
-          <line>531</line>
-          <option name="timeStamp" value="450" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/claims/HTTPHeaderClaimsSource.java</url>
           <line>117</line>
           <option name="timeStamp" value="451" />
@@ -1741,36 +1656,6 @@
           <url>file://$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/claims/QDLHeadersClaimsSource.java</url>
           <line>131</line>
           <option name="timeStamp" value="463" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/proxy/src/main/java/edu/uiuc/ncsa/oa2/servlet/RFC8628AuthorizationServer.java</url>
-          <line>509</line>
-          <option name="timeStamp" value="478" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/servlet/AbstractRegistrationServlet.java</url>
-          <line>81</line>
-          <option name="timeStamp" value="482" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-api/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/server/servlet/AbstractRegistrationServlet.java</url>
-          <line>62</line>
-          <option name="timeStamp" value="483" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/claims/AbstractAccessTokenHandler.java</url>
-          <line>99</line>
-          <option name="timeStamp" value="515" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/cm/oidc_cm/OIDCCMServlet.java</url>
-          <line>230</line>
-          <option name="timeStamp" value="528" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-loader/src/main/java/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/cm/oidc_cm/OIDCCMServlet.java</url>
-          <line>140</line>
-          <option name="timeStamp" value="529" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/JWKUtilCommands.java</url>
@@ -1818,13 +1703,8 @@
           <option name="timeStamp" value="559" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/oauth2/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/oa2/client/ATServer2.java</url>
-          <line>135</line>
-          <option name="timeStamp" value="560" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2CLCCommands.java</url>
-          <line>260</line>
+          <line>261</line>
           <option name="timeStamp" value="561" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -1873,19 +1753,9 @@
           <option name="timeStamp" value="585" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2CLCCommands.java</url>
-          <line>389</line>
-          <option name="timeStamp" value="591" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/util/5.3-SNAPSHOT/util-5.3-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/util/cli/ConfigurableCommandsImpl.java</url>
           <line>374</line>
           <option name="timeStamp" value="594" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2CLCCommands.java</url>
-          <line>412</line>
-          <option name="timeStamp" value="597" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/clc/QDLCLC.java</url>
@@ -1898,19 +1768,9 @@
           <option name="timeStamp" value="601" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/proxy/src/main/java/edu/uiuc/ncsa/oa2/servlet/OA2ATServlet.java</url>
-          <line>386</line>
-          <option name="timeStamp" value="602" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/web-installer/5.3-SNAPSHOT/web-installer-5.3-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/installer/WebInstaller.java</url>
           <line>638</line>
           <option name="timeStamp" value="607" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-installer/src/main/java/edu/uiuc/ncsa/oa4mp/installer/OA4MPServerInstaller.java</url>
-          <line>71</line>
-          <option name="timeStamp" value="611" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/web-installer/5.3-SNAPSHOT/web-installer-5.3-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/installer/WebInstaller.java</url>
@@ -1921,6 +1781,36 @@
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/web-installer/5.3-SNAPSHOT/web-installer-5.3-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/installer/WebInstaller.java</url>
           <line>479</line>
           <option name="timeStamp" value="613" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/oauth2/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/oa2/client/PAServer2.java</url>
+          <line>59</line>
+          <option name="timeStamp" value="633" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/oauth2/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/oa2/client/PAServer2.java</url>
+          <line>30</line>
+          <option name="timeStamp" value="634" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/client-loader/src/main/java/edu/uiuc/ncsa/oa4mp/oauth2/client/OA2ClientLoader.java</url>
+          <line>414</line>
+          <option name="timeStamp" value="638" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/client-loader/src/main/java/edu/uiuc/ncsa/oa4mp/oauth2/client/OA2ClientLoaderImpl.java</url>
+          <line>111</line>
+          <option name="timeStamp" value="639" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/oauth2/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/oa2/client/RTServer2.java</url>
+          <line>28</line>
+          <option name="timeStamp" value="640" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/oauth2/src/main/java/edu/uiuc/ncsa/oa4mp/delegation/oa2/client/ATServer2.java</url>
+          <line>56</line>
+          <option name="timeStamp" value="641" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
