@@ -201,6 +201,14 @@ public class OA2CLCCommands extends CommonCommands {
             // This just means we added an out of band way to list. If we don't exit here
             // we will clear the state no matter what the user requested.
             return;
+        }catch(Exception myConfigurationException){
+            // https://github.com/ncsa/oa4mp/issues/199
+            if(isDebugOn()){
+                myConfigurationException.printStackTrace();
+            }
+            // there was a bona fide problem trying to load the configuration.
+            say(myConfigurationException.getMessage());
+            return;  // that failed, bail.
         }
         if (showHelp(inputLine)) {
             return;
@@ -417,15 +425,27 @@ public class OA2CLCCommands extends CommonCommands {
             // there was a problem with the clipboard. Skip it.
         }
     }
-    public void echo_request(InputLine inputLine) throws Exception {
+    // Fixes https://github.com/ncsa/oa4mp/issues/199
+    public void echo_http_request(InputLine inputLine) throws Exception {
         if(showHelp(inputLine)){
-            say("echo_request on|off - echo the requests sent to the server.");
+            say("echo_http_request on|off - echo *all* requests sent to the server to the console.");
             say("Do be aware that this is a very low-level development tool which is quite useful");
             say("for seeing how the requests are being made. Sensitive information (such as the client");
             say("password) will be shown, so you have been warned. Do not use this unless you have a need.");
         }
         ServiceClient.ECHO_REQUEST = inputLine.getLastArg().equalsIgnoreCase("on");
         say("echo request mode set to " + (ServiceClient.ECHO_REQUEST?"on":"off"));
+    }
+
+
+    public void echo_http_response(InputLine inputLine) throws Exception {
+        if(showHelp(inputLine)){
+            say("echo_http_response on|off - echo the server responses to the console.");
+            say("Do be aware that this is a very low-level development tool which is quite useful");
+            say("for seeing how the reponses are being made. These may be very large.");
+        }
+        ServiceClient.ECHO_RESPONSE = inputLine.getLastArg().equalsIgnoreCase("on");
+        say("echo response mode set to " + (ServiceClient.ECHO_RESPONSE?"on":"off"));
     }
     protected String getFromClipboard(boolean silentMode) {
         // TODO Places where the clipboard is read have a lot of cases of prompting the user for the information. Refactor that to use this method?

@@ -18,6 +18,7 @@ import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.DateUtils;
 import edu.uiuc.ncsa.security.core.util.DebugConstants;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.servlet.ServiceClient;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -85,7 +86,7 @@ public class CLC implements QDLModuleMetaClass {
         @Override
         public Object evaluate(Object[] objects, State state) throws Throwable {
             try {
-                if(!initCalled){
+                if (!initCalled) {
                     QDLCLC qdlclc = new QDLCLC(null);
                     OA2CommandLineClient.setInstance(qdlclc);
                 }
@@ -108,10 +109,10 @@ public class CLC implements QDLModuleMetaClass {
             return true;
         }
 
-        protected OA2ClientEnvironment createEnvironment(QDLStem ini, String name){
-           OA2ClientEnvironment ce = new OA2ClientEnvironment();
-           ce.setScopes(ini.getStem("scopes").getQDLList());
-           return ce;
+        protected OA2ClientEnvironment createEnvironment(QDLStem ini, String name) {
+            OA2ClientEnvironment ce = new OA2ClientEnvironment();
+            ce.setScopes(ini.getStem("scopes").getQDLList());
+            return ce;
         }
 
         @Override
@@ -273,8 +274,10 @@ public class CLC implements QDLModuleMetaClass {
             return dd;
         }
     }
+
     protected String CURRENT_URI = "current_uri";
-    public class GetCurrentURI implements QDLFunction{
+
+    public class GetCurrentURI implements QDLFunction {
         @Override
         public String getName() {
             return CURRENT_URI;
@@ -288,8 +291,8 @@ public class CLC implements QDLModuleMetaClass {
         @Override
         public Object evaluate(Object[] objects, State state) throws Throwable {
             checkInit();
-            URI c =  clcCommands.getCurrentURI();
-            if(c == null){
+            URI c = clcCommands.getCurrentURI();
+            if (c == null) {
                 return QDLNull.getInstance();
             }
             return c.toString();
@@ -359,6 +362,97 @@ public class CLC implements QDLModuleMetaClass {
             List<String> doxx = new ArrayList<>();
             doxx.add(getName() + " refresh the tokens.");
             doxx.add(checkInitMessage);
+            return doxx;
+        }
+    }
+protected String ECHO_HTTP_RESPONSE = "echo_http_response";
+    public class EchoHttpResponse implements QDLFunction {
+        @Override
+        public String getName() {
+            return ECHO_HTTP_RESPONSE;
+        }
+
+        @Override
+        public int[] getArgCount() {
+            return new int[]{0,1};
+        }
+
+        @Override
+        public Object evaluate(Object[] objects, State state) throws Throwable {
+            if(objects.length == 0){
+                return ServiceClient.ECHO_RESPONSE;
+            }
+            if(!(objects[1] instanceof Boolean)){
+                throw new IllegalArgumentException(getName() + " requires a boolean argument");
+            }
+
+            Boolean oldValue = ServiceClient.ECHO_RESPONSE;
+            ServiceClient.ECHO_RESPONSE = (Boolean) objects[1];
+            return oldValue;
+        }
+
+        @Override
+        public List<String> getDocumentation(int argCount) {
+            List<String> doxx = new ArrayList<>();
+            switch (argCount) {
+                case 0:
+                    doxx.add(getName() + "() - query current state of response echoing.");
+                    doxx.add("Returns true is enabled, false otherwise.");
+                case 1:
+                    doxx.add(getName() + "( true | false) - set current state of response echoing.");
+                    doxx.add("Returns previous state.");
+            }
+            doxx.add("HTTP response echoing means that *every* HTTP response to the server is echoed to the command");
+            doxx.add("console (not to the GUI output). This is intended to allow very low-level");
+            doxx.add("observation of this module.");
+            doxx.add("See also:" + ECHO_HTTP_REQUEST);
+            return doxx;
+        }
+    }
+    protected String ECHO_HTTP_REQUEST = "echo_http_request";
+
+    public class EchoHTTPRequest implements QDLFunction {
+        @Override
+        public String getName() {
+            return ECHO_HTTP_REQUEST;
+        }
+
+        @Override
+        public int[] getArgCount() {
+            return new int[]{0, 1};
+        }
+
+        @Override
+        public Object evaluate(Object[] objects, State state) throws Throwable {
+            if(objects.length == 0){
+                return ServiceClient.ECHO_REQUEST;
+            }
+            if(!(objects[1] instanceof Boolean)){
+                throw new IllegalArgumentException(getName() + " requires a boolean argument");
+            }
+
+            Boolean oldValue = ServiceClient.ECHO_REQUEST;
+            ServiceClient.ECHO_REQUEST = (Boolean) objects[1];
+            return oldValue;
+        }
+
+        @Override
+        public List<String> getDocumentation(int argCount) {
+            List<String> doxx = new ArrayList<>();
+            switch (argCount) {
+                case 0:
+                    doxx.add(getName() + "() - query current state of request echoing.");
+                    doxx.add("Returns true is enabled, false otherwise.");
+                case 1:
+                    doxx.add(getName() + "( true | false) - set current state of request echoing.");
+                    doxx.add("Returns previous state.");
+            }
+            doxx.add("Request echoing means that *every* HTTP request to the server is echoed to the command");
+            doxx.add("console (not to the GUI output). This is intended to allow very low-level");
+            doxx.add("observation of this module. Crafting OAuth requests can be enormously difficult,");
+            doxx.add("so if you need to see the traffic, this is invaluable.");
+            doxx.add("See also:" + ECHO_HTTP_RESPONSE);
+
             return doxx;
         }
     }
@@ -1304,7 +1398,7 @@ public class CLC implements QDLModuleMetaClass {
 
     @Override
     public JSONObject serializeToJSON() {
-        if(clcCommands == null){
+        if (clcCommands == null) {
             // nothing to serialize since it has not been initialized yet
             // But this might be called when it is first gotten from the symbol
             // table.
@@ -1314,14 +1408,14 @@ public class CLC implements QDLModuleMetaClass {
     }
 
     @Override
-    public void deserializeFromJSON(JSONObject jsonObject){
-      try {
-          clcCommands.fromJSON(jsonObject);
-      }catch(Throwable t){
-          if(t instanceof RuntimeException){
-              throw (RuntimeException)t;
-          }
-          throw new RuntimeException("error loading stored CLC state", t);
-      }
+    public void deserializeFromJSON(JSONObject jsonObject) {
+        try {
+            clcCommands.fromJSON(jsonObject);
+        } catch (Throwable t) {
+            if (t instanceof RuntimeException) {
+                throw (RuntimeException) t;
+            }
+            throw new RuntimeException("error loading stored CLC state", t);
+        }
     }
 }

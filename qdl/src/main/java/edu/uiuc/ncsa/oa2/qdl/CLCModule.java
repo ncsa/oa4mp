@@ -35,6 +35,8 @@ public class CLCModule extends JavaModule {
         funcs.add(clc.new CreateURI());
         funcs.add(clc.new GetCurrentURI());
         funcs.add(clc.new DeviceFlow());
+        funcs.add(clc.new EchoHTTPRequest());
+        funcs.add(clc.new EchoHttpResponse());
         funcs.add(clc.new Exchange());
         funcs.add(clc.new GetCert());
         funcs.add(clc.new GetClaim());
