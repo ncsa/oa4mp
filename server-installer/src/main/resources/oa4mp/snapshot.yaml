@@ -2,6 +2,7 @@
   directories:
   - permissions:
     - {preprocess: true, update: false, source: etc/cfg.xml}
+    - {preprocess: true, update: false, source: bin/clc, exec: true}
     - {preprocess: true, update: false, source: bin/cli, exec: true}
     - {preprocess: true, update: false, source: bin/jwt, exec: true}
     - {preprocess: true, update: false, source: bin/migrate, exec: true}

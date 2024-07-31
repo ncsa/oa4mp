@@ -6,5 +6,5 @@ package edu.uiuc.ncsa.oa4mp;
  * on 6/11/24 at  11:26 AM
  */
 public class OA4MPVersion {
-    public static final String VERSION_NUMBER = "5.3-SNAPSHOT";
+    public static final String VERSION_NUMBER = "5.6";
 }

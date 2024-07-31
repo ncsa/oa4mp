@@ -174,6 +174,9 @@ public class OA4MPServerInstaller extends WebInstaller {
             }
             if (doProcessing) {
                 OA4MPServerInstaller.process();
+                if(OA4MPServerInstaller.getArgMap().isInstall()){
+                    OA4MPServerInstaller.say(OA4MPServerInstaller.getMessage("/oa4mp/success.txt"));
+                }
             }
             OA4MPServerInstaller.shutdown();
 
@@ -186,4 +189,5 @@ public class OA4MPServerInstaller extends WebInstaller {
     protected String getSetup() {
         return "/oa4mp/setup.yaml";
     }
+
 }

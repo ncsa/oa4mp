@@ -1,0 +1,6 @@
+____________________________________
+Release notes for OA4MP version 5.6
+‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+Welcome to OA4MP 5.6! This has several fixes, listed on the release
+page on GitHub https://github.com/ncsa/oa4mp/releases/tag/v5.6.
+

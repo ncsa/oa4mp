@@ -6,7 +6,7 @@
     <parent>
         <groupId>edu.uiuc.ncsa.myproxy</groupId>
         <artifactId>oa4mp</artifactId>
-        <version>5.3-SNAPSHOT</version>
+        <version>5.6</version>
     </parent>
 
     <artifactId>server-installer</artifactId>
@@ -20,7 +20,7 @@
          <dependency>
              <groupId>edu.uiuc.ncsa.security</groupId>
              <artifactId>web-installer</artifactId>
-             <version>5.3-SNAPSHOT</version>
+             <version>5.6</version>
          </dependency>
      </dependencies>
     <build>

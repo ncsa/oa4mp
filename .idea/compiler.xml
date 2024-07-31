@@ -29,7 +29,6 @@
         <module name="oa4mp-server-test" />
         <module name="client" />
         <module name="website" />
-        <module name="myproxy" />
         <module name="oa4mp-server-oauth2" />
         <module name="myproxy-logon" />
         <module name="server-loader" />
@@ -46,7 +45,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="myproxy-logon" target="11" />
+      <module name="myproxy" target="11" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
