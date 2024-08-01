@@ -311,7 +311,7 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
             say("unlink " + UNLINK_ALL_FLAG + " | client_id  + [" + UNLINK_REMOVE_FLAG + "] [admin_id]- unlink the client with the given client_id admin client");
             say(UNLINK_ALL_FLAG + " - (no client_id) unlink all clients, not just the specified one.");
             say(UNLINK_REMOVE_FLAG + " - remove clients that are unlinked.");
-            say("This means that the clients will still exist unless you specifially remove them.");
+            say("This means that the clients will still exist unless you specifically remove them.");
             say("Properly speaking, you would use the " + UNLINK_ALL_FLAG + " only before removing the ");
             say("admin client itself and retiring it.");
             say("See also: link");
@@ -349,7 +349,7 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
         if (doAll) {
             clients = permissionsStore.getClients(adminClient.getIdentifier());
         } else {
-            clients = new ArrayList<>();
+            clients = new ArrayList();
             clients.add(clientID);
         }
 
