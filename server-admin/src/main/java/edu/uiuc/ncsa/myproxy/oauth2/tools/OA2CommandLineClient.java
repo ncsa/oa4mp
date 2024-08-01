@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.myproxy.oauth2.tools;
 
 import edu.uiuc.ncsa.myproxy.oauth2.base.CommandLineClient;
 import edu.uiuc.ncsa.oa4mp.OA4MPVersion;
+import edu.uiuc.ncsa.security.core.exceptions.ConnectionException;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
@@ -106,11 +107,15 @@ public class OA2CommandLineClient extends CommandLineClient {
             initialize();
             about();
         } catch (Throwable mc) {
+
             Throwable t = mc;
             if(mc.getCause()!=null){
                 t = mc.getCause();
             }
-            say("Could not load the configuration:\"" + t.getMessage() + "\"");
+            if(!(mc instanceof ConnectionException)) {
+                // Don't print error message here, let it propagate back.
+                say("Could not load the configuration:\"" + t.getMessage() + "\"");
+            }
         }
     }
 

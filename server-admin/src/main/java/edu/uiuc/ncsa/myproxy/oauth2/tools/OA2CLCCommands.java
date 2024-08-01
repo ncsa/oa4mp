@@ -20,6 +20,8 @@ import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2Asset;
 import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2ClientEnvironment;
 import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2MPService;
 import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.exceptions.ConnectionException;
+import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.core.util.DateUtils;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
@@ -125,14 +127,37 @@ public class OA2CLCCommands extends CommonCommands {
                           OA2CommandLineClient oa2CommandLineClient) throws Throwable {
         super(logger);
         try {
-            setCe((OA2ClientEnvironment) oa2CommandLineClient.getEnvironment());
-        } catch (Throwable t) {
-            if (logger != null) {
-                logger.error("could not load configuration", t);
-            } else {
-                if (getDebugger().isEnabled()) {
-                    t.printStackTrace();
+            if (oa2CommandLineClient.getLoader() == null) {
+                if(isBatch()){
+                    throw new MyConfigurationException("No loader found");
+                }else{
+                    say("warning: no loader found");
                 }
+            }else{
+                setCe((OA2ClientEnvironment) oa2CommandLineClient.getEnvironment());
+            }
+        } catch (Throwable t) {
+            if (t instanceof ConnectionException) {
+                // Fix https://github.com/ncsa/oa4mp/issues/201
+                if (isBatch()) {
+                    if (logger != null) {
+                        logger.error("could not load configuration", t);
+                        throw t; // If batch mode and configuration cannot load, bomb here and now.
+                    }
+                } else {
+                    say("unable to connect to OA4MP server. Cannot load configuration.");
+                }
+            } else {
+                // Most likely is that there is some connection issue, but if not,
+                // fall through here
+                if (logger != null) {
+                    logger.error("could not load configuration", t);
+                } else {
+                    if (getDebugger().isEnabled()) {
+                        t.printStackTrace();
+                    }
+                }
+
             }
         }
         this.oa2CommandLineClient = oa2CommandLineClient;
@@ -201,9 +226,9 @@ public class OA2CLCCommands extends CommonCommands {
             // This just means we added an out of band way to list. If we don't exit here
             // we will clear the state no matter what the user requested.
             return;
-        }catch(Exception myConfigurationException){
+        } catch (Exception myConfigurationException) {
             // https://github.com/ncsa/oa4mp/issues/199
-            if(isDebugOn()){
+            if (isDebugOn()) {
                 myConfigurationException.printStackTrace();
             }
             // there was a bona fide problem trying to load the configuration.
@@ -419,34 +444,36 @@ public class OA2CLCCommands extends CommonCommands {
             if (clipboard != null) {
                 StringSelection data = new StringSelection(target);
                 clipboard.setContents(data, data);
-               say(s);
+                say(s);
             }
         } catch (Throwable t) {
             // there was a problem with the clipboard. Skip it.
         }
     }
+
     // Fixes https://github.com/ncsa/oa4mp/issues/199
     public void echo_http_request(InputLine inputLine) throws Exception {
-        if(showHelp(inputLine)){
+        if (showHelp(inputLine)) {
             say("echo_http_request on|off - echo *all* requests sent to the server to the console.");
             say("Do be aware that this is a very low-level development tool which is quite useful");
             say("for seeing how the requests are being made. Sensitive information (such as the client");
             say("password) will be shown, so you have been warned. Do not use this unless you have a need.");
         }
         ServiceClient.ECHO_REQUEST = inputLine.getLastArg().equalsIgnoreCase("on");
-        say("echo request mode set to " + (ServiceClient.ECHO_REQUEST?"on":"off"));
+        say("echo request mode set to " + (ServiceClient.ECHO_REQUEST ? "on" : "off"));
     }
 
 
     public void echo_http_response(InputLine inputLine) throws Exception {
-        if(showHelp(inputLine)){
+        if (showHelp(inputLine)) {
             say("echo_http_response on|off - echo the server responses to the console.");
             say("Do be aware that this is a very low-level development tool which is quite useful");
             say("for seeing how the reponses are being made. These may be very large.");
         }
         ServiceClient.ECHO_RESPONSE = inputLine.getLastArg().equalsIgnoreCase("on");
-        say("echo response mode set to " + (ServiceClient.ECHO_RESPONSE?"on":"off"));
+        say("echo response mode set to " + (ServiceClient.ECHO_RESPONSE ? "on" : "off"));
     }
+
     protected String getFromClipboard(boolean silentMode) {
         // TODO Places where the clipboard is read have a lot of cases of prompting the user for the information. Refactor that to use this method?
         try {
@@ -787,9 +814,10 @@ public class OA2CLCCommands extends CommonCommands {
         dummyAsset.setIdToken(idToken);
     }
 
-    public RefreshTokenImpl getRefreshToken(){
+    public RefreshTokenImpl getRefreshToken() {
         return dummyAsset.getRefreshToken();
     }
+
     public void claims(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             showClaimsHelp();
@@ -1507,12 +1535,12 @@ public class OA2CLCCommands extends CommonCommands {
             // Note that the call updates the asset, so we don't need to look at the response,
             // just print th right thing.
             if (isErsatz()) {
-                 if(requestedTokenType == OA2MPService.EXCHANGE_REFRESH_TOKEN){
-                     printToken(getRefreshToken(), false, true);
-                 }else{
-                     printTokens(false, true);
-                     printToken(getIdToken(), false, true);
-                 }
+                if (requestedTokenType == OA2MPService.EXCHANGE_REFRESH_TOKEN) {
+                    printToken(getRefreshToken(), false, true);
+                } else {
+                    printTokens(false, true);
+                    printToken(getIdToken(), false, true);
+                }
                 setErsatz(false); // no matter what, after a successful fork, do not re-attempt to fork!
             } else {
                 switch (requestedTokenType) {
@@ -2214,7 +2242,7 @@ public class OA2CLCCommands extends CommonCommands {
             parameters.put(SCOPE, array);
         }
         if (!parameters.containsKey(REDIRECT_URI)) {
-            if(getCe().getCallback()!=null) {
+            if (getCe().getCallback() != null) {
                 parameters.put(REDIRECT_URI, getCe().getCallback().toString());
             }
         }

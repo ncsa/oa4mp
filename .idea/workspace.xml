@@ -16,8 +16,11 @@
       <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/CLC.java" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/CLC.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/CLCModule.java" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/CLCModule.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/clc/QDLConfigLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/src/main/java/edu/uiuc/ncsa/oa2/qdl/clc/QDLConfigLoader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/docs/jwt-util.odt" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/docs/jwt-util.odt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2AdminClientCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2AdminClientCommands.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2CLCCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2CLCCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2CommandLineClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2CommandLineClient.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-installer/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-test/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/buildNumber.properties" afterDir="false" />
     </list>
@@ -90,8 +93,12 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "Application.QDL CLC.executor": "Run",
+    "Application.CLC.executor": "Run",
+    "Application.CLI.executor": "Debug",
+    "Application.QDL CLC.executor": "Debug",
+    "Application.QDL.executor": "Debug",
     "DefaultHtmlFileTemplate": "HTML File",
+    "JUnit.Test Suite.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
@@ -142,7 +149,7 @@
       <recent name="edu.uiuc.ncsa.oa4mp.delegation.server.storage.upkeep" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.QDL CLC">
+  <component name="RunManager" selected="Application.CLI">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="WIDTH" value="400" />
       <option name="HEIGHT" value="300" />
@@ -228,7 +235,7 @@
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
       <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.myproxy.oauth2.tools.OA2Commands" />
       <module name="server-admin" />
-      <option name="PROGRAM_PARAMETERS" value="-cfg $PROJECT_DIR$/../../csd/config/server-oa2.xml -name localhost:oa4mp.oa2.mariadb" />
+      <option name="PROGRAM_PARAMETERS" value="-cfg $PROJECT_DIR$/../../csd/config/servers.xml -name localhost:oa4mp.oa2.mariadb" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -1741,7 +1748,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2CLCCommands.java</url>
-          <line>269</line>
+          <line>294</line>
           <option name="timeStamp" value="561" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -1851,8 +1858,28 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2CLCCommands.java</url>
-          <line>198</line>
+          <line>223</line>
           <option name="timeStamp" value="642" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2CLCCommands.java</url>
+          <line>230</line>
+          <option name="timeStamp" value="648" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/qdl/language/1.5-QDL-SNAPSHOT/language-1.5-QDL-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/qdl/config/QDLConfigurationLoader.java</url>
+          <line>492</line>
+          <option name="timeStamp" value="654" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/qdl/language/1.5-QDL-SNAPSHOT/language-1.5-QDL-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/qdl/config/QDLConfigurationLoader.java</url>
+          <line>31</line>
+          <option name="timeStamp" value="657" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/edu/uiuc/ncsa/myproxy/oauth2/tools/OA2AdminClientCommands.java</url>
+          <line>346</line>
+          <option name="timeStamp" value="659" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

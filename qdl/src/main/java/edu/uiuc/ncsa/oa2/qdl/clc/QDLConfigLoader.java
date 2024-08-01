@@ -11,6 +11,7 @@ import edu.uiuc.ncsa.oa4mp.delegation.oa2.OIDCDiscoveryTags;
 import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.SSLConfigurationUtil2;
 import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2ClientEnvironment;
 import edu.uiuc.ncsa.oa4mp.oauth2.client.OA2ClientLoaderImpl;
+import edu.uiuc.ncsa.qdl.exceptions.IndexError;
 import edu.uiuc.ncsa.qdl.parsing.IniParserDriver;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.QDLStem;
@@ -63,11 +64,15 @@ public class QDLConfigLoader<T extends OA2ClientEnvironment> extends OA2ClientLo
     protected void initialize(QDLStem s, String configName) {
         fullConfig = s;
         Object obj = null;
-        obj = s.getByMultiIndex(configName); // because the constructor
-        if(obj==null){
+        try {
+            obj = s.getByMultiIndex(configName); // because the constructor
+        } catch (IndexError indexError) {
             throw new IllegalArgumentException(configName + " is not an entry");
-
         }
+        if (obj == null) { // edge case. No entry for some strange reason.
+            throw new IllegalArgumentException(configName + " is not an entry");
+        }
+
         if (!(obj instanceof QDLStem)) {
             throw new IllegalArgumentException(configName + " must be a stem, but was a " + obj.getClass().getSimpleName());
         }
@@ -77,11 +82,11 @@ public class QDLConfigLoader<T extends OA2ClientEnvironment> extends OA2ClientLo
             QDLStem ext;
             if (obj instanceof QDLStem) {
                 ext = (QDLStem) obj; //ext is the list of extensions
-            }else{
-                if(obj instanceof String){
+            } else {
+                if (obj instanceof String) {
                     ext = new QDLStem();
                     ext.put(0L, obj);
-                }else{
+                } else {
                     throw new IllegalArgumentException("The extends list must contain only strings");
                 }
             }
@@ -140,7 +145,7 @@ public class QDLConfigLoader<T extends OA2ClientEnvironment> extends OA2ClientLo
             scopes = new ArrayList<>();
         }
         Object obj = getConfig().get(SCOPES);
-        if(obj == null){
+        if (obj == null) {
             return scopes;
         }
         if (obj instanceof String) {
@@ -281,10 +286,10 @@ public class QDLConfigLoader<T extends OA2ClientEnvironment> extends OA2ClientLo
         if (sslConfiguration == null) {
             if (getConfig().containsKey(SSL)) {
                 QDLStem ssl = getConfig().getStem(SSL);
-                if(ssl.containsKey(TRUST_STORE_TAG)){
+                if (ssl.containsKey(TRUST_STORE_TAG)) {
                     // set this as the default. The assumption is that if there is a trust store, they
                     // don't want the default, though they can override it in the configuration.
-                      ssl.getStem(TRUST_STORE_TAG).put(TRUST_STORE_USE_DEFAULT_TRUST_MANAGER, false);
+                    ssl.getStem(TRUST_STORE_TAG).put(TRUST_STORE_USE_DEFAULT_TRUST_MANAGER, false);
                 }
                 renameSSLkeys(ssl);
                 sslConfiguration = SSLConfigurationUtil2.fromJSON((JSONObject) ssl.toJSON());
@@ -296,37 +301,39 @@ public class QDLConfigLoader<T extends OA2ClientEnvironment> extends OA2ClientLo
     /**
      * This will rename the keys to conform to the serialization in {@link SSLConfigurationUtil2}.
      * It's probably the most reliable way to do this.
+     *
      * @param ssl
      * @return
      */
-    protected void renameSSLkeys(QDLStem ssl){
-        if(ssl.containsKey(TRUST_STORE_TAG)){
+    protected void renameSSLkeys(QDLStem ssl) {
+        if (ssl.containsKey(TRUST_STORE_TAG)) {
             QDLStem trustStore = ssl.getStem(TRUST_STORE_TAG);
             QDLStem renameKeys = new QDLStem();
-            renameKeys.put(QDLConfigTags.TRUST_STORE_TYPE,SSLConfigurationUtil2.SSL_TRUSTSTORE_TYPE);
-            renameKeys.put(QDLConfigTags.TRUST_STORE_PATH,SSLConfigurationUtil2.SSL_TRUSTSTORE_PATH);
-            renameKeys.put(QDLConfigTags.TRUST_STORE_CERT_DN,SSLConfigurationUtil2.SSL_TRUSTSTORE_CERTIFICATE_DN);
-            renameKeys.put(QDLConfigTags.TRUST_STORE_PASSWORD,SSLConfigurationUtil2.SSL_TRUSTSTORE_PASSWORD);
-            renameKeys.put(QDLConfigTags.SSL_USE_JAVA_TRUST_STORE,SSLConfigurationUtil2.SSL_TRUSTSTORE_USE_JAVA_TRUSTSTORE);
-            renameKeys.put(QDLConfigTags.TRUST_STORE_STRICT_HOSTNAME,SSLConfigurationUtil2.SSL_TRUSTSTORE_IS_STRICT_HOSTNAMES);
-            renameKeys.put(QDLConfigTags.TRUST_STORE_USE_DEFAULT_TRUST_MANAGER,SSLConfigurationUtil2.SSL_TRUSTSTORE_USE_DEFAULT_TRUST_MANAGER);
-           trustStore.renameKeys(renameKeys, true);
-           // now to rename the trust_store
-           renameKeys = new QDLStem();
-           renameKeys.put(QDLConfigTags.TRUST_STORE_TAG, SSLConfigurationUtil2.SSL_TRUSTSTORE_TAG);
-           ssl.renameKeys(renameKeys, true);
+            renameKeys.put(QDLConfigTags.TRUST_STORE_TYPE, SSLConfigurationUtil2.SSL_TRUSTSTORE_TYPE);
+            renameKeys.put(QDLConfigTags.TRUST_STORE_PATH, SSLConfigurationUtil2.SSL_TRUSTSTORE_PATH);
+            renameKeys.put(QDLConfigTags.TRUST_STORE_CERT_DN, SSLConfigurationUtil2.SSL_TRUSTSTORE_CERTIFICATE_DN);
+            renameKeys.put(QDLConfigTags.TRUST_STORE_PASSWORD, SSLConfigurationUtil2.SSL_TRUSTSTORE_PASSWORD);
+            renameKeys.put(QDLConfigTags.SSL_USE_JAVA_TRUST_STORE, SSLConfigurationUtil2.SSL_TRUSTSTORE_USE_JAVA_TRUSTSTORE);
+            renameKeys.put(QDLConfigTags.TRUST_STORE_STRICT_HOSTNAME, SSLConfigurationUtil2.SSL_TRUSTSTORE_IS_STRICT_HOSTNAMES);
+            renameKeys.put(QDLConfigTags.TRUST_STORE_USE_DEFAULT_TRUST_MANAGER, SSLConfigurationUtil2.SSL_TRUSTSTORE_USE_DEFAULT_TRUST_MANAGER);
+            trustStore.renameKeys(renameKeys, true);
+            // now to rename the trust_store
+            renameKeys = new QDLStem();
+            renameKeys.put(QDLConfigTags.TRUST_STORE_TAG, SSLConfigurationUtil2.SSL_TRUSTSTORE_TAG);
+            ssl.renameKeys(renameKeys, true);
         }
 
     }
- /*
-             ssl.setTrustRootType(trustStore.getString(SSL_TRUSTSTORE_TYPE));
-            ssl.setTrustRootPassword(trustStore.getString(SSL_TRUSTSTORE_PASSWORD));
-            ssl.setTrustRootCertDN(trustStore.getString(SSL_TRUSTSTORE_CERTIFICATE_DN));
-            ssl.setTrustRootPath(trustStore.getString(SSL_TRUSTSTORE_PATH));
-            ssl.setUseDefaultJavaTrustStore(trustStore.getBoolean(SSL_TRUSTSTORE_USE_JAVA_TRUSTSTORE));
-            ssl.setUseDefaultTrustManager(trustStore.getBoolean(SSL_TRUSTSTORE_USE_DEFAULT_TRUST_MANAGER));
-            ssl.setStrictHostnames(trustStore.getBoolean(SSL_TRUSTSTORE_IS_STRICT_HOSTNAMES));
-  */
+
+    /*
+                ssl.setTrustRootType(trustStore.getString(SSL_TRUSTSTORE_TYPE));
+               ssl.setTrustRootPassword(trustStore.getString(SSL_TRUSTSTORE_PASSWORD));
+               ssl.setTrustRootCertDN(trustStore.getString(SSL_TRUSTSTORE_CERTIFICATE_DN));
+               ssl.setTrustRootPath(trustStore.getString(SSL_TRUSTSTORE_PATH));
+               ssl.setUseDefaultJavaTrustStore(trustStore.getBoolean(SSL_TRUSTSTORE_USE_JAVA_TRUSTSTORE));
+               ssl.setUseDefaultTrustManager(trustStore.getBoolean(SSL_TRUSTSTORE_USE_DEFAULT_TRUST_MANAGER));
+               ssl.setStrictHostnames(trustStore.getBoolean(SSL_TRUSTSTORE_IS_STRICT_HOSTNAMES));
+     */
     String identifier = null;
 
     @Override
@@ -366,8 +373,8 @@ public class QDLConfigLoader<T extends OA2ClientEnvironment> extends OA2ClientLo
             if (serviceURI == null) {
                 serviceURI = getWellKnownString(OIDCDiscoveryTags.ISSUER);
                 // slightly normalize it so we can just construct other endpoints.
-                if(serviceURI.endsWith("/")){
-                    serviceURI = serviceURI.substring(0,serviceURI.length()-1);
+                if (serviceURI.endsWith("/")) {
+                    serviceURI = serviceURI.substring(0, serviceURI.length() - 1);
                 }
             }
         }
@@ -410,10 +417,12 @@ public class QDLConfigLoader<T extends OA2ClientEnvironment> extends OA2ClientLo
         }
         return tokenURI;
     }
-   URI assetURI = null;
+
+    URI assetURI = null;
+
     @Override
     public URI getAssetURI() {
-        if(assetURI == null){
+        if (assetURI == null) {
             assetURI = URI.create(getServiceURI() + "/getcert"); // as per spec.
         }
         return assetURI;
@@ -461,7 +470,7 @@ public class QDLConfigLoader<T extends OA2ClientEnvironment> extends OA2ClientLo
                 deviceAuthorizationURI = createServiceURI(getEndpoint(DEVICE_AUTHORIZATION_URL),
                         OIDCDiscoveryTags.DEVICE_AUTHORIZATION_ENDPOINT_DEFAULT,
                         OIDCDiscoveryTags.DEVICE_AUTHORIZATION_ENDPOINT);
-            }catch(Throwable t){
+            } catch (Throwable t) {
                 // it is entirely possible that this server does not have support for
                 // device authorization in which case the call to the well-known endpoint
                 // fails. This is benign.
@@ -542,7 +551,7 @@ public class QDLConfigLoader<T extends OA2ClientEnvironment> extends OA2ClientLo
 
     @Override
     public URI getIssuer() {
-        if(issuer == null){
+        if (issuer == null) {
             issuer = createServiceURI(getEndpoint(ISSUER_URI),
                     OIDCDiscoveryTags.ISSUER,
                     OIDCDiscoveryTags.ISSUER);
@@ -627,6 +636,7 @@ public class QDLConfigLoader<T extends OA2ClientEnvironment> extends OA2ClientLo
     }
 
     HashMap<String, String> constants = null;
+
     @Override
     public HashMap<String, String> getConstants() {
         if (constants == null) {

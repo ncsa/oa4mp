@@ -98,7 +98,7 @@ public class CLC implements QDLModuleMetaClass {
                 initCalled = true;
             } catch (Throwable e) {
                 e.printStackTrace();
-                state.getLogger().error("error initializing client", e);
+                state.getLogger().error("error initializing client for name=" + objects[1] + ", config=" + objects[0], e);
                 initCalled = false;
                 clcCommands = null;
                 if (DebugUtil.isEnabled()) {

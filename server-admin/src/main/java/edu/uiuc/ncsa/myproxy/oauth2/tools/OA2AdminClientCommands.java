@@ -101,12 +101,12 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
             client.setExternalVOName(vo);
         }
         client.setAllowQDL(getPropertyHelp(keys.allowQDL(), "allow QDL?", "n").equalsIgnoreCase("y"));
-        if(client.isAllowQDL()){
+        if (client.isAllowQDL()) {
             client.setAllowQDLCodeBlocks(getPropertyHelp(keys.allowQDLCodeBlocks(), "  allow code blocks containing QDL (y/n)?", "n").equalsIgnoreCase("y"));
         }
 
 
-        if(getInput("configure advanced options (y/n)?", "n").equalsIgnoreCase("y")) {
+        if (getInput("configure advanced options (y/n)?", "n").equalsIgnoreCase("y")) {
             JSONObject newConfig = (JSONObject) inputJSON(client.getConfig(), "client configuration");
             String max = getPropertyHelp(keys.maxClients(), "Enter new maximum number of clients allowed", Integer.toString(client.getMaxClients()));
             if (!isEmpty(max)) {
@@ -306,13 +306,16 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
 
     }
 
-    public void unlink(InputLine inputLine) {
+    public static String NO_VERIFY_ALL_FLAG = "-no_verify";
+
+    public void unlink(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
-            say("unlink " + UNLINK_ALL_FLAG + " | client_id  + [" + UNLINK_REMOVE_FLAG + "] [admin_id]- unlink the client with the given client_id admin client");
+            say("unlink " + UNLINK_ALL_FLAG + " | client_id  + [" + UNLINK_REMOVE_FLAG + "]  + [" + NO_VERIFY_ALL_FLAG + "] [admin_id]- unlink the client with the given client_id admin client");
             say(UNLINK_ALL_FLAG + " - (no client_id) unlink all clients, not just the specified one.");
             say(UNLINK_REMOVE_FLAG + " - remove clients that are unlinked.");
+            say(NO_VERIFY_ALL_FLAG + "- if present will suppress asking if you really meant to use the ");
             say("This means that the clients will still exist unless you specifially remove them.");
-            say("Properly speaking, you would use the " + UNLINK_ALL_FLAG + " only before removing the ");
+            say("Properly speaking, you would use the " + UNLINK_ALL_FLAG + " only before removing the " + UNLINK_ALL_FLAG + " switch.");
             say("admin client itself and retiring it.");
             say("See also: link");
             return;
@@ -323,6 +326,9 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
         }
         boolean removeClient = inputLine.hasArg(UNLINK_REMOVE_FLAG);
         inputLine.removeSwitch(UNLINK_REMOVE_FLAG);
+
+        boolean noVerifyAll = inputLine.hasArg(NO_VERIFY_ALL_FLAG);
+        inputLine.removeSwitch(NO_VERIFY_ALL_FLAG);
 
         boolean doAll = inputLine.hasArg(UNLINK_ALL_FLAG);
         inputLine.removeSwitch(UNLINK_ALL_FLAG);
@@ -339,7 +345,10 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
 
 
         AdminClient adminClient = (AdminClient) findItem(inputLine);
-
+        if (adminClient == null) {
+            say("sorry, admin client with id \"" + clientID + "\" not found");
+            return;
+        }
         OA2Client client = null;
         // check if the client already exists.
         List<Identifier> clients;
@@ -348,6 +357,17 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
 
         if (doAll) {
             clients = permissionsStore.getClients(adminClient.getIdentifier());
+            // Fix https://github.com/ncsa/oa4mp/issues/116
+            if(clients.size() == 0){
+                say("no clients found");
+                return ;
+            }
+            if (!noVerifyAll) {
+                if (!readline("unlink ALL " + clients.size() + " of the clients for admin \"" + adminClient.getIdentifierString() + "\"?(Y/n)").equals("Y")) {
+                    say("aborting...");
+                    return;
+                }
+            }
         } else {
             clients = new ArrayList<>();
             clients.add(clientID);
