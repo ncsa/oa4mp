@@ -60,6 +60,11 @@
     }
 
     if (ed != null) {
+        // https://jira.ncsa.illinois.edu/browse/CIL-1852
+        // Filter out. Any 400 error should nto result in an email.
+        if(400 <= ed.getStatusCode() &&   ed.getStatusCode() < 500){
+            return;
+        }
         String remoteAddr = request.getRemoteAddr();
         String er = "Error Report - " + application.getServerInfo() + "\n";
         er       += "------------\n";
