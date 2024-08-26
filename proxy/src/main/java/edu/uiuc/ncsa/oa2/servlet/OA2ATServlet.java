@@ -1150,6 +1150,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         }
         if (returnRTOnly) {
             rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getRefreshToken().getToken()); // Required.
+            rfcClaims.put(EXPIRES_IN, rtiResponse.getRefreshToken().getLifetime()/1000);
 
             if (client.isRTLifetimeEnabled() && rtiResponse.hasRefreshToken()) {
                 t.setRTData(rtiResponse.getRefreshToken().getPayload());
@@ -1163,6 +1164,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             } else {
                 rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getAccessToken().encodeToken()); // Required.
             }
+            rfcClaims.put(EXPIRES_IN, rtiResponse.getAccessToken().getLifetime()/1000);
+
             rfcClaims.put(OA2Constants.ID_TOKEN, rtiResponse.getIdToken().getToken());
 
         }

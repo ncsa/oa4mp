@@ -66,10 +66,10 @@ public class TemplateSubsitutionQDLUtil implements QDLFunction {
         List<String> doxx = new ArrayList<>();
         switch (argCount) {
             case 2:
-                doxx.add(getName() + "(arg, scalar_claims.");
+                doxx.add(getName() + "(arg, scalar_claims.)");
                 break;
             case 3:
-                doxx.add(getName() + "(arg., scalar_claims., list_claims.");
+                doxx.add(getName() + "(arg., scalar_claims., list_claims.)");
                 break;
         }
         doxx.add("Output is always a list with all possible substitutions done.");
@@ -93,7 +93,7 @@ public class TemplateSubsitutionQDLUtil implements QDLFunction {
                 doxx.add("still get back a list.");
                 break;
             case 3:
-                doxx.add("list_claims.  = a stem of the list substitutions");
+                doxx.add("list_claims.  = a stem of the list substitutions. Used for groups.");
                 doxx.add("If there are groups (lists of strings), then the first list element that matches");
                 doxx.add("will be used. The groups. ");
                 doxx.add("Caveat: Be sure that the list_claims. have values simple flat lists of strings,");

@@ -15,4 +15,6 @@ test.:=[
 
 say('RFC 8693 (token exchange) and 𝕰𝖗s𝖆𝖙𝖟 client tests. These should run automated and require no manual input.');
 say('---------------');
+clc#echo_http_request(true);
+clc#echo_http_response(true);
 script_load('runner.qdl', test., true);

@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.oa2.qdl;
 
 import edu.uiuc.ncsa.myproxy.oa4mp.qdl.OA2LibLoader;
+import edu.uiuc.ncsa.oa2.qdl.storage.PStoreAccessLoader;
 import edu.uiuc.ncsa.oa2.qdl.storage.StoreAccessLoader;
 import edu.uiuc.ncsa.oa2.qdl.testUtils.TestUtilModule;
 import edu.uiuc.ncsa.qdl.variables.QDLStem;
@@ -20,6 +21,7 @@ public class OA2LibLoader2 extends OA2LibLoader {
         subLib.put( "cm", CMLoader.class.getCanonicalName());
         subLib.put( "clc", CLCLoader.class.getCanonicalName());
         subLib.put( "store", StoreAccessLoader.class.getCanonicalName());
+        subLib.put( "p_store", PStoreAccessLoader.class.getCanonicalName());
         subLib.put( "test_utils", TestUtilModule.class.getCanonicalName());
         lib.put("client", subLib);
         return lib;

@@ -1,0 +1,11 @@
+<!--
+ See https://oa4mp.org/common/configuration/postgres-store.html
+ Run the install script in ${OA4MP_HOME}etc/oa4mp-pg.sql
+-->
+<postgresql
+        username="YOUR_USERNAME"
+        password="YOUR_PASSWORD"
+        schema="oa4mp"
+        database="oa4mp">
+    <assetStore/>
+</postgresql>

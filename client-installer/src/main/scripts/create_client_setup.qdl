@@ -1,4 +1,7 @@
 #! /usr/bin/env -S qdl-run
+/*
+   Generates the setup.yaml file.
+*/
 convert ≔ j_load('convert'); // Yo!
 setup.≔[];
 setup.'type'≔'setup';
@@ -6,7 +9,17 @@ setup.'app_name'≔'OA4MP client';
 setup.'fail_on_error'≔false;
 setup.'cleanup_on_fail'≔false;
 setup.'help'≔{'installer':'/help.txt',  'app':'/app_help.txt','success':'/success.txt'};
-setup.'versions' ≔ [{'name':'v1', 'file':'/base/test-cfg1.yaml','description':'single script set', 'notes':'readme.txt'},
+setup.'versions' ≔ [{'name':'v5.6', 'file':'/oa4mp/v5_6.yaml','description':'version 5.6 release', 'notes':'/oa4mp/v5_6_notes.txt'},
                     {'name':'v2', 'file':'/base/test-cfg2.yaml','description':'two script sets'},
-                    {'name':'latest', 'file':'v1','description':'latest release'}];
+                    {'name':'latest', 'file':'v5.6','description':'latest release'}];
 return(convert#yaml_out(setup.));
+
+
+- app_name: OA4MP Client
+  help: {success: /oa4mp/success.txt}
+  versions:
+  - {file: /oa4mp/v5_6.yaml, name: v5.6, description: Version 5.6, notes: /oa4mp/v5_6_notes.txt}
+  - {file: v5.6, name: latest, description: latest release}
+  cleanup_on_fail: false
+  fail_on_error: false
+  type: setup

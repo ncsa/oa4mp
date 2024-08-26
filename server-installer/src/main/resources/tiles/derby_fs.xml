@@ -9,7 +9,7 @@
        bootPassword="${DERBY_BOOT_PASSWORD}"
        storeType="file"
        path="${OA4MP_HOME}var/storage/derby"
-       database="${OA4MP_HOME}var/storage/derby/server_oa4mp"
+       database="${OA4MP_HOME}var/storage/derby/oa4mp"
        schema="oa4mp">
     <transactions/>
     <clients/>

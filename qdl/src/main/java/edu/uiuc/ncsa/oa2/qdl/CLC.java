@@ -382,12 +382,12 @@ protected String ECHO_HTTP_RESPONSE = "echo_http_response";
             if(objects.length == 0){
                 return ServiceClient.ECHO_RESPONSE;
             }
-            if(!(objects[1] instanceof Boolean)){
+            if(!(objects[0] instanceof Boolean)){
                 throw new IllegalArgumentException(getName() + " requires a boolean argument");
             }
 
             Boolean oldValue = ServiceClient.ECHO_RESPONSE;
-            ServiceClient.ECHO_RESPONSE = (Boolean) objects[1];
+            ServiceClient.ECHO_RESPONSE = (Boolean) objects[0];
             return oldValue;
         }
 
@@ -427,12 +427,12 @@ protected String ECHO_HTTP_RESPONSE = "echo_http_response";
             if(objects.length == 0){
                 return ServiceClient.ECHO_REQUEST;
             }
-            if(!(objects[1] instanceof Boolean)){
+            if(!(objects[0] instanceof Boolean)){
                 throw new IllegalArgumentException(getName() + " requires a boolean argument");
             }
 
             Boolean oldValue = ServiceClient.ECHO_REQUEST;
-            ServiceClient.ECHO_REQUEST = (Boolean) objects[1];
+            ServiceClient.ECHO_REQUEST = (Boolean) objects[0];
             return oldValue;
         }
 

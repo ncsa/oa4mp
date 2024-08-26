@@ -11,7 +11,7 @@
         <version>5.3-SNAPSHOT</version>
     </parent>
     <artifactId>client-api</artifactId>
-    <name>OAuth for MyProxy client API.</name>
+    <name>OA4MP client API.</name>
     <packaging>jar</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>client-webapp</artifactId>
-    <name>OAuth for MyProxy client web application</name>
+    <name>OA4MP client web application</name>
     <packaging>war</packaging>
     <dependencies>
         <dependency>
@@ -24,11 +24,13 @@
             <artifactId>client-api</artifactId>
             <version>5.3-SNAPSHOT</version>
         </dependency>
+
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
-         <!--   <version>2.5</version>
+           <!--<version>4.0.1</version>
             <scope>provided</scope>-->
         </dependency>
+
     </dependencies>
 </project>

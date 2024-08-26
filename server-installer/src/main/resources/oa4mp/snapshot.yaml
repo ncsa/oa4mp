@@ -2,13 +2,14 @@
   directories:
   - permissions:
     - {preprocess: true, update: false, source: etc/cfg.xml}
+    - {preprocess: true, update: false, source: bin/clc, exec: true}
     - {preprocess: true, update: false, source: bin/cli, exec: true}
     - {preprocess: true, update: false, source: bin/jwt, exec: true}
     - {preprocess: true, update: false, source: bin/migrate, exec: true}
     - {preprocess: true, update: false, source: etc/create_keys.cmd}
     - {update: false, source: etc/oa4mp-message.template}
     - {update: false, source: etc/oa4mp-subject.template}
-    files: [oa4mp-install.jar]
+    files: [server-archive.jar]
     ignore: [/META-INF/]
     target_dir: /
   type: zip

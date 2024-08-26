@@ -97,6 +97,7 @@
         <module>oauth2</module>
         <module>server-installer</module>
         <module>client-installer</module>
+        <module>installer</module>
     </modules>
     <dependencies>
         <dependency>

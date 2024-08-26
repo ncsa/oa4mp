@@ -15,8 +15,6 @@ public class StoreAccessLoader implements QDLLoader {
     public List<Module> load() {
         ArrayList<Module> modules = new ArrayList<>();
         modules.add(new StoreAccessModule().newInstance(null));
-        modules.add(new PStoreAccessModule().newInstance(null));
-
         return modules;
     }
 }

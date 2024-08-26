@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>oa4mp-webapp</artifactId>
-    <name>OAuth for MyProxy web application</name>
+    <name>OA4MP web application</name>
     <packaging>war</packaging>
     <dependencies>
         <dependency>
@@ -45,9 +45,21 @@
             <scope>provided</scope>-->
         </dependency>
         <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+            <version>1.6.2</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>jstl</artifactId>
             <version>1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+            <version>1.6.2</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 

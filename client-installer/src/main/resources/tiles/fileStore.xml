@@ -1,0 +1,11 @@
+<!--
+     See https://oa4mp.org/common/configuration/file-store.html
+     Note that this is, in fact, deprecated. The issue is that
+     it does not scale and is therefore fine for smaller
+     installs or testing, but for anything that is actual
+     production you want a different store type.
+     The Derby file store is the correct replacement for this.
+-->
+<fileStore path="${OA4MP_HOME}var/storage/file_store">
+    <assetStore/>
+</fileStore>

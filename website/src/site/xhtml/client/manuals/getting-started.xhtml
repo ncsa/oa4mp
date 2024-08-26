@@ -5,28 +5,47 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
     <title>OA4MP Client: Getting Started</title>
-    <!--#include virtual="../../head.html" -->
 </head>
 <body class="composite">
-<!--#include virtual="../../header.html" -->
 
 <h1>Overview</h1>
 
-<p>Welcome to OA4MP! This describes the client software for the OA4MP service. It allows clients
+<p>Welcome to OA4MP client. OA4MP stands for <b>O</b>pen <b>A</b>uthorization for <b>M</b>any <b>P</b>eople,
+    and allows open authorization with multiple identities.
+    This describes the client software for the OA4MP service. It allows clients
     to request certificates and users to securely authorize them using the OAuth delegation protocol.</p>
 
 <h2>Prerequisites</h2>
 <ul>
-    <li>Tomcat 9 or above. SSL should be configured and enabled. Tomcat 8 will no longer work with the
-    compiler version of Java (11 or above) we are using.</li>
-    <li>Java <b>1.9</b> or above. Note that versions previous
-    to Java 1.7 will not work due to internal changes by Sun to their security APIs.</li>
-    <li>(Optional) Maven 3.3+ or higher (only if building from the source)</li>
-    <li>(Optional) Apache 2, configured to work with Tomcat.</li>
+    <li>Tomcat 9 or above (is using the servlet). SSL should be configured and enabled.</li>
+    <li>Java <b>1.11</b> or above. </li>
 </ul>
-<h2>Getting and deploying from the war.</h2>
 
-<p>You may most easily a bare-bones version for testing by downloading the current reference war:</p>
+<h2>How many clients are there?</h2>
+<p>
+    OA4MP has a very simple servlet (packaged as a war) that can be used,
+    though it is excruciatingly plain on purpose.
+    Mostly it is to show how the calls work, and it is assumed that you will customize it for your
+    project. It also includes a command line client (CLC) which allows you to do all operations
+    for a client from the command line. This is a surprisingly useful tool.
+</p>
+<h2>Getting and deploying.</h2>
+<h3>Using the client installer</h3>
+<p>To get the latest release, go to the <a href="https://github.com/ncsa/oa4mp/releases">release page for OA4MP</a>
+and choose the appropriate one (usually the latest). You will see a client-installer.jar. Download that and run it
+like any other jar:</p>
+<pre>
+    &gt;java -jar client-installer.jar
+</pre>
+<p>
+    This will print a lot of help and instructions. The two major case to invoke it are to install
+    or to update. Update implies you have an existing, functional client installation and just
+    want critical files updated. The install option will create a basic configuration and give
+    instructions on what to do next. This includes the command line client, documentation, examples
+    and a bunch of other very useful things.
+</p>
+<h3>Just the war</h3>
+<p>If you really only want the war, then you may just download the current reference war:</p>
 
 <p><a title="OA4MP client war"
       href="https://github.com/ncsa/oa4mp/releases/latest/client2.war">client2.war</a>
@@ -40,34 +59,7 @@ For many cases, this is all you need to do.
     $CATALINA_HOME/webapps directory. The system will not work until you have configured it then registered with an
     OA4MP server though.</p>
 
-<h3>Getting and building the source</h3>
-If you need/want to customize the basic package, you would download the source from
-<a title="oa4mp sources" href="https://github.com/ncsa/oa4mp">Git Hub</a>
-This will resolve the correct dependencies. Build the module you want by issuing
-<pre>mvn clean install</pre>
-and you should end up with a deployable war.
-
-<p>If you decide to write your own OA4MP webapp, you should use the following module:</p>
-<pre>
-    &lt;dependency&gt;
-        &lt;artifactId&gt;oa4mp-client-oauth2&lt;/artifactId&gt;
-        &lt;groupId&gt;edu.uiuc.ncsa.myproxy&lt;/groupId&gt;
-        &lt;version&gt;5.3-SNAPSHOT&lt;/version&gt;
-    &lt;/dependency&gt;
-</pre>
 
 
-<h2>Deploying to Apache</h2>
-
-<p>If you need to deploy this to Apache, you need to add the following to the <span
-        style="font-family: courier new,courier;">proxy_ajp.conf</span> file (which, e.g., lives under <span
-        style="font-family: courier new,courier;">/etc/httpd/conf.d</span> or perhaps <span
-        style="font-family: courier new,courier;">/etc/apache2/conf.d</span> in most unix distributions):</p>
-<pre>ProxyPass /client/simple ajp://localhost:8009/client/simple</pre>
-<p><strong>Note:</strong>In the WEB-INF/web.xml file there is a section called
-        <b>security-constraint</b>, which controls access to the webapp using Tomcat's SSL. This will conflict with access via Apache,
-    so comment that section out if you are deploying to Apache. It is only needed in stand-alone Tomcat deployments.</p>
-
-<!--#include virtual="../../footer.html" -->
 </body>
 </html>

@@ -72,7 +72,7 @@ public class StoreAccessModule extends JavaModule {
     protected List<QDLVariable> createVarList(StoreFacade sf) {
         List<QDLVariable> vars = new ArrayList<>();
         vars.add(sf.new FacadeHelp());
-        vars.add(sf.new StoreTypes());
+        vars.add(sf.new StoreType());
         return vars;
     }
 
@@ -89,12 +89,9 @@ public class StoreAccessModule extends JavaModule {
         functions.add(sf.new Count());
         functions.add(sf.new ToXML());
         functions.add(sf.new UpdateObject());
-        functions.add(sf.new VCreate());
-        functions.add(sf.new VGet());
+        functions.add(sf.new CreateVersion());
         functions.add(sf.new VGetVersions());
-        functions.add(sf.new VRemove());
         functions.add(sf.new VRestore());
-        //    functions.add(sf.new Diff());
         return functions;
     }
 

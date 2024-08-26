@@ -1,4 +1,12 @@
 #! /usr/bin/env -S qdl-run
+/*
+   (This is older and you should use create_server_snapshot_cfg.qdl to
+    generate the shrotened file list form the current snapshot. Use that
+    in conjunction with create-distro.sh to make a server archive for the
+    installer.)
+   QDL script to create the full yaml used for the current distribution. It just
+   dumps it to the command line so you can peruse it.
+*/
 convert ≔ j_load('convert');
 cfg.≔[]; // Yo!
 entry. ≔ [];

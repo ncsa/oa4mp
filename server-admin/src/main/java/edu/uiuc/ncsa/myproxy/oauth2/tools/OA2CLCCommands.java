@@ -131,7 +131,9 @@ public class OA2CLCCommands extends CommonCommands {
                 if(isBatch()){
                     throw new MyConfigurationException("No loader found");
                 }else{
-                    say("warning: no loader found");
+                    // probably should not issue this on startup since they may start without
+                    // a configuration then load one.
+                 //   say("warning: no loader found");
                 }
             }else{
                 setCe((OA2ClientEnvironment) oa2CommandLineClient.getEnvironment());

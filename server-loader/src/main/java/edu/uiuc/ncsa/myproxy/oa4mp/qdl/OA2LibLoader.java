@@ -15,7 +15,7 @@ import edu.uiuc.ncsa.qdl.variables.QDLStem;
  * on 4/4/23 at  9:20 AM
  */
 public class OA2LibLoader implements LibLoader {
-    protected String libKey = "oa2";
+    protected String libKey = "oa4mp";
 
     @Override
     public void add(State state) {

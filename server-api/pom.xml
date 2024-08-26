@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>server-api</artifactId>
-    <name>OAuth for MyProxy server API.</name>
+    <name>OA4MP server API.</name>
     <packaging>jar</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

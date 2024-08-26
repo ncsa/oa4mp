@@ -1,0 +1,16 @@
+<!--
+     See https://oa4mp.org/common/configuration/mariadb-store.html
+     Run the install script in ${OA4MP_HOME}etc/oa4mp-mariadb.sql
+
+     This assumes that you have created everything and just refer
+     to it here. Note that the schema is assumed to be oauth2
+-->
+<mysql username="YOUR_USERNAME"
+         password="YOUR_PASSWORD"
+         schema="oa4mp"
+         maxConnections="100"
+         connectionCleanup="601 sec."
+         idleTimeout="603 sec."
+         enableQueue="false">
+    <assetStore/>
+</mysql>

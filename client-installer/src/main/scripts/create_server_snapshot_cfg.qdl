@@ -1,0 +1,37 @@
+#! /usr/bin/env -S qdl-run
+/*
+   Creates the yaml file from the current snapshot. This would go into
+   the oa4mp/vx_y.yaml file for the distribution. This is a minimal
+   list of files and the installer uses this along with the server archive
+   jar.
+
+   You will need to change the sourceURL to the release you want!
+*/
+convert ≔ j_load('convert');
+cfg.≔[]; // Yo!
+entry. ≔ [];
+docs. ≔[];
+docs1.≔[];
+
+jar. ≔[];
+jar.'type'≔'zip';
+jar.'sourceURL'≔'https://github.com/ncsa/oa4mp/releases/download/mutable/';
+jar_entry.0.'target_dir'≔ '/';
+jar_entry.0.'files'≔['client-archive.jar'];
+jar_entry.0.'ignore'≔['/META-INF/'];
+jar_entry.0.'permissions'≔[
+                {'source':'etc/cfg.xml','update':false, 'preprocess':true},
+                {'source':'bin/clc','update':false, 'preprocess':true, 'exec':true},
+                {'source':'bin/jwt','update':false, 'preprocess':true, 'exec':true},
+                {'source':'etc/create_keys.cmd','update':false, 'preprocess':true}];
+jar.'directories'≔jar_entry.;
+
+cfg.'type'≔'file_set';
+cfg.'sourceURL'≔'https://github.com/ncsa/oa4mp/releases/download/mutable/';
+entry.0.'target_dir'≔'/lib';
+entry.0.'files'≔['client2.war',
+                'jwt.jar',
+                'clc.jar'];
+cfg.'directories'≔entry.;
+
+return(convert#yaml_out([jar.,cfg.]));

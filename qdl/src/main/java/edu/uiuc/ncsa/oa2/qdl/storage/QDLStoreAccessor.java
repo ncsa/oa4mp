@@ -315,11 +315,7 @@ public class QDLStoreAccessor {
             Identifiable newVersion = getStore().create();
             mc.toMap(oldVersion, map);
             Long newIndex = getStoreArchiver().create(oldVersion.getIdentifier());
-            if(key instanceof Long){
-                output.put((Long)key, newIndex);
-            }else{
-                output.put((String)key, newIndex);
-            }
+            output.putLongOrString(key, newIndex);
         }
         return output;
     }

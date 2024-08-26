@@ -1,0 +1,15 @@
+<!--
+    See https://oa4mp.org/common/configuration/derby-store.html
+     This uses a Derby file store. Note that this means you cannot use the CLI
+     when the service is running since the database can only have a single instance.
+-->
+
+<derby username="oa4mp"
+       password="${DERBY_PASSWORD}"
+       bootPassword="${DERBY_BOOT_PASSWORD}"
+       storeType="file"
+       path="${OA4MP_HOME}var/storage/derby"
+       database="${OA4MP_HOME}var/storage/derby/oa4mp"
+       schema="oa4mp">
+    <assetStore/>
+</derby>

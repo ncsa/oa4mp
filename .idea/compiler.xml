@@ -37,6 +37,7 @@
         <module name="client-test" />
         <module name="proxy" />
         <module name="server-admin" />
+        <module name="installer" />
         <module name="client-loader" />
         <module name="qdl" />
         <module name="client-oauth2" />
@@ -45,9 +46,6 @@
         <module name="myproxy-website" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="myproxy-logon" target="11" />
-    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">

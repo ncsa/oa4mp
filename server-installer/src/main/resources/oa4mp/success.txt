@@ -1,12 +1,45 @@
 Done! You should add
-  export OA4MP_HOME="${ROOT}"
+  export OA4MP_SERVER="${ROOT}"
 to your environment and
-   $OA4MP_HOME/bin
+   $OA4MP_SERVER/bin
 to your PATH
 Consider generating server keys by running:
 
 ${OA4MP_HOME}bin/jwt -batchFile ${OA4MP_HOME}etc/create_keys.cmd
 
+
+
 When done, select one of the key ids ('kid') in the keys.jwk file for your
 default server signing key and set it in the defaultKeyID property of the
-${ROOT}etc/cfg.xml file.
+${ROOT}etc/cfg.xml file. This creates a set of
+
+private keys : ${OA4MP_HOME}etc/keys.jwk
+
+Tomcat setup.
+‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+During installation, the server war (web archive) is downloaded to
+
+${OA4MP_HOME}lib/oauth2.war
+
+If you want to use a self-signed cert, read the blurb at
+
+https://oa4mp.org/common/manuals/using-self-signed-cert.html
+
+Assuming that Tomcat is installed in $CATALINA_HOME, you should
+(1) edit the $CATALINA_HOME/conf/web.xml file and add the following
+    right after the <web-app> tag:
+
+    <context-param>
+        <param-name>oa4mp:oauth2.server.config.file</param-name>
+        <param-value>${OA4MP_HOME}etc/cfg.xml</param-value>
+    </context-param>
+
+    <context-param>
+        <param-name>oa4mp:oauth2.server.config.name</param-name>
+        <param-value>default</param-value>
+    </context-param>
+
+(2) Copy the oauth2.war to $CATALINA_HOME/webapps
+    This should be noticed by Tomcat and auto-deployed
+
+(3) Test that it is up and running at the oauth2 endpoint.

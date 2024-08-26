@@ -1,0 +1,72 @@
+Done! You should add
+  export OA4MP_HOME="${ROOT}"
+to your environment and
+   $OA4MP_HOME/bin
+to your PATH
+
+Finishing the configuration file
+‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+The generated configuration file resides at
+
+   ${OA4MP_HOME}/etc/cfg.xml
+
+There is a default configuration, but it needs to have the following set
+
+  Tag           | Description
+ ---------------+-----------------------------------------------------------------
+  <id>          | The client id, generated at registration
+  <serviceUri>  | The OAuth 2 server's address
+  <callbackUri> | The callback you will use
+  <secret>      | The client secret (unless using keys, see below),
+                | generated at registration
+  <jwksFile>    | Path to your JSON web keys file, if using keys
+  <kid>         | The JWK identifier you wish to use, if using keys
+
+
+Tomcat install
+‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+If you need to set up a self-signed cert for Tomcat, read the blurb at
+
+   https://oa4mp.org/common/manuals/using-self-signed-cert.html
+
+first and follow the instructions there. You will need to set the
+connector in Tomcat (if you are installing OA4MP server, you
+can just do this once and for all for tomcat). Note especially you will have
+to set the keystore in the client configuration. (There is a commented
+out block that has most of that done, btw.)
+
+The war (web archive) file is in the ${OA4MP_HOME}lib/client2.war.
+Assuming Tomcat is installed at $CATALINIA_HOME,
+ To deploy:
+ (1) Add the following to your $CATALINA_HOME/conf/web.xml file
+     right after the opening web-app tag:
+
+    <context-param>
+        <param-name>oa4mp:oauth2.client.config.file</param-name>
+        <param-value>${OA4MP_HOME}etc/cfg.xml</param-value>
+    </context-param>
+    <context-param>
+        <param-name>oa4mp:oauth2.client.config.name</param-name>
+        <param-value>default</param-value>
+    </context-param>
+
+(2) Copy ${OA4MP_HOME}lib/client2.war to $CATALINA_HOME/webapps
+    It should auto-deploy and be available at the client2 endpoint.
+
+(3) Check the client2 endpoint under Tomcat is working.
+
+Using Keys (RFC 7523)
+‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+If you want to use public and private keys for authorization, then **before registering**,
+run:
+
+${OA4MP_HOME}bin/jwt -batchFile ${OA4MP_HOME}etc/create_keys.cmd
+
+The defaults for using keys are already in the generated cfg.xml file.
+This command creates a full set
+
+private keys : ${OA4MP_HOME}etc/keys.jwk
+ public keys : ${OA4MP_HOME}etc/public-keys.jwk
+
+If you opt to use keys, then at registration, just paste the contents of
+public-keys.jwk in to the registration page.

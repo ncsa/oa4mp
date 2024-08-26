@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>oa4mp-server-test</artifactId>
-    <name>OAuth for MyProxy server tests.</name>
+    <name>OA4MP server tests.</name>
     <packaging>jar</packaging>
     <dependencies>
 

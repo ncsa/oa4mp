@@ -1,0 +1,16 @@
+<!--
+     See https://oa4mp.org/common/configuration/mysql-store.html
+     Run the install script in ${OA4MP_HOME}etc/oa4mp-mysql.sql
+
+     Note I had to add the following to my mysql tag (right after password="
+     parameters="useJDBCCompliantTimezoneShift=true&amp;useLegacyDatetimeCode=false&amp;serverTimezone=America/Chicago"
+     with MySQL version 5. this was due to a buf in MySQL that gor the timezone wrong from the
+     OS (Ubuntu server).
+-->
+
+
+<mysql username="YOUR_USERNAME"
+       password="YOUR_PASSWORD"
+       schema="oa4mp">
+    <assetStore/>
+</mysql>

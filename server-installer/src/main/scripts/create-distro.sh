@@ -1,45 +1,46 @@
-# This creates the distribution jar archive for OA4MP.
+# This creates the distribution jar archive for OA4MP server.
 # it contains all of the files in the current distribution
 # in the correct directories and is designed to be referenced
 # by the web installer.
 # It does not contain the other jars or wars.
-# It creates a temporary directory, writes everything to try {
-# then jars that up and puts it in the server deply directory
+# It creates a temporary directory, writes everything to try,
+# then jars that up and puts it in the server deploy directory
 
-
+# OA4MP_ADMIN_SOURCES = the server-admin directory where the
+#                       definitive versions of some thing live
+# OA4MP_SERVER_SOURCES = the server installer directory
 
 DEFAULT_OA4MP_ROOT=$NCSA_DEV_INPUT/oa4mp
-DEFAULT_OA4MP_ROOT_SOURCES=$NCSA_DEV_INPUT/oa4mp/server-admin
-DEFAULT_JAR_NAME="oa4mp-installer.jar"
+OA4MP_ADMIN_SOURCES=$NCSA_DEV_INPUT/oa4mp/server-admin
+OA4MP_SERVER_SOURCES=$NCSA_DEV_INPUT/oa4mp/server-installer/
+JAR_NAME="server-archive.jar"
 # The next is where the full build places the constructed wars and jars.
 OA4MP_SERVER_DEPLOY=$NCSA_DEV_OUTPUT/oa4mp
 
 if [[  "$1" = "--help" ]];then
   echo "create_distro.sh [oa4mp_root]"
-  echo "create the diectory structure and populate it for OA4MP. You may then run the"
+  echo "create the directory structure and populate it for OA4MP. You may then run the"
   echo "create_installer.sh to create the actual jar."
-  echo "No arguments means to use the root (assumes there are already files there) named '$DEFAULT_OA4MP_ROOT'"
-   echo "The result will be a jar named '$DEFAULT_JAR_NAME"
+  echo "No arguments means to use the root of the entire OA4MP source tree "
+  echo "(assumes there are already files there) named '$DEFAULT_OA4MP_ROOT'"
+  echo "The result will be a jar named '$JAR_NAME"
   exit 1
 fi
 cd "/tmp/"
-cd $(mktemp -d)
+cd $(mktemp -d) || exit
 TEMP_DIR=$PWD
 echo "  creating target dirs for installer in $PWD"
 # **IF** there are arguments for the target of this, use them. Otherwise use the default
 OA4MP_ROOT=${1:-$DEFAULT_OA4MP_ROOT}
 
-cd $TEMP_DIR || exit
-
-cp $DEFAULT_OA4MP_ROOT_SOURCES/src/main/scripts/installer/version.txt .
+cp $OA4MP_ADMIN_SOURCES/src/main/scripts/installer/version.txt .
 
 # Now make the directories
 mkdir "bin"
 cd "bin" || exit
-cp $DEFAULT_OA4MP_ROOT_SOURCES/src/main/scripts/installer/clc .
-cp $DEFAULT_OA4MP_ROOT_SOURCES/src/main/scripts/installer/cli .
-cp $DEFAULT_OA4MP_ROOT_SOURCES/src/main/scripts/installer/jwt .
-cp $DEFAULT_OA4MP_ROOT_SOURCES/src/main/scripts/installer/migrate .
+cp $OA4MP_ADMIN_SOURCES/src/main/scripts/installer/cli .
+cp $OA4MP_ADMIN_SOURCES/src/main/scripts/installer/jwt .
+cp $OA4MP_ADMIN_SOURCES/src/main/scripts/installer/migrate .
 cd ..
 mkdir "docs"
 cd "docs" || exit
@@ -48,12 +49,12 @@ cp $OA4MP_ROOT/docs/pdf/*.pdf .
 cd ..
 mkdir "etc"
 cd "etc"
-cp $DEFAULT_OA4MP_ROOT_SOURCES/src/main/scripts/installer/cfg.xml .
-cp $DEFAULT_OA4MP_ROOT_SOURCES/src/main/scripts/installer/create_keys.cmd .
-cp $DEFAULT_OA4MP_ROOT/server-admin/src/main/resources/*.sql .
-cp $DEFAULT_OA4MP_ROOT/server-admin/src/main/resources/oa4mp-subject.template .
-cp $DEFAULT_OA4MP_ROOT/server-admin/src/main/resources/oa4mp-message.template .
-cp $DEFAULT_OA4MP_ROOT/server-admin/src/main/resources/derby-setup.txt .
+cp $OA4MP_SERVER_SOURCES/src/main/resources/installer/cfg.xml .
+cp $OA4MP_SERVER_SOURCES/src/main/resources/installer/create_keys.cmd .
+cp $OA4MP_ADMIN_SOURCES/src/main/resources/*.sql .
+cp $OA4MP_ADMIN_SOURCES/src/main/resources/oa4mp-subject.template .
+cp $OA4MP_ADMIN_SOURCES/src/main/resources/oa4mp-message.template .
+cp $OA4MP_ADMIN_SOURCES/src/main/resources/derby-setup.txt .
 cd $TEMP_DIR || exit
 mkdir "lib"
 mkdir "lib/cp"
@@ -67,7 +68,7 @@ mkdir "qdl"
 mkdir "qdl/scripts"
 
 # Make the example tarballs
-cd $DEFAULT_OA4MP_ROOT/server-admin/src/main/scripts
+cd $OA4MP_ADMIN_SOURCES/src/main/scripts
 if [ -f oidc-cm-scripts.tar ]
 then
   rm oidc-cm-scripts.tar
@@ -85,9 +86,8 @@ mv oidc-cm-scripts.tar  $TEMP_DIR/examples
 
 cd $TEMP_DIR
 
-#jar cf oa4mp-install.jar $TEMP_DIR
-jar cf  "oa4mp-install.jar" bin docs etc examples qdl lib log var version.txt
+jar cf  "$JAR_NAME" bin docs etc examples qdl lib log var version.txt
 
-mv oa4mp-install.jar $OA4MP_SERVER_DEPLOY
+mv $JAR_NAME $OA4MP_SERVER_DEPLOY
 echo "   ...done!"
 

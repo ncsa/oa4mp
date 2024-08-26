@@ -1,4 +1,5 @@
 #! /usr/bin/env -S qdl-run
+// Old version of client installer. Pulls docs from Git etc.
 convert ≔ j_load('convert');
 cfg.≔[]; // Yo!
 entry. ≔ [];
