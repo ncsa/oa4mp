@@ -14,7 +14,7 @@
     -->
     <servlet>
         <servlet-name>discovery</servlet-name>
-        <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2DiscoveryServlet</servlet-class>
+        <servlet-class>org.oa4mp.server.loader.oauth2.servlet.OA2DiscoveryServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>discovery</servlet-name>
@@ -27,7 +27,7 @@
 
     <servlet>
         <servlet-name>callback</servlet-name>
-        <servlet-class>edu.uiuc.ncsa.oa2.servlet.ProxyCallbackServlet</servlet-class>
+        <servlet-class>org.oa4mp.server.proxy.ProxyCallbackServlet</servlet-class>
         <load-on-startup>0</load-on-startup>
     </servlet>
     <servlet-mapping>
@@ -38,7 +38,7 @@
 
     <servlet>
         <servlet-name>accessToken</servlet-name>
-        <servlet-class>edu.uiuc.ncsa.oa2.servlet.OA2ATServlet</servlet-class>
+        <servlet-class>org.oa4mp.server.proxy.OA2ATServlet</servlet-class>
         <load-on-startup>0</load-on-startup>
     </servlet>
     <servlet-mapping>
@@ -50,7 +50,7 @@
 
     <servlet>
         <servlet-name>oidc-cm</servlet-name>
-        <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.oidc_cm.OIDCCMServlet</servlet-class>
+        <servlet-class>org.oa4mp.server.loader.oauth2.cm.oidc_cm.OIDCCMServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>oidc-cm</servlet-name>
@@ -60,7 +60,7 @@
 
     <servlet>
         <servlet-name>getCert</servlet-name>
-        <servlet-class>edu.uiuc.ncsa.oa2.servlet.OA2CertServlet</servlet-class>
+        <servlet-class>org.oa4mp.server.proxy.OA2CertServlet</servlet-class>
 
     </servlet>
     <servlet-mapping>
@@ -70,7 +70,7 @@
 
     <servlet>
         <servlet-name>error</servlet-name>
-        <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.ErrorServlet</servlet-class>
+        <servlet-class>org.oa4mp.server.api.storage.servlet.ErrorServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>error</servlet-name>
@@ -79,7 +79,7 @@
 
     <servlet>
         <servlet-name>authorize</servlet-name>
-        <servlet-class>edu.uiuc.ncsa.oa2.servlet.OA2AuthorizationServer</servlet-class>
+        <servlet-class>org.oa4mp.server.proxy.OA2AuthorizationServer</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>authorize</servlet-name>
@@ -88,7 +88,7 @@
 
     <servlet>
         <servlet-name>device_authorization</servlet-name>
-        <servlet-class>edu.uiuc.ncsa.oa2.servlet.RFC8628Servlet</servlet-class>
+        <servlet-class>org.oa4mp.server.proxy.RFC8628Servlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>device_authorization</servlet-name>
@@ -97,7 +97,7 @@
 
     <servlet>
         <servlet-name>device</servlet-name>
-        <servlet-class>edu.uiuc.ncsa.oa2.servlet.RFC8628AuthorizationServer</servlet-class>
+        <servlet-class>org.oa4mp.server.proxy.RFC8628AuthorizationServer</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>device</servlet-name>
@@ -106,7 +106,7 @@
 
     <servlet>
         <servlet-name>admin-register</servlet-name>
-        <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2AdminRegistrationServlet</servlet-class>
+        <servlet-class>org.oa4mp.server.loader.oauth2.servlet.OA2AdminRegistrationServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>admin-register</servlet-name>
@@ -116,7 +116,7 @@
 
     <servlet>
         <servlet-name>clientVetting</servlet-name>
-        <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2RegistrationServlet</servlet-class>
+        <servlet-class>org.oa4mp.server.loader.oauth2.servlet.OA2RegistrationServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet-mapping>
@@ -126,7 +126,7 @@
 
     <servlet>
         <servlet-name>client</servlet-name>
-        <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.ClientServlet</servlet-class>
+        <servlet-class>org.oa4mp.server.loader.oauth2.servlet.ClientServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet-mapping>
@@ -136,7 +136,7 @@
 
     <servlet>
         <servlet-name>userInfo</servlet-name>
-        <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.UserInfoServlet</servlet-class>
+        <servlet-class>org.oa4mp.server.loader.oauth2.servlet.UserInfoServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>userInfo</servlet-name>
@@ -145,7 +145,7 @@
 
     <servlet>
          <servlet-name>revoke</servlet-name>
-         <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC7009</servlet-class>
+         <servlet-class>org.oa4mp.server.loader.oauth2.servlet.RFC7009</servlet-class>
          <load-on-startup>0</load-on-startup>
      </servlet>
      <servlet-mapping>
@@ -155,7 +155,7 @@
 
     <servlet>
          <servlet-name>introspect</servlet-name>
-         <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.RFC7662</servlet-class>
+         <servlet-class>org.oa4mp.server.loader.oauth2.servlet.RFC7662</servlet-class>
          <load-on-startup>0</load-on-startup>
      </servlet>
      <servlet-mapping>
@@ -193,12 +193,12 @@
     </resource-ref>
 
     <listener>
-        <listener-class>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2Bootstrapper</listener-class>
+        <listener-class>org.oa4mp.server.loader.oauth2.loader.OA2Bootstrapper</listener-class>
 
     </listener>
 
     <error-page>
-        <exception-type>edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.TooManyRequestsException</exception-type>
+        <exception-type>org.oa4mp.server.api.storage.servlet.TooManyRequestsException</exception-type>
         <location>/tooManyClientRequests.jsp</location>
     </error-page>
 

@@ -131,13 +131,13 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li>edu.uiuc.ncsa.security.storage.cli.StoreCommands</li>
 <li>
 <ul class="inheritance">
-<li><a href="../base/StoreCommands2.html" title="class in edu.uiuc.ncsa.myproxy.oauth2.base">edu.uiuc.ncsa.myproxy.oauth2.base.StoreCommands2</a></li>
+<li><a href="../base/StoreCommands2.html" title="class in edu.uiuc.ncsa.myproxy.oauth2.base">org.oa4mp.server.admin.base.oauth2.myproxy.StoreCommands2</a></li>
 <li>
 <ul class="inheritance">
-<li><a href="../base/BaseClientStoreCommands.html" title="class in edu.uiuc.ncsa.myproxy.oauth2.base">edu.uiuc.ncsa.myproxy.oauth2.base.BaseClientStoreCommands</a></li>
+<li><a href="../base/BaseClientStoreCommands.html" title="class in edu.uiuc.ncsa.myproxy.oauth2.base">org.oa4mp.server.admin.base.oauth2.myproxy.BaseClientStoreCommands</a></li>
 <li>
 <ul class="inheritance">
-<li>edu.uiuc.ncsa.myproxy.oauth2.tools.OA2AdminClientCommands</li>
+<li>org.oa4mp.server.admin.tools.oauth2.myproxy.OA2AdminClientCommands</li>
 </ul>
 </li>
 </ul>
@@ -220,7 +220,7 @@ extends <a href="../base/BaseClientStoreCommands.html" title="class in edu.uiuc.
 </tr>
 </table>
 <ul class="blockList">
-<li class="blockList"><a id="fields.inherited.from.class.edu.uiuc.ncsa.myproxy.oauth2.base.BaseClientStoreCommands">
+<li class="blockList"><a id="fields.inherited.from.class.org.oa4mp.server.admin.base.oauth2.myproxy.BaseClientStoreCommands">
 <!--   -->
 </a>
 <h3>Fields inherited from class&nbsp;edu.uiuc.ncsa.myproxy.oauth2.base.<a href="../base/BaseClientStoreCommands.html" title="class in edu.uiuc.ncsa.myproxy.oauth2.base">BaseClientStoreCommands</a></h3>
@@ -257,11 +257,11 @@ extends <a href="../base/BaseClientStoreCommands.html" title="class in edu.uiuc.
 <th class="colLast" scope="col">Description</th>
 </tr>
 <tr class="altColor">
-<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(edu.uiuc.ncsa.security.core.util.MyLoggingFacade,java.lang.String,edu.uiuc.ncsa.security.core.Store,edu.uiuc.ncsa.myproxy.oauth2.base.ClientApprovalStoreCommands,edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionsStore,edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore)">OA2AdminClientCommands</a></span>&#8203;(edu.uiuc.ncsa.security.core.util.MyLoggingFacade&nbsp;logger,
+<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(edu.uiuc.ncsa.security.core.util.MyLoggingFacade,java.lang.String,edu.uiuc.ncsa.security.core.Store,org.oa4mp.server.admin.base.oauth2.myproxy.ClientApprovalStoreCommands,org.oa4mp.server.api.permissions.admin.PermissionsStore,edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore)">OA2AdminClientCommands</a></span>&#8203;(edu.uiuc.ncsa.security.core.util.MyLoggingFacade&nbsp;logger,
                       <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;defaultIndent,
                       edu.uiuc.ncsa.security.core.Store&nbsp;adminClientStore,
                       <a href="../base/ClientApprovalStoreCommands.html" title="class in edu.uiuc.ncsa.myproxy.oauth2.base">ClientApprovalStoreCommands</a>&nbsp;clientApprovalStoreCommands,
-                      edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionsStore&nbsp;permissionsStore,
+                      org.oa4mp.server.api.permissions.admin.PermissionsStore&nbsp;permissionsStore,
                       <a href="../../../oa4mp/delegation/server/storage/ClientStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.server.storage">ClientStore</a>&nbsp;clientStore)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -285,7 +285,7 @@ extends <a href="../base/BaseClientStoreCommands.html" title="class in edu.uiuc.
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>protected <a href="../../../oa4mp/delegation/common/storage/clients/BaseClient.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients">BaseClient</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#approvalMods(edu.uiuc.ncsa.security.util.cli.InputLine,edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClient)">approvalMods</a></span>&#8203;(edu.uiuc.ncsa.security.util.cli.InputLine&nbsp;inputLine,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#approvalMods(edu.uiuc.ncsa.security.util.cli.InputLine,org.oa4mp.delegation.common.clients.storage.BaseClient)">approvalMods</a></span>&#8203;(edu.uiuc.ncsa.security.util.cli.InputLine&nbsp;inputLine,
             <a href="../../../oa4mp/delegation/common/storage/clients/BaseClient.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients">BaseClient</a>&nbsp;client)</code></th>
 <td class="colLast">
 <div class="block">If there are modifications to the client before saving its approval (e.g.</div>
@@ -379,14 +379,14 @@ extends <a href="../base/BaseClientStoreCommands.html" title="class in edu.uiuc.
 </tr>
 </table>
 <ul class="blockList">
-<li class="blockList"><a id="methods.inherited.from.class.edu.uiuc.ncsa.myproxy.oauth2.base.BaseClientStoreCommands">
+<li class="blockList"><a id="methods.inherited.from.class.org.oa4mp.server.admin.base.oauth2.myproxy.BaseClientStoreCommands">
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;edu.uiuc.ncsa.myproxy.oauth2.base.<a href="../base/BaseClientStoreCommands.html" title="class in edu.uiuc.ncsa.myproxy.oauth2.base">BaseClientStoreCommands</a></h3>
-<code><a href="../base/BaseClientStoreCommands.html#approve(edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClient)">approve</a>, <a href="../base/BaseClientStoreCommands.html#approve(edu.uiuc.ncsa.security.util.cli.InputLine)">approve</a>, <a href="../base/BaseClientStoreCommands.html#approver_search(edu.uiuc.ncsa.security.util.cli.InputLine)">approver_search</a>, <a href="../base/BaseClientStoreCommands.html#archiveFormat(edu.uiuc.ncsa.security.core.Identifiable)">archiveFormat</a>, <a href="../base/BaseClientStoreCommands.html#create(edu.uiuc.ncsa.security.util.cli.InputLine)">create</a>, <a href="../base/BaseClientStoreCommands.html#create_hash(edu.uiuc.ncsa.security.util.cli.InputLine)">create_hash</a>, <a href="../base/BaseClientStoreCommands.html#format(edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClient,edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval)">format</a>, <a href="../base/BaseClientStoreCommands.html#format(edu.uiuc.ncsa.security.core.Identifiable)">format</a>, <a href="../base/BaseClientStoreCommands.html#getClientApprovalStore()">getClientApprovalStore</a>, <a href="../base/BaseClientStoreCommands.html#getPublicKeyFile(edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClient,edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClientKeys)">getPublicKeyFile</a>, <a href="../base/BaseClientStoreCommands.html#getSecret(edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClient,edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClientKeys)">getSecret</a>, <a href="../base/BaseClientStoreCommands.html#getSortable()">getSortable</a>, <a href="../base/BaseClientStoreCommands.html#inputJSON(net.sf.json.JSON,java.lang.String)">inputJSON</a>, <a href="../base/BaseClientStoreCommands.html#inputJSON(net.sf.json.JSON,java.lang.String,boolean)">inputJSON</a>, <a href="../base/BaseClientStoreCommands.html#isCARS(java.lang.String)">isCARS</a>, <a href="../base/BaseClientStoreCommands.html#listAll(boolean,java.lang.String)">listAll</a>, <a href="../base/BaseClientStoreCommands.html#longFormat(edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClient,edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval,boolean)">longFormat</a>, <a href="../base/BaseClientStoreCommands.html#longFormat(edu.uiuc.ncsa.security.core.Identifiable,boolean)">longFormat</a>, <a href="../base/BaseClientStoreCommands.html#password(edu.uiuc.ncsa.security.util.cli.InputLine)">password</a>, <a href="../base/BaseClientStoreCommands.html#reset_secret(edu.uiuc.ncsa.security.util.cli.InputLine)">reset_secret</a>, <a href="../base/BaseClientStoreCommands.html#rm(edu.uiuc.ncsa.security.util.cli.InputLine)">rm</a>, <a href="../base/BaseClientStoreCommands.html#rmCleanup(edu.uiuc.ncsa.security.core.Identifiable)">rmCleanup</a>, <a href="../base/BaseClientStoreCommands.html#rs(edu.uiuc.ncsa.security.util.cli.InputLine)">rs</a>, <a href="../base/BaseClientStoreCommands.html#showApproveHelp()">showApproveHelp</a>, <a href="../base/BaseClientStoreCommands.html#showCreateHashHelp()">showCreateHashHelp</a>, <a href="../base/BaseClientStoreCommands.html#status_search(edu.uiuc.ncsa.security.util.cli.InputLine)">status_search</a></code></li>
+<code><a href="../base/BaseClientStoreCommands.html#approve(org.oa4mp.delegation.common.clients.storage.BaseClient)">approve</a>, <a href="../base/BaseClientStoreCommands.html#approve(edu.uiuc.ncsa.security.util.cli.InputLine)">approve</a>, <a href="../base/BaseClientStoreCommands.html#approver_search(edu.uiuc.ncsa.security.util.cli.InputLine)">approver_search</a>, <a href="../base/BaseClientStoreCommands.html#archiveFormat(edu.uiuc.ncsa.security.core.Identifiable)">archiveFormat</a>, <a href="../base/BaseClientStoreCommands.html#create(edu.uiuc.ncsa.security.util.cli.InputLine)">create</a>, <a href="../base/BaseClientStoreCommands.html#create_hash(edu.uiuc.ncsa.security.util.cli.InputLine)">create_hash</a>, <a href="../base/BaseClientStoreCommands.html#format(org.oa4mp.delegation.common.clients.storage.BaseClient,edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval)">format</a>, <a href="../base/BaseClientStoreCommands.html#format(edu.uiuc.ncsa.security.core.Identifiable)">format</a>, <a href="../base/BaseClientStoreCommands.html#getClientApprovalStore()">getClientApprovalStore</a>, <a href="../base/BaseClientStoreCommands.html#getPublicKeyFile(org.oa4mp.delegation.common.clients.storage.BaseClient,org.oa4mp.delegation.common.clients.storage.BaseClientKeys)">getPublicKeyFile</a>, <a href="../base/BaseClientStoreCommands.html#getSecret(org.oa4mp.delegation.common.clients.storage.BaseClient,org.oa4mp.delegation.common.clients.storage.BaseClientKeys)">getSecret</a>, <a href="../base/BaseClientStoreCommands.html#getSortable()">getSortable</a>, <a href="../base/BaseClientStoreCommands.html#inputJSON(net.sf.json.JSON,java.lang.String)">inputJSON</a>, <a href="../base/BaseClientStoreCommands.html#inputJSON(net.sf.json.JSON,java.lang.String,boolean)">inputJSON</a>, <a href="../base/BaseClientStoreCommands.html#isCARS(java.lang.String)">isCARS</a>, <a href="../base/BaseClientStoreCommands.html#listAll(boolean,java.lang.String)">listAll</a>, <a href="../base/BaseClientStoreCommands.html#longFormat(org.oa4mp.delegation.common.clients.storage.BaseClient,edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval,boolean)">longFormat</a>, <a href="../base/BaseClientStoreCommands.html#longFormat(edu.uiuc.ncsa.security.core.Identifiable,boolean)">longFormat</a>, <a href="../base/BaseClientStoreCommands.html#password(edu.uiuc.ncsa.security.util.cli.InputLine)">password</a>, <a href="../base/BaseClientStoreCommands.html#reset_secret(edu.uiuc.ncsa.security.util.cli.InputLine)">reset_secret</a>, <a href="../base/BaseClientStoreCommands.html#rm(edu.uiuc.ncsa.security.util.cli.InputLine)">rm</a>, <a href="../base/BaseClientStoreCommands.html#rmCleanup(edu.uiuc.ncsa.security.core.Identifiable)">rmCleanup</a>, <a href="../base/BaseClientStoreCommands.html#rs(edu.uiuc.ncsa.security.util.cli.InputLine)">rs</a>, <a href="../base/BaseClientStoreCommands.html#showApproveHelp()">showApproveHelp</a>, <a href="../base/BaseClientStoreCommands.html#showCreateHashHelp()">showCreateHashHelp</a>, <a href="../base/BaseClientStoreCommands.html#status_search(edu.uiuc.ncsa.security.util.cli.InputLine)">status_search</a></code></li>
 </ul>
 <ul class="blockList">
-<li class="blockList"><a id="methods.inherited.from.class.edu.uiuc.ncsa.myproxy.oauth2.base.StoreCommands2">
+<li class="blockList"><a id="methods.inherited.from.class.org.oa4mp.server.admin.base.oauth2.myproxy.StoreCommands2">
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;edu.uiuc.ncsa.myproxy.oauth2.base.<a href="../base/StoreCommands2.html" title="class in edu.uiuc.ncsa.myproxy.oauth2.base">StoreCommands2</a></h3>
@@ -456,7 +456,7 @@ extends <a href="../base/BaseClientStoreCommands.html" title="class in edu.uiuc.
 <pre>public static final&nbsp;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> UNLINK_ALL_FLAG</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../constant-values.html#edu.uiuc.ncsa.myproxy.oauth2.tools.OA2AdminClientCommands.UNLINK_ALL_FLAG">Constant Field Values</a></dd>
+<dd><a href="../../../../../../constant-values.html#org.oa4mp.server.admin.tools.oauth2.myproxy.OA2AdminClientCommands.UNLINK_ALL_FLAG">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -469,7 +469,7 @@ extends <a href="../base/BaseClientStoreCommands.html" title="class in edu.uiuc.
 <pre>public static final&nbsp;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> UNLINK_REMOVE_FLAG</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../constant-values.html#edu.uiuc.ncsa.myproxy.oauth2.tools.OA2AdminClientCommands.UNLINK_REMOVE_FLAG">Constant Field Values</a></dd>
+<dd><a href="../../../../../../constant-values.html#org.oa4mp.server.admin.tools.oauth2.myproxy.OA2AdminClientCommands.UNLINK_REMOVE_FLAG">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -483,7 +483,7 @@ extends <a href="../base/BaseClientStoreCommands.html" title="class in edu.uiuc.
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a id="&lt;init&gt;(edu.uiuc.ncsa.security.core.util.MyLoggingFacade,java.lang.String,edu.uiuc.ncsa.security.core.Store,edu.uiuc.ncsa.myproxy.oauth2.base.ClientApprovalStoreCommands,edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionsStore,edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore)">
+<a id="&lt;init&gt;(edu.uiuc.ncsa.security.core.util.MyLoggingFacade,java.lang.String,edu.uiuc.ncsa.security.core.Store,org.oa4mp.server.admin.base.oauth2.myproxy.ClientApprovalStoreCommands,org.oa4mp.server.api.permissions.admin.PermissionsStore,edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore)">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -493,7 +493,7 @@ extends <a href="../base/BaseClientStoreCommands.html" title="class in edu.uiuc.
                               <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;defaultIndent,
                               edu.uiuc.ncsa.security.core.Store&nbsp;adminClientStore,
                               <a href="../base/ClientApprovalStoreCommands.html" title="class in edu.uiuc.ncsa.myproxy.oauth2.base">ClientApprovalStoreCommands</a>&nbsp;clientApprovalStoreCommands,
-                              edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionsStore&nbsp;permissionsStore,
+                              org.oa4mp.server.api.permissions.admin.PermissionsStore&nbsp;permissionsStore,
                               <a href="../../../oa4mp/delegation/server/storage/ClientStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.server.storage">ClientStore</a>&nbsp;clientStore)
                        throws <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Throwable.html?is-external=true" title="class or interface in java.lang" class="externalLink">Throwable</a></pre>
 <dl>
@@ -729,7 +729,7 @@ extends <a href="../base/BaseClientStoreCommands.html" title="class in edu.uiuc.
 </dl>
 </li>
 </ul>
-<a id="approvalMods(edu.uiuc.ncsa.security.util.cli.InputLine,edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClient)">
+<a id="approvalMods(edu.uiuc.ncsa.security.util.cli.InputLine,org.oa4mp.delegation.common.clients.storage.BaseClient)">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -738,12 +738,12 @@ extends <a href="../base/BaseClientStoreCommands.html" title="class in edu.uiuc.
 <pre class="methodSignature">protected&nbsp;<a href="../../../oa4mp/delegation/common/storage/clients/BaseClient.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients">BaseClient</a>&nbsp;approvalMods&#8203;(edu.uiuc.ncsa.security.util.cli.InputLine&nbsp;inputLine,
                                   <a href="../../../oa4mp/delegation/common/storage/clients/BaseClient.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients">BaseClient</a>&nbsp;client)
                            throws <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/io/IOException.html?is-external=true" title="class or interface in java.io" class="externalLink">IOException</a></pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../base/BaseClientStoreCommands.html#approvalMods(edu.uiuc.ncsa.security.util.cli.InputLine,edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClient)">BaseClientStoreCommands</a></code></span></div>
+<div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../base/BaseClientStoreCommands.html#approvalMods(edu.uiuc.ncsa.security.util.cli.InputLine,org.oa4mp.delegation.common.clients.storage.BaseClient)">BaseClientStoreCommands</a></code></span></div>
 <div class="block">If there are modifications to the client before saving its approval (e.g.
  admin clients should be prompted for QDL policy) put it here.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code><a href="../base/BaseClientStoreCommands.html#approvalMods(edu.uiuc.ncsa.security.util.cli.InputLine,edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClient)">approvalMods</a></code>&nbsp;in class&nbsp;<code><a href="../base/BaseClientStoreCommands.html" title="class in edu.uiuc.ncsa.myproxy.oauth2.base">BaseClientStoreCommands</a></code></dd>
+<dd><code><a href="../base/BaseClientStoreCommands.html#approvalMods(edu.uiuc.ncsa.security.util.cli.InputLine,org.oa4mp.delegation.common.clients.storage.BaseClient)">approvalMods</a></code>&nbsp;in class&nbsp;<code><a href="../base/BaseClientStoreCommands.html" title="class in edu.uiuc.ncsa.myproxy.oauth2.base">BaseClientStoreCommands</a></code></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/io/IOException.html?is-external=true" title="class or interface in java.io" class="externalLink">IOException</a></code></dd>

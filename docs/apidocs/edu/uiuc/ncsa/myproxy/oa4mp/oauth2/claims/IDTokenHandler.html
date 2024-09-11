@@ -125,10 +125,10 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang" class="externalLink">java.lang.Object</a></li>
 <li>
 <ul class="inheritance">
-<li><a href="AbstractPayloadHandler.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims">edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.AbstractPayloadHandler</a></li>
+<li><a href="AbstractPayloadHandler.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims">org.oa4mp.server.loader.oauth2.claims.AbstractPayloadHandler</a></li>
 <li>
 <ul class="inheritance">
-<li>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenHandler</li>
+<li>org.oa4mp.server.loader.oauth2.claims.IDTokenHandler</li>
 </ul>
 </li>
 </ul>
@@ -149,7 +149,7 @@ implements <a href="../../../../oa4mp/delegation/oa2/jwt/IDTokenHandlerInterface
  on 2/16/20 at  6:51 AM</div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../../serialized-form.html#edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenHandler">Serialized Form</a></dd>
+<dd><a href="../../../../../../../serialized-form.html#org.oa4mp.server.loader.oauth2.claims.IDTokenHandler">Serialized Form</a></dd>
 </dl>
 </li>
 </ul>
@@ -188,7 +188,7 @@ implements <a href="../../../../oa4mp/delegation/oa2/jwt/IDTokenHandlerInterface
 </tr>
 </table>
 <ul class="blockList">
-<li class="blockList"><a id="fields.inherited.from.class.edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.AbstractPayloadHandler">
+<li class="blockList"><a id="fields.inherited.from.class.org.oa4mp.server.loader.oauth2.claims.AbstractPayloadHandler">
 <!--   -->
 </a>
 <h3>Fields inherited from class&nbsp;edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.<a href="AbstractPayloadHandler.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims">AbstractPayloadHandler</a></h3>
@@ -211,7 +211,7 @@ implements <a href="../../../../oa4mp/delegation/oa2/jwt/IDTokenHandlerInterface
 <th class="colLast" scope="col">Description</th>
 </tr>
 <tr class="altColor">
-<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.PayloadHandlerConfigImpl)">IDTokenHandler</a></span>&#8203;(<a href="PayloadHandlerConfigImpl.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims">PayloadHandlerConfigImpl</a>&nbsp;payloadHandlerConfig)</code></th>
+<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(org.oa4mp.server.loader.oauth2.claims.PayloadHandlerConfigImpl)">IDTokenHandler</a></span>&#8203;(<a href="PayloadHandlerConfigImpl.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims">PayloadHandlerConfigImpl</a>&nbsp;payloadHandlerConfig)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 </table>
@@ -254,14 +254,14 @@ implements <a href="../../../../oa4mp/delegation/oa2/jwt/IDTokenHandlerInterface
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code>protected void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#checkRequiredScopes(edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction)">checkRequiredScopes</a></span>&#8203;(<a href="../storage/transactions/OA2ServiceTransaction.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions">OA2ServiceTransaction</a>&nbsp;t)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#checkRequiredScopes(org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction)">checkRequiredScopes</a></span>&#8203;(<a href="../storage/transactions/OA2ServiceTransaction.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions">OA2ServiceTransaction</a>&nbsp;t)</code></th>
 <td class="colLast">
 <div class="block">Use this to check for any requires scopes that the request must have.</div>
 </td>
 </tr>
 <tr id="i4" class="altColor">
 <td class="colFirst"><code>net.sf.json.JSONObject</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#execute(edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSource,net.sf.json.JSONObject)">execute</a></span>&#8203;(<a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSource.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims">ClaimSource</a>&nbsp;source,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#execute(org.oa4mp.delegation.server.claims.server.ClaimSource,net.sf.json.JSONObject)">execute</a></span>&#8203;(<a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSource.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims">ClaimSource</a>&nbsp;source,
        net.sf.json.JSONObject&nbsp;claims)</code></th>
 <td class="colLast">
 <div class="block">Runs this specific claim source against the internal state of this class.</div>
@@ -323,11 +323,11 @@ implements <a href="../../../../oa4mp/delegation/oa2/jwt/IDTokenHandlerInterface
 </tr>
 </table>
 <ul class="blockList">
-<li class="blockList"><a id="methods.inherited.from.class.edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.AbstractPayloadHandler">
+<li class="blockList"><a id="methods.inherited.from.class.org.oa4mp.server.loader.oauth2.claims.AbstractPayloadHandler">
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.<a href="AbstractPayloadHandler.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims">AbstractPayloadHandler</a></h3>
-<code><a href="AbstractPayloadHandler.html#doServerVariables(net.sf.json.JSONObject)">doServerVariables</a>, <a href="AbstractPayloadHandler.html#doSubstitution(java.lang.String,net.sf.json.JSONObject,net.sf.json.JSONObject)">doSubstitution</a>, <a href="AbstractPayloadHandler.html#getClaims()">getClaims</a>, <a href="AbstractPayloadHandler.html#getExtendedAttributes()">getExtendedAttributes</a>, <a href="AbstractPayloadHandler.html#getPhCfg()">getPhCfg</a>, <a href="AbstractPayloadHandler.html#getResponseCode()">getResponseCode</a>, <a href="AbstractPayloadHandler.html#getToken(edu.uiuc.ncsa.security.util.jwk.JSONWebKey)">getToken</a>, <a href="AbstractPayloadHandler.html#hasScript()">hasScript</a>, <a href="AbstractPayloadHandler.html#isEmpty(java.lang.String)">isEmpty</a>, <a href="AbstractPayloadHandler.html#listToString(java.util.List)">listToString</a>, <a href="AbstractPayloadHandler.html#refresh()">refresh</a>, <a href="AbstractPayloadHandler.html#setClaims(net.sf.json.JSONObject)">setClaims</a>, <a href="AbstractPayloadHandler.html#setExtendedAttributes(net.sf.json.JSONObject)">setExtendedAttributes</a>, <a href="AbstractPayloadHandler.html#setPhCfg(edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.PayloadHandlerConfig)">setPhCfg</a>, <a href="AbstractPayloadHandler.html#setResponseCode(int)">setResponseCode</a></code></li>
+<code><a href="AbstractPayloadHandler.html#doServerVariables(net.sf.json.JSONObject)">doServerVariables</a>, <a href="AbstractPayloadHandler.html#doSubstitution(java.lang.String,net.sf.json.JSONObject,net.sf.json.JSONObject)">doSubstitution</a>, <a href="AbstractPayloadHandler.html#getClaims()">getClaims</a>, <a href="AbstractPayloadHandler.html#getExtendedAttributes()">getExtendedAttributes</a>, <a href="AbstractPayloadHandler.html#getPhCfg()">getPhCfg</a>, <a href="AbstractPayloadHandler.html#getResponseCode()">getResponseCode</a>, <a href="AbstractPayloadHandler.html#getToken(edu.uiuc.ncsa.security.util.jwk.JSONWebKey)">getToken</a>, <a href="AbstractPayloadHandler.html#hasScript()">hasScript</a>, <a href="AbstractPayloadHandler.html#isEmpty(java.lang.String)">isEmpty</a>, <a href="AbstractPayloadHandler.html#listToString(java.util.List)">listToString</a>, <a href="AbstractPayloadHandler.html#refresh()">refresh</a>, <a href="AbstractPayloadHandler.html#setClaims(net.sf.json.JSONObject)">setClaims</a>, <a href="AbstractPayloadHandler.html#setExtendedAttributes(net.sf.json.JSONObject)">setExtendedAttributes</a>, <a href="AbstractPayloadHandler.html#setPhCfg(org.oa4mp.delegation.server.jwt.PayloadHandlerConfig)">setPhCfg</a>, <a href="AbstractPayloadHandler.html#setResponseCode(int)">setResponseCode</a></code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a id="methods.inherited.from.class.java.lang.Object">
@@ -337,11 +337,11 @@ implements <a href="../../../../oa4mp/delegation/oa2/jwt/IDTokenHandlerInterface
 <code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#clone()" title="class or interface in java.lang" class="externalLink">clone</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#equals(java.lang.Object)" title="class or interface in java.lang" class="externalLink">equals</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#finalize()" title="class or interface in java.lang" class="externalLink">finalize</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#getClass()" title="class or interface in java.lang" class="externalLink">getClass</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#hashCode()" title="class or interface in java.lang" class="externalLink">hashCode</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#notify()" title="class or interface in java.lang" class="externalLink">notify</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#notifyAll()" title="class or interface in java.lang" class="externalLink">notifyAll</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#toString()" title="class or interface in java.lang" class="externalLink">toString</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#wait()" title="class or interface in java.lang" class="externalLink">wait</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#wait(long)" title="class or interface in java.lang" class="externalLink">wait</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#wait(long,int)" title="class or interface in java.lang" class="externalLink">wait</a></code></li>
 </ul>
 <ul class="blockList">
-<li class="blockList"><a id="methods.inherited.from.class.edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.PayloadHandler">
+<li class="blockList"><a id="methods.inherited.from.class.org.oa4mp.delegation.server.jwt.PayloadHandler">
 <!--   -->
 </a>
 <h3>Methods inherited from interface&nbsp;edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.<a href="../../../../oa4mp/delegation/oa2/jwt/PayloadHandler.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt">PayloadHandler</a></h3>
-<code><a href="../../../../oa4mp/delegation/oa2/jwt/PayloadHandler.html#getClaims()">getClaims</a>, <a href="../../../../oa4mp/delegation/oa2/jwt/PayloadHandler.html#getExtendedAttributes()">getExtendedAttributes</a>, <a href="../../../../oa4mp/delegation/oa2/jwt/PayloadHandler.html#getPhCfg()">getPhCfg</a>, <a href="../../../../oa4mp/delegation/oa2/jwt/PayloadHandler.html#getResponseCode()">getResponseCode</a>, <a href="../../../../oa4mp/delegation/oa2/jwt/PayloadHandler.html#getToken(edu.uiuc.ncsa.security.util.jwk.JSONWebKey)">getToken</a>, <a href="../../../../oa4mp/delegation/oa2/jwt/PayloadHandler.html#hasScript()">hasScript</a>, <a href="../../../../oa4mp/delegation/oa2/jwt/PayloadHandler.html#refresh()">refresh</a>, <a href="../../../../oa4mp/delegation/oa2/jwt/PayloadHandler.html#setPhCfg(edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt.PayloadHandlerConfig)">setPhCfg</a>, <a href="../../../../oa4mp/delegation/oa2/jwt/PayloadHandler.html#setResponseCode(int)">setResponseCode</a></code></li>
+<code><a href="../../../../oa4mp/delegation/oa2/jwt/PayloadHandler.html#getClaims()">getClaims</a>, <a href="../../../../oa4mp/delegation/oa2/jwt/PayloadHandler.html#getExtendedAttributes()">getExtendedAttributes</a>, <a href="../../../../oa4mp/delegation/oa2/jwt/PayloadHandler.html#getPhCfg()">getPhCfg</a>, <a href="../../../../oa4mp/delegation/oa2/jwt/PayloadHandler.html#getResponseCode()">getResponseCode</a>, <a href="../../../../oa4mp/delegation/oa2/jwt/PayloadHandler.html#getToken(edu.uiuc.ncsa.security.util.jwk.JSONWebKey)">getToken</a>, <a href="../../../../oa4mp/delegation/oa2/jwt/PayloadHandler.html#hasScript()">hasScript</a>, <a href="../../../../oa4mp/delegation/oa2/jwt/PayloadHandler.html#refresh()">refresh</a>, <a href="../../../../oa4mp/delegation/oa2/jwt/PayloadHandler.html#setPhCfg(org.oa4mp.delegation.server.jwt.PayloadHandlerConfig)">setPhCfg</a>, <a href="../../../../oa4mp/delegation/oa2/jwt/PayloadHandler.html#setResponseCode(int)">setResponseCode</a></code></li>
 </ul>
 </li>
 </ul>
@@ -377,7 +377,7 @@ implements <a href="../../../../oa4mp/delegation/oa2/jwt/IDTokenHandlerInterface
 <pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> ID_TOKEN_DEFAULT_HANDLER_TYPE</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../../constant-values.html#edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenHandler.ID_TOKEN_DEFAULT_HANDLER_TYPE">Constant Field Values</a></dd>
+<dd><a href="../../../../../../../constant-values.html#org.oa4mp.server.loader.oauth2.claims.IDTokenHandler.ID_TOKEN_DEFAULT_HANDLER_TYPE">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -390,7 +390,7 @@ implements <a href="../../../../oa4mp/delegation/oa2/jwt/IDTokenHandlerInterface
 <pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> ID_TOKEN_BASIC_HANDLER_TYPE</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../../constant-values.html#edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.IDTokenHandler.ID_TOKEN_BASIC_HANDLER_TYPE">Constant Field Values</a></dd>
+<dd><a href="../../../../../../../constant-values.html#org.oa4mp.server.loader.oauth2.claims.IDTokenHandler.ID_TOKEN_BASIC_HANDLER_TYPE">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -404,7 +404,7 @@ implements <a href="../../../../oa4mp/delegation/oa2/jwt/IDTokenHandlerInterface
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a id="&lt;init&gt;(edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.PayloadHandlerConfigImpl)">
+<a id="&lt;init&gt;(org.oa4mp.server.loader.oauth2.claims.PayloadHandlerConfigImpl)">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -603,7 +603,7 @@ implements <a href="../../../../oa4mp/delegation/oa2/jwt/IDTokenHandlerInterface
 </dl>
 </li>
 </ul>
-<a id="checkRequiredScopes(edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction)">
+<a id="checkRequiredScopes(org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -631,7 +631,7 @@ implements <a href="../../../../oa4mp/delegation/oa2/jwt/IDTokenHandlerInterface
                           <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;claimKey)</pre>
 </li>
 </ul>
-<a id="execute(edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSource,net.sf.json.JSONObject)">
+<a id="execute(org.oa4mp.delegation.server.claims.server.ClaimSource,net.sf.json.JSONObject)">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -640,15 +640,15 @@ implements <a href="../../../../oa4mp/delegation/oa2/jwt/IDTokenHandlerInterface
 <pre class="methodSignature">public&nbsp;net.sf.json.JSONObject&nbsp;execute&#8203;(<a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSource.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims">ClaimSource</a>&nbsp;source,
                                       net.sf.json.JSONObject&nbsp;claims)
                                throws <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Throwable.html?is-external=true" title="class or interface in java.lang" class="externalLink">Throwable</a></pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../oa4mp/delegation/oa2/jwt/PayloadHandler.html#execute(edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSource,net.sf.json.JSONObject)">PayloadHandler</a></code></span></div>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../oa4mp/delegation/oa2/jwt/PayloadHandler.html#execute(org.oa4mp.delegation.server.claims.server.ClaimSource,net.sf.json.JSONObject)">PayloadHandler</a></code></span></div>
 <div class="block">Runs this specific claim source against the internal state of this class.
  Note that the contract is that it returns the updated claims and if there
  are no new claims, it should just return its claims argument.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../oa4mp/delegation/oa2/jwt/PayloadHandler.html#execute(edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSource,net.sf.json.JSONObject)">execute</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../oa4mp/delegation/oa2/jwt/PayloadHandler.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt">PayloadHandler</a></code></dd>
+<dd><code><a href="../../../../oa4mp/delegation/oa2/jwt/PayloadHandler.html#execute(org.oa4mp.delegation.server.claims.server.ClaimSource,net.sf.json.JSONObject)">execute</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../oa4mp/delegation/oa2/jwt/PayloadHandler.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.oa2.jwt">PayloadHandler</a></code></dd>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code><a href="AbstractPayloadHandler.html#execute(edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSource,net.sf.json.JSONObject)">execute</a></code>&nbsp;in class&nbsp;<code><a href="AbstractPayloadHandler.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims">AbstractPayloadHandler</a></code></dd>
+<dd><code><a href="AbstractPayloadHandler.html#execute(org.oa4mp.delegation.server.claims.server.ClaimSource,net.sf.json.JSONObject)">execute</a></code>&nbsp;in class&nbsp;<code><a href="AbstractPayloadHandler.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims">AbstractPayloadHandler</a></code></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Throwable.html?is-external=true" title="class or interface in java.lang" class="externalLink">Throwable</a></code></dd>

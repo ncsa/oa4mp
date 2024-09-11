@@ -15,7 +15,7 @@
     <packaging>jar</packaging>
     <dependencies>
         <dependency>
-            <groupId>edu.uiuc.ncsa.qdl</groupId>
+            <groupId>org.qdl_lang</groupId>
             <artifactId>language</artifactId>
             <version>1.5-QDL-SNAPSHOT</version>
         </dependency>
@@ -46,7 +46,7 @@
                             <archive>
                                 <manifest>
                                     <addClasspath>true</addClasspath>
-                                    <mainClass>edu.uiuc.ncsa.oa2.qdl.OA4MPQDLWorkspace</mainClass>
+                                    <mainClass>org.oa4mp.server.qdl.OA4MPQDLWorkspace</mainClass>
                                 </manifest>
                                 <manifestEntries>
                                     <application-version>${project.version}</application-version>
@@ -90,7 +90,7 @@
                             <archive>
                                 <manifest>
                                     <addClasspath>true</addClasspath>
-                                    <mainClass>edu.uiuc.ncsa.oa2.qdl.clc.QDLCLC</mainClass>
+                                    <mainClass>org.oa4mp.server.qdl.clc.QDLCLC</mainClass>
                                 </manifest>
                             </archive>
                             <descriptorRefs>

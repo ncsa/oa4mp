@@ -31,7 +31,7 @@
 ${STORE}
         <!-- See https://oa4mp.org/common/configuration/logging.html -->
         <logging
-                logFileName="{$OA4MP_ROOT}log/oa4mp-client.xml"
+                logFileName="${OA4MP_HOME}log/oa4mp-client.xml"
                 logName="oa4mp-client"
                 logSize="100000"
                 logFileCount="2"/>

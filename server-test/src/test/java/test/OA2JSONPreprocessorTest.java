@@ -1,6 +1,6 @@
 package test;
 
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfiguration;
+import org.oa4mp.delegation.server.server.config.LDAPConfiguration;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.util.JSONPreprocessorTest;

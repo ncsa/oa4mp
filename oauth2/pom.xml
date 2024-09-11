@@ -15,14 +15,6 @@
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
     </properties>
-
-    <!--
-               <dependency>
-            <groupId>edu.uiuc.ncsa.myproxy</groupId>
-            <artifactId>common</artifactId>
-            <version>5.3-SNAPSHOT</version>
-        </dependency>
-    -->
     <packaging>jar</packaging>
     <name>OA4MP delegation support for OAuth 2</name>
     <dependencies>
@@ -70,7 +62,7 @@
               next dependency is needed for testing the JWT runner scripting framework
         -->
         <dependency>
-            <groupId>edu.uiuc.ncsa.qdl</groupId>
+            <groupId>org.qdl_lang</groupId>
             <artifactId>language</artifactId>
             <version>1.5-QDL-SNAPSHOT</version>
             <scope>compile</scope>

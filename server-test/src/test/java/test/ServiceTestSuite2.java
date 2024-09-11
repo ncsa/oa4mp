@@ -5,9 +5,8 @@ package test;
  * on 3/13/12 at  3:10 PM
  */
 
-import edu.uiuc.ncsa.myproxy.oa4mp.*;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2Bootstrapper;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.FileStoreTest;
+import org.oa4mp.server.loader.oauth2.loader.OA2Bootstrapper;
+import org.oa4mp.delegation.client.test.common.storage.FileStoreTest;
 import edu.uiuc.ncsa.security.core.configuration.ConfigInheritanceTest;
 import edu.uiuc.ncsa.security.core.configuration.MultipleInheritanceTest;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
@@ -20,6 +19,7 @@ import junit.framework.TestSuite;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
+import org.oa4mp.server.test.*;
 
 import java.io.File;
 

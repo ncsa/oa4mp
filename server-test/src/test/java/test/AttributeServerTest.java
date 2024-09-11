@@ -1,17 +1,17 @@
 package test;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.TestStoreProviderInterface;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.RequestFactory;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.attributes.*;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientConverter;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2ClientKeys;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.ActionGet;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.ActionRemove;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.ActionSet;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.types.TypeAttribute;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Scopes;
+import org.oa4mp.server.loader.oauth2.cm.util.attributes.*;
+import org.oa4mp.server.test.TestStoreProviderInterface;
+import org.oa4mp.server.loader.oauth2.OA2SE;
+import org.oa4mp.server.loader.oauth2.cm.util.RequestFactory;
+import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
+import org.oa4mp.server.loader.oauth2.storage.clients.OA2ClientConverter;
+import org.oa4mp.server.loader.oauth2.storage.clients.OA2ClientKeys;
+import org.oa4mp.server.api.admin.things.actions.ActionGet;
+import org.oa4mp.server.api.admin.things.actions.ActionRemove;
+import org.oa4mp.server.api.admin.things.actions.ActionSet;
+import org.oa4mp.server.api.admin.things.types.TypeAttribute;
+import org.oa4mp.delegation.server.OA2Scopes;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 

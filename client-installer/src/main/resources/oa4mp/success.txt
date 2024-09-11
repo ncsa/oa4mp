@@ -1,7 +1,7 @@
 Done! You should add
-  export OA4MP_HOME="${ROOT}"
+  export OA4MP_CLIENT="${ROOT}"
 to your environment and
-   $OA4MP_HOME/bin
+   $OA4MP_CLIENT/bin
 to your PATH
 
 Finishing the configuration file

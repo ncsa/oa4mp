@@ -1,0 +1,40 @@
+script_load('access/acl.qdl');
+script_load('utils/init.qdl');
+access_idp := 'https://access-ci.org/idp';
+
+'org.cilogon.userinfo' ∉ scopes. ? err('The org.cilogon.userinfo scope is required','invalid_request');
+/*if[ 'org.cilogon.userinfo' ∉ scopes. ][
+    say('*** ACCESS: missing org.cilogon.userinfo scope: ' + to_string(scopes.));
+    sys_err.ok := false;
+    sys_err.error_type := 'invalid_request';
+    sys_err.message := 'The org.cilogon.userinfo scope is required';
+    return([]);
+];*/
+
+user. :=  script_load('access/get_user_dynamo.qdl', (claims.'idp' == access_idp)?claims.'eppn':claims.'sub');
+
+size(user.) == 0 ? err_uri('User not found', 'https://identity.access-ci.org/user-not-registered' );
+/*
+if[ size(user.) == 0 ][
+    sys_err.ok := false;
+    sys_err.error_type := 'qdl_error';
+    sys_err.message := 'User not found';
+    sys_err.custom_error_uri := 'https://identity.access-ci.org/user-not-registered';
+    return([]);
+];
+*/
+
+  ('AccessDenied' ∈ user.'isMemberOf') || ('CO:members:active' ∉ user.'isMemberOf') ?
+      err_uri('Access Denied', 'https://identity.access-ci.org/user-access-denied');
+/*if[
+  ('AccessDenied' ∈ user.'isMemberOf') || ('CO:members:active' ∉ user.'isMemberOf') // CIL-1428
+][
+    say('*** ACCESS: user access denied');
+    sys_err.ok := false;
+    sys_err.error_type := 'qdl_error';
+    sys_err.message := 'Access Denied';
+    sys_err.custom_error_uri := 'https://identity.access-ci.org/user-access-denied';
+    return([]);
+];*/
+remove(user.'isMemberOf'); // don't return this, just use it for access control
+claims. := claims.~user.;

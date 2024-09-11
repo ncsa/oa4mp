@@ -129,13 +129,13 @@
             <modules version="2.0">
                 <module type="java"
                         import_on_start="true">
-                    <class_name>edu.uiuc.ncsa.myproxy.oa4mp.qdl.OA2QDLLoader</class_name>
+                    <class_name>org.oa4mp.server.loader.qdl.OA2QDLLoader</class_name>
                 </module>
             </modules>
             <modules>
                 <module type="java"
                         import_on_start="true">
-                    <class_name>edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims.TokenHandlerLoader</class_name>
+                    <class_name>org.oa4mp.server.loader.qdl.claims.TokenHandlerLoader</class_name>
                 </module>
             </modules>
         </qdl>

@@ -1,7 +1,7 @@
 package test;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.claims.FunctorClaimsType;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.claims.OA2FunctorFactory;
+import org.oa4mp.server.loader.oauth2.functor.claims.FunctorClaimsType;
+import org.oa4mp.server.loader.oauth2.functor.claims.OA2FunctorFactory;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.util.FunctorParserTest;
 import edu.uiuc.ncsa.security.util.functor.JFunctorFactory;

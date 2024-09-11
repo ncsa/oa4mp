@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>oa4mp-server-oauth2</artifactId>
-    <name>OAuth 2 webapp</name>
+    <name>OA4MP webapp</name>
     <packaging>war</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -81,7 +81,7 @@
             <version>42.4.3</version>
         </dependency>
         <dependency>
-            <groupId>edu.uiuc.ncsa.qdl</groupId>
+            <groupId>org.qdl_lang</groupId>
             <artifactId>sas</artifactId>
             <version>1.5-QDL-SNAPSHOT</version>
         </dependency>

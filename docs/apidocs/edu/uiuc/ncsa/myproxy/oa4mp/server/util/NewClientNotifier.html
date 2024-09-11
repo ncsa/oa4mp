@@ -128,7 +128,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li>edu.uiuc.ncsa.security.servlet.Notifier</li>
 <li>
 <ul class="inheritance">
-<li>edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientNotifier</li>
+<li>org.oa4mp.server.api.util.NewClientNotifier</li>
 </ul>
 </li>
 </ul>
@@ -260,12 +260,12 @@ implements <a href="NewClientListener.html" title="interface in edu.uiuc.ncsa.my
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#fireNewClientEvent(edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientEvent)">fireNewClientEvent</a></span>&#8203;(<a href="NewClientEvent.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.util">NewClientEvent</a>&nbsp;notificationEvent)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#fireNewClientEvent(org.oa4mp.server.api.util.NewClientEvent)">fireNewClientEvent</a></span>&#8203;(<a href="NewClientEvent.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.util">NewClientEvent</a>&nbsp;notificationEvent)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>protected <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>,&#8203;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getReplacements(edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClient)">getReplacements</a></span>&#8203;(<a href="../../../../oa4mp/delegation/common/storage/BaseClient.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage">BaseClient</a>&nbsp;client)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getReplacements(org.oa4mp.delegation.common.clients.storage.BaseClient)">getReplacements</a></span>&#8203;(<a href="../../../../oa4mp/delegation/common/storage/BaseClient.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage">BaseClient</a>&nbsp;client)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 </table>
@@ -301,7 +301,7 @@ implements <a href="NewClientListener.html" title="interface in edu.uiuc.ncsa.my
 <pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> NAME</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../../constant-values.html#edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientNotifier.NAME">Constant Field Values</a></dd>
+<dd><a href="../../../../../../../constant-values.html#org.oa4mp.server.api.util.NewClientNotifier.NAME">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -314,7 +314,7 @@ implements <a href="NewClientListener.html" title="interface in edu.uiuc.ncsa.my
 <pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> EMAIL</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../../constant-values.html#edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientNotifier.EMAIL">Constant Field Values</a></dd>
+<dd><a href="../../../../../../../constant-values.html#org.oa4mp.server.api.util.NewClientNotifier.EMAIL">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -327,7 +327,7 @@ implements <a href="NewClientListener.html" title="interface in edu.uiuc.ncsa.my
 <pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> HOME_URI</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../../constant-values.html#edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientNotifier.HOME_URI">Constant Field Values</a></dd>
+<dd><a href="../../../../../../../constant-values.html#org.oa4mp.server.api.util.NewClientNotifier.HOME_URI">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -340,7 +340,7 @@ implements <a href="NewClientListener.html" title="interface in edu.uiuc.ncsa.my
 <pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> FAILURE_URI</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../../constant-values.html#edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientNotifier.FAILURE_URI">Constant Field Values</a></dd>
+<dd><a href="../../../../../../../constant-values.html#org.oa4mp.server.api.util.NewClientNotifier.FAILURE_URI">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -353,7 +353,7 @@ implements <a href="NewClientListener.html" title="interface in edu.uiuc.ncsa.my
 <pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> CREATION_TIME</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../../constant-values.html#edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientNotifier.CREATION_TIME">Constant Field Values</a></dd>
+<dd><a href="../../../../../../../constant-values.html#org.oa4mp.server.api.util.NewClientNotifier.CREATION_TIME">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -366,7 +366,7 @@ implements <a href="NewClientListener.html" title="interface in edu.uiuc.ncsa.my
 <pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> IDENTIFIER</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../../constant-values.html#edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientNotifier.IDENTIFIER">Constant Field Values</a></dd>
+<dd><a href="../../../../../../../constant-values.html#org.oa4mp.server.api.util.NewClientNotifier.IDENTIFIER">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -379,7 +379,7 @@ implements <a href="NewClientListener.html" title="interface in edu.uiuc.ncsa.my
 <pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> LIMITED_PROXY</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../../constant-values.html#edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientNotifier.LIMITED_PROXY">Constant Field Values</a></dd>
+<dd><a href="../../../../../../../constant-values.html#org.oa4mp.server.api.util.NewClientNotifier.LIMITED_PROXY">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -392,7 +392,7 @@ implements <a href="NewClientListener.html" title="interface in edu.uiuc.ncsa.my
 <pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> REPLY_TO</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../../constant-values.html#edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientNotifier.REPLY_TO">Constant Field Values</a></dd>
+<dd><a href="../../../../../../../constant-values.html#org.oa4mp.server.api.util.NewClientNotifier.REPLY_TO">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -426,7 +426,7 @@ implements <a href="NewClientListener.html" title="interface in edu.uiuc.ncsa.my
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a id="getReplacements(edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClient)">
+<a id="getReplacements(org.oa4mp.delegation.common.clients.storage.BaseClient)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -435,7 +435,7 @@ implements <a href="NewClientListener.html" title="interface in edu.uiuc.ncsa.my
 <pre class="methodSignature">protected&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>,&#8203;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&gt;&nbsp;getReplacements&#8203;(<a href="../../../../oa4mp/delegation/common/storage/BaseClient.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage">BaseClient</a>&nbsp;client)</pre>
 </li>
 </ul>
-<a id="fireNewClientEvent(edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientEvent)">
+<a id="fireNewClientEvent(org.oa4mp.server.api.util.NewClientEvent)">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -444,7 +444,7 @@ implements <a href="NewClientListener.html" title="interface in edu.uiuc.ncsa.my
 <pre class="methodSignature">public&nbsp;void&nbsp;fireNewClientEvent&#8203;(<a href="NewClientEvent.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.util">NewClientEvent</a>&nbsp;notificationEvent)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="NewClientListener.html#fireNewClientEvent(edu.uiuc.ncsa.myproxy.oa4mp.server.util.NewClientEvent)">fireNewClientEvent</a></code>&nbsp;in interface&nbsp;<code><a href="NewClientListener.html" title="interface in edu.uiuc.ncsa.myproxy.oa4mp.server.util">NewClientListener</a></code></dd>
+<dd><code><a href="NewClientListener.html#fireNewClientEvent(org.oa4mp.server.api.util.NewClientEvent)">fireNewClientEvent</a></code>&nbsp;in interface&nbsp;<code><a href="NewClientListener.html" title="interface in edu.uiuc.ncsa.myproxy.oa4mp.server.util">NewClientListener</a></code></dd>
 </dl>
 </li>
 </ul>

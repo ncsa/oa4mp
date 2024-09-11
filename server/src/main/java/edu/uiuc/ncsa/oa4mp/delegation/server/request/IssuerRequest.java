@@ -1,10 +1,10 @@
 package edu.uiuc.ncsa.oa4mp.delegation.server.request;
 
 import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
-import edu.uiuc.ncsa.oa4mp.delegation.common.services.Request;
-import edu.uiuc.ncsa.oa4mp.delegation.common.services.Response;
-import edu.uiuc.ncsa.oa4mp.delegation.common.services.Server;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
+import org.oa4mp.delegation.common.services.Request;
+import org.oa4mp.delegation.common.services.Response;
+import org.oa4mp.delegation.common.services.Server;
+import org.oa4mp.delegation.common.storage.clients.Client;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 
 import javax.servlet.http.HttpServletRequest;

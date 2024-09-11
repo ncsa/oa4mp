@@ -125,13 +125,13 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Object.html?is-external=true" title="class or interface in java.lang" class="externalLink">java.lang.Object</a></li>
 <li>
 <ul class="inheritance">
-<li><a href="ASImpl.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.client">edu.uiuc.ncsa.oa4mp.delegation.oa2.client.ASImpl</a></li>
+<li><a href="ASImpl.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.client">org.oa4mp.delegation.server.client.ASImpl</a></li>
 <li>
 <ul class="inheritance">
-<li><a href="TokenAwareServer.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.client">edu.uiuc.ncsa.oa4mp.delegation.oa2.client.TokenAwareServer</a></li>
+<li><a href="TokenAwareServer.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.client">org.oa4mp.delegation.server.client.TokenAwareServer</a></li>
 <li>
 <ul class="inheritance">
-<li>edu.uiuc.ncsa.oa4mp.delegation.oa2.client.ATServer2</li>
+<li>org.oa4mp.delegation.server.client.ATServer2</li>
 </ul>
 </li>
 </ul>
@@ -226,14 +226,14 @@ implements <a href="../../client/server/ATServer.html" title="interface in edu.u
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>protected <a href="ATResponse2.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.client">ATResponse2</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createResponse(edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl,edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl,edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.IDTokenImpl)">createResponse</a></span>&#8203;(<a href="../../common/token/impl/AccessTokenImpl.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.token.impl">AccessTokenImpl</a>&nbsp;at,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createResponse(org.oa4mp.delegation.common.impl.token.AccessTokenImpl,org.oa4mp.delegation.common.impl.token.RefreshTokenImpl,org.oa4mp.delegation.common.impl.token.IDTokenImpl)">createResponse</a></span>&#8203;(<a href="../../common/token/impl/AccessTokenImpl.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.token.impl">AccessTokenImpl</a>&nbsp;at,
               <a href="../../common/token/impl/RefreshTokenImpl.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.token.impl">RefreshTokenImpl</a>&nbsp;rt,
               <a href="../../common/token/impl/IDTokenImpl.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.token.impl">IDTokenImpl</a>&nbsp;idToken)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>protected <a href="ATResponse2.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.client">ATResponse2</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getAccessToken(edu.uiuc.ncsa.oa4mp.delegation.client.request.ATRequest)">getAccessToken</a></span>&#8203;(<a href="../../client/request/ATRequest.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client.request">ATRequest</a>&nbsp;atRequest)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getAccessToken(org.oa4mp.delegation.request.ATRequest)">getAccessToken</a></span>&#8203;(<a href="../../client/request/ATRequest.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client.request">ATRequest</a>&nbsp;atRequest)</code></th>
 <td class="colLast">
 <div class="block">Gets access token.</div>
 </td>
@@ -245,25 +245,25 @@ implements <a href="../../client/server/ATServer.html" title="interface in edu.u
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code><a href="../../client/request/ATResponse.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client.request">ATResponse</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#processATRequest(edu.uiuc.ncsa.oa4mp.delegation.client.request.ATRequest)">processATRequest</a></span>&#8203;(<a href="../../client/request/ATRequest.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client.request">ATRequest</a>&nbsp;atRequest)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#processATRequest(org.oa4mp.delegation.request.ATRequest)">processATRequest</a></span>&#8203;(<a href="../../client/request/ATRequest.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client.request">ATRequest</a>&nbsp;atRequest)</code></th>
 <td class="colLast">
 <div class="block">Processes access token request</div>
 </td>
 </tr>
 </table>
 <ul class="blockList">
-<li class="blockList"><a id="methods.inherited.from.class.edu.uiuc.ncsa.oa4mp.delegation.oa2.client.TokenAwareServer">
+<li class="blockList"><a id="methods.inherited.from.class.org.oa4mp.delegation.server.client.TokenAwareServer">
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;edu.uiuc.ncsa.oa4mp.delegation.oa2.client.<a href="TokenAwareServer.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.client">TokenAwareServer</a></h3>
-<code><a href="TokenAwareServer.html#getAndCheckIDToken(net.sf.json.JSONObject,edu.uiuc.ncsa.oa4mp.delegation.client.request.BasicRequest)">getAndCheckIDToken</a>, <a href="TokenAwareServer.html#getAndCheckResponse(java.lang.String)">getAndCheckResponse</a>, <a href="TokenAwareServer.html#getJsonWebKeys()">getJsonWebKeys</a>, <a href="TokenAwareServer.html#getServiceClient()">getServiceClient</a>, <a href="TokenAwareServer.html#getTokenEndpoint()">getTokenEndpoint</a>, <a href="TokenAwareServer.html#setTokenEndpoint(java.net.URI)">setTokenEndpoint</a></code></li>
+<code><a href="TokenAwareServer.html#getAndCheckIDToken(net.sf.json.JSONObject,org.oa4mp.delegation.request.BasicRequest)">getAndCheckIDToken</a>, <a href="TokenAwareServer.html#getAndCheckResponse(java.lang.String)">getAndCheckResponse</a>, <a href="TokenAwareServer.html#getJsonWebKeys()">getJsonWebKeys</a>, <a href="TokenAwareServer.html#getServiceClient()">getServiceClient</a>, <a href="TokenAwareServer.html#getTokenEndpoint()">getTokenEndpoint</a>, <a href="TokenAwareServer.html#setTokenEndpoint(java.net.URI)">setTokenEndpoint</a></code></li>
 </ul>
 <ul class="blockList">
-<li class="blockList"><a id="methods.inherited.from.class.edu.uiuc.ncsa.oa4mp.delegation.oa2.client.ASImpl">
+<li class="blockList"><a id="methods.inherited.from.class.org.oa4mp.delegation.server.client.ASImpl">
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;edu.uiuc.ncsa.oa4mp.delegation.oa2.client.<a href="ASImpl.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.client">ASImpl</a></h3>
-<code><a href="ASImpl.html#getAddress()">getAddress</a>, <a href="ASImpl.html#process(edu.uiuc.ncsa.oa4mp.delegation.common.services.Request)">process</a></code></li>
+<code><a href="ASImpl.html#getAddress()">getAddress</a>, <a href="ASImpl.html#process(org.oa4mp.delegation.common.services.Request)">process</a></code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a id="methods.inherited.from.class.java.lang.Object">
@@ -273,11 +273,11 @@ implements <a href="../../client/server/ATServer.html" title="interface in edu.u
 <code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Object.html?is-external=true#clone()" title="class or interface in java.lang" class="externalLink">clone</a>, <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Object.html?is-external=true#equals(java.lang.Object)" title="class or interface in java.lang" class="externalLink">equals</a>, <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Object.html?is-external=true#finalize()" title="class or interface in java.lang" class="externalLink">finalize</a>, <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Object.html?is-external=true#getClass()" title="class or interface in java.lang" class="externalLink">getClass</a>, <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Object.html?is-external=true#hashCode()" title="class or interface in java.lang" class="externalLink">hashCode</a>, <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Object.html?is-external=true#notify()" title="class or interface in java.lang" class="externalLink">notify</a>, <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Object.html?is-external=true#notifyAll()" title="class or interface in java.lang" class="externalLink">notifyAll</a>, <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Object.html?is-external=true#toString()" title="class or interface in java.lang" class="externalLink">toString</a>, <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Object.html?is-external=true#wait()" title="class or interface in java.lang" class="externalLink">wait</a>, <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Object.html?is-external=true#wait(long)" title="class or interface in java.lang" class="externalLink">wait</a>, <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Object.html?is-external=true#wait(long,int)" title="class or interface in java.lang" class="externalLink">wait</a></code></li>
 </ul>
 <ul class="blockList">
-<li class="blockList"><a id="methods.inherited.from.class.edu.uiuc.ncsa.oa4mp.delegation.common.services.DoubleDispatchServer">
+<li class="blockList"><a id="methods.inherited.from.class.org.oa4mp.delegation.common.services.DoubleDispatchServer">
 <!--   -->
 </a>
 <h3>Methods inherited from interface&nbsp;edu.uiuc.ncsa.oa4mp.delegation.common.services.<a href="../../common/services/DoubleDispatchServer.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.services">DoubleDispatchServer</a></h3>
-<code><a href="../../common/services/DoubleDispatchServer.html#process(edu.uiuc.ncsa.oa4mp.delegation.common.services.Request)">process</a></code></li>
+<code><a href="../../common/services/DoubleDispatchServer.html#process(org.oa4mp.delegation.common.services.Request)">process</a></code></li>
 </ul>
 </li>
 </ul>
@@ -328,7 +328,7 @@ implements <a href="../../client/server/ATServer.html" title="interface in edu.u
 <pre class="methodSignature">public static&nbsp;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/HashMap.html?is-external=true" title="class or interface in java.util" class="externalLink">HashMap</a>&lt;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/net/URI.html?is-external=true" title="class or interface in java.net" class="externalLink">URI</a>,&#8203;<a href="../../common/token/impl/IDTokenImpl.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.token.impl">IDTokenImpl</a>&gt;&nbsp;getIDTokenStore()</pre>
 </li>
 </ul>
-<a id="processATRequest(edu.uiuc.ncsa.oa4mp.delegation.client.request.ATRequest)">
+<a id="processATRequest(org.oa4mp.delegation.request.ATRequest)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -338,7 +338,7 @@ implements <a href="../../client/server/ATServer.html" title="interface in edu.u
 <div class="block">Processes access token request</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../client/server/ATServer.html#processATRequest(edu.uiuc.ncsa.oa4mp.delegation.client.request.ATRequest)">processATRequest</a></code>&nbsp;in interface&nbsp;<code><a href="../../client/server/ATServer.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.client.server">ATServer</a></code></dd>
+<dd><code><a href="../../client/server/ATServer.html#processATRequest(org.oa4mp.delegation.request.ATRequest)">processATRequest</a></code>&nbsp;in interface&nbsp;<code><a href="../../client/server/ATServer.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.client.server">ATServer</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>atRequest</code> - Access token request</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
@@ -346,7 +346,7 @@ implements <a href="../../client/server/ATServer.html" title="interface in edu.u
 </dl>
 </li>
 </ul>
-<a id="getAccessToken(edu.uiuc.ncsa.oa4mp.delegation.client.request.ATRequest)">
+<a id="getAccessToken(org.oa4mp.delegation.request.ATRequest)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -366,7 +366,7 @@ implements <a href="../../client/server/ATServer.html" title="interface in edu.u
 </dl>
 </li>
 </ul>
-<a id="createResponse(edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl,edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl,edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.IDTokenImpl)">
+<a id="createResponse(org.oa4mp.delegation.common.impl.token.AccessTokenImpl,org.oa4mp.delegation.common.impl.token.RefreshTokenImpl,org.oa4mp.delegation.common.impl.token.IDTokenImpl)">
 <!--   -->
 </a>
 <ul class="blockListLast">

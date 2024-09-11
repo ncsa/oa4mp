@@ -1,16 +1,16 @@
 package test;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.TestUtils;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.RefreshTokenStore;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenFactory;
+import org.oa4mp.server.test.TestUtils;
+import org.oa4mp.server.loader.oauth2.storage.RefreshTokenStore;
+import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
+import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
+import org.oa4mp.delegation.common.token.impl.TokenFactory;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.TransactionStore;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.RefreshToken;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2TokenForge;
+import org.oa4mp.delegation.common.storage.TransactionStore;
+import org.oa4mp.delegation.common.token.AuthorizationGrant;
+import org.oa4mp.delegation.common.token.RefreshToken;
+import org.oa4mp.delegation.server.OA2TokenForge;
 import edu.uiuc.ncsa.security.util.TestBase;
 
 import java.util.Date;

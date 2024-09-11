@@ -1,17 +1,17 @@
 package test;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.HTTPHeaderClaimsSource;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.LDAPClaimsSource;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.jSetClaimSource;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.claims.FunctorClaimsType;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.claims.OA2FunctorFactory;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.claims.jExclude;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.claims.jSet;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientFunctorScripts;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientFunctorScriptsFactory;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSource;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfiguration;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfigurationUtil;
+import org.oa4mp.server.loader.oauth2.claims.HTTPHeaderClaimsSource;
+import org.oa4mp.server.loader.oauth2.claims.LDAPClaimsSource;
+import org.oa4mp.server.loader.oauth2.flows.jSetClaimSource;
+import org.oa4mp.server.loader.oauth2.functor.claims.FunctorClaimsType;
+import org.oa4mp.server.loader.oauth2.functor.claims.OA2FunctorFactory;
+import org.oa4mp.server.loader.oauth2.functor.claims.jExclude;
+import org.oa4mp.server.loader.oauth2.functor.claims.jSet;
+import org.oa4mp.server.loader.oauth2.state.OA2ClientFunctorScripts;
+import org.oa4mp.server.loader.oauth2.state.OA2ClientFunctorScriptsFactory;
+import org.oa4mp.delegation.server.server.claims.ClaimSource;
+import org.oa4mp.delegation.server.server.config.LDAPConfiguration;
+import org.oa4mp.delegation.server.server.config.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.util.TestBase;
 import edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl;
@@ -29,8 +29,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientFunctorScriptsUtil.*;
-import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC8693Constants.AUDIENCE;
+import static org.oa4mp.server.loader.oauth2.state.OA2ClientFunctorScriptsUtil.*;
+import static org.oa4mp.delegation.server.server.RFC8693Constants.AUDIENCE;
 
 /**
  * Functor tests!

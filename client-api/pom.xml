@@ -36,14 +36,6 @@
             <artifactId>oauth2</artifactId>
             <version>5.3-SNAPSHOT</version>
         </dependency>
-
-        <dependency>
-            <groupId>edu.uiuc.ncsa.security</groupId>
-            <artifactId>core</artifactId>
-            <version>5.3-SNAPSHOT</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>servlet</artifactId>

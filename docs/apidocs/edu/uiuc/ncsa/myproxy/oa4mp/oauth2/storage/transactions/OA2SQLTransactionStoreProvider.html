@@ -134,10 +134,10 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li>edu.uiuc.ncsa.security.storage.sql.SQLStoreProvider&lt;T&gt;</li>
 <li>
 <ul class="inheritance">
-<li><a href="../../../server/admin/transactions/DSSQLTransactionStoreProvider.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions">edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.DSSQLTransactionStoreProvider</a>&lt;T&gt;</li>
+<li><a href="../../../server/admin/transactions/DSSQLTransactionStoreProvider.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions">org.oa4mp.server.api.transactions.admin.DSSQLTransactionStoreProvider</a>&lt;T&gt;</li>
 <li>
 <ul class="inheritance">
-<li>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2SQLTransactionStoreProvider&lt;T&gt;</li>
+<li>org.oa4mp.server.loader.oauth2.storage.transactions.OA2SQLTransactionStoreProvider&lt;T&gt;</li>
 </ul>
 </li>
 </ul>
@@ -175,7 +175,7 @@ extends <a href="../../../server/admin/transactions/DSSQLTransactionStoreProvide
 </a>
 <h3>Field Summary</h3>
 <ul class="blockList">
-<li class="blockList"><a id="fields.inherited.from.class.edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.DSSQLTransactionStoreProvider">
+<li class="blockList"><a id="fields.inherited.from.class.org.oa4mp.server.api.transactions.admin.DSSQLTransactionStoreProvider">
 <!--   -->
 </a>
 <h3>Fields inherited from class&nbsp;edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions.<a href="../../../server/admin/transactions/DSSQLTransactionStoreProvider.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.admin.transactions">DSSQLTransactionStoreProvider</a></h3>
@@ -203,7 +203,7 @@ extends <a href="../../../server/admin/transactions/DSSQLTransactionStoreProvide
 <code>MAIL, MAIL_COMPONENT, MAIL_CONFIG_ADMIN, MAIL_CONFIG_ALERTS, MAIL_CONFIG_DEFAULT_NAME, MAIL_CONFIG_HELP, MAIL_CONFIG_ROOT, MAIL_ENABLED, MAIL_FAIL_ON_MISSING_CONFIG, MAIL_MESSAGE_TEMPLATE, MAIL_NAME, MAIL_PARENT, MAIL_PASSWORD, MAIL_PORT, MAIL_RECIPIENTS, MAIL_SERVER, MAIL_START_TLS, MAIL_SUBJECT_TEMPLATE, MAIL_USE_SSL, MAIL_USERNAME</code></li>
 </ul>
 <ul class="blockList">
-<li class="blockList"><a id="fields.inherited.from.class.edu.uiuc.ncsa.myproxy.oa4mp.server.OA4MPConfigTags">
+<li class="blockList"><a id="fields.inherited.from.class.org.oa4mp.server.api.OA4MPConfigTags">
 <!--   -->
 </a>
 <h3>Fields inherited from interface&nbsp;edu.uiuc.ncsa.myproxy.oa4mp.server.<a href="../../../server/OA4MPConfigTags.html" title="interface in edu.uiuc.ncsa.myproxy.oa4mp.server">OA4MPConfigTags</a></h3>
@@ -233,7 +233,7 @@ extends <a href="../../../server/admin/transactions/DSSQLTransactionStoreProvide
 <th class="colLast" scope="col">Description</th>
 </tr>
 <tr class="altColor">
-<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(org.apache.commons.configuration.tree.ConfigurationNode,edu.uiuc.ncsa.security.storage.sql.ConnectionPoolProvider,java.lang.String,edu.uiuc.ncsa.myproxy.oa4mp.server.storage.MultiDSClientStoreProvider,javax.inject.Provider,javax.inject.Provider,edu.uiuc.ncsa.security.storage.data.MapConverter)">OA2SQLTransactionStoreProvider</a></span>&#8203;(org.apache.commons.configuration.tree.ConfigurationNode&nbsp;config,
+<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(org.apache.commons.configuration.tree.ConfigurationNode,edu.uiuc.ncsa.security.storage.sql.ConnectionPoolProvider,java.lang.String,org.oa4mp.server.api.storage.MultiDSClientStoreProvider,javax.inject.Provider,javax.inject.Provider,edu.uiuc.ncsa.security.storage.data.MapConverter)">OA2SQLTransactionStoreProvider</a></span>&#8203;(org.apache.commons.configuration.tree.ConfigurationNode&nbsp;config,
                               edu.uiuc.ncsa.security.storage.sql.ConnectionPoolProvider&lt;? extends edu.uiuc.ncsa.security.storage.sql.ConnectionPool&gt;&nbsp;cpp,
                               <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;type,
                               <a href="../../../server/storage/MultiDSClientStoreProvider.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.storage">MultiDSClientStoreProvider</a>&nbsp;clientStoreProvider,
@@ -315,7 +315,7 @@ extends <a href="../../../server/admin/transactions/DSSQLTransactionStoreProvide
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a id="&lt;init&gt;(org.apache.commons.configuration.tree.ConfigurationNode,edu.uiuc.ncsa.security.storage.sql.ConnectionPoolProvider,java.lang.String,edu.uiuc.ncsa.myproxy.oa4mp.server.storage.MultiDSClientStoreProvider,javax.inject.Provider,javax.inject.Provider,edu.uiuc.ncsa.security.storage.data.MapConverter)">
+<a id="&lt;init&gt;(org.apache.commons.configuration.tree.ConfigurationNode,edu.uiuc.ncsa.security.storage.sql.ConnectionPoolProvider,java.lang.String,org.oa4mp.server.api.storage.MultiDSClientStoreProvider,javax.inject.Provider,javax.inject.Provider,edu.uiuc.ncsa.security.storage.data.MapConverter)">
 <!--   -->
 </a>
 <ul class="blockListLast">

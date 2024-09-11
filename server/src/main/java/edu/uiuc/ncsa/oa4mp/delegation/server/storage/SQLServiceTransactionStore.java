@@ -1,8 +1,8 @@
 package edu.uiuc.ncsa.oa4mp.delegation.server.storage;
 
 import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.transactions.SQLBaseTransactionStore;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.TokenForge;
+import org.oa4mp.delegation.common.storage.transactions.SQLBaseTransactionStore;
+import org.oa4mp.delegation.common.token.TokenForge;
 import edu.uiuc.ncsa.security.core.exceptions.UninitializedException;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;

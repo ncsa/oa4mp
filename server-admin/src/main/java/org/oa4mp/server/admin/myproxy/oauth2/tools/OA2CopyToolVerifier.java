@@ -1,0 +1,29 @@
+package org.oa4mp.server.admin.myproxy.oauth2.tools;
+
+import org.oa4mp.server.admin.myproxy.oauth2.base.CopyTool;
+import org.oa4mp.server.admin.myproxy.oauth2.base.CopyToolVerifier;
+
+/**
+ * <p>Created by Jeff Gaynor<br>
+ * on 4/3/14 at  1:30 PM
+ */
+public class OA2CopyToolVerifier extends CopyToolVerifier {
+
+    @Override
+    public CopyTool getCopyTool() {
+        if (copyTool == null) {
+            copyTool = new OA2CopyTool();
+        }
+        return copyTool;
+    }
+
+    public static void main(String[] args) {
+           OA2CopyToolVerifier cctv = new OA2CopyToolVerifier();
+           if (args == null || args.length == 0) {
+               cctv.printHelp();
+               return;
+           }
+           cctv.doIt(cctv.getCopyTool(), args);
+       }
+
+}

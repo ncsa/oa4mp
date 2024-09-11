@@ -10,7 +10,7 @@
     </parent>
     <artifactId>myproxy-logon</artifactId>
     <version>5.3-SNAPSHOT</version>
-    <name>MyProxy Logon</name>
+    <name>MyProxy Logon Website</name>
     <packaging>jar</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

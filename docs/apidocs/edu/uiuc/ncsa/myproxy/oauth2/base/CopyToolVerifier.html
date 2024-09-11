@@ -125,7 +125,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Object.html?is-external=true" title="class or interface in java.lang" class="externalLink">java.lang.Object</a></li>
 <li>
 <ul class="inheritance">
-<li>edu.uiuc.ncsa.myproxy.oauth2.base.CopyToolVerifier</li>
+<li>org.oa4mp.server.admin.base.oauth2.myproxy.CopyToolVerifier</li>
 </ul>
 </li>
 </ul>
@@ -208,7 +208,7 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#doIt(edu.uiuc.ncsa.myproxy.oauth2.base.CopyTool,java.lang.String%5B%5D)">doIt</a></span>&#8203;(<a href="CopyTool.html" title="class in edu.uiuc.ncsa.myproxy.oauth2.base">CopyTool</a>&nbsp;adminTool,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#doIt(org.oa4mp.server.admin.base.oauth2.myproxy.CopyTool,java.lang.String%5B%5D)">doIt</a></span>&#8203;(<a href="CopyTool.html" title="class in edu.uiuc.ncsa.myproxy.oauth2.base">CopyTool</a>&nbsp;adminTool,
     <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>[]&nbsp;args)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -248,8 +248,8 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 </tr>
 <tr id="i7" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#verifyStores(edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl,edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl)">verifyStores</a></span>&#8203;(edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl&nbsp;sEnv,
-            edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl&nbsp;tEnv)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#verifyStores(org.oa4mp.server.api.ServiceEnvironmentImpl,org.oa4mp.server.api.ServiceEnvironmentImpl)">verifyStores</a></span>&#8203;(org.oa4mp.server.api.ServiceEnvironmentImpl&nbsp;sEnv,
+            org.oa4mp.server.api.ServiceEnvironmentImpl&nbsp;tEnv)</code></th>
 <td class="colLast">
 <div class="block">Run through all the stores in these environments.</div>
 </td>
@@ -329,7 +329,7 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 </dl>
 </li>
 </ul>
-<a id="doIt(edu.uiuc.ncsa.myproxy.oauth2.base.CopyTool,java.lang.String[])">
+<a id="doIt(org.oa4mp.server.admin.base.oauth2.myproxy.CopyTool,java.lang.String[])">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -357,14 +357,14 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 <pre class="methodSignature">public&nbsp;void&nbsp;printHelp()</pre>
 </li>
 </ul>
-<a id="verifyStores(edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl,edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl)">
+<a id="verifyStores(org.oa4mp.server.api.ServiceEnvironmentImpl,org.oa4mp.server.api.ServiceEnvironmentImpl)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>verifyStores</h4>
-<pre class="methodSignature">public&nbsp;boolean&nbsp;verifyStores&#8203;(edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl&nbsp;sEnv,
-                            edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl&nbsp;tEnv)</pre>
+<pre class="methodSignature">public&nbsp;boolean&nbsp;verifyStores&#8203;(org.oa4mp.server.api.ServiceEnvironmentImpl&nbsp;sEnv,
+                            org.oa4mp.server.api.ServiceEnvironmentImpl&nbsp;tEnv)</pre>
 <div class="block">Run through all the stores in these environments. Call super when overriding this method.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>

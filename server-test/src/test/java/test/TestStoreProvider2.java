@@ -1,11 +1,11 @@
 package test;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.TestStoreProvider;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientStore;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.Permission;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionsStore;
+import org.oa4mp.server.test.TestStoreProvider;
+import org.oa4mp.server.loader.oauth2.OA2SE;
+import org.oa4mp.server.api.admin.adminClient.AdminClient;
+import org.oa4mp.server.api.admin.adminClient.AdminClientStore;
+import org.oa4mp.server.api.admin.permissions.Permission;
+import org.oa4mp.server.api.admin.permissions.PermissionsStore;
 
 /**
  * <p>Created by Jeff Gaynor<br>

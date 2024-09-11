@@ -2,7 +2,7 @@ package edu.uiuc.ncsa.oa4mp.delegation.server.issuers;
 
 import edu.uiuc.ncsa.oa4mp.delegation.server.request.PARequest;
 import edu.uiuc.ncsa.oa4mp.delegation.server.request.PAResponse;
-import edu.uiuc.ncsa.oa4mp.delegation.common.services.DoubleDispatchServer;
+import org.oa4mp.delegation.common.services.DoubleDispatchServer;
 
 /**
  * <p>Created by Jeff Gaynor<br>

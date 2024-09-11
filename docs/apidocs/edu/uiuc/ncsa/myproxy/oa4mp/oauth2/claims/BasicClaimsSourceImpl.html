@@ -125,7 +125,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang" class="externalLink">java.lang.Object</a></li>
 <li>
 <ul class="inheritance">
-<li>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.BasicClaimsSourceImpl</li>
+<li>org.oa4mp.server.loader.oauth2.claims.BasicClaimsSourceImpl</li>
 </ul>
 </li>
 </ul>
@@ -157,7 +157,7 @@ implements <a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSource.h
  on 8/17/15 at  4:10 PM</div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../../serialized-form.html#edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.BasicClaimsSourceImpl">Serialized Form</a></dd>
+<dd><a href="../../../../../../../serialized-form.html#org.oa4mp.server.loader.oauth2.claims.BasicClaimsSourceImpl">Serialized Form</a></dd>
 </dl>
 </li>
 </ul>
@@ -206,7 +206,7 @@ implements <a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSource.h
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="rowColor">
-<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE)">BasicClaimsSourceImpl</a></span>&#8203;(<a href="../OA2SE.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2">OA2SE</a>&nbsp;oa2SE)</code></th>
+<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(org.oa4mp.server.loader.oauth2.OA2SE)">BasicClaimsSourceImpl</a></span>&#8203;(<a href="../OA2SE.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2">OA2SE</a>&nbsp;oa2SE)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="altColor">
@@ -214,7 +214,7 @@ implements <a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSource.h
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="rowColor">
-<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(edu.uiuc.ncsa.qdl.variables.QDLStem,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE)">BasicClaimsSourceImpl</a></span>&#8203;(edu.uiuc.ncsa.qdl.variables.QDLStem&nbsp;stem,
+<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(edu.uiuc.ncsa.qdl.variables.QDLStem,org.oa4mp.server.loader.oauth2.OA2SE)">BasicClaimsSourceImpl</a></span>&#8203;(edu.uiuc.ncsa.qdl.variables.QDLStem&nbsp;stem,
                      <a href="../OA2SE.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2">OA2SE</a>&nbsp;oa2SE)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -349,19 +349,19 @@ implements <a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSource.h
 </tr>
 <tr id="i17" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setConfiguration(edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSourceConfiguration)">setConfiguration</a></span>&#8203;(<a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceConfiguration.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims">ClaimSourceConfiguration</a>&nbsp;configuration)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setConfiguration(org.oa4mp.delegation.server.claims.server.ClaimSourceConfiguration)">setConfiguration</a></span>&#8203;(<a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceConfiguration.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims">ClaimSourceConfiguration</a>&nbsp;configuration)</code></th>
 <td class="colLast">
 <div class="block">This passes in a <code>JSONObject</code> that is in turn used to configure the source.</div>
 </td>
 </tr>
 <tr id="i18" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setGroupHandler(edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.GroupHandler)">setGroupHandler</a></span>&#8203;(<a href="../servlet/GroupHandler.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet">GroupHandler</a>&nbsp;groupHandler)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setGroupHandler(org.oa4mp.server.loader.oauth2.servlet.GroupHandler)">setGroupHandler</a></span>&#8203;(<a href="../servlet/GroupHandler.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet">GroupHandler</a>&nbsp;groupHandler)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i19" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setOa2SE(edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE)">setOa2SE</a></span>&#8203;(<a href="../OA2SE.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2">OA2SE</a>&nbsp;oa2SE)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setOa2SE(org.oa4mp.server.loader.oauth2.OA2SE)">setOa2SE</a></span>&#8203;(<a href="../OA2SE.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2">OA2SE</a>&nbsp;oa2SE)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i20" class="altColor">
@@ -424,7 +424,7 @@ implements <a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSource.h
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a id="&lt;init&gt;(edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE)">
+<a id="&lt;init&gt;(org.oa4mp.server.loader.oauth2.OA2SE)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -451,7 +451,7 @@ implements <a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSource.h
 <pre>public&nbsp;BasicClaimsSourceImpl&#8203;(edu.uiuc.ncsa.qdl.variables.QDLStem&nbsp;stem)</pre>
 </li>
 </ul>
-<a id="&lt;init&gt;(edu.uiuc.ncsa.qdl.variables.QDLStem,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE)">
+<a id="&lt;init&gt;(edu.uiuc.ncsa.qdl.variables.QDLStem,org.oa4mp.server.loader.oauth2.OA2SE)">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -495,19 +495,19 @@ implements <a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSource.h
 <pre class="methodSignature">public&nbsp;void&nbsp;setOmitList&#8203;(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util" class="externalLink">List</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&gt;&nbsp;omitList)</pre>
 </li>
 </ul>
-<a id="setConfiguration(edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSourceConfiguration)">
+<a id="setConfiguration(org.oa4mp.delegation.server.claims.server.ClaimSourceConfiguration)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>setConfiguration</h4>
 <pre class="methodSignature">public&nbsp;void&nbsp;setConfiguration&#8203;(<a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceConfiguration.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims">ClaimSourceConfiguration</a>&nbsp;configuration)</pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSource.html#setConfiguration(edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSourceConfiguration)">ClaimSource</a></code></span></div>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSource.html#setConfiguration(org.oa4mp.delegation.server.claims.server.ClaimSourceConfiguration)">ClaimSource</a></code></span></div>
 <div class="block">This passes in a <code>JSONObject</code> that is in turn used to configure the source. It is up to the implementaton
  to make sense of this.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSource.html#setConfiguration(edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSourceConfiguration)">setConfiguration</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSource.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims">ClaimSource</a></code></dd>
+<dd><code><a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSource.html#setConfiguration(org.oa4mp.delegation.server.claims.server.ClaimSourceConfiguration)">setConfiguration</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSource.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims">ClaimSource</a></code></dd>
 </dl>
 </li>
 </ul>
@@ -582,7 +582,7 @@ implements <a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSource.h
 </dl>
 </li>
 </ul>
-<a id="setOa2SE(edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE)">
+<a id="setOa2SE(org.oa4mp.server.loader.oauth2.OA2SE)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -665,7 +665,7 @@ implements <a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSource.h
 <pre class="methodSignature">public&nbsp;<a href="../servlet/GroupHandler.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet">GroupHandler</a>&nbsp;getGroupHandler()</pre>
 </li>
 </ul>
-<a id="setGroupHandler(edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.GroupHandler)">
+<a id="setGroupHandler(org.oa4mp.server.loader.oauth2.servlet.GroupHandler)">
 <!--   -->
 </a>
 <ul class="blockList">

@@ -125,10 +125,10 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang" class="externalLink">java.lang.Object</a></li>
 <li>
 <ul class="inheritance">
-<li><a href="BasicClaimsSourceImpl.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims">edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.BasicClaimsSourceImpl</a></li>
+<li><a href="BasicClaimsSourceImpl.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims">org.oa4mp.server.loader.oauth2.claims.BasicClaimsSourceImpl</a></li>
 <li>
 <ul class="inheritance">
-<li>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.LDAPClaimsSource</li>
+<li>org.oa4mp.server.loader.oauth2.claims.LDAPClaimsSource</li>
 </ul>
 </li>
 </ul>
@@ -153,7 +153,7 @@ implements edu.uiuc.ncsa.security.core.Logable</pre>
  on 4/26/16 at  3:32 PM</div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../../serialized-form.html#edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.LDAPClaimsSource">Serialized Form</a></dd>
+<dd><a href="../../../../../../../serialized-form.html#org.oa4mp.server.loader.oauth2.claims.LDAPClaimsSource">Serialized Form</a></dd>
 </dl>
 </li>
 </ul>
@@ -187,7 +187,7 @@ implements edu.uiuc.ncsa.security.core.Logable</pre>
 </tr>
 </table>
 <ul class="blockList">
-<li class="blockList"><a id="fields.inherited.from.class.edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.BasicClaimsSourceImpl">
+<li class="blockList"><a id="fields.inherited.from.class.org.oa4mp.server.loader.oauth2.claims.BasicClaimsSourceImpl">
 <!--   -->
 </a>
 <h3>Fields inherited from class&nbsp;edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.<a href="BasicClaimsSourceImpl.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims">BasicClaimsSourceImpl</a></h3>
@@ -214,11 +214,11 @@ implements edu.uiuc.ncsa.security.core.Logable</pre>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="rowColor">
-<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE)">LDAPClaimsSource</a></span>&#8203;(<a href="../OA2SE.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2">OA2SE</a>&nbsp;oa2SE)</code></th>
+<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(org.oa4mp.server.loader.oauth2.OA2SE)">LDAPClaimsSource</a></span>&#8203;(<a href="../OA2SE.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2">OA2SE</a>&nbsp;oa2SE)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="altColor">
-<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfiguration,edu.uiuc.ncsa.security.core.util.MyLoggingFacade)">LDAPClaimsSource</a></span>&#8203;(<a href="../../../../oa4mp/delegation/oa2/server/config/LDAPConfiguration.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config">LDAPConfiguration</a>&nbsp;ldapConfiguration,
+<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(org.oa4mp.delegation.server.config.server.LDAPConfiguration,edu.uiuc.ncsa.security.core.util.MyLoggingFacade)">LDAPClaimsSource</a></span>&#8203;(<a href="../../../../oa4mp/delegation/oa2/server/config/LDAPConfiguration.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config">LDAPConfiguration</a>&nbsp;ldapConfiguration,
                 edu.uiuc.ncsa.security.core.util.MyLoggingFacade&nbsp;myLogger)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -227,7 +227,7 @@ implements edu.uiuc.ncsa.security.core.Logable</pre>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="altColor">
-<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(edu.uiuc.ncsa.qdl.variables.QDLStem,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE)">LDAPClaimsSource</a></span>&#8203;(edu.uiuc.ncsa.qdl.variables.QDLStem&nbsp;stem,
+<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(edu.uiuc.ncsa.qdl.variables.QDLStem,org.oa4mp.server.loader.oauth2.OA2SE)">LDAPClaimsSource</a></span>&#8203;(edu.uiuc.ncsa.qdl.variables.QDLStem&nbsp;stem,
                 <a href="../OA2SE.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2">OA2SE</a>&nbsp;oa2SE)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -266,7 +266,7 @@ implements edu.uiuc.ncsa.security.core.Logable</pre>
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Hashtable.html?is-external=true" title="class or interface in java.util" class="externalLink">Hashtable</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>,&#8203;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createEnv(java.lang.String,edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfiguration)">createEnv</a></span>&#8203;(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;host,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createEnv(java.lang.String,org.oa4mp.delegation.server.config.server.LDAPConfiguration)">createEnv</a></span>&#8203;(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;host,
          <a href="../../../../oa4mp/delegation/oa2/server/config/LDAPConfiguration.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config">LDAPConfiguration</a>&nbsp;cfg)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -293,7 +293,7 @@ implements edu.uiuc.ncsa.security.core.Logable</pre>
 </tr>
 <tr id="i8" class="altColor">
 <td class="colFirst"><code>static <a href="Groups.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims">Groups</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#get_NEW_Gid(edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfiguration,java.lang.String)">get_NEW_Gid</a></span>&#8203;(<a href="../../../../oa4mp/delegation/oa2/server/config/LDAPConfiguration.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config">LDAPConfiguration</a>&nbsp;cfg2,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#get_NEW_Gid(org.oa4mp.delegation.server.config.server.LDAPConfiguration,java.lang.String)">get_NEW_Gid</a></span>&#8203;(<a href="../../../../oa4mp/delegation/oa2/server/config/LDAPConfiguration.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config">LDAPConfiguration</a>&nbsp;cfg2,
            <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;username)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -432,11 +432,11 @@ implements edu.uiuc.ncsa.security.core.Logable</pre>
 </tr>
 </table>
 <ul class="blockList">
-<li class="blockList"><a id="methods.inherited.from.class.edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.BasicClaimsSourceImpl">
+<li class="blockList"><a id="methods.inherited.from.class.org.oa4mp.server.loader.oauth2.claims.BasicClaimsSourceImpl">
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.<a href="BasicClaimsSourceImpl.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims">BasicClaimsSourceImpl</a></h3>
-<code><a href="BasicClaimsSourceImpl.html#getGroupHandler()">getGroupHandler</a>, <a href="BasicClaimsSourceImpl.html#getOa2SE()">getOa2SE</a>, <a href="BasicClaimsSourceImpl.html#getOmitList()">getOmitList</a>, <a href="BasicClaimsSourceImpl.html#getPostProcessor()">getPostProcessor</a>, <a href="BasicClaimsSourceImpl.html#getPreProcessor()">getPreProcessor</a>, <a href="BasicClaimsSourceImpl.html#getScopes()">getScopes</a>, <a href="BasicClaimsSourceImpl.html#hasConfiguration()">hasConfiguration</a>, <a href="BasicClaimsSourceImpl.html#hasJSONPostProcessor()">hasJSONPostProcessor</a>, <a href="BasicClaimsSourceImpl.html#hasJSONPreProcessor()">hasJSONPreProcessor</a>, <a href="BasicClaimsSourceImpl.html#isRunAtAuthorization()">isRunAtAuthorization</a>, <a href="BasicClaimsSourceImpl.html#process(net.sf.json.JSONObject,edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction)">process</a>, <a href="BasicClaimsSourceImpl.html#process(net.sf.json.JSONObject,javax.servlet.http.HttpServletRequest,edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction)">process</a>, <a href="BasicClaimsSourceImpl.html#setConfiguration(edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSourceConfiguration)">setConfiguration</a>, <a href="BasicClaimsSourceImpl.html#setGroupHandler(edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.GroupHandler)">setGroupHandler</a>, <a href="BasicClaimsSourceImpl.html#setOa2SE(edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE)">setOa2SE</a>, <a href="BasicClaimsSourceImpl.html#setOmitList(java.util.List)">setOmitList</a>, <a href="BasicClaimsSourceImpl.html#setScopes(java.util.Collection)">setScopes</a></code></li>
+<code><a href="BasicClaimsSourceImpl.html#getGroupHandler()">getGroupHandler</a>, <a href="BasicClaimsSourceImpl.html#getOa2SE()">getOa2SE</a>, <a href="BasicClaimsSourceImpl.html#getOmitList()">getOmitList</a>, <a href="BasicClaimsSourceImpl.html#getPostProcessor()">getPostProcessor</a>, <a href="BasicClaimsSourceImpl.html#getPreProcessor()">getPreProcessor</a>, <a href="BasicClaimsSourceImpl.html#getScopes()">getScopes</a>, <a href="BasicClaimsSourceImpl.html#hasConfiguration()">hasConfiguration</a>, <a href="BasicClaimsSourceImpl.html#hasJSONPostProcessor()">hasJSONPostProcessor</a>, <a href="BasicClaimsSourceImpl.html#hasJSONPreProcessor()">hasJSONPreProcessor</a>, <a href="BasicClaimsSourceImpl.html#isRunAtAuthorization()">isRunAtAuthorization</a>, <a href="BasicClaimsSourceImpl.html#process(net.sf.json.JSONObject,edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction)">process</a>, <a href="BasicClaimsSourceImpl.html#process(net.sf.json.JSONObject,javax.servlet.http.HttpServletRequest,edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction)">process</a>, <a href="BasicClaimsSourceImpl.html#setConfiguration(org.oa4mp.delegation.server.claims.server.ClaimSourceConfiguration)">setConfiguration</a>, <a href="BasicClaimsSourceImpl.html#setGroupHandler(org.oa4mp.server.loader.oauth2.servlet.GroupHandler)">setGroupHandler</a>, <a href="BasicClaimsSourceImpl.html#setOa2SE(org.oa4mp.server.loader.oauth2.OA2SE)">setOa2SE</a>, <a href="BasicClaimsSourceImpl.html#setOmitList(java.util.List)">setOmitList</a>, <a href="BasicClaimsSourceImpl.html#setScopes(java.util.Collection)">setScopes</a></code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a id="methods.inherited.from.class.java.lang.Object">
@@ -507,7 +507,7 @@ implements edu.uiuc.ncsa.security.core.Logable</pre>
 <pre>public&nbsp;LDAPClaimsSource&#8203;(edu.uiuc.ncsa.qdl.variables.QDLStem&nbsp;stem)</pre>
 </li>
 </ul>
-<a id="&lt;init&gt;(edu.uiuc.ncsa.qdl.variables.QDLStem,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE)">
+<a id="&lt;init&gt;(edu.uiuc.ncsa.qdl.variables.QDLStem,org.oa4mp.server.loader.oauth2.OA2SE)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -517,7 +517,7 @@ implements edu.uiuc.ncsa.security.core.Logable</pre>
                         <a href="../OA2SE.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2">OA2SE</a>&nbsp;oa2SE)</pre>
 </li>
 </ul>
-<a id="&lt;init&gt;(edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfiguration,edu.uiuc.ncsa.security.core.util.MyLoggingFacade)">
+<a id="&lt;init&gt;(org.oa4mp.delegation.server.config.server.LDAPConfiguration,edu.uiuc.ncsa.security.core.util.MyLoggingFacade)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -527,7 +527,7 @@ implements edu.uiuc.ncsa.security.core.Logable</pre>
                         edu.uiuc.ncsa.security.core.util.MyLoggingFacade&nbsp;myLogger)</pre>
 </li>
 </ul>
-<a id="&lt;init&gt;(edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE)">
+<a id="&lt;init&gt;(org.oa4mp.server.loader.oauth2.OA2SE)">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -674,7 +674,7 @@ implements edu.uiuc.ncsa.security.core.Logable</pre>
 <pre class="methodSignature">public&nbsp;void&nbsp;logon&#8203;(edu.uiuc.ncsa.security.core.util.MetaDebugUtil&nbsp;debugUtil)</pre>
 </li>
 </ul>
-<a id="createEnv(java.lang.String,edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfiguration)">
+<a id="createEnv(java.lang.String,org.oa4mp.delegation.server.config.server.LDAPConfiguration)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -879,7 +879,7 @@ implements edu.uiuc.ncsa.security.core.Logable</pre>
 </dl>
 </li>
 </ul>
-<a id="get_NEW_Gid(edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfiguration,java.lang.String)">
+<a id="get_NEW_Gid(org.oa4mp.delegation.server.config.server.LDAPConfiguration,java.lang.String)">
 <!--   -->
 </a>
 <ul class="blockList">

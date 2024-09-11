@@ -125,7 +125,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang" class="externalLink">java.lang.Object</a></li>
 <li>
 <ul class="inheritance">
-<li>edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims.ClaimSourceConfigConverter</li>
+<li>org.oa4mp.server.loader.oauth2.claims.qdl.ClaimSourceConfigConverter</li>
 </ul>
 </li>
 </ul>
@@ -162,7 +162,7 @@ implements <a href="CSConstants.html" title="interface in edu.uiuc.ncsa.myproxy.
 </a>
 <h3>Field Summary</h3>
 <ul class="blockList">
-<li class="blockList"><a id="fields.inherited.from.class.edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims.CSConstants">
+<li class="blockList"><a id="fields.inherited.from.class.org.oa4mp.server.loader.oauth2.claims.qdl.CSConstants">
 <!--   -->
 </a>
 <h3>Fields inherited from interface&nbsp;edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims.<a href="CSConstants.html" title="interface in edu.uiuc.ncsa.myproxy.oa4mp.qdl.claims">CSConstants</a></h3>
@@ -208,7 +208,7 @@ implements <a href="CSConstants.html" title="interface in edu.uiuc.ncsa.myproxy.
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>static edu.uiuc.ncsa.qdl.variables.QDLStem</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#convert(edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSource,java.lang.String)">convert</a></span>&#8203;(<a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSource.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims">ClaimSource</a>&nbsp;claimsSource,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#convert(org.oa4mp.delegation.server.claims.server.ClaimSource,java.lang.String)">convert</a></span>&#8203;(<a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSource.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims">ClaimSource</a>&nbsp;claimsSource,
        <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;type)</code></th>
 <td class="colLast">
 <div class="block">Takes a <a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSource.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims"><code>ClaimSource</code></a>, grabs it configuration and turns it in to a stem
@@ -225,13 +225,13 @@ implements <a href="CSConstants.html" title="interface in edu.uiuc.ncsa.myproxy.
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code>protected static void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setDefaultsinCfg(edu.uiuc.ncsa.qdl.variables.QDLStem,edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSourceConfiguration)">setDefaultsinCfg</a></span>&#8203;(edu.uiuc.ncsa.qdl.variables.QDLStem&nbsp;arg,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setDefaultsinCfg(edu.uiuc.ncsa.qdl.variables.QDLStem,org.oa4mp.delegation.server.claims.server.ClaimSourceConfiguration)">setDefaultsinCfg</a></span>&#8203;(edu.uiuc.ncsa.qdl.variables.QDLStem&nbsp;arg,
                 <a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceConfiguration.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims">ClaimSourceConfiguration</a>&nbsp;cfg)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code>protected static void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setDefaultsInStem(edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSourceConfiguration,edu.uiuc.ncsa.qdl.variables.QDLStem)">setDefaultsInStem</a></span>&#8203;(<a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceConfiguration.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims">ClaimSourceConfiguration</a>&nbsp;cfg,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setDefaultsInStem(org.oa4mp.delegation.server.claims.server.ClaimSourceConfiguration,edu.uiuc.ncsa.qdl.variables.QDLStem)">setDefaultsInStem</a></span>&#8203;(<a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceConfiguration.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims">ClaimSourceConfiguration</a>&nbsp;cfg,
                  edu.uiuc.ncsa.qdl.variables.QDLStem&nbsp;arg)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -278,7 +278,7 @@ implements <a href="CSConstants.html" title="interface in edu.uiuc.ncsa.myproxy.
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a id="convert(edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSource,java.lang.String)">
+<a id="convert(org.oa4mp.delegation.server.claims.server.ClaimSource,java.lang.String)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -312,7 +312,7 @@ implements <a href="CSConstants.html" title="interface in edu.uiuc.ncsa.myproxy.
 </dl>
 </li>
 </ul>
-<a id="setDefaultsinCfg(edu.uiuc.ncsa.qdl.variables.QDLStem,edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSourceConfiguration)">
+<a id="setDefaultsinCfg(edu.uiuc.ncsa.qdl.variables.QDLStem,org.oa4mp.delegation.server.claims.server.ClaimSourceConfiguration)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -322,7 +322,7 @@ implements <a href="CSConstants.html" title="interface in edu.uiuc.ncsa.myproxy.
                                        <a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceConfiguration.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims">ClaimSourceConfiguration</a>&nbsp;cfg)</pre>
 </li>
 </ul>
-<a id="setDefaultsInStem(edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSourceConfiguration,edu.uiuc.ncsa.qdl.variables.QDLStem)">
+<a id="setDefaultsInStem(org.oa4mp.delegation.server.claims.server.ClaimSourceConfiguration,edu.uiuc.ncsa.qdl.variables.QDLStem)">
 <!--   -->
 </a>
 <ul class="blockListLast">

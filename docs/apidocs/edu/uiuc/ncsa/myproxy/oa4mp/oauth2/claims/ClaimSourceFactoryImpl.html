@@ -125,10 +125,10 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang" class="externalLink">java.lang.Object</a></li>
 <li>
 <ul class="inheritance">
-<li><a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFactory.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims">edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSourceFactory</a></li>
+<li><a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFactory.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims">org.oa4mp.delegation.server.claims.server.ClaimSourceFactory</a></li>
 <li>
 <ul class="inheritance">
-<li>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.ClaimSourceFactoryImpl</li>
+<li>org.oa4mp.server.loader.oauth2.claims.ClaimSourceFactoryImpl</li>
 </ul>
 </li>
 </ul>
@@ -185,12 +185,12 @@ extends <a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFacto
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code><a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSource.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims">ClaimSource</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#create(edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSourceFactoryRequest)">create</a></span>&#8203;(<a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFactoryRequest.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims">ClaimSourceFactoryRequest</a>&nbsp;request)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#create(org.oa4mp.delegation.server.claims.server.ClaimSourceFactoryRequest)">create</a></span>&#8203;(<a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFactoryRequest.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims">ClaimSourceFactoryRequest</a>&nbsp;request)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>static <a href="http://docs.oracle.com/javase/7/docs/api/java/util/LinkedList.html?is-external=true" title="class or interface in java.util" class="externalLink">LinkedList</a>&lt;<a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSource.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims">ClaimSource</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createClaimSources(edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction)">createClaimSources</a></span>&#8203;(<a href="../OA2SE.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2">OA2SE</a>&nbsp;oa2SE,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createClaimSources(org.oa4mp.server.loader.oauth2.OA2SE,org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction)">createClaimSources</a></span>&#8203;(<a href="../OA2SE.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2">OA2SE</a>&nbsp;oa2SE,
                   <a href="../storage/transactions/OA2ServiceTransaction.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions">OA2ServiceTransaction</a>&nbsp;transaction)</code></th>
 <td class="colLast">
 <div class="block">This creates a uniform list of claim sources for both the access token servlet and the user info servlet.</div>
@@ -198,7 +198,7 @@ extends <a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFacto
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code>protected static <a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSource.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims">ClaimSource</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#processDefaultConfig(edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSourceConfigurationUtil,net.sf.json.JSONObject,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction)">processDefaultConfig</a></span>&#8203;(<a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceConfigurationUtil.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims">ClaimSourceConfigurationUtil</a>&nbsp;claimSourceConfigurationUtil,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#processDefaultConfig(org.oa4mp.delegation.server.claims.server.ClaimSourceConfigurationUtil,net.sf.json.JSONObject,org.oa4mp.server.loader.oauth2.OA2SE,org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction)">processDefaultConfig</a></span>&#8203;(<a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceConfigurationUtil.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims">ClaimSourceConfigurationUtil</a>&nbsp;claimSourceConfigurationUtil,
                     net.sf.json.JSONObject&nbsp;json,
                     <a href="../OA2SE.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2">OA2SE</a>&nbsp;oa2SE,
                     <a href="../storage/transactions/OA2ServiceTransaction.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions">OA2ServiceTransaction</a>&nbsp;transaction)</code></th>
@@ -206,7 +206,7 @@ extends <a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFacto
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code>protected static <a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSource.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims">ClaimSource</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#processLDAPConfig(edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfigurationUtil,net.sf.json.JSONObject,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction)">processLDAPConfig</a></span>&#8203;(<a href="../../../../oa4mp/delegation/oa2/server/config/LDAPConfigurationUtil.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config">LDAPConfigurationUtil</a>&nbsp;ldapConfigurationUtil,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#processLDAPConfig(org.oa4mp.delegation.server.config.server.LDAPConfigurationUtil,net.sf.json.JSONObject,org.oa4mp.server.loader.oauth2.OA2SE,org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction)">processLDAPConfig</a></span>&#8203;(<a href="../../../../oa4mp/delegation/oa2/server/config/LDAPConfigurationUtil.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config">LDAPConfigurationUtil</a>&nbsp;ldapConfigurationUtil,
                  net.sf.json.JSONObject&nbsp;json,
                  <a href="../OA2SE.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2">OA2SE</a>&nbsp;oa2SE,
                  <a href="../storage/transactions/OA2ServiceTransaction.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions">OA2ServiceTransaction</a>&nbsp;transaction)</code></th>
@@ -214,11 +214,11 @@ extends <a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFacto
 </tr>
 </table>
 <ul class="blockList">
-<li class="blockList"><a id="methods.inherited.from.class.edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSourceFactory">
+<li class="blockList"><a id="methods.inherited.from.class.org.oa4mp.delegation.server.claims.server.ClaimSourceFactory">
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.<a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFactory.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims">ClaimSourceFactory</a></h3>
-<code><a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFactory.html#getFactory()">getFactory</a>, <a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFactory.html#isFactorySet()">isFactorySet</a>, <a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFactory.html#newInstance(edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSourceFactoryRequest)">newInstance</a>, <a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFactory.html#setFactory(edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSourceFactory)">setFactory</a></code></li>
+<code><a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFactory.html#getFactory()">getFactory</a>, <a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFactory.html#isFactorySet()">isFactorySet</a>, <a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFactory.html#newInstance(org.oa4mp.delegation.server.claims.server.ClaimSourceFactoryRequest)">newInstance</a>, <a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFactory.html#setFactory(org.oa4mp.delegation.server.claims.server.ClaimSourceFactory)">setFactory</a></code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a id="methods.inherited.from.class.java.lang.Object">
@@ -262,7 +262,7 @@ extends <a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFacto
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a id="create(edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSourceFactoryRequest)">
+<a id="create(org.oa4mp.delegation.server.claims.server.ClaimSourceFactoryRequest)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -271,11 +271,11 @@ extends <a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFacto
 <pre class="methodSignature">public&nbsp;<a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSource.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims">ClaimSource</a>&nbsp;create&#8203;(<a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFactoryRequest.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims">ClaimSourceFactoryRequest</a>&nbsp;request)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFactory.html#create(edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSourceFactoryRequest)">create</a></code>&nbsp;in class&nbsp;<code><a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFactory.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims">ClaimSourceFactory</a></code></dd>
+<dd><code><a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFactory.html#create(org.oa4mp.delegation.server.claims.server.ClaimSourceFactoryRequest)">create</a></code>&nbsp;in class&nbsp;<code><a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFactory.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims">ClaimSourceFactory</a></code></dd>
 </dl>
 </li>
 </ul>
-<a id="createClaimSources(edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction)">
+<a id="createClaimSources(org.oa4mp.server.loader.oauth2.OA2SE,org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -294,7 +294,7 @@ extends <a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFacto
 </dl>
 </li>
 </ul>
-<a id="processDefaultConfig(edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSourceConfigurationUtil,net.sf.json.JSONObject,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction)">
+<a id="processDefaultConfig(org.oa4mp.delegation.server.claims.server.ClaimSourceConfigurationUtil,net.sf.json.JSONObject,org.oa4mp.server.loader.oauth2.OA2SE,org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -306,7 +306,7 @@ extends <a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFacto
                                                   <a href="../storage/transactions/OA2ServiceTransaction.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions">OA2ServiceTransaction</a>&nbsp;transaction)</pre>
 </li>
 </ul>
-<a id="processLDAPConfig(edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfigurationUtil,net.sf.json.JSONObject,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction)">
+<a id="processLDAPConfig(org.oa4mp.delegation.server.config.server.LDAPConfigurationUtil,net.sf.json.JSONObject,org.oa4mp.server.loader.oauth2.OA2SE,org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction)">
 <!--   -->
 </a>
 <ul class="blockListLast">

@@ -19,11 +19,7 @@
         <maven.javadoc.skip>true</maven.javadoc.skip>
     </properties>
     <dependencies>
-        <dependency>
-            <groupId>edu.uiuc.ncsa.myproxy</groupId>
-            <artifactId>client-api</artifactId>
-            <version>5.3-SNAPSHOT</version>
-        </dependency>
+
         <dependency>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
@@ -63,15 +59,9 @@
         </dependency>
 
         <dependency>
-            <groupId>edu.uiuc.ncsa.qdl</groupId>
+            <groupId>org.qdl_lang</groupId>
             <artifactId>language</artifactId>
             <version>1.5-QDL-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>edu.uiuc.ncsa.myproxy</groupId>
-            <artifactId>client-loader</artifactId>
-            <version>5.3-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

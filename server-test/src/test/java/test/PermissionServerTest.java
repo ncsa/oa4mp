@@ -1,18 +1,18 @@
 package test;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.TestStoreProviderInterface;
-import edu.uiuc.ncsa.myproxy.oa4mp.TestUtils;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.RequestFactory;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.permissions.*;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.Permission;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.permissions.PermissionList;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.ActionAdd;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.ActionList;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.ActionRemove;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.types.TypePermission;
+import org.oa4mp.server.loader.oauth2.cm.util.permissions.*;
+import org.oa4mp.server.test.TestStoreProviderInterface;
+import org.oa4mp.server.test.TestUtils;
+import org.oa4mp.server.loader.oauth2.OA2SE;
+import org.oa4mp.server.loader.oauth2.cm.util.RequestFactory;
+import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
+import org.oa4mp.server.api.admin.adminClient.AdminClient;
+import org.oa4mp.server.api.admin.permissions.Permission;
+import org.oa4mp.server.api.admin.permissions.PermissionList;
+import org.oa4mp.server.api.admin.things.actions.ActionAdd;
+import org.oa4mp.server.api.admin.things.actions.ActionList;
+import org.oa4mp.server.api.admin.things.actions.ActionRemove;
+import org.oa4mp.server.api.admin.things.types.TypePermission;
 import edu.uiuc.ncsa.security.core.Identifier;
 
 import java.util.LinkedList;

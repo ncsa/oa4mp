@@ -134,16 +134,16 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li>edu.uiuc.ncsa.security.servlet.AbstractServlet</li>
 <li>
 <ul class="inheritance">
-<li><a href="../../server/servlet/EnvServlet.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.servlet">edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.EnvServlet</a></li>
+<li><a href="../../server/servlet/EnvServlet.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.servlet">org.oa4mp.server.api.servlet.storage.EnvServlet</a></li>
 <li>
 <ul class="inheritance">
-<li><a href="../../server/servlet/MyProxyDelegationServlet.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.servlet">edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet</a></li>
+<li><a href="../../server/servlet/MyProxyDelegationServlet.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.servlet">org.oa4mp.server.api.servlet.storage.MyProxyDelegationServlet</a></li>
 <li>
 <ul class="inheritance">
-<li><a href="../../server/servlet/DiscoveryServlet.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.servlet">edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.DiscoveryServlet</a></li>
+<li><a href="../../server/servlet/DiscoveryServlet.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.servlet">org.oa4mp.server.api.servlet.storage.DiscoveryServlet</a></li>
 <li>
 <ul class="inheritance">
-<li>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2DiscoveryServlet</li>
+<li>org.oa4mp.server.loader.oauth2.servlet.OA2DiscoveryServlet</li>
 </ul>
 </li>
 </ul>
@@ -173,7 +173,7 @@ extends <a href="../../server/servlet/DiscoveryServlet.html" title="class in edu
  on 12/12/16 at  1:18 PM</div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../../serialized-form.html#edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2DiscoveryServlet">Serialized Form</a></dd>
+<dd><a href="../../../../../../../serialized-form.html#org.oa4mp.server.loader.oauth2.servlet.OA2DiscoveryServlet">Serialized Form</a></dd>
 </dl>
 </li>
 </ul>
@@ -267,21 +267,21 @@ extends <a href="../../server/servlet/DiscoveryServlet.html" title="class in edu
 </tr>
 </table>
 <ul class="blockList">
-<li class="blockList"><a id="fields.inherited.from.class.edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.DiscoveryServlet">
+<li class="blockList"><a id="fields.inherited.from.class.org.oa4mp.server.api.servlet.storage.DiscoveryServlet">
 <!--   -->
 </a>
 <h3>Fields inherited from class&nbsp;edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.<a href="../../server/servlet/DiscoveryServlet.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.servlet">DiscoveryServlet</a></h3>
 <code><a href="../../server/servlet/DiscoveryServlet.html#AUTHORIZATION_ENDPOINT">AUTHORIZATION_ENDPOINT</a>, <a href="../../server/servlet/DiscoveryServlet.html#DISCOVERY_PATH">DISCOVERY_PATH</a>, <a href="../../server/servlet/DiscoveryServlet.html#discoveryPagePath">discoveryPagePath</a>, <a href="../../server/servlet/DiscoveryServlet.html#REGISTRATION_ENDPOINT">REGISTRATION_ENDPOINT</a></code></li>
 </ul>
 <ul class="blockList">
-<li class="blockList"><a id="fields.inherited.from.class.edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet">
+<li class="blockList"><a id="fields.inherited.from.class.org.oa4mp.server.api.servlet.storage.MyProxyDelegationServlet">
 <!--   -->
 </a>
 <h3>Fields inherited from class&nbsp;edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.<a href="../../server/servlet/MyProxyDelegationServlet.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.servlet">MyProxyDelegationServlet</a></h3>
 <code><a href="../../server/servlet/MyProxyDelegationServlet.html#caThread">caThread</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#kpt">kpt</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#lastAccessedThread">lastAccessedThread</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#myproxyConnectionCache">myproxyConnectionCache</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#myproxyConnectionCleanup">myproxyConnectionCleanup</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#transactionCleanup">transactionCleanup</a></code></li>
 </ul>
 <ul class="blockList">
-<li class="blockList"><a id="fields.inherited.from.class.edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.EnvServlet">
+<li class="blockList"><a id="fields.inherited.from.class.org.oa4mp.server.api.servlet.storage.EnvServlet">
 <!--   -->
 </a>
 <h3>Fields inherited from class&nbsp;edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.<a href="../../server/servlet/EnvServlet.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.servlet">EnvServlet</a></h3>
@@ -356,28 +356,28 @@ extends <a href="../../server/servlet/DiscoveryServlet.html" title="class in edu
 </tr>
 <tr id="i4" class="altColor">
 <td class="colFirst"><code>protected net.sf.json.JSONObject</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setValues(javax.servlet.http.HttpServletRequest,net.sf.json.JSONObject,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VirtualOrganization)">setValues</a></span>&#8203;(javax.servlet.http.HttpServletRequest&nbsp;request,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setValues(javax.servlet.http.HttpServletRequest,net.sf.json.JSONObject,org.oa4mp.server.loader.oauth2.storage.vo.VirtualOrganization)">setValues</a></span>&#8203;(javax.servlet.http.HttpServletRequest&nbsp;request,
          net.sf.json.JSONObject&nbsp;jsonObject,
          <a href="../storage/vo/VirtualOrganization.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo">VirtualOrganization</a>&nbsp;vo)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 </table>
 <ul class="blockList">
-<li class="blockList"><a id="methods.inherited.from.class.edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.DiscoveryServlet">
+<li class="blockList"><a id="methods.inherited.from.class.org.oa4mp.server.api.servlet.storage.DiscoveryServlet">
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.<a href="../../server/servlet/DiscoveryServlet.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.servlet">DiscoveryServlet</a></h3>
 <code><a href="../../server/servlet/DiscoveryServlet.html#getDiscoveryPagePath()">getDiscoveryPagePath</a>, <a href="../../server/servlet/DiscoveryServlet.html#getRequestURI(javax.servlet.http.HttpServletRequest)">getRequestURI</a>, <a href="../../server/servlet/DiscoveryServlet.html#getRequestURI(javax.servlet.http.HttpServletRequest,boolean)">getRequestURI</a>, <a href="../../server/servlet/DiscoveryServlet.html#setDiscoveryPagePath(java.lang.String)">setDiscoveryPagePath</a>, <a href="../../server/servlet/DiscoveryServlet.html#setValues(javax.servlet.http.HttpServletRequest,net.sf.json.JSONObject)">setValues</a>, <a href="../../server/servlet/DiscoveryServlet.html#verifyAndGet(edu.uiuc.ncsa.oa4mp.delegation.server.request.IssuerResponse)">verifyAndGet</a></code></li>
 </ul>
 <ul class="blockList">
-<li class="blockList"><a id="methods.inherited.from.class.edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet">
+<li class="blockList"><a id="methods.inherited.from.class.org.oa4mp.server.api.servlet.storage.MyProxyDelegationServlet">
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.<a href="../../server/servlet/MyProxyDelegationServlet.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.servlet">MyProxyDelegationServlet</a></h3>
-<code><a href="../../server/servlet/MyProxyDelegationServlet.html#checkClientApproval(edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClient)">checkClientApproval</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#createDebugger(edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClient)">createDebugger</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#destroy()">destroy</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#getAGI()">getAGI</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#getATI()">getATI</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#getClient(edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant)">getClient</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#getClient(edu.uiuc.ncsa.security.core.Identifier)">getClient</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#getClient(javax.servlet.http.HttpServletRequest)">getClient</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#getFirstParameters(javax.servlet.http.HttpServletRequest)">getFirstParameters</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#getGrantIDFromRequest(javax.servlet.http.HttpServletRequest)">getGrantIDFromRequest</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#getMPConnection(edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction)">getMPConnection</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#getMPConnection(edu.uiuc.ncsa.security.core.Identifier)">getMPConnection</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#getMyproxyConnectionCache()">getMyproxyConnectionCache</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#getMyproxyServices()">getMyproxyServices</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#getServiceEnvironment()">getServiceEnvironment</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#getTransaction(edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant)">getTransaction</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#getTransactionByGrantID(javax.servlet.http.HttpServletRequest)">getTransactionByGrantID</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#getTransactionStore()">getTransactionStore</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#hasMPConnection(edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction)">hasMPConnection</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#hasMPConnection(edu.uiuc.ncsa.security.core.Identifier)">hasMPConnection</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#isEmpty(java.lang.String)">isEmpty</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#loadProperties2()">loadProperties2</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#newTransaction()">newTransaction</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#postprocess(edu.uiuc.ncsa.oa4mp.delegation.common.servlet.TransactionState)">postprocess</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#preprocess(edu.uiuc.ncsa.oa4mp.delegation.common.servlet.TransactionState)">preprocess</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#realStoreUpdates()">realStoreUpdates</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#say(java.lang.String)">say</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#shutdownCleanup(edu.uiuc.ncsa.security.core.cache.Cleanup)">shutdownCleanup</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#storeUpdates()">storeUpdates</a></code></li>
+<code><a href="../../server/servlet/MyProxyDelegationServlet.html#checkClientApproval(org.oa4mp.delegation.common.clients.storage.BaseClient)">checkClientApproval</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#createDebugger(org.oa4mp.delegation.common.clients.storage.BaseClient)">createDebugger</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#destroy()">destroy</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#getAGI()">getAGI</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#getATI()">getATI</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#getClient(org.oa4mp.delegation.common.token.AuthorizationGrant)">getClient</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#getClient(edu.uiuc.ncsa.security.core.Identifier)">getClient</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#getClient(javax.servlet.http.HttpServletRequest)">getClient</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#getFirstParameters(javax.servlet.http.HttpServletRequest)">getFirstParameters</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#getGrantIDFromRequest(javax.servlet.http.HttpServletRequest)">getGrantIDFromRequest</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#getMPConnection(edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction)">getMPConnection</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#getMPConnection(edu.uiuc.ncsa.security.core.Identifier)">getMPConnection</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#getMyproxyConnectionCache()">getMyproxyConnectionCache</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#getMyproxyServices()">getMyproxyServices</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#getServiceEnvironment()">getServiceEnvironment</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#getTransaction(org.oa4mp.delegation.common.token.AuthorizationGrant)">getTransaction</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#getTransactionByGrantID(javax.servlet.http.HttpServletRequest)">getTransactionByGrantID</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#getTransactionStore()">getTransactionStore</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#hasMPConnection(edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction)">hasMPConnection</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#hasMPConnection(edu.uiuc.ncsa.security.core.Identifier)">hasMPConnection</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#isEmpty(java.lang.String)">isEmpty</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#loadProperties2()">loadProperties2</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#newTransaction()">newTransaction</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#postprocess(org.oa4mp.delegation.common.servlet.TransactionState)">postprocess</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#preprocess(org.oa4mp.delegation.common.servlet.TransactionState)">preprocess</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#realStoreUpdates()">realStoreUpdates</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#say(java.lang.String)">say</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#shutdownCleanup(edu.uiuc.ncsa.security.core.cache.Cleanup)">shutdownCleanup</a>, <a href="../../server/servlet/MyProxyDelegationServlet.html#storeUpdates()">storeUpdates</a></code></li>
 </ul>
 <ul class="blockList">
-<li class="blockList"><a id="methods.inherited.from.class.edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.EnvServlet">
+<li class="blockList"><a id="methods.inherited.from.class.org.oa4mp.server.api.servlet.storage.EnvServlet">
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.<a href="../../server/servlet/EnvServlet.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.servlet">EnvServlet</a></h3>
@@ -436,7 +436,7 @@ extends <a href="../../server/servlet/DiscoveryServlet.html" title="class in edu
 <pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> TOKEN_ENDPOINT</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../../constant-values.html#edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2DiscoveryServlet.TOKEN_ENDPOINT">Constant Field Values</a></dd>
+<dd><a href="../../../../../../../constant-values.html#org.oa4mp.server.loader.oauth2.servlet.OA2DiscoveryServlet.TOKEN_ENDPOINT">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -449,7 +449,7 @@ extends <a href="../../server/servlet/DiscoveryServlet.html" title="class in edu
 <pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> USERINFO_ENDPOINT</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../../constant-values.html#edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2DiscoveryServlet.USERINFO_ENDPOINT">Constant Field Values</a></dd>
+<dd><a href="../../../../../../../constant-values.html#org.oa4mp.server.loader.oauth2.servlet.OA2DiscoveryServlet.USERINFO_ENDPOINT">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -462,7 +462,7 @@ extends <a href="../../server/servlet/DiscoveryServlet.html" title="class in edu
 <pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> TOKEN_INTROSPECTION_ENDPOINT</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../../constant-values.html#edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2DiscoveryServlet.TOKEN_INTROSPECTION_ENDPOINT">Constant Field Values</a></dd>
+<dd><a href="../../../../../../../constant-values.html#org.oa4mp.server.loader.oauth2.servlet.OA2DiscoveryServlet.TOKEN_INTROSPECTION_ENDPOINT">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -475,7 +475,7 @@ extends <a href="../../server/servlet/DiscoveryServlet.html" title="class in edu
 <pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> TOKEN_REVOCATION_ENDPOINT</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../../constant-values.html#edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2DiscoveryServlet.TOKEN_REVOCATION_ENDPOINT">Constant Field Values</a></dd>
+<dd><a href="../../../../../../../constant-values.html#org.oa4mp.server.loader.oauth2.servlet.OA2DiscoveryServlet.TOKEN_REVOCATION_ENDPOINT">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -488,7 +488,7 @@ extends <a href="../../server/servlet/DiscoveryServlet.html" title="class in edu
 <pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> RESPONSE_MODES_SUPPORTED</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../../constant-values.html#edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2DiscoveryServlet.RESPONSE_MODES_SUPPORTED">Constant Field Values</a></dd>
+<dd><a href="../../../../../../../constant-values.html#org.oa4mp.server.loader.oauth2.servlet.OA2DiscoveryServlet.RESPONSE_MODES_SUPPORTED">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -501,7 +501,7 @@ extends <a href="../../server/servlet/DiscoveryServlet.html" title="class in edu
 <pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> TOKEN_REVOCATION_ENDPOINT_AUTH_METHODS_SUPPORTED</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../../constant-values.html#edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2DiscoveryServlet.TOKEN_REVOCATION_ENDPOINT_AUTH_METHODS_SUPPORTED">Constant Field Values</a></dd>
+<dd><a href="../../../../../../../constant-values.html#org.oa4mp.server.loader.oauth2.servlet.OA2DiscoveryServlet.TOKEN_REVOCATION_ENDPOINT_AUTH_METHODS_SUPPORTED">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -514,7 +514,7 @@ extends <a href="../../server/servlet/DiscoveryServlet.html" title="class in edu
 <pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> ISSUER</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../../constant-values.html#edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2DiscoveryServlet.ISSUER">Constant Field Values</a></dd>
+<dd><a href="../../../../../../../constant-values.html#org.oa4mp.server.loader.oauth2.servlet.OA2DiscoveryServlet.ISSUER">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -527,7 +527,7 @@ extends <a href="../../server/servlet/DiscoveryServlet.html" title="class in edu
 <pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> DEVICE_AUTHORIZATION_ENDPOINT</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../../constant-values.html#edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2DiscoveryServlet.DEVICE_AUTHORIZATION_ENDPOINT">Constant Field Values</a></dd>
+<dd><a href="../../../../../../../constant-values.html#org.oa4mp.server.loader.oauth2.servlet.OA2DiscoveryServlet.DEVICE_AUTHORIZATION_ENDPOINT">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -540,7 +540,7 @@ extends <a href="../../server/servlet/DiscoveryServlet.html" title="class in edu
 <pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> OPENID_CONFIG_PATH</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../../constant-values.html#edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2DiscoveryServlet.OPENID_CONFIG_PATH">Constant Field Values</a></dd>
+<dd><a href="../../../../../../../constant-values.html#org.oa4mp.server.loader.oauth2.servlet.OA2DiscoveryServlet.OPENID_CONFIG_PATH">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -553,7 +553,7 @@ extends <a href="../../server/servlet/DiscoveryServlet.html" title="class in edu
 <pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> OAUTH_AUTHZ_SERVER_PATH</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../../constant-values.html#edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2DiscoveryServlet.OAUTH_AUTHZ_SERVER_PATH">Constant Field Values</a></dd>
+<dd><a href="../../../../../../../constant-values.html#org.oa4mp.server.loader.oauth2.servlet.OA2DiscoveryServlet.OAUTH_AUTHZ_SERVER_PATH">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -566,7 +566,7 @@ extends <a href="../../server/servlet/DiscoveryServlet.html" title="class in edu
 <pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> WELL_KNOWN_PATH</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../../constant-values.html#edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2DiscoveryServlet.WELL_KNOWN_PATH">Constant Field Values</a></dd>
+<dd><a href="../../../../../../../constant-values.html#org.oa4mp.server.loader.oauth2.servlet.OA2DiscoveryServlet.WELL_KNOWN_PATH">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -579,7 +579,7 @@ extends <a href="../../server/servlet/DiscoveryServlet.html" title="class in edu
 <pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> CODE_CHALLENGE_METHOD_SUPPORTED</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../../constant-values.html#edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2DiscoveryServlet.CODE_CHALLENGE_METHOD_SUPPORTED">Constant Field Values</a></dd>
+<dd><a href="../../../../../../../constant-values.html#org.oa4mp.server.loader.oauth2.servlet.OA2DiscoveryServlet.CODE_CHALLENGE_METHOD_SUPPORTED">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -592,7 +592,7 @@ extends <a href="../../server/servlet/DiscoveryServlet.html" title="class in edu
 <pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> CERTS</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../../constant-values.html#edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2DiscoveryServlet.CERTS">Constant Field Values</a></dd>
+<dd><a href="../../../../../../../constant-values.html#org.oa4mp.server.loader.oauth2.servlet.OA2DiscoveryServlet.CERTS">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -679,7 +679,7 @@ extends <a href="../../server/servlet/DiscoveryServlet.html" title="class in edu
 <pre class="methodSignature">public static&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;getIssuer&#8203;(javax.servlet.http.HttpServletRequest&nbsp;request)</pre>
 </li>
 </ul>
-<a id="setValues(javax.servlet.http.HttpServletRequest,net.sf.json.JSONObject,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.vo.VirtualOrganization)">
+<a id="setValues(javax.servlet.http.HttpServletRequest,net.sf.json.JSONObject,org.oa4mp.server.loader.oauth2.storage.vo.VirtualOrganization)">
 <!--   -->
 </a>
 <ul class="blockListLast">

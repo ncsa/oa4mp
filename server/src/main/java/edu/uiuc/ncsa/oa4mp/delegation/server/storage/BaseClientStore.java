@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.oa4mp.delegation.server.storage;
 
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClient;
+import org.oa4mp.delegation.common.storage.clients.BaseClient;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 

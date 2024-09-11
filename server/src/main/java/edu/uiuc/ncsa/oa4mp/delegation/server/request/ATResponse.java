@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.oa4mp.delegation.server.request;
 
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.Verifier;
+import org.oa4mp.delegation.common.token.AccessToken;
+import org.oa4mp.delegation.common.token.Verifier;
 
 /**
  * Server response to a request for an {@link AccessToken}

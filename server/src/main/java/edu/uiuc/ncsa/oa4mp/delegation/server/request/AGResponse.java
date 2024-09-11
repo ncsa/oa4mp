@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.oa4mp.delegation.server.request;
 
 import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant;
+import org.oa4mp.delegation.common.token.AuthorizationGrant;
 
 /**
  * Server response to a request for an {@link AuthorizationGrant}.

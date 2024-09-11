@@ -1,14 +1,14 @@
 package test;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.OA2State;
-import edu.uiuc.ncsa.qdl.TestUtils;
-import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
-import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
-import edu.uiuc.ncsa.qdl.functions.FStack;
-import edu.uiuc.ncsa.qdl.module.MIStack;
-import edu.uiuc.ncsa.qdl.module.MTStack;
-import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.variables.VStack;
+import org.oa4mp.server.loader.qdl.scripting.OA2State;
+import org.qdl_lang.TestUtils;
+import org.qdl_lang.evaluate.MetaEvaluator;
+import org.qdl_lang.evaluate.OpEvaluator;
+import org.qdl_lang.functions.FStack;
+import org.qdl_lang.module.MIStack;
+import org.qdl_lang.module.MTStack;
+import org.qdl_lang.state.State;
+import org.qdl_lang.variables.VStack;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 
 /**

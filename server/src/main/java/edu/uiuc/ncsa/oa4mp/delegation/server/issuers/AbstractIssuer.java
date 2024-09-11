@@ -1,9 +1,9 @@
 package edu.uiuc.ncsa.oa4mp.delegation.server.issuers;
 
-import edu.uiuc.ncsa.oa4mp.delegation.common.services.AddressableServer;
-import edu.uiuc.ncsa.oa4mp.delegation.common.services.Request;
-import edu.uiuc.ncsa.oa4mp.delegation.common.services.Response;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.TokenForge;
+import org.oa4mp.delegation.common.services.AddressableServer;
+import org.oa4mp.delegation.common.services.Request;
+import org.oa4mp.delegation.common.services.Response;
+import org.oa4mp.delegation.common.token.TokenForge;
 
 import java.net.URI;
 

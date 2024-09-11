@@ -125,7 +125,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang" class="externalLink">java.lang.Object</a></li>
 <li>
 <ul class="inheritance">
-<li>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2AuthorizedServletUtil</li>
+<li>org.oa4mp.server.loader.oauth2.servlet.OA2AuthorizedServletUtil</li>
 </ul>
 </li>
 </ul>
@@ -181,7 +181,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <th class="colLast" scope="col">Description</th>
 </tr>
 <tr class="altColor">
-<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet)">OA2AuthorizedServletUtil</a></span>&#8203;(<a href="../../server/servlet/MyProxyDelegationServlet.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.servlet">MyProxyDelegationServlet</a>&nbsp;servlet)</code></th>
+<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(org.oa4mp.server.api.servlet.storage.MyProxyDelegationServlet)">OA2AuthorizedServletUtil</a></span>&#8203;(<a href="../../server/servlet/MyProxyDelegationServlet.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.servlet">MyProxyDelegationServlet</a>&nbsp;servlet)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 </table>
@@ -213,7 +213,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>protected void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#checkPrompts(edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction,java.util.Map)">checkPrompts</a></span>&#8203;(<a href="../storage/transactions/OA2ServiceTransaction.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions">OA2ServiceTransaction</a>&nbsp;transaction,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#checkPrompts(org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction,java.util.Map)">checkPrompts</a></span>&#8203;(<a href="../storage/transactions/OA2ServiceTransaction.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions">OA2ServiceTransaction</a>&nbsp;transaction,
             <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>,&#8203;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&gt;&nbsp;map)</code></th>
 <td class="colLast">
 <div class="block">Basically, if the prompt parameter is there, we only support the login option.</div>
@@ -221,7 +221,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code>protected <a href="../storage/transactions/OA2ServiceTransaction.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions">OA2ServiceTransaction</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createNewTransaction(edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant)">createNewTransaction</a></span>&#8203;(<a href="../../../../oa4mp/delegation/common/token/AuthorizationGrant.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.token">AuthorizationGrant</a>&nbsp;grant)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createNewTransaction(org.oa4mp.delegation.common.token.AuthorizationGrant)">createNewTransaction</a></span>&#8203;(<a href="../../../../oa4mp/delegation/common/token/AuthorizationGrant.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.token">AuthorizationGrant</a>&nbsp;grant)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i3" class="rowColor">
@@ -251,7 +251,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 </tr>
 <tr id="i6" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#figureOutAudienceAndResource(edu.uiuc.ncsa.oa4mp.delegation.common.servlet.TransactionState)">figureOutAudienceAndResource</a></span>&#8203;(<a href="../../../../oa4mp/delegation/common/servlet/TransactionState.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.servlet">TransactionState</a>&nbsp;state)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#figureOutAudienceAndResource(org.oa4mp.delegation.common.servlet.TransactionState)">figureOutAudienceAndResource</a></span>&#8203;(<a href="../../../../oa4mp/delegation/common/servlet/TransactionState.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.servlet">TransactionState</a>&nbsp;state)</code></th>
 <td class="colLast">
 <div class="block">RFC 8707 support.</div>
 </td>
@@ -266,18 +266,18 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 </tr>
 <tr id="i8" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#postprocess(edu.uiuc.ncsa.oa4mp.delegation.common.servlet.TransactionState,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client)">postprocess</a></span>&#8203;(<a href="../../../../oa4mp/delegation/common/servlet/TransactionState.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.servlet">TransactionState</a>&nbsp;transactionState,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#postprocess(org.oa4mp.delegation.common.servlet.TransactionState,org.oa4mp.server.loader.oauth2.storage.clients.OA2Client)">postprocess</a></span>&#8203;(<a href="../../../../oa4mp/delegation/common/servlet/TransactionState.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.servlet">TransactionState</a>&nbsp;transactionState,
            <a href="../storage/clients/OA2Client.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients">OA2Client</a>&nbsp;client)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i9" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#preprocess(edu.uiuc.ncsa.oa4mp.delegation.common.servlet.TransactionState)">preprocess</a></span>&#8203;(<a href="../../../../oa4mp/delegation/common/servlet/TransactionState.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.servlet">TransactionState</a>&nbsp;state)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#preprocess(org.oa4mp.delegation.common.servlet.TransactionState)">preprocess</a></span>&#8203;(<a href="../../../../oa4mp/delegation/common/servlet/TransactionState.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.servlet">TransactionState</a>&nbsp;state)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i10" class="altColor">
 <td class="colFirst"><code>protected <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util" class="externalLink">Collection</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#resolveScopes(edu.uiuc.ncsa.oa4mp.delegation.common.servlet.TransactionState,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client)">resolveScopes</a></span>&#8203;(<a href="../../../../oa4mp/delegation/common/servlet/TransactionState.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.servlet">TransactionState</a>&nbsp;transactionState,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#resolveScopes(org.oa4mp.delegation.common.servlet.TransactionState,org.oa4mp.server.loader.oauth2.storage.clients.OA2Client)">resolveScopes</a></span>&#8203;(<a href="../../../../oa4mp/delegation/common/servlet/TransactionState.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.servlet">TransactionState</a>&nbsp;transactionState,
              <a href="../storage/clients/OA2Client.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients">OA2Client</a>&nbsp;client)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -329,7 +329,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a id="&lt;init&gt;(edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.MyProxyDelegationServlet)">
+<a id="&lt;init&gt;(org.oa4mp.server.api.servlet.storage.MyProxyDelegationServlet)">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -444,7 +444,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 </dl>
 </li>
 </ul>
-<a id="createNewTransaction(edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant)">
+<a id="createNewTransaction(org.oa4mp.delegation.common.token.AuthorizationGrant)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -470,7 +470,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 </dl>
 </li>
 </ul>
-<a id="checkPrompts(edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction,java.util.Map)">
+<a id="checkPrompts(org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction,java.util.Map)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -485,7 +485,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 </dl>
 </li>
 </ul>
-<a id="preprocess(edu.uiuc.ncsa.oa4mp.delegation.common.servlet.TransactionState)">
+<a id="preprocess(org.oa4mp.delegation.common.servlet.TransactionState)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -499,7 +499,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 </dl>
 </li>
 </ul>
-<a id="figureOutAudienceAndResource(edu.uiuc.ncsa.oa4mp.delegation.common.servlet.TransactionState)">
+<a id="figureOutAudienceAndResource(org.oa4mp.delegation.common.servlet.TransactionState)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -533,7 +533,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 </dl>
 </li>
 </ul>
-<a id="resolveScopes(edu.uiuc.ncsa.oa4mp.delegation.common.servlet.TransactionState,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client)">
+<a id="resolveScopes(org.oa4mp.delegation.common.servlet.TransactionState,org.oa4mp.server.loader.oauth2.storage.clients.OA2Client)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -543,7 +543,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
                                            <a href="../storage/clients/OA2Client.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients">OA2Client</a>&nbsp;client)</pre>
 </li>
 </ul>
-<a id="postprocess(edu.uiuc.ncsa.oa4mp.delegation.common.servlet.TransactionState,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client)">
+<a id="postprocess(org.oa4mp.delegation.common.servlet.TransactionState,org.oa4mp.server.loader.oauth2.storage.clients.OA2Client)">
 <!--   -->
 </a>
 <ul class="blockListLast">

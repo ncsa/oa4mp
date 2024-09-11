@@ -125,7 +125,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Object.html?is-external=true" title="class or interface in java.lang" class="externalLink">java.lang.Object</a></li>
 <li>
 <ul class="inheritance">
-<li>edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2TokenForge</li>
+<li>org.oa4mp.delegation.server.OA2TokenForge</li>
 </ul>
 </li>
 </ul>
@@ -281,12 +281,12 @@ implements <a href="../common/token/TokenForge.html" title="interface in edu.uiu
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code><a href="../common/token/impl/AuthorizationGrantImpl.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.token.impl">AuthorizationGrantImpl</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createToken(edu.uiuc.ncsa.oa4mp.delegation.oa2.server.AGRequest2)">createToken</a></span>&#8203;(<a href="server/AGRequest2.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.server">AGRequest2</a>&nbsp;request)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createToken(org.oa4mp.delegation.server.server.AGRequest2)">createToken</a></span>&#8203;(<a href="server/AGRequest2.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.server">AGRequest2</a>&nbsp;request)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i4" class="altColor">
 <td class="colFirst"><code><a href="../common/token/impl/RefreshTokenImpl.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.token.impl">RefreshTokenImpl</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createToken(edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RTIRequest)">createToken</a></span>&#8203;(<a href="server/RTIRequest.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.server">RTIRequest</a>&nbsp;request)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createToken(org.oa4mp.delegation.server.server.RTIRequest)">createToken</a></span>&#8203;(<a href="server/RTIRequest.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.server">RTIRequest</a>&nbsp;request)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i5" class="rowColor">
@@ -525,7 +525,7 @@ implements <a href="../common/token/TokenForge.html" title="interface in edu.uiu
 <pre>public static final&nbsp;int TYPE_AUTH_GRANT</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../constant-values.html#edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2TokenForge.TYPE_AUTH_GRANT">Constant Field Values</a></dd>
+<dd><a href="../../../../../../constant-values.html#org.oa4mp.delegation.server.OA2TokenForge.TYPE_AUTH_GRANT">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -538,7 +538,7 @@ implements <a href="../common/token/TokenForge.html" title="interface in edu.uiu
 <pre>public static final&nbsp;int TYPE_ACCESS_TOKEN</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../constant-values.html#edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2TokenForge.TYPE_ACCESS_TOKEN">Constant Field Values</a></dd>
+<dd><a href="../../../../../../constant-values.html#org.oa4mp.delegation.server.OA2TokenForge.TYPE_ACCESS_TOKEN">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -551,7 +551,7 @@ implements <a href="../common/token/TokenForge.html" title="interface in edu.uiu
 <pre>public static final&nbsp;int TYPE_REFRESH_TOKEN</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../constant-values.html#edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2TokenForge.TYPE_REFRESH_TOKEN">Constant Field Values</a></dd>
+<dd><a href="../../../../../../constant-values.html#org.oa4mp.delegation.server.OA2TokenForge.TYPE_REFRESH_TOKEN">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -564,7 +564,7 @@ implements <a href="../common/token/TokenForge.html" title="interface in edu.uiu
 <pre>public static final&nbsp;int TYPE_ID_TOKEN</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../constant-values.html#edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2TokenForge.TYPE_ID_TOKEN">Constant Field Values</a></dd>
+<dd><a href="../../../../../../constant-values.html#org.oa4mp.delegation.server.OA2TokenForge.TYPE_ID_TOKEN">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -577,7 +577,7 @@ implements <a href="../common/token/TokenForge.html" title="interface in edu.uiu
 <pre>public static final&nbsp;int TYPE_UNKNOWN</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../constant-values.html#edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2TokenForge.TYPE_UNKNOWN">Constant Field Values</a></dd>
+<dd><a href="../../../../../../constant-values.html#org.oa4mp.delegation.server.OA2TokenForge.TYPE_UNKNOWN">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -610,7 +610,7 @@ implements <a href="../common/token/TokenForge.html" title="interface in edu.uiu
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a id="createToken(edu.uiuc.ncsa.oa4mp.delegation.oa2.server.AGRequest2)">
+<a id="createToken(org.oa4mp.delegation.server.server.AGRequest2)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -628,7 +628,7 @@ implements <a href="../common/token/TokenForge.html" title="interface in edu.uiu
 <pre class="methodSignature">public&nbsp;<a href="../common/token/impl/AccessTokenImpl.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.token.impl">AccessTokenImpl</a>&nbsp;createToken&#8203;(<a href="../server/request/ATRequest.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.server.request">ATRequest</a>&nbsp;request)</pre>
 </li>
 </ul>
-<a id="createToken(edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RTIRequest)">
+<a id="createToken(org.oa4mp.delegation.server.server.RTIRequest)">
 <!--   -->
 </a>
 <ul class="blockList">

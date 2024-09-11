@@ -1,17 +1,17 @@
 package test;
 
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord;
-import edu.uiuc.ncsa.myproxy.oa4mp.qdl.scripting.OA2State;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RFC8693Constants;
-import edu.uiuc.ncsa.qdl.AbstractQDLTester;
-import edu.uiuc.ncsa.qdl.TestUtils;
-import edu.uiuc.ncsa.qdl.exceptions.QDLExceptionWithTrace;
-import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
+import org.oa4mp.server.loader.oauth2.OA2SE;
+import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
+import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
+import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
+import org.oa4mp.server.loader.oauth2.storage.tx.TXRecord;
+import org.oa4mp.server.loader.qdl.scripting.OA2State;
+import org.oa4mp.delegation.server.server.RFC8693Constants;
+import org.qdl_lang.AbstractQDLTester;
+import org.qdl_lang.TestUtils;
+import org.qdl_lang.exceptions.QDLExceptionWithTrace;
+import org.qdl_lang.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
@@ -28,7 +28,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import static edu.uiuc.ncsa.myproxy.oa4mp.TestUtils.findConfigNode;
+import static org.oa4mp.server.test.TestUtils.findConfigNode;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -42,7 +42,7 @@ public class QDLTests extends AbstractQDLTester {
      */
     protected void addModules(StringBuffer script) {
         addLine(script, "module_load('edu.uiuc.ncsa.oa2.qdl.QDLToolsLoader', 'java');");
-        addLine(script, "module_load('edu.uiuc.ncsa.myproxy.oa4mp.qdl.OA2QDLLoader', 'java');");
+        addLine(script, "module_load('org.oa4mp.server.loader.qdl.OA2QDLLoader', 'java');");
     }
 
     protected TestUtils getTestUtils() {
@@ -53,7 +53,7 @@ public class QDLTests extends AbstractQDLTester {
     public void testInGroup2() throws Throwable {
         OA2State state = (OA2State) getTestUtils().getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "module_load('edu.uiuc.ncsa.myproxy.oa4mp.qdl.OA2QDLLoader', 'java');");
+        addLine(script, "module_load('org.oa4mp.server.loader.qdl.OA2QDLLoader', 'java');");
         addLine(script, "module_import('oa2:/qdl/oidc/claims');");
         addLine(script, "groups. := [{'name':'test0','id':123}, {'name':'test1','id':234}, {'name':'test2','id':345}, {'name':'test3','id':456}];");
         addLine(script, "groups2. := ['test0', 'test1', 'test2', 'test3'];");
@@ -72,7 +72,7 @@ public class QDLTests extends AbstractQDLTester {
     public void testInGroup2Fail() throws Throwable {
         OA2State state = (OA2State) getTestUtils().getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "module_load('edu.uiuc.ncsa.myproxy.oa4mp.qdl.OA2QDLLoader', 'java');");
+        addLine(script, "module_load('org.oa4mp.server.loader.qdl.OA2QDLLoader', 'java');");
         addLine(script, "module_import('oa2:/qdl/oidc/claims');");
         addLine(script, "groups3. := ['test0', 'test1', 42, 'test3']; // should fail");
         addLine(script, "in_group2(['test0', 'foo', 'test2'], groups3.);");
@@ -92,7 +92,7 @@ public class QDLTests extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         // tests absolute path, not in server mode.
         String realPath = DebugUtil.getDevPath()+"/oa4mp/server-admin/src/main/resources/qdl/ui-test/test-claims.json";
-        addLine(script, "module_load('edu.uiuc.ncsa.myproxy.oa4mp.qdl.OA2QDLLoader', 'java');");
+        addLine(script, "module_load('org.oa4mp.server.loader.qdl.OA2QDLLoader', 'java');");
         addLine(script, "module_import('oa2:/qdl/oidc/claims');");
         addLine(script, "cfg. := new_template('file');");
         addLine(script, "cfg.file_path := '" + realPath + "';");
@@ -114,7 +114,7 @@ public class QDLTests extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         // tests absolute path, not in server mode.
         String testClaimsFile = DebugUtil.getDevPath()+"/oa4mp/server-test/src/main/resources/test-claims.json";
-        addLine(script, "module_load('edu.uiuc.ncsa.myproxy.oa4mp.qdl.OA2QDLLoader', 'java');");
+        addLine(script, "module_load('org.oa4mp.server.loader.qdl.OA2QDLLoader', 'java');");
         addLine(script, "module_import('oa2:/qdl/oidc/claims');");
         addLine(script, "cfg. := new_template('file');");
         addLine(script, "cfg.file_path := '" + testClaimsFile + "';");
@@ -132,7 +132,7 @@ public class QDLTests extends AbstractQDLTester {
     public void testTemplateSubstitution() throws Throwable {
         OA2State state = (OA2State) getTestUtils().getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "module_load('edu.uiuc.ncsa.myproxy.oa4mp.qdl.OA2QDLLoader', 'java');");
+        addLine(script, "module_load('org.oa4mp.server.loader.qdl.OA2QDLLoader', 'java');");
         addLine(script, "module_import('oa2:/qdl/oidc/claims');");
         addLine(script, "raw:='storage.read:/bsu/${isMemberOf}/${uid}';");
         addLine(script, "claims.uid ≔ 'bob';");
@@ -148,7 +148,7 @@ public class QDLTests extends AbstractQDLTester {
     public void testResolveTemplates() throws Throwable {
         OA2State state = (OA2State) getTestUtils().getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "module_load('edu.uiuc.ncsa.myproxy.oa4mp.qdl.OA2QDLLoader', 'java');");
+        addLine(script, "module_load('org.oa4mp.server.loader.qdl.OA2QDLLoader', 'java');");
         addLine(script, "module_import('oa2:/qdl/oidc/claims');");
         addLine(script, "cs. :=['x.y:/abc/def','p.q:/rst'];");
         addLine(script, "req. := ['x.y:/abc/def/ghi','x.y:/abc/defg', 'p.q:/'];");
@@ -168,7 +168,7 @@ public class QDLTests extends AbstractQDLTester {
     public void testResolveTemplates2() throws Throwable {
         OA2State state = (OA2State) getTestUtils().getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "module_load('edu.uiuc.ncsa.myproxy.oa4mp.qdl.OA2QDLLoader', 'java');");
+        addLine(script, "module_load('org.oa4mp.server.loader.qdl.OA2QDLLoader', 'java');");
         addLine(script, "module_import('oa2:/qdl/oidc/claims');");
         addLine(script, "c.:=['insert:/DQSegDB',\n" +
                 "                 'read:/frames',\n" +
@@ -208,7 +208,7 @@ public class QDLTests extends AbstractQDLTester {
         OA2State state = (OA2State) getTestUtils().getNewState();
         setFakeState(state);
         StringBuffer script = new StringBuffer();
-        addLine(script, "module_load('edu.uiuc.ncsa.myproxy.oa4mp.qdl.OA2QDLLoader', 'java');");
+        addLine(script, "module_load('org.oa4mp.server.loader.qdl.OA2QDLLoader', 'java');");
         //addLine(script, "module_load('edu.uiuc.ncsa.oa2.qdl.QDLToolsLoader', 'java');");
         addLine(script, "module_import('oa2:/qdl/oidc/claims');");
         addLine(script, "module_import('oa2:/qdl/oidc/token');");

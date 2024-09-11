@@ -1,7 +1,7 @@
 package test;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.TokenTest;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2TokenForge;
+import org.oa4mp.server.test.TokenTest;
+import org.oa4mp.delegation.server.OA2TokenForge;
 import org.junit.Test;
 
 /**

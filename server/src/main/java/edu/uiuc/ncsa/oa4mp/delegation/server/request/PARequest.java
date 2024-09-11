@@ -2,10 +2,10 @@ package edu.uiuc.ncsa.oa4mp.delegation.server.request;
 
 import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.oa4mp.delegation.server.issuers.PAIssuer;
-import edu.uiuc.ncsa.oa4mp.delegation.common.services.Response;
-import edu.uiuc.ncsa.oa4mp.delegation.common.services.Server;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.ProtectedAsset;
+import org.oa4mp.delegation.common.services.Response;
+import org.oa4mp.delegation.common.services.Server;
+import org.oa4mp.delegation.common.token.AccessToken;
+import org.oa4mp.delegation.common.token.ProtectedAsset;
 
 import javax.servlet.http.HttpServletRequest;
 

@@ -125,7 +125,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang" class="externalLink">java.lang.Object</a></li>
 <li>
 <ul class="inheritance">
-<li>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.ManagerFacade</li>
+<li>org.oa4mp.server.loader.oauth2.cm.ManagerFacade</li>
 </ul>
 </li>
 </ul>
@@ -157,7 +157,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <th class="colLast" scope="col">Description</th>
 </tr>
 <tr class="altColor">
-<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE)">ManagerFacade</a></span>&#8203;(<a href="../OA2SE.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2">OA2SE</a>&nbsp;serviceEnvironment)</code></th>
+<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(org.oa4mp.server.loader.oauth2.OA2SE)">ManagerFacade</a></span>&#8203;(<a href="../OA2SE.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2">OA2SE</a>&nbsp;serviceEnvironment)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 </table>
@@ -180,12 +180,12 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>protected void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#checkAdminClientSecret(edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient)">checkAdminClientSecret</a></span>&#8203;(<a href="../../server/admin/adminClient/AdminClient.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient">AdminClient</a>&nbsp;client)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#checkAdminClientSecret(org.oa4mp.server.api.adminClient.admin.AdminClient)">checkAdminClientSecret</a></span>&#8203;(<a href="../../server/admin/adminClient/AdminClient.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient">AdminClient</a>&nbsp;client)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>protected void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#checkClientSecret(edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClient,edu.uiuc.ncsa.oa4mp.delegation.server.storage.BaseClientStore)">checkClientSecret</a></span>&#8203;(<a href="../../../../oa4mp/delegation/common/storage/BaseClient.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage">BaseClient</a>&nbsp;client,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#checkClientSecret(org.oa4mp.delegation.common.clients.storage.BaseClient,edu.uiuc.ncsa.oa4mp.delegation.server.storage.BaseClientStore)">checkClientSecret</a></span>&#8203;(<a href="../../../../oa4mp/delegation/common/storage/BaseClient.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage">BaseClient</a>&nbsp;client,
                  <a href="../../../../oa4mp/delegation/server/storage/BaseClientStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.server.storage">BaseClientStore</a>&nbsp;store)</code></th>
 <td class="colLast">
 <div class="block">This takes the client created from the JSON that came in the request and goes
@@ -195,7 +195,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code>protected void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#checkOA2ClientSecret(edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client)">checkOA2ClientSecret</a></span>&#8203;(<a href="../storage/clients/OA2Client.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients">OA2Client</a>&nbsp;client)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#checkOA2ClientSecret(org.oa4mp.server.loader.oauth2.storage.clients.OA2Client)">checkOA2ClientSecret</a></span>&#8203;(<a href="../storage/clients/OA2Client.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients">OA2Client</a>&nbsp;client)</code></th>
 <td class="colLast">
 <div class="block">***************************</div>
 </td>
@@ -227,27 +227,27 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 </tr>
 <tr id="i8" class="altColor">
 <td class="colFirst"><code>protected <a href="../../../../oa4mp/delegation/common/services/Response.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.services">Response</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#process(edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client,net.sf.json.JSONObject)">process</a></span>&#8203;(<a href="../storage/clients/OA2Client.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients">OA2Client</a>&nbsp;subject,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#process(org.oa4mp.server.loader.oauth2.storage.clients.OA2Client,org.oa4mp.server.loader.oauth2.storage.clients.OA2Client,net.sf.json.JSONObject)">process</a></span>&#8203;(<a href="../storage/clients/OA2Client.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients">OA2Client</a>&nbsp;subject,
        <a href="../storage/clients/OA2Client.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients">OA2Client</a>&nbsp;target,
        net.sf.json.JSONObject&nbsp;rawJSON)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i9" class="rowColor">
 <td class="colFirst"><code>protected <a href="../../../../oa4mp/delegation/common/services/Response.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.services">Response</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#process(edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client,edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient,net.sf.json.JSONObject)">process</a></span>&#8203;(<a href="../storage/clients/OA2Client.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients">OA2Client</a>&nbsp;subject,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#process(org.oa4mp.server.loader.oauth2.storage.clients.OA2Client,org.oa4mp.server.api.adminClient.admin.AdminClient,net.sf.json.JSONObject)">process</a></span>&#8203;(<a href="../storage/clients/OA2Client.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients">OA2Client</a>&nbsp;subject,
        <a href="../../server/admin/adminClient/AdminClient.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient">AdminClient</a>&nbsp;target,
        net.sf.json.JSONObject&nbsp;rawJSON)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i10" class="altColor">
 <td class="colFirst"><code>protected <a href="../../../../oa4mp/delegation/common/services/Response.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.services">Response</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#process(edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client,net.sf.json.JSONObject)">process</a></span>&#8203;(<a href="../storage/clients/OA2Client.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients">OA2Client</a>&nbsp;oa2Client,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#process(org.oa4mp.server.loader.oauth2.storage.clients.OA2Client,net.sf.json.JSONObject)">process</a></span>&#8203;(<a href="../storage/clients/OA2Client.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients">OA2Client</a>&nbsp;oa2Client,
        net.sf.json.JSONObject&nbsp;rawJSON)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i11" class="rowColor">
 <td class="colFirst"><code>protected <a href="../../../../oa4mp/delegation/common/services/Response.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.services">Response</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#process(edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client,edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.ActionAdd,net.sf.json.JSONObject)">process</a></span>&#8203;(<a href="../../server/admin/adminClient/AdminClient.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient">AdminClient</a>&nbsp;subject,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#process(org.oa4mp.server.api.adminClient.admin.AdminClient,org.oa4mp.server.loader.oauth2.storage.clients.OA2Client,org.oa4mp.server.api.actions.things.admin.ActionAdd,net.sf.json.JSONObject)">process</a></span>&#8203;(<a href="../../server/admin/adminClient/AdminClient.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient">AdminClient</a>&nbsp;subject,
        <a href="../storage/clients/OA2Client.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients">OA2Client</a>&nbsp;target,
        <a href="../../server/admin/things/actions/ActionAdd.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions">ActionAdd</a>&nbsp;actionAdd,
        net.sf.json.JSONObject&nbsp;rawJSON)</code></th>
@@ -255,7 +255,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 </tr>
 <tr id="i12" class="altColor">
 <td class="colFirst"><code>protected <a href="../../../../oa4mp/delegation/common/services/Response.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.services">Response</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#process(edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client,edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.ActionApprove,net.sf.json.JSONObject)">process</a></span>&#8203;(<a href="../../server/admin/adminClient/AdminClient.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient">AdminClient</a>&nbsp;subject,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#process(org.oa4mp.server.api.adminClient.admin.AdminClient,org.oa4mp.server.loader.oauth2.storage.clients.OA2Client,org.oa4mp.server.api.actions.things.admin.ActionApprove,net.sf.json.JSONObject)">process</a></span>&#8203;(<a href="../../server/admin/adminClient/AdminClient.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient">AdminClient</a>&nbsp;subject,
        <a href="../storage/clients/OA2Client.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients">OA2Client</a>&nbsp;target,
        <a href="../../server/admin/things/actions/ActionApprove.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions">ActionApprove</a>&nbsp;actionApprove,
        net.sf.json.JSONObject&nbsp;rawJSON)</code></th>
@@ -263,7 +263,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 </tr>
 <tr id="i13" class="rowColor">
 <td class="colFirst"><code>protected <a href="../../../../oa4mp/delegation/common/services/Response.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.services">Response</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#process(edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client,edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.ActionCreate,net.sf.json.JSONObject)">process</a></span>&#8203;(<a href="../../server/admin/adminClient/AdminClient.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient">AdminClient</a>&nbsp;subject,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#process(org.oa4mp.server.api.adminClient.admin.AdminClient,org.oa4mp.server.loader.oauth2.storage.clients.OA2Client,org.oa4mp.server.api.actions.things.admin.ActionCreate,net.sf.json.JSONObject)">process</a></span>&#8203;(<a href="../../server/admin/adminClient/AdminClient.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient">AdminClient</a>&nbsp;subject,
        <a href="../storage/clients/OA2Client.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients">OA2Client</a>&nbsp;target,
        <a href="../../server/admin/things/actions/ActionCreate.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions">ActionCreate</a>&nbsp;actionCreate,
        net.sf.json.JSONObject&nbsp;rawJSON)</code></th>
@@ -271,7 +271,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 </tr>
 <tr id="i14" class="altColor">
 <td class="colFirst"><code>protected <a href="../../../../oa4mp/delegation/common/services/Response.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.services">Response</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#process(edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client,edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.ActionExecute,net.sf.json.JSONObject)">process</a></span>&#8203;(<a href="../../server/admin/adminClient/AdminClient.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient">AdminClient</a>&nbsp;subject,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#process(org.oa4mp.server.api.adminClient.admin.AdminClient,org.oa4mp.server.loader.oauth2.storage.clients.OA2Client,org.oa4mp.server.api.actions.things.admin.ActionExecute,net.sf.json.JSONObject)">process</a></span>&#8203;(<a href="../../server/admin/adminClient/AdminClient.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient">AdminClient</a>&nbsp;subject,
        <a href="../storage/clients/OA2Client.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients">OA2Client</a>&nbsp;target,
        <a href="../../server/admin/things/actions/ActionExecute.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions">ActionExecute</a>&nbsp;actionExecute,
        net.sf.json.JSONObject&nbsp;rawJSON)</code></th>
@@ -279,7 +279,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 </tr>
 <tr id="i15" class="rowColor">
 <td class="colFirst"><code>protected <a href="../../../../oa4mp/delegation/common/services/Response.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.services">Response</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#process(edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client,edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.ActionGet,net.sf.json.JSONObject)">process</a></span>&#8203;(<a href="../../server/admin/adminClient/AdminClient.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient">AdminClient</a>&nbsp;subject,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#process(org.oa4mp.server.api.adminClient.admin.AdminClient,org.oa4mp.server.loader.oauth2.storage.clients.OA2Client,org.oa4mp.server.api.actions.things.admin.ActionGet,net.sf.json.JSONObject)">process</a></span>&#8203;(<a href="../../server/admin/adminClient/AdminClient.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient">AdminClient</a>&nbsp;subject,
        <a href="../storage/clients/OA2Client.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients">OA2Client</a>&nbsp;target,
        <a href="../../server/admin/things/actions/ActionGet.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions">ActionGet</a>&nbsp;actionGet,
        net.sf.json.JSONObject&nbsp;rawJSON)</code></th>
@@ -287,7 +287,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 </tr>
 <tr id="i16" class="altColor">
 <td class="colFirst"><code>protected <a href="../../../../oa4mp/delegation/common/services/Response.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.services">Response</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#process(edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client,edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.ActionList,net.sf.json.JSONObject)">process</a></span>&#8203;(<a href="../../server/admin/adminClient/AdminClient.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient">AdminClient</a>&nbsp;subject,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#process(org.oa4mp.server.api.adminClient.admin.AdminClient,org.oa4mp.server.loader.oauth2.storage.clients.OA2Client,org.oa4mp.server.api.actions.things.admin.ActionList,net.sf.json.JSONObject)">process</a></span>&#8203;(<a href="../../server/admin/adminClient/AdminClient.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient">AdminClient</a>&nbsp;subject,
        <a href="../storage/clients/OA2Client.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients">OA2Client</a>&nbsp;target,
        <a href="../../server/admin/things/actions/ActionList.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions">ActionList</a>&nbsp;actionList,
        net.sf.json.JSONObject&nbsp;rawJSON)</code></th>
@@ -295,7 +295,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 </tr>
 <tr id="i17" class="rowColor">
 <td class="colFirst"><code>protected <a href="../../../../oa4mp/delegation/common/services/Response.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.services">Response</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#process(edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client,edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.ActionRemove,net.sf.json.JSONObject)">process</a></span>&#8203;(<a href="../../server/admin/adminClient/AdminClient.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient">AdminClient</a>&nbsp;subject,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#process(org.oa4mp.server.api.adminClient.admin.AdminClient,org.oa4mp.server.loader.oauth2.storage.clients.OA2Client,org.oa4mp.server.api.actions.things.admin.ActionRemove,net.sf.json.JSONObject)">process</a></span>&#8203;(<a href="../../server/admin/adminClient/AdminClient.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient">AdminClient</a>&nbsp;subject,
        <a href="../storage/clients/OA2Client.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients">OA2Client</a>&nbsp;target,
        <a href="../../server/admin/things/actions/ActionRemove.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions">ActionRemove</a>&nbsp;actionRemove,
        net.sf.json.JSONObject&nbsp;rawJSON)</code></th>
@@ -303,7 +303,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 </tr>
 <tr id="i18" class="altColor">
 <td class="colFirst"><code>protected <a href="../../../../oa4mp/delegation/common/services/Response.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.services">Response</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#process(edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client,edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.ActionSet,net.sf.json.JSONObject)">process</a></span>&#8203;(<a href="../../server/admin/adminClient/AdminClient.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient">AdminClient</a>&nbsp;subject,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#process(org.oa4mp.server.api.adminClient.admin.AdminClient,org.oa4mp.server.loader.oauth2.storage.clients.OA2Client,org.oa4mp.server.api.actions.things.admin.ActionSet,net.sf.json.JSONObject)">process</a></span>&#8203;(<a href="../../server/admin/adminClient/AdminClient.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient">AdminClient</a>&nbsp;subject,
        <a href="../storage/clients/OA2Client.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients">OA2Client</a>&nbsp;target,
        <a href="../../server/admin/things/actions/ActionSet.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions">ActionSet</a>&nbsp;actionSet,
        net.sf.json.JSONObject&nbsp;rawJSON)</code></th>
@@ -311,7 +311,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 </tr>
 <tr id="i19" class="rowColor">
 <td class="colFirst"><code>protected <a href="../../../../oa4mp/delegation/common/services/Response.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.services">Response</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#process(edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client,edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.ActionUnapprove,net.sf.json.JSONObject)">process</a></span>&#8203;(<a href="../../server/admin/adminClient/AdminClient.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient">AdminClient</a>&nbsp;subject,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#process(org.oa4mp.server.api.adminClient.admin.AdminClient,org.oa4mp.server.loader.oauth2.storage.clients.OA2Client,org.oa4mp.server.api.actions.things.admin.ActionUnapprove,net.sf.json.JSONObject)">process</a></span>&#8203;(<a href="../../server/admin/adminClient/AdminClient.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient">AdminClient</a>&nbsp;subject,
        <a href="../storage/clients/OA2Client.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients">OA2Client</a>&nbsp;target,
        <a href="../../server/admin/things/actions/ActionUnapprove.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions">ActionUnapprove</a>&nbsp;actionUnapprove,
        net.sf.json.JSONObject&nbsp;rawJSON)</code></th>
@@ -319,21 +319,21 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 </tr>
 <tr id="i20" class="altColor">
 <td class="colFirst"><code>protected <a href="../../../../oa4mp/delegation/common/services/Response.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.services">Response</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#process(edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client,net.sf.json.JSONObject)">process</a></span>&#8203;(<a href="../../server/admin/adminClient/AdminClient.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient">AdminClient</a>&nbsp;subject,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#process(org.oa4mp.server.api.adminClient.admin.AdminClient,org.oa4mp.server.loader.oauth2.storage.clients.OA2Client,net.sf.json.JSONObject)">process</a></span>&#8203;(<a href="../../server/admin/adminClient/AdminClient.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient">AdminClient</a>&nbsp;subject,
        <a href="../storage/clients/OA2Client.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients">OA2Client</a>&nbsp;target,
        net.sf.json.JSONObject&nbsp;rawJSON)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i21" class="rowColor">
 <td class="colFirst"><code>protected <a href="../../../../oa4mp/delegation/common/services/Response.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.services">Response</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#process(edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient,edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient,net.sf.json.JSONObject)">process</a></span>&#8203;(<a href="../../server/admin/adminClient/AdminClient.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient">AdminClient</a>&nbsp;subject,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#process(org.oa4mp.server.api.adminClient.admin.AdminClient,org.oa4mp.server.api.adminClient.admin.AdminClient,net.sf.json.JSONObject)">process</a></span>&#8203;(<a href="../../server/admin/adminClient/AdminClient.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient">AdminClient</a>&nbsp;subject,
        <a href="../../server/admin/adminClient/AdminClient.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient">AdminClient</a>&nbsp;target,
        net.sf.json.JSONObject&nbsp;rawJSON)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i22" class="altColor">
 <td class="colFirst"><code>protected <a href="../../../../oa4mp/delegation/common/services/Response.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.services">Response</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#process(edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient,net.sf.json.JSONObject)">process</a></span>&#8203;(<a href="../../server/admin/adminClient/AdminClient.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient">AdminClient</a>&nbsp;adminClient,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#process(org.oa4mp.server.api.adminClient.admin.AdminClient,net.sf.json.JSONObject)">process</a></span>&#8203;(<a href="../../server/admin/adminClient/AdminClient.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient">AdminClient</a>&nbsp;adminClient,
        net.sf.json.JSONObject&nbsp;rawJSON)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -366,7 +366,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a id="&lt;init&gt;(edu.uiuc.ncsa.myproxy.oa4mp.oauth2.OA2SE)">
+<a id="&lt;init&gt;(org.oa4mp.server.loader.oauth2.OA2SE)">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -430,7 +430,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <pre class="methodSignature">public&nbsp;<a href="util/permissions/PermissionServer.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.cm.util.permissions">PermissionServer</a>&nbsp;getPermissionServer()</pre>
 </li>
 </ul>
-<a id="process(edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient,net.sf.json.JSONObject)">
+<a id="process(org.oa4mp.server.api.adminClient.admin.AdminClient,net.sf.json.JSONObject)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -440,7 +440,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
                            net.sf.json.JSONObject&nbsp;rawJSON)</pre>
 </li>
 </ul>
-<a id="checkOA2ClientSecret(edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client)">
+<a id="checkOA2ClientSecret(org.oa4mp.server.loader.oauth2.storage.clients.OA2Client)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -450,7 +450,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <div class="block">***************************</div>
 </li>
 </ul>
-<a id="checkAdminClientSecret(edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient)">
+<a id="checkAdminClientSecret(org.oa4mp.server.api.adminClient.admin.AdminClient)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -459,7 +459,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <pre class="methodSignature">protected&nbsp;void&nbsp;checkAdminClientSecret&#8203;(<a href="../../server/admin/adminClient/AdminClient.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient">AdminClient</a>&nbsp;client)</pre>
 </li>
 </ul>
-<a id="checkClientSecret(edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClient,edu.uiuc.ncsa.oa4mp.delegation.server.storage.BaseClientStore)">
+<a id="checkClientSecret(org.oa4mp.delegation.common.clients.storage.BaseClient,edu.uiuc.ncsa.oa4mp.delegation.server.storage.BaseClientStore)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -478,7 +478,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 </dl>
 </li>
 </ul>
-<a id="process(edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client,net.sf.json.JSONObject)">
+<a id="process(org.oa4mp.server.loader.oauth2.storage.clients.OA2Client,net.sf.json.JSONObject)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -488,7 +488,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
                            net.sf.json.JSONObject&nbsp;rawJSON)</pre>
 </li>
 </ul>
-<a id="process(edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client,net.sf.json.JSONObject)">
+<a id="process(org.oa4mp.server.loader.oauth2.storage.clients.OA2Client,org.oa4mp.server.loader.oauth2.storage.clients.OA2Client,net.sf.json.JSONObject)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -499,7 +499,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
                            net.sf.json.JSONObject&nbsp;rawJSON)</pre>
 </li>
 </ul>
-<a id="process(edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient,edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient,net.sf.json.JSONObject)">
+<a id="process(org.oa4mp.server.api.adminClient.admin.AdminClient,org.oa4mp.server.api.adminClient.admin.AdminClient,net.sf.json.JSONObject)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -510,7 +510,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
                            net.sf.json.JSONObject&nbsp;rawJSON)</pre>
 </li>
 </ul>
-<a id="process(edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client,edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.ActionAdd,net.sf.json.JSONObject)">
+<a id="process(org.oa4mp.server.api.adminClient.admin.AdminClient,org.oa4mp.server.loader.oauth2.storage.clients.OA2Client,org.oa4mp.server.api.actions.things.admin.ActionAdd,net.sf.json.JSONObject)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -522,7 +522,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
                            net.sf.json.JSONObject&nbsp;rawJSON)</pre>
 </li>
 </ul>
-<a id="process(edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client,edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.ActionApprove,net.sf.json.JSONObject)">
+<a id="process(org.oa4mp.server.api.adminClient.admin.AdminClient,org.oa4mp.server.loader.oauth2.storage.clients.OA2Client,org.oa4mp.server.api.actions.things.admin.ActionApprove,net.sf.json.JSONObject)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -534,7 +534,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
                            net.sf.json.JSONObject&nbsp;rawJSON)</pre>
 </li>
 </ul>
-<a id="process(edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client,edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.ActionCreate,net.sf.json.JSONObject)">
+<a id="process(org.oa4mp.server.api.adminClient.admin.AdminClient,org.oa4mp.server.loader.oauth2.storage.clients.OA2Client,org.oa4mp.server.api.actions.things.admin.ActionCreate,net.sf.json.JSONObject)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -546,7 +546,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
                            net.sf.json.JSONObject&nbsp;rawJSON)</pre>
 </li>
 </ul>
-<a id="process(edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client,edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.ActionExecute,net.sf.json.JSONObject)">
+<a id="process(org.oa4mp.server.api.adminClient.admin.AdminClient,org.oa4mp.server.loader.oauth2.storage.clients.OA2Client,org.oa4mp.server.api.actions.things.admin.ActionExecute,net.sf.json.JSONObject)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -558,7 +558,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
                            net.sf.json.JSONObject&nbsp;rawJSON)</pre>
 </li>
 </ul>
-<a id="process(edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client,edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.ActionGet,net.sf.json.JSONObject)">
+<a id="process(org.oa4mp.server.api.adminClient.admin.AdminClient,org.oa4mp.server.loader.oauth2.storage.clients.OA2Client,org.oa4mp.server.api.actions.things.admin.ActionGet,net.sf.json.JSONObject)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -570,7 +570,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
                            net.sf.json.JSONObject&nbsp;rawJSON)</pre>
 </li>
 </ul>
-<a id="process(edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client,edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.ActionList,net.sf.json.JSONObject)">
+<a id="process(org.oa4mp.server.api.adminClient.admin.AdminClient,org.oa4mp.server.loader.oauth2.storage.clients.OA2Client,org.oa4mp.server.api.actions.things.admin.ActionList,net.sf.json.JSONObject)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -582,7 +582,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
                            net.sf.json.JSONObject&nbsp;rawJSON)</pre>
 </li>
 </ul>
-<a id="process(edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client,edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.ActionSet,net.sf.json.JSONObject)">
+<a id="process(org.oa4mp.server.api.adminClient.admin.AdminClient,org.oa4mp.server.loader.oauth2.storage.clients.OA2Client,org.oa4mp.server.api.actions.things.admin.ActionSet,net.sf.json.JSONObject)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -594,7 +594,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
                            net.sf.json.JSONObject&nbsp;rawJSON)</pre>
 </li>
 </ul>
-<a id="process(edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client,edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.ActionRemove,net.sf.json.JSONObject)">
+<a id="process(org.oa4mp.server.api.adminClient.admin.AdminClient,org.oa4mp.server.loader.oauth2.storage.clients.OA2Client,org.oa4mp.server.api.actions.things.admin.ActionRemove,net.sf.json.JSONObject)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -606,7 +606,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
                            net.sf.json.JSONObject&nbsp;rawJSON)</pre>
 </li>
 </ul>
-<a id="process(edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client,edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.actions.ActionUnapprove,net.sf.json.JSONObject)">
+<a id="process(org.oa4mp.server.api.adminClient.admin.AdminClient,org.oa4mp.server.loader.oauth2.storage.clients.OA2Client,org.oa4mp.server.api.actions.things.admin.ActionUnapprove,net.sf.json.JSONObject)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -618,7 +618,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
                            net.sf.json.JSONObject&nbsp;rawJSON)</pre>
 </li>
 </ul>
-<a id="process(edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client,edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient,net.sf.json.JSONObject)">
+<a id="process(org.oa4mp.server.loader.oauth2.storage.clients.OA2Client,org.oa4mp.server.api.adminClient.admin.AdminClient,net.sf.json.JSONObject)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -629,7 +629,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
                            net.sf.json.JSONObject&nbsp;rawJSON)</pre>
 </li>
 </ul>
-<a id="process(edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClient,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client,net.sf.json.JSONObject)">
+<a id="process(org.oa4mp.server.api.adminClient.admin.AdminClient,org.oa4mp.server.loader.oauth2.storage.clients.OA2Client,net.sf.json.JSONObject)">
 <!--   -->
 </a>
 <ul class="blockList">

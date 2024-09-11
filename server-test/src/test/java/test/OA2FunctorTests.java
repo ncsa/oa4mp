@@ -1,16 +1,15 @@
 package test;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.GroupElement;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.Groups;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.flows.jAccessToken;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.functor.claims.*;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientFunctorScripts;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientFunctorScriptsFactory;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.OA2ClientFunctorScriptsUtil;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients.OA2Client;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.OA2Scopes;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSourceConfiguration;
-import edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSourceConfigurationUtil;
+import org.oa4mp.server.loader.oauth2.claims.GroupElement;
+import org.oa4mp.server.loader.oauth2.claims.Groups;
+import org.oa4mp.server.loader.oauth2.flows.jAccessToken;
+import org.oa4mp.server.loader.oauth2.state.OA2ClientFunctorScripts;
+import org.oa4mp.server.loader.oauth2.state.OA2ClientFunctorScriptsFactory;
+import org.oa4mp.server.loader.oauth2.state.OA2ClientFunctorScriptsUtil;
+import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
+import org.oa4mp.delegation.server.OA2Scopes;
+import org.oa4mp.delegation.server.server.claims.ClaimSourceConfiguration;
+import org.oa4mp.delegation.server.server.claims.ClaimSourceConfigurationUtil;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.util.JFunctorTest;
 import edu.uiuc.ncsa.security.util.functor.*;
@@ -18,13 +17,14 @@ import edu.uiuc.ncsa.security.util.functor.logic.*;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.junit.Test;
+import org.oa4mp.server.loader.oauth2.functor.claims.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import static edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.OA2Claims.*;
+import static org.oa4mp.delegation.server.server.claims.OA2Claims.*;
 
 /*
 import static edu.uiuc.ncsa.delegation.oa2.server.claims.OA2Claims.*;

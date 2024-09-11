@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.oa4mp.delegation.server.request;
 
-import edu.uiuc.ncsa.oa4mp.delegation.common.services.Response;
+import org.oa4mp.delegation.common.services.Response;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;

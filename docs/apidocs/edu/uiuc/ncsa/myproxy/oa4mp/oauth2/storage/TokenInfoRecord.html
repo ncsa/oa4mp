@@ -125,7 +125,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang" class="externalLink">java.lang.Object</a></li>
 <li>
 <ul class="inheritance">
-<li>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.TokenInfoRecord</li>
+<li>org.oa4mp.server.loader.oauth2.storage.TokenInfoRecord</li>
 </ul>
 </li>
 </ul>
@@ -185,14 +185,14 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>protected net.sf.json.JSONObject</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#formatToken(edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenImpl,long,boolean)">formatToken</a></span>&#8203;(<a href="../../../../oa4mp/delegation/common/token/impl/TokenImpl.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.token.impl">TokenImpl</a>&nbsp;token,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#formatToken(org.oa4mp.delegation.common.impl.token.TokenImpl,long,boolean)">formatToken</a></span>&#8203;(<a href="../../../../oa4mp/delegation/common/token/impl/TokenImpl.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.token.impl">TokenImpl</a>&nbsp;token,
            long&nbsp;lifetime,
            boolean&nbsp;isValid)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#fromMap(edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2TransactionKeys)">fromMap</a></span>&#8203;(edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap&nbsp;map,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#fromMap(edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap,org.oa4mp.server.loader.oauth2.storage.transactions.OA2TransactionKeys)">fromMap</a></span>&#8203;(edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap&nbsp;map,
        <a href="transactions/OA2TransactionKeys.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions">OA2TransactionKeys</a>&nbsp;keys)</code></th>
 <td class="colLast">
 <div class="block">For use in SQL stores</div>
@@ -200,14 +200,14 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#fromTransaction(edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction)">fromTransaction</a></span>&#8203;(<a href="transactions/OA2ServiceTransaction.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions">OA2ServiceTransaction</a>&nbsp;t)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#fromTransaction(org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction)">fromTransaction</a></span>&#8203;(<a href="transactions/OA2ServiceTransaction.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions">OA2ServiceTransaction</a>&nbsp;t)</code></th>
 <td class="colLast">
 <div class="block">For use in stores like memory or file</div>
 </td>
 </tr>
 <tr id="i4" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#fromTXRecord(edu.uiuc.ncsa.security.core.Identifier,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord)">fromTXRecord</a></span>&#8203;(edu.uiuc.ncsa.security.core.Identifier&nbsp;clientID,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#fromTXRecord(edu.uiuc.ncsa.security.core.Identifier,org.oa4mp.server.loader.oauth2.storage.tx.TXRecord)">fromTXRecord</a></span>&#8203;(edu.uiuc.ncsa.security.core.Identifier&nbsp;clientID,
             <a href="tx/TXRecord.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx">TXRecord</a>&nbsp;txr)</code></th>
 <td class="colLast">
 <div class="block">This has either a refresh or an access token</div>
@@ -271,7 +271,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a id="fromMap(edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2TransactionKeys)">
+<a id="fromMap(edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap,org.oa4mp.server.loader.oauth2.storage.transactions.OA2TransactionKeys)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -287,7 +287,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 </dl>
 </li>
 </ul>
-<a id="fromTransaction(edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions.OA2ServiceTransaction)">
+<a id="fromTransaction(org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -310,7 +310,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <pre class="methodSignature">public&nbsp;net.sf.json.JSONObject&nbsp;toJSON()</pre>
 </li>
 </ul>
-<a id="formatToken(edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenImpl,long,boolean)">
+<a id="formatToken(org.oa4mp.delegation.common.impl.token.TokenImpl,long,boolean)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -339,7 +339,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <pre class="methodSignature">public&nbsp;boolean&nbsp;hasRefreshToken()</pre>
 </li>
 </ul>
-<a id="fromTXRecord(edu.uiuc.ncsa.security.core.Identifier,edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.tx.TXRecord)">
+<a id="fromTXRecord(edu.uiuc.ncsa.security.core.Identifier,org.oa4mp.server.loader.oauth2.storage.tx.TXRecord)">
 <!--   -->
 </a>
 <ul class="blockList">

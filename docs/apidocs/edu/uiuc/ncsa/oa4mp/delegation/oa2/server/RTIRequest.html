@@ -128,7 +128,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li><a href="../../server/request/IssuerRequest.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.server.request">edu.uiuc.ncsa.oa4mp.delegation.server.request.IssuerRequest</a></li>
 <li>
 <ul class="inheritance">
-<li>edu.uiuc.ncsa.oa4mp.delegation.oa2.server.RTIRequest</li>
+<li>org.oa4mp.delegation.server.server.RTIRequest</li>
 </ul>
 </li>
 </ul>
@@ -194,7 +194,7 @@ extends <a href="../../server/request/IssuerRequest.html" title="class in edu.ui
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="altColor">
-<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(javax.servlet.http.HttpServletRequest,edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction,edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken,boolean)">RTIRequest</a></span>&#8203;(javax.servlet.http.HttpServletRequest&nbsp;servletRequest,
+<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(javax.servlet.http.HttpServletRequest,edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction,org.oa4mp.delegation.common.token.AccessToken,boolean)">RTIRequest</a></span>&#8203;(javax.servlet.http.HttpServletRequest&nbsp;servletRequest,
           <a href="../../server/ServiceTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.server">ServiceTransaction</a>&nbsp;transaction,
           <a href="../../common/token/AccessToken.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.token">AccessToken</a>&nbsp;accessToken,
           boolean&nbsp;isOIDC)</code></th>
@@ -230,14 +230,14 @@ extends <a href="../../server/request/IssuerRequest.html" title="class in edu.ui
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code><a href="../../common/services/Response.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.services">Response</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#process(edu.uiuc.ncsa.oa4mp.delegation.common.services.Server)">process</a></span>&#8203;(<a href="../../common/services/Server.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.services">Server</a>&nbsp;server)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#process(org.oa4mp.delegation.common.services.Server)">process</a></span>&#8203;(<a href="../../common/services/Server.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.services">Server</a>&nbsp;server)</code></th>
 <td class="colLast">
 <div class="block">Process the request</div>
 </td>
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setAccessToken(edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken)">setAccessToken</a></span>&#8203;(<a href="../../common/token/AccessToken.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.token">AccessToken</a>&nbsp;accessToken)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setAccessToken(org.oa4mp.delegation.common.token.AccessToken)">setAccessToken</a></span>&#8203;(<a href="../../common/token/AccessToken.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.token">AccessToken</a>&nbsp;accessToken)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 </table>
@@ -292,7 +292,7 @@ extends <a href="../../server/request/IssuerRequest.html" title="class in edu.ui
                   boolean&nbsp;isOIDC)</pre>
 </li>
 </ul>
-<a id="&lt;init&gt;(javax.servlet.http.HttpServletRequest,edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction,edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken,boolean)">
+<a id="&lt;init&gt;(javax.servlet.http.HttpServletRequest,edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction,org.oa4mp.delegation.common.token.AccessToken,boolean)">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -336,7 +336,7 @@ extends <a href="../../server/request/IssuerRequest.html" title="class in edu.ui
 <pre class="methodSignature">public&nbsp;<a href="../../common/token/AccessToken.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.token">AccessToken</a>&nbsp;getAccessToken()</pre>
 </li>
 </ul>
-<a id="setAccessToken(edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken)">
+<a id="setAccessToken(org.oa4mp.delegation.common.token.AccessToken)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -345,20 +345,20 @@ extends <a href="../../server/request/IssuerRequest.html" title="class in edu.ui
 <pre class="methodSignature">public&nbsp;void&nbsp;setAccessToken&#8203;(<a href="../../common/token/AccessToken.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.token">AccessToken</a>&nbsp;accessToken)</pre>
 </li>
 </ul>
-<a id="process(edu.uiuc.ncsa.oa4mp.delegation.common.services.Server)">
+<a id="process(org.oa4mp.delegation.common.services.Server)">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>process</h4>
 <pre class="methodSignature">public&nbsp;<a href="../../common/services/Response.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.services">Response</a>&nbsp;process&#8203;(<a href="../../common/services/Server.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.services">Server</a>&nbsp;server)</pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../common/services/Request.html#process(edu.uiuc.ncsa.oa4mp.delegation.common.services.Server)">Request</a></code></span></div>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../common/services/Request.html#process(org.oa4mp.delegation.common.services.Server)">Request</a></code></span></div>
 <div class="block">Process the request</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../common/services/Request.html#process(edu.uiuc.ncsa.oa4mp.delegation.common.services.Server)">process</a></code>&nbsp;in interface&nbsp;<code><a href="../../common/services/Request.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.services">Request</a></code></dd>
+<dd><code><a href="../../common/services/Request.html#process(org.oa4mp.delegation.common.services.Server)">process</a></code>&nbsp;in interface&nbsp;<code><a href="../../common/services/Request.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.services">Request</a></code></dd>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code><a href="../../server/request/IssuerRequest.html#process(edu.uiuc.ncsa.oa4mp.delegation.common.services.Server)">process</a></code>&nbsp;in class&nbsp;<code><a href="../../server/request/IssuerRequest.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.server.request">IssuerRequest</a></code></dd>
+<dd><code><a href="../../server/request/IssuerRequest.html#process(org.oa4mp.delegation.common.services.Server)">process</a></code>&nbsp;in class&nbsp;<code><a href="../../server/request/IssuerRequest.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.server.request">IssuerRequest</a></code></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 </dl>
 </li>

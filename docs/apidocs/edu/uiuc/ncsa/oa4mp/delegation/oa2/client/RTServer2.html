@@ -125,13 +125,13 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Object.html?is-external=true" title="class or interface in java.lang" class="externalLink">java.lang.Object</a></li>
 <li>
 <ul class="inheritance">
-<li><a href="ASImpl.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.client">edu.uiuc.ncsa.oa4mp.delegation.oa2.client.ASImpl</a></li>
+<li><a href="ASImpl.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.client">org.oa4mp.delegation.server.client.ASImpl</a></li>
 <li>
 <ul class="inheritance">
-<li><a href="TokenAwareServer.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.client">edu.uiuc.ncsa.oa4mp.delegation.oa2.client.TokenAwareServer</a></li>
+<li><a href="TokenAwareServer.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.client">org.oa4mp.delegation.server.client.TokenAwareServer</a></li>
 <li>
 <ul class="inheritance">
-<li>edu.uiuc.ncsa.oa4mp.delegation.oa2.client.RTServer2</li>
+<li>org.oa4mp.delegation.server.client.RTServer2</li>
 </ul>
 </li>
 </ul>
@@ -198,36 +198,36 @@ implements <a href="../../client/server/RTServer.html" title="interface in edu.u
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code><a href="../../client/request/RTResponse.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client.request">RTResponse</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createResponse(edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl,edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl,edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.IDTokenImpl)">createResponse</a></span>&#8203;(<a href="../../common/token/impl/AccessTokenImpl.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.token.impl">AccessTokenImpl</a>&nbsp;at,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createResponse(org.oa4mp.delegation.common.impl.token.AccessTokenImpl,org.oa4mp.delegation.common.impl.token.RefreshTokenImpl,org.oa4mp.delegation.common.impl.token.IDTokenImpl)">createResponse</a></span>&#8203;(<a href="../../common/token/impl/AccessTokenImpl.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.token.impl">AccessTokenImpl</a>&nbsp;at,
               <a href="../../common/token/impl/RefreshTokenImpl.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.token.impl">RefreshTokenImpl</a>&nbsp;rt,
               <a href="../../common/token/impl/IDTokenImpl.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.token.impl">IDTokenImpl</a>&nbsp;idToken)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>protected <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getRTResponse(java.net.URI,edu.uiuc.ncsa.oa4mp.delegation.client.request.RTRequest)">getRTResponse</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/net/URI.html?is-external=true" title="class or interface in java.net" class="externalLink">URI</a>&nbsp;uri,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getRTResponse(java.net.URI,org.oa4mp.delegation.request.RTRequest)">getRTResponse</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/net/URI.html?is-external=true" title="class or interface in java.net" class="externalLink">URI</a>&nbsp;uri,
              <a href="../../client/request/RTRequest.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client.request">RTRequest</a>&nbsp;rtRequest)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code><a href="../../client/request/RTResponse.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client.request">RTResponse</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#processRTRequest(edu.uiuc.ncsa.oa4mp.delegation.client.request.RTRequest)">processRTRequest</a></span>&#8203;(<a href="../../client/request/RTRequest.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client.request">RTRequest</a>&nbsp;rtRequest)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#processRTRequest(org.oa4mp.delegation.request.RTRequest)">processRTRequest</a></span>&#8203;(<a href="../../client/request/RTRequest.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client.request">RTRequest</a>&nbsp;rtRequest)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 </table>
 <ul class="blockList">
-<li class="blockList"><a id="methods.inherited.from.class.edu.uiuc.ncsa.oa4mp.delegation.oa2.client.TokenAwareServer">
+<li class="blockList"><a id="methods.inherited.from.class.org.oa4mp.delegation.server.client.TokenAwareServer">
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;edu.uiuc.ncsa.oa4mp.delegation.oa2.client.<a href="TokenAwareServer.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.client">TokenAwareServer</a></h3>
-<code><a href="TokenAwareServer.html#getAndCheckIDToken(net.sf.json.JSONObject,edu.uiuc.ncsa.oa4mp.delegation.client.request.BasicRequest)">getAndCheckIDToken</a>, <a href="TokenAwareServer.html#getAndCheckResponse(java.lang.String)">getAndCheckResponse</a>, <a href="TokenAwareServer.html#getJsonWebKeys()">getJsonWebKeys</a>, <a href="TokenAwareServer.html#getServiceClient()">getServiceClient</a>, <a href="TokenAwareServer.html#getTokenEndpoint()">getTokenEndpoint</a>, <a href="TokenAwareServer.html#setTokenEndpoint(java.net.URI)">setTokenEndpoint</a></code></li>
+<code><a href="TokenAwareServer.html#getAndCheckIDToken(net.sf.json.JSONObject,org.oa4mp.delegation.request.BasicRequest)">getAndCheckIDToken</a>, <a href="TokenAwareServer.html#getAndCheckResponse(java.lang.String)">getAndCheckResponse</a>, <a href="TokenAwareServer.html#getJsonWebKeys()">getJsonWebKeys</a>, <a href="TokenAwareServer.html#getServiceClient()">getServiceClient</a>, <a href="TokenAwareServer.html#getTokenEndpoint()">getTokenEndpoint</a>, <a href="TokenAwareServer.html#setTokenEndpoint(java.net.URI)">setTokenEndpoint</a></code></li>
 </ul>
 <ul class="blockList">
-<li class="blockList"><a id="methods.inherited.from.class.edu.uiuc.ncsa.oa4mp.delegation.oa2.client.ASImpl">
+<li class="blockList"><a id="methods.inherited.from.class.org.oa4mp.delegation.server.client.ASImpl">
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;edu.uiuc.ncsa.oa4mp.delegation.oa2.client.<a href="ASImpl.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.client">ASImpl</a></h3>
-<code><a href="ASImpl.html#getAddress()">getAddress</a>, <a href="ASImpl.html#process(edu.uiuc.ncsa.oa4mp.delegation.common.services.Request)">process</a></code></li>
+<code><a href="ASImpl.html#getAddress()">getAddress</a>, <a href="ASImpl.html#process(org.oa4mp.delegation.common.services.Request)">process</a></code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a id="methods.inherited.from.class.java.lang.Object">
@@ -237,11 +237,11 @@ implements <a href="../../client/server/RTServer.html" title="interface in edu.u
 <code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Object.html?is-external=true#clone()" title="class or interface in java.lang" class="externalLink">clone</a>, <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Object.html?is-external=true#equals(java.lang.Object)" title="class or interface in java.lang" class="externalLink">equals</a>, <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Object.html?is-external=true#finalize()" title="class or interface in java.lang" class="externalLink">finalize</a>, <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Object.html?is-external=true#getClass()" title="class or interface in java.lang" class="externalLink">getClass</a>, <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Object.html?is-external=true#hashCode()" title="class or interface in java.lang" class="externalLink">hashCode</a>, <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Object.html?is-external=true#notify()" title="class or interface in java.lang" class="externalLink">notify</a>, <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Object.html?is-external=true#notifyAll()" title="class or interface in java.lang" class="externalLink">notifyAll</a>, <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Object.html?is-external=true#toString()" title="class or interface in java.lang" class="externalLink">toString</a>, <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Object.html?is-external=true#wait()" title="class or interface in java.lang" class="externalLink">wait</a>, <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Object.html?is-external=true#wait(long)" title="class or interface in java.lang" class="externalLink">wait</a>, <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Object.html?is-external=true#wait(long,int)" title="class or interface in java.lang" class="externalLink">wait</a></code></li>
 </ul>
 <ul class="blockList">
-<li class="blockList"><a id="methods.inherited.from.class.edu.uiuc.ncsa.oa4mp.delegation.common.services.DoubleDispatchServer">
+<li class="blockList"><a id="methods.inherited.from.class.org.oa4mp.delegation.common.services.DoubleDispatchServer">
 <!--   -->
 </a>
 <h3>Methods inherited from interface&nbsp;edu.uiuc.ncsa.oa4mp.delegation.common.services.<a href="../../common/services/DoubleDispatchServer.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.services">DoubleDispatchServer</a></h3>
-<code><a href="../../common/services/DoubleDispatchServer.html#process(edu.uiuc.ncsa.oa4mp.delegation.common.services.Request)">process</a></code></li>
+<code><a href="../../common/services/DoubleDispatchServer.html#process(org.oa4mp.delegation.common.services.Request)">process</a></code></li>
 </ul>
 </li>
 </ul>
@@ -281,7 +281,7 @@ implements <a href="../../client/server/RTServer.html" title="interface in edu.u
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a id="processRTRequest(edu.uiuc.ncsa.oa4mp.delegation.client.request.RTRequest)">
+<a id="processRTRequest(org.oa4mp.delegation.request.RTRequest)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -290,11 +290,11 @@ implements <a href="../../client/server/RTServer.html" title="interface in edu.u
 <pre class="methodSignature">public&nbsp;<a href="../../client/request/RTResponse.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client.request">RTResponse</a>&nbsp;processRTRequest&#8203;(<a href="../../client/request/RTRequest.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client.request">RTRequest</a>&nbsp;rtRequest)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../client/server/RTServer.html#processRTRequest(edu.uiuc.ncsa.oa4mp.delegation.client.request.RTRequest)">processRTRequest</a></code>&nbsp;in interface&nbsp;<code><a href="../../client/server/RTServer.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.client.server">RTServer</a></code></dd>
+<dd><code><a href="../../client/server/RTServer.html#processRTRequest(org.oa4mp.delegation.request.RTRequest)">processRTRequest</a></code>&nbsp;in interface&nbsp;<code><a href="../../client/server/RTServer.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.client.server">RTServer</a></code></dd>
 </dl>
 </li>
 </ul>
-<a id="getRTResponse(java.net.URI,edu.uiuc.ncsa.oa4mp.delegation.client.request.RTRequest)">
+<a id="getRTResponse(java.net.URI,org.oa4mp.delegation.request.RTRequest)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -304,7 +304,7 @@ implements <a href="../../client/server/RTServer.html" title="interface in edu.u
                                <a href="../../client/request/RTRequest.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client.request">RTRequest</a>&nbsp;rtRequest)</pre>
 </li>
 </ul>
-<a id="createResponse(edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl,edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl,edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.IDTokenImpl)">
+<a id="createResponse(org.oa4mp.delegation.common.impl.token.AccessTokenImpl,org.oa4mp.delegation.common.impl.token.RefreshTokenImpl,org.oa4mp.delegation.common.impl.token.IDTokenImpl)">
 <!--   -->
 </a>
 <ul class="blockListLast">

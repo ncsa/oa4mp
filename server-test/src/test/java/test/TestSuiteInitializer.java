@@ -1,21 +1,21 @@
 package test;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.AbstractTestSuiteInitializer;
-import edu.uiuc.ncsa.myproxy.oa4mp.TestStoreProviderInterface;
-import edu.uiuc.ncsa.myproxy.oa4mp.TestUtils;
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.OA2ConfigurationLoader;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironment;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.adminClient.AdminClientStoreProviders;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.admin.things.SATFactory;
-import edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AbstractBootstrapper;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.Client;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.ClientConverter;
+import org.oa4mp.server.test.AbstractTestSuiteInitializer;
+import org.oa4mp.server.test.TestStoreProviderInterface;
+import org.oa4mp.server.test.TestUtils;
+import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
+import org.oa4mp.server.api.ServiceEnvironment;
+import org.oa4mp.server.api.admin.adminClient.AdminClientStoreProviders;
+import org.oa4mp.server.api.admin.things.SATFactory;
+import org.oa4mp.server.api.storage.servlet.AbstractBootstrapper;
+import org.oa4mp.delegation.common.storage.clients.Client;
+import org.oa4mp.delegation.common.storage.clients.ClientConverter;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import edu.uiuc.ncsa.security.storage.sql.SQLStore;
 import edu.uiuc.ncsa.security.storage.sql.derby.DerbyConnectionPool;
 
-import static edu.uiuc.ncsa.myproxy.oa4mp.TestUtils.findConfigNode;
+import static org.oa4mp.server.test.TestUtils.findConfigNode;
 
 /**
  * Initializing the test suite has turned into such a large affair that the logic
@@ -121,7 +121,7 @@ public class TestSuiteInitializer extends AbstractTestSuiteInitializer {
             e.printStackTrace();
         }
         // setup QDL unit testing
-        edu.uiuc.ncsa.qdl.TestUtils.set_instance(new QDLTestUtils());
+        org.qdl_lang.TestUtils.set_instance(new QDLTestUtils());
     }
 
 }

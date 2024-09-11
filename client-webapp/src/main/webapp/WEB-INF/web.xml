@@ -12,7 +12,7 @@
     <servlet>
         <servlet-name>startRequest</servlet-name>
         <!--internal name of the servlet-->
-        <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.client.servlet.sample.SimpleStartRequest</servlet-class>
+        <servlet-class>org.oa4mp.client.api.servlet.sample.SimpleStartRequest</servlet-class>
         <load-on-startup>1</load-on-startup>
         <!--load as soon as tomcat starts?-->
     </servlet>
@@ -28,7 +28,7 @@
     <servlet>
         <servlet-name>ready</servlet-name>
         <!--internal name of the servlet-->
-        <servlet-class>edu.uiuc.ncsa.myproxy.oa4mp.client.servlet.sample.SimpleReadyServlet</servlet-class>
+        <servlet-class>org.oa4mp.client.api.servlet.sample.SimpleReadyServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
         <!--load as soon as tomcat starts?-->
     </servlet>
@@ -51,7 +51,7 @@
         <listener-class>edu.uiuc.ncsa.myproxy.oa4mp.client.loader.ClientBootstrapper</listener-class>
     </listener>-->
     <listener>
-        <listener-class>edu.uiuc.ncsa.oa4mp.oauth2.client.OA2ClientBootstrapper</listener-class>
+        <listener-class>org.oa4mp.client.loader.OA2ClientBootstrapper</listener-class>
     </listener>
 
     <!--

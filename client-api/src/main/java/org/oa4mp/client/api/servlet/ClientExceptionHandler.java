@@ -1,0 +1,73 @@
+package org.oa4mp.client.api.servlet;
+
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.servlet.ExceptionHandler;
+import edu.uiuc.ncsa.security.servlet.ExceptionHandlerThingie;
+import edu.uiuc.ncsa.security.servlet.JSPUtil;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+/**
+ * <p>Created by Jeff Gaynor<br>
+ * on 2/9/15 at  12:01 PM
+ */
+public class ClientExceptionHandler implements ExceptionHandler {
+    MyLoggingFacade logger;
+
+    @Override
+    public MyLoggingFacade getLogger() {
+        return logger;
+    }
+
+    protected ClientServlet clientServlet;
+
+    public ClientExceptionHandler(ClientServlet clientServlet, MyLoggingFacade logger) {
+        this.logger = logger;
+        this.clientServlet = clientServlet;
+    }
+    @Override
+    public void handleException(ExceptionHandlerThingie xh) throws IOException, ServletException {
+        Throwable t = xh.throwable;
+        HttpServletRequest request = xh.request;
+        HttpServletResponse response = xh.response;
+        if(DebugUtil.isEnabled()){t.printStackTrace();}
+        if (t.getCause() == null) {
+            clientServlet.warn("2.a. Exception from the server: (no other cause)");
+            request.setAttribute("cause", "(none)");
+            request.setAttribute("stackTrace", "(none)");
+
+        } else {
+            clientServlet.warn("2.a. Exception from the server: " + t.getCause().getMessage());
+            request.setAttribute("cause", t.getCause().getMessage());
+            request.setAttribute("stackTrace", t.getCause());
+
+        }
+        clientServlet.error("Exception while trying to get cert. message:" + t.getMessage());
+        String message = t.getMessage();
+        if((t instanceof NullPointerException)){
+            message = "null pointer";
+         }
+
+        if (t instanceof RuntimeException) {
+            String path = getNormalizedContextPath();
+            request.setAttribute("action", path);
+            request.setAttribute("message", message);
+            JSPUtil.fwd(request, response, clientServlet.getCE().getErrorPagePath());
+            return;
+        }
+        throw new ServletException("Error", t);
+    }
+
+    protected String getNormalizedContextPath() {
+        String path = clientServlet.getServletContext().getContextPath();
+        if(!path.endsWith("/")){
+            // normalize it
+            path = path + "/";
+        }
+        return path;
+    }
+}

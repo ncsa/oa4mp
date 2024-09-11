@@ -91,7 +91,7 @@
                             <archive>
                                 <manifest>
                                     <addClasspath>true</addClasspath>
-                                    <mainClass>edu.uiuc.ncsa.myproxy.oauth2.tools.OA2Commands</mainClass>
+                                    <mainClass>org.oa4mp.server.admin.myproxy.oauth2.tools.OA2Commands</mainClass>
 
                                 </manifest>
                             </archive>
@@ -128,7 +128,7 @@
                             <archive>
                                 <manifest>
                                     <addClasspath>true</addClasspath>
-                                    <mainClass>edu.uiuc.ncsa.myproxy.oauth2.tools.OA2CommandLineClient</mainClass>
+                                    <mainClass>org.oa4mp.server.admin.myproxy.oauth2.tools.OA2CommandLineClient</mainClass>
                                 </manifest>
                             </archive>
                             <descriptorRefs>
@@ -162,7 +162,7 @@
                             <archive>
                                 <manifest>
                                     <addClasspath>true</addClasspath>
-                                    <mainClass>edu.uiuc.ncsa.myproxy.oauth2.tools.JWKCLI</mainClass>
+                                    <mainClass>org.oa4mp.server.admin.myproxy.oauth2.tools.JWKCLI</mainClass>
                                 </manifest>
                             </archive>
                             <descriptorRefs>
@@ -196,7 +196,7 @@
                               <archive>
                                   <manifest>
                                       <addClasspath>true</addClasspath>
-                                      <mainClass>edu.uiuc.ncsa.myproxy.oauth2.tools.migrate.FSMigrationTool</mainClass>
+                                      <mainClass>org.oa4mp.server.admin.myproxy.oauth2.tools.migrate.FSMigrationTool</mainClass>
                                   </manifest>
                               </archive>
                               <descriptorRefs>

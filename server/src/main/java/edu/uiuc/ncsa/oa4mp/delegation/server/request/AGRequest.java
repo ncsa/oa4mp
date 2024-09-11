@@ -2,8 +2,8 @@ package edu.uiuc.ncsa.oa4mp.delegation.server.request;
 
 import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.oa4mp.delegation.server.issuers.AGIssuer;
-import edu.uiuc.ncsa.oa4mp.delegation.common.services.Response;
-import edu.uiuc.ncsa.oa4mp.delegation.common.services.Server;
+import org.oa4mp.delegation.common.services.Response;
+import org.oa4mp.delegation.common.services.Server;
 
 import javax.servlet.http.HttpServletRequest;
 

@@ -2,10 +2,10 @@ package edu.uiuc.ncsa.oa4mp.delegation.server.request;
 
 import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.oa4mp.delegation.server.issuers.CBIssuer;
-import edu.uiuc.ncsa.oa4mp.delegation.common.services.Response;
-import edu.uiuc.ncsa.oa4mp.delegation.common.services.Server;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.Verifier;
+import org.oa4mp.delegation.common.services.Response;
+import org.oa4mp.delegation.common.services.Server;
+import org.oa4mp.delegation.common.token.AuthorizationGrant;
+import org.oa4mp.delegation.common.token.Verifier;
 
 import java.net.URI;
 

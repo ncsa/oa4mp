@@ -125,10 +125,10 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang" class="externalLink">java.lang.Object</a></li>
 <li>
 <ul class="inheritance">
-<li><a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFactoryRequest.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims">edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSourceFactoryRequest</a></li>
+<li><a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFactoryRequest.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims">org.oa4mp.delegation.server.claims.server.ClaimSourceFactoryRequest</a></li>
 <li>
 <ul class="inheritance">
-<li>edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.LDAPClaimSourceFactoryRequest</li>
+<li>org.oa4mp.server.loader.oauth2.claims.LDAPClaimSourceFactoryRequest</li>
 </ul>
 </li>
 </ul>
@@ -162,7 +162,7 @@ extends <a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFacto
 <th class="colLast" scope="col">Description</th>
 </tr>
 <tr class="altColor">
-<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(edu.uiuc.ncsa.security.core.util.MyLoggingFacade,edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfiguration,java.util.Collection)">LDAPClaimSourceFactoryRequest</a></span>&#8203;(edu.uiuc.ncsa.security.core.util.MyLoggingFacade&nbsp;logger,
+<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(edu.uiuc.ncsa.security.core.util.MyLoggingFacade,org.oa4mp.delegation.server.config.server.LDAPConfiguration,java.util.Collection)">LDAPClaimSourceFactoryRequest</a></span>&#8203;(edu.uiuc.ncsa.security.core.util.MyLoggingFacade&nbsp;logger,
                              <a href="../../../../oa4mp/delegation/oa2/server/config/LDAPConfiguration.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config">LDAPConfiguration</a>&nbsp;ldap,
                              <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util" class="externalLink">Collection</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&gt;&nbsp;scopes)</code></th>
 <td class="colLast">&nbsp;</td>
@@ -192,11 +192,11 @@ extends <a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFacto
 </tr>
 </table>
 <ul class="blockList">
-<li class="blockList"><a id="methods.inherited.from.class.edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSourceFactoryRequest">
+<li class="blockList"><a id="methods.inherited.from.class.org.oa4mp.delegation.server.claims.server.ClaimSourceFactoryRequest">
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.<a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFactoryRequest.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims">ClaimSourceFactoryRequest</a></h3>
-<code><a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFactoryRequest.html#getConfiguration()">getConfiguration</a>, <a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFactoryRequest.html#getLogger()">getLogger</a>, <a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFactoryRequest.html#getScopes()">getScopes</a>, <a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFactoryRequest.html#setConfiguration(edu.uiuc.ncsa.oa4mp.delegation.oa2.server.claims.ClaimSourceConfiguration)">setConfiguration</a>, <a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFactoryRequest.html#setLogger(edu.uiuc.ncsa.security.core.util.MyLoggingFacade)">setLogger</a>, <a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFactoryRequest.html#setScopes(java.util.Collection)">setScopes</a>, <a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFactoryRequest.html#toString()">toString</a></code></li>
+<code><a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFactoryRequest.html#getConfiguration()">getConfiguration</a>, <a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFactoryRequest.html#getLogger()">getLogger</a>, <a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFactoryRequest.html#getScopes()">getScopes</a>, <a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFactoryRequest.html#setConfiguration(org.oa4mp.delegation.server.claims.server.ClaimSourceConfiguration)">setConfiguration</a>, <a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFactoryRequest.html#setLogger(edu.uiuc.ncsa.security.core.util.MyLoggingFacade)">setLogger</a>, <a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFactoryRequest.html#setScopes(java.util.Collection)">setScopes</a>, <a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFactoryRequest.html#toString()">toString</a></code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a id="methods.inherited.from.class.java.lang.Object">
@@ -221,7 +221,7 @@ extends <a href="../../../../oa4mp/delegation/oa2/server/claims/ClaimSourceFacto
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a id="&lt;init&gt;(edu.uiuc.ncsa.security.core.util.MyLoggingFacade,edu.uiuc.ncsa.oa4mp.delegation.oa2.server.config.LDAPConfiguration,java.util.Collection)">
+<a id="&lt;init&gt;(edu.uiuc.ncsa.security.core.util.MyLoggingFacade,org.oa4mp.delegation.server.config.server.LDAPConfiguration,java.util.Collection)">
 <!--   -->
 </a>
 <ul class="blockListLast">

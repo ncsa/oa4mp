@@ -1,5 +1,5 @@
 <!--
-    Dummy configuration file used for tests.
+    Dummy configuration file used for ClientConfigTest.
 -->
 <config>
     <client name="sample">

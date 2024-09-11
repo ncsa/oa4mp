@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.oa4mp.delegation.server.issuers;
 
-import edu.uiuc.ncsa.oa4mp.delegation.common.services.DoubleDispatchServer;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.TokenForge;
+import org.oa4mp.delegation.common.services.DoubleDispatchServer;
+import org.oa4mp.delegation.common.token.TokenForge;
 
 import javax.inject.Provider;
 import java.net.URI;

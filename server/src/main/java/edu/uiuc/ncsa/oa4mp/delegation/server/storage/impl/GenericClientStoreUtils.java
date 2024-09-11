@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.oa4mp.delegation.server.storage.impl;
 
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClient;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.ClientApprovalKeys;
+import org.oa4mp.delegation.common.storage.clients.BaseClient;
+import org.oa4mp.delegation.common.storage.clients.ClientApprovalKeys;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.BaseClientStore;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApprovalStore;

@@ -125,7 +125,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang" class="externalLink">java.lang.Object</a></li>
 <li>
 <ul class="inheritance">
-<li>edu.uiuc.ncsa.myproxy.oa4mp.client.AbstractOA4MPService</li>
+<li>org.oa4mp.client.api.AbstractOA4MPService</li>
 </ul>
 </li>
 </ul>
@@ -193,7 +193,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>protected </code></td>
-<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(edu.uiuc.ncsa.myproxy.oa4mp.client.ClientEnvironment)">AbstractOA4MPService</a></span>&#8203;(<a href="ClientEnvironment.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.client">ClientEnvironment</a>&nbsp;environment)</code></th>
+<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(org.oa4mp.client.api.ClientEnvironment)">AbstractOA4MPService</a></span>&#8203;(<a href="ClientEnvironment.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.client">ClientEnvironment</a>&nbsp;environment)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 </table>
@@ -216,7 +216,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>protected <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>,&#8203;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getAssetParameters(edu.uiuc.ncsa.myproxy.oa4mp.client.Asset)">getAssetParameters</a></span>&#8203;(<a href="Asset.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.client">Asset</a>&nbsp;asset)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getAssetParameters(org.oa4mp.client.api.Asset)">getAssetParameters</a></span>&#8203;(<a href="Asset.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.client">Asset</a>&nbsp;asset)</code></th>
 <td class="colLast">
 <div class="block">This creates the parameter map for the certificate request.</div>
 </td>
@@ -233,7 +233,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code>protected <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>,&#8203;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getATParameters(edu.uiuc.ncsa.myproxy.oa4mp.client.Asset,edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant,edu.uiuc.ncsa.oa4mp.delegation.common.token.Verifier)">getATParameters</a></span>&#8203;(<a href="Asset.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.client">Asset</a>&nbsp;asset,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getATParameters(org.oa4mp.client.api.Asset,org.oa4mp.delegation.common.token.AuthorizationGrant,org.oa4mp.delegation.common.token.Verifier)">getATParameters</a></span>&#8203;(<a href="Asset.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.client">Asset</a>&nbsp;asset,
                <a href="../../../oa4mp/delegation/common/token/AuthorizationGrant.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.token">AuthorizationGrant</a>&nbsp;ag,
                <a href="../../../oa4mp/delegation/common/token/Verifier.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.token">Verifier</a>&nbsp;v)</code></th>
 <td class="colLast">
@@ -242,7 +242,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 </tr>
 <tr id="i4" class="altColor">
 <td class="colFirst"><code>protected <a href="AssetResponse.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.client">AssetResponse</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getCert(edu.uiuc.ncsa.myproxy.oa4mp.client.Asset,edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant,edu.uiuc.ncsa.oa4mp.delegation.common.token.Verifier)">getCert</a></span>&#8203;(<a href="Asset.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.client">Asset</a>&nbsp;asset,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getCert(org.oa4mp.client.api.Asset,org.oa4mp.delegation.common.token.AuthorizationGrant,org.oa4mp.delegation.common.token.Verifier)">getCert</a></span>&#8203;(<a href="Asset.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.client">Asset</a>&nbsp;asset,
        <a href="../../../oa4mp/delegation/common/token/AuthorizationGrant.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.token">AuthorizationGrant</a>&nbsp;ag,
        <a href="../../../oa4mp/delegation/common/token/Verifier.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.common.token">Verifier</a>&nbsp;v)</code></th>
 <td class="colLast">
@@ -284,25 +284,25 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 </tr>
 <tr id="i10" class="altColor">
 <td class="colFirst"><code>abstract void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#postGetCert(edu.uiuc.ncsa.myproxy.oa4mp.client.Asset,edu.uiuc.ncsa.myproxy.oa4mp.client.AssetResponse)">postGetCert</a></span>&#8203;(<a href="Asset.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.client">Asset</a>&nbsp;asset,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#postGetCert(org.oa4mp.client.api.Asset,org.oa4mp.client.api.AssetResponse)">postGetCert</a></span>&#8203;(<a href="Asset.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.client">Asset</a>&nbsp;asset,
            <a href="AssetResponse.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.client">AssetResponse</a>&nbsp;assetResponse)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i11" class="rowColor">
 <td class="colFirst"><code>abstract void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#postRequestCert(edu.uiuc.ncsa.myproxy.oa4mp.client.Asset,edu.uiuc.ncsa.myproxy.oa4mp.client.OA4MPResponse)">postRequestCert</a></span>&#8203;(<a href="Asset.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.client">Asset</a>&nbsp;asset,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#postRequestCert(org.oa4mp.client.api.Asset,org.oa4mp.client.api.OA4MPResponse)">postRequestCert</a></span>&#8203;(<a href="Asset.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.client">Asset</a>&nbsp;asset,
                <a href="OA4MPResponse.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.client">OA4MPResponse</a>&nbsp;oa4MPResponse)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i12" class="altColor">
 <td class="colFirst"><code>abstract void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#preGetCert(edu.uiuc.ncsa.myproxy.oa4mp.client.Asset,java.util.Map)">preGetCert</a></span>&#8203;(<a href="Asset.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.client">Asset</a>&nbsp;asset,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#preGetCert(org.oa4mp.client.api.Asset,java.util.Map)">preGetCert</a></span>&#8203;(<a href="Asset.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.client">Asset</a>&nbsp;asset,
           <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&nbsp;parameters)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i13" class="rowColor">
 <td class="colFirst"><code>abstract void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#preRequestCert(edu.uiuc.ncsa.myproxy.oa4mp.client.Asset,java.util.Map)">preRequestCert</a></span>&#8203;(<a href="Asset.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.client">Asset</a>&nbsp;asset,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#preRequestCert(org.oa4mp.client.api.Asset,java.util.Map)">preRequestCert</a></span>&#8203;(<a href="Asset.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.client">Asset</a>&nbsp;asset,
               <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&nbsp;parameters)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -315,7 +315,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 </tr>
 <tr id="i15" class="rowColor">
 <td class="colFirst"><code>protected <a href="OA4MPResponse.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.client">OA4MPResponse</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#requestCert(edu.uiuc.ncsa.myproxy.oa4mp.client.Asset,java.util.Map)">requestCert</a></span>&#8203;(<a href="Asset.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.client">Asset</a>&nbsp;asset,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#requestCert(org.oa4mp.client.api.Asset,java.util.Map)">requestCert</a></span>&#8203;(<a href="Asset.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.client">Asset</a>&nbsp;asset,
            <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&nbsp;additionalParameters)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -343,7 +343,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 </tr>
 <tr id="i19" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setAssetProvider(edu.uiuc.ncsa.myproxy.oa4mp.client.storage.AssetProvider)">setAssetProvider</a></span>&#8203;(<a href="storage/AssetProvider.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.client.storage">AssetProvider</a>&nbsp;assetProvider)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setAssetProvider(org.oa4mp.client.api.storage.AssetProvider)">setAssetProvider</a></span>&#8203;(<a href="storage/AssetProvider.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.client.storage">AssetProvider</a>&nbsp;assetProvider)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 </table>
@@ -379,7 +379,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> SKIN_PARAMETER</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../constant-values.html#edu.uiuc.ncsa.myproxy.oa4mp.client.AbstractOA4MPService.SKIN_PARAMETER">Constant Field Values</a></dd>
+<dd><a href="../../../../../../constant-values.html#org.oa4mp.client.api.AbstractOA4MPService.SKIN_PARAMETER">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -403,7 +403,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a id="&lt;init&gt;(edu.uiuc.ncsa.myproxy.oa4mp.client.ClientEnvironment)">
+<a id="&lt;init&gt;(org.oa4mp.client.api.ClientEnvironment)">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -440,7 +440,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <pre class="methodSignature">public&nbsp;<a href="ClientEnvironment.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.client">ClientEnvironment</a>&nbsp;getEnvironment()</pre>
 </li>
 </ul>
-<a id="preRequestCert(edu.uiuc.ncsa.myproxy.oa4mp.client.Asset,java.util.Map)">
+<a id="preRequestCert(org.oa4mp.client.api.Asset,java.util.Map)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -450,7 +450,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
                                     <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&nbsp;parameters)</pre>
 </li>
 </ul>
-<a id="preGetCert(edu.uiuc.ncsa.myproxy.oa4mp.client.Asset,java.util.Map)">
+<a id="preGetCert(org.oa4mp.client.api.Asset,java.util.Map)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -460,7 +460,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
                                 <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&nbsp;parameters)</pre>
 </li>
 </ul>
-<a id="postRequestCert(edu.uiuc.ncsa.myproxy.oa4mp.client.Asset,edu.uiuc.ncsa.myproxy.oa4mp.client.OA4MPResponse)">
+<a id="postRequestCert(org.oa4mp.client.api.Asset,org.oa4mp.client.api.OA4MPResponse)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -470,7 +470,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
                                      <a href="OA4MPResponse.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.client">OA4MPResponse</a>&nbsp;oa4MPResponse)</pre>
 </li>
 </ul>
-<a id="postGetCert(edu.uiuc.ncsa.myproxy.oa4mp.client.Asset,edu.uiuc.ncsa.myproxy.oa4mp.client.AssetResponse)">
+<a id="postGetCert(org.oa4mp.client.api.Asset,org.oa4mp.client.api.AssetResponse)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -519,7 +519,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <pre class="methodSignature">public&nbsp;<a href="storage/AssetProvider.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.client.storage">AssetProvider</a>&nbsp;getAssetProvider()</pre>
 </li>
 </ul>
-<a id="setAssetProvider(edu.uiuc.ncsa.myproxy.oa4mp.client.storage.AssetProvider)">
+<a id="setAssetProvider(org.oa4mp.client.api.storage.AssetProvider)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -579,7 +579,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <pre class="methodSignature">protected&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/security/KeyPair.html?is-external=true" title="class or interface in java.security" class="externalLink">KeyPair</a>&nbsp;getNextKeyPair()</pre>
 </li>
 </ul>
-<a id="requestCert(edu.uiuc.ncsa.myproxy.oa4mp.client.Asset,java.util.Map)">
+<a id="requestCert(org.oa4mp.client.api.Asset,java.util.Map)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -628,7 +628,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 </dl>
 </li>
 </ul>
-<a id="getATParameters(edu.uiuc.ncsa.myproxy.oa4mp.client.Asset,edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant,edu.uiuc.ncsa.oa4mp.delegation.common.token.Verifier)">
+<a id="getATParameters(org.oa4mp.client.api.Asset,org.oa4mp.delegation.common.token.AuthorizationGrant,org.oa4mp.delegation.common.token.Verifier)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -648,7 +648,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 </dl>
 </li>
 </ul>
-<a id="getAssetParameters(edu.uiuc.ncsa.myproxy.oa4mp.client.Asset)">
+<a id="getAssetParameters(org.oa4mp.client.api.Asset)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -664,7 +664,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 </dl>
 </li>
 </ul>
-<a id="getCert(edu.uiuc.ncsa.myproxy.oa4mp.client.Asset,edu.uiuc.ncsa.oa4mp.delegation.common.token.AuthorizationGrant,edu.uiuc.ncsa.oa4mp.delegation.common.token.Verifier)">
+<a id="getCert(org.oa4mp.client.api.Asset,org.oa4mp.delegation.common.token.AuthorizationGrant,org.oa4mp.delegation.common.token.Verifier)">
 <!--   -->
 </a>
 <ul class="blockListLast">

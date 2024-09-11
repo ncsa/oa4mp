@@ -128,10 +128,10 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li>edu.uiuc.ncsa.security.core.util.AbstractEnvironment</li>
 <li>
 <ul class="inheritance">
-<li><a href="../../../oa4mp/delegation/client/AbstractClientEnvironment.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client">edu.uiuc.ncsa.oa4mp.delegation.client.AbstractClientEnvironment</a></li>
+<li><a href="../../../oa4mp/delegation/client/AbstractClientEnvironment.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client">org.oa4mp.delegation.AbstractClientEnvironment</a></li>
 <li>
 <ul class="inheritance">
-<li>edu.uiuc.ncsa.myproxy.oa4mp.client.ClientEnvironment</li>
+<li>org.oa4mp.client.api.ClientEnvironment</li>
 </ul>
 </li>
 </ul>
@@ -264,7 +264,7 @@ extends <a href="../../../oa4mp/delegation/client/AbstractClientEnvironment.html
 </tr>
 </table>
 <ul class="blockList">
-<li class="blockList"><a id="fields.inherited.from.class.edu.uiuc.ncsa.oa4mp.delegation.client.AbstractClientEnvironment">
+<li class="blockList"><a id="fields.inherited.from.class.org.oa4mp.delegation.AbstractClientEnvironment">
 <!--   -->
 </a>
 <h3>Fields inherited from class&nbsp;edu.uiuc.ncsa.oa4mp.delegation.client.<a href="../../../oa4mp/delegation/client/AbstractClientEnvironment.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client">AbstractClientEnvironment</a></h3>
@@ -294,7 +294,7 @@ extends <a href="../../../oa4mp/delegation/client/AbstractClientEnvironment.html
 <th class="colLast" scope="col">Description</th>
 </tr>
 <tr class="altColor">
-<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(edu.uiuc.ncsa.security.core.util.MyLoggingFacade,java.util.Map,java.net.URI,java.net.URI,java.net.URI,java.net.URI,java.net.URI,long,java.lang.String,java.security.PrivateKey,java.security.PublicKey,java.lang.String,boolean,long,long,edu.uiuc.ncsa.myproxy.oa4mp.client.storage.AssetProvider,javax.inject.Provider,javax.inject.Provider,javax.inject.Provider,javax.inject.Provider,boolean,java.lang.String,java.lang.String,java.lang.String)">ClientEnvironment</a></span>&#8203;(edu.uiuc.ncsa.security.core.util.MyLoggingFacade&nbsp;logger,
+<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(edu.uiuc.ncsa.security.core.util.MyLoggingFacade,java.util.Map,java.net.URI,java.net.URI,java.net.URI,java.net.URI,java.net.URI,long,java.lang.String,java.security.PrivateKey,java.security.PublicKey,java.lang.String,boolean,long,long,org.oa4mp.client.api.storage.AssetProvider,javax.inject.Provider,javax.inject.Provider,javax.inject.Provider,javax.inject.Provider,boolean,java.lang.String,java.lang.String,java.lang.String)">ClientEnvironment</a></span>&#8203;(edu.uiuc.ncsa.security.core.util.MyLoggingFacade&nbsp;logger,
                  <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>,&#8203;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&gt;&nbsp;constants,
                  <a href="http://docs.oracle.com/javase/7/docs/api/java/net/URI.html?is-external=true" title="class or interface in java.net" class="externalLink">URI</a>&nbsp;accessTokenUri,
                  <a href="http://docs.oracle.com/javase/7/docs/api/java/net/URI.html?is-external=true" title="class or interface in java.net" class="externalLink">URI</a>&nbsp;authorizationUri,
@@ -323,7 +323,7 @@ extends <a href="../../../oa4mp/delegation/client/AbstractClientEnvironment.html
 </td>
 </tr>
 <tr class="rowColor">
-<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(java.net.URI,java.net.URI,java.net.URI,long,java.lang.String,edu.uiuc.ncsa.oa4mp.delegation.client.DelegationService,java.net.URI,java.security.PrivateKey,java.security.PublicKey,java.net.URI,edu.uiuc.ncsa.oa4mp.delegation.common.token.TokenForge,edu.uiuc.ncsa.myproxy.oa4mp.client.storage.AssetStore,boolean,java.lang.String,java.lang.String,java.lang.String)">ClientEnvironment</a></span>&#8203;(<a href="http://docs.oracle.com/javase/7/docs/api/java/net/URI.html?is-external=true" title="class or interface in java.net" class="externalLink">URI</a>&nbsp;accessTokenUri,
+<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(java.net.URI,java.net.URI,java.net.URI,long,java.lang.String,org.oa4mp.delegation.DelegationService,java.net.URI,java.security.PrivateKey,java.security.PublicKey,java.net.URI,org.oa4mp.delegation.common.token.TokenForge,org.oa4mp.client.api.storage.AssetStore,boolean,java.lang.String,java.lang.String,java.lang.String)">ClientEnvironment</a></span>&#8203;(<a href="http://docs.oracle.com/javase/7/docs/api/java/net/URI.html?is-external=true" title="class or interface in java.net" class="externalLink">URI</a>&nbsp;accessTokenUri,
                  <a href="http://docs.oracle.com/javase/7/docs/api/java/net/URI.html?is-external=true" title="class or interface in java.net" class="externalLink">URI</a>&nbsp;authorizationUri,
                  <a href="http://docs.oracle.com/javase/7/docs/api/java/net/URI.html?is-external=true" title="class or interface in java.net" class="externalLink">URI</a>&nbsp;callback,
                  long&nbsp;certLifetime,
@@ -520,7 +520,7 @@ extends <a href="../../../oa4mp/delegation/client/AbstractClientEnvironment.html
 </tr>
 <tr id="i24" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setAssetProvider(edu.uiuc.ncsa.myproxy.oa4mp.client.storage.AssetProvider)">setAssetProvider</a></span>&#8203;(<a href="storage/AssetProvider.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.client.storage">AssetProvider</a>&nbsp;assetProvider)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setAssetProvider(org.oa4mp.client.api.storage.AssetProvider)">setAssetProvider</a></span>&#8203;(<a href="storage/AssetProvider.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.client.storage">AssetProvider</a>&nbsp;assetProvider)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i25" class="rowColor">
@@ -588,7 +588,7 @@ extends <a href="../../../oa4mp/delegation/client/AbstractClientEnvironment.html
 <pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> CALLBACK_URI_KEY</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../constant-values.html#edu.uiuc.ncsa.myproxy.oa4mp.client.ClientEnvironment.CALLBACK_URI_KEY">Constant Field Values</a></dd>
+<dd><a href="../../../../../../constant-values.html#org.oa4mp.client.api.ClientEnvironment.CALLBACK_URI_KEY">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -601,7 +601,7 @@ extends <a href="../../../oa4mp/delegation/client/AbstractClientEnvironment.html
 <pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> TOKEN</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../constant-values.html#edu.uiuc.ncsa.myproxy.oa4mp.client.ClientEnvironment.TOKEN">Constant Field Values</a></dd>
+<dd><a href="../../../../../../constant-values.html#org.oa4mp.client.api.ClientEnvironment.TOKEN">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -614,7 +614,7 @@ extends <a href="../../../oa4mp/delegation/client/AbstractClientEnvironment.html
 <pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> FORM_ENCODING</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../constant-values.html#edu.uiuc.ncsa.myproxy.oa4mp.client.ClientEnvironment.FORM_ENCODING">Constant Field Values</a></dd>
+<dd><a href="../../../../../../constant-values.html#org.oa4mp.client.api.ClientEnvironment.FORM_ENCODING">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -627,7 +627,7 @@ extends <a href="../../../oa4mp/delegation/client/AbstractClientEnvironment.html
 <pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> VERIFIER</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../constant-values.html#edu.uiuc.ncsa.myproxy.oa4mp.client.ClientEnvironment.VERIFIER">Constant Field Values</a></dd>
+<dd><a href="../../../../../../constant-values.html#org.oa4mp.client.api.ClientEnvironment.VERIFIER">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -758,7 +758,7 @@ extends <a href="../../../oa4mp/delegation/client/AbstractClientEnvironment.html
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a id="&lt;init&gt;(java.net.URI,java.net.URI,java.net.URI,long,java.lang.String,edu.uiuc.ncsa.oa4mp.delegation.client.DelegationService,java.net.URI,java.security.PrivateKey,java.security.PublicKey,java.net.URI,edu.uiuc.ncsa.oa4mp.delegation.common.token.TokenForge,edu.uiuc.ncsa.myproxy.oa4mp.client.storage.AssetStore,boolean,java.lang.String,java.lang.String,java.lang.String)">
+<a id="&lt;init&gt;(java.net.URI,java.net.URI,java.net.URI,long,java.lang.String,org.oa4mp.delegation.DelegationService,java.net.URI,java.security.PrivateKey,java.security.PublicKey,java.net.URI,org.oa4mp.delegation.common.token.TokenForge,org.oa4mp.client.api.storage.AssetStore,boolean,java.lang.String,java.lang.String,java.lang.String)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -798,7 +798,7 @@ extends <a href="../../../oa4mp/delegation/client/AbstractClientEnvironment.html
 </dl>
 </li>
 </ul>
-<a id="&lt;init&gt;(edu.uiuc.ncsa.security.core.util.MyLoggingFacade,java.util.Map,java.net.URI,java.net.URI,java.net.URI,java.net.URI,java.net.URI,long,java.lang.String,java.security.PrivateKey,java.security.PublicKey,java.lang.String,boolean,long,long,edu.uiuc.ncsa.myproxy.oa4mp.client.storage.AssetProvider,javax.inject.Provider,javax.inject.Provider,javax.inject.Provider,javax.inject.Provider,boolean,java.lang.String,java.lang.String,java.lang.String)">
+<a id="&lt;init&gt;(edu.uiuc.ncsa.security.core.util.MyLoggingFacade,java.util.Map,java.net.URI,java.net.URI,java.net.URI,java.net.URI,java.net.URI,long,java.lang.String,java.security.PrivateKey,java.security.PublicKey,java.lang.String,boolean,long,long,org.oa4mp.client.api.storage.AssetProvider,javax.inject.Provider,javax.inject.Provider,javax.inject.Provider,javax.inject.Provider,boolean,java.lang.String,java.lang.String,java.lang.String)">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -898,7 +898,7 @@ extends <a href="../../../oa4mp/delegation/client/AbstractClientEnvironment.html
 <pre class="methodSignature">public&nbsp;<a href="storage/AssetProvider.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.client.storage">AssetProvider</a>&nbsp;getAssetProvider()</pre>
 </li>
 </ul>
-<a id="setAssetProvider(edu.uiuc.ncsa.myproxy.oa4mp.client.storage.AssetProvider)">
+<a id="setAssetProvider(org.oa4mp.client.api.storage.AssetProvider)">
 <!--   -->
 </a>
 <ul class="blockList">

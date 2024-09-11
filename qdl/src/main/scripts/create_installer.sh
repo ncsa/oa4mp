@@ -22,8 +22,8 @@ cp "$OA4MP_QDL_ROOT/target/oa4mp-qdl-jar-with-dependencies.jar" $OA4MP_QDL_DEPLO
 unzip -p "$OA4MP_QDL_ROOT/target/oa4mp-qdl-jar-with-dependencies.jar" META-INF/MANIFEST.MF > $OA4MP_QDL_DEPLOY/lib/build-info.txt
 
 cd $OA4MP_QDL_DEPLOY || exit
-java  edu.uiuc.ncsa.qdl.install.ListDistroFiles $OA4MP_QDL_DEPLOY
+java  org.qdl_lang.install.ListDistroFiles $OA4MP_QDL_DEPLOY
 # Get the actual manifest so that build info is available.
-jar cmf installer.mf "$JAR_NAME" edu/uiuc/ncsa/qdl/install/Installer.class file_list.txt dir_list.txt version.txt  bin docs etc lib log var examples
+jar cmf installer.mf "$JAR_NAME" org/qdl_lang/install/Installer.class file_list.txt dir_list.txt version.txt  bin docs etc lib log var examples
 echo "done creating OA4MP QDL installer!"
 

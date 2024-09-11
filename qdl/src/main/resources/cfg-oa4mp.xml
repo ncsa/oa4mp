@@ -32,20 +32,20 @@
                 logSize="100000"
                 logFileCount="2"
                 debug="false"/>
-        <modules  lib_loader="edu.uiuc.ncsa.oa2.qdl.OA2LibLoader2"
+        <modules  lib_loader="org.oa4mp.server.qdl.OA2LibLoader2"
                   version="2.0">
               <module type="java"
                       import_on_start="true">
-                  <class_name>edu.uiuc.ncsa.myproxy.oa4mp.qdl.OA2QDLLoader</class_name>
+                  <class_name>org.oa4mp.server.loader.qdl.OA2QDLLoader</class_name>
               </module>
               <module type="java"
                       import_on_start="true">
-                  <class_name>edu.uiuc.ncsa.oa2.qdl.QDLToolsLoader</class_name>
+                  <class_name>org.oa4mp.server.qdl.QDLToolsLoader</class_name>
               </module>
             <!-- See $QDL_HOME/docs/qdl_oa4mp_store_access.pdf -->
               <module type="java"
                       import_on_start="false">
-                  <class_name>edu.uiuc.ncsa.oa2.qdl.storage.StoreAccessLoader</class_name>
+                  <class_name>org.oa4mp.server.qdl.storage.StoreAccessLoader</class_name>
               </module>
         </modules>
 
@@ -67,19 +67,19 @@
                    logSize="100000"
                    logFileCount="2"
                    debug="false"/>
-        <modules  lib_loader="edu.uiuc.ncsa.oa2.qdl.OA2LibLoader2"
+        <modules  lib_loader="org.oa4mp.server.qdl.OA2LibLoader2"
                   version="2.0">
               <module type="java"
                       import_on_start="true">
-                  <class_name>edu.uiuc.ncsa.myproxy.oa4mp.qdl.OA2QDLLoader</class_name>
+                  <class_name>org.oa4mp.server.loader.qdl.OA2QDLLoader</class_name>
               </module>
               <module type="java"
                       import_on_start="true">
-                  <class_name>edu.uiuc.ncsa.oa2.qdl.QDLToolsLoader</class_name>
+                  <class_name>org.oa4mp.server.qdl.QDLToolsLoader</class_name>
               </module>
               <module type="java"
                       import_on_start="false">
-                  <class_name>edu.uiuc.ncsa.oa2.qdl.storage.StoreAccessLoader</class_name>
+                  <class_name>org.oa4mp.server.qdl.storage.StoreAccessLoader</class_name>
               </module>
         </modules>
     </qdl>

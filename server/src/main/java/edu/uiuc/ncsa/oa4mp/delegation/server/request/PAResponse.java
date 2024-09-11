@@ -1,8 +1,8 @@
 package edu.uiuc.ncsa.oa4mp.delegation.server.request;
 
 
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.AccessToken;
-import edu.uiuc.ncsa.oa4mp.delegation.common.token.ProtectedAsset;
+import org.oa4mp.delegation.common.token.AccessToken;
+import org.oa4mp.delegation.common.token.ProtectedAsset;
 
 import java.util.Map;
 

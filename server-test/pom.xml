@@ -14,13 +14,13 @@
     <name>OAuth 2/Open ID Connect tests</name>
     <packaging>jar</packaging>
     <dependencies>
-        <dependency>
+ <!--       <dependency>
             <groupId>edu.uiuc.ncsa.myproxy</groupId>
             <artifactId>oa4mp-webapp</artifactId>
             <version>5.3-SNAPSHOT</version>
             <type>war</type>
             <scope>runtime</scope>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>jstl</groupId>
             <artifactId>jstl</artifactId>
@@ -106,11 +106,6 @@
             <scope>provided</scope>
         </dependency>
 
-<!--        <dependency>
-            <groupId>edu.uiuc.ncsa.security.delegation</groupId>
-            <artifactId>ncsa-security-oauth-1.0a</artifactId>
-            <version>5.3-SNAPSHOT</version>
-        </dependency>-->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
@@ -122,35 +117,14 @@
             <artifactId>server-loader</artifactId>
             <version>5.3-SNAPSHOT</version>
         </dependency>
-<!--
         <dependency>
-            <groupId>edu.uiuc.ncsa.security</groupId>
-            <artifactId>ncsa-qdl</artifactId>
-            <version>1.5-QDL-SNAPSHOT</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
--->
-        <dependency>
-            <groupId>edu.uiuc.ncsa.qdl</groupId>
+            <groupId>org.qdl_lang</groupId>
             <artifactId>tests</artifactId>
             <version>1.5-QDL-SNAPSHOT</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
 
-<!--        <dependency>
-            <groupId>edu.uiuc.ncsa.security</groupId>
-            <artifactId>ncsa-qdl</artifactId>
-            <version>1.5-QDL-SNAPSHOT</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>edu.uiuc.ncsa.security</groupId>
-            <artifactId>ncsa-qdl</artifactId>
-            <version>1.5-QDL-SNAPSHOT</version>
-            <scope>test</scope>
-        </dependency>-->
     </dependencies>
 
     <build>

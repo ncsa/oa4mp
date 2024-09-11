@@ -222,7 +222,7 @@ deploy the correct servlet in your web.xml file, to wit
 <pre>
 &lt;servlet&gt;
        &lt;servlet-name&gt;authorized&lt;/servlet-name&gt;
-       &lt;servlet-class&gt;edu.uiuc.ncsa.myproxy.oa4mp.server.servlet.AuthorizedServlet&lt;/servlet-class&gt;
+       &lt;servlet-class&gt;org.oa4mp.server.api.servlet.storage.AuthorizedServlet&lt;/servlet-class&gt;
        &lt;load-on-startup&gt;0&lt;/load-on-startup&gt;
    &lt;/servlet&gt;
    &lt;servlet-mapping&gt;
@@ -296,7 +296,7 @@ If there is an error, then the first line will not have a status of &quot;ok&quo
 <pre>
   &lt;servlet&gt;
       &lt;servlet-name&gt;authorized&lt;/servlet-name&gt;
-      &lt;servlet-class&gt;edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2AuthorizedServlet&lt;/servlet-class&gt;
+      &lt;servlet-class&gt;org.oa4mp.server.loader.oauth2.servlet.OA2AuthorizedServlet&lt;/servlet-class&gt;
   &lt;/servlet&gt;
   &lt;servlet-mapping&gt;
       &lt;servlet-name&gt;authorized&lt;/servlet-name&gt;

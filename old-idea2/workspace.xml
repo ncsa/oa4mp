@@ -142,7 +142,7 @@
       <Port>5050</Port>
     </configuration>
     <configuration name="AuthorizationTemplates" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.myproxy.oa4mp.oauth2.tokens.AuthorizationTemplates" />
+      <option name="MAIN_CLASS_NAME" value="org.oa4mp.server.loader.oauth2.tokens.AuthorizationTemplates" />
       <module name="oa4mp-server-loader-oauth2" />
       <extension name="coverage">
         <pattern>
@@ -155,7 +155,7 @@
     <configuration name="CLC" type="Application" factoryName="Application">
       <option name="ALTERNATIVE_JRE_PATH" value="11.0.8" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
-      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.myproxy.oauth2.tools.OA2CommandLineClient" />
+      <option name="MAIN_CLASS_NAME" value="org.oa4mp.server.admin.tools.oauth2.myproxy.OA2CommandLineClient" />
       <module name="oa4mp-server-admin-oauth2" />
       <option name="PROGRAM_PARAMETERS" value="-cfg $PROJECT_DIR$/../../csd/config/client-oa2.xml -name localhost:command.line2" />
       <method v="2" />
@@ -163,13 +163,13 @@
     <configuration name="CLI" type="Application" factoryName="Application">
       <option name="ALTERNATIVE_JRE_PATH" value="11.0.8" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
-      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.myproxy.oauth2.tools.OA2Commands" />
+      <option name="MAIN_CLASS_NAME" value="org.oa4mp.server.admin.tools.oauth2.myproxy.OA2Commands" />
       <module name="oa4mp-server-admin-oauth2" />
       <option name="PROGRAM_PARAMETERS" value="-cfg $PROJECT_DIR$/../../csd/config/server-oa2.xml -name localhost:oa4mp.oa2.mariadb" />
       <method v="2" />
     </configuration>
     <configuration name="ExtendedParameters" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.myproxy.oa4mp.oauth2.state.ExtendedParameters" />
+      <option name="MAIN_CLASS_NAME" value="org.oa4mp.server.loader.oauth2.state.ExtendedParameters" />
       <module name="oa4mp-server-loader-oauth2" />
       <extension name="coverage">
         <pattern>
@@ -180,7 +180,7 @@
       <method v="2" />
     </configuration>
     <configuration name="LDAPClaimsSource" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims.LDAPClaimsSource" />
+      <option name="MAIN_CLASS_NAME" value="org.oa4mp.server.loader.oauth2.claims.LDAPClaimsSource" />
       <module name="oa4mp-server-loader-oauth2" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <extension name="coverage">
@@ -194,7 +194,7 @@
       </method>
     </configuration>
     <configuration name="OA2ServletUtils" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.myproxy.oa4mp.oauth2.servlet.OA2ServletUtils" />
+      <option name="MAIN_CLASS_NAME" value="org.oa4mp.server.loader.oauth2.servlet.OA2ServletUtils" />
       <module name="oa4mp-server-loader-oauth2" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <extension name="coverage">

@@ -1,8 +1,8 @@
 package edu.uiuc.ncsa.oa4mp.delegation.server.storage;
 
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClient;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.BaseClientKeys;
-import edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients.ClientApprovalKeys;
+import org.oa4mp.delegation.common.storage.clients.BaseClient;
+import org.oa4mp.delegation.common.storage.clients.BaseClientKeys;
+import org.oa4mp.delegation.common.storage.clients.ClientApprovalKeys;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.DateThingy;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.RuleFilter;
 import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.UUCConfiguration;

@@ -128,7 +128,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li>edu.uiuc.ncsa.security.util.cli.CLITool</li>
 <li>
 <ul class="inheritance">
-<li>edu.uiuc.ncsa.myproxy.oauth2.base.CopyTool</li>
+<li>org.oa4mp.server.admin.base.oauth2.myproxy.CopyTool</li>
 </ul>
 </li>
 </ul>
@@ -241,8 +241,8 @@ extends edu.uiuc.ncsa.security.util.cli.CLITool</pre>
 </td>
 </tr>
 <tr class="rowColor">
-<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl,edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl)">CopyTool</a></span>&#8203;(edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl&nbsp;srcEnv,
-        edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl&nbsp;targetEnv)</code></th>
+<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(org.oa4mp.server.api.ServiceEnvironmentImpl,org.oa4mp.server.api.ServiceEnvironmentImpl)">CopyTool</a></span>&#8203;(org.oa4mp.server.api.ServiceEnvironmentImpl&nbsp;srcEnv,
+        org.oa4mp.server.api.ServiceEnvironmentImpl&nbsp;targetEnv)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 </table>
@@ -287,7 +287,7 @@ extends edu.uiuc.ncsa.security.util.cli.CLITool</pre>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i4" class="altColor">
-<td class="colFirst"><code>protected edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl</code></td>
+<td class="colFirst"><code>protected org.oa4mp.server.api.ServiceEnvironmentImpl</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getEnv(java.lang.String,java.lang.String)">getEnv</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;cfgFileOption,
       <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;cfgNameOption)</code></th>
 <td class="colLast">&nbsp;</td>
@@ -303,12 +303,12 @@ extends edu.uiuc.ncsa.security.util.cli.CLITool</pre>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i7" class="rowColor">
-<td class="colFirst"><code>edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl</code></td>
+<td class="colFirst"><code>org.oa4mp.server.api.ServiceEnvironmentImpl</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getSourceEnv()">getSourceEnv</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i8" class="altColor">
-<td class="colFirst"><code>edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl</code></td>
+<td class="colFirst"><code>org.oa4mp.server.api.ServiceEnvironmentImpl</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getTargetEnv()">getTargetEnv</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -324,7 +324,7 @@ extends edu.uiuc.ncsa.security.util.cli.CLITool</pre>
 </tr>
 <tr id="i11" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setCopyExtension(edu.uiuc.ncsa.myproxy.oauth2.base.CopyExtension)">setCopyExtension</a></span>&#8203;(<a href="CopyExtension.html" title="class in edu.uiuc.ncsa.myproxy.oauth2.base">CopyExtension</a>&nbsp;copyExtension)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setCopyExtension(org.oa4mp.server.admin.base.oauth2.myproxy.CopyExtension)">setCopyExtension</a></span>&#8203;(<a href="CopyExtension.html" title="class in edu.uiuc.ncsa.myproxy.oauth2.base">CopyExtension</a>&nbsp;copyExtension)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i12" class="altColor">
@@ -378,7 +378,7 @@ extends edu.uiuc.ncsa.security.util.cli.CLITool</pre>
 <pre>public static final&nbsp;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> SOURCE_CONFIG_NAME_OPTION</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../constant-values.html#edu.uiuc.ncsa.myproxy.oauth2.base.CopyTool.SOURCE_CONFIG_NAME_OPTION">Constant Field Values</a></dd>
+<dd><a href="../../../../../../constant-values.html#org.oa4mp.server.admin.base.oauth2.myproxy.CopyTool.SOURCE_CONFIG_NAME_OPTION">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -391,7 +391,7 @@ extends edu.uiuc.ncsa.security.util.cli.CLITool</pre>
 <pre>public static final&nbsp;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> SOURCE_CONFIG_NAME_LONG_OPTION</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../constant-values.html#edu.uiuc.ncsa.myproxy.oauth2.base.CopyTool.SOURCE_CONFIG_NAME_LONG_OPTION">Constant Field Values</a></dd>
+<dd><a href="../../../../../../constant-values.html#org.oa4mp.server.admin.base.oauth2.myproxy.CopyTool.SOURCE_CONFIG_NAME_LONG_OPTION">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -404,7 +404,7 @@ extends edu.uiuc.ncsa.security.util.cli.CLITool</pre>
 <pre>public static final&nbsp;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> SOURCE_CONFIG_FILE_OPTION</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../constant-values.html#edu.uiuc.ncsa.myproxy.oauth2.base.CopyTool.SOURCE_CONFIG_FILE_OPTION">Constant Field Values</a></dd>
+<dd><a href="../../../../../../constant-values.html#org.oa4mp.server.admin.base.oauth2.myproxy.CopyTool.SOURCE_CONFIG_FILE_OPTION">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -417,7 +417,7 @@ extends edu.uiuc.ncsa.security.util.cli.CLITool</pre>
 <pre>public static final&nbsp;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> SOURCE_CONFIG_FILE_LONG_OPTION</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../constant-values.html#edu.uiuc.ncsa.myproxy.oauth2.base.CopyTool.SOURCE_CONFIG_FILE_LONG_OPTION">Constant Field Values</a></dd>
+<dd><a href="../../../../../../constant-values.html#org.oa4mp.server.admin.base.oauth2.myproxy.CopyTool.SOURCE_CONFIG_FILE_LONG_OPTION">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -430,7 +430,7 @@ extends edu.uiuc.ncsa.security.util.cli.CLITool</pre>
 <pre>public static final&nbsp;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> TARGET_CONFIG_FILE_OPTION</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../constant-values.html#edu.uiuc.ncsa.myproxy.oauth2.base.CopyTool.TARGET_CONFIG_FILE_OPTION">Constant Field Values</a></dd>
+<dd><a href="../../../../../../constant-values.html#org.oa4mp.server.admin.base.oauth2.myproxy.CopyTool.TARGET_CONFIG_FILE_OPTION">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -443,7 +443,7 @@ extends edu.uiuc.ncsa.security.util.cli.CLITool</pre>
 <pre>public static final&nbsp;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> TARGET_CONFIG_FILE_LONG_OPTION</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../constant-values.html#edu.uiuc.ncsa.myproxy.oauth2.base.CopyTool.TARGET_CONFIG_FILE_LONG_OPTION">Constant Field Values</a></dd>
+<dd><a href="../../../../../../constant-values.html#org.oa4mp.server.admin.base.oauth2.myproxy.CopyTool.TARGET_CONFIG_FILE_LONG_OPTION">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -456,7 +456,7 @@ extends edu.uiuc.ncsa.security.util.cli.CLITool</pre>
 <pre>public static final&nbsp;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> TARGET_CONFIG_NAME_OPTION</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../constant-values.html#edu.uiuc.ncsa.myproxy.oauth2.base.CopyTool.TARGET_CONFIG_NAME_OPTION">Constant Field Values</a></dd>
+<dd><a href="../../../../../../constant-values.html#org.oa4mp.server.admin.base.oauth2.myproxy.CopyTool.TARGET_CONFIG_NAME_OPTION">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -469,7 +469,7 @@ extends edu.uiuc.ncsa.security.util.cli.CLITool</pre>
 <pre>public static final&nbsp;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a> TARGET_CONFIG_NAME_LONG_OPTION</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../constant-values.html#edu.uiuc.ncsa.myproxy.oauth2.base.CopyTool.TARGET_CONFIG_NAME_LONG_OPTION">Constant Field Values</a></dd>
+<dd><a href="../../../../../../constant-values.html#org.oa4mp.server.admin.base.oauth2.myproxy.CopyTool.TARGET_CONFIG_NAME_LONG_OPTION">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -483,14 +483,14 @@ extends edu.uiuc.ncsa.security.util.cli.CLITool</pre>
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a id="&lt;init&gt;(edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl,edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl)">
+<a id="&lt;init&gt;(org.oa4mp.server.api.ServiceEnvironmentImpl,org.oa4mp.server.api.ServiceEnvironmentImpl)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>CopyTool</h4>
-<pre>public&nbsp;CopyTool&#8203;(edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl&nbsp;srcEnv,
-                edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl&nbsp;targetEnv)</pre>
+<pre>public&nbsp;CopyTool&#8203;(org.oa4mp.server.api.ServiceEnvironmentImpl&nbsp;srcEnv,
+                org.oa4mp.server.api.ServiceEnvironmentImpl&nbsp;targetEnv)</pre>
 </li>
 </ul>
 <a id="&lt;init&gt;()">
@@ -538,7 +538,7 @@ extends edu.uiuc.ncsa.security.util.cli.CLITool</pre>
 <pre class="methodSignature">public&nbsp;<a href="CopyExtension.html" title="class in edu.uiuc.ncsa.myproxy.oauth2.base">CopyExtension</a>&nbsp;getCopyExtension()</pre>
 </li>
 </ul>
-<a id="setCopyExtension(edu.uiuc.ncsa.myproxy.oauth2.base.CopyExtension)">
+<a id="setCopyExtension(org.oa4mp.server.admin.base.oauth2.myproxy.CopyExtension)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -553,7 +553,7 @@ extends edu.uiuc.ncsa.security.util.cli.CLITool</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>getSourceEnv</h4>
-<pre class="methodSignature">public&nbsp;edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl&nbsp;getSourceEnv()</pre>
+<pre class="methodSignature">public&nbsp;org.oa4mp.server.api.ServiceEnvironmentImpl&nbsp;getSourceEnv()</pre>
 </li>
 </ul>
 <a id="getTargetEnv()">
@@ -562,7 +562,7 @@ extends edu.uiuc.ncsa.security.util.cli.CLITool</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>getTargetEnv</h4>
-<pre class="methodSignature">public&nbsp;edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl&nbsp;getTargetEnv()</pre>
+<pre class="methodSignature">public&nbsp;org.oa4mp.server.api.ServiceEnvironmentImpl&nbsp;getTargetEnv()</pre>
 </li>
 </ul>
 <a id="getEnv(java.lang.String,java.lang.String)">
@@ -571,7 +571,7 @@ extends edu.uiuc.ncsa.security.util.cli.CLITool</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>getEnv</h4>
-<pre class="methodSignature">protected&nbsp;edu.uiuc.ncsa.myproxy.oa4mp.server.ServiceEnvironmentImpl&nbsp;getEnv&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;cfgFileOption,
+<pre class="methodSignature">protected&nbsp;org.oa4mp.server.api.ServiceEnvironmentImpl&nbsp;getEnv&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;cfgFileOption,
                                                                            <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;cfgNameOption)</pre>
 </li>
 </ul>

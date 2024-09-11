@@ -43,7 +43,7 @@ OA4MP is hosted in the Sonatype repository, so specifying the dependency should 
 <h2>The Basic Client API</h2>
 
 <p>The major class that you will need is an instance of
-    <code>edu.uiuc.ncsa.myproxy.oa4mp.client.OA4MPService.java</code>
+    <code>org.oa4mp.client.api.OA4MPService.java</code>
     This has precisely two basic calls:</p>
 <pre>
 public OA4MPResponse requestCert();
@@ -82,7 +82,7 @@ AssetResponse assetResponse = service.getCert(accessToken, verifier);
 <h2>"<span style="color: #ff6600;">OAuth 2</span> extensions</h2>
 For OAuth 2 support, there are two more API calls possible to support the specification. This
 being Java you need to instantiate the class
-<a href="../../apidocs/edu/uiuc/ncsa/oa4mp/oauth2/client/OA2MPService.html">edu.uiuc.ncsa.oa4mp.oauth2.client.OA2MPService</a>
+<a href="../../apidocs/edu/uiuc/ncsa/oa4mp/oauth2/client/OA2MPService.html">org.oa4mp.client.loader.OA2MPService</a>
 which extends the above OA4MPService class above. There are two <i>additional</i> calls
 <ul>
     <li>refresh(String identifier)</li>

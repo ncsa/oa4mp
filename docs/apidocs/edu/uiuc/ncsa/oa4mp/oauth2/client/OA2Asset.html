@@ -128,10 +128,10 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li>edu.uiuc.ncsa.security.core.util.IdentifiableImpl</li>
 <li>
 <ul class="inheritance">
-<li><a href="../../../myproxy/oa4mp/client/Asset.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.client">edu.uiuc.ncsa.myproxy.oa4mp.client.Asset</a></li>
+<li><a href="../../../myproxy/oa4mp/client/Asset.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.client">org.oa4mp.client.api.Asset</a></li>
 <li>
 <ul class="inheritance">
-<li>edu.uiuc.ncsa.oa4mp.oauth2.client.OA2Asset</li>
+<li>org.oa4mp.client.loader.OA2Asset</li>
 </ul>
 </li>
 </ul>
@@ -153,7 +153,7 @@ extends <a href="../../../myproxy/oa4mp/client/Asset.html" title="class in edu.u
  on 3/28/14 at  12:04 PM</div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../../serialized-form.html#edu.uiuc.ncsa.oa4mp.oauth2.client.OA2Asset">Serialized Form</a></dd>
+<dd><a href="../../../../../../serialized-form.html#org.oa4mp.client.loader.OA2Asset">Serialized Form</a></dd>
 </dl>
 </li>
 </ul>
@@ -207,7 +207,7 @@ extends <a href="../../../myproxy/oa4mp/client/Asset.html" title="class in edu.u
 </tr>
 </table>
 <ul class="blockList">
-<li class="blockList"><a id="fields.inherited.from.class.edu.uiuc.ncsa.myproxy.oa4mp.client.Asset">
+<li class="blockList"><a id="fields.inherited.from.class.org.oa4mp.client.api.Asset">
 <!--   -->
 </a>
 <h3>Fields inherited from class&nbsp;edu.uiuc.ncsa.myproxy.oa4mp.client.<a href="../../../myproxy/oa4mp/client/Asset.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.client">Asset</a></h3>
@@ -293,7 +293,7 @@ extends <a href="../../../myproxy/oa4mp/client/Asset.html" title="class in edu.u
 </tr>
 <tr id="i8" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setAccessToken(edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl)">setAccessToken</a></span>&#8203;(<a href="../../delegation/common/token/impl/AccessTokenImpl.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.token.impl">AccessTokenImpl</a>&nbsp;accessToken)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setAccessToken(org.oa4mp.delegation.common.impl.token.AccessTokenImpl)">setAccessToken</a></span>&#8203;(<a href="../../delegation/common/token/impl/AccessTokenImpl.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.token.impl">AccessTokenImpl</a>&nbsp;accessToken)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i9" class="rowColor">
@@ -313,7 +313,7 @@ extends <a href="../../../myproxy/oa4mp/client/Asset.html" title="class in edu.u
 </tr>
 <tr id="i12" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setRefreshToken(edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl)">setRefreshToken</a></span>&#8203;(<a href="../../delegation/common/token/impl/RefreshTokenImpl.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.token.impl">RefreshTokenImpl</a>&nbsp;refreshToken)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setRefreshToken(org.oa4mp.delegation.common.impl.token.RefreshTokenImpl)">setRefreshToken</a></span>&#8203;(<a href="../../delegation/common/token/impl/RefreshTokenImpl.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.token.impl">RefreshTokenImpl</a>&nbsp;refreshToken)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i13" class="rowColor">
@@ -328,7 +328,7 @@ extends <a href="../../../myproxy/oa4mp/client/Asset.html" title="class in edu.u
 </tr>
 </table>
 <ul class="blockList">
-<li class="blockList"><a id="methods.inherited.from.class.edu.uiuc.ncsa.myproxy.oa4mp.client.Asset">
+<li class="blockList"><a id="methods.inherited.from.class.org.oa4mp.client.api.Asset">
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;edu.uiuc.ncsa.myproxy.oa4mp.client.<a href="../../../myproxy/oa4mp/client/Asset.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.client">Asset</a></h3>
@@ -519,7 +519,7 @@ extends <a href="../../../myproxy/oa4mp/client/Asset.html" title="class in edu.u
 <pre class="methodSignature">public&nbsp;<a href="../../delegation/common/token/impl/AccessTokenImpl.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.token.impl">AccessTokenImpl</a>&nbsp;getAccessToken()</pre>
 </li>
 </ul>
-<a id="setAccessToken(edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.AccessTokenImpl)">
+<a id="setAccessToken(org.oa4mp.delegation.common.impl.token.AccessTokenImpl)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -537,7 +537,7 @@ extends <a href="../../../myproxy/oa4mp/client/Asset.html" title="class in edu.u
 <pre class="methodSignature">public&nbsp;<a href="../../delegation/common/token/impl/RefreshTokenImpl.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.token.impl">RefreshTokenImpl</a>&nbsp;getRefreshToken()</pre>
 </li>
 </ul>
-<a id="setRefreshToken(edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.RefreshTokenImpl)">
+<a id="setRefreshToken(org.oa4mp.delegation.common.impl.token.RefreshTokenImpl)">
 <!--   -->
 </a>
 <ul class="blockList">
