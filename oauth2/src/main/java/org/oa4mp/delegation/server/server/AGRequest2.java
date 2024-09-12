@@ -1,6 +1,6 @@
 package org.oa4mp.delegation.server.server;
 
-import edu.uiuc.ncsa.oa4mp.delegation.server.request.AGRequest;
+import org.oa4mp.delegation.server.request.AGRequest;
 
 import javax.servlet.http.HttpServletRequest;
 

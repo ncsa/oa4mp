@@ -6,7 +6,7 @@ import org.oa4mp.server.loader.oauth2.storage.tx.TXRecord;
 import org.oa4mp.delegation.common.token.impl.TokenImpl;
 import org.oa4mp.delegation.server.OA2Errors;
 import org.oa4mp.delegation.server.OA2GeneralError;
-import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
+import org.oa4mp.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import org.apache.http.HttpStatus;
 

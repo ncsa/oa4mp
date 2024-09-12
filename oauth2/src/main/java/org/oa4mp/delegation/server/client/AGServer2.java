@@ -1,15 +1,15 @@
 package org.oa4mp.delegation.server.client;
 
-import org.oa4mp.delegation.request.AGRequest;
-import org.oa4mp.delegation.request.AGResponse;
-import org.oa4mp.delegation.server.AGServer;
+import edu.uiuc.ncsa.security.servlet.ServiceClient;
+import net.sf.json.JSONObject;
+import org.apache.commons.codec.binary.Hex;
+import org.oa4mp.delegation.client.request.AGRequest;
+import org.oa4mp.delegation.client.request.AGResponse;
+import org.oa4mp.delegation.client.server.AGServer;
 import org.oa4mp.delegation.common.token.impl.AuthorizationGrantImpl;
 import org.oa4mp.delegation.server.NonceHerder;
 import org.oa4mp.delegation.server.OA2Constants;
 import org.oa4mp.delegation.server.OA2Scopes;
-import edu.uiuc.ncsa.security.servlet.ServiceClient;
-import net.sf.json.JSONObject;
-import org.apache.commons.codec.binary.Hex;
 
 import java.net.URI;
 import java.security.SecureRandom;

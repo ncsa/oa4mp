@@ -1,11 +1,11 @@
 package org.oa4mp.server.api.storage.servlet;
 
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
-import edu.uiuc.ncsa.oa4mp.delegation.server.issuers.AGIssuer;
-import edu.uiuc.ncsa.oa4mp.delegation.server.issuers.ATIssuer;
-import edu.uiuc.ncsa.oa4mp.delegation.server.issuers.PAIssuer;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApprovalStore;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
+import org.oa4mp.delegation.server.issuers.AGIssuer;
+import org.oa4mp.delegation.server.issuers.ATIssuer;
+import org.oa4mp.delegation.server.issuers.PAIssuer;
+import org.oa4mp.delegation.server.storage.ClientApprovalStore;
+import org.oa4mp.delegation.server.storage.ClientStore;
 import org.oa4mp.delegation.common.storage.clients.Client;
 import org.oa4mp.delegation.common.storage.TransactionStore;
 import org.oa4mp.delegation.common.token.TokenForge;

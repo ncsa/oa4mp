@@ -1,6 +1,6 @@
 package org.oa4mp.delegation.server.server;
 
-import edu.uiuc.ncsa.oa4mp.delegation.server.request.ATResponse;
+import org.oa4mp.delegation.server.request.ATResponse;
 import org.oa4mp.delegation.common.token.Verifier;
 import org.oa4mp.delegation.common.token.impl.AccessTokenImpl;
 import org.oa4mp.delegation.common.token.impl.RefreshTokenImpl;

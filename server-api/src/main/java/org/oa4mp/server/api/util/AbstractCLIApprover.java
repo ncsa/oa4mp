@@ -3,7 +3,7 @@ package org.oa4mp.server.api.util;
 import org.oa4mp.server.api.ServiceEnvironment;
 import org.oa4mp.server.api.ServiceEnvironmentImpl;
 import org.oa4mp.delegation.common.storage.clients.Client;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
+import org.oa4mp.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;

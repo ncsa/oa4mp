@@ -1,6 +1,6 @@
 package org.oa4mp.delegation.server.server;
 
-import edu.uiuc.ncsa.oa4mp.delegation.server.request.IssuerResponse;
+import org.oa4mp.delegation.server.request.IssuerResponse;
 import org.oa4mp.delegation.common.token.AccessToken;
 import org.oa4mp.delegation.server.UserInfo;
 import net.sf.json.JSONObject;

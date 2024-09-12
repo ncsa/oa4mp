@@ -2,7 +2,7 @@ package org.oa4mp.server.api.storage.servlet;
 
 import org.oa4mp.server.api.util.NewClientEvent;
 import edu.uiuc.ncsa.security.core.Identifier;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
+import org.oa4mp.delegation.server.storage.ClientApproval;
 import org.oa4mp.delegation.common.storage.clients.Client;
 
 import javax.servlet.http.HttpServletRequest;

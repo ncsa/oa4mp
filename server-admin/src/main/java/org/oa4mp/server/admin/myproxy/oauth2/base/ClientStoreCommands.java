@@ -2,7 +2,7 @@ package org.oa4mp.server.admin.myproxy.oauth2.base;
 
 import org.oa4mp.delegation.common.storage.clients.Client;
 import org.oa4mp.delegation.common.storage.clients.ClientKeys;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
+import org.oa4mp.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;

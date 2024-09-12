@@ -3,9 +3,9 @@ package org.oa4mp.server.admin.myproxy.oauth2.base;
 import org.oa4mp.delegation.common.storage.clients.BaseClient;
 import org.oa4mp.delegation.common.storage.clients.BaseClientKeys;
 import org.oa4mp.delegation.common.storage.clients.ClientApprovalKeys;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.BaseClientStore;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApprovalStore;
+import org.oa4mp.delegation.server.storage.BaseClientStore;
+import org.oa4mp.delegation.server.storage.ClientApproval;
+import org.oa4mp.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval.Status.*;
+import static org.oa4mp.delegation.server.storage.ClientApproval.Status.*;
 import static edu.uiuc.ncsa.security.util.cli.CLIDriver.CLEAR_BUFFER_COMMAND;
 import static edu.uiuc.ncsa.security.util.cli.CLIDriver.EXIT_COMMAND;
 

@@ -2,9 +2,9 @@ package org.oa4mp.server.test;
 
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApprovalStore;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
+import org.oa4mp.delegation.server.storage.ClientApproval;
+import org.oa4mp.delegation.server.storage.ClientApprovalStore;
+import org.oa4mp.delegation.server.storage.ClientStore;
 import org.oa4mp.delegation.common.storage.clients.Client;
 import org.junit.Test;
 

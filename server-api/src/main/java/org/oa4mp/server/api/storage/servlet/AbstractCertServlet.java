@@ -1,9 +1,9 @@
 package org.oa4mp.server.api.storage.servlet;
 
-import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
-import edu.uiuc.ncsa.oa4mp.delegation.server.issuers.PAIssuer;
-import edu.uiuc.ncsa.oa4mp.delegation.server.request.PARequest;
-import edu.uiuc.ncsa.oa4mp.delegation.server.request.PAResponse;
+import org.oa4mp.delegation.server.ServiceTransaction;
+import org.oa4mp.delegation.server.issuers.PAIssuer;
+import org.oa4mp.delegation.server.request.PARequest;
+import org.oa4mp.delegation.server.request.PAResponse;
 import org.oa4mp.delegation.common.servlet.TransactionState;
 import org.oa4mp.delegation.common.token.AccessToken;
 import edu.uiuc.ncsa.security.storage.GenericStoreUtils;

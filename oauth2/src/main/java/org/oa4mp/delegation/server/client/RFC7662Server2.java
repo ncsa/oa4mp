@@ -1,14 +1,14 @@
 package org.oa4mp.delegation.server.client;
 
-import org.oa4mp.delegation.request.RFC7662Request;
-import org.oa4mp.delegation.request.RFC7662Response;
-import org.oa4mp.delegation.server.RFC7662Server;
-import org.oa4mp.delegation.common.storage.clients.Client;
-import org.oa4mp.delegation.server.server.RFC7662Constants;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
+import org.oa4mp.delegation.client.request.RFC7662Request;
+import org.oa4mp.delegation.client.request.RFC7662Response;
+import org.oa4mp.delegation.client.server.RFC7662Server;
+import org.oa4mp.delegation.common.storage.clients.Client;
+import org.oa4mp.delegation.server.server.RFC7662Constants;
 
 import java.net.URI;
 import java.util.HashMap;

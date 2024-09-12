@@ -1,6 +1,6 @@
 package org.oa4mp.server.api.admin.transactions;
 
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.support.ServiceTransactionKeys;
+import org.oa4mp.delegation.server.storage.support.ServiceTransactionKeys;
 
 import java.util.List;
 

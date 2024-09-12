@@ -4,11 +4,11 @@
 
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>edu.uiuc.ncsa.myproxy</groupId>
-        <artifactId>oa4mp</artifactId>
-        <version>5.3-SNAPSHOT</version>
+        <groupId>org.oa4mp</groupId>
+        <artifactId>oa4mp-parent</artifactId>
+        <version>5.6-SNAPSHOT</version>
     </parent>
-
+<!-- UNUSEED -->
     <artifactId>oa4mp-webapp</artifactId>
     <name>OA4MP web application</name>
     <packaging>war</packaging>

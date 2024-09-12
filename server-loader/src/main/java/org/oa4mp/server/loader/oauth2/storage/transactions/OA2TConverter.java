@@ -11,7 +11,7 @@ import org.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
 import org.oa4mp.delegation.common.token.impl.TokenFactory;
 import org.oa4mp.delegation.server.OA2TokenForge;
 import org.oa4mp.delegation.server.server.claims.OA2Claims;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
+import org.oa4mp.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;

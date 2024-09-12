@@ -10,7 +10,7 @@ import org.oa4mp.delegation.server.OA2ATException;
 import org.oa4mp.delegation.server.OA2Errors;
 import org.oa4mp.delegation.server.OA2GeneralError;
 import org.oa4mp.delegation.server.server.RFC7523Constants;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.upkeep.UpkeepThread;
+import org.oa4mp.delegation.server.storage.upkeep.UpkeepThread;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;

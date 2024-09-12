@@ -3,7 +3,7 @@ package org.oa4mp.server.api.admin.transactions;
 import org.oa4mp.server.api.OA4MPServiceTransaction;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.IdentifierProvider;
-import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransactionProvider;
+import org.oa4mp.delegation.server.ServiceTransactionProvider;
 
 /**
  * <p>Created by Jeff Gaynor<br>

@@ -1,7 +1,7 @@
 package org.oa4mp.delegation.server.client;
 
-import org.oa4mp.delegation.request.RFC7523Request;
-import org.oa4mp.delegation.request.RFC7523Response;
+import org.oa4mp.delegation.client.request.RFC7523Request;
+import org.oa4mp.delegation.client.request.RFC7523Response;
 import org.oa4mp.delegation.server.server.RFC7523Constants;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
 import net.sf.json.JSONObject;

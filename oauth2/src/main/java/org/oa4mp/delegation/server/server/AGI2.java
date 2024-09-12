@@ -1,9 +1,9 @@
 package org.oa4mp.delegation.server.server;
 
-import edu.uiuc.ncsa.oa4mp.delegation.server.issuers.AGIssuer;
-import edu.uiuc.ncsa.oa4mp.delegation.server.issuers.AbstractIssuer;
-import edu.uiuc.ncsa.oa4mp.delegation.server.request.AGRequest;
-import edu.uiuc.ncsa.oa4mp.delegation.server.request.IssuerResponse;
+import org.oa4mp.delegation.server.issuers.AGIssuer;
+import org.oa4mp.delegation.server.issuers.AbstractIssuer;
+import org.oa4mp.delegation.server.request.AGRequest;
+import org.oa4mp.delegation.server.request.IssuerResponse;
 import org.oa4mp.delegation.common.token.TokenForge;
 import org.oa4mp.delegation.common.token.impl.AuthorizationGrantImpl;
 import org.oa4mp.delegation.server.OA2TokenForge;

@@ -2,8 +2,8 @@ package org.oa4mp.client.api;
 
 import org.oa4mp.client.api.storage.AssetProvider;
 import org.oa4mp.client.api.storage.AssetStore;
-import org.oa4mp.delegation.AbstractClientEnvironment;
-import org.oa4mp.delegation.DelegationService;
+import org.oa4mp.delegation.client.AbstractClientEnvironment;
+import org.oa4mp.delegation.client.DelegationService;
 import org.oa4mp.delegation.common.storage.clients.Client;
 import org.oa4mp.delegation.common.token.TokenForge;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;

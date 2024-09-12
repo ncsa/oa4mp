@@ -1,6 +1,6 @@
 package org.oa4mp.delegation.server.client;
 
-import org.oa4mp.delegation.request.RTResponse;
+import org.oa4mp.delegation.client.request.RTResponse;
 import org.oa4mp.delegation.common.token.impl.AccessTokenImpl;
 import org.oa4mp.delegation.common.token.impl.IDTokenImpl;
 import org.oa4mp.delegation.common.token.impl.RefreshTokenImpl;

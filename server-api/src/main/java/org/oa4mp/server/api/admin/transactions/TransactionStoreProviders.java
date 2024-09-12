@@ -1,6 +1,6 @@
 package org.oa4mp.server.api.admin.transactions;
 
-import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
+import org.oa4mp.delegation.server.ServiceTransaction;
 
 /**
  * <p>Created by Jeff Gaynor<br>

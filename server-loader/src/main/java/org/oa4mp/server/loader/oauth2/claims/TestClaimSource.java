@@ -1,6 +1,6 @@
 package org.oa4mp.server.loader.oauth2.claims;
 
-import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
+import org.oa4mp.delegation.server.ServiceTransaction;
 import org.oa4mp.delegation.server.server.UnsupportedScopeException;
 import net.sf.json.JSONObject;
 

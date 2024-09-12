@@ -272,7 +272,7 @@ implements <a href="../../myproxy/oa4mp/oauth2/servlet/RFC8628Constants2.html" t
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>protected void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#checkParameters(org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction,org.oa4mp.server.loader.oauth2.storage.clients.OA2Client,edu.uiuc.ncsa.oa4mp.delegation.server.request.AGResponse,javax.servlet.http.HttpServletRequest)">checkParameters</a></span>&#8203;(<a href="../../myproxy/oa4mp/oauth2/storage/transactions/OA2ServiceTransaction.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions">OA2ServiceTransaction</a>&nbsp;t,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#checkParameters(org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction,org.oa4mp.server.loader.oauth2.storage.clients.OA2Client,org.oa4mp.delegation.server.request.AGResponse,javax.servlet.http.HttpServletRequest)">checkParameters</a></span>&#8203;(<a href="../../myproxy/oa4mp/oauth2/storage/transactions/OA2ServiceTransaction.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.transactions">OA2ServiceTransaction</a>&nbsp;t,
                <a href="../../myproxy/oa4mp/oauth2/storage/clients/OA2Client.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.oauth2.storage.clients">OA2Client</a>&nbsp;client,
                <a href="../../oa4mp/delegation/server/request/AGResponse.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.server.request">AGResponse</a>&nbsp;agResponse,
                javax.servlet.http.HttpServletRequest&nbsp;req)</code></th>
@@ -310,7 +310,7 @@ implements <a href="../../myproxy/oa4mp/oauth2/servlet/RFC8628Constants2.html" t
 </tr>
 <tr id="i6" class="altColor">
 <td class="colFirst"><code><a href="../../oa4mp/delegation/server/ServiceTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.server">ServiceTransaction</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#verifyAndGet(edu.uiuc.ncsa.oa4mp.delegation.server.request.IssuerResponse)">verifyAndGet</a></span>&#8203;(<a href="../../oa4mp/delegation/server/request/IssuerResponse.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.server.request">IssuerResponse</a>&nbsp;iResponse)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#verifyAndGet(org.oa4mp.delegation.server.request.IssuerResponse)">verifyAndGet</a></span>&#8203;(<a href="../../oa4mp/delegation/server/request/IssuerResponse.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.server.request">IssuerResponse</a>&nbsp;iResponse)</code></th>
 <td class="colLast">
 <div class="block">This is called after the response is received so that the system can get the approproate
  transaction.</div>
@@ -420,7 +420,7 @@ implements <a href="../../myproxy/oa4mp/oauth2/servlet/RFC8628Constants2.html" t
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a id="verifyAndGet(edu.uiuc.ncsa.oa4mp.delegation.server.request.IssuerResponse)">
+<a id="verifyAndGet(org.oa4mp.delegation.server.request.IssuerResponse)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -428,12 +428,12 @@ implements <a href="../../myproxy/oa4mp/oauth2/servlet/RFC8628Constants2.html" t
 <h4>verifyAndGet</h4>
 <pre class="methodSignature">public&nbsp;<a href="../../oa4mp/delegation/server/ServiceTransaction.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.server">ServiceTransaction</a>&nbsp;verifyAndGet&#8203;(<a href="../../oa4mp/delegation/server/request/IssuerResponse.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.server.request">IssuerResponse</a>&nbsp;iResponse)
                                 throws <a href="http://docs.oracle.com/javase/7/docs/api/java/io/IOException.html?is-external=true" title="class or interface in java.io" class="externalLink">IOException</a></pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../myproxy/oa4mp/server/servlet/MyProxyDelegationServlet.html#verifyAndGet(edu.uiuc.ncsa.oa4mp.delegation.server.request.IssuerResponse)">MyProxyDelegationServlet</a></code></span></div>
+<div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../myproxy/oa4mp/server/servlet/MyProxyDelegationServlet.html#verifyAndGet(org.oa4mp.delegation.server.request.IssuerResponse)">MyProxyDelegationServlet</a></code></span></div>
 <div class="block">This is called after the response is received so that the system can get the approproate
  transaction. Checks for the validity of the transaction should be done here too.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../myproxy/oa4mp/server/servlet/MyProxyDelegationServlet.html#verifyAndGet(edu.uiuc.ncsa.oa4mp.delegation.server.request.IssuerResponse)">verifyAndGet</a></code>&nbsp;in class&nbsp;<code><a href="../../myproxy/oa4mp/server/servlet/MyProxyDelegationServlet.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.servlet">MyProxyDelegationServlet</a></code></dd>
+<dd><code><a href="../../myproxy/oa4mp/server/servlet/MyProxyDelegationServlet.html#verifyAndGet(org.oa4mp.delegation.server.request.IssuerResponse)">verifyAndGet</a></code>&nbsp;in class&nbsp;<code><a href="../../myproxy/oa4mp/server/servlet/MyProxyDelegationServlet.html" title="class in edu.uiuc.ncsa.myproxy.oa4mp.server.servlet">MyProxyDelegationServlet</a></code></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="http://docs.oracle.com/javase/7/docs/api/java/io/IOException.html?is-external=true" title="class or interface in java.io" class="externalLink">IOException</a></code></dd>
@@ -470,7 +470,7 @@ implements <a href="../../myproxy/oa4mp/oauth2/servlet/RFC8628Constants2.html" t
 </dl>
 </li>
 </ul>
-<a id="checkParameters(org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction,org.oa4mp.server.loader.oauth2.storage.clients.OA2Client,edu.uiuc.ncsa.oa4mp.delegation.server.request.AGResponse,javax.servlet.http.HttpServletRequest)">
+<a id="checkParameters(org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction,org.oa4mp.server.loader.oauth2.storage.clients.OA2Client,org.oa4mp.delegation.server.request.AGResponse,javax.servlet.http.HttpServletRequest)">
 <!--   -->
 </a>
 <ul class="blockList">

@@ -13,7 +13,7 @@ import org.oa4mp.delegation.server.server.claims.ClaimSource;
 import org.oa4mp.delegation.server.server.claims.ClaimSourceConfiguration;
 import org.oa4mp.delegation.server.server.claims.OA2Claims;
 import org.oa4mp.delegation.server.server.config.JSONClaimSourceConfig;
-import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
+import org.oa4mp.delegation.server.ServiceTransaction;
 import org.qdl_lang.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.util.functor.parser.FunctorScript;

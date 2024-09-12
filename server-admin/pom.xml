@@ -5,36 +5,36 @@
 
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>edu.uiuc.ncsa.myproxy</groupId>
-        <artifactId>oa4mp</artifactId>
-        <version>5.3-SNAPSHOT</version>
+        <groupId>org.oa4mp</groupId>
+        <artifactId>oa4mp-parent</artifactId>
+        <version>5.6-SNAPSHOT</version>
     </parent>
 
     <artifactId>server-admin</artifactId>
-    <name>OAuth 2.0 for MyProxy administrative tools</name>
+    <name>OA4MP administrative tools</name>
     <packaging>jar</packaging>
     <dependencies>
         <!-- Need this for the monitor -->
         <dependency>
-            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <groupId>org.oa4mp</groupId>
             <artifactId>client-loader</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.6-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>util</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.6-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <groupId>org.oa4mp</groupId>
             <artifactId>server-loader</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.6-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <groupId>org.oa4mp</groupId>
             <artifactId>oauth2</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.6-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.sun.xml.bind</groupId>

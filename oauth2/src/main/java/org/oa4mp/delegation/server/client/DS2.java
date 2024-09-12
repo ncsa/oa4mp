@@ -1,12 +1,12 @@
 package org.oa4mp.delegation.server.client;
 
-import org.oa4mp.delegation.DelegationService;
-import org.oa4mp.delegation.common.token.AccessToken;
-import org.oa4mp.delegation.server.OA2Constants;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
+import org.oa4mp.delegation.client.DelegationService;
+import org.oa4mp.delegation.client.request.*;
+import org.oa4mp.delegation.client.server.*;
+import org.oa4mp.delegation.common.token.AccessToken;
 import org.oa4mp.delegation.common.token.RefreshToken;
-import org.oa4mp.delegation.request.*;
-import org.oa4mp.delegation.server.*;
+import org.oa4mp.delegation.server.OA2Constants;
 
 import java.net.URI;
 import java.util.Map;

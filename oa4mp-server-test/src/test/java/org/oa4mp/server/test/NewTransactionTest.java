@@ -8,7 +8,7 @@ import org.oa4mp.delegation.common.token.AuthorizationGrant;
 import org.oa4mp.delegation.common.token.TokenForge;
 import org.oa4mp.delegation.common.token.Verifier;
 import org.oa4mp.delegation.server.OA2TokenForge;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
+import org.oa4mp.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.util.TestBase;
 

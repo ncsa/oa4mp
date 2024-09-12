@@ -1,7 +1,7 @@
 package org.oa4mp.server.loader.oauth2.storage.tx;
 
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
+import org.oa4mp.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.StringUtils;

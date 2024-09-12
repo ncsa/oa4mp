@@ -5,9 +5,9 @@
 
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>edu.uiuc.ncsa.myproxy</groupId>
-        <artifactId>oa4mp</artifactId>
-        <version>5.3-SNAPSHOT</version>
+        <groupId>org.oa4mp</groupId>
+        <artifactId>oa4mp-parent</artifactId>
+        <version>5.6-SNAPSHOT</version>
     </parent>
 
     <artifactId>server-api</artifactId>
@@ -26,9 +26,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <groupId>org.oa4mp</groupId>
             <artifactId>server</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.6-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>net.sf.opencsv</groupId>
@@ -38,14 +38,14 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>util</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.6-SNAPSHOT</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>servlet</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.6-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>net.sf.json-lib</groupId>
@@ -55,9 +55,9 @@
         </dependency>
 
         <dependency>
-            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <groupId>org.oa4mp</groupId>
             <artifactId>myproxy-logon</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.6-SNAPSHOT</version>
         </dependency>
 
         <dependency>
@@ -73,9 +73,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <groupId>org.oa4mp</groupId>
             <artifactId>client-loader</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.6-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

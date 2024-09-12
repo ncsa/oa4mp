@@ -125,7 +125,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Object.html?is-external=true" title="class or interface in java.lang" class="externalLink">java.lang.Object</a></li>
 <li>
 <ul class="inheritance">
-<li><a href="../../client/DelegationService.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client">org.oa4mp.delegation.DelegationService</a></li>
+<li><a href="../../client/DelegationService.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client">org.oa4mp.delegation.client.DelegationService</a></li>
 <li>
 <ul class="inheritance">
 <li>org.oa4mp.delegation.server.client.DS2</li>
@@ -200,7 +200,7 @@ extends <a href="../../client/DelegationService.html" title="class in edu.uiuc.n
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/net/URI.html?is-external=true" title="class or interface in java.net" class="externalLink">URI</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createRedirectURL(org.oa4mp.delegation.request.DelegationRequest,org.oa4mp.delegation.request.AGResponse)">createRedirectURL</a></span>&#8203;(<a href="../../client/request/DelegationRequest.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client.request">DelegationRequest</a>&nbsp;delegationAssetRequest,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#createRedirectURL(org.oa4mp.delegation.client.request.DelegationRequest,org.oa4mp.delegation.client.request.AGResponse)">createRedirectURL</a></span>&#8203;(<a href="../../client/request/DelegationRequest.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client.request">DelegationRequest</a>&nbsp;delegationAssetRequest,
                  <a href="../../client/request/AGResponse.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client.request">AGResponse</a>&nbsp;agResp)</code></th>
 <td class="colLast">
 <div class="block">Creates redirect URL</div>
@@ -235,36 +235,36 @@ extends <a href="../../client/DelegationService.html" title="class in edu.uiuc.n
 </tr>
 <tr id="i6" class="altColor">
 <td class="colFirst"><code><a href="../../client/request/UIResponse.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client.request">UIResponse</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getUserInfo(org.oa4mp.delegation.request.UIRequest)">getUserInfo</a></span>&#8203;(<a href="../../client/request/UIRequest.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client.request">UIRequest</a>&nbsp;uiRequest)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getUserInfo(org.oa4mp.delegation.client.request.UIRequest)">getUserInfo</a></span>&#8203;(<a href="../../client/request/UIRequest.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client.request">UIRequest</a>&nbsp;uiRequest)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i7" class="rowColor">
 <td class="colFirst"><code><a href="../../client/request/DelegationResponse.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client.request">DelegationResponse</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#processDelegationRequest(org.oa4mp.delegation.request.DelegationRequest)">processDelegationRequest</a></span>&#8203;(<a href="../../client/request/DelegationRequest.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client.request">DelegationRequest</a>&nbsp;delegationRequest)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#processDelegationRequest(org.oa4mp.delegation.client.request.DelegationRequest)">processDelegationRequest</a></span>&#8203;(<a href="../../client/request/DelegationRequest.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client.request">DelegationRequest</a>&nbsp;delegationRequest)</code></th>
 <td class="colLast">
 <div class="block">Starts the delegation process.</div>
 </td>
 </tr>
 <tr id="i8" class="altColor">
 <td class="colFirst"><code><a href="../../client/request/RTResponse.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client.request">RTResponse</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#refresh(org.oa4mp.delegation.request.RTRequest)">refresh</a></span>&#8203;(<a href="../../client/request/RTRequest.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client.request">RTRequest</a>&nbsp;refreshTokenRequest)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#refresh(org.oa4mp.delegation.client.request.RTRequest)">refresh</a></span>&#8203;(<a href="../../client/request/RTRequest.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client.request">RTRequest</a>&nbsp;refreshTokenRequest)</code></th>
 <td class="colLast">
 <div class="block">As per spec., issue request for refresh from server.</div>
 </td>
 </tr>
 <tr id="i9" class="rowColor">
 <td class="colFirst"><code><a href="../../client/request/RFC7009Response.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client.request">RFC7009Response</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#rfc7009(org.oa4mp.delegation.request.RFC7009Request)">rfc7009</a></span>&#8203;(<a href="../../client/request/RFC7009Request.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client.request">RFC7009Request</a>&nbsp;request)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#rfc7009(org.oa4mp.delegation.client.request.RFC7009Request)">rfc7009</a></span>&#8203;(<a href="../../client/request/RFC7009Request.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client.request">RFC7009Request</a>&nbsp;request)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i10" class="altColor">
 <td class="colFirst"><code><a href="../../client/request/RFC7523Response.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client.request">RFC7523Response</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#rfc7523(org.oa4mp.delegation.request.RFC7523Request)">rfc7523</a></span>&#8203;(<a href="../../client/request/RFC7523Request.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client.request">RFC7523Request</a>&nbsp;request)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#rfc7523(org.oa4mp.delegation.client.request.RFC7523Request)">rfc7523</a></span>&#8203;(<a href="../../client/request/RFC7523Request.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client.request">RFC7523Request</a>&nbsp;request)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i11" class="rowColor">
 <td class="colFirst"><code><a href="../../client/request/RFC7662Response.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client.request">RFC7662Response</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#rfc7662(org.oa4mp.delegation.request.RFC7662Request)">rfc7662</a></span>&#8203;(<a href="../../client/request/RFC7662Request.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client.request">RFC7662Request</a>&nbsp;request)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#rfc7662(org.oa4mp.delegation.client.request.RFC7662Request)">rfc7662</a></span>&#8203;(<a href="../../client/request/RFC7662Request.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client.request">RFC7662Request</a>&nbsp;request)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i12" class="altColor">
@@ -279,11 +279,11 @@ extends <a href="../../client/DelegationService.html" title="class in edu.uiuc.n
 </tr>
 </table>
 <ul class="blockList">
-<li class="blockList"><a id="methods.inherited.from.class.org.oa4mp.delegation.DelegationService">
+<li class="blockList"><a id="methods.inherited.from.class.org.oa4mp.delegation.client.DelegationService">
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;edu.uiuc.ncsa.oa4mp.delegation.client.<a href="../../client/DelegationService.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client">DelegationService</a></h3>
-<code><a href="../../client/DelegationService.html#getAgServer()">getAgServer</a>, <a href="../../client/DelegationService.html#getAT(org.oa4mp.delegation.request.ATRequest)">getAT</a>, <a href="../../client/DelegationService.html#getAT(org.oa4mp.delegation.request.DelegatedAssetRequest)">getAT</a>, <a href="../../client/DelegationService.html#getAT(org.oa4mp.delegation.common.token.AuthorizationGrant,org.oa4mp.delegation.common.clients.storage.Client,java.util.Map)">getAT</a>, <a href="../../client/DelegationService.html#getAtServer()">getAtServer</a>, <a href="../../client/DelegationService.html#getCert(org.oa4mp.delegation.request.ATResponse,org.oa4mp.delegation.common.clients.storage.Client,java.util.Map)">getCert</a>, <a href="../../client/DelegationService.html#getPaServer()">getPaServer</a>, <a href="../../client/DelegationService.html#process(org.oa4mp.delegation.common.services.Request)">process</a>, <a href="../../client/DelegationService.html#processAssetRequest(org.oa4mp.delegation.request.DelegatedAssetRequest)">processAssetRequest</a></code></li>
+<code><a href="../../client/DelegationService.html#getAgServer()">getAgServer</a>, <a href="../../client/DelegationService.html#getAT(org.oa4mp.delegation.client.request.ATRequest)">getAT</a>, <a href="../../client/DelegationService.html#getAT(org.oa4mp.delegation.client.request.DelegatedAssetRequest)">getAT</a>, <a href="../../client/DelegationService.html#getAT(org.oa4mp.delegation.common.token.AuthorizationGrant,org.oa4mp.delegation.common.clients.storage.Client,java.util.Map)">getAT</a>, <a href="../../client/DelegationService.html#getAtServer()">getAtServer</a>, <a href="../../client/DelegationService.html#getCert(org.oa4mp.delegation.client.request.ATResponse,org.oa4mp.delegation.common.clients.storage.Client,java.util.Map)">getCert</a>, <a href="../../client/DelegationService.html#getPaServer()">getPaServer</a>, <a href="../../client/DelegationService.html#process(org.oa4mp.delegation.common.services.Request)">process</a>, <a href="../../client/DelegationService.html#processAssetRequest(org.oa4mp.delegation.client.request.DelegatedAssetRequest)">processAssetRequest</a></code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a id="methods.inherited.from.class.java.lang.Object">
@@ -375,7 +375,7 @@ extends <a href="../../client/DelegationService.html" title="class in edu.uiuc.n
 </dl>
 </li>
 </ul>
-<a id="getUserInfo(org.oa4mp.delegation.request.UIRequest)">
+<a id="getUserInfo(org.oa4mp.delegation.client.request.UIRequest)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -402,7 +402,7 @@ extends <a href="../../client/DelegationService.html" title="class in edu.uiuc.n
 <pre class="methodSignature">public&nbsp;void&nbsp;setRtServer&#8203;(<a href="../../client/server/RTServer.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.client.server">RTServer</a>&nbsp;rtServer)</pre>
 </li>
 </ul>
-<a id="refresh(org.oa4mp.delegation.request.RTRequest)">
+<a id="refresh(org.oa4mp.delegation.client.request.RTRequest)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -416,7 +416,7 @@ extends <a href="../../client/DelegationService.html" title="class in edu.uiuc.n
 </dl>
 </li>
 </ul>
-<a id="rfc7009(org.oa4mp.delegation.request.RFC7009Request)">
+<a id="rfc7009(org.oa4mp.delegation.client.request.RFC7009Request)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -425,7 +425,7 @@ extends <a href="../../client/DelegationService.html" title="class in edu.uiuc.n
 <pre class="methodSignature">public&nbsp;<a href="../../client/request/RFC7009Response.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client.request">RFC7009Response</a>&nbsp;rfc7009&#8203;(<a href="../../client/request/RFC7009Request.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client.request">RFC7009Request</a>&nbsp;request)</pre>
 </li>
 </ul>
-<a id="rfc7662(org.oa4mp.delegation.request.RFC7662Request)">
+<a id="rfc7662(org.oa4mp.delegation.client.request.RFC7662Request)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -434,7 +434,7 @@ extends <a href="../../client/DelegationService.html" title="class in edu.uiuc.n
 <pre class="methodSignature">public&nbsp;<a href="../../client/request/RFC7662Response.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client.request">RFC7662Response</a>&nbsp;rfc7662&#8203;(<a href="../../client/request/RFC7662Request.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client.request">RFC7662Request</a>&nbsp;request)</pre>
 </li>
 </ul>
-<a id="rfc7523(org.oa4mp.delegation.request.RFC7523Request)">
+<a id="rfc7523(org.oa4mp.delegation.client.request.RFC7523Request)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -443,23 +443,23 @@ extends <a href="../../client/DelegationService.html" title="class in edu.uiuc.n
 <pre class="methodSignature">public&nbsp;<a href="../../client/request/RFC7523Response.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client.request">RFC7523Response</a>&nbsp;rfc7523&#8203;(<a href="../../client/request/RFC7523Request.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client.request">RFC7523Request</a>&nbsp;request)</pre>
 </li>
 </ul>
-<a id="processDelegationRequest(org.oa4mp.delegation.request.DelegationRequest)">
+<a id="processDelegationRequest(org.oa4mp.delegation.client.request.DelegationRequest)">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>processDelegationRequest</h4>
 <pre class="methodSignature">public&nbsp;<a href="../../client/request/DelegationResponse.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client.request">DelegationResponse</a>&nbsp;processDelegationRequest&#8203;(<a href="../../client/request/DelegationRequest.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client.request">DelegationRequest</a>&nbsp;delegationRequest)</pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../client/DelegationService.html#processDelegationRequest(org.oa4mp.delegation.request.DelegationRequest)">DelegationService</a></code></span></div>
+<div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../client/DelegationService.html#processDelegationRequest(org.oa4mp.delegation.client.request.DelegationRequest)">DelegationService</a></code></span></div>
 <div class="block">Starts the delegation process. This requests that the server permit delegation.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code><a href="../../client/DelegationService.html#processDelegationRequest(org.oa4mp.delegation.request.DelegationRequest)">processDelegationRequest</a></code>&nbsp;in class&nbsp;<code><a href="../../client/DelegationService.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client">DelegationService</a></code></dd>
+<dd><code><a href="../../client/DelegationService.html#processDelegationRequest(org.oa4mp.delegation.client.request.DelegationRequest)">processDelegationRequest</a></code>&nbsp;in class&nbsp;<code><a href="../../client/DelegationService.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client">DelegationService</a></code></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 </dl>
 </li>
 </ul>
-<a id="createRedirectURL(org.oa4mp.delegation.request.DelegationRequest,org.oa4mp.delegation.request.AGResponse)">
+<a id="createRedirectURL(org.oa4mp.delegation.client.request.DelegationRequest,org.oa4mp.delegation.client.request.AGResponse)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -470,7 +470,7 @@ extends <a href="../../client/DelegationService.html" title="class in edu.uiuc.n
 <div class="block">Creates redirect URL</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../client/DelegationService.html#createRedirectURL(org.oa4mp.delegation.request.DelegationRequest,org.oa4mp.delegation.request.AGResponse)">createRedirectURL</a></code>&nbsp;in class&nbsp;<code><a href="../../client/DelegationService.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client">DelegationService</a></code></dd>
+<dd><code><a href="../../client/DelegationService.html#createRedirectURL(org.oa4mp.delegation.client.request.DelegationRequest,org.oa4mp.delegation.client.request.AGResponse)">createRedirectURL</a></code>&nbsp;in class&nbsp;<code><a href="../../client/DelegationService.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.client">DelegationService</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>delegationAssetRequest</code> - Delegation asset request</dd>
 <dd><code>agResp</code> - Authorization grant response</dd>

@@ -1,6 +1,6 @@
 package org.oa4mp.server.api.admin.adminClient;
 
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.BaseClientStore;
+import org.oa4mp.delegation.server.storage.BaseClientStore;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 /**

@@ -4,7 +4,7 @@ import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.api.admin.adminClient.AdminClient;
 import org.oa4mp.server.api.storage.servlet.AbstractRegistrationServlet;
 import org.oa4mp.server.api.util.NewAdminClientEvent;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
+import org.oa4mp.delegation.server.storage.ClientApproval;
 import org.oa4mp.delegation.common.storage.clients.BaseClient;
 import edu.uiuc.ncsa.security.servlet.PresentableState;
 import org.apache.commons.codec.binary.Base64;

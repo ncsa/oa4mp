@@ -1,10 +1,10 @@
 package org.oa4mp.delegation.server.server;
 
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
-import edu.uiuc.ncsa.oa4mp.delegation.server.issuers.AbstractIssuer;
-import edu.uiuc.ncsa.oa4mp.delegation.server.issuers.PAIssuer;
-import edu.uiuc.ncsa.oa4mp.delegation.server.request.PARequest;
-import edu.uiuc.ncsa.oa4mp.delegation.server.request.PAResponse;
+import org.oa4mp.delegation.server.issuers.AbstractIssuer;
+import org.oa4mp.delegation.server.issuers.PAIssuer;
+import org.oa4mp.delegation.server.request.PARequest;
+import org.oa4mp.delegation.server.request.PAResponse;
 import org.oa4mp.delegation.common.token.TokenForge;
 
 import java.net.URI;

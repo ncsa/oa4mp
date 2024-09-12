@@ -3,7 +3,7 @@ package org.oa4mp.server.loader.oauth2.claims;
 import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.delegation.server.server.UnsupportedScopeException;
 import org.oa4mp.delegation.server.server.claims.ClaimSourceConfiguration;
-import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
+import org.oa4mp.delegation.server.ServiceTransaction;
 import org.qdl_lang.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;

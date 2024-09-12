@@ -1,19 +1,19 @@
 package org.oa4mp.delegation.server.client;
 
-import org.oa4mp.delegation.common.token.AccessToken;
-import org.oa4mp.delegation.request.ATRequest;
-import org.oa4mp.delegation.request.ATResponse;
-import org.oa4mp.delegation.server.ATServer;
-import org.oa4mp.delegation.common.token.impl.AccessTokenImpl;
-import org.oa4mp.delegation.common.token.impl.IDTokenImpl;
-import org.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
-import org.oa4mp.delegation.common.token.impl.TokenFactory;
-import org.oa4mp.delegation.server.server.RFC8628Constants;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import net.sf.json.JSONObject;
+import org.oa4mp.delegation.client.request.ATRequest;
+import org.oa4mp.delegation.client.request.ATResponse;
+import org.oa4mp.delegation.client.server.ATServer;
+import org.oa4mp.delegation.common.token.AccessToken;
+import org.oa4mp.delegation.common.token.impl.AccessTokenImpl;
+import org.oa4mp.delegation.common.token.impl.IDTokenImpl;
+import org.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
+import org.oa4mp.delegation.common.token.impl.TokenFactory;
+import org.oa4mp.delegation.server.server.RFC8628Constants;
 
 import java.net.URI;
 import java.util.HashMap;

@@ -3,7 +3,7 @@ package org.oa4mp.client.api.loader;
 import org.oa4mp.client.api.ClientEnvironment;
 import org.oa4mp.client.api.ClientLoaderInterface;
 import org.oa4mp.client.api.ClientXMLTags;
-import org.oa4mp.delegation.DelegationService;
+import org.oa4mp.delegation.client.DelegationService;
 import org.oa4mp.delegation.common.servlet.DBConfigLoader;
 import org.oa4mp.delegation.server.OIDCDiscoveryTags;
 import edu.uiuc.ncsa.security.core.configuration.Configurations;

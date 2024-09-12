@@ -134,7 +134,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li>edu.uiuc.ncsa.security.storage.monitored.MonitoredFileStore&lt;V&gt;</li>
 <li>
 <ul class="inheritance">
-<li>edu.uiuc.ncsa.oa4mp.delegation.server.storage.impl.FSClientStore&lt;V&gt;</li>
+<li>org.oa4mp.delegation.server.impl.storage.FSClientStore&lt;V&gt;</li>
 </ul>
 </li>
 </ul>
@@ -265,13 +265,13 @@ implements <a href="../ClientStore.html" title="interface in edu.uiuc.ncsa.oa4mp
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/List.html?is-external=true" title="class or interface in java.util" class="externalLink">List</a>&lt;edu.uiuc.ncsa.security.core.Identifier&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getByApprover(java.lang.String,edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApprovalStore)">getByApprover</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;approver,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getByApprover(java.lang.String,org.oa4mp.delegation.server.storage.ClientApprovalStore)">getByApprover</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;approver,
              <a href="../ClientApprovalStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.server.storage">ClientApprovalStore</a>&nbsp;clientApprovalStore)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/List.html?is-external=true" title="class or interface in java.util" class="externalLink">List</a>&lt;edu.uiuc.ncsa.security.core.Identifier&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getByStatus(java.lang.String,edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApprovalStore)">getByStatus</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;status,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getByStatus(java.lang.String,org.oa4mp.delegation.server.storage.ClientApprovalStore)">getByStatus</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;status,
            <a href="../ClientApprovalStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.server.storage">ClientApprovalStore</a>&nbsp;clientApprovalStore)</code></th>
 <td class="colLast">
 <div class="block">Retrieve all clients of a given type from the approval store for the given status.</div>
@@ -415,7 +415,7 @@ implements <a href="../ClientStore.html" title="interface in edu.uiuc.ncsa.oa4mp
 </dl>
 </li>
 </ul>
-<a id="getByStatus(java.lang.String,edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApprovalStore)">
+<a id="getByStatus(java.lang.String,org.oa4mp.delegation.server.storage.ClientApprovalStore)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -423,16 +423,16 @@ implements <a href="../ClientStore.html" title="interface in edu.uiuc.ncsa.oa4mp
 <h4>getByStatus</h4>
 <pre class="methodSignature">public&nbsp;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/List.html?is-external=true" title="class or interface in java.util" class="externalLink">List</a>&lt;edu.uiuc.ncsa.security.core.Identifier&gt;&nbsp;getByStatus&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;status,
                                                                 <a href="../ClientApprovalStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.server.storage">ClientApprovalStore</a>&nbsp;clientApprovalStore)</pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../BaseClientStore.html#getByStatus(java.lang.String,edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApprovalStore)">BaseClientStore</a></code></span></div>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../BaseClientStore.html#getByStatus(java.lang.String,org.oa4mp.delegation.server.storage.ClientApprovalStore)">BaseClientStore</a></code></span></div>
 <div class="block">Retrieve all clients of a given type from the approval store for the given status.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../BaseClientStore.html#getByStatus(java.lang.String,edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApprovalStore)">getByStatus</a></code>&nbsp;in interface&nbsp;<code><a href="../BaseClientStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.server.storage">BaseClientStore</a>&lt;<a href="FSClientStore.html" title="type parameter in FSClientStore">V</a> extends <a href="../../../common/storage/clients/Client.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients">Client</a>&gt;</code></dd>
+<dd><code><a href="../BaseClientStore.html#getByStatus(java.lang.String,org.oa4mp.delegation.server.storage.ClientApprovalStore)">getByStatus</a></code>&nbsp;in interface&nbsp;<code><a href="../BaseClientStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.server.storage">BaseClientStore</a>&lt;<a href="FSClientStore.html" title="type parameter in FSClientStore">V</a> extends <a href="../../../common/storage/clients/Client.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients">Client</a>&gt;</code></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 </dl>
 </li>
 </ul>
-<a id="getByApprover(java.lang.String,edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApprovalStore)">
+<a id="getByApprover(java.lang.String,org.oa4mp.delegation.server.storage.ClientApprovalStore)">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -442,7 +442,7 @@ implements <a href="../ClientStore.html" title="interface in edu.uiuc.ncsa.oa4mp
                                                                   <a href="../ClientApprovalStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.server.storage">ClientApprovalStore</a>&nbsp;clientApprovalStore)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../BaseClientStore.html#getByApprover(java.lang.String,edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApprovalStore)">getByApprover</a></code>&nbsp;in interface&nbsp;<code><a href="../BaseClientStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.server.storage">BaseClientStore</a>&lt;<a href="FSClientStore.html" title="type parameter in FSClientStore">V</a> extends <a href="../../../common/storage/clients/Client.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients">Client</a>&gt;</code></dd>
+<dd><code><a href="../BaseClientStore.html#getByApprover(java.lang.String,org.oa4mp.delegation.server.storage.ClientApprovalStore)">getByApprover</a></code>&nbsp;in interface&nbsp;<code><a href="../BaseClientStore.html" title="interface in edu.uiuc.ncsa.oa4mp.delegation.server.storage">BaseClientStore</a>&lt;<a href="FSClientStore.html" title="type parameter in FSClientStore">V</a> extends <a href="../../../common/storage/clients/Client.html" title="class in edu.uiuc.ncsa.oa4mp.delegation.common.storage.clients">Client</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>

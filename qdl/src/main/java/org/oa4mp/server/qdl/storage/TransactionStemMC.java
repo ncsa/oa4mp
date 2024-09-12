@@ -4,7 +4,7 @@ import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
 import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
 import org.oa4mp.server.loader.oauth2.storage.transactions.OA2TransactionKeys;
 import org.oa4mp.delegation.common.token.MyX509Certificates;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
+import org.oa4mp.delegation.server.storage.ClientStore;
 import org.oa4mp.delegation.common.token.impl.TokenFactory;
 import org.oa4mp.delegation.common.token.impl.VerifierImpl;
 import org.qdl_lang.variables.QDLStem;

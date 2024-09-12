@@ -1,6 +1,6 @@
 package org.oa4mp.server.loader.oauth2.servlet;
 
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
+import org.oa4mp.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;

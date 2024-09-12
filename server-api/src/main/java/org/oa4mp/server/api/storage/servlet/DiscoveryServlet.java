@@ -2,8 +2,8 @@ package org.oa4mp.server.api.storage.servlet;
 
 import org.oa4mp.delegation.server.OIDCDiscoveryTags;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
-import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
-import edu.uiuc.ncsa.oa4mp.delegation.server.request.IssuerResponse;
+import org.oa4mp.delegation.server.ServiceTransaction;
+import org.oa4mp.delegation.server.request.IssuerResponse;
 import net.sf.json.JSONObject;
 import net.sf.json.util.JSONUtils;
 

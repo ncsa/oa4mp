@@ -16,7 +16,7 @@ import org.oa4mp.server.api.util.NewClientNotifier;
 import org.oa4mp.delegation.common.storage.clients.Client;
 import org.oa4mp.delegation.common.storage.clients.ClientConverter;
 import org.oa4mp.delegation.server.server.claims.ClaimSourceFactory;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.upkeep.UpkeepThread;
+import org.oa4mp.delegation.server.storage.upkeep.UpkeepThread;
 import org.qdl_lang.evaluate.MetaEvaluator;
 import org.qdl_lang.evaluate.OpEvaluator;
 import org.qdl_lang.functions.FStack;

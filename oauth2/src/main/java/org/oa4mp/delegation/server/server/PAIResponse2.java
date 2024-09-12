@@ -2,7 +2,7 @@ package org.oa4mp.delegation.server.server;
 
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
-import edu.uiuc.ncsa.oa4mp.delegation.server.request.PAResponse;
+import org.oa4mp.delegation.server.request.PAResponse;
 import org.oa4mp.delegation.common.token.AccessToken;
 import org.oa4mp.delegation.common.token.MyX509Certificates;
 import org.oa4mp.delegation.common.token.ProtectedAsset;

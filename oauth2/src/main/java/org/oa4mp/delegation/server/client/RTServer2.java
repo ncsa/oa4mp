@@ -1,8 +1,11 @@
 package org.oa4mp.delegation.server.client;
 
-import org.oa4mp.delegation.request.RTRequest;
-import org.oa4mp.delegation.request.RTResponse;
-import org.oa4mp.delegation.server.RTServer;
+import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.servlet.ServiceClient;
+import net.sf.json.JSONObject;
+import org.oa4mp.delegation.client.request.RTRequest;
+import org.oa4mp.delegation.client.request.RTResponse;
+import org.oa4mp.delegation.client.server.RTServer;
 import org.oa4mp.delegation.common.storage.clients.Client;
 import org.oa4mp.delegation.common.token.AccessToken;
 import org.oa4mp.delegation.common.token.RefreshToken;
@@ -12,9 +15,6 @@ import org.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
 import org.oa4mp.delegation.common.token.impl.TokenFactory;
 import org.oa4mp.delegation.server.OA2Constants;
 import org.oa4mp.delegation.server.OA2Scopes;
-import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
-import edu.uiuc.ncsa.security.servlet.ServiceClient;
-import net.sf.json.JSONObject;
 
 import java.net.URI;
 import java.util.HashMap;

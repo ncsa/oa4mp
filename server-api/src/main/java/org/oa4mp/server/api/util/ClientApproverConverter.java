@@ -1,7 +1,7 @@
 package org.oa4mp.server.api.util;
 
 import edu.uiuc.ncsa.security.core.util.IdentifiableProviderImpl;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
+import org.oa4mp.delegation.server.storage.ClientApproval;
 import org.oa4mp.delegation.common.storage.clients.ClientApprovalKeys;
 import edu.uiuc.ncsa.security.storage.data.ConversionMap;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;

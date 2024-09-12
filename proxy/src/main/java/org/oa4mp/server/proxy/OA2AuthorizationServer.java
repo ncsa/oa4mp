@@ -17,7 +17,7 @@ import org.oa4mp.delegation.server.OA2Constants;
 import org.oa4mp.delegation.server.OA2Errors;
 import org.oa4mp.delegation.server.OA2GeneralError;
 import org.oa4mp.delegation.server.jwt.JWTRunner;
-import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
+import org.oa4mp.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.servlet.HeaderUtils;
 import edu.uiuc.ncsa.security.servlet.PresentableState;

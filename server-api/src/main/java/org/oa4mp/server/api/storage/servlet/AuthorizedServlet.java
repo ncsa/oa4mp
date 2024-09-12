@@ -2,7 +2,7 @@ package org.oa4mp.server.api.storage.servlet;
 
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.DateUtils;
-import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
+import org.oa4mp.delegation.server.ServiceTransaction;
 import org.oa4mp.delegation.common.token.AuthorizationGrant;
 import org.apache.http.HttpStatus;
 

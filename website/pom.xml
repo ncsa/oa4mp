@@ -1,13 +1,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>edu.uiuc.ncsa.myproxy</groupId>
-    <version>5.3-SNAPSHOT</version>
+    <groupId>org.oa4mp</groupId>
+    <version>5.6-SNAPSHOT</version>
 
     <artifactId>website</artifactId>
     <packaging>jar</packaging>
-    <description>OAuth for MyProxy website</description>
-    <name>OA4MP</name>
+    <description>OA4MP website</description>
+    <name>OA4MP website</name>
 
 
     <properties>
@@ -17,80 +17,80 @@
 
     <dependencies>
         <dependency>
-            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <groupId>org.oa4mp</groupId>
             <artifactId>client</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.6-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <groupId>org.oa4mp</groupId>
             <artifactId>common</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.6-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>core</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.6-SNAPSHOT</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>servlet</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.6-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <groupId>org.oa4mp</groupId>
             <artifactId>server</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.6-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <groupId>org.oa4mp</groupId>
             <artifactId>common</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.6-SNAPSHOT</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>util</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.6-SNAPSHOT</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <groupId>org.oa4mp</groupId>
             <artifactId>myproxy-logon</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.6-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <groupId>org.oa4mp</groupId>
             <artifactId>client-api</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.6-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <groupId>org.oa4mp</groupId>
             <artifactId>client-loader</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.6-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <groupId>org.oa4mp</groupId>
             <artifactId>server-api</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.6-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <groupId>org.oa4mp</groupId>
             <artifactId>server-loader</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.6-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <groupId>org.oa4mp</groupId>
             <artifactId>oauth2</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.6-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.velocity</groupId>
@@ -171,7 +171,7 @@
                     <dependency>
                         <groupId>edu.uiuc.ncsa.maven.skin</groupId>
                         <artifactId>skin</artifactId>
-                        <version>5.3-SNAPSHOT</version>
+                        <version>5.6-SNAPSHOT</version>
                     </dependency>
                 </dependencies>
             </plugin>

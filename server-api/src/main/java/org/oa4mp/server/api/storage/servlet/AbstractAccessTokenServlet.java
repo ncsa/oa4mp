@@ -2,9 +2,9 @@ package org.oa4mp.server.api.storage.servlet;
 
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
-import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
-import edu.uiuc.ncsa.oa4mp.delegation.server.request.ATRequest;
-import edu.uiuc.ncsa.oa4mp.delegation.server.request.ATResponse;
+import org.oa4mp.delegation.server.ServiceTransaction;
+import org.oa4mp.delegation.server.request.ATRequest;
+import org.oa4mp.delegation.server.request.ATResponse;
 import org.oa4mp.delegation.common.servlet.TransactionState;
 import org.oa4mp.delegation.common.storage.clients.Client;
 import org.oa4mp.delegation.common.token.AuthorizationGrant;

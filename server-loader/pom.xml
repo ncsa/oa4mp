@@ -5,13 +5,13 @@
 
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>edu.uiuc.ncsa.myproxy</groupId>
-        <artifactId>oa4mp</artifactId>
-        <version>5.3-SNAPSHOT</version>
+        <groupId>org.oa4mp</groupId>
+        <artifactId>oa4mp-parent</artifactId>
+        <version>5.6-SNAPSHOT</version>
     </parent>
 
     <artifactId>server-loader</artifactId>
-    <name>OAuth 2/Open ID Connect server support for MyProxy</name>
+    <name>OA4MP server loader</name>
     <packaging>jar</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -31,19 +31,19 @@
             <version>1.4.2</version>
         </dependency>
         <dependency>
-            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <groupId>org.oa4mp</groupId>
             <artifactId>server-api</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.6-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>servlet</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.6-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <groupId>org.oa4mp</groupId>
             <artifactId>myproxy-logon</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.6-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -54,20 +54,20 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>util</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.6-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.qdl_lang</groupId>
             <artifactId>language</artifactId>
-            <version>1.5-QDL-SNAPSHOT</version>
+            <version>1.6-QDL-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <groupId>org.oa4mp</groupId>
             <artifactId>common</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.6-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>

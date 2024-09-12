@@ -8,7 +8,7 @@ import org.oa4mp.delegation.common.storage.clients.Client;
 import org.oa4mp.delegation.server.OA2Scopes;
 import org.oa4mp.delegation.server.server.config.LDAPConfiguration;
 import org.oa4mp.delegation.server.server.config.LDAPConfigurationUtil;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
+import org.oa4mp.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.core.exceptions.RetryException;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.servlet.PresentableState;

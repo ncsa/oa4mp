@@ -5,8 +5,8 @@ import org.oa4mp.server.api.util.ClientApprovalMemoryStore;
 import org.oa4mp.server.api.util.ClientApproverConverter;
 import edu.uiuc.ncsa.security.core.configuration.provider.MultiTypeProvider;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApprovalStore;
+import org.oa4mp.delegation.server.storage.ClientApproval;
+import org.oa4mp.delegation.server.storage.ClientApprovalStore;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
 /**

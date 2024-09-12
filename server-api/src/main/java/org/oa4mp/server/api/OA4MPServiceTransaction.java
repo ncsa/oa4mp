@@ -1,7 +1,7 @@
 package org.oa4mp.server.api;
 
 import edu.uiuc.ncsa.security.core.Identifier;
-import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
+import org.oa4mp.delegation.server.ServiceTransaction;
 import org.oa4mp.delegation.common.token.AuthorizationGrant;
 
 import static edu.uiuc.ncsa.security.core.util.BeanUtils.checkEquals;

@@ -1,6 +1,6 @@
 package org.oa4mp.server.api.storage.servlet;
 
-import edu.uiuc.ncsa.oa4mp.delegation.server.request.IssuerResponse;
+import org.oa4mp.delegation.server.request.IssuerResponse;
 import org.oa4mp.delegation.common.servlet.TransactionState;
 import org.oa4mp.delegation.common.storage.transactions.BasicTransaction;
 import edu.uiuc.ncsa.security.storage.XMLMap;

@@ -1,6 +1,6 @@
 package org.oa4mp.delegation.server.server;
 
-import edu.uiuc.ncsa.oa4mp.delegation.server.issuers.AbstractIssuer;
+import org.oa4mp.delegation.server.issuers.AbstractIssuer;
 import org.oa4mp.delegation.common.token.TokenForge;
 import org.oa4mp.delegation.server.OA2Utilities;
 import org.oa4mp.delegation.server.UserInfo;

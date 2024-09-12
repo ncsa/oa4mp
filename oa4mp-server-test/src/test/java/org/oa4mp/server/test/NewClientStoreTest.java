@@ -1,7 +1,7 @@
 package org.oa4mp.server.test;
 
 import org.oa4mp.delegation.common.storage.clients.Client;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
+import org.oa4mp.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.util.TestBase;
 
 /**

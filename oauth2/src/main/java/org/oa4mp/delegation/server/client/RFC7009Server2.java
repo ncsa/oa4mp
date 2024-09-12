@@ -1,11 +1,11 @@
 package org.oa4mp.delegation.server.client;
 
-import org.oa4mp.delegation.request.RFC7009Request;
-import org.oa4mp.delegation.request.RFC7009Response;
-import org.oa4mp.delegation.server.RFC7009Server;
-import org.oa4mp.delegation.server.server.RFC7662Constants;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
+import org.oa4mp.delegation.client.request.RFC7009Request;
+import org.oa4mp.delegation.client.request.RFC7009Response;
+import org.oa4mp.delegation.client.server.RFC7009Server;
+import org.oa4mp.delegation.server.server.RFC7662Constants;
 
 import java.net.URI;
 import java.util.HashMap;

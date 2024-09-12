@@ -1,11 +1,10 @@
 package org.oa4mp.server.loader.oauth2.loader;
 
-import edu.uiuc.ncsa.oa4mp.delegation.server.issuers.AGIssuer;
-import edu.uiuc.ncsa.oa4mp.delegation.server.issuers.ATIssuer;
-import edu.uiuc.ncsa.oa4mp.delegation.server.issuers.PAIssuer;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApprovalStore;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.uuc.*;
+import org.oa4mp.delegation.server.issuers.AGIssuer;
+import org.oa4mp.delegation.server.issuers.ATIssuer;
+import org.oa4mp.delegation.server.issuers.PAIssuer;
+import org.oa4mp.delegation.server.storage.ClientApprovalStore;
+import org.oa4mp.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.configuration.Configurations;
@@ -40,6 +39,7 @@ import org.oa4mp.delegation.server.server.claims.ClaimSource;
 import org.oa4mp.delegation.server.server.claims.ClaimSourceConfiguration;
 import org.oa4mp.delegation.server.server.config.LDAPConfiguration;
 import org.oa4mp.delegation.server.server.config.LDAPConfigurationUtil;
+import org.oa4mp.delegation.server.storage.uuc.*;
 import org.oa4mp.server.api.ClientApprovalProvider;
 import org.oa4mp.server.api.OA4MPConfigTags;
 import org.oa4mp.server.api.ServiceConstantKeys;

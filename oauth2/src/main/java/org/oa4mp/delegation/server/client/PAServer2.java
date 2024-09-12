@@ -1,15 +1,15 @@
 package org.oa4mp.delegation.server.client;
 
-import org.oa4mp.delegation.AbstractClientEnvironment;
-import org.oa4mp.delegation.request.PARequest;
-import org.oa4mp.delegation.request.PAResponse;
-import org.oa4mp.delegation.server.PAServer;
-import org.oa4mp.delegation.server.OA2Constants;
+import edu.uiuc.ncsa.security.servlet.ServiceClient;
+import edu.uiuc.ncsa.security.util.pkcs.MyCertUtil;
+import org.oa4mp.delegation.client.AbstractClientEnvironment;
+import org.oa4mp.delegation.client.request.PARequest;
+import org.oa4mp.delegation.client.request.PAResponse;
+import org.oa4mp.delegation.client.server.PAServer;
 import org.oa4mp.delegation.common.storage.clients.Client;
 import org.oa4mp.delegation.common.token.AccessToken;
 import org.oa4mp.delegation.common.token.MyX509Certificates;
-import edu.uiuc.ncsa.security.servlet.ServiceClient;
-import edu.uiuc.ncsa.security.util.pkcs.MyCertUtil;
+import org.oa4mp.delegation.server.OA2Constants;
 
 import java.security.cert.CertificateException;
 import java.util.HashMap;

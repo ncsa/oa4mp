@@ -3,7 +3,7 @@ package org.oa4mp.server.qdl.storage;
 import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
 import org.oa4mp.delegation.common.storage.TransactionStore;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
+import org.oa4mp.delegation.server.storage.ClientStore;
 import org.qdl_lang.evaluate.SystemEvaluator;
 import org.qdl_lang.extensions.QDLFunction;
 import org.qdl_lang.extensions.QDLMetaModule;

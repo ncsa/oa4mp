@@ -5,10 +5,10 @@ import org.oa4mp.delegation.common.token.impl.AccessTokenImpl;
 import org.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
 import org.oa4mp.delegation.server.OA2TokenForge;
 import org.oa4mp.delegation.server.OA2Utilities;
-import edu.uiuc.ncsa.oa4mp.delegation.server.issuers.ATIssuer;
-import edu.uiuc.ncsa.oa4mp.delegation.server.issuers.AbstractIssuer;
-import edu.uiuc.ncsa.oa4mp.delegation.server.request.ATRequest;
-import edu.uiuc.ncsa.oa4mp.delegation.server.request.ATResponse;
+import org.oa4mp.delegation.server.issuers.ATIssuer;
+import org.oa4mp.delegation.server.issuers.AbstractIssuer;
+import org.oa4mp.delegation.server.request.ATRequest;
+import org.oa4mp.delegation.server.request.ATResponse;
 
 import java.net.URI;
 import java.util.Map;

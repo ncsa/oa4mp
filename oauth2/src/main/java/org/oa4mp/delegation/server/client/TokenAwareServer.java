@@ -1,6 +1,6 @@
 package org.oa4mp.delegation.server.client;
 
-import org.oa4mp.delegation.request.BasicRequest;
+import org.oa4mp.delegation.client.request.BasicRequest;
 import org.oa4mp.delegation.common.token.impl.IDTokenImpl;
 import org.oa4mp.delegation.common.token.impl.TokenFactory;
 import org.oa4mp.delegation.server.JWTUtil;

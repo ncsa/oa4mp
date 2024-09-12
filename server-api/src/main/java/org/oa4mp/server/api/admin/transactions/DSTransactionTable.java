@@ -1,6 +1,6 @@
 package org.oa4mp.server.api.admin.transactions;
 
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.support.ServiceTransactionTable;
+import org.oa4mp.delegation.server.storage.support.ServiceTransactionTable;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnDescriptorEntry;
 
 import static java.sql.Types.LONGVARCHAR;

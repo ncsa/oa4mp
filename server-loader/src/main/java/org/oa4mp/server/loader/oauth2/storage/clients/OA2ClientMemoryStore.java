@@ -1,6 +1,6 @@
 package org.oa4mp.server.loader.oauth2.storage.clients;
 
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.impl.ClientMemoryStore;
+import org.oa4mp.delegation.server.storage.impl.ClientMemoryStore;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 

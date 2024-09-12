@@ -6,7 +6,7 @@ import org.oa4mp.delegation.common.token.impl.IDTokenImpl;
 import org.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
 import org.oa4mp.delegation.server.OA2Scopes;
 import org.oa4mp.delegation.server.server.claims.OA2Claims;
-import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
+import org.oa4mp.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;

@@ -1,7 +1,7 @@
 package org.oa4mp.server.api.admin.adminClient;
 
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApprovalStore;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.impl.GenericClientStoreUtils;
+import org.oa4mp.delegation.server.storage.ClientApprovalStore;
+import org.oa4mp.delegation.server.storage.impl.GenericClientStoreUtils;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.XMLConverter;

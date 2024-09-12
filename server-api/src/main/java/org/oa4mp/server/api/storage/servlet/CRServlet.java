@@ -5,7 +5,7 @@ import edu.uiuc.ncsa.myproxy.MyProxyConnectable;
 import org.oa4mp.server.api.util.JGlobusUtil;
 import org.oa4mp.delegation.common.token.AccessToken;
 import org.oa4mp.delegation.common.token.MyX509Certificates;
-import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
+import org.oa4mp.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.ConnectionException;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
@@ -34,7 +34,7 @@ public abstract class CRServlet extends MyProxyDelegationServlet {
 
     /**
      * Indirection call. If your extension to this class needs to do any
-     * prep work before calling {@link #doCertRequest(edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction, String)}
+     * prep work before calling {@link #doCertRequest(ServiceTransaction, String)}
      * put it here. And this should contain the actual call to that method. This is called in the authorization leg
      * and the getCert call. You should point this at the {@link #doCertRequest(ServiceTransaction, String)} method
      * here which does all the dirty work of tracking down the connection and getting the cert. So, depending on your

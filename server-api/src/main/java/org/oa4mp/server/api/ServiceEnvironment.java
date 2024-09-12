@@ -1,6 +1,7 @@
 package org.oa4mp.server.api;
 
 import edu.uiuc.ncsa.myproxy.MyProxyServiceFacade;
+import org.oa4mp.delegation.server.issuers.AbstractIssuer;
 import org.oa4mp.server.api.admin.adminClient.AdminClient;
 import org.oa4mp.server.api.admin.adminClient.AdminClientStore;
 import org.oa4mp.server.api.admin.permissions.Permission;
@@ -9,13 +10,13 @@ import org.oa4mp.server.api.storage.servlet.AuthorizationServletConfig;
 import org.oa4mp.delegation.common.storage.clients.Client;
 import org.oa4mp.delegation.common.storage.TransactionStore;
 import org.oa4mp.delegation.common.token.TokenForge;
-import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
-import edu.uiuc.ncsa.oa4mp.delegation.server.issuers.AGIssuer;
-import edu.uiuc.ncsa.oa4mp.delegation.server.issuers.ATIssuer;
-import edu.uiuc.ncsa.oa4mp.delegation.server.issuers.PAIssuer;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApprovalStore;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
+import org.oa4mp.delegation.server.ServiceTransaction;
+import org.oa4mp.delegation.server.issuers.AGIssuer;
+import org.oa4mp.delegation.server.issuers.ATIssuer;
+import org.oa4mp.delegation.server.issuers.PAIssuer;
+import org.oa4mp.delegation.server.storage.ClientApproval;
+import org.oa4mp.delegation.server.storage.ClientApprovalStore;
+import org.oa4mp.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.core.Logable;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.servlet.UsernameTransformer;
@@ -87,14 +88,14 @@ public interface ServiceEnvironment extends Logable {
     TokenForge getTokenForge();
 
     /**
-     * The {@link edu.uiuc.ncsa.oa4mp.delegation.server.issuers.AbstractIssuer} that creates {@link edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant}s.
+     * The {@link AbstractIssuer} that creates {@link edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant}s.
      *
      * @return
      */
     AGIssuer getAgIssuer();
 
     /**
-     * The {@link edu.uiuc.ncsa.oa4mp.delegation.server.issuers.AbstractIssuer} that creates {@link edu.uiuc.ncsa.security.delegation.token.AccessToken}s.
+     * The {@link AbstractIssuer} that creates {@link edu.uiuc.ncsa.security.delegation.token.AccessToken}s.
      *
      * @return
      */
@@ -102,7 +103,7 @@ public interface ServiceEnvironment extends Logable {
     ATIssuer getAtIssuer();
 
     /**
-     * The {@link edu.uiuc.ncsa.oa4mp.delegation.server.issuers.AbstractIssuer} that creates the {@link edu.uiuc.ncsa.security.delegation.token.ProtectedAsset}s.
+     * The {@link AbstractIssuer} that creates the {@link edu.uiuc.ncsa.security.delegation.token.ProtectedAsset}s.
      *
      * @return
      */

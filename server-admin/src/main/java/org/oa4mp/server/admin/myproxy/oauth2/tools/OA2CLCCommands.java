@@ -6,7 +6,7 @@ import org.oa4mp.client.api.storage.AssetStoreUtil;
 import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
 import org.oa4mp.server.loader.oauth2.servlet.RFC8628Constants2;
 import org.oa4mp.delegation.common.token.impl.*;
-import org.oa4mp.delegation.request.RTResponse;
+import org.oa4mp.delegation.client.request.RTResponse;
 import org.oa4mp.delegation.common.token.Token;
 import org.oa4mp.delegation.server.JWTUtil;
 import org.oa4mp.delegation.server.NonceHerder;

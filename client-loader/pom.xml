@@ -5,13 +5,13 @@
 
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>edu.uiuc.ncsa.myproxy</groupId>
-        <artifactId>oa4mp</artifactId>
-        <version>5.3-SNAPSHOT</version>
+        <groupId>org.oa4mp</groupId>
+        <artifactId>oa4mp-parent</artifactId>
+        <version>5.6-SNAPSHOT</version>
     </parent>
 
     <artifactId>client-loader</artifactId>
-    <name>OAuth 2/Open ID Connect support for the client</name>
+    <name>OA4MP client loader</name>
     <packaging>jar</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -20,22 +20,14 @@
     </properties>
     <dependencies>
         <dependency>
-            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <groupId>org.oa4mp</groupId>
             <artifactId>client-api</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.6-SNAPSHOT</version>
         </dependency>
-
-<!--        <dependency>
-            <groupId>edu.uiuc.ncsa.security</groupId>
-            <artifactId>util</artifactId>
-            <version>5.3-SNAPSHOT</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>-->
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>servlet</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.6-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.derby</groupId>
@@ -43,14 +35,14 @@
             <version>10.14.2.0</version>
         </dependency>
         <dependency>
-            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <groupId>org.oa4mp</groupId>
             <artifactId>myproxy-logon</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.6-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <groupId>org.oa4mp</groupId>
             <artifactId>oauth2</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.6-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>

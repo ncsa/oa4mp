@@ -8,9 +8,9 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>edu.uiuc.ncsa.myproxy</groupId>
-    <artifactId>oa4mp</artifactId>
-    <version>5.3-SNAPSHOT</version>
+    <groupId>org.oa4mp</groupId>
+    <artifactId>oa4mp-parent</artifactId>
+    <version>5.6-SNAPSHOT</version>
     <packaging>pom</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -18,8 +18,8 @@
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
     </properties>
-    <name>Top level OA4MP</name>
-    <description>Top level OAuth client and server code for MyProxy</description>
+    <name>OA4MP Parent Project</name>
+    <description>Top level client and server code OA4MP</description>
     <licenses>
           <license>
               <name>Apache license</name>
@@ -80,16 +80,16 @@
         <module>oa4mp-server-oauth2</module>
         <module>client-api</module>
         <module>client-loader</module>
-        <module>client-oauth2</module>
+        <!--<module>client-oauth2</module>-->
         <module>server-admin</module>
         <module>client-webapp</module>
         <module>client-test</module>
-        <module>oa4mp-webapp</module>
+        <!--<module>oa4mp-webapp</module>-->
         <module>proxy</module>
         <module>website</module>
         <module>server-test</module>
         <module>skin</module>
-        <module>myproxy-website</module>
+       <!-- <module>myproxy-website</module>-->
         <module>qdl</module>
         <module>common</module>
         <module>client</module>

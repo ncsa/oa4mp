@@ -1,7 +1,7 @@
 package org.oa4mp.delegation.server.server;
 
-import edu.uiuc.ncsa.oa4mp.delegation.server.request.AGResponse;
-import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
+import org.oa4mp.delegation.server.request.AGResponse;
+import org.oa4mp.delegation.server.ServiceTransaction;
 import org.oa4mp.delegation.common.storage.clients.Client;
 import org.oa4mp.delegation.common.token.AuthorizationGrant;
 import org.oa4mp.delegation.server.OA2Constants;

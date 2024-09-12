@@ -4,7 +4,7 @@ import org.oa4mp.server.api.admin.transactions.OA4MPIdentifierProvider;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.IdentifiableProviderImpl;
 import edu.uiuc.ncsa.security.core.util.IdentifierProvider;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
+import org.oa4mp.delegation.server.storage.ClientApproval;
 
 /**
  * <p>Created by Jeff Gaynor<br>

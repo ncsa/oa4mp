@@ -1,9 +1,9 @@
 package org.oa4mp.server.api.storage.servlet;
 
-import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
-import edu.uiuc.ncsa.oa4mp.delegation.server.UnapprovedClientException;
-import edu.uiuc.ncsa.oa4mp.delegation.server.request.AGRequest;
-import edu.uiuc.ncsa.oa4mp.delegation.server.request.AGResponse;
+import org.oa4mp.delegation.server.ServiceTransaction;
+import org.oa4mp.delegation.server.UnapprovedClientException;
+import org.oa4mp.delegation.server.request.AGRequest;
+import org.oa4mp.delegation.server.request.AGResponse;
 import org.oa4mp.delegation.common.servlet.TransactionState;
 import org.oa4mp.delegation.common.storage.clients.Client;
 import edu.uiuc.ncsa.security.storage.GenericStoreUtils;

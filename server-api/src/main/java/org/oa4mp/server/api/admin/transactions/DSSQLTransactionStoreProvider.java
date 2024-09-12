@@ -13,7 +13,7 @@ import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import javax.inject.Provider;
 
-import static edu.uiuc.ncsa.oa4mp.delegation.server.storage.SQLServiceTransactionStore.DEFAULT_TABLENAME;
+import static org.oa4mp.delegation.server.storage.SQLServiceTransactionStore.DEFAULT_TABLENAME;
 
 /**
  * <p>Created by Jeff Gaynor<br>

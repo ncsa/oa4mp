@@ -2,9 +2,9 @@ package org.oa4mp.server.api.storage;
 
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.impl.ClientMemoryStore;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.impl.ClientStoreProvider;
+import org.oa4mp.delegation.server.storage.ClientStore;
+import org.oa4mp.delegation.server.storage.impl.ClientMemoryStore;
+import org.oa4mp.delegation.server.storage.impl.ClientStoreProvider;
 import org.oa4mp.delegation.common.storage.clients.Client;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 

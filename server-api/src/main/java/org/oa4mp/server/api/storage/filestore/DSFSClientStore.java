@@ -1,7 +1,7 @@
 package org.oa4mp.server.api.storage.filestore;
 
 import org.oa4mp.delegation.common.storage.clients.Client;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.impl.FSClientStore;
+import org.oa4mp.delegation.server.storage.impl.FSClientStore;
 import edu.uiuc.ncsa.security.core.util.IdentifiableProviderImpl;
 import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;

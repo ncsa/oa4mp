@@ -2,8 +2,8 @@ package org.oa4mp.server.api.storage.servlet;
 
 import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
-import edu.uiuc.ncsa.oa4mp.delegation.server.request.IssuerResponse;
+import org.oa4mp.delegation.server.ServiceTransaction;
+import org.oa4mp.delegation.server.request.IssuerResponse;
 import org.oa4mp.delegation.common.storage.clients.Client;
 import edu.uiuc.ncsa.security.servlet.JSPUtil;
 import org.apache.commons.codec.binary.Base64;

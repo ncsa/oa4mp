@@ -2,7 +2,7 @@ package org.oa4mp.delegation.server.server.claims;
 
 import org.oa4mp.delegation.server.UserInfo;
 import org.oa4mp.delegation.server.server.UnsupportedScopeException;
-import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
+import org.oa4mp.delegation.server.ServiceTransaction;
 import org.qdl_lang.variables.QDLStem;
 import edu.uiuc.ncsa.security.util.functor.parser.FunctorScript;
 import net.sf.json.JSONObject;

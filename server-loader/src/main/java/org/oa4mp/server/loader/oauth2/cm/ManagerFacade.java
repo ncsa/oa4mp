@@ -16,7 +16,7 @@ import org.oa4mp.server.api.admin.things.types.TypePermission;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.BaseClientStore;
+import org.oa4mp.delegation.server.storage.BaseClientStore;
 import org.oa4mp.delegation.common.services.Response;
 import org.oa4mp.delegation.common.storage.clients.BaseClient;
 import net.sf.json.JSONObject;

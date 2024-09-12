@@ -2,8 +2,8 @@ package org.oa4mp.server.loader.oauth2.servlet;
 
 import org.oa4mp.server.api.storage.servlet.AbstractInitServlet;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
-import edu.uiuc.ncsa.oa4mp.delegation.server.ServiceTransaction;
-import edu.uiuc.ncsa.oa4mp.delegation.server.request.IssuerResponse;
+import org.oa4mp.delegation.server.ServiceTransaction;
+import org.oa4mp.delegation.server.request.IssuerResponse;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

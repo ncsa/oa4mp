@@ -4,7 +4,7 @@ import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
 import org.oa4mp.server.loader.oauth2.storage.tx.TXRecord;
 import org.oa4mp.server.loader.oauth2.storage.tx.TXRecordSerializationKeys;
 import org.oa4mp.server.loader.oauth2.storage.tx.TXStore;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientStore;
+import org.oa4mp.delegation.server.storage.ClientStore;
 import org.qdl_lang.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.StringUtils;

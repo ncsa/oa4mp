@@ -4,7 +4,7 @@ import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2ClientConverter;
-import edu.uiuc.ncsa.oa4mp.delegation.server.storage.ClientApproval;
+import org.oa4mp.delegation.server.storage.ClientApproval;
 import org.qdl_lang.extensions.QDLFunction;
 import org.qdl_lang.extensions.QDLMetaModule;
 import org.qdl_lang.state.State;

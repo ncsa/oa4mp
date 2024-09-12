@@ -4,12 +4,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>edu.uiuc.ncsa.myproxy</groupId>
-        <artifactId>oa4mp</artifactId>
-        <version>5.3-SNAPSHOT</version>
+        <groupId>org.oa4mp</groupId>
+        <artifactId>oa4mp-parent</artifactId>
+        <version>5.6-SNAPSHOT</version>
     </parent>
 
     <artifactId>installer</artifactId>
+    <name>OA4MP installer parent</name>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
@@ -20,7 +21,7 @@
     <dependency>
         <groupId>edu.uiuc.ncsa.security</groupId>
         <artifactId>web-installer</artifactId>
-        <version>5.3-SNAPSHOT</version>
+        <version>5.6-SNAPSHOT</version>
     </dependency>
 </dependencies>
 </project>

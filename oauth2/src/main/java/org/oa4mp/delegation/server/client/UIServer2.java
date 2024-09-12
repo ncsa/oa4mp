@@ -1,10 +1,10 @@
 package org.oa4mp.delegation.server.client;
 
-import org.oa4mp.delegation.request.UIRequest;
-import org.oa4mp.delegation.request.UIResponse;
-import org.oa4mp.delegation.server.UIServer;
-import org.oa4mp.delegation.server.OA2Constants;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
+import org.oa4mp.delegation.client.request.UIRequest;
+import org.oa4mp.delegation.client.request.UIResponse;
+import org.oa4mp.delegation.client.server.UIServer;
+import org.oa4mp.delegation.server.OA2Constants;
 
 import java.util.HashMap;
 

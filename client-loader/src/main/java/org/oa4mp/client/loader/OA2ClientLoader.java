@@ -21,7 +21,7 @@ import org.oa4mp.client.api.ClientXMLTags;
 import org.oa4mp.client.api.OA4MPServiceProvider;
 import org.oa4mp.client.api.loader.AbstractClientLoader;
 import org.oa4mp.client.api.storage.*;
-import org.oa4mp.delegation.DelegationService;
+import org.oa4mp.delegation.client.DelegationService;
 import org.oa4mp.delegation.common.OA4MPVersion;
 import org.oa4mp.delegation.common.storage.clients.Client;
 import org.oa4mp.delegation.common.token.TokenForge;

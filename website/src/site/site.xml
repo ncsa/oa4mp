@@ -6,7 +6,7 @@
         <href>http://www.ncsa.illinois.edu/</href>
     </bannerLeft>
     <bannerRight>
-        <name>OA4MP</name>
+        <name>OA4MP site CSS</name>
         <src>css/images/oa4mp-logo-small-2.png</src>
         <href>https://ncsa.github.io/oa4mp/</href>
     </bannerRight>
@@ -14,7 +14,7 @@
     <skin>
         <groupId>edu.uiuc.ncsa.maven.skin</groupId>
         <artifactId>skin</artifactId>
-        <version>5.3-SNAPSHOT</version>
+        <version>5.6-SNAPSHOT</version>
     </skin>
     <body>
         <menu name="OA4MP">
