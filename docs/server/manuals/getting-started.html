@@ -31,7 +31,7 @@
                 </a>
                                     <a href="https://ncsa.github.io/oa4mp/" id="bannerRight"  >
         
-                                                                    <img src="../../css/images/oa4mp-logo-small-2.png" alt="OA4MP"/>
+                                                                    <img src="../../css/images/oa4mp-logo-small-2.png" alt="OA4MP site CSS"/>
         
                 </a>
                 <div class="clear">
@@ -48,7 +48,7 @@
     
         
                     <div class="xleft">
-            Last Published: 2024-07-30
+            Last Published: 2024-09-12
                                 </div>
                 <div class="xright">            
     
@@ -58,7 +58,7 @@
                         
     
         
-                         Version: 5.3-SNAPSHOT
+                         Version: 5.6-SNAPSHOT
             </div>
     <div class="clear">
         <hr/>
@@ -146,12 +146,14 @@
 
 
 
-
 <h1>Overview</h1>
 
 
-<p>Welcome to OA4MP! This is a delegation service for MyProxy. It allows clients to request certificates and
-    users to securely authorize them using the OAuth delegation protocol. Current release is <b>3.0</b>.</p>
+<p>Welcome to OA4MP server! OA4MP stands for <b>O</b>pen <b>A</b>uthorization for <b>M</b>any <b>P</b>eople,
+    and allows open authorization with multiple identities.
+    The server  allows for authorization and issues tokens,
+    (hence some call it an <i>issuer</i>). There is also an
+    <a href="../../client/index.html">OA4MP client</a>. Current release is <b>5.6-SNAPSHOT</b>.</p>
 
 <section>
 <h2><a name="Prerequisites"></a>Prerequisites</h2>
@@ -167,12 +169,10 @@
     
 <li>Java 1.11. Higher versions of Java (like Java 17) won't work.</li>
     
-<li>Some form of persistent storage. This may be a file system, MySQL or PostgreSQL.</li>
+<li>Some form of persistent storage. This may be a file system, Derby, MySQL or PostgreSQL.</li>
     
 <li>Java mail. This must be configured regardless if notifications are set. Read <a href="../configuration/server-email.html" title="OA4MP: Email Notifications">here</a> for details.
     </li>
-    
-<li>Maven 3.0 or above (if building from the source)</li>
     
 <li>Possibly either the latest <a class="externalLink" href="http://dev.mysql.com/downloads/connector/j/">MySQL
         connector</a>. <a class="externalLink" href="https://downloads.mariadb.org/client-java/+releases/">Maria DB client</a>
@@ -200,13 +200,9 @@
 <h2><a name="Getting_and_deploying_from_the_war."></a>Getting and deploying from the war.</h2>
 
 
-<p>You may most easily a bare-bones version for testing by downloading the current reference war:</p>
+<p>You may most easily a bare-bones version for testing by downloading the current reference war from the
+    <a class="externalLink" href="https://github.com/ncsa/oa4mp/releases">GitHub OA4MP release page</a></p>
 
-
-<p><a class="externalLink" href="https://github.com/ncsa/oa4mp/releases/latest/oauth.war" title="OA4MP service war">oauth-server-latest.war</a>
-    <br /></br>
-    <a class="externalLink" href="https://github.com/ncsa/oa4mp/releases/latest/oauth.war.asc" title="PGP signature">(PGP signature)</a>
-</p>
 
 
 <p>Download this, read to <a href="../configuration/config-index.html" title="Server Configuration Reference Manual">configure
@@ -227,21 +223,6 @@ and you should end up with a deployable war.
 
 </section><section>
 <h3><a name="Writing_your_own_webapp."></a>Writing your own webapp.</h3>
-
-
-<p>If you decide to write your own webapp, you should use the following module:</p>
-
-<div>
-<pre>
-    &lt;dependency&gt;
-        &lt;artifactId&gt;oa4mp-server-oauth1&lt;/artifactId&gt;
-        &lt;groupId&gt;edu.uiuc.ncsa.myproxy&lt;/groupId&gt;
-        &lt;version&gt;4.3&lt;/version&gt;
-    &lt;/dependency&gt;
-</pre></div>
-
-<p>which will get the OAuth libraries and give you access to the configuration loader. </p>
-
 
 </section></section><section>
 <h2><a name="Deploying_to_Apache"></a>Deploying to Apache</h2>
@@ -312,7 +293,6 @@ and you should end up with a deployable war.
 <p>The file contains default user, table, database and schema names, which you may change if you see fit (be sure to
     pass these along in your configuration file!). Again, you only need to edit the values at the top of the file,
     thanks to PostgreSQL's support for variables.</p>
-
 
 </section></section>
 
