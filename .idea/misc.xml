@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CCaseConfig">
     <option name="checkoutReserved" value="false" />
@@ -41,6 +42,9 @@
     <option name="originalFiles">
       <list>
         <option value="$PROJECT_DIR$/pom.xml" />
+        <option value="$PROJECT_DIR$/oa4mp-webapp/pom.xml" />
+        <option value="$PROJECT_DIR$/client-oauth2/pom.xml" />
+        <option value="$PROJECT_DIR$/myproxy-website/pom.xml" />
       </list>
     </option>
   </component>

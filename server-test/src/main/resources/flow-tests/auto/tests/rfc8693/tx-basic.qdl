@@ -18,7 +18,6 @@ rt. := (args.0?exchange('-rt'):exchange('-rt', '-x')).'refresh_token';
 id. := (args.0?exchange('-id'):exchange('-id', '-x'));*/
 at. :=clc#exchange('-at','-subject',args.0?'at':'rt').'access_token';
 rt. :=clc#exchange('-rt','-subject',args.0?'at':'rt').'refresh_token';
-id. :=clc#exchange('-id','-subject',args.0?'at':'rt');
 ⊨ at.'jti' != tokens.'access_token'.'jti' : 'access token not updated';
 ⊨ rt.'jti' != tokens.'refresh_token'.'jti' : 'refresh token not updated';
 
@@ -26,6 +25,9 @@ id. :=clc#exchange('-id','-subject',args.0?'at':'rt');
 ⊨ at.'jwt'.'iss' == 'https://localhost:9443/oauth2' : 'wrong access token issuer';
 ⊨ at.'jwt'.'aud' == 'https://wlcg.cern.ch/jwt/v1/access' : 'wrong access token audience';
 ⊨ rt.'lifetime' == 3600000 : 'wrong refresh token lifetime';
+
+sleep(5000); // added 9/13/2024 since exchange happened so fast on new system iat test failed.
+id. :=clc#exchange('-id','-subject',args.0?'at':'rt');
 ⊨clc#claims().'sub' == 'jeff' : 'IDT wrong subject';
 ⊨clc#claims().'iss' == 'https://localhost:9443/oauth2' : 'IDT wrong issuer';
 ⊨clc#claims().'aud' == 'localhost:p1' : 'IDT wrong audience';

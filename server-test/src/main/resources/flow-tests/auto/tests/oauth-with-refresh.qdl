@@ -12,7 +12,7 @@ initialization := size(args())==1⇒args().0:import(load('test#/auto/utils/initi
 //checks:=initialization#checks();
 ini.:=initialization#get_client_ini(test_id);
 server_defaults.:=initialization# server_defaults();
-//cc.:=initialization#get_client_config(test_id);
+//cc.:=initializat:q!ion#get_client_config(test_id);
 
 tokens. := clc#rfc7523(params.);
 ⊨ tokens.'access_token'.'lifetime' == 1000*server_defaults.'at_lifetime' : 'wrong access token lifetime';

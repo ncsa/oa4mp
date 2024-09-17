@@ -26,7 +26,7 @@ public class TokenHandlerModule extends JavaModule {
     @Override
     public Module newInstance(State state1) {
         OA2State state = (OA2State)state1;
-        TokenHandlerModule thm = new TokenHandlerModule(URI.create("oa2:/qdl/oidc/token"), "tokens");
+        TokenHandlerModule thm = new TokenHandlerModule(URI.create("oa4mp:/qdl/oidc/token"), "tokens");
 
         ArrayList<QDLFunction> funcs = new ArrayList<>();
         IDTokenInitializer ida = new IDTokenInitializer();

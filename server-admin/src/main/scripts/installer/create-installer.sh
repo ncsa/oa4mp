@@ -23,7 +23,8 @@ fi
 
 # Get the actual manifest so that build info is available.
 cd $TARGET_ROOT || exit
-java  edu.uiuc.ncsa.install.ListDistroFiles $TARGET_ROOT
-jar cmf installer.mf "$JAR_NAME" edu/uiuc/ncsa/install/Installer.class dir_list.txt file_list.txt bin docs etc examples installer.mf lib log var version.txt wars
+#java  org.qdl_lang.install.ListDistroFiles $TARGET_ROOT
+java  org.oa4mp.server.admin.install.ListDistroFiles $TARGET_ROOT
+jar cmf installer.mf "$JAR_NAME" org/oa4mp/server/admin/install/Installer.class dir_list.txt file_list.txt bin docs etc examples installer.mf lib log var version.txt wars
 
 echo '     ... done!'

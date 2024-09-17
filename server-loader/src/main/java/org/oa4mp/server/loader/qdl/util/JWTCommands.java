@@ -1,24 +1,23 @@
 package org.oa4mp.server.loader.qdl.util;
 
-import org.oa4mp.server.loader.oauth2.state.ExtendedParameters;
-import org.oa4mp.server.loader.qdl.scripting.OA2State;
+import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
+import edu.uiuc.ncsa.security.util.jwk.JWKUtil2;
+import net.sf.json.JSONObject;
 import org.oa4mp.delegation.server.JWTUtil;
 import org.oa4mp.delegation.server.jwt.MyOtherJWTUtil2;
+import org.oa4mp.server.loader.oauth2.state.ExtendedParameters;
+import org.oa4mp.server.loader.qdl.scripting.OA2State;
 import org.qdl_lang.evaluate.IOEvaluator;
 import org.qdl_lang.exceptions.QDLException;
 import org.qdl_lang.extensions.QDLFunction;
-import org.qdl_lang.extensions.QDLMetaModule;
 import org.qdl_lang.extensions.QDLVariable;
 import org.qdl_lang.state.State;
 import org.qdl_lang.util.QDLFileUtil;
 import org.qdl_lang.variables.Constant;
 import org.qdl_lang.variables.QDLNull;
 import org.qdl_lang.variables.QDLStem;
-import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
-import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
-import edu.uiuc.ncsa.security.util.jwk.JWKUtil2;
-import net.sf.json.JSONObject;
 
 import java.net.URI;
 import java.security.SecureRandom;
@@ -30,7 +29,7 @@ import static org.oa4mp.server.loader.oauth2.state.ExtendedParameters.OA4MP_NS;
  * <p>Created by Jeff Gaynor<br>
  * on 4/7/20 at  1:06 PM
  */
-public class JWTCommands implements QDLMetaModule {
+public class JWTCommands  {
     JWKUtil2 jwkUtil;
     public boolean hasJWKS(){
         return !((jwks == null) || jwks.isEmpty());
@@ -965,7 +964,7 @@ public class JWTCommands implements QDLMetaModule {
         }
     }
 
-    @Override
+/*    @Override
     public JSONObject serializeToJSON() {
         return null;
     }
@@ -973,5 +972,5 @@ public class JWTCommands implements QDLMetaModule {
     @Override
     public void deserializeFromJSON(JSONObject jsonObject) {
 
-    }
+    }*/
 }

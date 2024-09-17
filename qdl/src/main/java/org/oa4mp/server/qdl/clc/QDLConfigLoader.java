@@ -28,6 +28,7 @@ import javax.inject.Provider;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.URI;
 import java.util.*;
 import java.util.logging.Level;
@@ -266,7 +267,7 @@ public class QDLConfigLoader<T extends OA2ClientEnvironment> extends OA2ClientLo
         return new StupidAssetStoreProvider(store);
     }
 
-    public static class StupidAssetStoreProvider<T extends AssetStore> implements Provider<T> {
+    public static class StupidAssetStoreProvider<T extends AssetStore> implements Provider<T>, Serializable {
         AssetStore assetStore;
 
         public StupidAssetStoreProvider(AssetStore assetStore) {

@@ -40,7 +40,7 @@ public class StoreAccessModule extends JavaModule {
      */
     @Override
     public Module newInstance(State state) {
-        StoreAccessModule storeAccessModule = new StoreAccessModule(URI.create("oa2:/qdl/store"), "store");
+        StoreAccessModule storeAccessModule = new StoreAccessModule(URI.create("oa4mp:/qdl/store"), "store");
 
 
         storeAccessModule.storeFacade = newStoreFacade();

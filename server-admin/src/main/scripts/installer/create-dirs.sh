@@ -41,17 +41,19 @@ fi
 cd $TARGET_ROOT || exit
 #rm -Rf *
 
-mkdir edu
-mkdir edu/uiuc
-mkdir edu/uiuc/ncsa
-mkdir edu/uiuc/ncsa/install
-
+mkdir org
+mkdir org/oa4mp
+mkdir org/oa4mp/server
+mkdir org/oa4mp/server/admin
+mkdir org/oa4mp/server/admin/install
 
 cd $TARGET_ROOT || exit
 cp $DEFAULT_OA4MP_ROOT_SOURCES/src/main/scripts/installer/installer.mf .
 cp $DEFAULT_OA4MP_ROOT_SOURCES/src/main/scripts/installer/version.txt .
 # following class has to be installed here so it executes later.
-cp "$DEFAULT_OA4MP_ROOT_SOURCES"/target/classes/edu/uiuc/ncsa/install/*.class edu/uiuc/ncsa/install
+cp "$DEFAULT_OA4MP_ROOT_SOURCES"/target/classes/org/oa4mp/server/admin/install/*.class org/oa4mp/server/admin/install
+# cp "$QDL_SOURCES"/target/classes/org/qdl_lang/install/*.class org/qdl_lang/install
+
 
 # Now make the directories
 mkdir "bin"

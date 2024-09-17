@@ -21,7 +21,7 @@ public class ClaimsModule extends JavaModule {
     protected ClaimsModule(URI namespace, String alias) {
         super(namespace, alias);
     }
-    public static final String NAMESPACE ="oa2:/qdl/oidc/claims";
+    public static final String NAMESPACE ="oa4mp:/qdl/oidc/claims";
     @Override
     public Module newInstance(State state) {
         ClaimsModule claimsModule = new ClaimsModule(URI.create(NAMESPACE), "claims");

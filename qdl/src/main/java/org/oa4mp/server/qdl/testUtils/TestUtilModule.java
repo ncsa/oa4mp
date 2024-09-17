@@ -22,7 +22,7 @@ public class TestUtilModule extends JavaModule {
 
     @Override
     public Module newInstance(State state) {
-        TestUtilModule m = new TestUtilModule(URI.create("oa2:/qdl/oidc/test/util"), "test_util");
+        TestUtilModule m = new TestUtilModule(URI.create("oa4mp:/qdl/oidc/test/util"), "test_util");
         TestUtils testUtils = new TestUtils();
         m.setMetaClass(testUtils);
         funcs = new ArrayList<>();

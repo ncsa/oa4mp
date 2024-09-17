@@ -22,7 +22,7 @@ public class PStoreAccessModule extends StoreAccessModule {
 
     @Override
     public Module newInstance(State state) {
-        PStoreAccessModule storeAccessModule = new PStoreAccessModule(URI.create("oa2:/qdl/p_store"), "p_store");
+        PStoreAccessModule storeAccessModule = new PStoreAccessModule(URI.create("oa4mp:/qdl/p_store"), "p_store");
         storeAccessModule.storeFacade = newStoreFacade();
 
         doIt(storeAccessModule, state);

@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import edu.uiuc.ncsa.security.util.ssl.SSLConfiguration;
 
 import javax.inject.Provider;
+import java.io.Serializable;
 import java.net.URI;
 import java.util.Collection;
 import java.util.List;
@@ -16,7 +17,7 @@ import java.util.Map;
  * <p>Created by Jeff Gaynor<br>
  * on 6/26/12 at  10:52 AM
  */
-public interface ClientLoaderInterface<T extends ClientEnvironment> extends ConfigurationLoader<T> {
+public interface ClientLoaderInterface<T extends ClientEnvironment> extends ConfigurationLoader<T>, Serializable {
     /**
      * The provider that creates an instance of the {@link OA4MPService}
      *

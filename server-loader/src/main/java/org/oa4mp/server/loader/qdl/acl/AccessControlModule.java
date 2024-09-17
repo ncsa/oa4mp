@@ -21,7 +21,7 @@ public class AccessControlModule extends JavaModule {
         super(namespace, alias);
     }
 
-    public static final String NAMESPACE =  "oa2:/qdl/acl";
+    public static final String NAMESPACE =  "oa4mp:/qdl/acl";
     @Override
     public Module newInstance(State state) {
 

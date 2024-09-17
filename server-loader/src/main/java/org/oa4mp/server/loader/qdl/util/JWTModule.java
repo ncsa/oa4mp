@@ -27,7 +27,7 @@ public class JWTModule extends JavaModule {
 
     public static final String JWT_COMMANDS_TAG = "jwt_commands";
 
-    public static final String NAMESPACE =  "oa2:/qdl/jwt";
+    public static final String NAMESPACE =  "oa4mp:/qdl/jwt";
 
     public JWTModule() {
     }
@@ -43,7 +43,7 @@ public class JWTModule extends JavaModule {
         JWTModule jwtModule = new JWTModule(URI.create(NAMESPACE), "jwt");
 
         JWTCommands jwtCommands = new JWTCommands(null);
-       jwtModule.setMetaClass(jwtCommands);
+     //  jwtModule.setMetaClass(jwtCommands);
         jwtModule.jwtCommands = jwtCommands;
         funcs = new ArrayList<>();
         funcs.add(jwtCommands.new CreateJWK());
