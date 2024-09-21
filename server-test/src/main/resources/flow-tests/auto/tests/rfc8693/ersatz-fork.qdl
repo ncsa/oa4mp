@@ -32,7 +32,7 @@ clc#read(saved_cfg , '-p'); // -p switch tell client that this is an ersatz clie
 old_tokens. := clc#tokens();
 
 old_id. := clc#claims();
-say('STARTING 𝕰𝖗s𝖆𝖙𝖟 FORK');
+//say('STARTING 𝕰𝖗s𝖆𝖙𝖟 FORK');
 tokens. := clc#exchange(args.0, args.1, args.2); // forks flow
 at. := tokens.'access_token';
 rt. := tokens.'refresh_token';

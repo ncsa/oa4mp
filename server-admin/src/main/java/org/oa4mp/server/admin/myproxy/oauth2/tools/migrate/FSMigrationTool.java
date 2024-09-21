@@ -477,6 +477,12 @@ public class FSMigrationTool extends CLITool {
         say("B = boolean, true or false");
         say("F = flag (present or not)");
         say("S = String. Double quote as needed");
+        say("**************************************************************");
+        say("* Be sure to read the documentation either on the website at *");
+        say("*      https://oa4mp.org/pdf/filestore-migration.pdf         *");
+        say("* or included in the standard distribution in                *");
+        say("*      $OA4MP_SERVER/docs/filestore-migration.pdf            *");
+        say("**************************************************************");
     }
 
     private static void oldHelp() {

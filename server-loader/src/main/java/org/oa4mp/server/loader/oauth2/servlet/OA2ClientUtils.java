@@ -1,5 +1,6 @@
 package org.oa4mp.server.loader.oauth2.servlet;
 
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import org.oa4mp.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
@@ -180,6 +181,12 @@ public class OA2ClientUtils {
      */
     public static LinkedList<String> createCallbacksForWebUI(OA2Client client,
                                                              String rawCBs) throws IOException {
+        if(StringUtils.isTrivial(rawCBs)){
+            // Fix https://github.com/ncsa/oa4mp/issues/206.
+            // no callbacks should not require they pass muster, since some clients
+            // only want to have the device flow.
+            return new LinkedList<>();
+        }
         BufferedReader br = new BufferedReader(new StringReader(rawCBs));
         String x = br.readLine();
 

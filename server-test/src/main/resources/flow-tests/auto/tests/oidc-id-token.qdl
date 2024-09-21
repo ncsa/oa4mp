@@ -19,6 +19,7 @@ claims. := clc#claims();
 ⊨claims.'sub' == 'threepwood' : 'wrong subject, got ' + (claims.'sub');
 ⊨∄claims.'is_memberOf' : 'got an is member of claim';
 exp:=claims.'exp';
+sleep(5000);
 tokens.:=clc#refresh();
 claims. := clc#claims();
 ⊨claims.'sub' == 'threepwood' : 'wrong subject, got ' + (claims.'sub');

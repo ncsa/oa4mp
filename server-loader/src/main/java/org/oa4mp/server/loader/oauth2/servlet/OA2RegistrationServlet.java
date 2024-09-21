@@ -32,6 +32,8 @@ import java.security.SecureRandom;
 import java.security.interfaces.RSAPublicKey;
 import java.util.*;
 
+import static org.oa4mp.server.loader.oauth2.servlet.OA2ClientUtils.createCallbacksForWebUI;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 3/20/14 at  4:48 PM
@@ -91,7 +93,8 @@ public class OA2RegistrationServlet extends AbstractRegistrationServlet {
 
     protected Client setupNewClient(HttpServletRequest request, HttpServletResponse response) throws Throwable {
         OA2Client client = (OA2Client) super.setupNewClient(request, response);
-        String rawCBs = getRequiredParam(request, CALLBACK_URI, client);
+        //String rawCBs = getRequiredParam(request, CALLBACK_URI, client);
+        String rawCBs = getParameter(request, CALLBACK_URI);
         String rawRTLifetime = getParameter(request, REFRESH_TOKEN_LIFETIME);
         String[] rawScopes = request.getParameterValues("chkScopes");
         if (rawScopes != null) {
@@ -215,9 +218,7 @@ public class OA2RegistrationServlet extends AbstractRegistrationServlet {
             }
         }
 
-        LinkedList<String> uris = OA2ClientUtils.createCallbacksForWebUI(client, rawCBs);
-        //LinkedList<String> uris = newCreateCallbacks(rawCBs);
-        client.setCallbackURIs(uris);
+        client.setCallbackURIs(createCallbacksForWebUI(client, rawCBs));
         client.setSignTokens(true); // part of CIL-359, signing ID tokens.
         // CIL-414 makes the approval record here so that we can get an accurate count later.
         ClientApproval approval = (ClientApproval) getOA2SE().getClientApprovalStore().create();
