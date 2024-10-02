@@ -2,6 +2,7 @@ package org.oa4mp.server.qdl;
 
 
 import org.qdl_lang.extensions.JavaModule;
+import org.qdl_lang.extensions.QDLFunction;
 import org.qdl_lang.module.Module;
 import org.qdl_lang.state.State;
 
@@ -27,7 +28,7 @@ public class ClientManagementModule extends JavaModule {
 
         ClientManagementCommands cc = new ClientManagementCommands();
         cmm.setMetaClass(cc);
-        funcs = new ArrayList<>();
+        ArrayList<QDLFunction> funcs = new ArrayList<>();
         funcs.add(cc.new InitMethod());
         funcs.add(cc.new ReadClient());
         funcs.add(cc.new SaveClient());

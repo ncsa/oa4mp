@@ -62,7 +62,12 @@ public class QDLACL implements QDLMetaModule {
             return null;
         }
     }
-
+public class ACLReject2 extends ACLReject{
+    @Override
+    public String getName() {
+        return "blacklist";
+    }
+}
     public static String ADD_TO_ACL_NAME = "acl_add";
 
     protected Boolean acceptOrReject(Object[] objects,
@@ -186,7 +191,12 @@ public class QDLACL implements QDLMetaModule {
             return doxx;
         }
     }
-
+   public class AddToACL2 extends AddToACL {
+       @Override
+       public String getName() {
+           return "add";
+       }
+   }
     public static String CHECK_ACL_NAME = "acl_check";
     public static Identifier ACL_ACCEPT_ALL = BasicIdentifier.newID("*");
 
@@ -248,6 +258,17 @@ public class QDLACL implements QDLMetaModule {
             doxx.add(getName() + " check the current access list. If there is no such entry, an illegal access is triggered.");
             doxx.add("See also: " + ADD_TO_ACL_NAME);
             return doxx;
+        }
+    }
+
+    /**
+     * This uses the short name for this so it can be used with better naming by
+     * the new module systsm, e.g. acl#add rather than acl#acl_add
+     */
+    public class CheckACL2 extends CheckACL {
+        @Override
+        public String getName() {
+            return "check";
         }
     }
 

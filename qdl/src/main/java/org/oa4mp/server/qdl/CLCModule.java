@@ -1,6 +1,7 @@
 package org.oa4mp.server.qdl;
 
 import org.qdl_lang.extensions.JavaModule;
+import org.qdl_lang.extensions.QDLFunction;
 import org.qdl_lang.module.Module;
 import org.qdl_lang.state.State;
 
@@ -27,6 +28,7 @@ public class CLCModule extends JavaModule {
         CLCModule clcModule = new CLCModule(URI.create("oa4mp:/qdl/oidc/client"), "clc");
         CLC clc = new CLC();
        clcModule.setMetaClass(clc);
+       ArrayList<QDLFunction> funcs = new ArrayList<>();
         funcs = new ArrayList<>();
         funcs.add(clc.new Access());
         funcs.add(clc.new AccessAT());

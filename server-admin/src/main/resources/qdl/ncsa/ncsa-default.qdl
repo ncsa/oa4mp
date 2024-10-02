@@ -20,74 +20,26 @@
 
 */
 debugger(1);
-DEBUG := debugger().'level'==1;
-say('debugger=' + to_string(debugger()));
-debugger(1, 'first debug message');
-is_defined(proxy_claims.)?say('*** proxy_claims'+to_string(proxy_claims.)):say('*** NO PROXY CLAIMS');
-logger('log message');
-// Debug stuff --  enable if running on my dev box. Should not be in store.
-if[DEBUG][
-  say('In debug = ON');
-  claims.idp := 'https://idp.ncsa.illinois.edu/idp/shibboleth';
-  claims.eppn := 'jgaynor@illinois.edu';
-  claims.debug := 'debugging mode on.';
-]; //end debugging hack
-debugger('at top');
-debugger('script arg count =' + script_args());
 
 script_load('utils/init.qdl');
 
-if[claims.idp != idp.ncsa][return();]; // never process anything unless IDP is right.
+claims.'idp' ≠ idp.'ncsa' ⇒ return(); // never process anything unless IDP is right.
 
 if[
-     exec_phase == 'pre_auth'
+     exec_phase ≡ 'pre_auth'
 ]then[
-     cfg. := new_template('ncsa');
+     cc ≔ j_load($$OA4MP_PATH + '.util.claims');
+     cfg. ≔ cc#new_template('ncsa');
      debugger('*** NCSA claims=' + print(claims.));
-     claims.uid := head(claims.eppn, '@'); // set search key
-     claim_sources. := claim_sources. ~ [create_source(cfg.)]; // add it to any claims
-     debugger('*** NCSA set claim_sources. ' + size(claim_sources.));
+     claims.'uid' ≔ head(claims.'eppn', '@'); // set search key
+     claim_sources. ≔ claim_sources. ~ [cc#create_source(cfg.)]; // add it to any claims
      debugger('*** NCSA updated claims #1 =' + print(claims.));
+     return();
 ]; //end if
 
- debugger('*** ncsa-default claims=' + print(claims.));
- if[exec_phase ∉ ['post_token', 'post_refresh', 'post_user_info']][return();];
- if[0==script_args()][return();]; // do not process claims
+ exec_phase ∉ ['post_token', 'post_refresh', 'post_user_info'] ⇒ return();
+ [0≡script_args() ⇒ return(); // do not process claims
 
- if[!is_defined(claims.isMemberOf.)][return();];
- if[to_boolean(script_args(0))][claims.isMemberOf. := claims.isMemberOf\*\name;];
+ !is_defined(claims.'isMemberOf') ⇒ return();
+ if[to_boolean(script_args(0))][claims.'isMemberOf' := claims.isMemberOf\*\name;];
  return();
- // rest of this is now ignored.
-
-if[
-   exec_phase ∈ ['post_token' ,'post_refresh', 'post_user_info'] // CIL-1327 only do this in token/refresh/user info
-]then[
-     // default is false -- return whole list
-    convert := false;
-    if[
-        0 < script_args()
-      ][
-        convert := to_boolean(script_args(0));
-       ];
-
-    if[!convert][return();];
-
-   // then take the isMemberOf claims and return them as a flat list, not as a JSON structure.
-    s. := null; // initialize it
-
-    if[
-       !is_defined(claims.isMemberOf.)
-      ][
-       return();
-    ];
-     n := size(claims.isMemberOf.);
-    while[
-       for_next(j,n)
-    ][
-       s.j := claims.isMemberOf.j.name;
-    ]; // end while
-    claims.isMemberOf. := s.;
-];
-
-     debugger('*** NCSA updated claims #2 =' + print(claims.));
-

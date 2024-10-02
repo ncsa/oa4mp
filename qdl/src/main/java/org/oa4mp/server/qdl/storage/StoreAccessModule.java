@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
+import static org.oa4mp.server.qdl.storage.StoreFacade.STORE_TYPES_STEM_NAME;
+import static org.oa4mp.server.qdl.storage.StoreFacade.STORE_TYPE_CLIENT;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -71,7 +73,7 @@ public class StoreAccessModule extends JavaModule {
 
     protected List<QDLVariable> createVarList(StoreFacade sf) {
         List<QDLVariable> vars = new ArrayList<>();
-        vars.add(sf.new FacadeHelp());
+     //   vars.add(sf.new FacadeHelp());
         vars.add(sf.new StoreType());
         return vars;
     }
@@ -204,20 +206,22 @@ public class StoreAccessModule extends JavaModule {
         if (descr.isEmpty()) {
             descr.add("Module for accessing OA4MP stores (except permissions, which require their");
             descr.add("own machinery and hence they have their own module.");
+            descr.add("The power of this module is that each object is turned into a stem and");
+            descr.add("may be treated like a QDL object, then saved. There are many utilities too.");
             descr.add("All operations are available, such as creating objects and getting");
-            descr.add("objects or searches. Note that you will get a stem of the properties ");
-            descr.add("for the object. This determines the object. Note that saving the object");
+            descr.add("objects or searches. Note that saving the object");
             descr.add("is not an update, i.e., if you remove properties, they will be deleted");
             descr.add("in the store.");
-            descr.add("Use.");
-            descr.add("1. use module_import(uri, component), e.g. ");
-            descr.add("module_import('oa2:/qdl/store', 'clients');");
-            descr.add("2. initialize the store");
-            descr.add("clients#init('/home/ncsa/dev/csd/config/server-oa2.xml', 'localhost:oa4mp.oa2.mariadb', 'client');");
+            descr.add("Use. To make a store for clients");
+            descr.add("1. create the module variable ");
+            descr.add("\n   clients. := j_load('oa4mp.client.store');\n");
+            descr.add("2. initialize the store, last argument sets the type");
+            descr.add("   clients#init('/home/ncsa/dev/csd/config/server-oa2.xml', 'localhost:oa4mp.oa2.mariadb', "
+                    + STORE_TYPES_STEM_NAME + ".'" + STORE_TYPE_CLIENT + "');");
             descr.add("This returns true if the store intialized ok.");
             descr.add("3. Issue commands, e.g.");
-            descr.add("  x. := store#search('client_id', '.*234.*')\n" +
-                    "  size(x.)\n" +
+            descr.add("   x. := clients#search('client_id', '.*234.*');\n" +
+                    "   size(x.);\n" +
                     "4\n");
             descr.add("Indicates that 4 client records were found. The stem contains the");
             descr.add("records themselves and may be substantial.");

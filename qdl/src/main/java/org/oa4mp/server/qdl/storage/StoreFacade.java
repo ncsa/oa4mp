@@ -13,7 +13,6 @@ import org.oa4mp.delegation.common.storage.TransactionStore;
 import org.oa4mp.delegation.server.storage.ClientStore;
 import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
-import org.qdl_lang.evaluate.SystemEvaluator;
 import org.qdl_lang.extensions.QDLFunction;
 import org.qdl_lang.extensions.QDLVariable;
 import org.qdl_lang.state.State;
@@ -877,7 +876,7 @@ public class StoreFacade /*implements QDLMetaModule*/ {
         }
     }
 
-    public String STORE_TYPES_STEM_NAME = "$$STORE_TYPE.";
+    public static String STORE_TYPES_STEM_NAME = "$$STORE_TYPE.";
 
     public class StoreType implements QDLVariable {
         QDLStem storeTypes = null;
@@ -893,7 +892,7 @@ public class StoreFacade /*implements QDLMetaModule*/ {
         }
     }
 
-    public String STORE_HELP_NAME = "store_help";
+  /*  public String STORE_HELP_NAME = "store_help";
 
     public class FacadeHelp implements QDLVariable {
         @Override
@@ -944,7 +943,7 @@ public class StoreFacade /*implements QDLMetaModule*/ {
             return help;
         }
     }
-
+*/
     /**
      * Convert a list of objects to version id stems. The name is the name of the calling function, so
      * error can be better created.

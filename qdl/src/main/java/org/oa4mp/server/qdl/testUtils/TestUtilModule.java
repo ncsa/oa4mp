@@ -1,6 +1,7 @@
 package org.oa4mp.server.qdl.testUtils;
 
 import org.qdl_lang.extensions.JavaModule;
+import org.qdl_lang.extensions.QDLFunction;
 import org.qdl_lang.module.Module;
 import org.qdl_lang.state.State;
 
@@ -25,7 +26,8 @@ public class TestUtilModule extends JavaModule {
         TestUtilModule m = new TestUtilModule(URI.create("oa4mp:/qdl/oidc/test/util"), "test_util");
         TestUtils testUtils = new TestUtils();
         m.setMetaClass(testUtils);
-        funcs = new ArrayList<>();
+
+        ArrayList<QDLFunction> funcs = new ArrayList<>();
         funcs.add(testUtils.new ComputeIDTLifetime());
         funcs.add(testUtils.new ComputeATLifetime());
         funcs.add(testUtils.new ComputeRTLifetime());
