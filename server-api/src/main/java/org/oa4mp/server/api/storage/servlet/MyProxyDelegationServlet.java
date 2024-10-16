@@ -325,6 +325,12 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
         return HeaderUtils.getFirstParameters(req);
     }
 
+    /**
+     * Gets the first values of the parameter with the give key or null if no such value.
+     * @param req
+     * @param key
+     * @return
+     */
     public String getFirstParameterValue(HttpServletRequest req, String key){
         return HeaderUtils.getFirstParameterValue(req, key);
     }

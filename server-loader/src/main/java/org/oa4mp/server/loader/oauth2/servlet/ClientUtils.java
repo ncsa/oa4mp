@@ -408,7 +408,7 @@ public class ClientUtils {
         while (stringTokenizer.hasMoreTokens()) {
             passedInScopes.add(stringTokenizer.nextToken());
         }
-        return resolveScopes(request, st, oa2Client, passedInScopes, isNew, isRFC8628);
+        return resolveScopes(request, st, oa2Client, passedInScopes, isNew, isRFC8628, false);
     }
 
     public static Collection<String> resolveScopes(HttpServletRequest request,
@@ -416,7 +416,8 @@ public class ClientUtils {
                                                    OA2Client oa2Client,
                                                    Collection passedInScopes,
                                                    boolean isNew,
-                                                   boolean isRFC8628) {
+                                                   boolean isRFC8628,
+                                                   boolean isRFC6749_4_4) {
 
         Collection<String> requestedScopes = new ArrayList<>();
 
@@ -435,21 +436,7 @@ public class ClientUtils {
         debugger.trace(ClientUtils.class, ".resolveScopes: user validated scopes=" + st.getValidatedScopes());
         */
 
-/*        if (isRFC8628) {
-            // It is never an error to have no scopes if this is the RFC8628 servlet, since there is no way
-            // to pass them in during the initial request. Just return an empty list
-            return requestedScopes;
-        } else {
-            // It is possible that there are no scopes at all for a pure OAuth 2 client.
-            if (!oa2Client.getScopes().isEmpty()) {
-                throw new OA2RedirectableError(OA2Errors.INVALID_SCOPE,
-                        "Missing scopes parameter.",
-                        HttpStatus.SC_BAD_REQUEST,
-                        st.getRequestState(),
-                        st.getCallback(), oa2Client);
-            }
-        //    return requestedScopes;
-        }*/
+
         // The scopes the client wants:
 
         // Fixes github issue 8, support for public clients: https://github.com/ncsa/oa4mp/issues/8
@@ -477,7 +464,7 @@ public class ClientUtils {
             String x = y.toString();
             // CIL-1012 offline_access. Some clients end this along, but it has no effect.
             // Basically if get it, we don't want to throw an error.
-            if (x.equals(OA2Scopes.SCOPE_OFFLINE_ACCESS)) {
+            if ((!isRFC6749_4_4) && x.equals(OA2Scopes.SCOPE_OFFLINE_ACCESS)) {
                 // Basically just always ignore it.
                 continue;
             }
@@ -494,7 +481,9 @@ public class ClientUtils {
         }
         if (((OA2SE) getServiceEnvironment()).isOIDCEnabled()) {
 
-            if (oa2Client.getScopes().contains(OA2Scopes.SCOPE_OPENID) && !hasOpenIDScope)
+            if (oa2Client.useStrictScopes()
+                    && oa2Client.getScopes().contains(OA2Scopes.SCOPE_OPENID)
+                    && !hasOpenIDScope)
                 throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST,
                         "The " + OA2Scopes.SCOPE_OPENID + " scope is missing from the request.",
                         HttpStatus.SC_BAD_REQUEST,

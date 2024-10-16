@@ -333,7 +333,7 @@ public class ProxyUtils {
     }
 
     /**
-     * Attempt to do a refresh of the claims from the proxy server. This is not sued yet since there are a
+     * Attempt to do a refresh of the claims from the proxy server. This is not used yet since there are a
      * lot of policy type decisions to make. For instance, what if the lifetimes of tokens on the proxy
      * are much shorter than on the server? Then there has to be some way to communicate that no updates
      * to the claims are possible.
@@ -344,8 +344,10 @@ public class ProxyUtils {
      */
     protected static void doProxyClaimsRefresh(OA2SE oa2SE, OA2ServiceTransaction t) throws Throwable {
         OA2CLCCommands clcCommands = getCLC(oa2SE, t);
-        clcCommands.refresh(new InputLine("user_info "));
-        if (!clcCommands.hadException()) {
+        try {
+           //clcCommands.refresh(new InputLine("user_info "));
+           clcCommands.refresh();
+        }catch(Throwable throwable){
             setClaimsFromProxy(t, clcCommands.getIdToken().getPayload(), MyProxyDelegationServlet.createDebugger(t.getOA2Client()));
         }
         t.setProxyState(clcCommands.toJSON());

@@ -26,7 +26,10 @@ import java.util.StringTokenizer;
  */
 public class RFC7523Utils implements RFC7523Constants {
     /**
-     * Does a POST to the endpoint using the client's key.
+     * Does a POST to the endpoint using the client's key. This fuilfills RFC 7523's section 2.2,
+     * authentication using a JWT. This returns a string (a JSON object) since there are
+     * various checks that can/should
+     * be done on the response, but not necessarily immediately.
      *
      * @param serviceClient
      * @param oa2Client
@@ -149,7 +152,8 @@ public class RFC7523Utils implements RFC7523Constants {
     }
 
     /**
-     * Creates an authorization grant for the client. Note that clients must have a previous
+     * Creates an authorization grant for the client as per RFC 7523 section 2.1.
+     * Note that clients must have a previous
      * trust relationship to do this, or it will fail.
      *
      * @param serviceClient

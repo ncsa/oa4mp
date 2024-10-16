@@ -1,0 +1,39 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   Tests a client with an echo configuration -- the scopes passed in are simply returned
+   as the scopes in the access token.
+
+ tokens{
+   access{
+     type=wlcg
+       "qdl":{
+         "code":"access_token.scope :=detokenize(scopes., ' ');",
+         "xmd":{"exec_phase":["post_token", "post_refresh","post_exchange"]}
+       } //end QDL
+     } //end access token
+ }// end tokens
+*/
+test_id:= 'ccf.oauth.qdl';
+clc#init($$OA4MP_CLC_INI, test_id);
+initialization := size(args())==1⇒args().0:import(load('test#/auto/utils/initialization.mdl'));
+ini.:=initialization#get_client_ini(test_id);
+server_defaults.:=initialization# server_defaults();
+// Three quick tests. This client is no configured to return id token or refresh tokens ever,
+// so requests for them should simply be ignored
+scopes. := ['read:/foo', 'write:/bar', 'compute.start'];
+aud := 'ANY';
+tokens. := clc#ccf({'audience':aud,'scope':scopes.}); // from the raw response
+
+say(clc#tokens());
+⊨ tokens.'expires_in' == server_defaults.'at_lifetime' : 'wrong access token lifetime';
+⊨ ∄tokens.'refresh_token' : 'should not get a refresh token by default.';
+⊨ size(clc#claims()) == 0 : 'should not get id token by default';
+at. := clc#tokens().'access_token'.'jwt';
+⊨ false ∉ (scopes. ∈ tokenize(at.scope, ' ')) : 'wrong scopes: ' + at.scope;
+⊨ at.'aud' == aud;
+/*  clc#user_info();
+  clc#refresh();
+  clc#exchange();*/
+
+say('ok: OAuth client credentials flow, refresh token, with scripting');

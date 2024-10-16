@@ -155,7 +155,9 @@ public class OA2ClaimsUtil implements ScriptingConstants {
             if (t.getOA2Client().isPublicClient() && !t.getScopes().contains(OA2Scopes.SCOPE_OPENID)) {
                 throw new OA2GeneralError(OA2Errors.INVALID_SCOPE, "invalid scope: no open id scope", HttpStatus.SC_UNAUTHORIZED, null,t.getClient());
             }
-            if (t.getOA2Client().getScopes().contains(OA2Scopes.SCOPE_OPENID) && !t.getScopes().contains(OA2Scopes.SCOPE_OPENID)) {
+            if (t.getOA2Client().useStrictScopes()
+                    && t.getOA2Client().getScopes().contains(OA2Scopes.SCOPE_OPENID)
+                    && !t.getScopes().contains(OA2Scopes.SCOPE_OPENID)) {
                 throw new OA2GeneralError(OA2Errors.INVALID_SCOPE, "invalid scope: no open id scope", HttpStatus.SC_UNAUTHORIZED, null, t.getClient());
             }
         } else {

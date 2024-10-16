@@ -112,6 +112,7 @@ public abstract class OA2ClientLoaderImpl<T extends OA2ClientEnvironment> implem
                             new PAServer2(createServiceClient(getAssetURI())),
                             new UIServer2(createServiceClient(getUIURI())),
                             new RTServer2(createServiceClient(getAccessTokenURI()), getIssuer(), getWellKnownURI(), isOIDCEnabled()), // as per spec, refresh token server is at same endpoint as access token server.
+                            new RFC6749_4_4Server(createServiceClient(getAccessTokenURI()), getIssuer(), getWellKnownURI(), isOIDCEnabled()),
                             new RFC7009Server2(createServiceClient(getRFC7009Endpoint()), getIssuer(), getWellKnownURI(), isOIDCEnabled()),
                             new RFC7662Server2(createServiceClient(getRFC7662Endpoint()), getIssuer(), getWellKnownURI(), isOIDCEnabled()),
                             new RFC7523Server(createServiceClient(getAccessTokenURI()), getIssuer(), getWellKnownURI(), isOIDCEnabled()),

@@ -3,6 +3,7 @@ package org.oa4mp.client.loader;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
 import edu.uiuc.ncsa.security.util.crypto.CertUtil;
 import edu.uiuc.ncsa.security.util.crypto.KeyUtil;
@@ -155,7 +156,7 @@ public class OA2MPService extends OA4MPService {
     public void preRequestCert(Asset asset, Map parameters) {
         // do nothing here in this case. Protocol says add cert req before getCert.
         if (!parameters.containsKey(getEnvironment().getConstants().get(CALLBACK_URI_KEY))) {
-            if(getEnvironment().getCallback() ==null){
+            if (getEnvironment().getCallback() == null) {
                 throw new IllegalArgumentException("missing callback in configuration");
             }
             parameters.put(getEnvironment().getConstants().get(CALLBACK_URI_KEY), getEnvironment().getCallback().toString());
@@ -215,7 +216,7 @@ public class OA2MPService extends OA4MPService {
         ATResponse2 atResponse2 = (ATResponse2) getEnvironment().getDelegationService().getAT(dar);
         asset.setIssuedAt(new Date(atResponse2.getAccessToken().getIssuedAt()));
         //asset.setIssuedAt((Date) atResponse2.getParameters().get(OA2Claims.ISSUED_AT));
-        if(atResponse2.hasIDToken() && atResponse2.getIdToken().getPayload().containsKey(OA2Claims.SUBJECT)) {
+        if (atResponse2.hasIDToken() && atResponse2.getIdToken().getPayload().containsKey(OA2Claims.SUBJECT)) {
             asset.setUsername(atResponse2.getIdToken().getPayload().getString(OA2Claims.SUBJECT));
             asset.setIdToken(atResponse2.getIdToken());
         }
@@ -629,6 +630,49 @@ public class OA2MPService extends OA4MPService {
         return ds2.rfc7662(request).getResponse();
     }
 
+    public JSONObject rfc6749_4_4(OA2Asset asset, Map parameters, boolean useRFC7523) {
+        RFC6749_4_4Request req;
+        if (useRFC7523) {
+            if (!getEnvironment().hasJWKS()) {
+                throw new IllegalArgumentException("sorry, but this client does not have any keys.");
+            }
+            // do RFC 7523 stuff
+            req = new RFC6749_4_4Request(getEnvironment().getClient(), parameters,getEnvironment().getKid());
+        } else {
+            if (StringUtils.isTrivial(getEnvironment().getClient().getSecret())) {
+                throw new IllegalArgumentException("sorry, but this client does not have a secret. Cannot start a flow that requires a secret.");
+            }
+            parameters.put(CLIENT_ID, getEnvironment().getClient().getIdentifierString());
+            parameters.put(CLIENT_SECRET, getEnvironment().getClient().getSecret());
+            req = new RFC6749_4_4Request();
+        }
+        req.setParameters(parameters);
+        DS2 ds2 = (DS2) getEnvironment().getDelegationService();
+        RFC6749_4_4_Response response = ds2.rfc6749_4_4(req);
+        JSONObject json = response.getJSON();
+        if (json.containsKey(NONCE) && !NonceHerder.hasNonce((String) json.get(NONCE))) {
+            throw new InvalidNonceException("Unknown nonce.");
+        }
+        NonceHerder.removeNonce((String) json.get(NONCE)); // prevent replay attacks.
+        if(!json.containsKey(ACCESS_TOKEN)) {
+            throw new IllegalArgumentException("No access token found in server response");
+        }
+        AccessTokenImpl at = TokenFactory.createAT(json.getString(ACCESS_TOKEN));
+        asset.setAccessToken(at);
+        if(json.containsKey(ID_TOKEN)){
+            IDTokenImpl idt = TokenFactory.createIDT(json.getString(ID_TOKEN));
+            asset.setIdToken(idt);
+        }
+        if(json.containsKey(REFRESH_TOKEN)) {
+            RefreshTokenImpl rt = TokenFactory.createRT(json.getString(REFRESH_TOKEN));
+            asset.setRefreshToken(rt);
+        }else{
+          asset.setRefreshToken(null);
+        }
+        getAssetStore().save(asset);
+        return json;
+    }
+
     public JSONObject rfc7523(OA2Asset asset, Map parameters) {
         RFC7523Request request = new RFC7523Request();
         request.setKeyID(getEnvironment().getKid());
@@ -660,23 +704,7 @@ public class OA2MPService extends OA4MPService {
         }
         getAssetStore().save(asset);
 
-/*
-      asset.setIssuedAt((Date) atResponse2.getParameters().get(OA2Claims.ISSUED_AT));
-        asset.setUsername((String) atResponse2.getParameters().get(OA2Claims.SUBJECT));
-        if (atResponse2.getParameters().containsKey(NONCE) && !NonceHerder.hasNonce((String) atResponse2.getParameters().get(NONCE))) {
-            throw new InvalidNonceException("Unknown nonce.");
-        }
-        NonceHerder.removeNonce((String) atResponse2.getParameters().get(NONCE)); // prevent replay attacks.
 
-        asset.setAccessToken((AccessTokenImpl) atResponse2.getAccessToken());
-        asset.setRefreshToken(atResponse2.getRefreshToken());
-        Object idToken = atResponse2.getParameters().get(OA2Constants.ID_TOKEN);
-        if (idToken != null) {
-            asset.setIdToken((JSONObject) idToken);
-        }
-        getAssetStore().save(asset);
-        return atResponse2;
- */
         return response.getResponse();
     }
 }

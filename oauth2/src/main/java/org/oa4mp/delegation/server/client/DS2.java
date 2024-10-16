@@ -32,6 +32,7 @@ public class DS2 extends DelegationService {
                PAServer paServer,
                UIServer2 uiServer,
                RTServer rtServer,
+               RFC6749_4_4Server rfc6749_4_4Server,
                RFC7009Server rfc7009Server,
                RFC7662Server rfc7662Server,
                RFC7523Server rfc7523Server,
@@ -39,6 +40,7 @@ public class DS2 extends DelegationService {
         super(agServer, atServer, paServer);
         this.uiServer = uiServer;
         this.rtServer = rtServer;
+        this.rfc6749_4_4Server = rfc6749_4_4Server;
         this.rfc7009Server = rfc7009Server;
         this.rfc7662Server = rfc7662Server;
         this.rfc7523Server = rfc7523Server;
@@ -48,6 +50,8 @@ public class DS2 extends DelegationService {
     public RFC8623Server getRfc8623Server() {
         return rfc8623Server;
     }
+
+    RFC6749_4_4Server rfc6749_4_4Server;
 
     public void setRfc8623Server(RFC8623Server rfc8623Server) {
         this.rfc8623Server = rfc8623Server;
@@ -90,28 +94,32 @@ public class DS2 extends DelegationService {
     }
 
     public RFC7009Response rfc7009(RFC7009Request request) {
-        return  getRfc7009Server().processRFC7009Request(request);
+        return getRfc7009Server().processRFC7009Request(request);
     }
 
     public RFC7662Response rfc7662(RFC7662Request request) {
         return getRfc7662Server().processRFC7662Request(request);
     }
 
-    public RFC7523Response rfc7523(RFC7523Request request){
-       return rfc7523Server.processRFC7523Request(request);
+    public RFC6749_4_4_Response rfc6749_4_4(RFC6749_4_4Request request) {
+        return rfc6749_4_4Server.processRFC6749_4_4Request(request);
     }
+
+    public RFC7523Response rfc7523(RFC7523Request request) {
+        return rfc7523Server.processRFC7523Request(request);
+    }
+
     @Override
     public DelegationResponse processDelegationRequest(DelegationRequest delegationRequest) {
         DelegationResponse delResp = new DelegationResponse(null);
-        Map<String,String> m = delegationRequest.getParameters();
+        Map<String, String> m = delegationRequest.getParameters();
         m.put(OA2Constants.CLIENT_ID, delegationRequest.getClient().getIdentifierString());
         m.put(OA2Constants.REDIRECT_URI, delegationRequest.getParameters().get(OA2Constants.REDIRECT_URI));
-        URI authZUri = ((AGServer2)getAgServer()).getServiceClient().host();
+        URI authZUri = ((AGServer2) getAgServer()).getServiceClient().host();
         URI redirectURI = URI.create(ServiceClient.convertToStringRequest(authZUri.toString(), m));
         delResp.setParameters(m); //send them all back.
         delResp.setRedirectUri(redirectURI);
         return delResp;
-
     }
 
     /**
@@ -132,6 +140,7 @@ public class DS2 extends DelegationService {
         }
         return URI.create(rc);
     }
+
     public RFC7662Server getRfc7662Server() {
         return rfc7662Server;
     }

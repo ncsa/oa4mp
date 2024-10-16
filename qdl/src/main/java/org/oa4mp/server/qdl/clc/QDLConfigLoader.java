@@ -62,8 +62,51 @@ public class QDLConfigLoader<T extends OA2ClientEnvironment> extends OA2ClientLo
 
     QDLStem fullConfig;
 
-    protected void initialize(QDLStem s, String configName) {
-        fullConfig = s;
+    /**
+     * Resolve the extension property for a client. If the client extends another one
+     * track that down and its extensions. Otherwise, do nothing.
+     *
+     * @param all
+     * @param target
+     * @return
+     */
+    protected QDLStem resolveExtends(QDLStem all, QDLStem target) {
+        // Fix https://github.com/ncsa/oa4mp/issues/210
+        if (!target.containsKey(EXTENDS)) {
+            return target;  // This extends nothing
+        }
+        // Next figures out if the extends entry is a string or a list of strings
+        Object obj = target.getByMultiIndex(EXTENDS); // reuse obj;
+        QDLStem ext;
+        if (obj instanceof QDLStem) {
+            ext = (QDLStem) obj; //ext is the list of extensions
+        } else {
+            if (obj instanceof String) {
+                ext = new QDLStem();
+                ext.put(0L, obj);
+            } else {
+                throw new IllegalArgumentException("The extends list must contain only strings");
+            }
+        }
+        if (!ext.isList()) {
+            throw new IllegalArgumentException("The extends object must be a list ");
+        }
+        // So ext is now a list of antecessors.
+        // Spec says to do resolutions in order, so in [a0, a1, a2, ...] a0 is overridden by a1, etc.
+        for (Object value : ext.getQDLList().values()) {
+            String name = (String) value;
+            QDLStem y = resolveExtends(all, (QDLStem) all.getByMultiIndex(name));
+            target = target.union(y);
+        }
+        target.remove(EXTENDS); // So this is resolved and won't be redone later
+        return target;
+    }
+
+    protected QDLStem initialize(QDLStem s, String configName) {
+        return NEWinitialize(s, configName);
+    }
+
+    protected QDLStem NEWinitialize(QDLStem s, String configName) {
         Object obj = null;
         try {
             obj = s.getByMultiIndex(configName); // because the constructor
@@ -77,53 +120,15 @@ public class QDLConfigLoader<T extends OA2ClientEnvironment> extends OA2ClientLo
         if (!(obj instanceof QDLStem)) {
             throw new IllegalArgumentException(configName + " must be a stem, but was a " + obj.getClass().getSimpleName());
         }
-        QDLStem base = (QDLStem) obj; // base is the original stem with all the configurations.
-        if (base.containsKey(EXTENDS)) {
-            obj = base.getByMultiIndex(EXTENDS); // reuse obj;
-            QDLStem ext;
-            if (obj instanceof QDLStem) {
-                ext = (QDLStem) obj; //ext is the list of extensions
-            } else {
-                if (obj instanceof String) {
-                    ext = new QDLStem();
-                    ext.put(0L, obj);
-                } else {
-                    throw new IllegalArgumentException("The extends list must contain only strings");
-                }
-            }
-            if (!ext.isList()) {
-                throw new IllegalArgumentException("The extends object must be a list ");
-            }
-            QDLStem arg = null;
-            // so if ext is the current configuration and extends = [a,b,c,d] this is
-            // a~b~c~d~ext
-            // so much easier in QDL...
-            for (Object x : ext.getQDLList().values()) {
-                boolean firstPass = true;
-                if (!(x instanceof String)) {
-                    throw new IllegalArgumentException("All the elements in the extends list must be names of configuration, i.e., strings.");
-                }
-                if (s.containsKey((String) x)) {
-                    QDLStem y = s.getStem((String) x);
-                    if (firstPass) {
-                        arg = y;
-                        firstPass = false;
-                    } else {
-                        arg = arg.union(y);
-                    }
-                }
-            }
-            if (arg != null) {
-                base = arg.union(base); // argument overrides values in arg.
-            }
-        }
-        config = base;
+        return resolveExtends(s, (QDLStem) obj);
     }
 
     QDLStem config;
 
     public QDLConfigLoader(QDLStem stem, String configName) {
-        initialize(stem, configName); // sets config
+        fullConfig = stem;
+        config = initialize(stem, configName); // sets config
+
         setConfigName(configName);
     }
 
@@ -171,11 +176,14 @@ public class QDLConfigLoader<T extends OA2ClientEnvironment> extends OA2ClientLo
     public JSONWebKeys getKeys() {
         if (jsonWebKeys == null) {
             String path = getConfig().getString(JWKS);
-            JWKUtil2 jwkUtil2 = new JWKUtil2();
-            try {
-                jsonWebKeys = jwkUtil2.fromJSON(new File(path));
-            } catch (IOException e) {
-                throw new IllegalArgumentException("the file '" + path + "' could not be loaded:" + e.getMessage());
+            if (path != null) {
+
+                JWKUtil2 jwkUtil2 = new JWKUtil2();
+                try {
+                    jsonWebKeys = jwkUtil2.fromJSON(new File(path));
+                } catch (IOException e) {
+                    throw new IllegalArgumentException("the file '" + path + "' could not be loaded:" + e.getMessage());
+                }
             }
         }
         return jsonWebKeys;
@@ -703,7 +711,8 @@ public class QDLConfigLoader<T extends OA2ClientEnvironment> extends OA2ClientLo
 
     public static void main(String[] args) throws Throwable {
         String clientFile = "/home/ncsa/dev/csd/config/auto-test/clients.ini";
-        String cfgName = "commandline2";
+        //String cfgName = "commandline2";
+        String cfgName = "oauth.conf.basic";
         IniParserDriver iniParserDriver = new IniParserDriver();
         FileReader fileReader = new FileReader(clientFile);
         QDLStem out = iniParserDriver.parse(fileReader, true);

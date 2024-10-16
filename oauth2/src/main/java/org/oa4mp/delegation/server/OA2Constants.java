@@ -49,6 +49,12 @@ public interface OA2Constants {
      */
     public static String GRANT_TYPE_IMPLICIT = "implicit";
 
+    /**
+     * Use for <a href="https://tools.ietf.org/html/rfc6749#section-4.4">client credentials flow.</a>
+     */
+    // https://github.com/ncsa/oa4mp/issues/209
+    public static String GRANT_TYPE_CLIENT_CREDENTIALS = "client_credentials";
+
     // CIL-1101
     public static String GRANT_TYPE_DEVICE_FLOW = "urn:ietf:params:oauth:grant-type:device_code";
 

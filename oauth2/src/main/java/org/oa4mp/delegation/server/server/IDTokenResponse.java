@@ -171,14 +171,19 @@ public abstract class IDTokenResponse extends IResponse2 {
         }
 
         String ss = OA2Scopes.ScopeUtil.toString(allScopes);
-        if(!StringUtils.isTrivial(ss)) {
+        if (!StringUtils.isTrivial(ss)) {
             m.put(SCOPE, ss);
         }
         // We have to compute the user metadata no matter what, but only return it if the
-        // client is OIDC.
+        // client is OIDC AND has requested it.
         if (isOIDC() || serviceTransaction.getResponseTypes().contains(RESPONSE_TYPE_ID_TOKEN)) {
-            DebugUtil.trace(this, "writing ID token response");
-            m.put(ID_TOKEN, getIdToken().getToken());
+            if (st.getScopes().contains(OA2Scopes.SCOPE_OPENID)) {
+                // It is still possible that an OIDC client does not request its openid scope.
+                // There is nothing the spec that says it has to, just that it is not acting
+                // like an OIDC client, but a standard OAuth 2 client. It can happen.
+                DebugUtil.trace(this, "writing ID token response");
+                m.put(ID_TOKEN, getIdToken().getToken());
+            }
         }
 
         JSONObject json = JSONObject.fromObject(m);

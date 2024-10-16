@@ -504,6 +504,8 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
                 } else {
                     atData.put(AUDIENCE, vo.getAtIssuer());
                 }
+                // Note that at this point a default audience could be set, but different
+                // protocols have very different ideas. These are set in the individual handlers.
             }
         }
         // If they really asserted it

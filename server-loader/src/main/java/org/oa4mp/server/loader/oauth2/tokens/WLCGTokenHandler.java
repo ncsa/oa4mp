@@ -49,7 +49,9 @@ public class WLCGTokenHandler extends AbstractAccessTokenHandler implements WLCG
             atData.put(EDUPERSON_ASSURANCE, getUserMetaData().get(EDUPERSON_ASSURANCE));
         }
         if (getATConfig().getAudience().isEmpty()) {
-            atData.put(AUDIENCE, DEFAULT_AUDIENCE);
+            if(!atData.containsKey(AUDIENCE)) {
+                atData.put(AUDIENCE, DEFAULT_AUDIENCE);
+            }
         } else {
             String a = "";
             for (String x : getATConfig().getAudience()) {

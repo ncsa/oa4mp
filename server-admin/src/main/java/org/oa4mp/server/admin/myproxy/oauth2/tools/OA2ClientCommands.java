@@ -485,7 +485,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
     }
 
     /**
-     * Prompt for a comma separated list, parse it an return it. The moniker identifies what goes on the list,
+     * Prompt for a comma separated list, parse it and return it. The moniker identifies what goes on the list,
      * the legalValues (if present) restrict the values to what is on that list.
      *
      * @param legalValues
@@ -497,6 +497,9 @@ public class OA2ClientCommands extends ClientStoreCommands {
     protected List<String> processCommaSeparatedList(String key, List<String> legalValues, String moniker, String defaultValue) throws IOException {
         String rawValues = getPropertyHelp(key, "enter a comma separated list of " + moniker + ".", defaultValue);
         LinkedList<String> list = new LinkedList<>();
+        if(StringUtils.isTrivial(rawValues)){
+            return list; // nix to do and don't return a list of blanks or some such.
+        }
         if (rawValues.equals(defaultValue)) {
             list.add(defaultValue);
             return list;

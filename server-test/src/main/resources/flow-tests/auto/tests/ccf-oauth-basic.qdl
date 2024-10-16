@@ -1,0 +1,45 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   Tests a client with no configuration. This is as basic as it gets.
+*/
+test_id:= 'ccf.oauth.basic';
+clc#init($$OA4MP_CLC_INI, test_id);
+initialization := size(args())==1⇒args().0:import(load('test#/auto/utils/initialization.mdl'));
+ini.:=initialization#get_client_ini(test_id);
+server_defaults.:=initialization# server_defaults();
+// Three quick tests. This client is no configured to return id token or refresh tokens ever,
+// so requests for them should simply be ignored
+tokens. := clc#ccf(); // from the raw response
+⊨ tokens.'expires_in' == server_defaults.'at_lifetime' : 'wrong access token lifetime';
+⊨ ∄tokens.'refresh_token' : 'should not get a refresh token by default.';
+⊨ size(clc#claims()) == 0 : 'should not get id token by default';
+
+tokens. := clc#ccf({'scope':'openid'});
+⊨ tokens.'expires_in' == server_defaults.'at_lifetime' : 'wrong access token lifetime';
+⊨ ∄tokens.'refresh_token' : 'should not get a refresh token when requesting openid scope';
+⊨ size(clc#claims()) == 0 : 'should not get id token ever';
+
+tokens. := clc#ccf({'scope':'offline_access'});
+⊨ tokens.'expires_in' == server_defaults.'at_lifetime' : 'wrong access token lifetime';
+⊨ ∄tokens.'refresh_token' : 'should not get a refresh token ever.';
+⊨ size(clc#claims()) == 0 : 'should not get id token ever';
+
+
+// All the rest of the calls should fail outright with such a minimal client.
+try[
+  clc#user_info();
+  ⊨ false : 'was able to get user info';
+ ]catch[];
+
+try[
+  clc#refresh();
+  ⊨ false : 'was able to perform token refresh';
+ ]catch[];
+
+try[
+  clc#exchange();
+  ⊨ false : 'was able to perform token exchange';
+ ]catch[];
+
+say('ok: OAuth client credentials flow, no refresh token, no claims');

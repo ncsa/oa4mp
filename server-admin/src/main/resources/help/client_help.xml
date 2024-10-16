@@ -566,7 +566,7 @@ be used for signature verification.
 Tip: To set this property in the CLI, get the keys and place them in a file, then
      use the -file parameter for the update command, e.g.
 
-oa4mp>update >jwks -file /home/root/temp/new-keys.json]]>
+clients>update >jwks -file /home/root/temp/new-keys.json]]>
     </body>
     </entry>
     <entry id="rfc7523_client">

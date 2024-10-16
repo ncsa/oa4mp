@@ -16,12 +16,13 @@ public class OA4MPQDLWorkspace extends QDLWorkspace {
     public static void main(String[] args) throws Throwable {
         WorkspaceProvider workspaceProvider = new QDLOA4MPWorkspaceprovider();
         QDLWorkspace.setWorkspaceProvider(workspaceProvider);
+        WorkspaceCommands.setWorkspaceCommandsProvider(new QDLOA4MPWorkspaceCommandsProvider());
         OA4MPQDLWorkspace workspace = (OA4MPQDLWorkspace) init(args);
-        // Fix https://github.com/ncsa/oa4mp/issues/207
-        OA2LibLoader2 oa2LibLoader2 = new OA2LibLoader2();
-        oa2LibLoader2.add(workspace.getWorkspaceCommands().getState());
         if (workspace != null) {
             workspace.mainLoop();
         }
     }
+
+
+
 }

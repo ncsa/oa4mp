@@ -26,4 +26,18 @@ public class BasicResponse implements Response {
     }
 
     Map parameters;
+
+    /**
+     * (Optional) set the actual, unprocessed response from the server.
+     * @return
+     */
+    public String getRawResponse() {
+        return rawResponse;
+    }
+
+    public void setRawResponse(String rawResponse) {
+        this.rawResponse = rawResponse;
+    }
+
+    String rawResponse;
 }

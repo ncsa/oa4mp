@@ -3,6 +3,7 @@
 // will be found.
 path:='test#/';
 test.:=[
+        [(path + 'auto/tests/rfc8693/') + 'github-211.qdl',  '-subject','at'],
         [(path + 'auto/tests/rfc8693/') + 'ersatz-rt.qdl',  '-subject','at'],
         [(path + 'auto/tests/rfc8693/') + 'ersatz-rt.qdl',  '-subject','rt'],
         [(path + 'auto/tests/rfc8693/') + 'ersatz-fork.qdl', '-at', '-subject','at'],

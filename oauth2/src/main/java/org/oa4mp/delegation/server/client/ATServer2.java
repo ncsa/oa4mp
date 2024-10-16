@@ -129,6 +129,7 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
                 response = getServiceClient().doGet(m);
             }
         }
+
         JSONObject jsonObject = getAndCheckResponse(response);
         if (!jsonObject.containsKey(ACCESS_TOKEN)) {
             throw new IllegalArgumentException(" No access token found in server response");
@@ -173,6 +174,7 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
             ServletDebugUtil.trace(this, "Skipping id token entry...");
         }
         ATResponse2 atr = createResponse(at, rt, idToken);
+        atr.setRawResponse(response);
         atr.setParameters(params);
         return atr;
     }

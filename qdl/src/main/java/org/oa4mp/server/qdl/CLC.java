@@ -1,5 +1,6 @@
 package org.oa4mp.server.qdl;
 
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import org.oa4mp.server.admin.myproxy.oauth2.tools.OA2CLCCommands;
 import org.oa4mp.server.admin.myproxy.oauth2.tools.OA2CommandLineClient;
 import org.oa4mp.server.qdl.clc.QDLCLC;
@@ -216,25 +217,53 @@ public class CLC implements QDLMetaModule {
         public Object evaluate(Object[] objects, State state) throws Throwable {
             checkInit();
             String args = DUMMY_ARG;
+            boolean verify = false;
+            boolean rawResponse = false;
             if (objects.length == 1) {
-                if (objects[0] instanceof Boolean) {
-                    if (!(Boolean) objects[0]) {
-                        args = args + " " + clcCommands.NO_VERIFY_JWT;
+                if (objects[0] instanceof QDLStem) {
+                    QDLStem input = (QDLStem) objects[0];
+                    if (input.containsKey("verify")) {
+                        verify = input.getBoolean("verify");
                     }
-                } else {
-                    throw new IllegalArgumentException(getName() + " requires a boolean argument");
+                    if (input.containsKey("raw_response")) {
+                        rawResponse = input.getBoolean("raw_response");
+                    }
                 }
             }
-            clcCommands.access(new InputLine(args));
+            if (!verify) {
+                args = args + " " + clcCommands.NO_VERIFY_JWT;
+            }
 
+            clcCommands.access(new InputLine(args));
+            if (rawResponse) {
+                QDLStem out = new QDLStem();
+                try {
+                    JSONObject jsonObject = JSONObject.fromObject(clcCommands.getCurrentATResponse().getRawResponse());
+                    out.fromJSON(jsonObject);
+                    return out;
+                } catch (Throwable t) {
+
+                }
+                return clcCommands.getCurrentATResponse().getRawResponse();
+            }
             return getTokens();
         }
 
         @Override
         public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
-            doxx.add(getName() + "([verify_jwts]) get the access token.");
-            doxx.add("verify_jwts - if true (default) verify any JWTs. If false, do not verify them.");
+            switch (argCount) {
+                case 0:
+                    doxx.add(getName() + "() get the access token, verifying the response. This returns the tokens.");
+                    break;
+                case 1:
+                    doxx.add(getName() + "(arg.) get the access token, using the stem entries to construct the response.");
+                    String bb = StringUtils.getBlanks(getName().length() + 1);
+                    doxx.add("\nThe elements of the arg. stem are:\n");
+                    doxx.add("      verify (boolean) - if true (default, verify the tokens");
+                    doxx.add("raw_response (boolean) - if false, return the raw response. If true (default) return the actual tokens.");
+                    break;
+            }
             doxx.add(checkInitMessage);
             return doxx;
         }
@@ -353,7 +382,8 @@ public class CLC implements QDLMetaModule {
         @Override
         public Object evaluate(Object[] objects, State state) throws Throwable {
             checkInit();
-            clcCommands.refresh(argsToInputLine(getName(), objects));
+            //clcCommands.refresh(argsToInputLine(getName(), objects));
+            clcCommands.refresh();
             return getTokens();
         }
 
@@ -365,7 +395,9 @@ public class CLC implements QDLMetaModule {
             return doxx;
         }
     }
-protected String ECHO_HTTP_RESPONSE = "echo_http_response";
+
+    protected String ECHO_HTTP_RESPONSE = "echo_http_response";
+
     public class EchoHttpResponse implements QDLFunction {
         @Override
         public String getName() {
@@ -374,15 +406,15 @@ protected String ECHO_HTTP_RESPONSE = "echo_http_response";
 
         @Override
         public int[] getArgCount() {
-            return new int[]{0,1};
+            return new int[]{0, 1};
         }
 
         @Override
         public Object evaluate(Object[] objects, State state) throws Throwable {
-            if(objects.length == 0){
+            if (objects.length == 0) {
                 return ServiceClient.ECHO_RESPONSE;
             }
-            if(!(objects[0] instanceof Boolean)){
+            if (!(objects[0] instanceof Boolean)) {
                 throw new IllegalArgumentException(getName() + " requires a boolean argument");
             }
 
@@ -409,6 +441,7 @@ protected String ECHO_HTTP_RESPONSE = "echo_http_response";
             return doxx;
         }
     }
+
     protected String ECHO_HTTP_REQUEST = "echo_http_request";
 
     public class EchoHTTPRequest implements QDLFunction {
@@ -424,10 +457,10 @@ protected String ECHO_HTTP_RESPONSE = "echo_http_response";
 
         @Override
         public Object evaluate(Object[] objects, State state) throws Throwable {
-            if(objects.length == 0){
+            if (objects.length == 0) {
                 return ServiceClient.ECHO_REQUEST;
             }
-            if(!(objects[0] instanceof Boolean)){
+            if (!(objects[0] instanceof Boolean)) {
                 throw new IllegalArgumentException(getName() + " requires a boolean argument");
             }
 
@@ -458,6 +491,7 @@ protected String ECHO_HTTP_RESPONSE = "echo_http_response";
     }
 
     protected String EXCHANGE_NAME = "exchange";
+    protected String EXCHANGE_RAW_RESPONSE = "raw_response";
 
     public class Exchange implements QDLFunction {
         @Override
@@ -467,13 +501,16 @@ protected String ECHO_HTTP_RESPONSE = "echo_http_response";
 
         @Override
         public int[] getArgCount() {
-            return new int[]{0, 1, 2, 3, 4, 5, 6, 7}; // just ion case we need to pass lots
+            return new int[]{0, 1, 2, 3, 4, 5, 6, 7}; // just in case we need to pass lots
         }
 
         @Override
         public Object evaluate(Object[] objects, State state) throws Throwable {
             checkInit();
-            clcCommands.exchange(argsToInputLine(getName(), objects));
+            InputLine inputLine = argsToInputLine(getName(), objects);
+            boolean rawResponse = inputLine.hasArg(EXCHANGE_RAW_RESPONSE);
+            inputLine.removeSwitch(EXCHANGE_RAW_RESPONSE);
+            clcCommands.exchange(inputLine);
             if (Arrays.asList(objects).contains("-id")) {
                 // if they request an id token, return it.
                 QDLStem x = new QDLStem();
@@ -486,16 +523,22 @@ protected String ECHO_HTTP_RESPONSE = "echo_http_response";
                 x.put("refresh_token", tokenToStem(clcCommands.getDummyAsset().getRefreshToken()));
                 return x;
             }
+            if (rawResponse) {
+                QDLStem out = new QDLStem();
+                out.fromJSON(clcCommands.getExchangeResponse());
+                return out;
+            }
             return getTokens();
         }
 
         @Override
         public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
-            doxx.add(getName() + "([-rt | -at | -none] [-subject at|rt|id] Do the token exchange.");
+            doxx.add(getName() + "([-rt | -at | -none] [-subject at|rt|id] [" + EXCHANGE_RAW_RESPONSE+"] Do the token exchange.");
             doxx.add("returns: Both tokens, but the requested token is updated.");
             doxx.add("Arguments:");
             doxx.add("(None) = exchange the access token using the access token as the bearer token. Make sure it has not expired.");
+            doxx.add(EXCHANGE_RAW_RESPONSE + " = return the raw response from the server, not just the tokens.");
             doxx.add("-at = explicitly request an access token");
             doxx.add("-rt = exchange refresh token, using the refresh token as the bearer token");
             doxx.add("-none = do not request the return type, let the server use its default");
@@ -591,7 +634,8 @@ protected String ECHO_HTTP_RESPONSE = "echo_http_response";
         @Override
         public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
-            doxx.add(getName() + " initiate the device flow. If possible, the user code is copied to the clipboard.");
+            doxx.add(getName() + "() - initiate the device flow. If possible, the user code is copied to the clipboard.");
+            doxx.add("This returns the raw response from the server");
             doxx.add(checkInitMessage);
             return doxx;
         }
@@ -1246,33 +1290,7 @@ protected String ECHO_HTTP_RESPONSE = "echo_http_response";
         @Override
         public Object evaluate(Object[] objects, State state) throws Throwable {
             checkInit();
-            Map parameters = new HashMap();
-            if (objects.length == 1) {
-                if (objects[0] instanceof String) {
-                    parameters.put(OA2Claims.SUBJECT, objects[0]);
-                } else {
-                    if (objects[0] instanceof QDLStem) {
-                        QDLStem stem = (QDLStem) objects[0];
-                        for (Object key : stem.keySet()) {
-                            Object value = stem.get(key);
-                            if (value instanceof QDLStem) {
-                                QDLStem qdlStem = (QDLStem) value;
-                                if (qdlStem.isList()) {
-                                    JSONArray array = new JSONArray();
-                                    array.addAll(qdlStem.getQDLList());
-                                    parameters.put(key, array);
-                                } else {
-                                    throw new IllegalArgumentException("General stems are not supported as values, just lists");
-                                }
-                            } else {
-                                parameters.put(key, value);
-                            }
-                        }
-                    } else {
-                        throw new IllegalArgumentException("unknown argument type for " + getName());
-                    }
-                }
-            }
+            Map parameters = argToMap(objects, getName());
             clcCommands.rfc7523(parameters);
 
             return getTokens();
@@ -1296,13 +1314,44 @@ protected String ECHO_HTTP_RESPONSE = "echo_http_response";
                     dd.add("Sends request with the user name (as the subject of the request token). This is used on the");
                     dd.add("service as if the user logged in with the given name, so all e.g. QDL scripts will run against that name.");
                     dd.add("\nE.g.");
-                    dd.add(getName() + "('sub':'bob@bigstate.edu','lifetime':1000000)");
+                    dd.add(getName() + "({'sub':'bob@bigstate.edu','lifetime':1000000})");
                     dd.add("sends the request with the given user name and the parameter (in this case, requesting a certificate lifetime).");
                     break;
             }
 
             return dd;
         }
+    }
+
+    private static Map argToMap(Object[] objects, String name) {
+        Map parameters = new HashMap();
+        if (objects.length == 1) {
+            if (objects[0] instanceof String) {
+                parameters.put(OA2Claims.SUBJECT, objects[0]);
+            } else {
+                if (objects[0] instanceof QDLStem) {
+                    QDLStem stem = (QDLStem) objects[0];
+                    for (Object key : stem.keySet()) {
+                        Object value = stem.get(key);
+                        if (value instanceof QDLStem) {
+                            QDLStem qdlStem = (QDLStem) value;
+                            if (qdlStem.isList()) {
+                                JSONArray array = new JSONArray();
+                                array.addAll(qdlStem.getQDLList());
+                                parameters.put(key, array);
+                            } else {
+                                throw new IllegalArgumentException("General stems are not supported as values, just lists");
+                            }
+                        } else {
+                            parameters.put(key, value);
+                        }
+                    }
+                } else {
+                    throw new IllegalArgumentException("unknown argument type for " + name);
+                }
+            }
+        }
+        return parameters;
     }
 
     public static String VERBOSE_ON = "verbose_on";
@@ -1393,6 +1442,62 @@ protected String ECHO_HTTP_RESPONSE = "echo_http_response";
             dd.add("This is used for low-level debugging of Java, such as module development.");
             dd.add("Unless you are a Java developer enabling it might result in out that does not make a lot of sense");
             return dd;
+        }
+    }
+
+    public static String CLIENT_CREDENTIALS_FLOW = "ccf";
+    public static String CLIENT_CREDENTIALS_RFC7523 = "rfc7523";
+
+    public class ClientCredentialsFlow implements QDLFunction {
+        @Override
+        public String getName() {
+            return CLIENT_CREDENTIALS_FLOW;
+        }
+
+        @Override
+        public int[] getArgCount() {
+            return new int[]{0, 1};
+        }
+
+        @Override
+        public Object evaluate(Object[] objects, State state) throws Throwable {
+            checkInit();
+            Boolean useRFC7523 = Boolean.FALSE;
+            if (0 < objects.length && (objects[0] instanceof QDLStem)) {
+                useRFC7523 = ((QDLStem) objects[0]).containsKey("rfc7523");
+                if (useRFC7523) {
+                    useRFC7523 = ((QDLStem) objects[0]).getBoolean("rfc7523");
+                }
+            }
+            Map parameters = argToMap(objects, getName());
+            clcCommands.ccf(parameters, useRFC7523);
+            QDLStem QDLStem = new QDLStem();
+            if (clcCommands.getCcfResponse() != null) {
+                QDLStem.fromJSON(clcCommands.getCcfResponse());
+            }
+            return QDLStem;
+        }
+
+        @Override
+        public List<String> getDocumentation(int argCount) {
+            List<String> doxx = new ArrayList<>();
+            switch (argCount) {
+                case 0:
+                    doxx.add(getName() + "() - initiate basic client credentials flow.");
+                    break;
+                case 1:
+                    String bb = StringUtils.getBlanks(getName().length());
+                    doxx.add(getName() + "(username | arg.) - initiate basic client credentials flow, using a subject or arguments.");
+                    doxx.add(bb + "If the subject is supplied, it will be used as the subject of the");
+                    doxx.add(bb + "ID token.");
+                    doxx.add(bb + "If you supply the key " + CLIENT_CREDENTIALS_RFC7523 + " with a true value, then");
+                    doxx.add(bb + "RFC7523 credentials are used. If false (default) or omitted, then the standard  id + secret is used.");
+                    break;
+            }
+            doxx.add("This returns the raw response as a JSON object. To get the tokens or claims, use the");
+            doxx.add("API calls, e.g. clc#tokens()");
+            doxx.add(checkInitMessage);
+            return doxx;
         }
     }
 

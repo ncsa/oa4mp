@@ -34,6 +34,7 @@ public class CLCModule extends JavaModule {
         funcs.add(clc.new AccessAT());
         funcs.add(clc.new AccessRT());
         funcs.add(clc.new ClearParam());
+        funcs.add(clc.new ClientCredentialsFlow());
         funcs.add(clc.new CreateURI());
         funcs.add(clc.new GetCurrentURI());
         funcs.add(clc.new DeviceFlow());

@@ -1,5 +1,6 @@
 package org.oa4mp.server.proxy;
 
+import edu.uiuc.ncsa.security.servlet.HeaderUtils;
 import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.claims.IDTokenHandler;
 import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
@@ -66,6 +67,7 @@ import static org.oa4mp.delegation.server.OA2Constants.NONCE;
 import static org.oa4mp.delegation.server.OA2Constants.STATE;
 import static org.oa4mp.delegation.server.server.RFC8693Constants.*;
 import static org.oa4mp.delegation.server.server.claims.OA2Claims.JWT_ID;
+import static org.oa4mp.delegation.server.server.claims.OA2Claims.SUBJECT;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -161,12 +163,11 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             doRFC7523(request, response, oa2Client);
             return true;
         }
-        OA2Client client = (OA2Client) getClient(request);
+        OA2Client client = getClient(request);
         // In all other cases, the client credentials must be sent.
         if (client == null) {
             warn("executeByGrant encountered a null client");
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, "no such client");
-
         }
         MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(client);
         debugger.trace(this, "starting execute by grant, grant = \"" + grantType + "\"");
@@ -175,9 +176,24 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             verifyClient(resolvedClient, request, true);
             //verifyClientSecret(resolvedClient, getClientSecret(request));
         }
+        if (grantType.equals(GRANT_TYPE_CLIENT_CREDENTIALS)) {
+            if (client.isPublicClient()) {
+                warn("public client " + client.getIdentifierString() + " requested a client credential flow but is not allowed on this server.");
+                throw new OA2ATException(OA2Errors.REQUEST_NOT_SUPPORTED,
+                        "client credential flow not supported for public clients");
+            }
+            if (!client.isServiceClient()) {
+                warn("Client " + client.getIdentifierString() + " requested a client credential flow but is not allowed on this server.");
+                throw new OA2ATException(OA2Errors.REQUEST_NOT_SUPPORTED,
+                        "client credential flow not supported for this client");
+            }
+            doRFC6749_4_4(request, response, resolvedClient);
+            debugger.trace(this, "client credential flow completed, returning... ");
+            return true;
+        }
         if (grantType.equals(GRANT_TYPE_TOKEN_EXCHANGE)) {
             if (!oa2SE.isRfc8693Enabled()) {
-                warn("Client " + client.getIdentifierString() + " requested a token exchange but token exchange is not enabled onthis server.");
+                warn("Client " + client.getIdentifierString() + " requested a token exchange but token exchange is not enabled on this server.");
                 throw new OA2ATException(OA2Errors.REQUEST_NOT_SUPPORTED,
                         "token exchange not supported on this server ");
             }
@@ -208,6 +224,137 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         }
 
         return false;
+    }
+
+    /**
+     * Does <a href="https://www.rfc-editor.org/rfc/rfc6749#section-4.4"></a>client credential flow</a>
+     *
+     * @param request
+     * @param response
+     * @param client
+     * @throws Throwable
+     */
+    protected void doRFC6749_4_4(HttpServletRequest request, HttpServletResponse response, OA2Client client) throws Throwable {
+        ServletDebugUtil.printAllParameters(getClass(), request, true);
+        String state = getFirstParameterValue(request, STATE);
+        String nonce = getFirstParameterValue(request, NONCE);
+        OA2ServiceTransaction serviceTransaction = (OA2ServiceTransaction) getOA2SE().getTransactionStore().create();
+        String uri = serviceTransaction.getIdentifier().getUri().toString();
+        if (-1 == uri.indexOf("/rfc6749_4_4")) {
+            uri = uri.substring(0, uri.indexOf("/")) + "/rfc6749_4_4" + uri.substring(uri.indexOf("/"));
+            serviceTransaction.setIdentifier(BasicIdentifier.newID(uri));
+        }
+        serviceTransaction.setRequestState(state);
+        serviceTransaction.setNonce(nonce);
+        serviceTransaction.setClient(client);
+        Date now = new Date();
+        serviceTransaction.setAuthTime(now); // auth time is now.
+        client.setLastAccessed(now);
+        /*
+        exp
+        jti
+         */
+        JSONObject claims = new JSONObject();
+        List<String> audience = HeaderUtils.getParameters(request, AUDIENCE, " ");
+        serviceTransaction.setAudience(audience);
+        List<String> resource = HeaderUtils.getParameters(request, RESOURCE, " ");
+        serviceTransaction.setResource(resource);
+        if (null != request.getParameter(OA2Claims.ISSUER)) {
+            List<String> issuers = HeaderUtils.getParameters(request, OA2Claims.ISSUER, null);
+            // the contract is that the issuers must match the client id if present
+            for (String issuer : issuers) {
+                if (!client.getIdentifierString().equals(issuer)) {
+                    throw new OA2ATException(OA2Errors.INVALID_SCOPE,
+                            "unable to determine scopes",
+                            HttpStatus.SC_BAD_REQUEST,
+                            state, client);
+
+                }
+            }
+        }
+        serviceTransaction.setUserMetaData(claims); // set this so it exists for later.
+        List<String> scopes = OA2HeaderUtils.getParameters(request, SCOPE, " ");
+        // scopes are optional.
+        if (!scopes.isEmpty()) {
+            try {
+                serviceTransaction.setScopes(ClientUtils.resolveScopes(
+                        request,
+                        serviceTransaction,
+                        client,
+                        scopes,
+                        true, false, true));
+            } catch (OA2RedirectableError redirectableError) {
+                throw new OA2ATException(OA2Errors.INVALID_SCOPE,
+                        "unable to determine scopes",
+                        HttpStatus.SC_BAD_REQUEST,
+                        state, client);
+            }
+        }
+        String subject = getFirstParameterValue(request, SUBJECT);
+        if (subject == null) {
+            if (scopes.contains(OA2Scopes.SCOPE_OPENID)) {
+                // case here is that they are requesting an id token, but there is no subject
+                // for the ID token.
+                throw new OA2ATException(OA2Errors.INVALID_REQUEST,
+                        "no subject for ID token set",
+                        HttpStatus.SC_BAD_REQUEST,
+                        state, client);
+
+            }
+        } else {
+            serviceTransaction.setUsername(subject);
+            claims.put(OA2Claims.SUBJECT, serviceTransaction.getUsername());
+        }
+        if (request.getParameter(OA2Constants.ACCESS_TOKEN_LIFETIME) != null) {
+            String rawATLifetime = getFirstParameterValue(request, OA2Constants.ACCESS_TOKEN_LIFETIME);
+            try {
+                long at = XMLConfigUtil.getValueSecsOrMillis(rawATLifetime);
+                serviceTransaction.setRequestedATLifetime(at);
+            } catch (Throwable t) {
+                getServiceEnvironment().info("Could not set requested access token lifetime to \"" + rawATLifetime
+                        + "\" for client " + client.getIdentifierString());
+                // do nothing.
+            }
+        }
+     //   serviceTransaction.setAccessTokenLifetime(ClientUtils.computeATLifetime(serviceTransaction, client, getOA2SE()));
+
+        if (request.getParameter(OA2Constants.REFRESH_LIFETIME) != null) {
+            String rawATLifetime = getFirstParameterValue(request, OA2Constants.REFRESH_LIFETIME);
+            try {
+                long rt = XMLConfigUtil.getValueSecsOrMillis(rawATLifetime);
+                serviceTransaction.setRequestedRTLifetime(rt);
+            } catch (Throwable t) {
+                getServiceEnvironment().info("Could not set requested refresh token lifetime to \"" + rawATLifetime
+                        + "\" for client " + client.getIdentifierString());
+                // do nothing.
+            }
+        }
+/*        if (client.isRTLifetimeEnabled()) {
+            long lifetime = ClientUtils.computeRefreshLifetime(serviceTransaction, client, getOA2SE());
+            serviceTransaction.setRefreshTokenLifetime(ClientUtils.computeRefreshLifetime(serviceTransaction, client, getOA2SE()));
+            serviceTransaction.setRefreshTokenExpiresAt(System.currentTimeMillis() + lifetime);
+        } else {
+            serviceTransaction.setRefreshTokenLifetime(0L);
+        }*/
+        if (request.getParameter(OA2Constants.ID_TOKEN_LIFETIME) != null) {
+            String rawATLifetime = getFirstParameterValue(request, OA2Constants.ID_TOKEN_LIFETIME);
+            try {
+                long idt = XMLConfigUtil.getValueSecsOrMillis(rawATLifetime);
+                serviceTransaction.setRequestedIDTLifetime(idt);
+            } catch (Throwable t) {
+                getServiceEnvironment().info("Could not set requested ID token lifetime to \"" + rawATLifetime
+                        + "\" for client " + client.getIdentifierString());
+                // do nothing.
+            }
+        }
+      //  serviceTransaction.setIDTokenLifetime(ClientUtils.computeIDTLifetime(serviceTransaction, client, getOA2SE()));
+
+
+        OA2ServletUtils.processXAs(request, serviceTransaction, client);
+
+        // ****** End of setup for request, setup for access token request
+        processServiceClientRequest(request, response, client, serviceTransaction, true);
+
     }
 
     /**
@@ -305,7 +452,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                     serviceTransaction,
                     client,
                     scopes,
-                    true, false));
+                    true, false, false));
         } catch (OA2RedirectableError redirectableError) {
             throw new OA2ATException(OA2Errors.INVALID_SCOPE,
                     "unable to determine scopes",
@@ -319,50 +466,77 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 //               long at = Long.parseLong(rawATLifetime);
                 serviceTransaction.setRequestedATLifetime(at);
             } catch (Throwable t) {
-                getServiceEnvironment().info("Could not set request access token lifetime to \"" + rawATLifetime
+                getServiceEnvironment().info("Could not set requested access token lifetime to \"" + rawATLifetime
                         + "\" for client " + client.getIdentifierString());
                 // do nothing.
             }
         }
 
-        serviceTransaction.setAccessTokenLifetime(ClientUtils.computeATLifetime(serviceTransaction, client, getOA2SE()));
+ //       serviceTransaction.setAccessTokenLifetime(ClientUtils.computeATLifetime(serviceTransaction, client, getOA2SE()));
         if (jsonRequest.containsKey(OA2Constants.REFRESH_LIFETIME)) {
             String rawRTLifetime = jsonRequest.getString(OA2Constants.REFRESH_LIFETIME);
             try {
                 long at = XMLConfigUtil.getValueSecsOrMillis(rawRTLifetime);
                 serviceTransaction.setRequestedRTLifetime(at);
             } catch (Throwable t) {
-                getServiceEnvironment().info("Could not set request refresh token lifetime to \"" + rawRTLifetime
+                getServiceEnvironment().info("Could not set requested refresh token lifetime to \"" + rawRTLifetime
                         + "\" for client " + client.getIdentifierString());
                 // do nothing.
             }
 
         }
-        if (client.isRTLifetimeEnabled()) {
+    /*    if (client.isRTLifetimeEnabled()) {
             long lifetime = ClientUtils.computeRefreshLifetime(serviceTransaction, client, getOA2SE());
             serviceTransaction.setRefreshTokenLifetime(ClientUtils.computeRefreshLifetime(serviceTransaction, client, getOA2SE()));
             serviceTransaction.setRefreshTokenExpiresAt(System.currentTimeMillis() + lifetime);
         } else {
             serviceTransaction.setRefreshTokenLifetime(0L);
-        }
+        }*/
         if (jsonRequest.containsKey(OA2Constants.ID_TOKEN_LIFETIME)) {
             String rawLifetime = jsonRequest.getString(OA2Constants.ID_TOKEN_LIFETIME);
             try {
                 long at = XMLConfigUtil.getValueSecsOrMillis(rawLifetime);
                 serviceTransaction.setRequestedIDTLifetime(at);
             } catch (Throwable t) {
-                getServiceEnvironment().info("Could not set request ID token lifetime to \"" + rawLifetime
+                getServiceEnvironment().info("Could not set requested ID token lifetime to \"" + rawLifetime
                         + "\" for client " + client.getIdentifierString());
                 // do nothing.
             }
         }
-        serviceTransaction.setIDTokenLifetime(ClientUtils.computeIDTLifetime(serviceTransaction, client, getOA2SE()));
+     //   serviceTransaction.setIDTokenLifetime(ClientUtils.computeIDTLifetime(serviceTransaction, client, getOA2SE()));
         try {
             String[] rawResource = extractArray(jsonRequest, RESOURCE);
             String[] rawAudience = extractArray(jsonRequest, AUDIENCE);
             OA2AuthorizedServletUtil.figureOutAudienceAndResource(serviceTransaction, rawResource, rawAudience);
         } catch (OA2GeneralError ge) {
             throw new OA2ATException(ge.getError(), ge.getDescription(), ge.getHttpStatus(), state, client);
+        }
+        processServiceClientRequest(request, response, client, serviceTransaction, false);
+    }
+
+    /**
+     * Both RFC7523 and credential flow clients operate the same once the parameters have
+     * been processed. This is code common to both for that.
+     *
+     * @param request
+     * @param response
+     * @param client
+     * @param serviceTransaction
+     * @throws Throwable
+     */
+    private void processServiceClientRequest(HttpServletRequest request,
+                                             HttpServletResponse response,
+                                             OA2Client client,
+                                             OA2ServiceTransaction serviceTransaction,
+                                             boolean isRFC6749_4_4) throws Throwable {
+        serviceTransaction.setAccessTokenLifetime(ClientUtils.computeATLifetime(serviceTransaction, client, getOA2SE()));
+        serviceTransaction.setIDTokenLifetime(ClientUtils.computeIDTLifetime(serviceTransaction, client, getOA2SE()));
+        if (client.isRTLifetimeEnabled()) {
+            long lifetime = ClientUtils.computeRefreshLifetime(serviceTransaction, client, getOA2SE());
+            serviceTransaction.setRefreshTokenLifetime(ClientUtils.computeRefreshLifetime(serviceTransaction, client, getOA2SE()));
+            serviceTransaction.setRefreshTokenExpiresAt(System.currentTimeMillis() + lifetime);
+        } else {
+            serviceTransaction.setRefreshTokenLifetime(0L);
         }
         ATRequest atRequest = getATRequest(request, serviceTransaction, client);
         ATIResponse2 atiResponse2 = (ATIResponse2) getATI().process(atRequest);
@@ -403,6 +577,16 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         }
         ATIResponse2 atResponse = (ATIResponse2) issuerTransactionState.getIssuerResponse();
         atResponse.setJsonWebKey(key);
+        if(isRFC6749_4_4){
+            // Only return a refresh token if they explicitly request it with the offline_access
+            // scope AND they are allowed to get
+            if(!serviceTransaction.getScopes().contains(OA2Scopes.SCOPE_OFFLINE_ACCESS)){
+                ((ATIResponse2) issuerTransactionState.getIssuerResponse()).setRefreshToken(null);
+            }
+            if(!serviceTransaction.getScopes().contains(OA2Scopes.SCOPE_OPENID)){
+                ((ATIResponse2) issuerTransactionState.getIssuerResponse()).setIdToken(null);
+            }
+        }
         writeATResponse(response, issuerTransactionState);
     }
 
@@ -896,6 +1080,13 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             debugger.trace(this, "resolving ersatz client");
             try {
                 Permission p = getOA2SE().getPermissionStore().getErsatzChain(t.getProvisioningAdminID(), t.getProvisioningClientID(), client.getIdentifier());
+                if(p == null){
+                    throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
+                            "permissions not found for admin '" + t.getProvisioningAdminID()+
+                                    "' + and provisioner '" + t.getProvisioningClientID()+ "'", HttpStatus.SC_UNAUTHORIZED,
+                            t.getRequestState(),
+                            client);
+                }
                 client = createErsatz(t.getProvisioningClientID(), client, p.getErsatzChain());
                 debugger = MyProxyDelegationServlet.createDebugger(client);
                 t.setClient(client);
@@ -1150,7 +1341,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         }
         if (returnRTOnly) {
             rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getRefreshToken().getToken()); // Required.
-            rfcClaims.put(EXPIRES_IN, rtiResponse.getRefreshToken().getLifetime()/1000);
+            rfcClaims.put(EXPIRES_IN, rtiResponse.getRefreshToken().getLifetime() / 1000);
 
             if (client.isRTLifetimeEnabled() && rtiResponse.hasRefreshToken()) {
                 t.setRTData(rtiResponse.getRefreshToken().getPayload());
@@ -1164,7 +1355,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             } else {
                 rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getAccessToken().encodeToken()); // Required.
             }
-            rfcClaims.put(EXPIRES_IN, rtiResponse.getAccessToken().getLifetime()/1000);
+            rfcClaims.put(EXPIRES_IN, rtiResponse.getAccessToken().getLifetime() / 1000);
 
             rfcClaims.put(OA2Constants.ID_TOKEN, rtiResponse.getIdToken().getToken());
 
@@ -1348,7 +1539,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                     rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getAccessToken().encodeToken()); // Required.
                 }
                 // https://jira.ncsa.illinois.edu/browse/CIL-2019
-                rfcClaims.put(EXPIRES_IN, rtiResponse.getAccessToken().getLifetime()/1000);
+                rfcClaims.put(EXPIRES_IN, rtiResponse.getAccessToken().getLifetime() / 1000);
                 // create scope string  Remember that these may have been changed by a script,
                 // so here is the right place to set it.
                 rfcClaims.put(OA2Constants.SCOPE, listToString(newATTX.getScopes()));
@@ -1363,7 +1554,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                     rfcClaims.put(OA2Constants.REFRESH_TOKEN, rtiResponse.getRefreshToken().encodeToken()); // Optional
                 }
                 // https://jira.ncsa.illinois.edu/browse/CIL-2019
-                rfcClaims.put(EXPIRES_IN, rtiResponse.getRefreshToken().getLifetime()/1000);
+                rfcClaims.put(EXPIRES_IN, rtiResponse.getRefreshToken().getLifetime() / 1000);
 
                 long gracePeriod = ClientUtils.computeRTGracePeriod(client, oa2se);
                 long expiresAt = System.currentTimeMillis() + gracePeriod;
@@ -1384,7 +1575,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 debugger.trace(this, "Processed id token return type");
                 rfcClaims.put(OA2Constants.ACCESS_TOKEN, rtiResponse.getIdToken().getToken());
                 // https://jira.ncsa.illinois.edu/browse/CIL-2019
-                rfcClaims.put(EXPIRES_IN, rtiResponse.getIdToken().getLifetime()/1000);
+                rfcClaims.put(EXPIRES_IN, rtiResponse.getIdToken().getLifetime() / 1000);
         }
 
         debugger.trace(this, "rfc claims returned:" + rfcClaims.toString(1));

@@ -1,0 +1,40 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+  Tests the ersatz machinery when getting just a refresh token.
+  This has the provisioner do some refreshes first, so there is a lookup
+  of the token in the TX store.
+*/
+/* for running in the QDL workspace manually
+path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests';
+script_path(path ~ script_path());
+saved_cfg := '/tmp/ersatz1-test.json';
+script_load('local/rfc8693/provisioner-with-refresh.qdl', saved_cfg);
+clc#init($$OA4MP_CLC_XML_INI, 'localhost:e1');
+clc#read(saved_cfg , '-p'); // -p switch tell client that this is an ersatz client
+
+tokens. := clc#exchange(); // does fork
+ Fixes https://github.com/ncsa/oa4mp/issues/211
+*/
+
+debugger(1);
+args. := (0<size(args()))?args().0:['-subject', 'at']; // default is to use access token for exchange.
+saved_cfg := '/tmp/ersatz1-test.json';
+script_load('auto/tests/rfc8693/provision-githib-211.qdl', saved_cfg);
+clc#init($$OA4MP_CLC_XML_INI, 'localhost:e1');
+clc#read(saved_cfg , '-p'); // -p switch tell client that this is an ersatz client
+old_tokens. := clc#tokens();
+
+old_id. := clc#claims();
+tokens. := clc#exchange('-rt', args.0, args.1); // forks flow
+rt. := tokens.'refresh_token';
+// same token returned by the service, not a new one.
+⊨ (rt.'jti') != (old_tokens.'refresh_token'.'jti') : 'refresh token not swapped';
+
+// As per the spec, the access_token is always returned but the content is no specified.
+// If the return type is a RT, then BOTh are the same token, the RT
+//⊨ tokens.'access_token'.'jti' == rt.'jti' : 'refresh token not returned as main token';
+⊨ 4800000 == rt.'lifetime' : 'refresh token has incorrect lifetime';
+⊨ 'https://wlcg.cern.ch/jwt/refresh1' == rt.'jwt'.'aud' : 'refresh token has incorrect audience';
+
+say('ok: 𝕰𝖗s𝖆𝖙𝖟 requesting a refresh token, post provisioner refresh, using ' + (args.1) + ' for the subject token');

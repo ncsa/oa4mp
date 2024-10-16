@@ -447,9 +447,9 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
         for (Permission p : ersatzClients) {
             count++;
             if (p.getErsatzChain().size() == 1) {
-                say(p.getErsatzChain().get(0).toString());
+                say(p.getErsatzChain().get(0).toString()); // the unique element is a singleton
             } else {
-                say(p.getErsatzChain().toString());
+                say(p.getErsatzChain().toString()); // whole thing if multiples
             }
         }
         say(count + " total ersatz clients for " + clientID);

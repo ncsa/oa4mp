@@ -1,28 +1,8 @@
 package org.oa4mp.server.admin.myproxy.oauth2.tools;
 
-import org.oa4mp.client.api.AssetResponse;
-import org.oa4mp.client.api.OA4MPResponse;
-import org.oa4mp.client.api.storage.AssetStoreUtil;
-import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
-import org.oa4mp.server.loader.oauth2.servlet.RFC8628Constants2;
-import org.oa4mp.delegation.common.token.impl.*;
-import org.oa4mp.delegation.client.request.RTResponse;
-import org.oa4mp.delegation.common.token.Token;
-import org.oa4mp.delegation.server.JWTUtil;
-import org.oa4mp.delegation.server.NonceHerder;
-import org.oa4mp.delegation.server.OA2Constants;
-import org.oa4mp.delegation.server.UserInfo;
-import org.oa4mp.delegation.server.client.ATResponse2;
-import org.oa4mp.delegation.server.client.RFC7523Utils;
-import org.oa4mp.delegation.server.jwt.MyOtherJWTUtil2;
-import org.oa4mp.delegation.server.server.claims.OA2Claims;
-import org.oa4mp.client.loader.OA2Asset;
-import org.oa4mp.client.loader.OA2ClientEnvironment;
-import org.oa4mp.client.loader.OA2MPService;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.ConnectionException;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
-import edu.uiuc.ncsa.security.core.util.DateUtils;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
@@ -37,6 +17,25 @@ import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
+import org.oa4mp.client.api.AssetResponse;
+import org.oa4mp.client.api.OA4MPResponse;
+import org.oa4mp.client.api.storage.AssetStoreUtil;
+import org.oa4mp.client.loader.OA2Asset;
+import org.oa4mp.client.loader.OA2ClientEnvironment;
+import org.oa4mp.client.loader.OA2MPService;
+import org.oa4mp.delegation.client.request.RTResponse;
+import org.oa4mp.delegation.common.token.Token;
+import org.oa4mp.delegation.common.token.impl.*;
+import org.oa4mp.delegation.server.JWTUtil;
+import org.oa4mp.delegation.server.NonceHerder;
+import org.oa4mp.delegation.server.OA2Constants;
+import org.oa4mp.delegation.server.UserInfo;
+import org.oa4mp.delegation.server.client.ATResponse2;
+import org.oa4mp.delegation.server.client.RFC7523Utils;
+import org.oa4mp.delegation.server.jwt.MyOtherJWTUtil2;
+import org.oa4mp.delegation.server.server.claims.OA2Claims;
+import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
+import org.oa4mp.server.loader.oauth2.servlet.RFC8628Constants2;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
@@ -54,10 +53,10 @@ import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.*;
 
+import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 import static org.oa4mp.delegation.server.OA2Constants.*;
 import static org.oa4mp.delegation.server.jwt.MyOtherJWTUtil2.PAYLOAD_INDEX;
 import static org.oa4mp.delegation.server.server.RFC8628Constants.*;
-import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 
 /**
  * A command line client. Invoke help as needed, but the basic operation is to create the initial
@@ -128,14 +127,14 @@ public class OA2CLCCommands extends CommonCommands {
         super(logger);
         try {
             if (oa2CommandLineClient.getLoader() == null) {
-                if(isBatch()){
+                if (isBatch()) {
                     throw new MyConfigurationException("No loader found");
-                }else{
+                } else {
                     // probably should not issue this on startup since they may start without
                     // a configuration then load one.
-                 //   say("warning: no loader found");
+                    //   say("warning: no loader found");
                 }
-            }else{
+            } else {
                 setCe((OA2ClientEnvironment) oa2CommandLineClient.getEnvironment());
             }
         } catch (Throwable t) {
@@ -976,14 +975,7 @@ public class OA2CLCCommands extends CommonCommands {
         if (getDummyAsset().hasRefreshToken() && getDummyAsset().getRefreshToken().isOldVersion() && getDummyAsset().getRefreshToken().getLifetime() < 0) {
             getDummyAsset().getRefreshToken().setLifetime(OA2ConfigurationLoader.MAX_REFRESH_TOKEN_LIFETIME_DEFAULT);
         }
-/*
-                Object rawIdToken = currentATResponse.getParameters().get(RAW_ID_TOKEN);
-        if (rawIdToken == null) {
-            idToken = null; // something is probably wrong
-        } else {
-            idToken = TokenFactory.createIDT((String) rawIdToken);
-        }
-*/
+
         if (inputLine.hasArg(CLAIMS_FLAG)) {
             if (getIdToken() != null && getIdToken().getPayload().isEmpty()) {
                 say("(no claims found)");
@@ -996,29 +988,12 @@ public class OA2CLCCommands extends CommonCommands {
         }
     }
 
+    public ATResponse2 getCurrentATResponse() {
+        return currentATResponse;
+    }
+
     ATResponse2 currentATResponse;
 
-/*    public String getAT() {
-        if (currentATResponse == null) return "";
-        return currentATResponse.getAccessToken().getToken();
-    }
-
-    public String getRT() {
-        if (currentATResponse == null) return "";
-        return currentATResponse.getRefreshToken().getToken();
-    }
-
-    public void setAT(AccessTokenImpl at) {
-        if (currentATResponse != null) {
-            currentATResponse.setAccessToken(at);
-        }
-    }
-
-    public void setRT(RefreshTokenImpl rt) {
-        if (currentATResponse != null) {
-            currentATResponse.setRefreshToken(rt);
-        }
-    }*/
 
     protected void getCertHelp() {
         say("get_cert");
@@ -1113,6 +1088,7 @@ public class OA2CLCCommands extends CommonCommands {
             JSONObject json = JWTUtil.verifyAndReadJWT(token.getToken(), keys);
             return json;
         } catch (Throwable t) {
+                t.printStackTrace();
             // do nothing.
         }
         return null;
@@ -1184,55 +1160,6 @@ public class OA2CLCCommands extends CommonCommands {
         NEWprintToken(accessToken, noVerify, printRaw);
     }
 
-    protected void OLDprintToken(AccessTokenImpl accessToken, boolean noVerify, boolean printRaw) {
-
-        if (accessToken != null) {
-            JSONObject token = null;
-            // If the access token is a jwt
-            try {
-                token = resolveFromToken(accessToken, noVerify);
-            } catch (Throwable t) {
-                say("service is unreachable -- cannot verify token.");
-                return;
-            }
-            if (token == null) {
-                say("access token = " + accessToken.getToken());
-                if (TokenUtils.isBase32(accessToken.getToken())) {
-                    // Or we over-write the access token and lose base 64 encoding.
-                    AccessTokenImpl accessToken2 = new AccessTokenImpl(null);
-
-                    accessToken2.decodeToken(accessToken.getToken());
-                    accessToken = accessToken2;
-                    say("   decoded token:" + accessToken.getToken());
-                }
-                Date startDate = DateUtils.getDate(accessToken.getToken());
-                startDate.setTime(startDate.getTime() + accessToken.getLifetime());
-                if (startDate.getTime() < System.currentTimeMillis()) {
-                    say("   token expired \n");
-                } else {
-                    say("   expires in = " + accessToken.getLifetime() + " ms.");
-                    say("   valid until " + startDate + "\n");
-                }
-            } else {
-                sayi("JWT access token:" + token.toString(1));
-                AccessTokenImpl at = (AccessTokenImpl) accessToken;
-                if (printRaw) {
-                    sayi("raw token=" + at.getToken());
-                }
-                if (token.containsKey(OA2Claims.EXPIRATION)) {
-                    Date d = new Date();
-                    d.setTime(token.getLong(OA2Claims.EXPIRATION) * 1000L);
-
-                    at.setLifetime(d.getTime() - System.currentTimeMillis());
-                    if (at.getLifetime() <= 0) {
-                        say("   token expired at " + d + "\n");
-                    } else {
-                        say("   expires in = " + at.getLifetime() + " ms.\n");
-                    }
-                }
-            }
-        }
-    }
 
     protected void NEWprintToken(TokenImpl tokenImpl, boolean noVerify, boolean printRaw) {
         if (tokenImpl == null) {
@@ -1280,53 +1207,6 @@ public class OA2CLCCommands extends CommonCommands {
         }
     }
 
-
-    protected void OLDprintToken(RefreshTokenImpl refreshToken, boolean noVerify, boolean printRaw) {
-        if (refreshToken != null) {
-            JSONObject token = null;
-            try {
-                token = resolveFromToken(refreshToken, noVerify);
-            } catch (Throwable t) {
-                say("service is unreachable -- cannot verify token.");
-                return;
-            }
-            if (token == null) {
-                say("refresh token = " + refreshToken.getToken());
-                //     if (TokenUtils.isBase32(refreshToken.getToken())) {
-                //       RefreshTokenImpl refreshToken2 = new RefreshTokenImpl(null);
-
-                //     refreshToken2.decodeToken(refreshToken.getToken());
-                //   refreshToken = refreshToken2;
-                say("   decoded token:" + refreshToken.getToken());
-                //}
-                Date startDate = DateUtils.getDate(refreshToken.getToken());
-                startDate.setTime(startDate.getTime() + refreshToken.getLifetime());
-                if (startDate.getTime() <= System.currentTimeMillis()) {
-                    say("   token expired " + startDate + "\n");
-                } else {
-                    say("   expires in = " + refreshToken.getLifetime() + " ms.");
-                    say("   valid until " + startDate + "\n");
-                }
-
-            } else {
-                say("JWT refresh token = " + token.toString(1));
-                sayi("raw token=" + refreshToken.getToken());
-
-                if (token.containsKey(OA2Claims.EXPIRATION)) {
-                    Date d = new Date();
-                    d.setTime(token.getLong(OA2Claims.EXPIRATION) * 1000L);
-
-                    refreshToken.setLifetime(d.getTime() - System.currentTimeMillis());
-                    if (refreshToken.getLifetime() <= 0) {
-                        say("   token expired\n");
-                    } else {
-                        say("   expires in = " + refreshToken.getLifetime() + " ms.");
-                    }
-                }
-            }
-        }
-    }
-
     protected void printTokens(boolean noVerify, boolean printRaw) {
         // It is possible that the service is down in which case the tokens can't be verified.
         if (isVerbose() && currentURI != null) {
@@ -1350,8 +1230,34 @@ public class OA2CLCCommands extends CommonCommands {
             say("Oops! No configuration has been loaded.");
             return;
         }
+        try {
+            refresh();
+        }catch(Throwable t){
+            say(t.getMessage());
+            return;
+        }
+        if (inputLine.hasArg(CLAIMS_FLAG)) {
+            if (getIdToken().getPayload().isEmpty()) {
+                say("(no claims found)");
+            } else {
+                say(getIdToken().getPayload().toString(2));
+            }
+        }
+        if (isPrintOuput()) {
+            printTokens(inputLine.hasArg(NO_VERIFY_JWT), false);
+        }
+
+    }
+    public void refresh() throws Exception {
         lastException = null;
         try {
+            if (getCe() == null) {
+                throw new IllegalStateException( "no configuration has been loaded.");
+            }
+
+            if(!dummyAsset.hasRefreshToken()){
+                throw new IllegalStateException("no refresh token");
+            }
             RTResponse rtResponse = getService().refresh(dummyAsset.getIdentifier().toString(), refreshParameters);
             OA2Asset z = (OA2Asset) getCe().getAssetStore().get(dummyAsset.getIdentifier().toString());
             if (z != null && dummyAsset.getIssuedAt().getTime() < z.getIssuedAt().getTime()) {
@@ -1360,16 +1266,6 @@ public class OA2CLCCommands extends CommonCommands {
             // Have to update the AT reponse here every time or no token state is preserved.
             currentATResponse = new ATResponse2(dummyAsset.getAccessToken(), dummyAsset.getRefreshToken(), dummyAsset.getIdToken());
             currentATResponse.setParameters(rtResponse.getParameters());
-            if (inputLine.hasArg(CLAIMS_FLAG)) {
-                if (getIdToken().getPayload().isEmpty()) {
-                    say("(no claims found)");
-                } else {
-                    say(getIdToken().getPayload().toString(2));
-                }
-            }
-            if (isPrintOuput()) {
-                printTokens(inputLine.hasArg(NO_VERIFY_JWT), false);
-            }
         } catch (Throwable t) {
             lastException = t;
             throw t;
@@ -1424,8 +1320,6 @@ public class OA2CLCCommands extends CommonCommands {
         sayi("Note: you can only specify scopes for the access token. They are ignored for refresh tokens");
         say("See also: access, refresh, set_param -x to set additional parameters (like specific scopes or the audience");
     }
-
-    JSONObject sciToken = null;
 
     /*
     Testing for exchange:
@@ -1529,7 +1423,7 @@ public class OA2CLCCommands extends CommonCommands {
             // This fixes it, but this code should be moved there, along with the resolveFromToken method
             // Since it only really affects the CLC, it has a low priority though.
 
-            getService().exchangeRefreshToken(getDummyAsset(),
+            exchangeResponse = getService().exchangeRefreshToken(getDummyAsset(),
                     subjectToken,
                     exchangeParameters,
                     requestedTokenType,
@@ -1565,6 +1459,15 @@ public class OA2CLCCommands extends CommonCommands {
         }
     }
 
+    public JSONObject getExchangeResponse() {
+        return exchangeResponse;
+    }
+
+    public void setExchangeResponse(JSONObject exchangeResponse) {
+        this.exchangeResponse = exchangeResponse;
+    }
+
+    JSONObject exchangeResponse;
     protected String ASSET_KEY = "asset";
     protected String AT_RESPONSE_KEY = "at_response";
     protected String AUTHZ_GRANT_KEY = "authz_grant";
@@ -2294,4 +2197,68 @@ public class OA2CLCCommands extends CommonCommands {
 
     }
 
+    public static final String CCF_RFC7523 = "-rfc7523";
+    public static final String CCF_SUB = "-sub";
+
+    public void ccf(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            say("ccf [" + CCF_SUB + " subject | " + CCF_RFC7523 + "] - client credential flow with a given subject");
+            say(CCF_RFC7523 + " if present forces using that. The default is to use a standard client_id");
+            say("         and secret. Including this when there are no keys raises an error.");
+            say(CCF_SUB + " subject - sets the subject for the request. If this is configured to return an ID token");
+            say("         with the openid scopes, this will be used as the subject of that token");
+            return;
+        }
+        boolean useRFC7523 = inputLine.hasArg(CCF_RFC7523);
+        inputLine.removeSwitch(CCF_RFC7523);
+
+        String subject = null;
+        if (inputLine.hasArg(CCF_SUB)) {
+            subject = inputLine.getNextArgFor(CCF_SUB);
+            inputLine.removeSwitchAndValue(CCF_SUB);
+        }
+        Map parameters = new HashMap();
+        if (subject != null) {
+            parameters.put(OA2Claims.SUBJECT, subject);
+        }
+
+        say(getCcfResponse().toString(1));
+    }
+
+    public JSONObject ccf(Map parameters, boolean useRFC7523) throws Exception {
+        dummyAsset = (OA2Asset) getCe().getAssetStore().create();
+
+
+        if (!parameters.containsKey(SCOPE)) {
+            JSONArray array = new JSONArray();
+            array.addAll(getCe().getScopes());
+            parameters.put(SCOPE, array);
+        }
+        if (!parameters.containsKey(NONCE)) {
+            parameters.put(NONCE, NonceHerder.createNonce());
+        }
+        if (!parameters.containsKey(STATE)) {
+            parameters.put(STATE, NonceHerder.createNonce()); // random state is ok
+        }
+        if (!parameters.containsKey(OA2Claims.SUBJECT)) {
+            parameters.put(OA2Claims.SUBJECT, getCe().getClient().getIdentifierString());
+        }
+        parameters.put(GRANT_TYPE, GRANT_TYPE_CLIENT_CREDENTIALS);
+        JSONObject jsonObject = getService().rfc6749_4_4(getDummyAsset(), parameters, useRFC7523);
+        setCcfResponse(jsonObject);
+        return jsonObject;
+    }
+
+    public JSONObject getCcfResponse() {
+        return ccfResponse;
+    }
+
+    public void setCcfResponse(JSONObject ccfResponse) {
+        this.ccfResponse = ccfResponse;
+    }
+
+    JSONObject ccfResponse;
 }
+/*
+load localhost:test/rfc9068 /home/ncsa/dev/csd/config/client-oa2.xml
+ */

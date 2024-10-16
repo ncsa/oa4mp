@@ -4,12 +4,16 @@ import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
 import org.oa4mp.server.api.OA4MPConfigTags;
 import org.qdl_lang.config.QDLConfigurationConstants;
+import org.qdl_lang.state.LibLoader;
 import org.qdl_lang.workspace.WorkspaceCommands;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.util.cli.IOInterface;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
 import org.apache.commons.configuration.tree.ConfigurationNode;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -28,12 +32,12 @@ public class OA4MPQDLWorkspaceCommands extends WorkspaceCommands {
         try {
             super.loadQE(inputLine, cfgName);
         } catch (MyConfigurationException mcx) {
-             // try to process it as a server config
+            // try to process it as a server config
             // https://github.com/ncsa/oa4mp/issues/196
             ConfigurationNode node = XMLConfigUtil.findConfiguration(inputLine.getNextArgFor(QDLConfigurationConstants.CONFIG_FILE_FLAG), cfgName, OA4MPConfigTags.COMPONENT);
             OA2ConfigurationLoader sourceLoader = new OA2ConfigurationLoader<>(node);
             OA2SE sourceSE = (OA2SE) sourceLoader.load();
-             setQdlEnvironment(sourceSE.getQDLEnvironment());
+            setQdlEnvironment(sourceSE.getQDLEnvironment());
         }
     }
 
@@ -45,5 +49,17 @@ public class OA4MPQDLWorkspaceCommands extends WorkspaceCommands {
     @Override
     public WorkspaceCommands newInstance(IOInterface ioInterface) {
         return new OA4MPQDLWorkspaceCommands(ioInterface);
+    }
+
+    protected List<LibLoader> loaders;
+
+    @Override
+    public List<LibLoader> getLibLoaders() {
+        if (loaders == null) {
+            loaders = new ArrayList<>();
+            // Fix https://github.com/ncsa/oa4mp/issues/207
+            loaders.add(new OA2LibLoader2());
+        }
+        return loaders;
     }
 }

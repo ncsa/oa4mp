@@ -1,0 +1,45 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   Tests a client with no configuration. This is as basic as it gets.
+*/
+test_id:= 'ccf.oidc.basic';
+clc#init($$OA4MP_CLC_INI, test_id);
+initialization := size(args())==1⇒args().0:import(load('test#/auto/utils/initialization.mdl'));
+ini.:=initialization#get_client_ini(test_id);
+server_defaults.:=initialization# server_defaults();
+cc.:=initialization#get_client_config(test_id); // This is the client configuration from the server
+/*
+cc_at.:=cc.'cfg'.'tokens'.'access';
+cc_idt.:=cc.'cfg'.'tokens'.'identity';
+cc_rt.:=cc.'cfg'.'tokens'.'refresh';
+*/
+// Test 1. No scopes means just an access token
+tokens. := clc#ccf({'scope':' '}); // suppressed the client just requesting openid scope
+⊨ tokens.'expires_in' == server_defaults.'at_lifetime' : 'wrong access token lifetime';
+⊨ ∄tokens.'refresh_token' : 'should not get a refresh token by default.';
+⊨ ∄tokens.'id_token' : 'should not get an ID token by default';
+
+// Test 2. offline_access means refresh token only
+tokens. := clc#ccf({'scope':'offline_access'}); // from the raw response
+⊨ tokens.'expires_in' == server_defaults.'at_lifetime' : 'wrong access token lifetime';
+⊨ ∃tokens.'refresh_token' : 'should get a refresh token when requested';
+⊨ ∄tokens.'id_token' : 'should not get an ID token when requesting refresh token';
+
+// Test 3. openid scope means id token
+tokens. := clc#ccf({'scope':'openid'}); // from the raw response
+⊨ tokens.'expires_in' == server_defaults.'at_lifetime' : 'wrong access token lifetime';
+⊨ ∄tokens.'refresh_token' : 'should not get a refresh token when requesting id token';
+⊨ ∃tokens.'id_token' : 'should get an ID token for openid scope.';
+
+// Test 4. both scopes means both tokens
+tokens. := clc#ccf({'scope':['offline_access', 'openid']}); // from the raw response
+⊨ tokens.'expires_in' == server_defaults.'at_lifetime' : 'wrong access token lifetime';
+⊨ ∃tokens.'refresh_token' : 'should get a refresh token.';
+⊨ ∃tokens.'id_token' : 'should get an ID token  for openid scope.';
+// Test that nothing else in the flow is changed by using the CCF
+clc#user_info();
+clc#refresh();
+clc#exchange();
+
+say('ok: OIDC client credentials flow, has refresh token, has claims');
