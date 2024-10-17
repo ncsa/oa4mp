@@ -9,7 +9,7 @@
 path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests';
 script_path(path ~ script_path());
 saved_cfg := '/tmp/ersatz1-test.json';
-script_load('local/rfc8693/provisioner-with-refresh.qdl', saved_cfg);
+script_load('/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests/auto/tests/rfc8693/provision-github-211.qdl', saved_cfg);
 clc#init($$OA4MP_CLC_XML_INI, 'localhost:e1');
 clc#read(saved_cfg , '-p'); // -p switch tell client that this is an ersatz client
 
@@ -20,7 +20,7 @@ tokens. := clc#exchange(); // does fork
 debugger(1);
 args. := (0<size(args()))?args().0:['-subject', 'at']; // default is to use access token for exchange.
 saved_cfg := '/tmp/ersatz1-test.json';
-script_load('auto/tests/rfc8693/provision-githib-211.qdl', saved_cfg);
+script_load('auto/tests/rfc8693/provision-github-211.qdl', saved_cfg);
 clc#init($$OA4MP_CLC_XML_INI, 'localhost:e1');
 clc#read(saved_cfg , '-p'); // -p switch tell client that this is an ersatz client
 old_tokens. := clc#tokens();

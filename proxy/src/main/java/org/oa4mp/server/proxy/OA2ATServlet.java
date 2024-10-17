@@ -935,8 +935,42 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                     }
                     break;
             }
+            // Fix for https://github.com/ncsa/oa4mp/issues/211
+            // Needed to check exchange store in case multiple refreshes done at some point.
+            if (t == null) {
+                // if there is no such transaction found, then this is probably from a previous exchange. Go find it
+                try {
+                    if (accessToken != null) {
+                        t = OA2TokenUtils.getTransactionFromTX(oa2se, accessToken, debugger);
+                    }
+                    if (refreshToken != null) {
+                        t = OA2TokenUtils.getTransactionFromTX(oa2se, refreshToken, debugger);
+                        if (t != null) {
+                            rfc8693Thingie.oldRTTX = (TXRecord) oa2se.getTxStore().get(refreshToken.getJTIAsIdentifier());
+                        }
+                    }
+                    if (idToken != null) {
+                        t = OA2TokenUtils.getTransactionFromTX(oa2se, idToken, debugger);
+                    }
+                    if (t != null) {
+                        debugger.trace("found transaction from TX record.");
+                    }
 
-            if (t != null) {
+                } catch (OA2GeneralError oa2GeneralError) {
+                    if (!(debugger instanceof ClientDebugUtil)) {
+                        // last ditch effort to tell us what client is doing this.
+                        info("Could not find transaction for client " + client.getIdentifierString());
+                    }
+                    throw oa2GeneralError;
+                }
+            }
+
+            if (t == null) {
+                // Still null. Ain't one no place. Bail.
+                info("No pending transactions found anywhere for client \"" + client.getIdentifierString() + "\".");
+                throw new OA2ATException(OA2Errors.INVALID_GRANT, "no pending transaction found.", client);
+            }
+            if(!client.getIdentifierString().equals(t.getClient().getIdentifierString())){
 
                 debugger.trace(this, "transaction found, checking for ersatz client:" + t.summary());
 
@@ -1042,38 +1076,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         }
 
 
-        if (t == null) {
-            // if there is no such transaction found, then this is probably from a previous exchange. Go find it
-            try {
-                if (accessToken != null) {
-                    t = OA2TokenUtils.getTransactionFromTX(oa2se, accessToken, debugger);
-                }
-                if (refreshToken != null) {
-                    t = OA2TokenUtils.getTransactionFromTX(oa2se, refreshToken, debugger);
-                    if (t != null) {
-                        rfc8693Thingie.oldRTTX = (TXRecord) oa2se.getTxStore().get(refreshToken.getJTIAsIdentifier());
-                    }
-                }
-                if (idToken != null) {
-                    t = OA2TokenUtils.getTransactionFromTX(oa2se, idToken, debugger);
-                }
-                if (t != null) {
-                    debugger.trace("found transaction from TX record.");
-                }
-
-            } catch (OA2GeneralError oa2GeneralError) {
-                if (!(debugger instanceof ClientDebugUtil)) {
-                    // last ditch effort to tell us what client is doing this.
-                    info("Could not find transaction for client " + client.getIdentifierString());
-                }
-                throw oa2GeneralError;
-            }
-        }
-        if (t == null) {
-            // Still null. Ain't one no place. Bail.
-            info("No pending transactions found anywhere for client \"" + client.getIdentifierString() + "\".");
-            throw new OA2ATException(OA2Errors.INVALID_GRANT, "no pending transaction found.", client);
-        }
         rfc8693Thingie.transaction = t;
         if (client.isErsatzClient() && !client.isReadOnly()) {
             // Gotten this far and there is an ersatz client. Read only is a good as "has been resolved"
