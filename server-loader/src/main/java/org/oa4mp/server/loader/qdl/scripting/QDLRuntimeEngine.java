@@ -1,27 +1,5 @@
 package org.oa4mp.server.loader.qdl.scripting;
 
-import org.oa4mp.server.loader.oauth2.flows.FlowStates2;
-import org.oa4mp.server.loader.oauth2.flows.FlowType;
-import org.oa4mp.server.loader.oauth2.state.ScriptRuntimeEngineFactory;
-import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
-import org.oa4mp.server.loader.oauth2.storage.tx.TXRecord;
-import org.oa4mp.server.loader.qdl.claims.ConfigtoCS;
-import org.oa4mp.delegation.server.OA2Errors;
-import org.oa4mp.delegation.server.jwt.ScriptRuntimeException;
-import org.oa4mp.delegation.server.server.claims.ClaimSource;
-import org.qdl_lang.config.QDLConfigurationLoaderUtils;
-import org.qdl_lang.exceptions.QDLException;
-import org.qdl_lang.exceptions.RaiseErrorException;
-import org.qdl_lang.extensions.mail.QDLMail;
-import org.qdl_lang.scripting.Scripts;
-import org.qdl_lang.state.StateUtils;
-import org.qdl_lang.variables.QDLList;
-import org.qdl_lang.variables.QDLNull;
-import org.qdl_lang.variables.QDLStem;
-import org.qdl_lang.workspace.WorkspaceCommands;
-import org.qdl_lang.xml.SerializationConstants;
-import org.qdl_lang.xml.SerializationState;
-import org.qdl_lang.xml.XMLUtils;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
@@ -31,6 +9,30 @@ import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
+import org.oa4mp.delegation.server.OA2Errors;
+import org.oa4mp.delegation.server.jwt.ScriptRuntimeException;
+import org.oa4mp.delegation.server.server.claims.ClaimSource;
+import org.oa4mp.server.loader.oauth2.flows.FlowStates2;
+import org.oa4mp.server.loader.oauth2.flows.FlowType;
+import org.oa4mp.server.loader.oauth2.state.ScriptRuntimeEngineFactory;
+import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
+import org.oa4mp.server.loader.oauth2.storage.tx.TXRecord;
+import org.oa4mp.server.loader.qdl.OA2LibLoader;
+import org.oa4mp.server.loader.qdl.claims.ConfigtoCS;
+import org.qdl_lang.config.QDLConfigurationLoaderUtils;
+import org.qdl_lang.exceptions.QDLException;
+import org.qdl_lang.exceptions.RaiseErrorException;
+import org.qdl_lang.extensions.mail.QDLMail;
+import org.qdl_lang.scripting.Scripts;
+import org.qdl_lang.state.LibLoader;
+import org.qdl_lang.state.StateUtils;
+import org.qdl_lang.variables.QDLList;
+import org.qdl_lang.variables.QDLNull;
+import org.qdl_lang.variables.QDLStem;
+import org.qdl_lang.workspace.WorkspaceCommands;
+import org.qdl_lang.xml.SerializationConstants;
+import org.qdl_lang.xml.SerializationState;
+import org.qdl_lang.xml.XMLUtils;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
@@ -98,6 +100,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             }
         }
         state.setServerMode(qe.isServerModeOn());
+        state.setTransaction(transaction);
         // next line allows for debugging individual clients.
         if (!qe.isRestrictedIO()) {
             state.setRestrictedIO(false);
@@ -112,8 +115,13 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         state.getOpEvaluator().setNumericDigits(qe.getNumericDigits());
         state.setScriptPaths(qe.getScriptPath());  // Be sure script paths are read.
         state.setAssertionsOn(qe.isAssertionsOn());
+        // Normally the lib paths are set in the workspace, but there is no workspace in the
+        // runtime engine. Just stash them in the state directly so scripts can use them.
+        LibLoader loader = new OA2LibLoader();
+        loader.add(state);
         if (qe != null && qe.isEnabled()) {
             try {
+                state.createSystemInfo(qe); // populate this here.
                 QDLConfigurationLoaderUtils.setupVFS(qe, state);
                 QDLConfigurationLoaderUtils.setupModules(qe, state);
                 QDLConfigurationLoaderUtils.runBootScript(qe, state);

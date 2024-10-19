@@ -1464,9 +1464,11 @@ public class CLC implements QDLMetaModule {
             checkInit();
             Boolean useRFC7523 = Boolean.FALSE;
             if (0 < objects.length && (objects[0] instanceof QDLStem)) {
-                useRFC7523 = ((QDLStem) objects[0]).containsKey("rfc7523");
+                QDLStem inStem = (QDLStem) objects[0];
+                useRFC7523 = inStem.containsKey(CLIENT_CREDENTIALS_RFC7523);
                 if (useRFC7523) {
-                    useRFC7523 = ((QDLStem) objects[0]).getBoolean("rfc7523");
+                    useRFC7523 = inStem.getBoolean(CLIENT_CREDENTIALS_RFC7523);
+                    inStem.remove(CLIENT_CREDENTIALS_RFC7523);
                 }
             }
             Map parameters = argToMap(objects, getName());

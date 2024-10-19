@@ -48,7 +48,7 @@ public class ScriptRuntimeEngineFactory {
                 StateUtils.setFactory(new StateUtils() {
                     @Override
                     public State create() {
-                        return new OA2State(
+                        OA2State ss= new OA2State(
                                 new VStack(),
                                 new OpEvaluator(),
                                 MetaEvaluator.getInstance(),
@@ -61,6 +61,10 @@ public class ScriptRuntimeEngineFactory {
                                 false,
                                 true,
                                 null); // default in server mode, but can be overridden later
+                        ss.setTransaction(transaction);
+                        ss.setOa2se(oa2SE);
+                        ss.setTxRecord(txRecord);
+                        return ss;
                     }
                 });
             }

@@ -21,7 +21,8 @@ public class AccessControlModule extends JavaModule {
         super(namespace, alias);
     }
 
-    public static final String NAMESPACE =  "oa4mp:/qdl/acl";
+    public static final String NAMESPACE = "oa4mp:/qdl/acl";
+
     @Override
     public Module newInstance(State state) {
 
@@ -35,15 +36,18 @@ public class AccessControlModule extends JavaModule {
         funcs.add(qdlacl.new CheckACL());
         funcs.add(qdlacl.new CheckACL2());
         accessControlModule.addFunctions(funcs);
-
+        if (state != null) {
+            accessControlModule.init(state);
+        }
         setupModule(accessControlModule);
         return accessControlModule;
     }
+
     List<String> descr = new ArrayList<>();
 
     @Override
     public List<String> getDescription() {
-        if(descr.isEmpty()){
+        if (descr.isEmpty()) {
             descr.add("ACL (Access Control List) management for QDL scripts running under OA4MP.");
             descr.add("If you need access control, this module is required and should be loaded automatically.");
         }

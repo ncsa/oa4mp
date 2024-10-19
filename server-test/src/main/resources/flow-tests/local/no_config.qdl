@@ -16,7 +16,6 @@ if[rc!='ok'][return(rc);];
 
 tokens. := clc#access();
 claims. := clc#claims();
-say('claims:\n' + print(claims.));
 // Check that the server-side scripting is working.
 ⊨ ∃claims.'ϑ': 'missing claim from server script \'ϑ\'';
 ⊨ claims.'ϑ'=='my-ϑ': 'wrong claim value for \'ϑ\'';

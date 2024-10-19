@@ -6,9 +6,12 @@ initialization := import(load('test#/auto/utils/initialization.mdl'));
 start:=date_ms();
 clc := j_load('oa4mp.client.clc');
 test.:= [
-          [path + 'auto/tests/' +'ccf-oauth-qdl.qdl', initialization],
-          [path + 'auto/tests/' +'ccf-oidc-basic.qdl', initialization],
-          [path + 'auto/tests/' +'ccf-oauth-basic.qdl', initialization],
+          [(path + 'auto/tests/' +'ccf-oauth-basic.qdl'), 'ccf.oauth.rfc7523', initialization, true],
+          [(path + 'auto/tests/' +'ccf-oidc-basic.qdl'),'ccf.oidc.rfc7523', initialization, true],
+          [(path + 'auto/tests/' +'ccf-oauth-qdl.qdl'), 'ccf.oauth.rfc7523.qdl', initialization, true],
+          [(path + 'auto/tests/' +'ccf-oauth-basic.qdl'), 'ccf.oauth.basic', initialization, false],
+          [(path + 'auto/tests/' +'ccf-oidc-basic.qdl'),'ccf.oidc.basic', initialization, false],
+          [(path + 'auto/tests/' +'ccf-oauth-qdl.qdl'), 'ccf.oauth.qdl', initialization, false],
           [path + 'auto/tests/' +'server-script.qdl', initialization],
           [path + 'auto/tests/' +'oauth-with-refresh.qdl', initialization],
           [path + 'auto/tests/' +'oauth-basic-no-refresh.qdl',initialization],

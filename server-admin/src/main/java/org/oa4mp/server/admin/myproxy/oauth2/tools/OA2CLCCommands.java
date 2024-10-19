@@ -1088,7 +1088,6 @@ public class OA2CLCCommands extends CommonCommands {
             JSONObject json = JWTUtil.verifyAndReadJWT(token.getToken(), keys);
             return json;
         } catch (Throwable t) {
-                t.printStackTrace();
             // do nothing.
         }
         return null;

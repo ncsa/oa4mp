@@ -270,37 +270,6 @@ val jwt: String = signedJWT.serialize()     */
         }
     }
 
-/*
-    public static boolean verify(JSONObject header, JSONObject payload, String sig, JSONWebKey webKey) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException, InvalidKeySpecException {
-
-        Object alg = header.get(ALGORITHM);
-        if (alg == null || !(alg instanceof String)) {
-            throw new IllegalStateException("Unknown algorithm");
-        }
-        String algorithm = (String) alg;
-        //  DebugUtil.trace(JWTUtil.class, "Verifying JWT with algorithm =" + algorithm);
-        Signature signature = null;
-        if (algorithm.equals(NONE_JWT)) {
-            if (!isTrivial(sig)) {
-                throw new IllegalStateException("Error: the algorithm is " + NONE_JWT + " but there is  signature. ");
-            }
-            return true;
-        }
-        signature = Signature.getInstance(getJavaSignatureName(algorithm));
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-
-        X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(webKey.publicKey.getEncoded());
-        RSAPublicKey pubKey = (RSAPublicKey) keyFactory.generatePublic(pubKeySpec);
-
-        signature.initVerify(pubKey);
-        signature.update(concat(header, payload).getBytes());
-        boolean rc = signature.verify(Base64.decodeBase64(sig));
-        //   DebugUtil.trace(JWTUtil.class, "Verification ok?" + rc);
-        return rc;
-    }
-*/
-
-
     /**
      * This returns header, payload and signature as the three elements of an array.
      *

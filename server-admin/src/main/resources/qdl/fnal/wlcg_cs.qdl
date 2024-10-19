@@ -94,7 +94,7 @@ say('*** WLCG_CS debug: lookup name: ' + lookupName);
 say('*** WLCG_CS debug: requested capabilities: ' + c);
 say('*** WLCG_CS debug: claims count = ' + to_string(size(claims.)));
 
-                  cs. := new_template('ldap');
+                  cs. := claims#new_template('ldap');
          cs.auth_type := 'simple';
            cs.address := 'ldap-test.cilogon.org';
               cs.port := 636;
@@ -106,7 +106,7 @@ cs.search_attributes. :=  [EPPN, EPE, VOPAUID];
           cs.username := script_args(0);
           cs.password := script_args(1);
 
-record. := get_claims(create_source(cs.), lookupName);
+record. := claims#get_claims(claims#create_source(cs.), lookupName);
 
 say('*** WLCG_CS debug, returned from LDAP: ' + to_string(record.));
 
@@ -127,6 +127,6 @@ if[
 ];
 
 wlcg_cs. := record.EPE.;
-wlcg_cs. := template_substitution(wlcg_cs., claims.);
+wlcg_cs. := claims#template_substitution(wlcg_cs., claims.);
 say('*** WLCG_CS debug, returning: ' + to_string(wlcg_cs., true));
 return([vault_id, at_sub, wlcg_cs.]);

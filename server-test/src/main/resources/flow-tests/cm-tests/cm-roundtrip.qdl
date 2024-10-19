@@ -1,11 +1,9 @@
 #! /usr/bin/env -S qdl-run  
 
 script_load('test#/cm-tests/init.qdl', args(0));
-say('got past init');
 payload. := from_json(file_read(ini.'payloads' + 'create-minimal.json'));
 payload.'client_id' := custom_id();
 server_defaults.:=http#get({'query':'org.oa4mp:/server#defaults'})\content;
-say(print(server_defaults.));
 resp. := http#post(payload.);
 r. := http#get({'client_id':resp.'content'.'client_id'});
 client. := r.'content';

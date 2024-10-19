@@ -25,7 +25,7 @@ public class TokenHandlerModule extends JavaModule {
 
     @Override
     public Module newInstance(State state1) {
-        OA2State state = (OA2State)state1;
+        OA2State state = (OA2State) state1;
         TokenHandlerModule thm = new TokenHandlerModule(URI.create("oa4mp:/qdl/oidc/token"), "tokens");
 
         ArrayList<QDLFunction> funcs = new ArrayList<>();
@@ -47,7 +47,9 @@ public class TokenHandlerModule extends JavaModule {
 
 
         thm.addFunctions(funcs);
-
+        if (state != null) {
+            thm.init(state);
+        }
         setupModule(thm);
         return thm;
     }
@@ -60,7 +62,7 @@ public class TokenHandlerModule extends JavaModule {
             descr.add("This module allows you to access the token handler support of OA4MP as it relates");
             descr.add("to id, access and refresh tokens. They are all done similarly in that there is");
             descr.add("an init call that sets up the handler, you set the appropriate values in the appropriate");
-            descr.add("stem (e.g. "+ QDLRuntimeEngine.SRE_REQ_ACCESS_TOKEN + ".) and when you are done,");
+            descr.add("stem (e.g. " + QDLRuntimeEngine.SRE_REQ_ACCESS_TOKEN + ".) and when you are done,");
             descr.add("call the appropirate finish command, which ensures that all required fields (like");
             descr.add("time stamps are done right.");
             descr.add("On token refresh or exchange, invoke the refresh call. It is possible that the");

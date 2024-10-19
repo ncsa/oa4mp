@@ -15,15 +15,26 @@
  }// end tokens
 */
 test_id:= 'ccf.oauth.qdl';
+initialization := null;
+is_rfc7523 := false;
+  if[0 < size(args())]
+then[
+            test_id := args().0.0;
+     initialization := args().0.1;
+         is_rfc7523 := args().0.2;
+  ]
+else[
+     initialization := import(load('test#/auto/utils/initialization.mdl'));
+];
 clc#init($$OA4MP_CLC_INI, test_id);
-initialization := size(args())==1⇒args().0:import(load('test#/auto/utils/initialization.mdl'));
+//initialization := size(args())==1⇒args().0:import(load('test#/auto/utils/initialization.mdl'));
 ini.:=initialization#get_client_ini(test_id);
 server_defaults.:=initialization# server_defaults();
 // Three quick tests. This client is no configured to return id token or refresh tokens ever,
 // so requests for them should simply be ignored
 scopes. := ['read:/foo', 'write:/bar', 'compute.start'];
 aud := 'ANY';
-tokens. := clc#ccf({'audience':aud,'scope':scopes.}); // from the raw response
+tokens. := clc#ccf({'audience':aud,'scope':scopes., 'rfc7523':is_rfc7523}); // from the raw response
 
 ⊨ tokens.'expires_in' == server_defaults.'at_lifetime' : 'wrong access token lifetime';
 ⊨ ∄tokens.'refresh_token' : 'should not get a refresh token by default.';

@@ -19,7 +19,7 @@ block[
 
      tx_scopes. := ~mask(tx_scopes., starts_with(tx_scopes., CS_HEAD)!= 0) ;
      tx_scopes. := ~mask(tx_scopes., starts_with(tx_scopes., 'wlcg.groups:')!= 0) ;
-     xi. := resolve_templates(at_claims.EPE., tx_scopes., false); // resolves any scopes explicitly granted to user
+     xi. := claims#resolve_templates(at_claims.EPE., tx_scopes., false); // resolves any scopes explicitly granted to user
      SS('rtx xi.:\n' + print(xi.));
 
      cs. := []~mask(scopes., -1 < starts_with(scopes., CS_HEAD));
@@ -42,7 +42,7 @@ block[
               ][
                   is_uri(x)->is_defined(to_uri(x).scheme);
                   // do any substitutions in the templates.
-                  s_rec. := template_substitution(record.EPE., claims.); // use s_rec not record.EPE now
+                  s_rec. := claims#template_substitution(record.EPE., claims.); // use s_rec not record.EPE now
                   SS('rtx s_rec. post subst:\n' + print(s_rec.));
                   uq_. := []~mask(s_rec., !for_each(@is_uri, s_rec.)); // unqualified names
                   SS('rtx uq_.:\n' + print(uq_.));
@@ -52,7 +52,7 @@ block[
                        SS('rtx uq_. after reduce:\n' + print(uq_.));
                       ];
                   // Get any specific overrides.
-                  eta. := resolve_templates(s_rec., tx_scopes., false);
+                  eta. := claims#resolve_templates(s_rec., tx_scopes., false);
                   SS('rtx eta.:\n' + print(eta.));
                    xi. := xi. ~ eta. ~ uq_.; // duplicates ok here, removed later
               ]; // end if LDAP has entries for CS.

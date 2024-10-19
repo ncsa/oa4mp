@@ -1,5 +1,6 @@
 package org.oa4mp.server.test;
 
+import org.oa4mp.server.loader.qdl.OA2LibLoader;
 import org.oa4mp.server.loader.qdl.scripting.OA2State;
 import org.qdl_lang.TestUtils;
 import org.qdl_lang.evaluate.MetaEvaluator;
@@ -28,7 +29,7 @@ public class QDLTestUtils extends TestUtils {
                                    MyLoggingFacade myLoggingFacade,
                                    boolean isServerMode,
                                    boolean assertionsOn) {
-        return new OA2State(
+        OA2State ss = new OA2State(
                 vStack,
                 new OpEvaluator(),
                 MetaEvaluator.getInstance(),
@@ -41,6 +42,8 @@ public class QDLTestUtils extends TestUtils {
                 true,
                 true,
                 null);
+        (new OA2LibLoader()).add(ss);
+        return ss;
     }
 
     // A main method for testing snippets of code.

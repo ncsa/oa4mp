@@ -208,7 +208,7 @@ public class OA2State extends State {
             boolean isServerMode,
             boolean isRestrictedIO,
             boolean assertionsOn) {
-        return new OA2State(
+        OA2State s = new OA2State(
                 vStack,
                 opEvaluator,
                 metaEvaluator,
@@ -221,6 +221,10 @@ public class OA2State extends State {
                 assertionsOn,
                 isStrictACLs(),
                 getJsonWebKeys());
+        s.setOa2se(getOa2se());
+        s.setAclBlackList(getAclBlackList());
+        s.setAclList(getAclList());
+        return s;
     }
 
     @Override

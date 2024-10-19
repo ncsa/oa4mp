@@ -31,9 +31,9 @@
 
 
 */
- acl_add('localhost:test/fnal');
- acl_add('fnal:dwd-7');
- acl_check();
+ acl#acl_add('localhost:test/fnal');
+ acl#acl_add('fnal:dwd-7');
+ acl#acl_check();
  EPE := 'eduPersonEntitlement';
 
 if[
@@ -44,7 +44,7 @@ if[
      return();
   ];
 
-           fnal. := new_template('ldap');
+           fnal. := claims#new_template('ldap');
    fnal.username := script_args(0);
    fnal.password := script_args(1);
   fnal.auth_type := 'simple';
@@ -57,7 +57,7 @@ fnal.search_base := 'ou=people,o=Fermilab,o=CO,dc=cilogon,dc=org';
 
 fnal.search_attributes. :=  [EPE,'isMemberOf'];
 
-       at_claims. := get_claims(fnal., claims.eppn); // test user
+       at_claims. := claims#get_claims(fnal., claims.eppn); // test user
  access_token.sub := claims.eppn;
 
 // A 'starts with' function that returns the elements of x. that start with something in y.

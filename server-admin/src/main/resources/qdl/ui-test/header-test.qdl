@@ -17,7 +17,7 @@
 
 */
 
-cfg. := new_template('header');
+cfg. := claims#new_template('header');
 cfg.'prefix' := 'x_';
 say('starting header test');
 say('headers:\n' + print(auth_headers.));

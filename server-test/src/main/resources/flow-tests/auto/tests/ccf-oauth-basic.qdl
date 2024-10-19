@@ -4,23 +4,34 @@
    Tests a client with no configuration. This is as basic as it gets.
 */
 test_id:= 'ccf.oauth.basic';
+initialization := null;
+is_rfc7523 := false;
+  if[0 < size(args())]
+then[
+            test_id := args().0.0;
+     initialization := args().0.1;
+         is_rfc7523 := args().0.2;
+  ]
+else[
+     initialization := import(load('test#/auto/utils/initialization.mdl'));
+];
+//initialization := size(args())==1⇒args().0:import(load('test#/auto/utils/initialization.mdl'));
 clc#init($$OA4MP_CLC_INI, test_id);
-initialization := size(args())==1⇒args().0:import(load('test#/auto/utils/initialization.mdl'));
 ini.:=initialization#get_client_ini(test_id);
 server_defaults.:=initialization# server_defaults();
 // Three quick tests. This client is no configured to return id token or refresh tokens ever,
 // so requests for them should simply be ignored
-tokens. := clc#ccf(); // from the raw response
+tokens. := clc#ccf({'rfc7523':is_rfc7523}); // from the raw response
 ⊨ tokens.'expires_in' == server_defaults.'at_lifetime' : 'wrong access token lifetime';
 ⊨ ∄tokens.'refresh_token' : 'should not get a refresh token by default.';
 ⊨ size(clc#claims()) == 0 : 'should not get id token by default';
 
-tokens. := clc#ccf({'scope':'openid'});
+tokens. := clc#ccf({'scope':'openid','rfc7523':is_rfc7523});
 ⊨ tokens.'expires_in' == server_defaults.'at_lifetime' : 'wrong access token lifetime';
 ⊨ ∄tokens.'refresh_token' : 'should not get a refresh token when requesting openid scope';
 ⊨ size(clc#claims()) == 0 : 'should not get id token ever';
 
-tokens. := clc#ccf({'scope':'offline_access'});
+tokens. := clc#ccf({'scope':'offline_access', 'rfc7523':is_rfc7523});
 ⊨ tokens.'expires_in' == server_defaults.'at_lifetime' : 'wrong access token lifetime';
 ⊨ ∄tokens.'refresh_token' : 'should not get a refresh token ever.';
 ⊨ size(clc#claims()) == 0 : 'should not get id token ever';

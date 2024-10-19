@@ -24,7 +24,7 @@
 
 */
 
-cfg. := new_template('file');
+cfg. := claims#new_template('file');
 say(to_string('*** user_info dir = ' + to_string(dir('vfs#/scripts/'))));
 /*
 
@@ -40,4 +40,4 @@ cfg.file_path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-admin/src/main/resource
 cfg.'claim_key' := 'eppn'; 
 claims.'eppn' := 'jgaynor@foo.bar'; // set it for testing later. Use GitHub for IDP so this can be set here.
 say('claims.eppn set');
-claim_sources. := claim_sources. ~ [create_source(cfg.)]; // test automated getting claims
+claim_sources. := claim_sources. ~ [claims#create_source(cfg.)]; // test automated getting claims

@@ -192,7 +192,7 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
         StateUtils.setFactory(new StateUtils() {
             @Override
             public State create() {
-                return new OA2State(
+                OA2State ss = new OA2State(
                         new VStack(),
                         new OpEvaluator(),
                         MetaEvaluator.getInstance(),
@@ -205,6 +205,8 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
                         false,
                         true,
                         null); // default in server mode, but can be overridden later
+                ss.setOa2se(oa2SE);
+                return ss;
             }
         });
     }

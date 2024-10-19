@@ -54,7 +54,7 @@ public class QDLTests extends AbstractQDLTester {
         OA2State state = (OA2State) getTestUtils().getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "module_load('org.oa4mp.server.loader.qdl.OA2QDLLoader', 'java');");
-        addLine(script, "module_import('oa2:/qdl/oidc/claims');");
+        addLine(script, "module_import('oa4mp:/qdl/oidc/claims');");
         addLine(script, "groups. := [{'name':'test0','id':123}, {'name':'test1','id':234}, {'name':'test2','id':345}, {'name':'test3','id':456}];");
         addLine(script, "groups2. := ['test0', 'test1', 'test2', 'test3'];");
         addLine(script, "groups3. := ['test0', 'test1', 42, 'test3']; // should fail");
@@ -68,12 +68,43 @@ public class QDLTests extends AbstractQDLTester {
         assert getBooleanValue("ok2", state) : "Basic in_group test for flat list group list failed";
         assert getBooleanValue("ok3", state) : "Basic in_group test for mixed group list failed";
     }
-
+    public void testInGroup2A() throws Throwable {
+        OA2State state = (OA2State) getTestUtils().getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "claims:=j_load('oa4mp.util.claims');");
+        addLine(script, "groups. := [{'name':'test0','id':123}, {'name':'test1','id':234}, {'name':'test2','id':345}, {'name':'test3','id':456}];");
+        addLine(script, "groups2. := ['test0', 'test1', 'test2', 'test3'];");
+        addLine(script, "groups3. := ['test0', 'test1', 42, 'test3']; // should fail");
+        addLine(script, "groups4. := [{'name':'test0','id':123}, 'test1', 'test2', 'test3']; // should work\n");
+        addLine(script, "ok1 := reduce(@&&, claims#in_group2(['test0', 'foo'], groups.)==[true,false]);");
+        addLine(script, "ok2 := reduce(@&&, claims#in_group2(['test0', 'foo', 'test2'], groups2.)==[true,false,true]);");
+        addLine(script, "ok3 := reduce(@&&, claims#in_group2(['test0', 'foo', 'test2'], groups4.)==[true,false,true]);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok1", state) : "Basic in_group test for structured group list failed";
+        assert getBooleanValue("ok2", state) : "Basic in_group test for flat list group list failed";
+        assert getBooleanValue("ok3", state) : "Basic in_group test for mixed group list failed";
+    }
+    public void testInGroup2FailA() throws Throwable {
+        OA2State state = (OA2State) getTestUtils().getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "claims := j_load('oa4mp.util.claims');");
+        addLine(script, "groups3. := ['test0', 'test1', 42, 'test3']; // should fail");
+        addLine(script, "claims#in_group2(['test0', 'foo', 'test2'], groups3.);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        boolean good = false;
+        try {
+            interpreter.execute(script.toString());
+        } catch (QDLExceptionWithTrace iax) {
+            good = iax.getCause() instanceof IllegalArgumentException;
+        }
+        assert good : "Was able to execute in_group2 test against bad list";
+    }
     public void testInGroup2Fail() throws Throwable {
         OA2State state = (OA2State) getTestUtils().getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "module_load('org.oa4mp.server.loader.qdl.OA2QDLLoader', 'java');");
-        addLine(script, "module_import('oa2:/qdl/oidc/claims');");
+        addLine(script, "module_import('oa4mp:/qdl/oidc/claims');");
         addLine(script, "groups3. := ['test0', 'test1', 42, 'test3']; // should fail");
         addLine(script, "in_group2(['test0', 'foo', 'test2'], groups3.);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
@@ -84,16 +115,34 @@ public class QDLTests extends AbstractQDLTester {
             good = iax.getCause() instanceof IllegalArgumentException;
         }
         assert good : "Was able to execute in_group2 test against bad list";
-
     }
 
-    public void testVFSFileClaimSource() throws Throwable {
+   /* public void testVFSFileClaimSourceA() throws Throwable {
+        OA2State state = (OA2State) getTestUtils().getNewState();
+        StringBuffer script = new StringBuffer();
+        // tests absolute path, not in server mode.
+        String realPath = DebugUtil.getDevPath()+"/oa4mp/server-admin/src/main/resources/qdl/ui-test/test-claims.json";
+        addLine(script, "claims:= j_load('oa4mp.util.claims');");
+        addLine(script, "cfg. := claims#new_template('file');");
+        addLine(script, "cfg.file_path := '" + realPath + "';");
+        addLine(script, "my_claims. := claims#get_claims(claims#create_source(cfg.), 'jgaynor@foo.bar');");
+
+        addLine(script, "ok_eppn := my_claims.eppn == 'jgaynor@foo.bar';");
+        addLine(script, "ok_name := my_claims.isMemberOf.0.name == 'org_ici';");
+        addLine(script, "ok_id := my_claims.isMemberOf.0.id == 1282;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok_eppn", state) : "Did not get the correct eppn";
+        assert getBooleanValue("ok_name", state) : "Did not get the correct name from the zeroth group";
+        assert getBooleanValue("ok_id", state) : "Did not get the correct id from the zeroth group";
+    }*/
+/*    public void testVFSFileClaimSource() throws Throwable {
         OA2State state = (OA2State) getTestUtils().getNewState();
         StringBuffer script = new StringBuffer();
         // tests absolute path, not in server mode.
         String realPath = DebugUtil.getDevPath()+"/oa4mp/server-admin/src/main/resources/qdl/ui-test/test-claims.json";
         addLine(script, "module_load('org.oa4mp.server.loader.qdl.OA2QDLLoader', 'java');");
-        addLine(script, "module_import('oa2:/qdl/oidc/claims');");
+        addLine(script, "module_import('oa4mp:/qdl/oidc/claims');");
         addLine(script, "cfg. := new_template('file');");
         addLine(script, "cfg.file_path := '" + realPath + "';");
         addLine(script, "my_claims. := get_claims(create_source(cfg.), 'jgaynor@foo.bar');");
@@ -106,19 +155,58 @@ public class QDLTests extends AbstractQDLTester {
         assert getBooleanValue("ok_eppn", state) : "Did not get the correct eppn";
         assert getBooleanValue("ok_name", state) : "Did not get the correct name from the zeroth group";
         assert getBooleanValue("ok_id", state) : "Did not get the correct id from the zeroth group";
+    }*/
+    public void testVFSFileClaimSourceA() throws Throwable {
+        OA2State state = (OA2State) getTestUtils().getNewState();
+        StringBuffer script = new StringBuffer();
+        // tests absolute path, not in server mode.
+        String realPath = DebugUtil.getDevPath()+"/oa4mp/server-admin/src/main/resources/qdl/ui-test/test-claims.json";
+        addLine(script, "claims:= j_load('oa4mp.util.claims');");
+        addLine(script, "cfg. := claims#new_template('file');");
+        addLine(script, "cfg.file_path := '" + realPath + "';");
+        addLine(script, "my_claims. := claims#get_claims(claims#create_source(cfg.), 'jgaynor@foo.bar');");
 
+        addLine(script, "ok_eppn := my_claims.eppn == 'jgaynor@foo.bar';");
+        addLine(script, "ok_name := my_claims.isMemberOf.0.name == 'org_ici';");
+        addLine(script, "ok_id := my_claims.isMemberOf.0.id == 1282;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok_eppn", state) : "Did not get the correct eppn";
+        assert getBooleanValue("ok_name", state) : "Did not get the correct name from the zeroth group";
+        assert getBooleanValue("ok_id", state) : "Did not get the correct id from the zeroth group";
     }
 
-    public void testFileClaimSource() throws Throwable {
+
+    public void testVFSFileClaimSource() throws Throwable {
+        OA2State state = (OA2State) getTestUtils().getNewState();
+        StringBuffer script = new StringBuffer();
+        // tests absolute path, not in server mode.
+        String realPath = DebugUtil.getDevPath()+"/oa4mp/server-admin/src/main/resources/qdl/ui-test/test-claims.json";
+        addLine(script, "module_load('org.oa4mp.server.loader.qdl.OA2QDLLoader', 'java');");
+        addLine(script, "module_import('oa4mp:/qdl/oidc/claims');");
+        addLine(script, "cfg. := new_template('file');");
+        addLine(script, "cfg.file_path := '" + realPath + "';");
+        addLine(script, "my_claims. := get_claims(create_source(cfg.), 'jgaynor@foo.bar');");
+
+        addLine(script, "ok_eppn := my_claims.eppn == 'jgaynor@foo.bar';");
+        addLine(script, "ok_name := my_claims.isMemberOf.0.name == 'org_ici';");
+        addLine(script, "ok_id := my_claims.isMemberOf.0.id == 1282;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok_eppn", state) : "Did not get the correct eppn";
+        assert getBooleanValue("ok_name", state) : "Did not get the correct name from the zeroth group";
+        assert getBooleanValue("ok_id", state) : "Did not get the correct id from the zeroth group";
+    }
+
+    public void testFileClaimSourceA() throws Throwable {
         OA2State state = (OA2State) getTestUtils().getNewState();
         StringBuffer script = new StringBuffer();
         // tests absolute path, not in server mode.
         String testClaimsFile = DebugUtil.getDevPath()+"/oa4mp/server-test/src/main/resources/test-claims.json";
-        addLine(script, "module_load('org.oa4mp.server.loader.qdl.OA2QDLLoader', 'java');");
-        addLine(script, "module_import('oa2:/qdl/oidc/claims');");
-        addLine(script, "cfg. := new_template('file');");
+        addLine(script, "claims := j_load('oa4mp.util.claims');");
+        addLine(script, "cfg. := claims#new_template('file');");
         addLine(script, "cfg.file_path := '" + testClaimsFile + "';");
-        addLine(script, "my_claims. := get_claims(create_source(cfg.), 'jgaynor');");
+        addLine(script, "my_claims. := claims#get_claims(claims#create_source(cfg.), 'jgaynor');");
         addLine(script, "ok_eppn := my_claims.eppn == 'test-eppn@foo.bar';");
         addLine(script, "ok_name := my_claims.isMemberOf.0.name == 'org_ici';");
         addLine(script, "ok_id := my_claims.isMemberOf.0.id == 1282;");
@@ -133,7 +221,7 @@ public class QDLTests extends AbstractQDLTester {
         OA2State state = (OA2State) getTestUtils().getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "module_load('org.oa4mp.server.loader.qdl.OA2QDLLoader', 'java');");
-        addLine(script, "module_import('oa2:/qdl/oidc/claims');");
+        addLine(script, "module_import('oa4mp:/qdl/oidc/claims');");
         addLine(script, "raw:='storage.read:/bsu/${isMemberOf}/${uid}';");
         addLine(script, "claims.uid ≔ 'bob';");
         addLine(script, "grps.isMemberOf. ≔ ['all','dune'];");
@@ -144,16 +232,43 @@ public class QDLTests extends AbstractQDLTester {
         assert getBooleanValue("ok", state) : "template substitution failed";
         assert getBooleanValue("ok1", state) : "template substitution failed";
     }
+    public void testTemplateSubstitutionA() throws Throwable {
+        OA2State state = (OA2State) getTestUtils().getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "claims := j_load('oa4mp.util.claims');");
+        addLine(script, "raw:='storage.read:/bsu/${isMemberOf}/${uid}';");
+        addLine(script, "claims.uid ≔ 'bob';");
+        addLine(script, "grps.isMemberOf. ≔ ['all','dune'];");
+        addLine(script, "ok ≔ reduce(@∧, ['storage.read:/bsu/all/bob','storage.read:/bsu/dune/bob'] ≡ claims#template_substitution(raw, claims., grps.));");
+        addLine(script, "ok1 ≔ reduce(@∧, ['a.b/bob','a.c:/all/bob','a.c:/dune/bob'] ≡ claims#template_substitution(['a.b/${uid}', 'a.c:/${isMemberOf}/${uid}'], claims., grps.));");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "template substitution failed";
+        assert getBooleanValue("ok1", state) : "template substitution failed";
+    }
 
     public void testResolveTemplates() throws Throwable {
         OA2State state = (OA2State) getTestUtils().getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "module_load('org.oa4mp.server.loader.qdl.OA2QDLLoader', 'java');");
-        addLine(script, "module_import('oa2:/qdl/oidc/claims');");
+        addLine(script, "module_import('oa4mp:/qdl/oidc/claims');");
         addLine(script, "cs. :=['x.y:/abc/def','p.q:/rst'];");
         addLine(script, "req. := ['x.y:/abc/def/ghi','x.y:/abc/defg', 'p.q:/'];");
         addLine(script, "ok_false ≔ reduce(@∧,resolve_templates(cs., req., false) ≡ ['x.y:/abc/def/ghi']);");
         addLine(script, "ok_true ≔ reduce(@∧,resolve_templates(cs., req., true) ≡ ['p.q:/rst','x.y:/abc/def/ghi']);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok_false", state) : "resolve template failed for non-query";
+        assert getBooleanValue("ok_true", state) : "resolve template failed for query";
+    }
+    public void testResolveTemplatesA() throws Throwable {
+        OA2State state = (OA2State) getTestUtils().getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "claims := j_load('oa4mp.util.claims');");
+        addLine(script, "cs. :=['x.y:/abc/def','p.q:/rst'];");
+        addLine(script, "req. := ['x.y:/abc/def/ghi','x.y:/abc/defg', 'p.q:/'];");
+        addLine(script, "ok_false ≔ reduce(@∧,claims#resolve_templates(cs., req., false) ≡ ['x.y:/abc/def/ghi']);");
+        addLine(script, "ok_true ≔ reduce(@∧,claims#resolve_templates(cs., req., true) ≡ ['p.q:/rst','x.y:/abc/def/ghi']);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getBooleanValue("ok_false", state) : "resolve template failed for non-query";
@@ -169,7 +284,7 @@ public class QDLTests extends AbstractQDLTester {
         OA2State state = (OA2State) getTestUtils().getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "module_load('org.oa4mp.server.loader.qdl.OA2QDLLoader', 'java');");
-        addLine(script, "module_import('oa2:/qdl/oidc/claims');");
+        addLine(script, "module_import('oa4mp:/qdl/oidc/claims');");
         addLine(script, "c.:=['insert:/DQSegDB',\n" +
                 "                 'read:/frames',\n" +
                 "                 'read:/GraceDB',\n" +
@@ -202,6 +317,43 @@ public class QDLTests extends AbstractQDLTester {
         assert getBooleanValue("size_ok", state) : "expect  " + getLongValue("size_out", state) + " but got " + getLongValue("size_resolved", state) + " elements";
         assert getBooleanValue("ok", state) : "incorrect result.";
     }
+    public void testResolveTemplates2A() throws Throwable {
+        OA2State state = (OA2State) getTestUtils().getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "claims:=j_load('oa4mp.util.claims');");
+        addLine(script, "c.:=['insert:/DQSegDB',\n" +
+                "                 'read:/frames',\n" +
+                "                 'read:/GraceDB',\n" +
+                "                 'compute.create',\n" +
+                "                 'compute.create2'\n" +
+                "                 ];");
+        addLine(script, "    r.:=['openid',\n" +
+                "        'profile',\n" +
+                "        'email',\n" +
+                "        'org.cilogon.userinfo',\n" +
+                "        'read:/DQSegDB',\n" +
+                "        'write:/DQSegDB',\n" +
+                "        'query:/DQSegDB',\n" +
+                "        'insert:/DQSegDB',\n" +
+                "        'read:/frames',\n" +
+                "        'read:/GraceDB',\n" +
+                "        'compute.create',\n" +
+                "        'compute.cancel',\n" +
+                "        'compute.read',\n" +
+                "        'compute.modify'\n" +
+                "       ];");
+        addLine(script, "out. := ['read:/frames','compute.create','read:/GraceDB','insert:/DQSegDB'];"); // expected, note no compute.create2
+        addLine(script, "resolved.:= claims#resolve_templates(c., r., false);");
+        addLine(script, "size_resolved := size(resolved.);");
+        addLine(script, "size_out := size(out.);");
+        addLine(script, "size_ok := size_resolved ≡ size_out;");
+        addLine(script, "ok ≔ reduce(@∧,out.∈ resolved.);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("size_ok", state) : "expect  " + getLongValue("size_out", state) + " but got " + getLongValue("size_resolved", state) + " elements";
+        assert getBooleanValue("ok", state) : "incorrect result.";
+    }
+
     // next test is a good idea, but was impossible to get running in practice -- just too much
     // configuration needed to bootstrap it. May revisit it later.
 /*    public void testATHandler() throws Throwable{
@@ -210,7 +362,7 @@ public class QDLTests extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         addLine(script, "module_load('org.oa4mp.server.loader.qdl.OA2QDLLoader', 'java');");
         //addLine(script, "module_load('edu.uiuc.ncsa.oa2.qdl.QDLToolsLoader', 'java');");
-        addLine(script, "module_import('oa2:/qdl/oidc/claims');");
+        addLine(script, "module_import('oa4mp:/qdl/oidc/claims');");
         addLine(script, "module_import('oa2:/qdl/oidc/token');");
         addLine(script, "z.:=[];");
         addLine(script, "at_init('wlcg',z.);");
