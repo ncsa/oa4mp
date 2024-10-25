@@ -27,6 +27,8 @@ import net.sf.json.JSONObject;
 import java.net.URI;
 import java.util.*;
 
+import static edu.uiuc.ncsa.security.core.util.StringUtils.pad;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 7/22/21 at  10:41 AM
@@ -219,6 +221,7 @@ public class CLC implements QDLMetaModule {
             String args = DUMMY_ARG;
             boolean verify = false;
             boolean rawResponse = false;
+            boolean hasHeaders = false;
             if (objects.length == 1) {
                 if (objects[0] instanceof QDLStem) {
                     QDLStem input = (QDLStem) objects[0];
@@ -228,6 +231,10 @@ public class CLC implements QDLMetaModule {
                     if (input.containsKey("raw_response")) {
                         rawResponse = input.getBoolean("raw_response");
                     }
+                    if (input.containsKey(ServiceClient.HEADER_KEY)) {
+                        clcCommands.getTokenParameters().put(ServiceClient.HEADER_KEY, input.get(ServiceClient.HEADER_KEY));
+                        hasHeaders = true;
+                    }
                 }
             }
             if (!verify) {
@@ -235,6 +242,9 @@ public class CLC implements QDLMetaModule {
             }
 
             clcCommands.access(new InputLine(args));
+            if (hasHeaders) {
+                clcCommands.getTokenParameters().remove(ServiceClient.HEADER_KEY);
+            }
             if (rawResponse) {
                 QDLStem out = new QDLStem();
                 try {
@@ -262,6 +272,7 @@ public class CLC implements QDLMetaModule {
                     doxx.add("\nThe elements of the arg. stem are:\n");
                     doxx.add("      verify (boolean) - if true (default, verify the tokens");
                     doxx.add("raw_response (boolean) - if false, return the raw response. If true (default) return the actual tokens.");
+                    doxx.add("\nTo send headers, include a stem that has the key " + ServiceClient.HEADER_KEY);
                     break;
             }
             doxx.add(checkInitMessage);
@@ -507,22 +518,57 @@ public class CLC implements QDLMetaModule {
         @Override
         public Object evaluate(Object[] objects, State state) throws Throwable {
             checkInit();
-            InputLine inputLine = argsToInputLine(getName(), objects);
-            boolean rawResponse = inputLine.hasArg(EXCHANGE_RAW_RESPONSE);
-            inputLine.removeSwitch(EXCHANGE_RAW_RESPONSE);
+            QDLStem inStem = null;
+            boolean hasHeaders = false;
+            boolean rawResponse = false;
+            InputLine inputLine;
+            if (objects.length == 1) {
+                if (objects[0] instanceof QDLStem) {
+                    inStem = (QDLStem) objects[0];
+                }
+            }
+
+            if (inStem == null) {
+                inputLine = argsToInputLine(getName(), objects);
+                rawResponse = inputLine.hasArg(EXCHANGE_RAW_RESPONSE);
+                inputLine.removeSwitch(EXCHANGE_RAW_RESPONSE);
+            } else {
+                List<String> args = new ArrayList<>();
+                args.add("-" + inStem.getString("subject"));
+
+                if (inStem.containsKey("type")) {
+                    args.add("-subject");
+                    args.add(inStem.getString("type"));
+                }
+                if (inStem.containsKey(EXCHANGE_RAW_RESPONSE)) {
+                    rawResponse = inStem.getBoolean(EXCHANGE_RAW_RESPONSE);
+                }
+                if (inStem.containsKey(ServiceClient.HEADER_KEY)) {
+                    hasHeaders = true;
+                    clcCommands.getExchangeParameters().put(ServiceClient.HEADER_KEY, inStem.getStem(ServiceClient.HEADER_KEY));
+                }
+                // ok, we will construct the input line at this point since
+                inputLine = new InputLine(args);
+            }
+
+            boolean isIDToken = inputLine.hasArg("-id");
+            boolean isRefreshToken = inputLine.hasArg("-rt");
             clcCommands.exchange(inputLine);
-            if (Arrays.asList(objects).contains("-id")) {
+            if (hasHeaders) {
+                clcCommands.getExchangeParameters().remove(ServiceClient.HEADER_KEY);
+            }
+            if (isIDToken) {
                 // if they request an id token, return it.
                 QDLStem x = new QDLStem();
                 x.fromJSON(clcCommands.getIdToken().getPayload());
                 return x;
             }
-            if (Arrays.asList(objects).contains("-rt")) {
-                // if they request only a refresh token, return it.
+            if (isRefreshToken) {
                 QDLStem x = new QDLStem();
                 x.put("refresh_token", tokenToStem(clcCommands.getDummyAsset().getRefreshToken()));
                 return x;
             }
+
             if (rawResponse) {
                 QDLStem out = new QDLStem();
                 out.fromJSON(clcCommands.getExchangeResponse());
@@ -534,19 +580,41 @@ public class CLC implements QDLMetaModule {
         @Override
         public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
-            doxx.add(getName() + "([-rt | -at | -none] [-subject at|rt|id] [" + EXCHANGE_RAW_RESPONSE+"] Do the token exchange.");
-            doxx.add("returns: Both tokens, but the requested token is updated.");
-            doxx.add("Arguments:");
-            doxx.add("(None) = exchange the access token using the access token as the bearer token. Make sure it has not expired.");
-            doxx.add(EXCHANGE_RAW_RESPONSE + " = return the raw response from the server, not just the tokens.");
-            doxx.add("-at = explicitly request an access token");
-            doxx.add("-rt = exchange refresh token, using the refresh token as the bearer token");
-            doxx.add("-none = do not request the return type, let the server use its default");
-            doxx.add("-subject = Use the indicated token as the subject. The default is to use the requested type.");
-            doxx.add("E.g.");
-            doxx.add("exchange('-at', '-subject', 'rt');");
-            doxx.add("would exchange the access token (possibly expired) using the (valid) refresh token.");
+            switch (argCount) {
+                case 0:
+                    doxx.add(getName() + "() - Do the token exchange using the access token as the bearer token.");
+                    break;
+                case 1:
+                    int width = 15;
+                    doxx.add(getName() + "(['-rt' | '-at' | 'id'| '-none'] | arg.) - Do the token exchange using the access token as the bearer token and getting back the indicated type.");
+                    doxx.add("arg. - a stem for the types, the possible entries are");
+                    doxx.add(pad("Key", width) + "Value");
+                    doxx.add(pad("subject", width) + "The subject type, at, rt, id");
+                    doxx.add(pad("type", width) + "The type of token to return at, rt or id");
+                    doxx.add(pad(EXCHANGE_RAW_RESPONSE, width) + "returns the raw response from the server, not the tokens");
+                    doxx.add(pad(ServiceClient.HEADER_KEY, width) + "a stem of header values.");
+                    doxx.add("\nE.g.");
+                    doxx.add("exchange({'subject':'at','type','rt')");
+                    doxx.add("would do the exchange using the access token as a bearer token to get a refresh token");
+                    break;
+                default:
+                    doxx.add(getName() + "([-rt | -at | '-id' | -none] [-subject at|rt|id] [" + EXCHANGE_RAW_RESPONSE + "] Do the token exchange.");
+                    doxx.add("returns: Both tokens, but the requested token is updated.");
+                    doxx.add("Arguments:");
+                    doxx.add("(None) = exchange the access token using the access token as the bearer token. Make sure it has not expired.");
+                    doxx.add(EXCHANGE_RAW_RESPONSE + " = return the raw response from the server, not just the tokens.");
+                    doxx.add("-at = explicitly request an access token");
+                    doxx.add("-rt = exchange refresh token, using the refresh token as the bearer token");
+                    doxx.add("-none = do not request the return type, let the server use its default");
+                    doxx.add("-subject = Use the indicated token as the subject. The default is to use the requested type.");
+                    doxx.add("\nE.g.");
+                    doxx.add("exchange('-at', '-subject', 'rt');");
+                    doxx.add("would exchange the access token (possibly expired) using the (valid) refresh token.");
+            }
+
             doxx.add(checkInitMessage);
+            doxx.add("\nE.g.");
+
             return doxx;
         }
     }
@@ -564,7 +632,7 @@ public class CLC implements QDLMetaModule {
         args.add(name);// name of function
         for (Object ooo : objects) {
             if (ooo instanceof String) {
-                args.add((String) ooo);
+                args.add(((String) ooo).trim());
             }
         }
         String[] strings = new String[]{};
@@ -619,22 +687,37 @@ public class CLC implements QDLMetaModule {
 
         @Override
         public int[] getArgCount() {
-            return new int[]{0};
+            return new int[]{0, 1};
         }
 
         @Override
         public Object evaluate(Object[] objects, State state) throws Throwable {
             checkInit();
-            QDLStem QDLStem = new QDLStem();
-            clcCommands.df(argsToInputLine(getName(), objects));
-            QDLStem.fromJSON(clcCommands.getDfResponse());
-            return QDLStem;
+            QDLStem outStem = new QDLStem();
+            QDLStem inStem = new QDLStem();
+
+            if (objects.length == 1) {
+                if (!(objects[0] instanceof QDLStem)) {
+                    throw new IllegalArgumentException("If there is an argument, it must be a stem of headers");
+                }
+                inStem.put(ServiceClient.HEADER_KEY, objects[0]);
+            }
+            JSONObject json = clcCommands.df(inStem);
+            outStem.fromJSON(json);
+            return outStem;
         }
 
         @Override
         public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
-            doxx.add(getName() + "() - initiate the device flow. If possible, the user code is copied to the clipboard.");
+            switch (argCount) {
+                case 0:
+                    doxx.add(getName() + "() - initiate the device flow. If possible, the user code is copied to the clipboard.");
+                    break;
+                case 1:
+                    doxx.add(getName() + "(headers.) - initiate the device flow, setting the headers. If possible, the user code is copied to the clipboard.");
+                    break;
+            }
             doxx.add("This returns the raw response from the server");
             doxx.add(checkInitMessage);
             return doxx;
@@ -907,7 +990,7 @@ public class CLC implements QDLMetaModule {
                 }
             }
             for (Object key : qdlList.values()) {
-                HashMap<String, String> params = null;
+                HashMap<String, Object> params = null;
                 switch (key.toString()) {
                     case PARAM_FLAG_AUTHZ:
                     case PARAM_FLAG_AUTHZ_SHORT:
@@ -999,7 +1082,7 @@ public class CLC implements QDLMetaModule {
             }
             QDLStem stem = (QDLStem) objects[0];
             for (Object key : stem.keySet()) {
-                HashMap<String, String> params = null;
+                HashMap<String, Object> params = null;
                 switch (key.toString()) {
                     case PARAM_FLAG_AUTHZ:
                     case PARAM_FLAG_AUTHZ_SHORT:
@@ -1316,6 +1399,7 @@ public class CLC implements QDLMetaModule {
                     dd.add("\nE.g.");
                     dd.add(getName() + "({'sub':'bob@bigstate.edu','lifetime':1000000})");
                     dd.add("sends the request with the given user name and the parameter (in this case, requesting a certificate lifetime).");
+                    dd.add("\nTo send headers, include a stem that has the key " + ServiceClient.HEADER_KEY);
                     break;
             }
 
@@ -1494,6 +1578,7 @@ public class CLC implements QDLMetaModule {
                     doxx.add(bb + "ID token.");
                     doxx.add(bb + "If you supply the key " + CLIENT_CREDENTIALS_RFC7523 + " with a true value, then");
                     doxx.add(bb + "RFC7523 credentials are used. If false (default) or omitted, then the standard  id + secret is used.");
+                    doxx.add("\nTo send headers, include a stem that has the key " + ServiceClient.HEADER_KEY);
                     break;
             }
             doxx.add("This returns the raw response as a JSON object. To get the tokens or claims, use the");

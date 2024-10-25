@@ -76,7 +76,7 @@
     </distributionManagement>-->
     <dependencies>
         <dependency>
-            <groupId>edu.uiuc.ncsa.myproxy</groupId>
+            <groupId>org.oa4mp</groupId>
             <artifactId>myproxy-logon</artifactId>
             <version>5.6-SNAPSHOT</version>
         </dependency>

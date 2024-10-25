@@ -253,6 +253,7 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
 
         grantTypes.add(OA2Constants.GRANT_TYPE_REFRESH_TOKEN);
         grantTypes.add(OA2Constants.GRANT_TYPE_AUTHORIZATION_CODE);
+        grantTypes.add(OA2Constants.GRANT_TYPE_CLIENT_CREDENTIALS);
         if (oa2SE.isRfc8628Enabled()) {
             grantTypes.add(RFC8628Constants2.GRANT_TYPE_DEVICE_CODE);
         }

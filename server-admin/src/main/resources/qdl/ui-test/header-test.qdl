@@ -15,13 +15,23 @@
      } //end identity token
    } //end tokens
 
+   ╔══════════════════════════════════════════════════════════════════════════════╗
+   ║  NOTE: j_load uses this in shared state mode as a very specific trick        ║
+   ║  to use the QDL header claim source. This is because there is a lot of       ║
+   ║  the state that has to be processed. If you don't do this, then when         ║
+   ║  you get_claims, none of the state is available to the function and none     ║
+   ║  of the headers you set are processed.                                       ║
+   ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
-cfg. := claims#new_template('header');
+c2 := j_load($$OA4MP_PATH +'.util.claims', 'share');
+cfg. := c2#new_template('header');
 cfg.'prefix' := 'x_';
-say('starting header test');
+say('starting header test at ' + date_iso());
 say('headers:\n' + print(auth_headers.));
-// since the claim source uses the auth-headers, we can hot-rod it.
+// since the claim source uses the auth-headers, we can just use those directly.
+// For the remote user test, thje request is made, we add the additional headers in this
+// script and then they are processed.
 auth_headers. := auth_headers. ~ {'x_foo' :'bar', 'x_arf':'woof', 'y_oink':'oink'};
 /*
 
@@ -32,7 +42,7 @@ auth_headers. := auth_headers. ~ {'x_foo' :'bar', 'x_arf':'woof', 'y_oink':'oink
    ╚══════════════════════════════════════════════════════════════════════════════╝
 
 */
-cfg. := claims#create_source(cfg.);
-headers. := claims#get_claims(cfg., claims.'sub');
+cfg. := c2#create_source(cfg.);
+headers. := c2#get_claims(cfg., claims.'sub');
 say('headers:\n' + print(headers.));
 claims. := claims. ~ headers.;

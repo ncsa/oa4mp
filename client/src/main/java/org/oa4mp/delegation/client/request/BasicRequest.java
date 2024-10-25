@@ -68,9 +68,9 @@ public abstract class BasicRequest implements Request {
      *
      * @return
      */
-    public Map<String, String> getParameters() {
+    public Map<String, Object> getParameters() {
         if (parameters == null) {
-            parameters = new HashMap<String, String>();
+            parameters = new HashMap<String, Object>();
         }
         return parameters;
     }
@@ -79,7 +79,7 @@ public abstract class BasicRequest implements Request {
      * @param parameters
      * @see #getParameters() for what this is and does.
      */
-    public void setParameters(Map<String, String> parameters) {
+    public void setParameters(Map<String, Object> parameters) {
         this.parameters = parameters;
     }
 

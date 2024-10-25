@@ -124,7 +124,7 @@
         <url-pattern>/register</url-pattern>
     </servlet-mapping>
 
-    <servlet>
+<!--    <servlet>
         <servlet-name>client</servlet-name>
         <servlet-class>org.oa4mp.server.loader.oauth2.servlet.ClientServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
@@ -132,7 +132,7 @@
     <servlet-mapping>
         <servlet-name>client</servlet-name>
         <url-pattern>/clients</url-pattern>
-    </servlet-mapping>
+    </servlet-mapping>-->
 
     <servlet>
         <servlet-name>userInfo</servlet-name>

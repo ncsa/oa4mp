@@ -444,14 +444,14 @@ val jwt: String = signedJWT.serialize()     */
         }
 
         // Fix for OAUTH-164, id_token support follows.
-        String rawResponse = serviceClient.doGet(wellKnown);
+        String rawResponse = serviceClient.doGet(wellKnown, null);
         JSON rawJSON = JSONSerializer.toJSON(rawResponse);
 
         if (!(rawJSON instanceof JSONObject)) {
             throw new IllegalStateException("Attempted to get JSON Object but returned result is not JSON");
         }
         JSONObject json = (JSONObject) rawJSON;
-        String rawKeys = serviceClient.doGet(json.getString("jwks_uri"));
+        String rawKeys = serviceClient.doGet(json.getString("jwks_uri"), null);
         JSONWebKeys keys = null;
         JSONObject claims = null;
         try {

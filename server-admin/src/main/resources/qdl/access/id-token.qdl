@@ -16,7 +16,7 @@ Created by Jeff Gaynor
 script_load('access/acl.qdl');
 
     access_idp := 'https://access-ci.org/idp';
-/*F
+/*
 if[
     is_defined(claims.'eppn')
   ][

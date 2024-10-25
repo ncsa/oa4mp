@@ -1,1 +1,3 @@
 // Do nothing.
+acl#acl_add('localhost:test/igwn');
+acl#acl_check();

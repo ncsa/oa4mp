@@ -4,7 +4,8 @@
     automated tests, the code paths initially are very different and must be tested.
 */
 path:='test#/';
-test.:=(path + 'local/') + ['test_qdl.qdl',
+test.:=(path + 'local/') + [ 'test_acl.qdl',
+                             'test_qdl.qdl',
                              'cil1550.qdl',
                              'file_claims.qdl',
                              'no_config.qdl',

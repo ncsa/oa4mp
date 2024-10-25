@@ -53,7 +53,6 @@ rt_asserted.:= tokens.'refresh_token'.'jwt';
 
 // Check that the server-side scripting is working.
 verify();
-
 // Refresh
 tokens. := clc#refresh();
 at_asserted.:= tokens.'access_token'.'jwt';
@@ -66,6 +65,5 @@ at_asserted. := clc#exchange('-at','-subject','rt').'access_token'.'jwt';
 rt_asserted. := clc#exchange('-rt','-subject','rt').'refresh_token'.'jwt';
      claims. := clc#exchange('-id','-subject','rt');
 verify();
-//say('refresh:\n'+print(clc#refresh()));
-//say('\nclaims:\n' + print(clc#claims()));
+
 say('ok: Server QDL scripts');

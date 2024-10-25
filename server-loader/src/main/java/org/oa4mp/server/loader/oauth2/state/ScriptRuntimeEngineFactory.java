@@ -39,10 +39,12 @@ public class ScriptRuntimeEngineFactory {
         }*/
 
         if (oa2SE.getQDLEnvironment() == null || !oa2SE.getQDLEnvironment().isEnabled()) {
-            oa2SE.getMyLogger().warn("**********************************");
-            oa2SE.getMyLogger().warn("QDL scripting detected, but no QDL runtime engine has been configured.");
-            oa2SE.getMyLogger().warn("No QDL scripts will be run.");
-            oa2SE.getMyLogger().warn("**********************************");
+            oa2SE.getMyLogger().warn("*********************************");
+            oa2SE.getMyLogger().warn("* QDL scripting detected, but   * ");
+            oa2SE.getMyLogger().warn("* QDL scripts cannot be run.    *");
+            oa2SE.getMyLogger().warn("* No/invalid runtime engine has *");
+            oa2SE.getMyLogger().warn("* been configured.              *");
+            oa2SE.getMyLogger().warn("*********************************");
         } else {
             if (!StateUtils.isFactorySet()) {
                 StateUtils.setFactory(new StateUtils() {

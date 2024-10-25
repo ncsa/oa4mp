@@ -1,21 +1,21 @@
 package org.oa4mp.server.test;
 
 
+import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import net.sf.json.JSONObject;
+import org.oa4mp.delegation.server.server.RFC8693Constants;
 import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
 import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
 import org.oa4mp.server.loader.oauth2.storage.tx.TXRecord;
 import org.oa4mp.server.loader.qdl.scripting.OA2State;
-import org.oa4mp.delegation.server.server.RFC8693Constants;
 import org.qdl_lang.AbstractQDLTester;
 import org.qdl_lang.TestUtils;
 import org.qdl_lang.exceptions.QDLExceptionWithTrace;
 import org.qdl_lang.parsing.QDLInterpreter;
-import edu.uiuc.ncsa.security.core.Identifier;
-import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import net.sf.json.JSONObject;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
@@ -31,19 +31,15 @@ import java.util.List;
 import static org.oa4mp.server.test.TestUtils.findConfigNode;
 
 /**
+ * Tests for QDL. There are versions of these that end in A or not. Those that do not end in A
+ * are the old module system which imported them into the state and made them more or less global.
+ * Those that in in A are the new system where modules are simply assigned to variables. The tests are
+ * redundant but have very different internal state so can't be combined into some single test.
  * <p>Created by Jeff Gaynor<br>
  * on 11/21/20 at  3:44 PM
  */
 public class QDLTests extends AbstractQDLTester {
-    /**
-     * Add the standard OA2 QDL modules to the current test as imports
-     *
-     * @param script
-     */
-    protected void addModules(StringBuffer script) {
-        addLine(script, "module_load('edu.uiuc.ncsa.oa2.qdl.QDLToolsLoader', 'java');");
-        addLine(script, "module_load('org.oa4mp.server.loader.qdl.OA2QDLLoader', 'java');");
-    }
+
 
     protected TestUtils getTestUtils() {
         QDLTestUtils.set_instance(new QDLTestUtils());
@@ -71,6 +67,31 @@ public class QDLTests extends AbstractQDLTester {
     public void testInGroup2A() throws Throwable {
         OA2State state = (OA2State) getTestUtils().getNewState();
         StringBuffer script = new StringBuffer();
+        addLine(script, "claims:=j_load('oa4mp.util.claims');");
+        addLine(script, "groups. := [{'name':'test0','id':123}, {'name':'test1','id':234}, {'name':'test2','id':345}, {'name':'test3','id':456}];");
+        addLine(script, "groups2. := ['test0', 'test1', 'test2', 'test3'];");
+        addLine(script, "groups3. := ['test0', 'test1', 42, 'test3']; // should fail");
+        addLine(script, "groups4. := [{'name':'test0','id':123}, 'test1', 'test2', 'test3']; // should work\n");
+        addLine(script, "ok1 := reduce(@&&, claims#in_group2(['test0', 'foo'], groups.)==[true,false]);");
+        addLine(script, "ok2 := reduce(@&&, claims#in_group2(['test0', 'foo', 'test2'], groups2.)==[true,false,true]);");
+        addLine(script, "ok3 := reduce(@&&, claims#in_group2(['test0', 'foo', 'test2'], groups4.)==[true,false,true]);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok1", state) : "Basic in_group test for structured group list failed";
+        assert getBooleanValue("ok2", state) : "Basic in_group test for flat list group list failed";
+        assert getBooleanValue("ok3", state) : "Basic in_group test for mixed group list failed";
+    }
+
+    /**
+     * Regression test to check that loading both old and new modules to same named module
+     * does not fail. The new module <i>should</i> be given preference.
+     * @throws Throwable
+     */
+    public void testInGroup2B() throws Throwable {
+        OA2State state = (OA2State) getTestUtils().getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "module_load('org.oa4mp.server.loader.qdl.OA2QDLLoader', 'java');");
+        addLine(script, "module_import('oa4mp:/qdl/oidc/claims');");
         addLine(script, "claims:=j_load('oa4mp.util.claims');");
         addLine(script, "groups. := [{'name':'test0','id':123}, {'name':'test1','id':234}, {'name':'test2','id':345}, {'name':'test3','id':456}];");
         addLine(script, "groups2. := ['test0', 'test1', 'test2', 'test3'];");
@@ -117,45 +138,6 @@ public class QDLTests extends AbstractQDLTester {
         assert good : "Was able to execute in_group2 test against bad list";
     }
 
-   /* public void testVFSFileClaimSourceA() throws Throwable {
-        OA2State state = (OA2State) getTestUtils().getNewState();
-        StringBuffer script = new StringBuffer();
-        // tests absolute path, not in server mode.
-        String realPath = DebugUtil.getDevPath()+"/oa4mp/server-admin/src/main/resources/qdl/ui-test/test-claims.json";
-        addLine(script, "claims:= j_load('oa4mp.util.claims');");
-        addLine(script, "cfg. := claims#new_template('file');");
-        addLine(script, "cfg.file_path := '" + realPath + "';");
-        addLine(script, "my_claims. := claims#get_claims(claims#create_source(cfg.), 'jgaynor@foo.bar');");
-
-        addLine(script, "ok_eppn := my_claims.eppn == 'jgaynor@foo.bar';");
-        addLine(script, "ok_name := my_claims.isMemberOf.0.name == 'org_ici';");
-        addLine(script, "ok_id := my_claims.isMemberOf.0.id == 1282;");
-        QDLInterpreter interpreter = new QDLInterpreter(null, state);
-        interpreter.execute(script.toString());
-        assert getBooleanValue("ok_eppn", state) : "Did not get the correct eppn";
-        assert getBooleanValue("ok_name", state) : "Did not get the correct name from the zeroth group";
-        assert getBooleanValue("ok_id", state) : "Did not get the correct id from the zeroth group";
-    }*/
-/*    public void testVFSFileClaimSource() throws Throwable {
-        OA2State state = (OA2State) getTestUtils().getNewState();
-        StringBuffer script = new StringBuffer();
-        // tests absolute path, not in server mode.
-        String realPath = DebugUtil.getDevPath()+"/oa4mp/server-admin/src/main/resources/qdl/ui-test/test-claims.json";
-        addLine(script, "module_load('org.oa4mp.server.loader.qdl.OA2QDLLoader', 'java');");
-        addLine(script, "module_import('oa4mp:/qdl/oidc/claims');");
-        addLine(script, "cfg. := new_template('file');");
-        addLine(script, "cfg.file_path := '" + realPath + "';");
-        addLine(script, "my_claims. := get_claims(create_source(cfg.), 'jgaynor@foo.bar');");
-
-        addLine(script, "ok_eppn := my_claims.eppn == 'jgaynor@foo.bar';");
-        addLine(script, "ok_name := my_claims.isMemberOf.0.name == 'org_ici';");
-        addLine(script, "ok_id := my_claims.isMemberOf.0.id == 1282;");
-        QDLInterpreter interpreter = new QDLInterpreter(null, state);
-        interpreter.execute(script.toString());
-        assert getBooleanValue("ok_eppn", state) : "Did not get the correct eppn";
-        assert getBooleanValue("ok_name", state) : "Did not get the correct name from the zeroth group";
-        assert getBooleanValue("ok_id", state) : "Did not get the correct id from the zeroth group";
-    }*/
     public void testVFSFileClaimSourceA() throws Throwable {
         OA2State state = (OA2State) getTestUtils().getNewState();
         StringBuffer script = new StringBuffer();

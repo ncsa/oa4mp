@@ -53,4 +53,7 @@ if[0 < size(failures.)][
      say('   ' + x);
   ];
 ];
-if[0 < counter.'fail'][say('check the logs at '+info().'boot'.'log_file');];
+if[0 < counter.'fail'][
+   msg := 'check the logs'  + (is_defined(info().'boot'.'log_file') ? (' at ' + info().'boot'.'log_file') : '');
+   say(msg);
+];

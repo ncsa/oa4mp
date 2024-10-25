@@ -89,18 +89,14 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
      */
     protected void init(OA2ServiceTransaction transaction) {
         state = (OA2State) StateUtils.newInstance();
-        if (transaction.hasScriptState()) {
-            try {
-                deserializeState(transaction.getScriptState(), transaction.getScriptStateSerializationVersion());
-            } catch (Throwable t) {
-                DebugUtil.trace(this, "Could not deserialize stored transaction state:" + t.getMessage());
-                if (getState().getOa2se() != null) {
-                    getState().getOa2se().getMyLogger().warn("Could not deserialize stored transaction state:" + t.getMessage());
-                }
-            }
+        if(OA2State.getRootState() == null){
+            // After deserialiozation it might not have this set. Set it.
+            OA2State.setRootState(state);
         }
+
         state.setServerMode(qe.isServerModeOn());
         state.setTransaction(transaction);
+
         // next line allows for debugging individual clients.
         if (!qe.isRestrictedIO()) {
             state.setRestrictedIO(false);
@@ -121,12 +117,26 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         loader.add(state);
         if (qe != null && qe.isEnabled()) {
             try {
+                state.setLogger(qe.getMyLogger());
                 state.createSystemInfo(qe); // populate this here.
                 QDLConfigurationLoaderUtils.setupVFS(qe, state);
                 QDLConfigurationLoaderUtils.setupModules(qe, state);
                 QDLConfigurationLoaderUtils.runBootScript(qe, state);
             } catch (Throwable throwable) {
                 throwable.printStackTrace();
+            }
+        }
+        // Fix for https://github.com/ncsa/oa4mp/issues/213
+        // absolute last thing is to deserialize since the state has to be completely initialized or
+        // none of the resulting modules etc have viable state.
+        if (transaction.hasScriptState()) {
+            try {
+                deserializeState(transaction.getScriptState(), transaction.getScriptStateSerializationVersion());
+            } catch (Throwable t) {
+                DebugUtil.trace(this, "Could not deserialize stored transaction state:" + t.getMessage());
+                if (getState().getOa2se() != null) {
+                    getState().getOa2se().getMyLogger().warn("Could not deserialize stored transaction state:" + t.getMessage());
+                }
             }
         }
     }

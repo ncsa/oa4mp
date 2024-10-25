@@ -1,5 +1,10 @@
 package org.oa4mp.server.loader.qdl.acl;
 
+import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.exceptions.NFWException;
+import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import org.oa4mp.server.loader.qdl.scripting.OA2State;
 import org.qdl_lang.exceptions.QDLIllegalAccessException;
 import org.qdl_lang.extensions.QDLFunction;
@@ -7,14 +12,11 @@ import org.qdl_lang.extensions.QDLMetaModule;
 import org.qdl_lang.state.State;
 import org.qdl_lang.variables.Constant;
 import org.qdl_lang.variables.QDLStem;
-import edu.uiuc.ncsa.security.core.Identifier;
-import edu.uiuc.ncsa.security.core.exceptions.NFWException;
-import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import net.sf.json.JSONObject;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
 
 /**
  * <H2>ACL Use</H2>
@@ -32,6 +34,38 @@ import java.util.List;
  */
 public class QDLACL implements QDLMetaModule {
 
+    public TreeSet<String> getWhiteList() {
+        if (whiteList == null) {
+            whiteList = new TreeSet<>();
+        }
+        return whiteList;
+    }
+
+    public void setWhiteList(TreeSet<String> whiteList) {
+        this.whiteList = whiteList;
+    }
+
+    public TreeSet<String> getBlackList() {
+        if (blackList == null) {
+            blackList = new TreeSet<>();
+        }
+        return blackList;
+    }
+
+    public void setBlackList(TreeSet<String> blackList) {
+        this.blackList = blackList;
+    }
+
+    TreeSet<String> whiteList = null;
+    TreeSet<String> blackList = null;
+
+    public boolean hasWhiteList() {
+        return whiteList != null;
+    }
+
+    public boolean hasBlackList() {
+        return blackList != null;
+    }
 
     public static String ACL_REJECT_NAME = "acl_blacklist";
 
@@ -62,12 +96,14 @@ public class QDLACL implements QDLMetaModule {
             return null;
         }
     }
-public class ACLReject2 extends ACLReject{
-    @Override
-    public String getName() {
-        return "blacklist";
+
+    public class ACLReject2 extends ACLReject {
+        @Override
+        public String getName() {
+            return "blacklist";
+        }
     }
-}
+
     public static String ADD_TO_ACL_NAME = "acl_add";
 
     protected Boolean acceptOrReject(Object[] objects,
@@ -134,9 +170,11 @@ public class ACLReject2 extends ACLReject{
                 }
             }
             if (accept) {
-                oa2State.getAclList().add(identifier);
+                getWhiteList().add(identifier.toString());
+                //   oa2State.getAclList().add(identifier);
             } else {
-                oa2State.getAclBlackList().add(identifier);
+                getBlackList().add(identifier.toString());
+                //    oa2State.getAclBlackList().add(identifier);
             }
         }
         if (0 < badIds.size()) {
@@ -191,12 +229,14 @@ public class ACLReject2 extends ACLReject{
             return doxx;
         }
     }
-   public class AddToACL2 extends AddToACL {
-       @Override
-       public String getName() {
-           return "add";
-       }
-   }
+
+    public class AddToACL2 extends AddToACL {
+        @Override
+        public String getName() {
+            return "add";
+        }
+    }
+
     public static String CHECK_ACL_NAME = "acl_check";
     public static Identifier ACL_ACCEPT_ALL = BasicIdentifier.newID("*");
 
@@ -220,7 +260,47 @@ public class ACLReject2 extends ACLReject{
 
             OA2State oa2State = (OA2State) state;
             // Check blacklist first
+            if (!oa2State.getAclBlackList().isEmpty()) {
+                for (Identifier id : oa2State.getAclBlackList()) {
+                    getBlackList().add(id.toString());
+                }
+            }
+            if (!oa2State.getAclList().isEmpty()) {
+                for (Identifier id : oa2State.getAclList()) {
+                    getWhiteList().add(id.toString());
+                }
+            }
+            if (getBlackList().contains(oa2State.getClientID().toString())) {
+                // Full stop.
+                throw new QDLIllegalAccessException(" client '" + oa2State.getClientID() + "' does not have permission to access this resource.");
+            }
+            for (Identifier adminID : oa2State.getAdminIDs()) {
+                if (getBlackList().contains(adminID.toString())) {
+                    throw new QDLIllegalAccessException(" admin '" + adminID + "' does not have permission to access this resource.");
+                }
+            }
+            if (getWhiteList().isEmpty()) {
+                if (oa2State.isStrictACLs()) {
+                    throw new QDLIllegalAccessException(" client '" + oa2State.getClientID() + "' does not have permission to access this resource.");
+                }
+                return Boolean.FALSE;
+            }
+            if (getWhiteList().contains(ACL_ACCEPT_ALL.toString())) {
+                return Boolean.TRUE;
+            }
+            // Direct check.
+            if (getWhiteList().contains(oa2State.getClientID().toString())) {
+                return Boolean.TRUE;
+            }
+            for (Identifier adminID : oa2State.getAdminIDs()) {
+                if (getWhiteList().contains(adminID.toString())) {
+                    return Boolean.TRUE;
+                }
+            }
+            throw new QDLIllegalAccessException("Error: client '" + oa2State.getClientID() + "' does not have permission to access this resource.");
 
+            // ===========
+/*
             if (oa2State.getAclBlackList().contains(oa2State.getClientID())) {
                 // Full stop.
                 throw new QDLIllegalAccessException(" client '" + oa2State.getClientID() + "' does not have permission to access this resource.");
@@ -250,6 +330,7 @@ public class ACLReject2 extends ACLReject{
             }
             throw new QDLIllegalAccessException("Error: client '" + oa2State.getClientID() + "' does not have permission to access this resource.");
 
+*/
         }
 
         @Override
@@ -274,11 +355,27 @@ public class ACLReject2 extends ACLReject{
 
     @Override
     public JSONObject serializeToJSON() {
-        return null;
+        JSONObject json = new JSONObject();
+        if (hasBlackList()) {
+            JSONArray array = new JSONArray();
+            array.addAll(getBlackList());
+            json.put("blacklist", array);
+        }
+        if (hasWhiteList()) {
+            JSONArray array = new JSONArray();
+            array.addAll(getWhiteList());
+            json.put("whitelist", array);
+        }
+        return json;
     }
 
     @Override
     public void deserializeFromJSON(JSONObject jsonObject) {
-
+        if (jsonObject.has("blacklist")) {
+            getBlackList().addAll(jsonObject.getJSONArray("blacklist"));
+        }
+        if (jsonObject.has("whitelist")) {
+            getWhiteList().addAll(jsonObject.getJSONArray("whitelist"));
+        }
     }
 }

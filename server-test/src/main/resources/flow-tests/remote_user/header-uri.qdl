@@ -33,4 +33,4 @@ clc#refresh(); // need to repeat this test
 claims. := clc#claims();
 test_claims(claims.);
 
-say('ok: Remote user + header using device flow');
+say('ok: Remote user + header using authorization code flow');

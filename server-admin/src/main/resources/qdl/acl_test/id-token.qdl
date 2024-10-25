@@ -1,0 +1,22 @@
+/*
+ tokens{
+  identity{
+     type=identity
+     qdl{
+         load="acl_test/id-token.qdl"
+         xmd={exec_phase="post_auth"}
+       }// end qdl
+     } //end identity token
+     access{
+        type=rfc9068
+        qdl{
+           load="acl_test/access.qdl"
+           xmd={exec_phase=["post_token","post_refresh","post_exchange"]}
+        } //end QDL
+     } // end access token
+   } //end tokens
+*/
+script_load('acl_test/acl.qdl');
+ acl#acl_check();
+
+claims.'acl_check' := 'ok';

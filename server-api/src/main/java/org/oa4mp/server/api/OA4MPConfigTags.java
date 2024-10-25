@@ -85,6 +85,7 @@ public interface OA4MPConfigTags extends StorageConfigurationTags, MailConfigura
     String ENABLE_UTIL_SERVLET = "enableUtilServlet"; // attribute tag for enabling the util servlet
     String ENABLE_RFC8693_SUPPORT = "enableTokenExchange"; //
     String ENABLE_RFC8628_SUPPORT = "enableDeviceFlow"; //
+    String ENABLE_CCF_SUPPORT = "enableClientCredentialsFlow"; //
 
 
     String MESSAGES = "messages";

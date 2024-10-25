@@ -112,7 +112,7 @@ public class DS2 extends DelegationService {
     @Override
     public DelegationResponse processDelegationRequest(DelegationRequest delegationRequest) {
         DelegationResponse delResp = new DelegationResponse(null);
-        Map<String, String> m = delegationRequest.getParameters();
+        Map<String, Object> m = delegationRequest.getParameters();
         m.put(OA2Constants.CLIENT_ID, delegationRequest.getClient().getIdentifierString());
         m.put(OA2Constants.REDIRECT_URI, delegationRequest.getParameters().get(OA2Constants.REDIRECT_URI));
         URI authZUri = ((AGServer2) getAgServer()).getServiceClient().host();

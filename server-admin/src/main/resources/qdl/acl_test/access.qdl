@@ -1,0 +1,5 @@
+//script_load('acl_test/acl.qdl');
+ acl#acl_check();
+
+access_token.'acl_check' := 'ok';
+access_token.'scope' := 'read:/public/' + claims.'sub' + ' write:/public/' + claims.'sub';

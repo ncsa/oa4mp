@@ -103,7 +103,7 @@ public abstract class DelegationService implements Server {
 
     }
 
-    public DelegatedAssetResponse getCert(ATResponse atResponse, Client client, Map<String, String> assetParameters) {
+    public DelegatedAssetResponse getCert(ATResponse atResponse, Client client, Map<String, Object> assetParameters) {
         PARequest paReq = new PARequest();
         paReq.setClient(client);
         paReq.setAccessToken(atResponse.getAccessToken());

@@ -258,6 +258,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     isMonitorEnabled(),
                     getMonitorInterval(),
                     getMonitorAlarms(),
+                    isCCFEnabled(),
                     getDebugger()
             );
 
@@ -892,6 +893,24 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
             DebugUtil.trace(this, "RFC 8693 support enabled? " + rfc8693Enabled);
         }
         return rfc8693Enabled;
+    }
+Boolean ccfEnabled = null;
+    protected Boolean isCCFEnabled() {
+        if (ccfEnabled == null) {
+            try {
+                String raw = getFirstAttribute(cn, OA4MPConfigTags.ENABLE_CCF_SUPPORT);
+                if(raw == null){
+                    ccfEnabled = Boolean.TRUE;
+                }else {
+                    ccfEnabled = "true".equals(raw);
+                }
+            } catch (Throwable t) {
+                // use default which is to enable.
+                ccfEnabled = Boolean.TRUE;
+            }
+            DebugUtil.trace(this, "client credential support enabled? " + ccfEnabled);
+        }
+        return ccfEnabled;
     }
 
     Boolean rfc8628Enabled = null;

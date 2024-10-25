@@ -100,8 +100,8 @@ public class OA2MPService extends OA4MPService {
     }
 
     @Override
-    protected Map<String, String> getATParameters(Asset asset, AuthorizationGrant ag, Verifier v) {
-        Map<String, String> m = super.getATParameters(asset, ag, v);
+    protected Map<String, Object> getATParameters(Asset asset, AuthorizationGrant ag, Verifier v) {
+        Map<String, Object> m = super.getATParameters(asset, ag, v);
         OA2Asset a = (OA2Asset) asset;
         if (a == null) {
             throw new GeneralException("Asset not found. You may need to clear your browser cookies.");
@@ -146,7 +146,7 @@ public class OA2MPService extends OA4MPService {
         dar.setAuthorizationGrant(new AuthorizationGrantImpl(URI.create(deviceCode)));
         dar.setClient(getEnvironment().getClient());
         dar.setKeyID(getEnvironment().getKid());
-        Map<String, String> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         map.putAll(additionalParameters);
         dar.setParameters(map);
         return processAtRequest(asset, dar);
@@ -198,12 +198,14 @@ public class OA2MPService extends OA4MPService {
         super(environment);
     }
 
-    public ATResponse2 getAccessToken(OA2Asset asset, AuthorizationGrant ag, Map<String, String> additionalParameters) {
+    public ATResponse2 getAccessToken(OA2Asset asset, AuthorizationGrant ag,
+                                      Map<String, Object> additionalParameters) {
         DelegatedAssetRequest dar = new DelegatedAssetRequest();
         dar.setAuthorizationGrant(ag);
         dar.setClient(getEnvironment().getClient());
         dar.setKeyID(getEnvironment().getKid());
-        Map<String, String> m1 = getATParameters(asset, ag, null);
+        Map<String, Object> m1 = new HashMap<>();
+        m1.putAll(getATParameters(asset, ag, null));
         if (additionalParameters != null) {
             m1.putAll(additionalParameters);
         }
@@ -253,7 +255,8 @@ public class OA2MPService extends OA4MPService {
         }
         a.setPrivateKey(keyPair.getPrivate());
         a.setCertReq(certReq);
-        Map<String, String> m1 = getAssetParameters(a);
+        Map<String, Object> m1 = new HashMap<>();
+                m1.putAll(getAssetParameters(a));
 
         preGetCert(a, m1);
 

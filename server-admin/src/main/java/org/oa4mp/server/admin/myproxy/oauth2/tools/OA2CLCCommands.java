@@ -2,6 +2,7 @@ package org.oa4mp.server.admin.myproxy.oauth2.tools;
 
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.ConnectionException;
+import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
@@ -248,72 +249,81 @@ public class OA2CLCCommands extends CommonCommands {
     String deviceFlowCallback;
 
     public void df(InputLine inputLine) throws Exception {
-        if (showHelp(inputLine)) {
-            say("df");
-            sayi("Usage: Initiate the device flow for this client");
-            sayi("You will need to use a browser and the returned user code to authenticate. Then");
-            sayi("you can get the access token with the access command. This client does not");
-            sayi("do polling.");
-            sayi("This will follow the contract of the standard flow for extra parameters: just set them");
-            sayi("beforehand as needed and they will be added to the initial request. ");
-            sayi("See also: access");
-            return;
-        }
-        // set up for the next round
         clear(inputLine, false);
+        try {
+            df(new HashMap()); // don't want response
+            String uriComplete = dfResponse.getString(RFC8628Constants2.VERIFICATION_URI_COMPLETE);
+            say("please go to: " + deviceFlowCallback);
+            if (uriComplete != null) {
+                say("          or: " + uriComplete);
+            }
+
+            say("user code: " + userCode);
+            Date exp = new Date();
+            long dfExpiresIn = dfResponse.getLong(RFC8628Constants2.EXPIRES_IN);
+            exp.setTime(exp.getTime() + dfExpiresIn * 1000);
+            say("code valid until " + exp + " (" + dfExpiresIn + " sec.)");
+            // recopy to clipboard, but with a message
+            if (uriComplete == null) {
+                copyToClipboard(userCode, "user code copied to clipboard");
+            } else {
+                copyToClipboard(uriComplete, "verification uri copied to clipboard");
+            }
+        } catch (Exception e) {
+            say(e.getMessage());
+        }
+    }
+
+    /**
+     * Do the device flow using the supplied map for extra parameters. This returns the raw response
+     * (parsed as JSON) from the server. If this is to send headers, set them with the
+     * {@link ServiceClient#HEADER_KEY}.
+     * @param map
+     * @return
+     * @throws Exception
+     */
+    public JSONObject df(Map map) throws Exception {
+        // set up for the next round
         if (getCe() == null) {
-            say("sorry, but you have no loaded a configuration yet.");
-            return;
+            throw new GeneralException("sorry, but you have no loaded a configuration yet.");
         }
         dummyAsset = (OA2Asset) getCe().getAssetStore().create();
-
         OA2ClientEnvironment oa2ce = getCe();
         String rawResponse = null;
         if (oa2ce.getClient().hasJWKS()) {
-            Map map = new HashMap();
             map.put(OA2Constants.SCOPE, oa2ce.scopesToString());
             rawResponse = RFC7523Utils.doPost(getService().getRFC8623ServiceClient(),
                     oa2ce.getClient(), oa2ce.getDeviceAuthorizationUri(),
                     oa2ce.getKid(), map);
 
         } else {
-            rawResponse = getService().getServiceClient().doGet(getRequestString(oa2ce),
+            rawResponse = getService().getServiceClient().doGet(getRFC8623RequestString(oa2ce, map),
+                    map,
                     oa2ce.getClient().getIdentifierString(),
                     oa2ce.getClient().getSecret());
         }
         try {
             dfResponse = JSONObject.fromObject(rawResponse);
-            deviceFlowCallback = dfResponse.getString(RFC8628Constants2.VERIFICATION_URI);
-            String uriComplete = dfResponse.getString(RFC8628Constants2.VERIFICATION_URI_COMPLETE);
-            say("please go to: " + deviceFlowCallback);
-            if (uriComplete != null) {
-                say("          or: " + uriComplete);
-            }
             userCode = dfResponse.getString(RFC8628Constants2.USER_CODE);
             deviceCode = dfResponse.getString(DEVICE_CODE);
-            say("user code: " + userCode);
-            Date exp = new Date();
-            long dfExpiresIn = dfResponse.getLong(RFC8628Constants2.EXPIRES_IN);
-            exp.setTime(exp.getTime() + dfExpiresIn * 1000);
-            say("code valid until " + exp + " (" + dfExpiresIn + " sec.)");
+            deviceFlowCallback = dfResponse.getString(RFC8628Constants2.VERIFICATION_URI);
+            String uriComplete = dfResponse.getString(RFC8628Constants2.VERIFICATION_URI_COMPLETE);
             if (uriComplete == null) {
-                copyToClipboard(userCode, "user code copied to clipboard");
+                copyToClipboard(userCode, null);
             } else {
-                copyToClipboard(uriComplete, "verification uri copied to clipboard");
+                copyToClipboard(uriComplete, null);
             }
             isDeviceFlow = true;
             grant = new AuthorizationGrantImpl(URI.create(dfResponse.getString(RFC8628Constants2.DEVICE_CODE)));
+            return dfResponse;
         } catch (
                 Throwable t) {
-            say("sorry but the response from the service was not understood:" + rawResponse);
-            if (getDebugger().isEnabled()) {
-                t.printStackTrace(); // in case /trace on
-            }
+            throw new GeneralException("sorry but the response from the service was not understood:" + rawResponse, t);
         }
 
     }
 
-    private String getRequestString(OA2ClientEnvironment oa2ce) throws UnsupportedEncodingException {
+    private String getRFC8623RequestString(OA2ClientEnvironment oa2ce, Map parameters) throws UnsupportedEncodingException {
         String requestString = oa2ce.getDeviceAuthorizationUri().toString();
 
         String scopes = oa2ce.scopesToString();
@@ -324,7 +334,7 @@ public class OA2CLCCommands extends CommonCommands {
             if (key.equals(SCOPE)) {
                 scopes = scopes + " " + requestParameters.get(key); // take the default, add new ones
             } else {
-                String x = key + "=" + URLEncoder.encode(requestParameters.get(key), "UTF-8");
+                String x = key + "=" + URLEncoder.encode(requestParameters.get(key).toString(), "UTF-8");
                 if (isFirstPass) {
 
                     isFirstPass = false;
@@ -337,6 +347,11 @@ public class OA2CLCCommands extends CommonCommands {
 
         requestString = requestString + "?" + OA2Constants.CLIENT_ID + "=" + oa2ce.getClientId();
         requestString = requestString + "&" + SCOPE + "=" + URLEncoder.encode(scopes, "UTF-8");
+        for(Object key : parameters.keySet()){
+            if(!key.equals(ServiceClient.HEADER_KEY)){
+                requestString = requestString + "&" + key + "=" + URLEncoder.encode(parameters.get(key).toString(), "UTF-8");
+            }
+        }
         if (!StringUtils.isTrivial(extraParams)) {
             requestString = requestString + "&" + extraParams;
         }
@@ -445,7 +460,9 @@ public class OA2CLCCommands extends CommonCommands {
             if (clipboard != null) {
                 StringSelection data = new StringSelection(target);
                 clipboard.setContents(data, data);
-                say(s);
+                if(s!=null) {
+                    say(s);
+                }
             }
         } catch (Throwable t) {
             // there was a problem with the clipboard. Skip it.
@@ -935,7 +952,7 @@ public class OA2CLCCommands extends CommonCommands {
     private void df_get_at(InputLine inputLine) {
         lastException = null;
         if (isDeviceFlow) {
-            HashMap<String, String> copyOfParams = new HashMap<>();
+            HashMap copyOfParams = new HashMap<>();
             copyOfParams.putAll(tokenParameters);
             OA2ClientEnvironment oa2ce = (OA2ClientEnvironment) getCe();
 
@@ -943,7 +960,7 @@ public class OA2CLCCommands extends CommonCommands {
             // default scopes. 
             String scopes = oa2ce.scopesToString();
             if (copyOfParams.containsKey(SCOPE)) {
-                String ss = copyOfParams.get(SCOPE);
+                String ss = copyOfParams.get(SCOPE).toString(); // poor man's cast to string.
                 if (-1 == ss.indexOf(scopes)) {
                     ss = scopes + " " + ss;
                     copyOfParams.put(SCOPE, ss);
@@ -1110,13 +1127,13 @@ public class OA2CLCCommands extends CommonCommands {
         String rawResponse = null;
         try {
             if (inputLine.hasArgs()) {
-                rawResponse = getService().getServiceClient().doGet(inputLine.getLastArg());
+                rawResponse = getService().getServiceClient().doGet(inputLine.getLastArg(), new HashMap());
             } else {
                 if (currentURI == null) {
                     say("sorry, you did not specify a URL and no default was found.");
                     return;
                 } else {
-                    rawResponse = getService().getServiceClient().doGet(currentURI.toString());
+                    rawResponse = getService().getServiceClient().doGet(currentURI.toString(), new HashMap());
                 }
 
             }
@@ -1231,7 +1248,7 @@ public class OA2CLCCommands extends CommonCommands {
         }
         try {
             refresh();
-        }catch(Throwable t){
+        } catch (Throwable t) {
             say(t.getMessage());
             return;
         }
@@ -1247,14 +1264,15 @@ public class OA2CLCCommands extends CommonCommands {
         }
 
     }
+
     public void refresh() throws Exception {
         lastException = null;
         try {
             if (getCe() == null) {
-                throw new IllegalStateException( "no configuration has been loaded.");
+                throw new IllegalStateException("no configuration has been loaded.");
             }
 
-            if(!dummyAsset.hasRefreshToken()){
+            if (!dummyAsset.hasRefreshToken()) {
                 throw new IllegalStateException("no refresh token");
             }
             RTResponse rtResponse = getService().refresh(dummyAsset.getIdentifier().toString(), refreshParameters);
@@ -1854,42 +1872,42 @@ public class OA2CLCCommands extends CommonCommands {
     }
 
 
-    public HashMap<String, String> getRequestParameters() {
+    public HashMap<String, Object> getRequestParameters() {
         return requestParameters;
     }
 
-    public void setRequestParameters(HashMap<String, String> requestParameters) {
+    public void setRequestParameters(HashMap<String, Object> requestParameters) {
         this.requestParameters = requestParameters;
     }
 
-    public HashMap<String, String> getTokenParameters() {
+    public HashMap<String, Object> getTokenParameters() {
         return tokenParameters;
     }
 
-    public void setTokenParameters(HashMap<String, String> tokenParameters) {
+    public void setTokenParameters(HashMap<String, Object> tokenParameters) {
         this.tokenParameters = tokenParameters;
     }
 
-    public HashMap<String, String> getRefreshParameters() {
+    public HashMap<String, Object> getRefreshParameters() {
         return refreshParameters;
     }
 
-    public void setRefreshParameters(HashMap<String, String> refreshParameters) {
+    public void setRefreshParameters(HashMap<String, Object> refreshParameters) {
         this.refreshParameters = refreshParameters;
     }
 
-    public HashMap<String, String> getExchangeParameters() {
+    public HashMap<String, Object> getExchangeParameters() {
         return exchangeParameters;
     }
 
-    public void setExchangeParameters(HashMap<String, String> exchangeParameters) {
+    public void setExchangeParameters(HashMap<String, Object> exchangeParameters) {
         this.exchangeParameters = exchangeParameters;
     }
 
-    HashMap<String, String> requestParameters = new HashMap<>();
-    HashMap<String, String> tokenParameters = new HashMap<>();
-    HashMap<String, String> refreshParameters = new HashMap<>();
-    HashMap<String, String> exchangeParameters = new HashMap<>();
+    public HashMap<String, Object> requestParameters = new HashMap<>();
+    public HashMap<String, Object> tokenParameters = new HashMap<>();
+    public HashMap<String, Object> refreshParameters = new HashMap<>();
+    public HashMap<String, Object> exchangeParameters = new HashMap<>();
 
     public static final String REQ_PARAM_SWITCH = "-authz";
     public static final String SHORT_REQ_PARAM_SWITCH = "-a";
@@ -2004,10 +2022,10 @@ public class OA2CLCCommands extends CommonCommands {
 
     }
 
-    private void listParams(Map<String, String> params, InputLine inputLine, String component) {
+    private void listParams(Map params, InputLine inputLine, String component) {
         if (inputLine.getArgCount() == 0) {
             // show them all
-            for (String k : params.keySet()) {
+            for (Object k : params.keySet()) {
                 say(component + ": " + k + "=" + params.get(k));
             }
         } else {

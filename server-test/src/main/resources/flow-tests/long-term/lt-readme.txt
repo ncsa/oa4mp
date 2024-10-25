@@ -11,12 +11,15 @@ refreshes and exchanges work with the new server.
 The argument is an ini file with the client ids and other information.
 
 (Caveat: pipe the scripts std err someplace since in 5.4 the
-underlying client does issues benign warnings.)
+underlying client does issue benign warnings.)
 
 =======
 The ini file
 =======
-
+(
+The one for my system is at
+/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests/local/lt-ids.ini
+)
 The syntax is essentially to have section of cfg. stems for the
 CLC, plus a default section that has, well, defaults in it.
 

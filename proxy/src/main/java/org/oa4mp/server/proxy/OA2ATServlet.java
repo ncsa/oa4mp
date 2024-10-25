@@ -177,6 +177,11 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             //verifyClientSecret(resolvedClient, getClientSecret(request));
         }
         if (grantType.equals(GRANT_TYPE_CLIENT_CREDENTIALS)) {
+            if (!oa2SE.isCCFEnabled()) {
+                warn("Client " + client.getIdentifierString() + " requested a client credential flow but that is not enabled on this server.");
+                throw new OA2ATException(OA2Errors.REQUEST_NOT_SUPPORTED,
+                        "client credentials flow not supported on this server ");
+            }
             if (client.isPublicClient()) {
                 warn("public client " + client.getIdentifierString() + " requested a client credential flow but is not allowed on this server.");
                 throw new OA2ATException(OA2Errors.REQUEST_NOT_SUPPORTED,

@@ -259,7 +259,7 @@ public abstract class AbstractOA4MPService {
      * @param v
      * @return
      */
-    protected Map<String, String> getATParameters(Asset asset, AuthorizationGrant ag, Verifier v) {
+    protected Map<String, Object> getATParameters(Asset asset, AuthorizationGrant ag, Verifier v) {
         Map m = new HashMap();
         m.put(getEnvironment().getConstants().get(ClientEnvironment.CALLBACK_URI_KEY), getEnvironment().getCallback().toString());
         return m;

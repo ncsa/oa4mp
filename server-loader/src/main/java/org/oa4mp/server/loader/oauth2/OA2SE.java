@@ -110,6 +110,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  boolean isMonitorEnabled,
                  long monitorInterval,
                  Collection<LocalTime> monitorAlarms,
+                 boolean clientCredentialFlowEnabled,
                  MetaDebugUtil debugger) {
 
         super(logger,
@@ -129,6 +130,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
                 usernameTransformer,
                 isPingable,
                 psp);
+        this.ccfEnabled = clientCredentialFlowEnabled;
         if (0 < agLifetime) {
             this.authorizationGrantLifetime = agLifetime;
         }
@@ -387,6 +389,19 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.rfc8693Enabled = rfc8693Enabled;
     }
 
+    /**
+     * Is the client credential flow enabled for this server?
+     * @return
+     */
+    public boolean isCCFEnabled() {
+        return ccfEnabled;
+    }
+
+    public void setCCFEnabled(boolean ccfEnabled) {
+        this.ccfEnabled = ccfEnabled;
+    }
+
+    boolean ccfEnabled = true;
     boolean rfc8693Enabled = false;
 
     /**

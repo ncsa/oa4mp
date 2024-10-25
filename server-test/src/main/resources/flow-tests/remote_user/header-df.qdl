@@ -24,6 +24,7 @@ define[test_claims(claims.)][
 if[rc!='ok'][return(rc);];
 tokens. := clc#access();
 claims. := clc#claims();
+say(print(claims.));
 test_claims(claims.);
 
 // The claims are set from the headers. In refreshes, the headers are not present
