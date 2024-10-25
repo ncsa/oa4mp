@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.oa4mp</groupId>
     <artifactId>oa4mp-parent</artifactId>
-    <version>5.6-SNAPSHOT</version>
+    <version>6.x-SNAPSHOT</version>
     <packaging>pom</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -80,11 +80,11 @@
         <module>oa4mp-server-oauth2</module>
         <module>client-api</module>
         <module>client-loader</module>
-        <!--<module>client-oauth2</module>-->
+        <module>client-oauth2</module>
         <module>server-admin</module>
         <module>client-webapp</module>
         <module>client-test</module>
-        <!--<module>oa4mp-webapp</module>-->
+        <module>oa4mp-webapp</module>
         <module>proxy</module>
         <module>website</module>
         <module>server-test</module>

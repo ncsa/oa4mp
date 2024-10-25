@@ -1,1 +1,1 @@
-OA4MP Version: 5.6-SNAPSHOT
+OA4MP Version: 6.x-SNAPSHOT

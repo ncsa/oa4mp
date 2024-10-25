@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.oa4mp</groupId>
         <artifactId>oa4mp-parent</artifactId>
-        <version>5.6-SNAPSHOT</version>
+        <version>6.x-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -28,7 +28,7 @@
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>common</artifactId>
-            <version>5.6-SNAPSHOT</version>
+            <version>6.x-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

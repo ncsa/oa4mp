@@ -8,7 +8,7 @@
     <parent>
         <groupId>org.oa4mp</groupId>
         <artifactId>oa4mp-parent</artifactId>
-        <version>5.6-SNAPSHOT</version>
+        <version>6.x-SNAPSHOT</version>
     </parent>
     <artifactId>client-api</artifactId>
     <name>OA4MP client API.</name>
@@ -22,24 +22,24 @@
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>client</artifactId>
-            <version>5.6-SNAPSHOT</version>
+            <version>6.x-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>common</artifactId>
-            <version>5.6-SNAPSHOT</version>
+            <version>6.x-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>oauth2</artifactId>
-            <version>5.6-SNAPSHOT</version>
+            <version>6.x-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>servlet</artifactId>
-            <version>5.6-SNAPSHOT</version>
+            <version>6.x-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
