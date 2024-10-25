@@ -9,7 +9,7 @@
     <parent>
         <groupId>org.oa4mp</groupId>
         <artifactId>oa4mp-parent</artifactId>
-        <version>6.x-SNAPSHOT</version>
+        <version>6.0</version>
     </parent>
 
     <artifactId>client-webapp</artifactId>
@@ -19,12 +19,12 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>servlet</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.0</version>
         </dependency>
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>client-api</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.0</version>
         </dependency>
 
         <dependency>

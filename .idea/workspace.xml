@@ -10,7 +10,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="https://github.com/ncsa/oa4mp/issues/213. Documentation">
+    <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="Updated version and re-generate website">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client-api/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/client-api/pom.xml" afterDir="false" />
@@ -830,7 +830,6 @@
       <change beforePath="$PROJECT_DIR$/qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qdl/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-admin/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/docs/rfc6749_4_4.odt" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/docs/rfc6749_4_4.odt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-admin/src/main/scripts/installer/version.txt" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/scripts/installer/version.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-api/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-installer/buildNumber.properties" afterDir="false" />
@@ -874,7 +873,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="5.5" />
+        <entry key="$PROJECT_DIR$" value="master" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -952,7 +951,7 @@
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "Tomcat Server.OA4MP server.executor": "Run",
     "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "master",
+    "git-widget-placeholder": "6.0",
     "jdk.selected.JAVA_MODULE": "11 (2)",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests/local",
@@ -1955,15 +1954,7 @@
       <workItem from="1723846044829" duration="12406000" />
       <workItem from="1724671040061" duration="88175000" />
       <workItem from="1726051918658" duration="61220000" />
-      <workItem from="1726656910058" duration="312045000" />
-    </task>
-    <task id="LOCAL-00004" summary="Merge from 5.4.3. Also updated CILogon QDL installer so it runs without invoking other build manually.">
-      <option name="closed" value="true" />
-      <created>1705433242260</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1705433242260</updated>
+      <workItem from="1726656910058" duration="314701000" />
     </task>
     <task id="LOCAL-00005" summary="Fix https://github.com/ncsa/oa4mp/issues/157 Updated tests and refactored testing harness to remove duplicate code blocks.">
       <option name="closed" value="true" />
@@ -2349,7 +2340,15 @@
       <option name="project" value="LOCAL" />
       <updated>1729832340815</updated>
     </task>
-    <option name="localTasksCounter" value="53" />
+    <task id="LOCAL-00053" summary="Updated version and re-generate website">
+      <option name="closed" value="true" />
+      <created>1729878916804</created>
+      <option name="number" value="00053" />
+      <option name="presentableId" value="LOCAL-00053" />
+      <option name="project" value="LOCAL" />
+      <updated>1729878916804</updated>
+    </task>
+    <option name="localTasksCounter" value="54" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -2360,7 +2359,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
-    <MESSAGE value="Tomcat regression tests, making sure server scripts are tested and working." />
     <MESSAGE value="examples updated and the build scripts were updated." />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/192 Add documentation for using RFC 7523 with OA4MP. Slight improvement with creating JWKs at the command line." />
     <MESSAGE value="Updating all the documentation" />
@@ -2385,7 +2383,8 @@
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/211. Fixed with regression test. Tests for client credentials flow added." />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/212. Added lots of tests for the new client credentials flow using RFC 7523 and lots of tweaks to tests." />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/213. Documentation" />
-    <option name="LAST_COMMIT_MESSAGE" value="https://github.com/ncsa/oa4mp/issues/213. Documentation" />
+    <MESSAGE value="Updated version and re-generate website" />
+    <option name="LAST_COMMIT_MESSAGE" value="Updated version and re-generate website" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
