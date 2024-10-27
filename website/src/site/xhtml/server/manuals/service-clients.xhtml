@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Service Clients</title>
+</head>
+<body class="composite">
+<h1>What is a service client?</h1>
+<p>A <i>service client</i> is a specialized OA4MP client that complies with
+    either
+<a href="https://datatracker.ietf.org/doc/html/rfc7523#section-2.1">§ 2.1 of
+    RFC 7523</a> or with <a href="https://www.rfc-editor.org/rfc/rfc6749">§4.4 of the OAuth specification</a>.
+    This means that it is allowed to directly issue a token request without authentication.
+<b><i>However</i></b>, this implies a trust relationship and requires vetting.
+</p>
+<h2>Why?</h2>
+<p>As computing switches to token-based trust models and leaves behind X.509 certificates,
+services still need to be able to identify themselves and there need to be trust relationships
+in effect. Before, a server would have an X.509 certificate to prove who or what it was, and now
+it needs a signed token. Requiring a service (and its human administrator) to go through an OAuth
+flow every time, say, a server restarts,
+is an intolerable burden on a system. Therefore, the trust is agreed upon separately with
+a service client. Typically, a service client has a single (robot) user and hence restricts which users
+can be recognized. The service then issues token requests directly.</p>
+<h2>RFC 7523</h2>
+<p>Public/private keys must be generated and all authentication is
+    key-based. Once all is in place, the service simply issues a grant request (which is in JSON and
+    also signed with the private key) to the
+    token endpoint, signed with its keys, and gets tokens back. Read the
+<a href="https://oa4mp.org/pdf/rfc7523_intro.pdf">RFC 7523 documentation</a> for more</p>
+
+<h2>RFC 6749 §4.4</h2>
+<p>To authenticate, (as per §2.3 of the specification)</p>
+<blockquote>[t]he authorization
+    server MAY accept any form of client authentication meeting its
+    security requirements.</blockquote>
+<p>Hence you may use public/private keys with the client credentials flow too if your
+client has them. OA4MP will issue tokens based on the request. Read the
+<a href="https://oa4mp.org/pdf/rfc6749_4_4.pdf">client credentials flow documentation</a> for more</p>
+</body>
+</html>

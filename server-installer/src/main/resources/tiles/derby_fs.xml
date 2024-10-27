@@ -4,7 +4,7 @@
      when the service is running since the database can only have a single instance.
 -->
 
-<derby username="oa4mp"
+<derby username="${DERBY_USERNAME}"
        password="${DERBY_PASSWORD}"
        bootPassword="${DERBY_BOOT_PASSWORD}"
        storeType="file"
