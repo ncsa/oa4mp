@@ -22,6 +22,24 @@ There is a default configuration, but it needs to have the following set
   <jwksFile>    | Path to your JSON web keys file, if using keys
   <kid>         | The JWK identifier you wish to use, if using keys
 
+Create your keys if you are using them (see next section), then register your client at
+the server of your choice, filling in the information above.
+
+Using Keys (RFC 7523)
+‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+If you want to use public and private keys for authorization, then **before registering**,
+run:
+
+${OA4MP_HOME}bin/jwt -batchFile ${OA4MP_HOME}etc/create_keys.cmd
+
+The defaults for using keys are already in the generated cfg.xml file.
+This command creates a full set
+
+private keys : ${OA4MP_HOME}etc/keys.jwk
+ public keys : ${OA4MP_HOME}etc/public-keys.jwk
+
+If you opt to use keys, then at registration, just paste the contents of
+public-keys.jwk in to the registration page.
 
 Tomcat install
 ‾‾‾‾‾‾‾‾‾‾‾‾‾‾
@@ -54,19 +72,3 @@ Assuming Tomcat is installed at $CATALINIA_HOME,
     It should auto-deploy and be available at the client2 endpoint.
 
 (3) Check the client2 endpoint under Tomcat is working.
-
-Using Keys (RFC 7523)
-‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-If you want to use public and private keys for authorization, then **before registering**,
-run:
-
-${OA4MP_HOME}bin/jwt -batchFile ${OA4MP_HOME}etc/create_keys.cmd
-
-The defaults for using keys are already in the generated cfg.xml file.
-This command creates a full set
-
-private keys : ${OA4MP_HOME}etc/keys.jwk
- public keys : ${OA4MP_HOME}etc/public-keys.jwk
-
-If you opt to use keys, then at registration, just paste the contents of
-public-keys.jwk in to the registration page.

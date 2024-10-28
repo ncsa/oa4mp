@@ -23,11 +23,7 @@
              <artifactId>installer</artifactId>
              <version>6.0</version>
          </dependency>
-         <dependency>
-             <groupId>org.apache.derby</groupId>
-             <artifactId>derby</artifactId>
-             <version>10.14.2.0</version>
-         </dependency>
+
      </dependencies>
     <build>
         <plugins>

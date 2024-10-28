@@ -24,9 +24,8 @@
 <h2>How many clients are there?</h2>
 <p>
     OA4MP has a very simple servlet (packaged as a war) that can be used,
-    though it is excruciatingly plain on purpose.
-    Mostly it is to show how the calls work, and it is assumed that you will customize it for your
-    project. It also includes a command line client (CLC) which allows you to do all operations
+    though it is excruciatingly plain on purpose. It is intended that you boiler-plate out
+    the good bits to your snazzy app. OA4MP also includes a command line client (CLC) which allows you to do all operations
     for a client from the command line. This is a surprisingly useful tool.
 </p>
 <h2>Getting and deploying.</h2>
@@ -42,16 +41,14 @@ like any other jar:</p>
     or to update. Update implies you have an existing, functional client installation and just
     want critical files updated. The install option will create a basic configuration and give
     instructions on what to do next. This includes the command line client, documentation, examples
-    and a bunch of other very useful things.
+    and a bunch of other very useful things. Do read the blurb printed at the end! Some utilities cannot
+    be reasonable launched from inside Java, so depending on what you want to do, you may have to run,
+    e.g. the key generation tool.
 </p>
 <h3>Just the war</h3>
-<p>If you really only want the war, then you may just download the current reference war:</p>
+<p>If you really only want the war, then you may just download the current reference war from
+the release page.</p>
 
-<p><a title="OA4MP client war"
-      href="https://github.com/ncsa/oa4mp/releases/latest/client2.war">client2.war</a>
-     <br></br>
-      <a title="PGP signature file" href="https://github.com/ncsa/oa4mp/releases/latest/client2.war.asc">(PGP signature)</a>
-</p>
 
 For many cases, this is all you need to do.
 

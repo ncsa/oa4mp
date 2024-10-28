@@ -29,4 +29,10 @@ public class OA4MPClientInstaller extends AbstractInstaller {
             t.printStackTrace();
         }
     }
+
+    @Override
+    protected String getDerbySetupScriptPath() {
+        return getTemplates().get("${OA4MP_HOME}") + "etc/client-derby.sql";
+
+    }
 }

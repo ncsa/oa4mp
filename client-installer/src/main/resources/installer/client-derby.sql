@@ -88,23 +88,28 @@ run '/full/path/to/oauth2-derby.qdl';
 
 */
 
-/* Uncomment this if you did not do the test above and have already created the schema.
-CREATE SCHEMA oauth2;
-*/
+/* Comment this if you did do the test above and have already created the schema. */
+CREATE SCHEMA oa4mp;
 
-create table oauth2.assets  (
-             identifier  varchar(255) Primary key,
-             private_key clob,
-                username varchar(2048),
-            redirect_uri clob,
-             certificate clob,
-           refresh_token varchar(2048),
-            access_token varchar(2048),
-                   nonce varchar(2048),
-                   state clob,
-                issuedat timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        refresh_lifetime bigint,
-                cert_req clob,
-                   token varchar(2048),
-             creation_ts timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-    );
+create table oa4mp.assets
+(
+    access_token     varchar(2048),
+    cert_req         clob,
+    certificate      clob,
+    creation_ts      timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    description      clob,
+    id_token         clob,
+    identifier       varchar(255) Primary key,
+    issuedat         timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    nonce            varchar(2048),
+    private_key      clob,
+    redirect_uri     clob,
+    refresh_lifetime bigint,
+    refresh_token    varchar(2048),
+    state            clob,
+    token            varchar(2048),
+    username         varchar(2048)
+);
+
+
+

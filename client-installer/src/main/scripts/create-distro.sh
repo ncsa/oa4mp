@@ -37,7 +37,7 @@ cp $OA4MP_ADMIN_SOURCES/src/main/scripts/installer/version.txt .
 # Now make the directories
 mkdir "bin"
 cd "bin" || exit
-cp $OA4MP_ADMIN_SOURCES/src/main/scripts/installer/clc .
+cp $OA4MP_CLIENT_SOURCES/src/main/resources/installer/clc .
 cp $OA4MP_ADMIN_SOURCES/src/main/scripts/installer/jwt .
 cd ..
 mkdir "docs"
@@ -48,7 +48,7 @@ cd ..
 mkdir "etc"
 cd "etc"
 cp $OA4MP_CLIENT_SOURCES/src/main/resources/installer/cfg.xml .
-cp $OA4MP_ADMIN_SOURCES/src/main/scripts/installer/create_keys.cmd .
+cp $OA4MP_CLIENT_SOURCES/src/main/resources/installer/create_keys.cmd .
 cp $OA4MP_CLIENT_SOURCES/src/main/resources/installer/*.sql .
 cp $OA4MP_ADMIN_SOURCES/src/main/resources/derby-setup.txt .
 cd $TEMP_DIR || exit

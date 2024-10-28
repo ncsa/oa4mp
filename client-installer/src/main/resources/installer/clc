@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 # Run the OA4MP client (a command line interface client). This allows you to check the complete
 # lifecycle of getting a cert, refresh tokens and user info from the command line -- almost.
 # Invoke with --help for more information.
@@ -9,7 +8,7 @@
 OA4MP_ROOT=${OA4MP_HOME}
 DEFAULT_CONFIG="$OA4MP_ROOT"etc/cfg.xml
 DEFAULT_TARGET=default
-clientJar=""$OA4MP_ROOT"lib/clc.jar
+clientJar="$OA4MP_ROOT"lib/clc.jar
 logFile="$OA4MP_ROOT"var/log/clc.log
 
 # End of user serviceable parts.
@@ -24,9 +23,9 @@ if [[  "$1" = "--help" || $# -gt 2 ]];then
 fi
 
 target=${1:-$DEFAULT_TARGET}
-adminCfg=${2:-$DEFAULT_CONFIG}
+clientCfg=${2:-$DEFAULT_CONFIG}
 
-java  -jar $clientJar   -cfg $adminCfg -name $target -log $logFile -v
+java  -jar $clientJar   -cfg $clientCfg -name $target -log $logFile
 
 if [ $? != 0 ]; then
   exit 1

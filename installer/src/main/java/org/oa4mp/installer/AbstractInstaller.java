@@ -72,20 +72,11 @@ public abstract class AbstractInstaller extends WebInstaller {
     }
 
     protected void setupDerbyFS() throws Throwable {
-/*
-        JSONObject cfg = new JSONObject();
-        cfg.put(ConnectionPoolProvider.PASSWORD, getTemplates().get("${DERBY_PASSWORD"));
-        cfg.put(ConnectionPoolProvider.BOOT_PASSWORD, getTemplates().get("${DERBY_BOOT_PASSWORD"));
-        cfg.put(ConnectionPoolProvider.USERNAME, getTemplates().get("${DERBY_USERNAME"));
-        cfg.put(ConnectionPoolProvider.DERBY_STORE_TYPE, "file");
-        cfg.put(ConnectionPoolProvider.SCHEMA, "oa4mp");
-        cfg.put(ConnectionPoolProvider.DATABASE, "oa4mp");
-        cfg.put(ConnectionPoolProvider.P, "oa4mp");
-*/
         String dbDir = getRoot().getAbsolutePath() + "/var/storage/derby";
         DerbyConnectionPoolProvider derbyConnectionPoolProvider = DerbyConnectionPoolProvider.newInstance().
                 setStoreType(DERBY_STORE_TYPE_FILE).
                 setRootDirectory(dbDir).
+                setSchema("oa4mp").
                 setDatabase(dbDir + "/oa4mp").
                 setBootPassword(getTemplates().get("${DERBY_BOOT_PASSWORD}")).
                 setPassword(getTemplates().get("${DERBY_PASSWORD}")).
@@ -95,13 +86,16 @@ public abstract class AbstractInstaller extends WebInstaller {
         pool.getConnectionParameters().setCreateOne(true);
         // need to get the create script as a list of strings.
         // should be in ${OA4MP_HOME}etc/oa4mp-derby.sql
-        List<String> script = FileUtil.readFileAsLines(getTemplates().get("${OA4MP_HOME}") + "etc/oa4mp-derby.sql");
+        List<String> script = FileUtil.readFileAsLines(getDerbySetupScriptPath());
+        //List<String> script = FileUtil.readFileAsLines(getTemplates().get("${OA4MP_HOME}") + "etc/oa4mp-derby.sql");
         script = SQLStore.crappySQLParser(script);
 
         pool.setCreateScript(script);
         pool.createStore();
         trace("JDBC connection URL:\n\t" + pool.getConnectionParameters().getJdbcUrl());
     }
+
+    protected abstract String getDerbySetupScriptPath();
 
     @Override
     protected Map<String, String> setupTemplates() throws IOException {
@@ -138,6 +132,9 @@ public abstract class AbstractInstaller extends WebInstaller {
                     getArgMap().put(STORE_FLAG, args[++i]);
                     break;
             }
+        }
+        if(!getArgMap().containsKey(STORE_FLAG)) {
+            getArgMap().put(STORE_FLAG, STORE_TYPE_DERBY_FILE);
         }
     }
 
