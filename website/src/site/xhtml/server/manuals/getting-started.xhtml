@@ -15,7 +15,7 @@
     and allows open authorization with multiple identities.
     The server  allows for authorization and issues tokens,
     (hence some call it an <i>issuer</i>). There is also an
-    <a href="../../client/index.html">OA4MP client</a>. Current release is <strong>6.x-SNAPSHOT</strong>.</p>
+    <a href="../../client/index.html">OA4MP client</a>. Current release is <strong>6.0</strong>.</p>
 
 <h2>Prerequisites</h2>
 <ul>
@@ -30,13 +30,16 @@
             title="OA4MP: Email Notifications"
             href="../configuration/server-email.html">here</a> for details.
     </li>
-    <li>Possibly either the latest <a href="http://dev.mysql.com/downloads/connector/j/">MySQL
-        connector</a>. <a href="https://downloads.mariadb.org/client-java/+releases/">Maria DB client</a>
-        or <a href="http://jdbc.postgresql.org/download.html">PostgreSQL jar</a>.
-        If you are using one of these systems
-        for storage, install them by dropping them in <code>$CATALINA_HOME/lib</code>. OA4MP used
-        to bundle these in the wars, but since their licences conflicted with those of some of
-        our users, we decided to simply let you supply them. If you are just using file-based storage,
+    <li>Possibly either the latest of
+        <ul>
+            <li><a href="http://dev.mysql.com/downloads/connector/j/">MySQL</a></li>
+            <li><a href="https://downloads.mariadb.org/client-java/+releases/">Maria DB</a></li>
+            <li><a href="http://jdbc.postgresql.org/download.html">PostgreSQL</a></li>
+            <li><a href="https://db.apache.org/derby/">Apache Derby</a></li>
+        </ul>
+        OA4MP used
+        to bundle the connectors for these in the wars, but since their licences conflicted with those of some of
+        our users, we decided to simply let you supply them. If you are just using only file-based storage,
         then you don't need either of these.
     </li>
     <li>Possibly JGlobus. If your server needs to issue limited proxies drop the most recent version
@@ -48,75 +51,136 @@
         check for the version of Bouncy Castle that your version of JGlobus uses and use that as well.
         JGlobus-Core 2.0.4 includes Bouncy Castle classes.
     </li>
-    <li>(Optional) Apache 2, configured to work with Tomcat.</li>
 </ul>
 <h2>Getting and deploying from the war.</h2>
+<p>This is available as an installer. Download <a href="https://github.com/ncsa/oa4mp/releases/download/v6.0/server-installer.jar">server-installer.jar</a>
+from the website. This will download and install a full distribution for the version you want. A full set of help is built in
+to the installer and if you issue</p>
+<pre>
+    java -jar server-installer.jar
+</pre>
+<p>(so no arguments) it will print out a general help page with instructions. Generally you want to set an environment variable,
+<b>OA4MP_SERVER</b> and install to that. If you are installing the OA4MP client as well, these should
+    go into different directories. The suggested directory for the server is /opt/oa4mp_server.
+   This jar will install the CLI, download the current war and so forth. It will also
+create a barebones configuration for you server, in $OA4MP_SERVER/etc. After the installation has finished,
+follow the instructions. You should set up any databases (see comments in the configuration file and below for databases).
+A good post install test is to see if the CLI comes up:</p>
+<pre>
+my-pc:$OA4MP_SERVER/bin/cli
 
-<p>You may most easily a bare-bones version for testing by downloading the current reference war from the
-    <a href="https://github.com/ncsa/oa4mp/releases">GitHub OA4MP release page</a></p>
+  .g8""8q.    db                 `7MMM.     ,MMF'`7MM"""Mq.
+.dP'    `YM.   ;MM:                  MMMb    dPMM    MM   `MM.
+dM'      `MM  ,V^MM.         ,AM     M YM   ,M MM    MM   ,M9
+MM        MM ,M  `MM        AVMM     M  Mb  M' MM    MMmmdM9
+MM.      ,MP AbmmmqMA     ,W' MM     M  YM.P'  MM    MM
+`Mb.    ,dP'A'     VML  ,W'   MM     M  `YM'   MM    MM
+  `"bmmd"'.AMA.   .AMMA.AmmmmmMMmm .JML. `'  .JMML..JMML.
+                              MM
+                              MM
+*************************************************************
+* OA4MP CLI (Command Line Interpreter)                      *
+* Version 6.0                                               *
+* By Jeff Gaynor  NCSA                                      *
+* type 'help' for a list of commands                        *
+*      'exit', 'quit' or '/q' to end this session.          *
+*************************************************************
+oa4mp&gt;
+</pre>
 
-
-<p>Download this, read to <a title="Server Configuration Reference Manual"
+<p>You may now profitably read how to <a title="Server Configuration Reference Manual"
                              href="../configuration/config-index.html">configure
-    the deployment</a>, and deploy it to Tomcat. The war, as delivered, cannot be run.You must do some minimal
-    configuration at least before deploying it. </p>
-
-
-<h3>Getting and building the source</h3>
-If you need/want to customize the basic package, you would download it from
-<a title="oa4mp sources" href="https://github.com/ncsa/oa4mp">Git Hub</a> at
-the current release (4.3).
-This has the correct dependencies in it. Build it by issuing
-<pre>mvn clean install</pre>
-and you should end up with a deployable war.
-
-<h3>Writing your own webapp.</h3>
+    the deployment</a>, and deploy it to Tomcat. The basic configuration for the CLI
+as delivered should work for the server, although there are many ways to extend and
+configure OA4MP, so read the comments in the configuration file (has suggestions
+    based on your installation choices) and the documentation.</p>
 
 <h2>Deploying to Apache</h2>
 
-<p>If you need to deploy this to Apache, you need to add the following to the proxy_ajp.conf file (which, e.g., lives
+<p>If you need to deploy this to Apache, one possible way is to use the venerable Proxy AJP connector, proxy_ajp.conf file (which, e.g., lives
     under /etc/httpd/conf.d in most unix distributions):</p>
-<pre>ProxyPass /oauth/initiate ajp://localhost:8009/oauth/initiate</pre>
-<pre>ProxyPass /oauth/authorize ajp://localhost:8009/oauth/authorize</pre>
-<pre>ProxyPass /oauth/token ajp://localhost:8009/oauth/token</pre>
-<pre>ProxyPass /oauth/getcert ajp://localhost:8009/oauth/getcert</pre>
-<pre>ProxyPass /oauth/register ajp://localhost:8009/oauth/register</pre>
+<pre>
+ProxyPass /oauth/initiate ajp://localhost:8009/oauth/initiate
+ProxyPass /oauth/authorize ajp://localhost:8009/oauth/authorize
+... every endpoint you need to support
+</pre>
 <p>These entries allow access to all parts of the process. <strong>Note</strong>: in the WEB-INF/web.xml file there is a
     section called security-constraint, which controls access to the webapp using Tomcat's SSL. This will conflict with
     access via Apache, so comment that section out if you are deploying to Apache. It is only needed in stand-alone
     Tomcat deployments.</p>
 
-<h2>Setting up persistent storage</h2>
+<h1>Setting up persistent storage</h1>
+<h2>Location of database scripts</h2>
+<p>In a standard OA4MP install, the scripts to create the databases are all in </p>
+<pre>$OA4MP_SERVER/etc</pre>
+<p>These should be run before trying tos tart either the CLI or the server.</p>
 
-<h3>File-based storage</h3>
+<h2>File-based storage</h2>
 
-<p>You may store all information for the service in your local file system. It is important that you restrict access to
+<p>(Deprecated) You may store all information for the service in your local file system. It is important that you restrict access to
     it and back it up. Specifying the storage location in your configuration file is sufficient, since the system will
-    detect if it exists and create anything it needs.</p>
+    detect if it exists and create anything it needs. See <a href="https://oa4mp.org/common/configuration/file-store.html">file storage</a>.
+The advantage is that this is quick to set up and requires no special configuration. The downside is that it does not scale well.
+If your needs are small, this is fine. If you want a slightly more complex solution that is local (and you don'ave have to manage),
+use the Derby file store.</p>
 
-<h3>MySQL</h3>
+<h2>MySQL</h2>
 
 <p>In order to use MySQL for persistent storage, you must run the supplied script,
-    <a title="mysql.sql install script" href="https://github.com/ncsa/oa4mp/releases/latest/mysql.sql">mysql.sql</a>
-    to create all of the tables and users before your first use.</p>
-<pre><code>mysql -u username -p &lt; <code>/path/to/file/mysql.sql</code></code></pre>
+    <b>oa4mp-mysql.sql</b>
+    to create all of the tables and users before your first use:</p>
+<pre><code>mysql -u username -p &lt; <code>$OA4MP_SERVER/etc/oa4mp-mysql.sql</code></code></pre>
 <p>(the username is an account (<em>root</em>, e.g.) which has sufficient privileges to create other users) which will
-    prompt you for your password and run the file. If you do not accept the default account names, you must edit this
+    prompt you for your password and run the file. See <a href="https://oa4mp.org/common/configuration/mysql-store.html">the MySQL configuration</a>
+    for more.
+    If you do not accept the default account names, you must edit this
     file and replace all occurrences of them manually, as well as setting the passwords. This has to be done because of
     MySQL's very lousy support for variables. (Should you have to re-run the script, you should manually remove the
     users and database beforehand. These commands are commented out at the beginning of the file.) </p>
 
-<h3>PostgreSQL</h3>
+<h2>Maria DB</h2>
 
-<p>Most Unix distros have this database installed by default. There is a specific script, <a
-        title="PostGreSQL install script"
-        href="https://github.com/ncsa/oa4mp/releases/latest/pg.sql">pg.sql</a>, that will
+<p>In order to use Maria DB for persistent storage, you must run the supplied script,
+    <b>oa4mp-mariadb.sql</b>
+    to create all of the tables and users before your first use:</p>
+<pre><code>mysql -u username -p &lt; <code>$OA4MP_SERVER/etc/oa4mp-mariadb.sql</code></code></pre>
+<p>(the username is an account (<em>root</em>, e.g.) which has sufficient privileges to create other users) which will
+    prompt you for your password and run the file. See <a href="https://oa4mp.org/common/configuration/mariadb-store.html">the Maria DB configuration</a>
+    for more.
+    If you do not accept the default account names, you must edit this
+    file and replace all occurrences of them manually, as well as setting the passwords.
+    (Should you have to re-run the script, you should manually remove the
+    users and database beforehand. These commands are commented out at the beginning of the file.) </p>
+
+<h2>PostgreSQL</h2>
+
+<p>Most Unix distros have this database installed by default. There is a specific script, <b>oa4mp-pg.sql</b>, that will
     create all the tables. All you should need to do is set the passwords near the top of the file. Then you would need
-    to log in to the command line psql tool as the user postgres (this is the super user) and from that prompt issue</p>
-<pre>\i /path/to/file/pg.sql</pre>
+    to log in to the command line psql tool as the user postgres (this is the super user) and from that prompt issue
+(replace $OA4MP_SERVER first since psql has no knowledge of environment variables)</p>
+<pre>\i $OA4MP_SERVER/etc/oa4mp-pg.sql</pre>
 <p>The file contains default user, table, database and schema names, which you may change if you see fit (be sure to
-    pass these along in your configuration file!). Again, you only need to edit the values at the top of the file,
+    pass these along in your configuration file!).
+    See <a href="https://oa4mp.org/common/configuration/postgres-store.html">the Postgres configuration</a>.
+    Again, you only need to edit the values at the top of the file,
     thanks to PostgreSQL's support for variables.</p>
+
+<h2>Apache Derby</h2>
+
+<p>There is a specific script, <b>oa4mp-derby.sql</b>, that will
+    create all the tables, however, there is a detailed readme with the particulars in.</p>
+<pre>$OA4MP_SERVER/derby-setup.txt</pre>
+<p>All you should need to do is set the passwords near the top of the file. Then you would need
+    to log in to the command line psql tool as the user postgres (this is the super user) and from that prompt issue
+    (replace $OA4MP_SERVER first since psql has no knowledge of environment variables)</p>
+<pre>\i $OA4MP_SERVER/etc/oa4mp-pg.sql</pre>
+<p>The file contains default user, table, database and schema names, which you may change if you see fit (be sure to
+    pass these along in your configuration file!).
+    See <a href="https://oa4mp.org/common/configuration/derby-store.html">the Derby configuration</a>. Note that
+    Derby may be used as either a server or locally as a file store. The advantageof the latter is that Derby is
+    bundled with OA4MP and a standard install will create and manage a Derby file store instance for you, making
+    it seamless.
+</p>
 
 </body>
 </html>

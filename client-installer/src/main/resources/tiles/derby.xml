@@ -1,0 +1,21 @@
+<!--
+    See https://oa4mp.org/common/configuration/derby-store.html
+    This assumes you are running a Derby server and have created the database
+    in that.
+-->
+
+<derby username="YOUR_USERNAME"
+       password="YOUR_PASSWORD"
+       bootPassword="YOUR_BOOT_PASSWORD"
+       storeType="server"
+       path="YOUR_PATH"
+       database="YOUR_DATABASE"
+       schema="YOUR_SCHEMA">
+    <transactions/>
+    <clients/>
+    <clientApprovals/>
+    <permissions/>
+    <adminClients/>
+    <txStore/>
+    <voStore/>
+</derby>

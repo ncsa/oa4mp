@@ -18,13 +18,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
      <dependencies>
-<!--
-         <dependency>
-             <groupId>edu.uiuc.ncsa.security</groupId>
-             <artifactId>web-installer</artifactId>
-             <version>6.x-SNAPSHOT</version>
-         </dependency>
--->
          <dependency>
              <groupId>org.oa4mp</groupId>
              <artifactId>installer</artifactId>

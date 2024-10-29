@@ -1,7 +1,5 @@
 
-/* Uncomment this if you did not do the test above and have already created the schema.
-CREATE SCHEMA oa4mp;
-*/
+/* Comment this if you did the test above and have already created the schema. */
 CREATE SCHEMA oa4mp;
 
 

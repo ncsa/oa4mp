@@ -118,4 +118,9 @@ public class OA4MPServerInstaller extends AbstractInstaller {
         }
     }
 
+    @Override
+    protected String getDerbySetupScriptPath() {
+        return getTemplates().get("${OA4MP_HOME}") + "etc/oa4mp-derby.sql";
+
+    }
 }

@@ -22,7 +22,8 @@
         <callbackUri>${CALLBACK_URI}</callbackUri>
         <!-- RFC 7523 support instead of a secret
              See https://github.com/ncsa/oa4mp/blob/master/docs/pdf/rfc7523_intro.pdf
-
+         -->
+        <!-- Uncomment this if you decide to use your and have created your them
        <kid>${JWT_KEY_ID}</kid>
        <jwksFile>${OA4MP_HOME}etc/keys.jwk</jwksFile>
        -->

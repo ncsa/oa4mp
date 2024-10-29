@@ -23,5 +23,16 @@
         <artifactId>web-installer</artifactId>
         <version>6.x-SNAPSHOT</version>
     </dependency>
+    <dependency>
+        <groupId>edu.uiuc.ncsa.security</groupId>
+        <artifactId>storage</artifactId>
+        <version>6.x-SNAPSHOT</version>
+        <scope>compile</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.derby</groupId>
+        <artifactId>derby</artifactId>
+        <version>10.14.2.0</version>
+    </dependency>
 </dependencies>
 </project>

@@ -19,6 +19,7 @@ lowriter --headless --convert-to pdf ${args[0]}/qdl/src/main/docs/qdl_oa4mp_stor
 lowriter --headless --convert-to pdf ${args[0]}/qdl/src/main/docs/token_handler_configuration.odt        > /dev/null
 lowriter --headless --convert-to pdf ${args[0]}/server-admin/src/main/docs/filestore-migration.odt       > /dev/null
 lowriter --headless --convert-to pdf ${args[0]}/server-admin/src/main/docs/rfc7523_intro.odt             > /dev/null
+lowriter --headless --convert-to pdf ${args[0]}/server-admin/src/main/docs/rfc6749_4_4.odt             > /dev/null
 lowriter --headless --convert-to pdf ${args[0]}/server-admin/src/main/docs/jwt-util.odt                  > /dev/null
 lowriter --headless --convert-to pdf ${args[0]}/server-admin/src/main/docs/forking_a_flow_quickstart.odt > /dev/null
 lowriter --headless --convert-to pdf ${args[0]}/website/src/main/doc/oa2-client.odt                      > /dev/null

@@ -4,7 +4,7 @@
 
      Note I had to add the following to my mysql tag (right after password="
      parameters="useJDBCCompliantTimezoneShift=true&amp;useLegacyDatetimeCode=false&amp;serverTimezone=America/Chicago"
-     with MySQL version 5. this was due to a buf in MySQL that gor the timezone wrong from the
+     with MySQL version 5. this was due to a bug in MySQL that got the timezone wrong from the
      OS (Ubuntu server).
 -->
 

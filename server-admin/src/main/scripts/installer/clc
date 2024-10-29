@@ -7,10 +7,10 @@
 # different from the standard install.
 
 OA4MP_ROOT=${OA4MP_HOME}
-DEFAULT_CONFIG=$OA4MP_ROOT/etc/cfg.xml
+DEFAULT_CONFIG="$OA4MP_ROOT"etc/cfg.xml
 DEFAULT_TARGET=default
-clientJar=$OA4MP_ROOT/lib/clc.jar
-logFile=$OA4MP_ROOT/var/log/clc.log
+clientJar=""$OA4MP_ROOT"lib/clc.jar
+logFile="$OA4MP_ROOT"var/log/clc.log
 
 # End of user serviceable parts.
 
