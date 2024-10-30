@@ -98,6 +98,7 @@
         <module>server-installer</module>
         <module>client-installer</module>
         <module>installer</module>
+        <module>rfc8414</module>
     </modules>
     <dependencies>
         <dependency>

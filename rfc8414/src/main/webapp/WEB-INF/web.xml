@@ -26,4 +26,9 @@
             <transport-guarantee>CONFIDENTIAL</transport-guarantee>
         </user-data-constraint>
     </security-constraint>
+
+    <context-param>
+        <param-name>oa4mp:oa4mp.service.name</param-name>
+        <param-value>oauth2</param-value>
+    </context-param>
 </web-app>

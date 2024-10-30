@@ -34,6 +34,7 @@
         <module name="myproxy-logon" />
         <module name="server-loader" />
         <module name="server-installer" />
+        <module name="rfc8414" />
         <module name="client-test" />
         <module name="proxy" />
         <module name="server-admin" />

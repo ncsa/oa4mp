@@ -35,6 +35,8 @@
     <file url="file://$PROJECT_DIR$/proxy/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/qdl/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/qdl/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rfc8414/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rfc8414/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/server-admin/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/server-admin/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/server-api/src/main/java" charset="UTF-8" />

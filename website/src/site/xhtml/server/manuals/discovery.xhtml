@@ -5,20 +5,42 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
     <title>The Discovery Service</title>
-    <!--#include virtual="../../head.html" -->
 </head>
 <body class="composite">
-<!--#include virtual="../../header.html" -->
 <h2>The Discovery Service</h2>
 <p>OA4MP (for OIDC) supports the .well-known endpoint, as per <a href="https://tools.ietf.org/html/rfc5785">RFC 5785</a>
+    <a href="https://datatracker.ietf.org/doc/html/rfc8414">OAuth 2 Discovery</a>,
     and <a href="https://openid.net/specs/openid-connect-discovery-1_0.html">OIDC discovery</a>.
 It should be noted that each instance of OA4MP will have its own location for this which corresponds
 to that instance. This allows for multiple services in a single domain.</p>
-<p>You may also use the discovery service to get the public signing keys. This is at the certs endpoint.
+<p>You may also use the discovery service to get the public signing keys. This is at the <b>certs</b> endpoint.
 </p>
 
-<h3>Example</h3>
-<p>If OA4MP is hosted at <code>https://services.bigstate.edu/oauth2</code>, then the discovery page is at
+<h3>By the specification</h3>
+<p>According to the specifications (RFC 8414, RFC 5785) a request to the service at the
+<b>.well-known</b> end point must return the information for the OAuth server. This means that</p>
+<ul>
+    <li>If Apache webserver is fronting Tomcat, you must use <b>mod_rewrite</b> to forward any requests to
+    the OA4MP Discovery servlet</li>
+    <li>In a Tomcat only install, you should install the RFC8414 servlet that will automatically forward
+    the requests.</li>
+</ul>
+<p>It is also possible to just use the <a href="https://tomcat.apache.org/tomcat-9.0-doc/rewrite.html">rewrite valve</a>
+in Tomcat to forward requests, however, since it is possible to have multiple OA4MP instances each with its own
+ Discovery service, the RFC8414 servlet is much more flexible.</p>
+
+<h2>A note on issuers.</h2>
+<p>OA4MP allows for multiple issuers with their own keys and hence discovery pages to be created.
+The normal way this works is that a <i>virtual organization</i> is created and </p>
+
+<h3>Example accessing the well-known page</h3>
+<p>In this case, Tomcat has been configured to return the well-known page for a single OA4MP install using
+    the RFC8414 webapp.
+A request to <code>https://services.bigstate.edu/.well-known/openid-configuration</code> will be forwarded
+to the OA4MP instance and serviced there. See the next example for a typical response.</p>
+
+<h3>Example accessing the OA4MP Discovery service directly</h3>
+<p>If OA4MP is hosted at <code>https://services.bigstate.edu/oauth2</code>, then the discovery service is at
 <code>https://services.bigstate.edu/oauth2/.well-known/openid-configuration</code> and will return a JSON
 object such as </p>
 <pre>
@@ -86,6 +108,5 @@ and this will return a JSON WebKey object:
   }
  ]}
 </pre>
-<!--#include virtual="../../footer.html" -->
 </body>
 </html>

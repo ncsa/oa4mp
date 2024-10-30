@@ -18,10 +18,12 @@ import java.io.IOException;
  */
 // Fixes https://github.com/ncsa/oa4mp/issues/175
 public class RFC8414Servlet extends HttpServlet {
+    public static final String SERVICE_NAME = "oa4mp:oa4mp.service.name";
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         ServletDebugUtil.printAllParameters(getClass(), req, true);
-        resp.sendRedirect("/oauth2" + req.getRequestURI());
+        String caput= getServletContext().getInitParameter(SERVICE_NAME);
+        resp.sendRedirect("/" + caput  + req.getRequestURI());
     }
 
     @Override

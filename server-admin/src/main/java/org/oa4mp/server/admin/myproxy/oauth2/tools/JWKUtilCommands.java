@@ -1236,7 +1236,7 @@ public class JWKUtilCommands extends CommonCommands {
         sayi("    validate_token " + CL_WELL_KNOWN_FLAG + " https://foo.bar/.well-known " + CL_INPUT_FILE_FLAG + " my_token.jwt                                         ");
         sayi("       This will read the keys in the well-known file and read the token in the file                                ");
         sayi("                                                                                                                 ");
-        sayi("    validate_token " + CL_WELL_KNOWN_FLAG + "https://foo.bar/.well-known -v " + CL_INPUT_FILE_FLAG + " my_token.jwt                                      ");
+        sayi("    validate_token " + CL_WELL_KNOWN_FLAG + " https://foo.bar/.well-known -v " + CL_INPUT_FILE_FLAG + " my_token.jwt                                      ");
         sayi("       Identical behavior to the first example but note the -v flag: This causes any information about              ");
         sayi("       the token to be printed. Normally this is not used except for trying to debug issues.                        ");
         sayi("                                        ");
