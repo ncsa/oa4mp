@@ -3,6 +3,8 @@
    capability set is used from the access token request, but the requests generally are
    for subset of the full set of capabilities.
 */
+script_load('fnal/acl.qdl');
+
 block[
     // Only one capability set at most is allowed.
      // At this point in the code there is no CS ever passed

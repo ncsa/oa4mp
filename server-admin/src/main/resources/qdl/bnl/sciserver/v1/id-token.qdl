@@ -58,7 +58,7 @@ phase since there is a browser to redirect.
  }}}
     // Note. No refresh tokens!
 */
-//script_load('bnl/acl.qdl');
+script_load('bnl/acl.qdl');
 script_load('utils/init.qdl'); // set up stuff
 
    debugger(1);

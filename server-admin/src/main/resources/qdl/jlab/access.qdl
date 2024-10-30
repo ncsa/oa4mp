@@ -16,7 +16,7 @@
 NOTE that the args are "eic" for EIC or "jlab" for everything else.
 
 */
-//script_load('jlab/acl.qdl');
+script_load('jlab/acl.qdl');
 
 
      DEBUG := true; // set false everywhere but on my test server.

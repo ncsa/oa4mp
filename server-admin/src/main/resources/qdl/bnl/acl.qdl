@@ -1,3 +1,4 @@
  acl_add('cilogon:/adminClient/bnal');
+ acl_add('localhost:bnl');
  // for cilogon:/client_id/8e718657741cc54785321b06bbfdc9
  acl_check();

@@ -19,25 +19,25 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="server" />
-        <module name="server-api" />
-        <module name="skin" />
-        <module name="oauth2" />
-        <module name="oa4mp-webapp" />
-        <module name="common" />
-        <module name="server-test" />
-        <module name="client-webapp" />
-        <module name="oa4mp-server-test" />
-        <module name="client" />
         <module name="website" />
         <module name="oa4mp-server-oauth2" />
         <module name="myproxy-logon" />
+        <module name="server-api" />
+        <module name="skin" />
         <module name="server-loader" />
+        <module name="oauth2" />
         <module name="server-installer" />
         <module name="client-test" />
         <module name="proxy" />
         <module name="server-admin" />
+        <module name="oa4mp-webapp" />
+        <module name="common" />
+        <module name="server-test" />
         <module name="client-loader" />
+        <module name="client-webapp" />
+        <module name="oa4mp-server-test" />
         <module name="qdl" />
+        <module name="client" />
         <module name="client-oauth2" />
         <module name="client-installer" />
         <module name="client-api" />
@@ -45,6 +45,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="installer" target="11" />
       <module name="myproxy" target="11" />
     </bytecodeTargetLevel>
   </component>

@@ -3,6 +3,8 @@
    NOTE: setting ID token claims in another handler won't get them picked up.
    updated: 2020-12-16T21:40:05.453Z
 */
+script_load('fnal/acl.qdl');
+
 DEBUG := true; // always false on production.
 if[DEBUG][
    /* ********** These fake getting the claims and scopes from the user. ********** */
