@@ -221,11 +221,8 @@ public class OA2State extends State {
                 assertionsOn,
                 isStrictACLs(),
                 getJsonWebKeys());
-      //  return oa2StateInit(s);
-        s.setOa2se(getOa2se());
-        s.setAclBlackList(getAclBlackList());
-        s.setAclList(getAclList());
-        return s;
+        return oa2StateInit(s);
+
     }
 
 
