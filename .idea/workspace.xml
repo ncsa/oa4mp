@@ -10,9 +10,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="Work on the client and server installer. Derby file store  now works across the board and the the install script for clients has been updated. The website required a lot of updaing, since the &quot;getting started&quot; paged was at least 5 yeas old.">
+    <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="Updated OA2State object to set transient fields on deserialize.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/scripting/OA2State.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/scripting/OA2State.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/client-installer/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-installer/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-test/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/buildNumber.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,7 +36,6 @@
       <list>
         <option value="Interface" />
         <option value="HTML File" />
-        <option value="package-info" />
         <option value="Class" />
       </list>
     </option>
@@ -76,9 +79,6 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
-  <component name="ProblemsViewState">
-    <option name="selectedTabId" value="DEPENDENCY_CHECKER_PROBLEMS_TAB" />
-  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 3
 }</component>
@@ -92,30 +92,16 @@
   <component name="ProjectViewState">
     <option name="autoscrollFromSource" value="true" />
     <option name="autoscrollToSource" value="true" />
+    <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
     <option name="showMembers" value="true" />
     <option name="showModules" value="false" />
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "Application.CLC.executor": "Debug",
-    "Application.CLI.executor": "Debug",
-    "Application.Client Installer.executor": "Run",
-    "Application.OA4MPClientInstaller.executor": "Run",
-    "Application.OA4MPServerInstaller.executor": "Run",
-    "Application.QDL CLC.executor": "Debug",
+    "Application.QDL CLC.executor": "Run",
     "Application.QDL.executor": "Debug",
-    "Application.QDLConfigLoader.executor": "Debug",
-    "Application.Server Installer.executor": "Run",
-    "Application.jwt.executor": "Debug",
-    "Application.org.oa4mp.server.installer.OA4MPServerInstaller.executor": "Run",
     "DefaultHtmlFileTemplate": "HTML File",
-    "JUnit.QDLTests.testVFSFileClaimSourceA.executor": "Run",
-    "JUnit.Test Suite.executor": "Run",
-    "Java Scratch.Scratch (3).executor": "Run",
-    "Java Scratch.Scratch.executor": "Run",
-    "Maven.myproxy-website [clean,install].executor": "Run",
-    "Maven.oa4mp-parent [clean,install].executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
@@ -124,7 +110,7 @@
     "git-widget-placeholder": "6.0",
     "jdk.selected.JAVA_MODULE": "11 (2)",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/home/ncsa/dev/ncsa-git/oa4mp/client-installer/src/main/resources/installer",
+    "last_opened_file_path": "/home/ncsa/dev/ncsa-git/oa4mp/server-installer/src/main/resources/oa4mp",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -132,13 +118,12 @@
     "nodejs_package_manager_path": "npm",
     "project.structure.last.edited": "Libraries",
     "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.29887053",
+    "project.structure.side.proportion": "0.48910892",
     "settings.editor.selected.configurable": "preferences.pluginManager",
     "vue.rearranger.settings.migration": "true"
   },
   "keyToStringList": {
     "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
-      "PLAIN_TEXT",
       "JSON",
       "JAVA",
       "SQL"
@@ -147,24 +132,23 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/client-installer/src/main/resources/installer" />
-      <recent name="$PROJECT_DIR$/client-installer/src/main/resources/oa4mp" />
-      <recent name="$PROJECT_DIR$/client-installer/src/main/resources/tiles" />
-      <recent name="$PROJECT_DIR$/server-installer/src/main/resources/tiles" />
       <recent name="$PROJECT_DIR$/server-installer/src/main/resources/oa4mp" />
+      <recent name="$PROJECT_DIR$/server-installer/src/main/resources/tiles" />
+      <recent name="$PROJECT_DIR$/server-admin/src/main/scripts/installer" />
+      <recent name="$PROJECT_DIR$/server-installer/src/main/scripts" />
+      <recent name="$PROJECT_DIR$/client-installer/src/main/resources" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/server/src/main/java/org/oa4mp/delegation/server" />
-      <recent name="$PROJECT_DIR$/client/src/main/java/org/oa4mp/delegation/client" />
-      <recent name="$PROJECT_DIR$/client-installer/src/main/resources/installer" />
       <recent name="$PROJECT_DIR$/server-installer/src/main/scripts" />
       <recent name="$PROJECT_DIR$/client-installer/src/main/resources/oa4mp" />
+      <recent name="$PROJECT_DIR$/server-installer/src/main/resources/oa4mp" />
+      <recent name="$PROJECT_DIR$/client-installer/src/main/scripts" />
+      <recent name="$PROJECT_DIR$/server-admin/src/main/scripts/installer" />
     </key>
     <key name="MoveInnerDialog.RECENTS_KEY">
       <recent name="edu.uiuc.ncsa.oa4mp.delegation.server.storage" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
-      <recent name="edu.uiuc.ncsa.oa2.qdl.storage" />
       <recent name="edu.uiuc.ncsa.install" />
       <recent name="edu.uiuc.ncsa.myproxy.oa4mp.oauth2.claims" />
       <recent name="edu.uiuc.ncsa.oa4mp.delegation.server.storage.upkeep" />
@@ -219,7 +203,7 @@
     <configuration name="CLC" type="Application" factoryName="Application">
       <option name="ALTERNATIVE_JRE_PATH" value="11 (2)" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
-      <option name="MAIN_CLASS_NAME" value="org.oa4mp.server.admin.myproxy.oauth2.tools.OA2CommandLineClient" />
+      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.myproxy.oauth2.tools.OA2CommandLineClient" />
       <module name="server-admin" />
       <option name="PROGRAM_PARAMETERS" value="-cfg $PROJECT_DIR$/../../csd/config/clients.xml -name localhost:command.line -comment # -out /tmp/eee.txt" />
       <extension name="software.aws.toolkits.jetbrains.core.execution.JavaAwsConnectionExtension">
@@ -256,16 +240,6 @@
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
       <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.myproxy.oauth2.tools.OA2Commands" />
       <module name="server-admin" />
-      <option name="PROGRAM_PARAMETERS" value="-cfg $PROJECT_DIR$/../../csd/config/servers.xml -name localhost:oa4mp.oa2.mariadb" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="CLI" type="Application" factoryName="Application">
-      <option name="ALTERNATIVE_JRE_PATH" value="11 (2)" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
-      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.myproxy.oauth2.tools.OA2Commands" />
-      <module name="server-admin" />
       <option name="PROGRAM_PARAMETERS" value="-cfg $PROJECT_DIR$/../../csd/config/server-oa2.xml -name localhost:oa4mp.oa2.mariadb" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -281,12 +255,12 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Client Installer" type="Application" factoryName="Application">
+    <configuration name="CLI" type="Application" factoryName="Application">
       <option name="ALTERNATIVE_JRE_PATH" value="11 (2)" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
-      <option name="MAIN_CLASS_NAME" value="org.oa4mp.client.installer.OA4MPClientInstaller" />
-      <module name="client-installer" />
-      <option name="PROGRAM_PARAMETERS" value="install -dir /tmp/a/b/c/oa4mp-client -store derby_file -log /tmp/oa4mp.log -v -version snapshot" />
+      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.myproxy.oauth2.tools.OA2Commands" />
+      <module name="server-admin" />
+      <option name="PROGRAM_PARAMETERS" value="-cfg $PROJECT_DIR$/../../csd/config/server-oa2.xml -name localhost:oa4mp.oa2.mariadb" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -362,15 +336,34 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="OA4MPClientInstaller" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="org.oa4mp.client.installer.OA4MPClientInstaller" />
-      <module name="client-installer" />
-      <option name="PROGRAM_PARAMETERS" value="notes" />
+    <configuration name="OA2CopyTool" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.myproxy.oauth2.tools.OA2CopyTool" />
+      <module name="server-admin" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="org.oa4mp.client.installer.*" />
+          <option name="PATTERN" value="edu.uiuc.ncsa.myproxy.oauth2.tools.migrate.*" />
           <option name="ENABLED" value="true" />
         </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="OA4MPServerInstaller" type="Application" factoryName="Application" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.oa4mp.installer.OA4MPServerInstaller" />
+      <module name="server-installer" />
+      <option name="PROGRAM_PARAMETERS" value="install -dir /tmp/oa4mp-test -store pg -log /tmp/oa4mp.log -v -version snapshot" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="edu.uiuc.ncsa.oa4mp.installer.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <extension name="software.aws.toolkits.jetbrains.core.execution.JavaAwsConnectionExtension">
+        <option name="credential" />
+        <option name="region" />
+        <option name="useCurrentConnection" value="false" />
       </extension>
       <method v="2">
         <option name="Make" enabled="true" />
@@ -395,12 +388,27 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="Pacer" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="ALTERNATIVE_JRE_PATH" value="11 (2)" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.core.util.Pacer" />
+      <module name="server-admin" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="edu.uiuc.ncsa.security.core.util.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="QDL CLC" type="Application" factoryName="Application">
       <option name="ALTERNATIVE_JRE_PATH" value="11 (2)" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
-      <option name="MAIN_CLASS_NAME" value="org.oa4mp.server.qdl.clc.QDLCLC" />
+      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.oa2.qdl.clc.QDLCLC" />
       <module name="qdl" />
-      <option name="PROGRAM_PARAMETERS" value="-cfg $PROJECT_DIR$/../../csd/config/auto-test/clients.ini -name ccf.conf.basic" />
+      <option name="PROGRAM_PARAMETERS" value="-cfg $PROJECT_DIR$/../../csd/config/auto-test/clients.ini -name oauth.conf.basic" />
       <extension name="software.aws.toolkits.jetbrains.core.execution.JavaAwsConnectionExtension">
         <option name="credential" />
         <option name="region" />
@@ -443,9 +451,9 @@
     <configuration name="QDL" type="Application" factoryName="Application">
       <option name="ALTERNATIVE_JRE_PATH" value="11 (2)" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
-      <option name="MAIN_CLASS_NAME" value="org.oa4mp.server.qdl.OA4MPQDLWorkspace" />
+      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.oa2.qdl.OA4MPQDLWorkspace" />
       <module name="qdl" />
-      <option name="PROGRAM_PARAMETERS" value="-tty swing -logo os2 -cfg $PROJECT_DIR$/../../csd/config/qdl-cfg.xml -name oa2-dev" />
+      <option name="PROGRAM_PARAMETERS" value="-cfg $PROJECT_DIR$/../../csd/config/qdl-cfg.xml -name oa2-dev -tty swing" />
       <extension name="software.aws.toolkits.jetbrains.core.execution.JavaAwsConnectionExtension">
         <option name="credential" />
         <option name="region" />
@@ -456,12 +464,11 @@
       </method>
     </configuration>
     <configuration name="QDLConfigLoader" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="org.oa4mp.server.qdl.clc.QDLConfigLoader" />
+      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.oa2.qdl.clc.QDLConfigLoader" />
       <module name="qdl" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="org.oa4mp.server.qdl.clc.*" />
+          <option name="PATTERN" value="edu.uiuc.ncsa.oa2.qdl.clc.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -499,20 +506,27 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Server Installer" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="org.oa4mp.server.installer.OA4MPServerInstaller" />
-      <module name="server-installer" />
-      <option name="PROGRAM_PARAMETERS" value="install -dir /tmp/a/b/c/oa4mp-test -store derby_file -log /tmp/oa4mp.log -v -version snapshot" />
+    <configuration name="TokenFactory" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenFactory" />
+      <module name="common" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="edu.uiuc.ncsa.oa4mp.installer.*" />
+          <option name="PATTERN" value="edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <extension name="software.aws.toolkits.jetbrains.core.execution.JavaAwsConnectionExtension">
-        <option name="credential" />
-        <option name="region" />
-        <option name="useCurrentConnection" value="false" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TokenFactory" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.TokenFactory" />
+      <module name="common" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="edu.uiuc.ncsa.oa4mp.delegation.common.token.impl.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
       </extension>
       <method v="2">
         <option name="Make" enabled="true" />
@@ -527,9 +541,8 @@
     <configuration name="jwt" type="Application" factoryName="Application">
       <option name="ALTERNATIVE_JRE_PATH" value="11 (2)" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
-      <option name="MAIN_CLASS_NAME" value="org.oa4mp.server.admin.myproxy.oauth2.tools.JWKCLI" />
+      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.myproxy.oauth2.tools.JWKCLI" />
       <module name="server-admin" />
-      <option name="PROGRAM_PARAMETERS" value="-batchFile /tmp/a/b/c/oa4mp-client/etc/create_keys.cmd" />
       <extension name="software.aws.toolkits.jetbrains.core.execution.JavaAwsConnectionExtension">
         <option name="credential" />
         <option name="region" />
@@ -583,33 +596,12 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="QDLTests.testVFSFileClaimSourceA" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="server-test" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="org.oa4mp.server.test.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="org.oa4mp.server.test" />
-      <option name="MAIN_CLASS_NAME" value="org.oa4mp.server.test.QDLTests" />
-      <option name="METHOD_NAME" value="testVFSFileClaimSourceA" />
-      <option name="TEST_OBJECT" value="method" />
-      <option name="VM_PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="moduleWithDependencies" />
-      </option>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="Test Suite" type="JUnit" factoryName="JUnit">
       <module name="server-test" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
       <option name="ALTERNATIVE_JRE_PATH" value="11 (2)" />
-      <option name="PACKAGE_NAME" value="org.oa4mp.server.test" />
-      <option name="MAIN_CLASS_NAME" value="org.oa4mp.server.test.ServiceTestSuite2" />
+      <option name="PACKAGE_NAME" value="test" />
+      <option name="MAIN_CLASS_NAME" value="test.ServiceTestSuite2" />
       <option name="METHOD_NAME" value="" />
       <option name="TEST_OBJECT" value="class" />
       <option name="VM_PARAMETERS" value="-ea " />
@@ -688,9 +680,20 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Scratch 2" type="Java Scratch" temporary="true">
+    <configuration name="Derby Scratch" type="Java Scratch" temporary="true">
+      <option name="ALTERNATIVE_JRE_PATH" value="11 (2)" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
       <option name="MAIN_CLASS_NAME" value="Scratch" />
+      <module name="server-test" />
+      <option name="SCRATCH_FILE_URL" value="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_10.java" />
       <shortenClasspath name="NONE" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Scratch (1)" type="Java Scratch" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Scratch" />
+      <option name="SCRATCH_FILE_URL" value="file://$APPLICATION_CONFIG_DIR$/scratches/scratch.java" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -709,11 +712,9 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Scratch" type="Java Scratch" temporary="true" nameIsGenerated="true">
+    <configuration name="Scratch (2)" type="Java Scratch" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="Scratch" />
-      <module name="server-admin" />
-      <option name="SCRATCH_FILE_URL" value="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_2.java" />
-      <shortenClasspath name="NONE" />
+      <option name="SCRATCH_FILE_URL" value="file://$APPLICATION_CONFIG_DIR$/scratches/watch_ex.java" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -725,7 +726,14 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="OA4MP server" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat 9.0.91" ALTERNATIVE_JRE_ENABLED="true" ALTERNATIVE_JRE_PATH="11 (2)">
+    <configuration name="Scratch" type="Java Scratch" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Scratch" />
+      <option name="SCRATCH_FILE_URL" value="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_1.java" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="OA4MP server" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat 9.0.65" ALTERNATIVE_JRE_ENABLED="false">
       <option name="OPEN_IN_BROWSER_URL" value="https://localhost:9443/client2/" />
       <option name="UPDATING_POLICY" value="restart-server" />
       <deployment>
@@ -820,8 +828,8 @@
       <method v="2">
         <option name="Make" enabled="true" />
         <option name="BuildArtifacts" enabled="true">
-          <artifact name="oa4mp-server-oauth2:war" />
           <artifact name="client-oauth2:war" />
+          <artifact name="oa4mp-server-oauth2:war" />
         </option>
       </method>
     </configuration>
@@ -1027,8 +1035,6 @@
     </configuration>
     <list>
       <item itemvalue="Application.OA4MPServerInstaller" />
-      <item itemvalue="Application.Server Installer" />
-      <item itemvalue="Application.Client Installer" />
       <item itemvalue="Application.Installer" />
       <item itemvalue="Application.jwt" />
       <item itemvalue="Application.FSMigrate" />
@@ -1037,24 +1043,24 @@
       <item itemvalue="Application.CLI" />
       <item itemvalue="Application.QDL CLC" />
       <item itemvalue="Application.QDL" />
+      <item itemvalue="Application.OA2CopyTool" />
+      <item itemvalue="Application.Pacer" />
       <item itemvalue="Application.QDLConfigLoader" />
-      <item itemvalue="Application.OA4MPClientInstaller" />
-      <item itemvalue="Java Scratch.Derby Scratch" />
+      <item itemvalue="Application.TokenFactory" />
+      <item itemvalue="Java Scratch.Scratch" />
       <item itemvalue="Java Scratch.Scratch (1)" />
       <item itemvalue="Java Scratch.Scratch (2)" />
-      <item itemvalue="Java Scratch.Scratch" />
-      <item itemvalue="Java Scratch.Scratch 2" />
+      <item itemvalue="Java Scratch.Derby Scratch" />
       <item itemvalue="JUnit.Test Suite" />
-      <item itemvalue="JUnit.QDLTests.testVFSFileClaimSourceA" />
       <item itemvalue="Tomcat Server.OA4MP server" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.QDLTests.testVFSFileClaimSourceA" />
-        <item itemvalue="Application.QDLConfigLoader" />
+        <item itemvalue="Java Scratch.Derby Scratch" />
+        <item itemvalue="Java Scratch.Scratch (2)" />
+        <item itemvalue="Java Scratch.Scratch (1)" />
         <item itemvalue="Java Scratch.Scratch" />
-        <item itemvalue="Java Scratch.Scratch 2" />
-        <item itemvalue="Application.OA4MPClientInstaller" />
+        <item itemvalue="Application.TokenFactory" />
       </list>
     </recent_temporary>
   </component>
@@ -1130,16 +1136,71 @@
       <workItem from="1719404308274" duration="78113000" />
       <workItem from="1719860097249" duration="3196000" />
       <workItem from="1719877866068" duration="8695000" />
-      <workItem from="1722602736730" duration="3767000" />
-      <workItem from="1722857711712" duration="5241000" />
-      <workItem from="1722953718235" duration="9939000" />
-      <workItem from="1723048214781" duration="2108000" />
-      <workItem from="1723058557435" duration="35682000" />
-      <workItem from="1723637905667" duration="15592000" />
-      <workItem from="1723846044829" duration="12406000" />
-      <workItem from="1724671040061" duration="88175000" />
-      <workItem from="1726051918658" duration="61220000" />
-      <workItem from="1726656910058" duration="360307000" />
+      <workItem from="1730313506368" duration="4527000" />
+    </task>
+    <task id="LOCAL-00001" summary="Added option for file stores to delete files they cannot parse. Updated client loader too. &#10;https://github.com/ncsa/oa4mp/issues/151&#10;https://github.com/ncsa/oa4mp/issues/150&#10;https://github.com/ncsa/oa4mp/issues/149">
+      <option name="closed" value="true" />
+      <created>1702683147192</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1702683147192</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Refactoring client configurations to allow for using a QDL ini file. Trying to decouple XML from configurations. Implemented QDL ini file parsing for the command line client.">
+      <option name="closed" value="true" />
+      <created>1703199386896</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1703199386896</updated>
+    </task>
+    <task id="LOCAL-00003" summary="https://github.com/ncsa/oa4mp/issues/153 get the issuer from the well-known page for the command line client since checks are now failing for the ID tokens.">
+      <option name="closed" value="true" />
+      <created>1704237008240</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1704237008240</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Merge from 5.4.3. Also updated CILogon QDL installer so it runs without invoking other build manually.">
+      <option name="closed" value="true" />
+      <created>1705433242260</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1705433242260</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Fix https://github.com/ncsa/oa4mp/issues/157 Updated tests and refactored testing harness to remove duplicate code blocks.">
+      <option name="closed" value="true" />
+      <created>1706109270179</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1706109270179</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Added ability in QDL to simply set the file source claim and be done with it. This allows for having a file source in the virtual file system and therefore completely under QDL's control. Also refactored testing code.">
+      <option name="closed" value="true" />
+      <created>1706226398751</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1706226398751</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Fix https://github.com/ncsa/oa4mp/issues/159. Client management endpoint should preserve the grace period, not zero it out (thereby disabling grace periods for any unwitting clients.)">
+      <option name="closed" value="true" />
+      <created>1706307730563</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1706307730563</updated>
+    </task>
+    <task id="LOCAL-00008" summary="First part of fixing https://github.com/ncsa/oa4mp/issues/161. refactored test code">
+      <option name="closed" value="true" />
+      <created>1706655602716</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1706655602716</updated>
     </task>
     <task id="LOCAL-00009" summary="Partial commit of large-scale refactoring of tests. Found an issue in the ID token Handler where downscoping on refreshes would not quite work right.">
       <option name="closed" value="true" />
@@ -1381,159 +1442,39 @@
       <option name="project" value="LOCAL" />
       <updated>1721819529163</updated>
     </task>
-    <task id="LOCAL-00039" summary="https://github.com/ncsa/oa4mp/issues/116,&#10;https://github.com/ncsa/oa4mp/issues/200, &#10;https://github.com/ncsa/oa4mp/issues/201">
+    <task id="LOCAL-00039" summary="Commit website">
       <option name="closed" value="true" />
-      <created>1722548010965</created>
+      <created>1722375437512</created>
       <option name="number" value="00039" />
       <option name="presentableId" value="LOCAL-00039" />
       <option name="project" value="LOCAL" />
-      <updated>1722548010965</updated>
+      <updated>1722375437512</updated>
     </task>
-    <task id="LOCAL-00040" summary="https://jira.ncsa.illinois.edu/browse/CIL-1852">
+    <task id="LOCAL-00040" summary="Commit 5.6 website">
       <option name="closed" value="true" />
-      <created>1723574656746</created>
+      <created>1722428088854</created>
       <option name="number" value="00040" />
       <option name="presentableId" value="LOCAL-00040" />
       <option name="project" value="LOCAL" />
-      <updated>1723574656746</updated>
+      <updated>1722428088854</updated>
     </task>
-    <task id="LOCAL-00041" summary="Updates to store API for QDL.">
+    <task id="LOCAL-00041" summary="Commit 5.6 website redux, installer fixes">
       <option name="closed" value="true" />
-      <created>1724709608542</created>
+      <created>1722459656167</created>
       <option name="number" value="00041" />
       <option name="presentableId" value="LOCAL-00041" />
       <option name="project" value="LOCAL" />
-      <updated>1724709608542</updated>
+      <updated>1722459656167</updated>
     </task>
-    <task id="LOCAL-00042" summary="Partial migration of package names.">
+    <task id="LOCAL-00042" summary="Temp save for migration">
       <option name="closed" value="true" />
-      <created>1726093622945</created>
+      <created>1730318303085</created>
       <option name="number" value="00042" />
       <option name="presentableId" value="LOCAL-00042" />
       <option name="project" value="LOCAL" />
-      <updated>1726093622945</updated>
+      <updated>1730318303085</updated>
     </task>
-    <task id="LOCAL-00043" summary="https://github.com/ncsa/oa4mp/issues/205">
-      <option name="closed" value="true" />
-      <created>1726164149400</created>
-      <option name="number" value="00043" />
-      <option name="presentableId" value="LOCAL-00043" />
-      <option name="project" value="LOCAL" />
-      <updated>1726164149401</updated>
-    </task>
-    <task id="LOCAL-00044" summary="Updated package names for website">
-      <option name="closed" value="true" />
-      <created>1726164274122</created>
-      <option name="number" value="00044" />
-      <option name="presentableId" value="LOCAL-00044" />
-      <option name="project" value="LOCAL" />
-      <updated>1726164274122</updated>
-    </task>
-    <task id="LOCAL-00045" summary="Renamed teh QDL modules' namespace to start with oa4mp, not the old oa2. Added Java serialization to someclasses to make sure QDL's contract of still (for now) allowing it is not broken.">
-      <option name="closed" value="true" />
-      <created>1726595661955</created>
-      <option name="number" value="00045" />
-      <option name="presentableId" value="LOCAL-00045" />
-      <option name="project" value="LOCAL" />
-      <updated>1726595661955</updated>
-    </task>
-    <task id="LOCAL-00046" summary="Small tweaks (documentation) and fix https://github.com/ncsa/oa4mp/issues/207">
-      <option name="closed" value="true" />
-      <created>1726922097470</created>
-      <option name="number" value="00046" />
-      <option name="presentableId" value="LOCAL-00046" />
-      <option name="project" value="LOCAL" />
-      <updated>1726922097470</updated>
-    </task>
-    <task id="LOCAL-00047" summary="Javadoc after package rename.">
-      <option name="closed" value="true" />
-      <created>1726922133406</created>
-      <option name="number" value="00047" />
-      <option name="presentableId" value="LOCAL-00047" />
-      <option name="project" value="LOCAL" />
-      <updated>1726922133406</updated>
-    </task>
-    <task id="LOCAL-00048" summary="Checkin before break, massive doc update">
-      <option name="closed" value="true" />
-      <created>1727906450127</created>
-      <option name="number" value="00048" />
-      <option name="presentableId" value="LOCAL-00048" />
-      <option name="project" value="LOCAL" />
-      <updated>1727906450127</updated>
-    </task>
-    <task id="LOCAL-00049" summary="Before Github 211 fix attempt">
-      <option name="closed" value="true" />
-      <created>1729114784110</created>
-      <option name="number" value="00049" />
-      <option name="presentableId" value="LOCAL-00049" />
-      <option name="project" value="LOCAL" />
-      <updated>1729114784110</updated>
-    </task>
-    <task id="LOCAL-00050" summary="https://github.com/ncsa/oa4mp/issues/211. Fixed with regression test. Tests for client credentials flow added.">
-      <option name="closed" value="true" />
-      <created>1729163220991</created>
-      <option name="number" value="00050" />
-      <option name="presentableId" value="LOCAL-00050" />
-      <option name="project" value="LOCAL" />
-      <updated>1729163220991</updated>
-    </task>
-    <task id="LOCAL-00051" summary="https://github.com/ncsa/oa4mp/issues/212. Added lots of tests for the new client credentials flow using RFC 7523 and lots of tweaks to tests.">
-      <option name="closed" value="true" />
-      <created>1729343653210</created>
-      <option name="number" value="00051" />
-      <option name="presentableId" value="LOCAL-00051" />
-      <option name="project" value="LOCAL" />
-      <updated>1729343653210</updated>
-    </task>
-    <task id="LOCAL-00052" summary="https://github.com/ncsa/oa4mp/issues/213. Documentation">
-      <option name="closed" value="true" />
-      <created>1729832340815</created>
-      <option name="number" value="00052" />
-      <option name="presentableId" value="LOCAL-00052" />
-      <option name="project" value="LOCAL" />
-      <updated>1729832340815</updated>
-    </task>
-    <task id="LOCAL-00053" summary="Updated version and re-generate website">
-      <option name="closed" value="true" />
-      <created>1729878916804</created>
-      <option name="number" value="00053" />
-      <option name="presentableId" value="LOCAL-00053" />
-      <option name="project" value="LOCAL" />
-      <updated>1729878916804</updated>
-    </task>
-    <task id="LOCAL-00054" summary="6.0 release check in">
-      <option name="closed" value="true" />
-      <created>1729881932968</created>
-      <option name="number" value="00054" />
-      <option name="presentableId" value="LOCAL-00054" />
-      <option name="project" value="LOCAL" />
-      <updated>1729881932968</updated>
-    </task>
-    <task id="LOCAL-00055" summary="installer update">
-      <option name="closed" value="true" />
-      <created>1730040234654</created>
-      <option name="number" value="00055" />
-      <option name="presentableId" value="LOCAL-00055" />
-      <option name="project" value="LOCAL" />
-      <updated>1730040234654</updated>
-    </task>
-    <task id="LOCAL-00056" summary="Regenerate website">
-      <option name="closed" value="true" />
-      <created>1730040628208</created>
-      <option name="number" value="00056" />
-      <option name="presentableId" value="LOCAL-00056" />
-      <option name="project" value="LOCAL" />
-      <updated>1730040628208</updated>
-    </task>
-    <task id="LOCAL-00057" summary="Work on the client and server installer. Derby file store  now works across the board and the the install script for clients has been updated. The website required a lot of updaing, since the &quot;getting started&quot; paged was at least 5 yeas old.">
-      <option name="closed" value="true" />
-      <created>1730149379137</created>
-      <option name="number" value="00057" />
-      <option name="presentableId" value="LOCAL-00057" />
-      <option name="project" value="LOCAL" />
-      <updated>1730149379137</updated>
-    </task>
-    <option name="localTasksCounter" value="58" />
+    <option name="localTasksCounter" value="43" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1542,34 +1483,45 @@
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.cfg" />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
+    <MESSAGE value="https://github.com/ncsa/security-lib/issues/34" />
+    <MESSAGE value="https://github.com/ncsa/oa4mp/issues/169&#10;https://github.com/ncsa/oa4mp/issues/170&#10;https://github.com/ncsa/oa4mp/issues/171&#10;&#10;Nice refactoring of some classes too." />
+    <MESSAGE value="Another test update" />
+    <MESSAGE value="Updates to command line tool for migration. Was missing loading the UpKeep configuration in admin clients if present." />
+    <MESSAGE value="Documentation..." />
+    <MESSAGE value="Corrections from 5.5 release, mostly for building the PDFs right." />
+    <MESSAGE value="Fix for https://github.com/ncsa/oa4mp/issues/176. Added tests, updated documentation." />
+    <MESSAGE value="Added meta-test." />
+    <MESSAGE value="Sync with 5.5" />
+    <MESSAGE value="Fixes for&#10;https://github.com/ncsa/oa4mp/issues/188&#10;https://github.com/ncsa/oa4mp/issues/187&#10;https://github.com/ncsa/oa4mp/issues/186&#10;https://github.com/ncsa/oa4mp/issues/185&#10;https://github.com/ncsa/oa4mp/issues/181&#10;https://github.com/ncsa/oa4mp/issues/180&#10;https://github.com/ncsa/oa4mp/issues/179" />
+    <MESSAGE value="Tomcat regression tests, making sure server scripts are tested and working." />
+    <MESSAGE value="examples updated and the build scripts were updated." />
+    <MESSAGE value="https://github.com/ncsa/oa4mp/issues/192 Add documentation for using RFC 7523 with OA4MP. Slight improvement with creating JWKs at the command line." />
+    <MESSAGE value="Updating all the documentation" />
+    <MESSAGE value="https://github.com/ncsa/oa4mp/issues/193&#10;Installer for Qi Wu (ostensibly -- long overdue)" />
     <MESSAGE value="Noting that https://github.com/ncsa/oa4mp/issues/117 was addressed." />
     <MESSAGE value="Fixes https://jira.ncsa.illinois.edu/browse/CIL-2019" />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/196. Document the JWT util and added a startup script for OA4MP installs to create a set of signing keys." />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/197, https://github.com/ncsa/oa4mp/issues/198" />
     <MESSAGE value="Update website" />
     <MESSAGE value="Update of website. Added support for echoing requests in CLC." />
-    <MESSAGE value="https://github.com/ncsa/oa4mp/issues/116,&#10;https://github.com/ncsa/oa4mp/issues/200, &#10;https://github.com/ncsa/oa4mp/issues/201" />
-    <MESSAGE value="https://jira.ncsa.illinois.edu/browse/CIL-1852" />
-    <MESSAGE value="Updates to store API for QDL." />
-    <MESSAGE value="Partial migration of package names." />
-    <MESSAGE value="https://github.com/ncsa/oa4mp/issues/205" />
-    <MESSAGE value="Updated package names for website" />
-    <MESSAGE value="Renamed teh QDL modules' namespace to start with oa4mp, not the old oa2. Added Java serialization to someclasses to make sure QDL's contract of still (for now) allowing it is not broken." />
-    <MESSAGE value="Small tweaks (documentation) and fix https://github.com/ncsa/oa4mp/issues/207" />
-    <MESSAGE value="Javadoc after package rename." />
-    <MESSAGE value="Checkin before break, massive doc update" />
-    <MESSAGE value="Before Github 211 fix attempt" />
-    <MESSAGE value="https://github.com/ncsa/oa4mp/issues/211. Fixed with regression test. Tests for client credentials flow added." />
-    <MESSAGE value="https://github.com/ncsa/oa4mp/issues/212. Added lots of tests for the new client credentials flow using RFC 7523 and lots of tweaks to tests." />
-    <MESSAGE value="https://github.com/ncsa/oa4mp/issues/213. Documentation" />
-    <MESSAGE value="Updated version and re-generate website" />
-    <MESSAGE value="6.0 release check in" />
-    <MESSAGE value="installer update" />
-    <MESSAGE value="Regenerate website" />
-    <MESSAGE value="Work on the client and server installer. Derby file store  now works across the board and the the install script for clients has been updated. The website required a lot of updaing, since the &quot;getting started&quot; paged was at least 5 yeas old." />
-    <option name="LAST_COMMIT_MESSAGE" value="Work on the client and server installer. Derby file store  now works across the board and the the install script for clients has been updated. The website required a lot of updaing, since the &quot;getting started&quot; paged was at least 5 yeas old." />
+    <MESSAGE value="Commit website" />
+    <MESSAGE value="Commit 5.6 website" />
+    <MESSAGE value="Commit 5.6 website redux, installer fixes" />
+    <MESSAGE value="Temp save for migration" />
+    <option name="LAST_COMMIT_MESSAGE" value="Temp save for migration" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
