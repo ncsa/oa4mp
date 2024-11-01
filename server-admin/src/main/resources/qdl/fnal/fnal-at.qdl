@@ -172,7 +172,7 @@ say(' requested_scopes. =' + input_form(requested_scopes.));
 if[
     exec_phase == 'post_token'
   ][
-    output_scopes. := resolve_templates(caps., requested_scopes., true);
+    output_scopes. := claims#resolve_templates(caps., requested_scopes., true);
 ];
 
 
@@ -182,7 +182,7 @@ if[
 if[
     exec_phase == 'post_exchange' || exec_phase == 'post_refresh'
   ][
-        output_scopes. := resolve_templates(caps., requested_scopes., true);
+        output_scopes. := claims#resolve_templates(caps., requested_scopes., true);
 ];
 
  say('new output_scopes = ' + to_string(output_scopes.));

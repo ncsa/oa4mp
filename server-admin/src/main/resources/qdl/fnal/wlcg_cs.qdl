@@ -127,6 +127,6 @@ if[
 ];
 
 wlcg_cs. := record.EPE.;
-wlcg_cs. := template_substitution(wlcg_cs., claims.);
+wlcg_cs. := claims#template_substitution(wlcg_cs., claims.);
 say('*** WLCG_CS debug, returning: ' + to_string(wlcg_cs., true));
 return([vault_id, at_sub, wlcg_cs.]);

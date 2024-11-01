@@ -40,7 +40,7 @@ block[
             return(∅);
     ];
 
-    xi. := resolve_templates(at_claims.EPE., scopes., true);  // first pass, get explicitly allowed scopes
+    xi. := claims#resolve_templates(at_claims.EPE., scopes., true);  // first pass, get explicitly allowed scopes
 
     ccc := theta.0 - CS_HEAD;
     record. :=  script_load('fnal/new/get_service.qdl',  ccc+'@fnal.gov');
@@ -59,10 +59,10 @@ block[
              is_defined(record.EPE.)
           ][
              // do any substitutions in the templates.
-             s_rec. := template_substitution(record.EPE., claims.);
+             s_rec. := claims#template_substitution(record.EPE., claims.);
              say('*** FNAL eta. post subst =' + to_string(s_rec.));
              // Get any specific overrides.
-             eta. := resolve_templates(s_rec., scopes., true);
+             eta. := claims#resolve_templates(s_rec., scopes., true);
              say('*** FNAL eta. =' + to_string(eta.));
              xi. := xi. ~ eta. ~ s_rec.; // duplicates ok here, removed later
          ]; // no capabilites means do nothing.

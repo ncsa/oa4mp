@@ -234,7 +234,8 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
 
             SerializationState serializationState = new SerializationState();
             serializationState.setVersion(SerializationConstants.VERSION_2_1_TAG);
-            state.deserializeFromJSON(JSONObject.fromObject(rawJSON), serializationState);
+            JSONObject jsonObject = JSONObject.fromObject(rawJSON);
+            state.deserializeFromJSON(jsonObject, serializationState);
         } catch (Throwable e) {
             DebugUtil.trace(this, "error deserializing state", e);
             if (e instanceof RuntimeException) {
