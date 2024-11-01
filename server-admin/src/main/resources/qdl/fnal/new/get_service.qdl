@@ -32,6 +32,6 @@ block[
     service_cfg.search_attributes. :=  [EPPN, EPE, VOPAUID];
               service_cfg.username := ini.'name';
               service_cfg.password := ini.'pwd';
-
-    return(claims#get_claims(claims#create_source(service_cfg.), script_args(0)));
+                                 x := args().0;
+    return(claims#get_claims(claims#create_source(service_cfg.), x));
 ];
