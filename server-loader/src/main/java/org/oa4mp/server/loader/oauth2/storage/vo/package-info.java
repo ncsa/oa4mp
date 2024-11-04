@@ -1,5 +1,5 @@
 /**
- * Virtual organization storage.
+ * Virtual issuer storage.
  * <p>Created by Jeff Gaynor<br>
  * on 3/8/21 at  1:27 PM
  */

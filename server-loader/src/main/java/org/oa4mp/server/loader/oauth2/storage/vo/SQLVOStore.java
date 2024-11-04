@@ -19,7 +19,7 @@ import java.util.Date;
  * <p>Created by Jeff Gaynor<br>
  * on 2/19/21 at  4:48 PM
  */
-public class SQLVOStore<V extends VirtualOrganization> extends MonitoredSQLStore<V> implements VOStore<V> {
+public class SQLVOStore<V extends VirtualIssuer> extends MonitoredSQLStore<V> implements VIStore<V> {
     public SQLVOStore(ConnectionPool connectionPool, Table table, Provider<V> identifiableProvider, MapConverter<V> converter) {
         super(connectionPool, table, identifiableProvider, converter);
     }
@@ -28,7 +28,7 @@ public class SQLVOStore<V extends VirtualOrganization> extends MonitoredSQLStore
     public V findByPath(String component) {
         String pathQuery = "select * from " + getTable().getFQTablename()
                 + " where "
-                + ((VOSerializationKeys) getMapConverter().getKeys()).discoveryPath()
+                + ((VISerializationKeys) getMapConverter().getKeys()).discoveryPath()
                 + " = ?";
         ConnectionRecord cr = getConnection();
         Connection c = cr.connection;
@@ -55,7 +55,7 @@ public class SQLVOStore<V extends VirtualOrganization> extends MonitoredSQLStore
             releaseConnection(cr);
         } catch (SQLException e) {
             destroyConnection(cr);
-            throw new GeneralException("Error getting virtual organization with path component \"" + component + "\"", e);
+            throw new GeneralException("Error getting virtual issuer with path component \"" + component + "\"", e);
         }
         return vo;
     }
@@ -74,7 +74,7 @@ public class SQLVOStore<V extends VirtualOrganization> extends MonitoredSQLStore
 
     @Override
     public String getCreationTSField() {
-        return ((VOSerializationKeys)getMapConverter().getKeys()).creationTS();
+        return ((VISerializationKeys)getMapConverter().getKeys()).creationTS();
     }
 }
 

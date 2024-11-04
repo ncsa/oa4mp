@@ -12,7 +12,7 @@ import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
 import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
 import org.oa4mp.server.loader.oauth2.storage.transactions.OA2TStoreInterface;
 import org.oa4mp.server.loader.oauth2.storage.tx.TXRecord;
-import org.oa4mp.server.loader.oauth2.storage.vo.VirtualOrganization;
+import org.oa4mp.server.loader.oauth2.storage.vo.VirtualIssuer;
 import org.oa4mp.server.loader.oauth2.tokens.UITokenUtils;
 import org.oa4mp.server.api.admin.adminClient.AdminClient;
 import org.oa4mp.server.api.admin.permissions.Permission;
@@ -573,7 +573,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         }
         issuerTransactionState = doAT(issuerTransactionState, client);
         // Now, get the right signing key
-        VirtualOrganization vo = getOA2SE().getVO(client.getIdentifier());
+        VirtualIssuer vo = getOA2SE().getVI(client.getIdentifier());
         JSONWebKey key = null;
         if (vo != null && vo.getJsonWebKeys() != null) {
             key = vo.getJsonWebKeys().get(vo.getDefaultKeyID());
@@ -697,13 +697,13 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         if (isAdminClient) {
             if (token.isJWT()) {
                 JSONWebKeys jsonWebKeys;
-                if (adminClient.getVirtualOrganization() == null) {
+                if (adminClient.getVirtualIssuer() == null) {
                     jsonWebKeys = oa2SE.getJsonWebKeys();
                 } else {
-                    VirtualOrganization vo = (VirtualOrganization) oa2SE.getVOStore().get(adminClient.getVirtualOrganization());
+                    VirtualIssuer vo = (VirtualIssuer) oa2SE.getVOStore().get(adminClient.getVirtualIssuer());
                     if (vo == null) {
                         // Admin client is in a VO but no such VO is found. This implies an internal error
-                        throw new NFWException("Virtual organization \"" + adminClient.getVirtualOrganization() + "\"not found.");
+                        throw new NFWException("Virtual issuer \"" + adminClient.getVirtualIssuer() + "\"not found.");
                     }
                     jsonWebKeys = vo.getJsonWebKeys();
                 }
@@ -712,7 +712,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         } else {
             if (at.isJWT()) {
                 JSONWebKeys jsonWebKeys;
-                VirtualOrganization vo = getOA2SE().getVO(clientID);
+                VirtualIssuer vo = getOA2SE().getVI(clientID);
                 if (vo == null) {
                     jsonWebKeys = oa2SE.getJsonWebKeys();
                 } else {
@@ -2038,7 +2038,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         if (debugger == null) {
             debugger = MyProxyDelegationServlet.createDebugger(client);
         }
-        VirtualOrganization vo = oa2SE.getVO(client.getIdentifier());
+        VirtualIssuer vo = oa2SE.getVI(client.getIdentifier());
         JSONWebKey key = null;
         if (vo != null && vo.getJsonWebKeys() != null) {
             key = vo.getJsonWebKeys().get(vo.getDefaultKeyID());
@@ -2334,7 +2334,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         }
 
         rtiResponse.setServiceTransaction(t);
-        VirtualOrganization vo = oa2SE.getVO(client.getIdentifier());
+        VirtualIssuer vo = oa2SE.getVI(client.getIdentifier());
 
         if (vo == null) {
             rtiResponse.setJsonWebKey(oa2SE.getJsonWebKeys().getDefault());
@@ -2515,7 +2515,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         //      atResponse.setClaimSources(setupClaimSources(transaction, oa2SE));
 
         atResponse.setServiceTransaction(transaction);
-        VirtualOrganization vo = oa2SE.getVO(transaction.getClient().getIdentifier());
+        VirtualIssuer vo = oa2SE.getVI(transaction.getClient().getIdentifier());
         if (vo == null) {
             atResponse.setJsonWebKey(oa2SE.getJsonWebKeys().getDefault());
         } else {
@@ -2733,7 +2733,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         }
         debugger.trace(this, "returns from doAT");
         OA2SE oa2se = (OA2SE) MyProxyDelegationServlet.getServiceEnvironment();
-        VirtualOrganization vo = oa2se.getVO(transaction.getClient().getIdentifier());
+        VirtualIssuer vo = oa2se.getVI(transaction.getClient().getIdentifier());
         if (vo == null) {
             debugger.trace(this, "no vo");
             ((ATIResponse2) issuerTransactionState.getIssuerResponse()).setJsonWebKey((oa2se).getJsonWebKeys().getDefault());

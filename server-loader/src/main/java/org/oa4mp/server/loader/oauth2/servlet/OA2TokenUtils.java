@@ -5,7 +5,7 @@ import org.oa4mp.server.loader.oauth2.storage.RefreshTokenStore;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
 import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
 import org.oa4mp.server.loader.oauth2.storage.tx.TXRecord;
-import org.oa4mp.server.loader.oauth2.storage.vo.VirtualOrganization;
+import org.oa4mp.server.loader.oauth2.storage.vo.VirtualIssuer;
 import org.oa4mp.server.api.util.ClientDebugUtil;
 import org.oa4mp.delegation.common.storage.clients.BaseClient;
 import edu.uiuc.ncsa.security.core.exceptions.InvalidAlgorithmException;
@@ -47,7 +47,7 @@ public class OA2TokenUtils {
      * @return
      */
     public static JSONWebKeys getKeys(OA2SE oa2se, OA2Client client) {
-        VirtualOrganization vo = oa2se.getVO(client.getIdentifier());
+        VirtualIssuer vo = oa2se.getVI(client.getIdentifier());
         //CIL-974
         JSONWebKeys keys = ((OA2SE) getServiceEnvironment()).getJsonWebKeys();
 

@@ -9,27 +9,27 @@ import org.apache.commons.configuration.tree.ConfigurationNode;
  * <p>Created by Jeff Gaynor<br>
  * on 12/17/20 at  10:02 AM
  */
-public class VOMultiStoreProvider<T extends VOStore<? extends VirtualOrganization>> extends MonitoredMultiTypeProvider<T> {
+public class VOMultiStoreProvider<T extends VIStore<? extends VirtualIssuer>> extends MonitoredMultiTypeProvider<T> {
     public VOMultiStoreProvider(ConfigurationNode config,
                                 boolean disableDefaultStore,
                                 MyLoggingFacade logger,
                                 String type,
                                 String target,
                                 VOProvider voProvider,
-                                VOConverter voConverter) {
+                                VIConverter VIConverter) {
         super(config, disableDefaultStore, logger, type, target);
-        this.voConverter = voConverter;
+        this.VIConverter = VIConverter;
         this.voProvider = voProvider;
     }
 
     VOProvider voProvider = null;
-    VOConverter voConverter = null;
+    VIConverter VIConverter = null;
 
     @Override
     public T getDefaultStore() {
         if (disableDefaultStore) {
             throw new GeneralException("Error: default stores for this configuration have been disabled and none has been specified. Aborting...");
         }
-        return (T) new VOMemoryStore(voProvider, voConverter);
+        return (T) new VIMemoryStore(voProvider, VIConverter);
     }
 }

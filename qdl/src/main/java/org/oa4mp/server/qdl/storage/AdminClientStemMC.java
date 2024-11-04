@@ -93,10 +93,10 @@ public class AdminClientStemMC<V extends AdminClient> extends StemConverter<V> {
             v.setMaxClients(stem.getLong(kk().maxClients()).intValue());
         }
         if (isStringKeyOK(stem, kk().vo())) {
-            v.setVirtualOrganization(BasicIdentifier.newID(stem.getString(kk().voURI())));
+            v.setVirtualIssuer(BasicIdentifier.newID(stem.getString(kk().voURI())));
         }
         if (isStringKeyOK(stem, kk().voURI())) {
-            v.setExternalVOName(stem.getString(kk().voURI()));
+            v.setExternalVIName(stem.getString(kk().voURI()));
         }
 
         return v;
@@ -126,8 +126,8 @@ public class AdminClientStemMC<V extends AdminClient> extends StemConverter<V> {
         stem.put(kk().maxClients(), Long.valueOf(v.getMaxClients()));
         setNonNullStemValue(stem, kk().allowQDLCodeBlocks(), v.allowQDLCodeBlocks());
 
-        setNonNullStemValue(stem, kk().voURI(), v.getVirtualOrganization().toString());
-        setNonNullStemValue(stem, kk().vo(), v.getExternalVOName());
+        setNonNullStemValue(stem, kk().voURI(), v.getVirtualIssuer().toString());
+        setNonNullStemValue(stem, kk().vo(), v.getExternalVIName());
         return stem;
     }
 

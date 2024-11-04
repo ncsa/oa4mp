@@ -14,7 +14,7 @@ public class VOTable extends Table {
     public VOTable(SerializationKeys keys, String schema, String tablenamePrefix, String tablename) {
         super(keys, schema, tablenamePrefix, tablename);
     }
-    protected VOSerializationKeys vok(){return (VOSerializationKeys) keys;}
+    protected VISerializationKeys vok(){return (VISerializationKeys) keys;}
 
     @Override
       public void createColumnDescriptors() {

@@ -22,7 +22,7 @@ public interface QDLXMLConstants extends SerializationConstants {
     String STATE = "state";
     String ID_ATTR = "id";
 
-    String VO_ENTRY = "virtual_organization";
+    String VO_ENTRY = "virtual_issuer";
     String VO_JSON_WEB_KEYS = "json_web_keys";
     String VO_DEFAULT_KEY = "default_key";
     String VO_TITLE = "title";

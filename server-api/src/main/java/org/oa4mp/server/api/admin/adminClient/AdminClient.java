@@ -70,7 +70,7 @@ public class AdminClient extends BaseClient {
         super(identifier);
     }
 
-    Identifier virtualOrganization = null;
+    Identifier virtualIssuer = null;
     String issuer;
 
     public String getIssuer() {
@@ -82,31 +82,32 @@ public class AdminClient extends BaseClient {
     }
 
     /**
-     * The  name, used by external applications for their VO. These names have nothing to do
-     * with OA4MP's virtual organization mechanisms and are typically just displayed to the
-     * user at some point.
+     * The  name, used by external applications for their VI. These names have nothing to do
+     * with OA4MP's virtual issuer mechanisms and are typically just displayed to the
+     * user at some point. Normally these are identical to the id of the VI, but
+     * might be different.
      * @return
      */
-    public String getExternalVOName() {
-        return externalVOName;
+    public String getExternalVIName() {
+        return externalVIName;
     }
 
-    public void setExternalVOName(String externalVOName) {
-        this.externalVOName = externalVOName;
+    public void setExternalVIName(String externalVIName) {
+        this.externalVIName = externalVIName;
     }
 
-    String externalVOName;
+    String externalVIName;
 
-    public Identifier getVirtualOrganization() {
-        return virtualOrganization;
+    public Identifier getVirtualIssuer() {
+        return virtualIssuer;
     }
 
-    public void setVirtualOrganization(Identifier virtualOrganization) {
-        this.virtualOrganization = virtualOrganization;
+    public void setVirtualIssuer(Identifier virtualIssuer) {
+        this.virtualIssuer = virtualIssuer;
     }
 
-    public boolean hasVirtualOrganization(){
-        return virtualOrganization!=null;
+    public boolean hasVirtualIssuer(){
+        return virtualIssuer !=null;
     }
     int maxClients = DEFAULT_MAX_NUMBER_OF_OIDC_CLIENTS;
      JSONObject config;
@@ -139,7 +140,7 @@ public class AdminClient extends BaseClient {
         }
         AdminClient ac = (AdminClient) obj;
         if (!checkEquals(getIssuer(), ac.getIssuer())) return false;
-        if (!checkEquals(getVirtualOrganization(), ac.getVirtualOrganization())) return false;
+        if (!checkEquals(getVirtualIssuer(), ac.getVirtualIssuer())) return false;
         if(getMaxClients() != ac.getMaxClients()) return false;
         return super.equals(obj);
     }
@@ -186,9 +187,9 @@ public class AdminClient extends BaseClient {
     public String toString() {
         return "AdminClient{" +
                 "admin_id=" + getIdentifier() +
-                ", virtualOrganization=" + virtualOrganization +
+                ", virtualIssuer=" + virtualIssuer +
                 ", issuer='" + issuer + '\'' +
-                ", externalVOName='" + externalVOName + '\'' +
+                ", externalVOName='" + externalVIName + '\'' +
                 ", maxClients=" + maxClients +
                 ", config=" + config +
                 ", allowQDL=" + allowQDL +

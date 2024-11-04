@@ -3,7 +3,7 @@ package org.oa4mp.server.loader.oauth2.servlet;
 import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
 import org.oa4mp.server.loader.oauth2.storage.tx.TXRecord;
-import org.oa4mp.server.loader.oauth2.storage.vo.VirtualOrganization;
+import org.oa4mp.server.loader.oauth2.storage.vo.VirtualIssuer;
 import org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import org.oa4mp.delegation.common.token.impl.AccessTokenImpl;
@@ -99,7 +99,7 @@ public abstract class BearerTokenServlet extends MyProxyDelegationServlet {
 
            if(at.isJWT()){
                JSONWebKeys keys = ((OA2SE) getServiceEnvironment()).getJsonWebKeys();
-               VirtualOrganization vo = oa2SE.getVO(transaction.getClient().getIdentifier());
+               VirtualIssuer vo = oa2SE.getVI(transaction.getClient().getIdentifier());
 
                if(vo != null){
                     keys = vo.getJsonWebKeys();

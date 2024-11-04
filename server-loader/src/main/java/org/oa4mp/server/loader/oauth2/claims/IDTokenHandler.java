@@ -5,7 +5,7 @@ import org.oa4mp.server.loader.oauth2.servlet.OA2DiscoveryServlet;
 import org.oa4mp.server.loader.oauth2.servlet.OA2HeaderUtils;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
 import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
-import org.oa4mp.server.loader.oauth2.storage.vo.VirtualOrganization;
+import org.oa4mp.server.loader.oauth2.storage.vo.VirtualIssuer;
 import org.oa4mp.server.api.admin.adminClient.AdminClient;
 import org.oa4mp.delegation.common.token.impl.IDTokenImpl;
 import org.oa4mp.delegation.common.token.impl.TokenFactory;
@@ -74,7 +74,7 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
     protected void setIssuer(HttpServletRequest request) {
         issuer = null;
         // So in order
-        VirtualOrganization vo = oa2se.getVO(transaction.getClient().getIdentifier());
+        VirtualIssuer vo = oa2se.getVI(transaction.getClient().getIdentifier());
         DebugUtil.trace(this, "vo = " + vo);
         if (vo != null) {
             issuer = vo.getIssuer();

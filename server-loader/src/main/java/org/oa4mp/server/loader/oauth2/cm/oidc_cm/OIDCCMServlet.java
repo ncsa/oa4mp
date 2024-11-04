@@ -12,7 +12,7 @@ import org.oa4mp.server.loader.oauth2.servlet.OA2HeaderUtils;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2ClientConverter;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2ClientKeys;
-import org.oa4mp.server.loader.oauth2.storage.vo.VirtualOrganization;
+import org.oa4mp.server.loader.oauth2.storage.vo.VirtualIssuer;
 import org.oa4mp.server.api.admin.adminClient.AdminClient;
 import org.oa4mp.server.api.admin.permissions.Permission;
 import org.oa4mp.server.api.storage.servlet.EnvServlet;
@@ -327,12 +327,12 @@ public class OIDCCMServlet extends EnvServlet {
             jsonObject.put("api_versions", versions);  // version list supported on this server
             jsonObject.put(OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_TAG, getOA2SE().getRtGracePeriod() / 1000);
             jsonObject.put(OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_TAG, getOA2SE().getRtGracePeriod() / 1000);
-            if (adminClient == null || !adminClient.hasVirtualOrganization()) {
+            if (adminClient == null || !adminClient.hasVirtualIssuer()) {
                 // Fix https://github.com/ncsa/oa4mp/issues/177
                 jsonObject.put("issuer", getOA2SE().getIssuer());
                 jsonObject.put("at_issuer", getOA2SE().getIssuer());
             } else {
-                VirtualOrganization vo = (VirtualOrganization) getOA2SE().getVOStore().get(adminClient.getVirtualOrganization());
+                VirtualIssuer vo = (VirtualIssuer) getOA2SE().getVOStore().get(adminClient.getVirtualIssuer());
                 jsonObject.put("issuer", vo.getIssuer());
                 jsonObject.put("at_issuer", vo.getAtIssuer());
             }

@@ -8,10 +8,20 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 2/16/21 at  8:52 AM
  */
-//public class VOSerializationKeys extends SerializationKeys {
-public class VOSerializationKeys extends MonitoredKeys {
 
-    public VOSerializationKeys() {
+/*
+╔═════════════════════════════════════════════════════════════╗
+║Re https://github.com/ncsa/oa4mp/issues/216                  ║
+║do NOT change the identifier to reflect the rename of virtual║
+║organizations to virtual issuers or existing OA4MP           ║
+║installs will unrecoverably break!                           ║
+║                                                             ║
+║These have to remain as legacy artifacts.                    ║
+╚═════════════════════════════════════════════════════════════╝
+ */
+public class VISerializationKeys extends MonitoredKeys {
+
+    public VISerializationKeys() {
         identifier("vo_id"); // sets the default identifier for this
         // Changing this to extend MonitoredKeys requires that we change these
         // or existing stuff breaks.
@@ -50,11 +60,6 @@ public class VOSerializationKeys extends MonitoredKeys {
         return atIssuer;
     }
 
-/*    public String creationTS(String... x) {
-        if (0 < x.length) created = x[0];
-        return created;
-    }*/
-
     public String defaultKeyID(String... x) {
         if (0 < x.length) defaultKeyID = x[0];
         return defaultKeyID;
@@ -75,11 +80,6 @@ public class VOSerializationKeys extends MonitoredKeys {
         return jsonWebKeys;
     }
 
- /*   public String lastModifiedTS(String... x) {
-        if (0 < x.length) lastModified = x[0];
-        return lastModified;
-    }*/
-
     public String title(String... x) {
         if (0 < x.length) title = x[0];
         return title;
@@ -89,6 +89,4 @@ public class VOSerializationKeys extends MonitoredKeys {
         if (0 < x.length) valid = x[0];
         return valid;
     }
-
-
 }

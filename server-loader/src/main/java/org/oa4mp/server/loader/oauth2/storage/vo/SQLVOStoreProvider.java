@@ -17,7 +17,7 @@ public class SQLVOStoreProvider<T extends SQLVOStore> extends SQLStoreProvider<T
     public SQLVOStoreProvider(ConfigurationNode config,
                               ConnectionPoolProvider<? extends ConnectionPool> cpp,
                               String type,
-                              VOConverter converter,
+                              VIConverter converter,
                               VOProvider VOProvider) {
         super(config, cpp, type, OA4MPConfigTags.VIRTUAL_ORGANIZATION_STORE,DEFAULT_TABLENAME , converter);
          this.VOProvider = VOProvider;
@@ -28,13 +28,13 @@ public class SQLVOStoreProvider<T extends SQLVOStore> extends SQLStoreProvider<T
     public T newInstance(Table table) {
         T t = (T) new SQLVOStore(getConnectionPool(),
                 (VOTable) table,
-                VOProvider, (VOConverter) converter);
+                VOProvider, (VIConverter) converter);
         t.setUpkeepConfiguration(getUpkeepConfiguration());
         return t;
     }
 
     @Override
     public T get() {
-        return newInstance(new VOTable((VOSerializationKeys)converter.keys,getSchema(),getPrefix(), getTablename()));
+        return newInstance(new VOTable((VISerializationKeys)converter.keys,getSchema(),getPrefix(), getTablename()));
     }
 }

@@ -1,8 +1,11 @@
 package org.oa4mp.server.admin.myproxy.oauth2.tools;
 
-import org.oa4mp.server.loader.oauth2.storage.vo.VOSerializationKeys;
-import org.oa4mp.server.loader.oauth2.storage.vo.VOStore;
-import org.oa4mp.server.loader.oauth2.storage.vo.VirtualOrganization;
+import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import org.oa4mp.server.api.admin.adminClient.AdminClient;
+import org.oa4mp.server.loader.oauth2.storage.vo.VISerializationKeys;
+import org.oa4mp.server.loader.oauth2.storage.vo.VIStore;
+import org.oa4mp.server.loader.oauth2.storage.vo.VirtualIssuer;
 import org.oa4mp.server.loader.qdl.util.SigningCommands;
 import org.oa4mp.server.admin.myproxy.oauth2.base.StoreCommands2;
 import edu.uiuc.ncsa.security.core.Identifiable;
@@ -28,46 +31,45 @@ import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
  * <p>Created by Jeff Gaynor<br>
  * on 2/22/21 at  8:01 AM
  */
-public class VOCommands extends StoreCommands2 {
+public class VICommands extends StoreCommands2 {
 
     public static final String EC_FLAG = "-ec";
     public static final String RSA_SIZE_FLAG = "-size";
     public static final String EC_CURVE_FLAG = "-curve";
 
-    public VOCommands(MyLoggingFacade logger, String defaultIndent, Store store) throws Throwable {
+    public VICommands(MyLoggingFacade logger, String defaultIndent, Store store) throws Throwable {
         super(logger, defaultIndent, store);
     }
 
-    protected VOStore getVOS() {
-        return (VOStore) getStore();
+    protected VIStore getVIS() {
+        return (VIStore) getStore();
     }
 
-    public VOCommands(MyLoggingFacade logger, Store store) throws Throwable {
+    public VICommands(MyLoggingFacade logger, Store store) throws Throwable {
         super(logger, store);
     }
 
     @Override
     public String getName() {
-        return "  vo";
+        return "  vi";
     }
 
     @Override
     public void extraUpdates(Identifiable identifiable, int magicNumber) throws IOException {
         super.extraUpdates(identifiable, magicNumber);
-        VirtualOrganization vo = (VirtualOrganization) identifiable;
-        VOSerializationKeys keys = (VOSerializationKeys) getSerializationKeys();
-        if (vo.getCreationTS() == null) {
-            vo.setCreationTS(new Date());
+        VirtualIssuer vi = (VirtualIssuer) identifiable;
+        VISerializationKeys keys = (VISerializationKeys) getSerializationKeys();
+        if (vi.getCreationTS() == null) {
+            vi.setCreationTS(new Date());
         }
-        vo.setTitle(getPropertyHelp(keys.title(), "enter the title", vo.getTitle()));
-        vo.setIssuer(getPropertyHelp(keys.issuer(), "enter the issuer", vo.getIssuer()));
-        vo.setValid(getPropertyHelp(keys.valid(), "is this valid?", Boolean.toString(vo.isValid())).equalsIgnoreCase("y"));
-        String iss = vo.getAtIssuer();
+        vi.setTitle(getPropertyHelp(keys.title(), "enter the title", vi.getTitle()));
+        vi.setIssuer(getPropertyHelp(keys.issuer(), "enter the issuer", vi.getIssuer()));
+        String iss = vi.getAtIssuer();
         if (iss == null) {
-            iss = vo.getIssuer(); //default is they are equal
+            iss = vi.getIssuer(); //default is they are equal
         }
-        vo.setAtIssuer(getPropertyHelp(keys.atIssuer(), "enter the access token issuer", iss));
-        vo.setDiscoveryPath(getPropertyHelp(keys.discoveryPath(), "enter the discovery path. NOTE this should be of the form host/path e.g.cilogon.org/ligo:", vo.getDiscoveryPath()));
+        vi.setAtIssuer(getPropertyHelp(keys.atIssuer(), "enter the access token issuer", iss));
+        vi.setDiscoveryPath(getPropertyHelp(keys.discoveryPath(), "enter the discovery path. NOTE this should be of the form host/path e.g.cilogon.org/ligo:", vi.getDiscoveryPath()));
         String ok = getInput("Did you want to specify a file with the JSON web keys(y/n)", "n");
         if (!isTrivial(ok)) {
             if (ok.trim().toLowerCase().equals("y")) {
@@ -78,7 +80,7 @@ public class VOCommands extends StoreCommands2 {
                         if (f.canRead()) {
                             try {
                                 JSONWebKeys jsonWebKeys = JSONWebKeyUtil.fromJSON(f);
-                                vo.setJsonWebKeys(jsonWebKeys);
+                                vi.setJsonWebKeys(jsonWebKeys);
                                 printJWK(jsonWebKeys);
                             } catch (Throwable e) {
                                 if (DebugUtil.isEnabled()) {
@@ -99,19 +101,21 @@ public class VOCommands extends StoreCommands2 {
             } else {
                 String rc = getPropertyHelp(keys.jsonWebKeys(), "Did you want to create a new set?", "n");
                 if (rc.trim().toLowerCase().equals("y")) {
-                    String type = readline("enter type RSA or EC:");
+                    String type = getInput("enter type RSA or EC:", "RSA");
                     type = type.toUpperCase();
                     if (type.equals("RSA")) {
                         int keySize = 2048;
-                        String raw = readline("Enter key size (default is" + keySize + ")");
+                        String raw = readline("Enter key size (default is " + keySize + ")");
                         try {
-                            keySize = Integer.parseInt(raw);
+                            if (!StringUtils.isTrivial(raw)) {
+                                keySize = Integer.parseInt(raw);
+                            }
                         } catch (Throwable t) {
                             say("sorry but \"" + raw + "\" is not an integer");
                             return;
                         }
                         try {
-                            newKeys(vo, keySize);
+                            newKeys(vi, keySize);
                         } catch (Throwable t) {
                             say("That did not work:" + t.getMessage());
                             if (DebugUtil.isEnabled()) {
@@ -119,12 +123,12 @@ public class VOCommands extends StoreCommands2 {
                             }
                             return;
                         }
-                    }else{
+                    } else {
                         if (type.equals("EC")) {
                             String curve = readline("If you do not want the default curves used, enter a specific one:");
 
                             try {
-                                newKeys(vo, curve);
+                                newKeys(vi, curve);
                             } catch (Throwable e) {
                                 say("That did not work:" + e.getMessage());
                                 if (DebugUtil.isEnabled()) {
@@ -132,7 +136,7 @@ public class VOCommands extends StoreCommands2 {
                                 }
                                 return;
                             }
-                        }else{
+                        } else {
                             say("Sorry but \"" + type + "\" is not a valid type of key");
                         }
                     }
@@ -140,11 +144,15 @@ public class VOCommands extends StoreCommands2 {
             }
         }
         String defaultKey = null;
-        if (vo.getJsonWebKeys() != null) {
-            defaultKey = vo.getJsonWebKeys().getDefaultKeyID();
+        if (vi.getJsonWebKeys() != null) {
+            defaultKey = vi.getJsonWebKeys().getDefaultKeyID();
         }
-        vo.setDefaultKeyID(getPropertyHelp(keys.defaultKeyID(), "enter the default key id", defaultKey));
-
+        vi.setDefaultKeyID(getPropertyHelp(keys.defaultKeyID(), "enter the default key id", defaultKey));
+        vi.setCreationTS(new Date());
+        vi.setLastModifiedTS(new Date());
+        // could ask if they really want it to be valid, but don't
+        //vi.setValid(getPropertyHelp(keys.valid(), "is this valid?", Boolean.toString(vi.isValid())).equalsIgnoreCase("y"));
+        vi.setValid(true);
     }
 
     public void new_keys(InputLine inputLine) throws Exception {
@@ -166,7 +174,7 @@ public class VOCommands extends StoreCommands2 {
         }
         Identifiable id = findItem(inputLine);
         if (id == null) {
-            say("sorry, no such VO");
+            say("sorry, no such virtual issuer");
             return;
         }
         int keySize = 2048;
@@ -190,7 +198,7 @@ public class VOCommands extends StoreCommands2 {
             }
 
         }
-        VirtualOrganization vo = (VirtualOrganization) id;
+        VirtualIssuer vo = (VirtualIssuer) id;
         if (vo.getJsonWebKeys() != null) {
             String ok = getInput("Did you want to overwrite the current set of keys?(y/n)", "n");
             if (ok.trim().equalsIgnoreCase("y")) {
@@ -216,14 +224,14 @@ public class VOCommands extends StoreCommands2 {
         }
     }
 
-    protected void newKeys(VirtualOrganization vo, int keySize) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+    protected void newKeys(VirtualIssuer vo, int keySize) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
         JSONWebKeys jsonWebKeys = SigningCommands.createRSAJsonWebKeys(keySize, null);
         vo.setJsonWebKeys(jsonWebKeys);
         printJWK(jsonWebKeys);
 
     }
 
-    protected void newKeys(VirtualOrganization vo, String curve) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+    protected void newKeys(VirtualIssuer vo, String curve) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
         JSONWebKeys jsonWebKeys;
         if (StringUtils.isTrivial(curve)) {
             jsonWebKeys = SigningCommands.createECJsonWebKeys(null);
@@ -242,7 +250,7 @@ public class VOCommands extends StoreCommands2 {
      * @throws NoSuchAlgorithmException
      * @throws InvalidAlgorithmParameterException
      */
-    protected void newKeys(VirtualOrganization vo) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+    protected void newKeys(VirtualIssuer vo) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
         newKeys(vo, null); // do the spec default
     }
 
@@ -254,10 +262,10 @@ public class VOCommands extends StoreCommands2 {
         }
         Identifiable id = findItem(inputLine);
         if (id == null) {
-            say("sorry, no such VO");
+            say("sorry, no such virtual issuer");
             return;
         }
-        VirtualOrganization vo = (VirtualOrganization) id;
+        VirtualIssuer vo = (VirtualIssuer) id;
         if (vo.getJsonWebKeys() == null) {
             say("sorry, no JSON web keys set.");
             return;
@@ -279,7 +287,7 @@ public class VOCommands extends StoreCommands2 {
 
     @Override
     protected String format(Identifiable identifiable) {
-        VirtualOrganization vo = (VirtualOrganization) identifiable;
+        VirtualIssuer vo = (VirtualIssuer) identifiable;
         return vo.getIdentifierString() + " title:" + vo.getTitle() + " create time: " + vo.getCreationTS();
     }
 
@@ -287,5 +295,28 @@ public class VOCommands extends StoreCommands2 {
     public void bootstrap() throws Throwable {
         super.bootstrap();
         getHelpUtil().load("/help/vo_help.xml");
+    }
+
+    public void add_admin(InputLine inputLine) throws Throwable{
+        if(showHelp(inputLine)){
+            say("add_admin admin_id [vi_id] - add the admin client to the current or given virtual issuer");
+            return;
+        }
+        Identifiable id = findItem(inputLine);
+        if (id == null) {
+            say("sorry, no such virtual issuer");
+            return;
+        }
+        // the position of the admin client id is always the first argument.
+        Identifier adminID = BasicIdentifier.newID(inputLine.getArg(1));
+        if(adminID == null){
+            say("bad syntax -- no admin id could be found.");
+            return;
+        }
+        AdminClient adminClient = getEnvironment().getAdminClientStore().get(adminID);
+        adminClient.setVirtualIssuer(id.getIdentifier());
+        adminClient.setExternalVIName(id.getIdentifierString());
+        getEnvironment().getAdminClientStore().save(adminClient);
+        say("virtual issuer \"" + id.getIdentifierString() + "\"" + " set for admin client \"" + adminID + "\".");
     }
 }

@@ -15,14 +15,14 @@ import java.util.Map;
  * <p>Created by Jeff Gaynor<br>
  * on 12/14/20 at  10:37 AM
  */
-public class VOMemoryStore<V extends VirtualOrganization> extends MonitoredMemoryStore<V> implements VOStore<V> {
-    public VOMemoryStore(VOProvider<V> identifiableProvider,
-                         VOConverter<V> converter) {
+public class VIMemoryStore<V extends VirtualIssuer> extends MonitoredMemoryStore<V> implements VIStore<V> {
+    public VIMemoryStore(VOProvider<V> identifiableProvider,
+                         VIConverter<V> converter) {
         super(identifiableProvider);
         this.converter = converter;
     }
 
-    VOConverter<V> converter;
+    VIConverter<V> converter;
 
     @Override
     public XMLConverter<V> getXMLConverter() {

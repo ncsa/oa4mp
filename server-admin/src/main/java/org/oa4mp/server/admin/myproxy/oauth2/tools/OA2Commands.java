@@ -35,8 +35,7 @@ public class OA2Commands extends BaseCommands {
     public static final String ADMINS = "admins";
     public static final String TOKENS = "tokens";
     public static final String KEYS = "keys";
-    public static final String VIRTUAL_ORGANIZATION = "vo";
-    //  public static final String JSON = "json";
+    public static final String VIRTUAL_ISSUER = "vi";
 
 
     @Override
@@ -46,7 +45,7 @@ public class OA2Commands extends BaseCommands {
         components.add(ADMINS);
         components.add(TOKENS);
         components.add(KEYS);
-        components.add(VIRTUAL_ORGANIZATION);
+        components.add(VIRTUAL_ISSUER);
     }
 
     public OA2Commands(MyLoggingFacade logger) {
@@ -122,7 +121,7 @@ public class OA2Commands extends BaseCommands {
         say(PERMISSIONS + " - basic permission management.");
         say(ADMINS + " - create or manage administrative clients.");
         say(TOKENS + " - manage tokens created in the token exchange endpoint");
-        say(VIRTUAL_ORGANIZATION + " - manage virtual organizations");
+        say(VIRTUAL_ISSUER + " - manage virtual issuers");
         say("e.g.\n\nuse " + CLIENTS + "\n\nwill call up the client management component.");
         say("Type 'exit' or /q when you wish to exit the component and return to the main menu");
         say(" --> and /h prints your command history, /r runs the last command");
@@ -197,14 +196,14 @@ public class OA2Commands extends BaseCommands {
         return tokenStoreCommands;
     }
 
-    VOCommands voCommands;
+    VICommands VICommands;
 
-    protected VOCommands getVOCommands() throws Throwable {
-        if (voCommands == null) {
-            voCommands = new VOCommands(getMyLogger(), "  ", getOA2SE().getVOStore());
-            voCommands.setEnvironment(getOA2SE());
+    protected VICommands getVOCommands() throws Throwable {
+        if (VICommands == null) {
+            VICommands = new VICommands(getMyLogger(), "  ", getOA2SE().getVOStore());
+            VICommands.setEnvironment(getOA2SE());
         }
-        return voCommands;
+        return VICommands;
     }
 
     TransactionStoreCommands transactionStoreCommands = null;
@@ -262,7 +261,7 @@ public class OA2Commands extends BaseCommands {
         if (inputLine.hasArg(TOKENS)) {
             commands = getTokenCommands();
         }
-        if (inputLine.hasArg(VIRTUAL_ORGANIZATION)) {
+        if (inputLine.hasArg(VIRTUAL_ISSUER)) {
             commands = getVOCommands();
         }
         if (commands != null) {

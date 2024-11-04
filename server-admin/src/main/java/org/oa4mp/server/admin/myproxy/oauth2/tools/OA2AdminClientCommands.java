@@ -71,15 +71,15 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
             client.setIssuer(issuer);
         }
         String voURI;
-        if (client.getVirtualOrganization() == null) {
+        if (client.getVirtualIssuer() == null) {
             voURI = getPropertyHelp(keys.voURI(), "Give the VO URI", null);
         } else {
-            voURI = getPropertyHelp(keys.voURI(), "Give the VO URI", client.getVirtualOrganization().toString());
+            voURI = getPropertyHelp(keys.voURI(), "Give the VO URI", client.getVirtualIssuer().toString());
         }
         if (!isEmpty(voURI)) {
             try {
                 URI z = URI.create(voURI);
-                client.setVirtualOrganization(BasicIdentifier.newID(z));
+                client.setVirtualIssuer(BasicIdentifier.newID(z));
             } catch (Throwable t) {
                 if (DebugUtil.isEnabled()) {
                     t.printStackTrace();
@@ -89,16 +89,16 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
         }
 
 
-        String vo;
-        if (client.getExternalVOName() == null) {
-            String vvv = client.getVirtualOrganization().toString();
-            vo = getPropertyHelp(keys.vo(), "Give the VO", vvv); // offer the other VO (real one) as default
+        String vi;
+        if (client.getExternalVIName() == null) {
+            String vvv = client.getVirtualIssuer().toString();
+            vi = getPropertyHelp(keys.vo(), "Give the VI", vvv); // offer the other VO (real one) as default
         } else {
-            vo = getPropertyHelp(keys.vo(), "Give the VO", client.getExternalVOName().toString());
+            vi = getPropertyHelp(keys.vo(), "Give the VI", client.getExternalVIName().toString());
         }
 
-        if (!isEmpty(vo)) {
-            client.setExternalVOName(vo);
+        if (!isEmpty(vi)) {
+            client.setExternalVIName(vi);
         }
         client.setAllowQDL(getPropertyHelp(keys.allowQDL(), "allow QDL?", "n").equalsIgnoreCase("y"));
         if (client.isAllowQDL()) {

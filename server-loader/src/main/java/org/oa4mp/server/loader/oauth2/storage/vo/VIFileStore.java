@@ -16,8 +16,8 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 12/14/20 at  9:02 AM
  */
-public class VOFileStore<V extends VirtualOrganization> extends MonitoredFileStore<V> implements VOStore<V> {
-    public VOFileStore(File storeDirectory,
+public class VIFileStore<V extends VirtualIssuer> extends MonitoredFileStore<V> implements VIStore<V> {
+    public VIFileStore(File storeDirectory,
                        File indexDirectory,
                        IdentifiableProvider<V> identifiableProvider,
                        MapConverter<V> converter,
@@ -26,7 +26,7 @@ public class VOFileStore<V extends VirtualOrganization> extends MonitoredFileSto
         super(storeDirectory, indexDirectory, identifiableProvider, converter, removeEmptyFiles,removeFailedFiles);
     }
 
-    public VOFileStore(File directory,
+    public VIFileStore(File directory,
                        IdentifiableProvider<V> idp,
                        MapConverter<V> cp,
                        boolean removeEmptyFiles,

@@ -62,7 +62,7 @@ public class AdminClientTest extends TestBase {
         c.setEmail("bob@foo.bar");
         c.setName("Test client 42");
         c.setIssuer("https://www.bigscience.org/claims");
-        c.setVirtualOrganization(BasicIdentifier.randomID());
+        c.setVirtualIssuer(BasicIdentifier.randomID());
         c.setMaxClients(AdminClient.DEFAULT_MAX_NUMBER_OF_OIDC_CLIENTS + 100);
         JSONObject j = new JSONObject();
         converter.toJSON(c, j);
@@ -73,7 +73,7 @@ public class AdminClientTest extends TestBase {
         assert c.getEmail().equals(c2.getEmail());
         assert c.getName().equals(c2.getName());
         assert c.getIssuer().equals(c2.getIssuer());
-        assert c.getVirtualOrganization().equals(c2.getVirtualOrganization());
+        assert c.getVirtualIssuer().equals(c2.getVirtualIssuer());
         assert c.getMaxClients() == c2.getMaxClients();
         //   assert c2.equals(c) : "admin clients not the same after conversion to then from JSON";
         // clean up.
@@ -99,7 +99,7 @@ public class AdminClientTest extends TestBase {
         c.setEmail("bob@foo.bar");
         c.setName("Test client 42");
         c.setIssuer("https://www.bigscience.org/claims");
-        c.setVirtualOrganization(BasicIdentifier.randomID());
+        c.setVirtualIssuer(BasicIdentifier.randomID());
         c.setMaxClients(AdminClient.DEFAULT_MAX_NUMBER_OF_OIDC_CLIENTS + 100);
         Date nowDate = new Date();
         long now = nowDate.getTime();
@@ -113,7 +113,7 @@ public class AdminClientTest extends TestBase {
         assert c.getEmail().equals(c2.getEmail());
         assert c.getName().equals(c2.getName());
         assert c.getIssuer().equals(c2.getIssuer());
-        assert c.getVirtualOrganization().equals(c2.getVirtualOrganization());
+        assert c.getVirtualIssuer().equals(c2.getVirtualIssuer());
         assert c.getMaxClients() == c2.getMaxClients();
         assert now - comparisonTolerance <= lastMod && lastMod <= now + comparisonTolerance : "timestamp " + lastMod + " failed to be within tolerance " + comparisonTolerance + " for now " + now + ", difference =" + (lastMod - now);
         // clean up.

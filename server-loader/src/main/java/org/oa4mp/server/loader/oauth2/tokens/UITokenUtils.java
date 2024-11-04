@@ -8,7 +8,7 @@ import org.oa4mp.delegation.server.OA2Errors;
 import org.oa4mp.delegation.server.OA2GeneralError;
 import org.apache.http.HttpStatus;
 import org.oa4mp.server.loader.oauth2.servlet.UserInfoServlet;
-import org.oa4mp.server.loader.oauth2.storage.vo.VirtualOrganization;
+import org.oa4mp.server.loader.oauth2.storage.vo.VirtualIssuer;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -25,7 +25,7 @@ public class UITokenUtils {
      * Given a string of some token (unknown format, e.g. from a header or
      * passed in as a parameter) return an access token.<br/><br/>
      * <b>Note</b> this does not verify the token if it's a JWT! This is because one usage
-     * pattern for {@link VirtualOrganization} is to get the token,
+     * pattern for {@link VirtualIssuer} is to get the token,
      * find the transaction, read the client, then determine the VO and check the keys.
      * This call lets you bootstrap that process. Note that at this point in the flow we cannot
      * check the signature.

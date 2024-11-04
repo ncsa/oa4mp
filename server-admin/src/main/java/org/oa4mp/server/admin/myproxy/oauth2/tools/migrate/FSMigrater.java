@@ -3,7 +3,7 @@ package org.oa4mp.server.admin.myproxy.oauth2.tools.migrate;
 import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.storage.transactions.OA2TStoreInterface;
 import org.oa4mp.server.loader.oauth2.storage.tx.TXStore;
-import org.oa4mp.server.loader.oauth2.storage.vo.VOStore;
+import org.oa4mp.server.loader.oauth2.storage.vo.VIStore;
 import org.oa4mp.server.api.admin.adminClient.AdminClientStore;
 import org.oa4mp.server.api.admin.permissions.Permission;
 import org.oa4mp.server.api.admin.permissions.PermissionsStore;
@@ -173,7 +173,7 @@ public class FSMigrater implements MigrationConstants {
         if (s instanceof ClientStore) {
             return CLIENTS_STORE;
         }
-        if (s instanceof VOStore) {
+        if (s instanceof VIStore) {
             return VIRTUAL_ORGANIZATION_STORE;
         }
         if (s instanceof PermissionsStore) {

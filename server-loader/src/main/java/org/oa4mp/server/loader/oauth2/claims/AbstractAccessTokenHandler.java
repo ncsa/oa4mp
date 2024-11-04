@@ -3,7 +3,7 @@ package org.oa4mp.server.loader.oauth2.claims;
 import org.oa4mp.server.loader.oauth2.servlet.ClientUtils;
 import org.oa4mp.server.loader.oauth2.servlet.OA2DiscoveryServlet;
 import org.oa4mp.server.loader.oauth2.storage.tx.TXRecord;
-import org.oa4mp.server.loader.oauth2.storage.vo.VirtualOrganization;
+import org.oa4mp.server.loader.oauth2.storage.vo.VirtualIssuer;
 import org.oa4mp.server.loader.oauth2.tokens.AccessTokenConfig;
 import org.oa4mp.server.loader.oauth2.tokens.AuthorizationPath;
 import org.oa4mp.server.loader.oauth2.tokens.AuthorizationTemplate;
@@ -466,7 +466,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
         String issuer = "";
 
         if (isTrivial(getATConfig().getIssuer())) {
-            VirtualOrganization vo = oa2se.getVO(client.getIdentifier());
+            VirtualIssuer vo = oa2se.getVI(client.getIdentifier());
             if (vo == null) {
                 // fail safe. No VO, no configuration, return this service as issuer.
                 issuer = OA2DiscoveryServlet.getIssuer(request);
@@ -497,7 +497,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
             if (getATConfig().getAudience() != null && !getATConfig().getAudience().isEmpty()) {
                 atData.put(AUDIENCE, getATConfig().getAudience());
             } else{
-                VirtualOrganization vo = oa2se.getVO(client.getIdentifier());
+                VirtualIssuer vo = oa2se.getVI(client.getIdentifier());
                 if (vo == null) {
                     // fail safe. No VO, no configuration, return this service as issuer.
                     atData.put(AUDIENCE, transaction.getClient().getIdentifierString());

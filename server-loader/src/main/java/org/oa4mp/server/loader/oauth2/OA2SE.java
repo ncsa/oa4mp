@@ -5,8 +5,8 @@ import org.oa4mp.server.loader.oauth2.cm.CMConfigs;
 import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
 import org.oa4mp.server.loader.oauth2.servlet.RFC8628ServletConfig;
 import org.oa4mp.server.loader.oauth2.storage.tx.TXStore;
-import org.oa4mp.server.loader.oauth2.storage.vo.VOStore;
-import org.oa4mp.server.loader.oauth2.storage.vo.VirtualOrganization;
+import org.oa4mp.server.loader.oauth2.storage.vo.VIStore;
+import org.oa4mp.server.loader.oauth2.storage.vo.VirtualIssuer;
 import org.oa4mp.server.loader.qdl.scripting.OA2QDLEnvironment;
 import org.oa4mp.server.api.MyProxyFacadeProvider;
 import org.oa4mp.server.api.ServiceEnvironmentImpl;
@@ -55,7 +55,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
     public OA2SE(MyLoggingFacade logger,
                  Provider<TransactionStore> tsp,
                  Provider<TXStore> txStoreProvider,
-                 Provider<VOStore> voStoreProvider,
+                 Provider<VIStore> voStoreProvider,
                  Provider<ClientStore> csp,
                  int maxAllowedNewClientRequests,
                  long agLifetime,
@@ -169,7 +169,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.qdlEnvironment = qdlEnvironment;
         this.rfc8693Enabled = rfc8693Enabled;
         this.txStore = txStoreProvider.get();
-        this.voStore = voStoreProvider.get();
+        this.VIStore = voStoreProvider.get();
         this.maxIdTokenLifetime = maxIDTokenLifetime;
         this.idTokenLifetime = idTokenLifetime;
         this.maxATLifetime = maxATLifetime;
@@ -335,10 +335,10 @@ public class OA2SE extends ServiceEnvironmentImpl {
 
     long maxRTLifetime = -1L;
 
-    VOStore voStore;
+    VIStore VIStore;
 
-    public VOStore getVOStore() {
-        return voStore;
+    public VIStore getVOStore() {
+        return VIStore;
     }
 
     public TXStore getTxStore() {
@@ -612,7 +612,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
      * @param clientID
      * @return
      */
-    public VirtualOrganization getVO(Identifier clientID) {
+    public VirtualIssuer getVI(Identifier clientID) {
         if (clientID == null) {
             return null; // should not happen.
         }
@@ -625,14 +625,14 @@ public class OA2SE extends ServiceEnvironmentImpl {
                 return null;
             case 1:
                 AdminClient ac = getAdminClientStore().get(adminIDs.get(0));
-                if (ac == null || ac.getVirtualOrganization() == null) {
+                if (ac == null || ac.getVirtualIssuer() == null) {
                     return null; // no VO set. Most common case.
                 }
                 DebugUtil.trace(this, "got admin client " + ac.getIdentifierString());
-                VirtualOrganization vo = (VirtualOrganization) getVOStore().get(ac.getVirtualOrganization());
+                VirtualIssuer vo = (VirtualIssuer) getVOStore().get(ac.getVirtualIssuer());
                 DebugUtil.trace(this, "got vo  " + (vo == null ? "(none)" : vo.getIdentifierString()));
                 if (!vo.isValid()) {
-                    throw new GeneralException("invalid virtual organization \"" + vo.getIdentifierString() + "\"");
+                    throw new GeneralException("invalid virtual issuer \"" + vo.getIdentifierString() + "\"");
                 }
                 if (vo != null) {
                     return vo;

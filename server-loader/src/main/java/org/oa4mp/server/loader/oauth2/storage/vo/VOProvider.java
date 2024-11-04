@@ -11,7 +11,7 @@ import javax.inject.Provider;
  * <p>Created by Jeff Gaynor<br>
  * on 12/14/20 at  10:43 AM
  */
-public class VOProvider<V extends VirtualOrganization> extends IdentifiableProviderImpl<V> {
+public class VOProvider<V extends VirtualIssuer> extends IdentifiableProviderImpl<V> {
     public VOProvider(Provider<Identifier> idProvider, OA2TokenForge tokenForge) {
         super(idProvider);
         this.tokenForge = tokenForge;
@@ -22,7 +22,7 @@ public class VOProvider<V extends VirtualOrganization> extends IdentifiableProvi
 
     @Override
     public V get(boolean createNewIdentifier) {
-        V vo = (V) new VirtualOrganization(BasicIdentifier.newID(tokenForge.getAuthorizationGrant().getToken()));
+        V vo = (V) new VirtualIssuer(BasicIdentifier.newID(tokenForge.getAuthorizationGrant().getToken()));
         return vo;
     }
 }

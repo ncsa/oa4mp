@@ -1,7 +1,5 @@
 package org.oa4mp.server.test;
 
-import org.oa4mp.server.test.TestStoreProviderInterface;
-import org.oa4mp.server.test.TestUtils;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2ClientConverter;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2ClientKeys;
@@ -211,7 +209,7 @@ public abstract class DDServerTests extends TestCase {
         adminClient.setSecret(getRandom(64));
         adminClient.setName("Test admin client " + random);
         adminClient.setEmail("bob@" + random + ".foo.bar");
-        adminClient.setVirtualOrganization(BasicIdentifier.randomID());
+        adminClient.setVirtualIssuer(BasicIdentifier.randomID());
         adminClient.setIssuer("Issuer=" + random);
         store.save(adminClient);
         return adminClient;

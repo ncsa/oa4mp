@@ -25,11 +25,10 @@ import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
  * <p>Created by Jeff Gaynor<br>
  * on 2/16/21 at  6:59 AM
  */
-//public class VirtualOrganization extends IdentifiableImpl implements DateComparable {
-public class VirtualOrganization extends Monitored {
+public class VirtualIssuer extends Monitored {
+// Fixes https://github.com/ncsa/oa4mp/issues/216 rename this class
 
-
-    public VirtualOrganization(Identifier identifier) {
+    public VirtualIssuer(Identifier identifier) {
         super(identifier);
 
     }
@@ -201,7 +200,7 @@ public class VirtualOrganization extends Monitored {
 
     @Override
     public String toString() {
-        return "VirtualOrganization{" +
+        return "VirtualIssuer{" +
                 "created=" + getCreationTS() +
                 ", defaultKeyID='" + defaultKeyID + '\'' +
                 ", discoveryPath='" + discoveryPath + '\'' +

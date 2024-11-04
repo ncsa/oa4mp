@@ -16,13 +16,13 @@ import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
  * <p>Created by Jeff Gaynor<br>
  * on 2/19/21 at  3:04 PM
  */
-public class VOConverter<V extends VirtualOrganization> extends MapConverter<V> {
-    public VOConverter(SerializationKeys keys, IdentifiableProvider<V> provider) {
+public class VIConverter<V extends VirtualIssuer> extends MapConverter<V> {
+    public VIConverter(SerializationKeys keys, IdentifiableProvider<V> provider) {
         super(keys, provider);
     }
 
-    protected VOSerializationKeys vok() {
-        return (VOSerializationKeys) keys;
+    protected VISerializationKeys vok() {
+        return (VISerializationKeys) keys;
     }
 
     @Override
@@ -40,8 +40,8 @@ public class VOConverter<V extends VirtualOrganization> extends MapConverter<V> 
             vo.setIssuer(map.getString(vok().issuer()));
         }
         if (map.containsKey(vok().atIssuer()) && !isTrivial(map.getString(vok().atIssuer()))) {
-              vo.setAtIssuer(map.getString(vok().atIssuer()));
-          }
+            vo.setAtIssuer(map.getString(vok().atIssuer()));
+        }
         if (map.containsKey(vok().defaultKeyID()) && !isTrivial(map.getString(vok().defaultKeyID()))) {
             vo.setDefaultKeyID(map.getString(vok().defaultKeyID()));
         }
@@ -68,28 +68,32 @@ public class VOConverter<V extends VirtualOrganization> extends MapConverter<V> 
     public void toMap(V value, ConversionMap<String, Object> data) {
         super.toMap(value, data);
         data.put(vok().valid(), value.isValid());
-        data.put(vok().creationTS(), value.getCreationTS().getTime());
-        data.put(vok().lastModifiedTS(), value.getLastModifiedTS().getTime());
-        if(value.getLastAccessed()!=null) {
+        if (value.getCreationTS() != null) {
+            data.put(vok().creationTS(), value.getCreationTS().getTime());
+        }
+        if (value.getLastModifiedTS() != null) {
+            data.put(vok().lastModifiedTS(), value.getLastModifiedTS().getTime());
+        }
+        if (value.getLastAccessed() != null) {
             // Fixes https://github.com/ncsa/oa4mp/issues/149
             data.put(vok().lastAccessed(), value.getLastAccessed().getTime());
         }
-        if(!isTrivial(value.getIssuer())){
+        if (!isTrivial(value.getIssuer())) {
             data.put(vok().issuer(), value.getIssuer());
         }
-        if(!isTrivial(value.getAtIssuer())){
-              data.put(vok().atIssuer(), value.getAtIssuer());
-          }
-        if(!isTrivial(value.getTitle())){
+        if (!isTrivial(value.getAtIssuer())) {
+            data.put(vok().atIssuer(), value.getAtIssuer());
+        }
+        if (!isTrivial(value.getTitle())) {
             data.put(vok().title(), value.getTitle());
         }
-        if(!isTrivial(value.getDefaultKeyID())){
+        if (!isTrivial(value.getDefaultKeyID())) {
             data.put(vok().defaultKeyID(), value.getDefaultKeyID());
         }
-        if(!isTrivial(value.getDiscoveryPath())){
+        if (!isTrivial(value.getDiscoveryPath())) {
             data.put(vok().discoveryPath(), value.getDiscoveryPath());
         }
-        if(value.getJsonWebKeys() != null){
+        if (value.getJsonWebKeys() != null) {
             data.put(vok().jsonWebKeys(), JSONWebKeyUtil.toJSON(value.getJsonWebKeys()).toString());
         }
     }

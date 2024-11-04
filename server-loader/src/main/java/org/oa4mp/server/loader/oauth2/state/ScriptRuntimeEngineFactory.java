@@ -5,7 +5,7 @@ import org.oa4mp.server.loader.oauth2.functor.FunctorRuntimeEngine;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
 import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
 import org.oa4mp.server.loader.oauth2.storage.tx.TXRecord;
-import org.oa4mp.server.loader.oauth2.storage.vo.VirtualOrganization;
+import org.oa4mp.server.loader.oauth2.storage.vo.VirtualIssuer;
 import org.oa4mp.server.loader.qdl.scripting.OA2State;
 import org.oa4mp.server.loader.qdl.scripting.QDLRuntimeEngine;
 import org.qdl_lang.evaluate.MetaEvaluator;
@@ -74,7 +74,7 @@ public class ScriptRuntimeEngineFactory {
             qrt.setConfigToCS(transaction.getConfigToCS());
             OA2State state = qrt.getState();
             state.setOa2se(oa2SE);
-            VirtualOrganization vo = oa2SE.getVO(oa2Client.getIdentifier());
+            VirtualIssuer vo = oa2SE.getVI(oa2Client.getIdentifier());
             if (vo != null) {
                 state.setJsonWebKeys(vo.getJsonWebKeys());
             } else {

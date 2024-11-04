@@ -35,8 +35,8 @@ public class AdminClientConverter<V extends AdminClient> extends BaseClientConve
         v.setListUsersInOtherClients(getJsonUtil().getJSONValueBoolean(json, getACK().listUsersInOtherClients()));
         v.setNotifyOnNewClientCreate(getJsonUtil().getJSONValueBoolean(json, getACK().notifyOnNewClientCreate()));
         v.setIssuer(getJsonUtil().getJSONValueString(json, getACK().issuer()));
-        v.setExternalVOName(getJsonUtil().getJSONValueString(json, getACK().vo()));
-        v.setVirtualOrganization(BasicIdentifier.newID(getJsonUtil().getJSONValueString(json, getACK().voURI())));
+        v.setExternalVIName(getJsonUtil().getJSONValueString(json, getACK().vo()));
+        v.setVirtualIssuer(BasicIdentifier.newID(getJsonUtil().getJSONValueString(json, getACK().voURI())));
         v.setMaxClients(getJsonUtil().getJSONValueInt(json, getACK().maxClients()));
         v.setAllowQDL(getJsonUtil().getJSONValueBoolean(json, getACK().allowQDL()));
         v.setGenerateIDs(getJsonUtil().getJSONValueBoolean(json, getACK().generateIDs()));
@@ -55,9 +55,9 @@ public class AdminClientConverter<V extends AdminClient> extends BaseClientConve
     @Override
     public V fromMap(ConversionMap<String, Object> map, V v) {
         V value = super.fromMap(map, v);
-        value.setExternalVOName(map.getString(getACK().vo()));
+        value.setExternalVIName(map.getString(getACK().vo()));
         try {
-            value.setVirtualOrganization(BasicIdentifier.newID(map.getString(getACK().voURI())));
+            value.setVirtualIssuer(BasicIdentifier.newID(map.getString(getACK().voURI())));
         } catch (Throwable t) {
             throw new GeneralException("Error reading " + getACK().voURI() + " field in database: \"" + t.getMessage() + "\"");
         }
@@ -119,9 +119,9 @@ public class AdminClientConverter<V extends AdminClient> extends BaseClientConve
     @Override
     public void toJSON(V client, JSONObject json) {
         super.toJSON(client, json);
-        getJsonUtil().setJSONValue(json, getACK().vo(), client.getExternalVOName());
-        if (client.getVirtualOrganization() != null) {
-            getJsonUtil().setJSONValue(json, getACK().voURI(), client.getVirtualOrganization().toString());
+        getJsonUtil().setJSONValue(json, getACK().vo(), client.getExternalVIName());
+        if (client.getVirtualIssuer() != null) {
+            getJsonUtil().setJSONValue(json, getACK().voURI(), client.getVirtualIssuer().toString());
         }
         getJsonUtil().setJSONValue(json, getACK().allowCustomIDs(), client.isAllowCustomIDs());
         getJsonUtil().setJSONValue(json, getACK().generateIDs(), client.isGenerateIDs());
@@ -143,8 +143,8 @@ public class AdminClientConverter<V extends AdminClient> extends BaseClientConve
     @Override
     public void toMap(V client, ConversionMap<String, Object> map) {
         map.put(getACK().issuer(), client.getIssuer());
-        map.put(getACK().vo(), client.getExternalVOName());
-        map.put(getACK().voURI(), client.getVirtualOrganization());
+        map.put(getACK().vo(), client.getExternalVIName());
+        map.put(getACK().voURI(), client.getVirtualIssuer());
         map.put(getACK().maxClients(), client.getMaxClients());
         map.put(getACK().allowQDL(), client.isAllowQDL());
         map.put(getACK().allowQDLCodeBlocks(), client.allowQDLCodeBlocks());

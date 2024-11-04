@@ -1,7 +1,7 @@
 package org.oa4mp.server.loader.oauth2.servlet;
 
 import org.oa4mp.server.loader.oauth2.OA2SE;
-import org.oa4mp.server.loader.oauth2.storage.vo.VirtualOrganization;
+import org.oa4mp.server.loader.oauth2.storage.vo.VirtualIssuer;
 import org.oa4mp.server.api.storage.servlet.DiscoveryServlet;
 import org.oa4mp.delegation.server.OA2Constants;
 import org.oa4mp.delegation.server.OA2Errors;
@@ -32,8 +32,8 @@ import java.util.StringTokenizer;
 public class OA2DiscoveryServlet extends DiscoveryServlet {
     public static String DISCOVERY_PATH_SEPARATOR = "/";
 
-    protected VirtualOrganization getVO(HttpServletRequest req, String requestUri) {
-        VirtualOrganization vo = null;
+    protected VirtualIssuer getVI(HttpServletRequest req, String requestUri) {
+        VirtualIssuer vo = null;
         String host = getOA2SE().getServiceAddress().getHost();
         String p = requestUri.substring(getOA2SE().getServiceAddress().getPath().length());
         StringTokenizer st = new StringTokenizer(p, "/");
@@ -56,7 +56,7 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
                     if (vo == null) {
                         // Then this is not recognized.
                         throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
-                                "unknown virtual organization \"" + component + "\"",
+                                "unknown virtual issuer \"" + component + "\"",
                                 HttpStatus.SC_BAD_REQUEST,
                                 null);
                     }
@@ -129,7 +129,7 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
         if (isCerts) {
             String discoveryPath = requestUri.substring(1 + requestUri.lastIndexOf("/"));
             // Fix for CIL-976
-            VirtualOrganization vo = getOA2SE().getVOStore().findByPath(getOA2SE().getServiceAddress().getHost() + DISCOVERY_PATH_SEPARATOR + discoveryPath);
+            VirtualIssuer vo = getOA2SE().getVOStore().findByPath(getOA2SE().getServiceAddress().getHost() + DISCOVERY_PATH_SEPARATOR + discoveryPath);
             JSONWebKeys publicKeys;
             if (vo == null) {
                 publicKeys = JSONWebKeyUtil.makePublic(((OA2SE) getServiceEnvironment()).getJsonWebKeys());
@@ -150,7 +150,7 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
 
         }
 
-        VirtualOrganization vo = getVO(httpServletRequest, requestUri);
+        VirtualIssuer vo = getVI(httpServletRequest, requestUri);
 /*
         if (requestUri.endsWith("/")) {
             requestUri = requestUri.substring(0, requestUri.length() - 1);
@@ -178,7 +178,7 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
         }
     }
 
-    protected JSONObject setValues(HttpServletRequest request, JSONObject jsonObject, VirtualOrganization vo) {
+    protected JSONObject setValues(HttpServletRequest request, JSONObject jsonObject, VirtualIssuer vo) {
         OA2SE oa2SE = (OA2SE) getServiceEnvironment();
 
         String requestURI = getRequestURI(request);

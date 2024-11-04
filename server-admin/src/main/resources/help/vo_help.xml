@@ -24,7 +24,7 @@ The id of the JSON Web Key that will be used for signing. ]]>
 Used in the discovery endpoint for constructing and resolving the
 well-known page. This is *not* a complete path, but is of the form
 
-host/vo
+host/vi
 
 So for instance, if your site is at
 
@@ -34,11 +34,16 @@ and you have a discover_path of
 
 login.bgsu.edu/my_issuer
 
-then the resulting constructed well-known page would reside at
+then the resulting discovery page would be generated at
 
-https://login.bgsu.edu/oauth2/.well-known/openid-configuration.my_issuer
+https://login.bgsu.edu/oauth2/.well-known/openid-configuration/my_issuer
 
-and various entries in it would have their paths constructed from this as well, such
+and the server would respond to requests for
+
+https://login.bgsu.edu/.well-known/openid-configuration/my_issuer
+
+by returning the generated page. Of course, various entries in it would have
+their paths constructed from this as well, such
 as the jwks_uri (which is where all the custom signing keys for this VO might
 reside at
 
@@ -96,7 +101,7 @@ and set it to both the client's vo and vo_uri.]]>
 Print a short report on the current set of JSON web keys for this VO, if any.]]>
     </body>
     <example>
-        <![CDATA[ vo>print_keys /prod:fnal/vo_1
+        <![CDATA[ vi>print_keys /prod:fnal/vo_1
 Found keys are:
   89F07558E2304FB6891C94A0E573C385: alg =RS384, use=sig
   79E85A32A61FF5E979A3FDEF30A0BCF4: alg =RS512, use=sig
@@ -153,7 +158,7 @@ testing immediately.
 </html>
     <!--
 oa2>use vo
-  vo>list_keys
+  vi>list_keys
 at_issuer  created  default_key_id  description  discovery_path  issuer  json_web_keys  last_modified  title  valid  vo_id*
   vo>/commands
                  print_keys

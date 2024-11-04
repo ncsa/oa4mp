@@ -10,10 +10,10 @@ import java.io.File;
  * <p>Created by Jeff Gaynor<br>
  * on 12/14/20 at  1:14 PM
  */
-public class VOFSProvider<T extends VOFileStore> extends FSProvider<T> implements OA4MPConfigTags {
+public class VOFSProvider<T extends VIFileStore> extends FSProvider<T> implements OA4MPConfigTags {
     public VOFSProvider(ConfigurationNode config,
                         VOProvider provider,
-                        VOConverter converter) {
+                        VIConverter converter) {
         super(config, FILE_STORE, VIRTUAL_ORGANIZATION_STORE, converter);
         this.provider = provider;
     }
@@ -23,7 +23,7 @@ public class VOFSProvider<T extends VOFileStore> extends FSProvider<T> implement
 
     @Override
     protected T produce(File dataPath, File indexPath, boolean removeEmptyFiles, boolean removeFailedFiles) {
-        return (T) new VOFileStore(dataPath,
+        return (T) new VIFileStore(dataPath,
                 indexPath,
                 provider,
                 converter,
