@@ -2,14 +2,14 @@
     <entry id="at_issuer">
     <body>
     <![CDATA[Property: String (--)
-The issuer that will be put in every access token in the VO unless locally
+The issuer that will be put in every access token in the VI unless locally
 overridden.]]>
     </body>
     </entry>
     <entry id="created">
     <body>
     <![CDATA[Property: Integer (**)
-The time in ms. at which this VO was created.]]>
+The time in ms. at which this VI was created.]]>
     </body>
     </entry>
     <entry id="default_key_id">
@@ -44,7 +44,7 @@ https://login.bgsu.edu/.well-known/openid-configuration/my_issuer
 
 by returning the generated page. Of course, various entries in it would have
 their paths constructed from this as well, such
-as the jwks_uri (which is where all the custom signing keys for this VO might
+as the jwks_uri (which is where all the custom signing keys for this VI might
 reside at
 
 https://login.bgsu.org:8443/oauth2/certs/my_issuer
@@ -56,14 +56,14 @@ the addition of port numbers.]]>
     <entry id="issuer">
     <body>
     <![CDATA[Property: String (--)
-The default issuer for every client in this VO, unless locally overridden.]]>
+The default issuer for every client in this VI, unless locally overridden.]]>
     </body>
     </entry>
     <entry id="json_web_keys">
     <body>
     <![CDATA[Property: JSON (--)
 A set of keys as per RFC 7515 (https://www.rfc-editor.org/rfc/rfc7517). These
-can/should be auto generated for the VO.
+can/should be auto generated for the VI.
 
 See also: default_key_id]]>
     </body>
@@ -71,37 +71,37 @@ See also: default_key_id]]>
     <entry id="last_modified">
     <body>
     <![CDATA[Property: Integer (**)
-The timestamp in milliseconds that this VO was last saved.]]>
+The timestamp in milliseconds that this VI was last saved.]]>
     </body>
     </entry>
     <entry id="title">
     <body>
     <![CDATA[Property: String (--)
-A human-readable string. Generally this should make sense to whoever administers this VO.]]>
+A human-readable string. Generally this should make sense to whoever administers this VI.]]>
     </body>
     </entry>
     <entry id="valid">
     <body>
     <![CDATA[Property: Boolean (true)
-Is this VO valid/enabled? Setting this flag to false -- a serious step -- immediately shuts down
-use of this VO and any attempt by any client to start a flow will fail. Mostly this exists as a
-drastic tool in case, e.g., the VO has somehow been compromised.]]>
+Is this VI valid/enabled? Setting this flag to false -- a serious step -- immediately shuts down
+use of this VI and any attempt by any client to start a flow will fail. Mostly this exists as a
+drastic tool in case, e.g., the VI has somehow been compromised.]]>
     </body>
     </entry>
     <entry id="vo_id">
     <body>
     <![CDATA[Property: Identifier (**)
-A standard unique identifier for this VO. Note that any admin client in the VO should use this
-and set it to both the client's vo and vo_uri.]]>
+A standard unique identifier for this VI. Note that any admin client in the VI will use this to identify
+the VI. Set it for the admin using the add_admin command.]]>
     </body>
     </entry>
     <entry id="print_keys">
     <body>
     <![CDATA[Command.
-Print a short report on the current set of JSON web keys for this VO, if any.]]>
+Print a short report on the current set of JSON web keys for this VI, if any.]]>
     </body>
     <example>
-        <![CDATA[ vi>print_keys /prod:fnal/vo_1
+        <![CDATA[ vi>print_keys /prod:fnal/vi_1
 Found keys are:
   89F07558E2304FB6891C94A0E573C385: alg =RS384, use=sig
   79E85A32A61FF5E979A3FDEF30A0BCF4: alg =RS512, use=sig
@@ -114,19 +114,19 @@ use in OA4MP).]]>
     <entry id="new_keys">
     <body>
     <![CDATA[Command.
-Creates a completely new set of keys for this VO.]]>
+Creates a completely new set of keys for this VI.]]>
     </body>
     </entry>
     <entry id="about">
     <body>
-    <![CDATA[Virtual Organization.
-OA4MP supports multiple issuers through its "virtual organization" mechanism.
-A VO (virtual organization) has its own issuer, discovery endpoint and signing keys.
+    <![CDATA[Virtual Issuers.
+OA4MP supports multiple issuers through its "virtual issuer" mechanism.
+A VI (virtual issuer) has its own issuer, discovery endpoint and signing keys.
 
 How's it work?
 --------------
-A VO exists outside of all clients. Admin clients may be added to the VO in which case all
-of the VO environment (keys, issuers, etc.) is automatically inherited by any client.
+A VI exists outside of all clients. Admin clients may be added to the VI in which case all
+of the VI environment (keys, issuers, etc.) is automatically inherited by any client.
 It is possible to locally override this either in the client's cfg property or in a script.
 
 How to make one?
@@ -134,33 +134,26 @@ How to make one?
 Choose an id (that is a url) and use that. This identifier is only ever used internally,
 so something like
 
-production:/vo/caltech/igwn
+production:/vi/caltech/igwn
 
 is just fine. Then use this with the create command and select Y to edit the client. The
 reason is that the logic flow for the client is followed. Read the prompts and do what
-they say and you should have a fully functional VO at the end. You can test this by going to
+they say, and you should have a fully functional VI at the end. You can test this by going to
 your new well-known endpoint, which should be live at this point.
 
-Uses
+Using one
 ----
-Any admin client is added to the VO by setting its vo_uri (and vo) property to be
-the same as the vo_uri property here. Again, this is live and should be available for
+Set the VI for an admin using the add_admin command. Again, these are created live and should be available for
 testing immediately.
 ]]>
-    </body>
-    </entry>
-    <entry id="test 1">
-    <body>
-    <![CDATA[Yo!]]>
-    </body>
-    </entry>
+
 
 </html>
     <!--
-oa2>use vo
+oa2>use vi
   vi>list_keys
 at_issuer  created  default_key_id  description  discovery_path  issuer  json_web_keys  last_modified  title  valid  vo_id*
-  vo>/commands
+  vi>/commands
                  print_keys
  new_keys
 

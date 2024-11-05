@@ -75,14 +75,14 @@
     issuer for an installed OA4MP server (at https://math.edgestow.edu/oauth2). In the example that follows, lines
     of input are numbered and the section after has commentary on each line. This seems to be the most readable way to
     do it.
-    Output from the CLI is not
+    Output from the CLI is not numbers, only user input.
 </p>
 <pre>
  0. oa4mp>use vi
- 1. vi>create edgestow:geometry
+ 1.   vi>create edgestow:geometry
  2. object created, edit (y/n)?y
-   Update the values. A return accepts the existing or default value in []'s
-   For properties you can type /help or --help and print out the online help for the topic.
+     Update the values. A return accepts the existing or default value in []'s
+     For properties you can type /help or --help and print out the online help for the topic.
  3. enter the identifier[edgestow:geometry]:
  4. enter description[--]:Issuer for Differential Geometry at the University of Edgestow
  5. enter the title[--]:Issuer for Differential Geometry at the University of Edgestow
@@ -93,19 +93,19 @@
 10. Did you want to create a new set?[n]:y
 11. enter type RSA or EC:[RSA]:
 12. Enter key size (default is 2048)
-  Found keys are:
-    1A11D7F309DDF102: alg =RS256, use=sig
-    01FF6CEA64431C8F: alg =RS384, use=sig
-    C51F2F847B928C4B: alg =RS512, use=sig
+      Found keys are:
+        1A11D7F309DDF102: alg =RS256, use=sig
+        01FF6CEA64431C8F: alg =RS384, use=sig
+        C51F2F847B928C4B: alg =RS512, use=sig
 13. enter the default key id[1A11D7F309DDF102]:
-  here is the complete object:
+      here is the complete object:
 
            at_issuer : https://math.edgestow.edu/oauth2/geometry
               created : 1730744581287
        default_key_id : 1A11D7F309DDF102
-    description : Issuer for Diffe... <i>lots more</i>
+    description : Issuer for Diffe... <i>lots more lines!</i>
 14. save (y/n)? y
-    Updates saved
+      Updates saved
 </pre>
 <ol>
     <li>Create the virtual issuer with the given ID. The ID is a URI and should be readable. If you do nto supply
@@ -144,11 +144,25 @@
         set of edits is lost, requiring that you set up the record manually.
     </li>
 </ol>
-<p>
-    That's all of the configuration you need to set it up. To check that it works, try the well-known page at
-    <font color="blue">https://math.edgestow.edu/.well-known/openid-configuration/geometry"</font> which should
-    be a page that lists all of the appropriate configuration (such as the generated keys).
-</p>
+<h4>Tips</h4>
+<ul>
+    <li>You can always enter --help (note double hyphen!) at the prompt and get a help for the
+    given topic, e.g. for the identifier prompt you could issue
+<pre>   enter the identifier[edgestow:geometry]:--help
+        -----
+        Property: Identifier (**)
+        A standard unique identifier for this VI. Note that any admin client in the VI will use this to identify
+        the VI. Set it for the admin using the add_admin command.
+        -----
+        enter the identifier[edgestow:geometry]:
+</pre>
+    </li>
+    <li>Default values for the property are in the []'s and the default of "--" means no value is
+    set. Just hit return if you want to accept the default value.</li>
+    <li>This is all live. To check that it works, try the well-known page at
+        <font color="blue">https://math.edgestow.edu/.well-known/openid-configuration/geometry"</font> which should
+        be a page that lists all of the appropriate configuration (such as the generated keys).</li>
+</ul>
 
 <h2>Example of setting the VI for an admin client</h2>
 <p>
@@ -175,8 +189,7 @@ virtual issuer "edgestow:geometry" set for admin with id "oa4mp:/admin/edgestow/
 <p><small>For instance, there
     may be half a dozen OA4MP instances on different servers with completely random names that are behind a load
     balancer that presents itself as the service at <font color="blue">math.bigstate.edu</font>. Requests to this
-    endpoint are
-    forwarded by the load balancer to one of these OA4MP instances. The
-    generated response should have actual name of the service, not that of the local machine servicing that.</small></p>
+    endpoint are forwarded by the load balancer to one of these OA4MP instances. The
+    generated response should have actual name of the service, not that of the local machine servicing the request.</small></p>
 </body>
 </html>

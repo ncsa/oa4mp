@@ -103,19 +103,15 @@ The secret for this client.]]>
     </body>
     </entry>
     <entry id="vo">
-    <body>See vi
-    </body>
-    </entry>
-    <entry id="vo">
     <body>
     <![CDATA[Property: URI (--)
 The identifier for the virtual issuer. This is redundant with vo_uri for historical reasons
-and they should be the same going forward. This and vo_uri should match the vo_uri property of the VI
+and they should be the same going forward. This and vo_uri should match the vo_id property of the VI
 this admin belongs to. Removing properties from an object is actually rather hard to engineer, so
 until the day comes there is time to do it, this just is deprecated.)
 
 (Historical aside:At one point early on VIs were given simple names.
-They morphed into full fledged OA4MP objects
+They morphed into full-fledged OA4MP objects
 and were, for a time, called VOs (virtual organizations). This is why the names here are vo and vo_uri,
 because these are also the keys used in any backing storage and while we can rename these objects
 here, changing them in the store would break existing OA4MP installs.)

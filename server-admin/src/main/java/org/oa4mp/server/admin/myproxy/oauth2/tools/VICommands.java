@@ -294,7 +294,7 @@ public class VICommands extends StoreCommands2 {
     @Override
     public void bootstrap() throws Throwable {
         super.bootstrap();
-        getHelpUtil().load("/help/vo_help.xml");
+        getHelpUtil().load("/help/vi_help.xml");
     }
 
     public void add_admin(InputLine inputLine) throws Throwable{
