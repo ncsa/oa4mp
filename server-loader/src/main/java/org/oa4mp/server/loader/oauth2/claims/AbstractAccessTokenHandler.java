@@ -3,7 +3,7 @@ package org.oa4mp.server.loader.oauth2.claims;
 import org.oa4mp.server.loader.oauth2.servlet.ClientUtils;
 import org.oa4mp.server.loader.oauth2.servlet.OA2DiscoveryServlet;
 import org.oa4mp.server.loader.oauth2.storage.tx.TXRecord;
-import org.oa4mp.server.loader.oauth2.storage.vo.VirtualIssuer;
+import org.oa4mp.server.loader.oauth2.storage.vi.VirtualIssuer;
 import org.oa4mp.server.loader.oauth2.tokens.AccessTokenConfig;
 import org.oa4mp.server.loader.oauth2.tokens.AuthorizationPath;
 import org.oa4mp.server.loader.oauth2.tokens.AuthorizationTemplate;
@@ -460,7 +460,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
     public void setAccountingInformation() {
         JSONObject atData = getPayload();
         // Figure out issuer. If in config, that wins. If not, if the client is
-        // in a vo, use the designated at issuer. If that is not set, use the
+        // in a vi, use the designated at issuer. If that is not set, use the
         // VO issuer. If that fails, get the server issuer from the discovery servlet.
         //
         String issuer = "";

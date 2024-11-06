@@ -127,25 +127,6 @@ public class OA2AuthorizedServletUtil {
             String codeChallenge = req.getParameter(RFC7636Util.CODE_CHALLENGE);
             String codeChallengeMethod = req.getParameter(RFC7636Util.CODE_CHALLENGE_METHOD);
             setupPKCE(codeChallenge,codeChallengeMethod,oa2se,transaction,resolvedClient,debugger);
-    /*        if (StringUtils.isTrivial(codeChallenge)) {
-                if (oa2se.isRfc7636Required() && resolvedClient.isPublicClient()) {
-                    throw new OA2RedirectableError(OA2Errors.ACCESS_DENIED,
-                            "access denied",
-                            HttpStatus.SC_UNAUTHORIZED,
-                            transaction.getRequestState(),
-                            transaction.getCallback());
-
-                }
-            } else {
-                debugger.trace(this, "Setting code challenge to codeChallenge");
-                transaction.setCodeChallenge(codeChallenge);
-                if (StringUtils.isTrivial(codeChallengeMethod)) {
-                    transaction.setCodeChallengeMethod(RFC7636Util.METHOD_PLAIN);
-                } else {
-                    transaction.setCodeChallengeMethod(codeChallengeMethod);
-                }
-            }*/
-
             Map<String, String> params = agResponse.getParameters();
             XMLMap backup = GenericStoreUtils.toXML(getServiceEnvironment().getTransactionStore(), transaction);
             preprocess(new TransactionState(req, resp, params, transaction, backup));

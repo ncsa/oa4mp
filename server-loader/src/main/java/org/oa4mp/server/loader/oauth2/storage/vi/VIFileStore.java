@@ -1,4 +1,4 @@
-package org.oa4mp.server.loader.oauth2.storage.vo;
+package org.oa4mp.server.loader.oauth2.storage.vi;
 
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;

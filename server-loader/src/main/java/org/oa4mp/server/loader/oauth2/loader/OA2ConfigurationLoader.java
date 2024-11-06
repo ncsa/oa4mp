@@ -74,7 +74,7 @@ import org.oa4mp.server.loader.oauth2.storage.clients.OA2ClientProvider;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2ClientSQLStoreProvider;
 import org.oa4mp.server.loader.oauth2.storage.transactions.*;
 import org.oa4mp.server.loader.oauth2.storage.tx.*;
-import org.oa4mp.server.loader.oauth2.storage.vo.*;
+import org.oa4mp.server.loader.oauth2.storage.vi.*;
 import org.oa4mp.server.loader.qdl.scripting.OA2QDLConfigurationLoader;
 import org.oa4mp.server.loader.qdl.scripting.OA2QDLEnvironment;
 import org.qdl_lang.config.QDLConfigurationConstants;
@@ -1693,57 +1693,57 @@ Boolean ccfEnabled = null;
     }
 
 
-    protected SQLVOStoreProvider createSQLVOP(ConfigurationNode config,
+    protected SQLVIStoreProvider createSQLVOP(ConfigurationNode config,
                                               ConnectionPoolProvider<? extends ConnectionPool> cpp,
                                               String type,
-                                              VOProvider<? extends VirtualIssuer> tp,
+                                              VIProvider<? extends VirtualIssuer> tp,
                                               Provider<TokenForge> tfp,
                                               VIConverter converter) {
-        return new SQLVOStoreProvider(config, cpp, type, converter, tp);
+        return new SQLVIStoreProvider(config, cpp, type, converter, tp);
     }
 
     Provider<VIStore> voStoreProvider;
 
     protected Provider<VIStore> getVOStoreProvider() {
-        VOProvider voProvider = new VOProvider(null, (OA2TokenForge) getTokenForgeProvider().get());
-        VIConverter VIConverter = new VIConverter(new VISerializationKeys(), voProvider);
-        return getVOStoreProvider(voProvider, VIConverter);
+        VIProvider VIProvider = new VIProvider(null, (OA2TokenForge) getTokenForgeProvider().get());
+        VIConverter VIConverter = new VIConverter(new VISerializationKeys(), VIProvider);
+        return getVOStoreProvider(VIProvider, VIConverter);
     }
 
-    protected Provider<VIStore> getVOStoreProvider(VOProvider voProvider,
+    protected Provider<VIStore> getVOStoreProvider(VIProvider VIProvider,
                                                    VIConverter<? extends VirtualIssuer> VIConverter) {
         if (voStoreProvider == null) {
-            VOMultiStoreProvider storeProvider = new VOMultiStoreProvider(cn,
+            VIMultiStoreProvider storeProvider = new VIMultiStoreProvider(cn,
                     isDefaultStoreDisabled(),
                     getMyLogger(),
                     null, null,
-                    voProvider, VIConverter);
+                    VIProvider, VIConverter);
             storeProvider.addListener(createSQLVOP(cn,
                     getMySQLConnectionPoolProvider(),
                     OA4MPConfigTags.MYSQL_STORE,
-                    voProvider,
+                    VIProvider,
                     getTokenForgeProvider(),
                     VIConverter));
             storeProvider.addListener(createSQLVOP(cn,
                     getMariaDBConnectionPoolProvider(),
                     OA4MPConfigTags.MARIADB_STORE,
-                    voProvider,
+                    VIProvider,
                     getTokenForgeProvider(),
                     VIConverter));
             storeProvider.addListener(createSQLVOP(cn,
                     getPgConnectionPoolProvider(),
                     OA4MPConfigTags.POSTGRESQL_STORE,
-                    voProvider,
+                    VIProvider,
                     getTokenForgeProvider(),
                     VIConverter));
             storeProvider.addListener(createSQLVOP(cn,
                     getDerbyConnectionPoolProvider(),
                     OA4MPConfigTags.DERBY_STORE,
-                    voProvider,
+                    VIProvider,
                     getTokenForgeProvider(),
                     VIConverter));
 
-            storeProvider.addListener(new VOFSProvider(cn, voProvider, VIConverter));
+            storeProvider.addListener(new VIFSProvider(cn, VIProvider, VIConverter));
             storeProvider.addListener(new TypedProvider<VIStore>(cn, OA4MPConfigTags.MEMORY_STORE, OA4MPConfigTags.VIRTUAL_ORGANIZATION_STORE) {
                 @Override
                 public Object componentFound(CfgEvent configurationEvent) {
@@ -1755,7 +1755,7 @@ Boolean ccfEnabled = null;
 
                 @Override
                 public VIStore get() {
-                    return new VIMemoryStore(voProvider, VIConverter);
+                    return new VIMemoryStore(VIProvider, VIConverter);
                 }
 
             });

@@ -1,7 +1,7 @@
 package org.oa4mp.server.loader.oauth2.servlet;
 
 import org.oa4mp.server.loader.oauth2.OA2SE;
-import org.oa4mp.server.loader.oauth2.storage.vo.VirtualIssuer;
+import org.oa4mp.server.loader.oauth2.storage.vi.VirtualIssuer;
 import org.oa4mp.server.api.storage.servlet.DiscoveryServlet;
 import org.oa4mp.delegation.server.OA2Constants;
 import org.oa4mp.delegation.server.OA2Errors;
@@ -52,7 +52,7 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
                 if (st.hasMoreTokens()) {
                     String component = st.nextToken();
                     // Fix for CIL-976
-                    vo = getOA2SE().getVOStore().findByPath(host + DISCOVERY_PATH_SEPARATOR + component);
+                    vo = getOA2SE().getVIStore().findByPath(host + DISCOVERY_PATH_SEPARATOR + component);
                     if (vo == null) {
                         // Then this is not recognized.
                         throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
@@ -77,12 +77,12 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
         // case 2: Check for default
         String nextToken = st.nextToken();
         if (x.equals(WELL_KNOWN_PATH) && nextToken.equals(OPENID_CONFIG_PATH) || nextToken.equals(OAUTH_AUTHZ_SERVER_PATH)) {
-            return vo; // default case, no vo components.
+            return vo; // default case, no vi components.
         }
-        // case 3, vo component comes first
+        // case 3, vi component comes first
         if (nextToken.equals(WELL_KNOWN_PATH) && st.nextToken().equals(OPENID_CONFIG_PATH) && !st.hasMoreTokens()) {
             // Fix for CIL-976
-            vo = getOA2SE().getVOStore().findByPath(host + DISCOVERY_PATH_SEPARATOR + x);
+            vo = getOA2SE().getVIStore().findByPath(host + DISCOVERY_PATH_SEPARATOR + x);
         } else {
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
                     "unsupported discovery url for \"" + x + "\"",
@@ -90,7 +90,7 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
                     null);
 
         }
-        // default case, no special component, so return default vo.
+        // default case, no special component, so return default vi.
         return vo;
     }
 
@@ -122,14 +122,14 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
             if (requestUri.endsWith(certPath)) {
                 requestUri = requestUri.substring(0, requestUri.length() - certPath.length()); // whack off certs part
             } else {
-                requestUri = requestUri.substring(requestUri.indexOf(certPath) + certPath.length()); // whack off leading certs part (vo suffix case)
+                requestUri = requestUri.substring(requestUri.indexOf(certPath) + certPath.length()); // whack off leading certs part (vi suffix case)
             }
         }
         // normalize the uri
         if (isCerts) {
             String discoveryPath = requestUri.substring(1 + requestUri.lastIndexOf("/"));
             // Fix for CIL-976
-            VirtualIssuer vo = getOA2SE().getVOStore().findByPath(getOA2SE().getServiceAddress().getHost() + DISCOVERY_PATH_SEPARATOR + discoveryPath);
+            VirtualIssuer vo = getOA2SE().getVIStore().findByPath(getOA2SE().getServiceAddress().getHost() + DISCOVERY_PATH_SEPARATOR + discoveryPath);
             JSONWebKeys publicKeys;
             if (vo == null) {
                 publicKeys = JSONWebKeyUtil.makePublic(((OA2SE) getServiceEnvironment()).getJsonWebKeys());

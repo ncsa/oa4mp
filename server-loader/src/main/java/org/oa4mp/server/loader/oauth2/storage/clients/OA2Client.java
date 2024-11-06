@@ -309,7 +309,7 @@ public class OA2Client extends Client implements OA2ClientScopes {
     protected String xoauth_attributes = "xoauth_attributes";
     protected String oa4mp_attributes = "oa4mp_attributes";
     protected String oidc_cm_attributes = "oidc-cm_attributes";
-    protected String TOKENS_KEY = "/tokens";
+    protected String TOKENS_KEY = "/tokens"; // Caveat, this is used to create the JSON Path searching in the cfg
     protected String ACCESS_TOKENS_KEY = "access";
     protected String REFRESH_TOKENS_KEY = "refresh";
     protected String ID_TOKENS_KEY = "identity";

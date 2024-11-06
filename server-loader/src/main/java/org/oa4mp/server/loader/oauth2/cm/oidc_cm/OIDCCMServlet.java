@@ -12,7 +12,7 @@ import org.oa4mp.server.loader.oauth2.servlet.OA2HeaderUtils;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2ClientConverter;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2ClientKeys;
-import org.oa4mp.server.loader.oauth2.storage.vo.VirtualIssuer;
+import org.oa4mp.server.loader.oauth2.storage.vi.VirtualIssuer;
 import org.oa4mp.server.api.admin.adminClient.AdminClient;
 import org.oa4mp.server.api.admin.permissions.Permission;
 import org.oa4mp.server.api.storage.servlet.EnvServlet;
@@ -332,7 +332,7 @@ public class OIDCCMServlet extends EnvServlet {
                 jsonObject.put("issuer", getOA2SE().getIssuer());
                 jsonObject.put("at_issuer", getOA2SE().getIssuer());
             } else {
-                VirtualIssuer vo = (VirtualIssuer) getOA2SE().getVOStore().get(adminClient.getVirtualIssuer());
+                VirtualIssuer vo = (VirtualIssuer) getOA2SE().getVIStore().get(adminClient.getVirtualIssuer());
                 jsonObject.put("issuer", vo.getIssuer());
                 jsonObject.put("at_issuer", vo.getAtIssuer());
             }

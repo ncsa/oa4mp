@@ -131,16 +131,18 @@ public class RFC7662 extends TokenManagerServlet {
 
         OA2ServiceTransaction transaction = state.transaction;
         long authTime = transaction.getAuthTime().getTime();
+        // Fix for https://github.com/ncsa/oa4mp/issues/218
         if (state.isAT) {
             json.put(OA2Claims.AUDIENCE, transaction.getAudience());
             json.put(OA2Constants.SCOPE, transaction.getScopes());
             json.put(OA2Claims.EXPIRATION, (authTime + transaction.getAccessTokenLifetime()) / 1000);
+        }else{
+            json.put(OA2Claims.EXPIRATION, (authTime + transaction.getRefreshTokenLifetime()) / 1000);
         }
         // In a standard OA4MP token (this case) there is no issuer outside of the service itself.
         if (transaction.getUserMetaData().containsKey(OA2Claims.ISSUER)) {
             json.put(OA2Claims.ISSUER, transaction.getUserMetaData().getString(OA2Claims.ISSUER));
         }
-        json.put(OA2Claims.EXPIRATION, token.getIssuedAt() / 1000);
         json.put(OA2Claims.ISSUED_AT, authTime / 1000);
         json.put(OA2Claims.NOT_VALID_BEFORE, token.getIssuedAt() / 1000);
         json.put(OA2Claims.JWT_ID, token.getJti().toString());

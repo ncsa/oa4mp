@@ -235,7 +235,7 @@ public class ThingTester {
         actionItems.put("type", "attribute");
 
         JSONObject contentItems = new JSONObject();
-        contentItems.put("vo", "urn:vo/comanage/98627854/ae673b3f8d");
+        contentItems.put("vi", "urn:vi/comanage/98627854/ae673b3f8d");
         contentItems.put("issuer", "http://bang.nova.edu");
         JSONObject api = new JSONObject();
         JSONObject apiItems = new JSONObject();
@@ -261,7 +261,7 @@ public class ThingTester {
 
         JSONArray contentItems = new JSONArray();
 
-        contentItems.add("vo");
+        contentItems.add("vi");
         contentItems.add("issuer");
         JSONObject api = new JSONObject();
         JSONObject apiItems = new JSONObject();

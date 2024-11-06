@@ -1,13 +1,5 @@
 package org.oa4mp.server.admin.myproxy.oauth2.tools;
 
-import org.oa4mp.server.loader.oauth2.OA2SE;
-import org.oa4mp.server.loader.oauth2.functor.claims.OA2FunctorFactory;
-import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
-import org.oa4mp.server.admin.myproxy.oauth2.Banners;
-import org.oa4mp.server.admin.myproxy.oauth2.base.BaseCommands;
-import org.oa4mp.server.admin.myproxy.oauth2.base.ClientStoreCommands;
-import org.oa4mp.server.admin.myproxy.oauth2.base.CopyCommands;
-import org.oa4mp.delegation.common.OA4MPVersion;
 import edu.uiuc.ncsa.sas.SASCLIDriver;
 import edu.uiuc.ncsa.sas.StringIO;
 import edu.uiuc.ncsa.sas.thing.response.LogonResponse;
@@ -20,9 +12,16 @@ import edu.uiuc.ncsa.security.util.cli.*;
 import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 import org.apache.commons.lang.StringUtils;
+import org.oa4mp.delegation.common.OA4MPVersion;
+import org.oa4mp.server.admin.myproxy.oauth2.Banners;
+import org.oa4mp.server.admin.myproxy.oauth2.base.BaseCommands;
+import org.oa4mp.server.admin.myproxy.oauth2.base.ClientStoreCommands;
+import org.oa4mp.server.admin.myproxy.oauth2.base.CopyCommands;
+import org.oa4mp.server.loader.oauth2.OA2SE;
+import org.oa4mp.server.loader.oauth2.functor.claims.OA2FunctorFactory;
+import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
 
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.*;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -87,7 +86,10 @@ public class OA2Commands extends BaseCommands {
 
     public static void main(String[] args) {
         try {
-            InputLine inputLine = new InputLine(args);
+            ArrayList<String> aaa = new ArrayList<>();
+            aaa.add(OA2Commands.class.getSimpleName()); // dummy first argument
+            aaa.addAll(Arrays.asList(args));
+            InputLine inputLine = new InputLine(aaa);
             if (inputLine.hasArg("-sas")) {
                 setupSAS(inputLine);
                 return;
@@ -200,7 +202,7 @@ public class OA2Commands extends BaseCommands {
 
     protected VICommands getVOCommands() throws Throwable {
         if (VICommands == null) {
-            VICommands = new VICommands(getMyLogger(), "  ", getOA2SE().getVOStore());
+            VICommands = new VICommands(getMyLogger(), "  ", getOA2SE().getVIStore());
             VICommands.setEnvironment(getOA2SE());
         }
         return VICommands;

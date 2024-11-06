@@ -3,7 +3,7 @@ package org.oa4mp.server.loader.oauth2.servlet;
 import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
 import org.oa4mp.server.loader.oauth2.storage.tx.TXRecord;
-import org.oa4mp.server.loader.oauth2.storage.vo.VirtualIssuer;
+import org.oa4mp.server.loader.oauth2.storage.vi.VirtualIssuer;
 import org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import org.oa4mp.delegation.common.token.impl.AccessTokenImpl;

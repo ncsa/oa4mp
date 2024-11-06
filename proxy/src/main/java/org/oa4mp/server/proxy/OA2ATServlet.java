@@ -12,7 +12,7 @@ import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
 import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
 import org.oa4mp.server.loader.oauth2.storage.transactions.OA2TStoreInterface;
 import org.oa4mp.server.loader.oauth2.storage.tx.TXRecord;
-import org.oa4mp.server.loader.oauth2.storage.vo.VirtualIssuer;
+import org.oa4mp.server.loader.oauth2.storage.vi.VirtualIssuer;
 import org.oa4mp.server.loader.oauth2.tokens.UITokenUtils;
 import org.oa4mp.server.api.admin.adminClient.AdminClient;
 import org.oa4mp.server.api.admin.permissions.Permission;
@@ -700,7 +700,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 if (adminClient.getVirtualIssuer() == null) {
                     jsonWebKeys = oa2SE.getJsonWebKeys();
                 } else {
-                    VirtualIssuer vo = (VirtualIssuer) oa2SE.getVOStore().get(adminClient.getVirtualIssuer());
+                    VirtualIssuer vo = (VirtualIssuer) oa2SE.getVIStore().get(adminClient.getVirtualIssuer());
                     if (vo == null) {
                         // Admin client is in a VO but no such VO is found. This implies an internal error
                         throw new NFWException("Virtual issuer \"" + adminClient.getVirtualIssuer() + "\"not found.");
@@ -2735,10 +2735,10 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         OA2SE oa2se = (OA2SE) MyProxyDelegationServlet.getServiceEnvironment();
         VirtualIssuer vo = oa2se.getVI(transaction.getClient().getIdentifier());
         if (vo == null) {
-            debugger.trace(this, "no vo");
+            debugger.trace(this, "no vi");
             ((ATIResponse2) issuerTransactionState.getIssuerResponse()).setJsonWebKey((oa2se).getJsonWebKeys().getDefault());
         } else {
-            debugger.trace(this, "has vo");
+            debugger.trace(this, "has vi");
             ((ATIResponse2) issuerTransactionState.getIssuerResponse()).setJsonWebKey(vo.getJsonWebKeys().get(vo.getDefaultKeyID()));
         }
         debugger.trace(this, "writing AT response");

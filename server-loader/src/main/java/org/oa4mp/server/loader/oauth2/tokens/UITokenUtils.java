@@ -8,7 +8,7 @@ import org.oa4mp.delegation.server.OA2Errors;
 import org.oa4mp.delegation.server.OA2GeneralError;
 import org.apache.http.HttpStatus;
 import org.oa4mp.server.loader.oauth2.servlet.UserInfoServlet;
-import org.oa4mp.server.loader.oauth2.storage.vo.VirtualIssuer;
+import org.oa4mp.server.loader.oauth2.storage.vi.VirtualIssuer;
 
 import javax.servlet.http.HttpServletRequest;
 

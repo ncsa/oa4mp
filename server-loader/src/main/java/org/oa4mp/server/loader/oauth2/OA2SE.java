@@ -5,8 +5,8 @@ import org.oa4mp.server.loader.oauth2.cm.CMConfigs;
 import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
 import org.oa4mp.server.loader.oauth2.servlet.RFC8628ServletConfig;
 import org.oa4mp.server.loader.oauth2.storage.tx.TXStore;
-import org.oa4mp.server.loader.oauth2.storage.vo.VIStore;
-import org.oa4mp.server.loader.oauth2.storage.vo.VirtualIssuer;
+import org.oa4mp.server.loader.oauth2.storage.vi.VIStore;
+import org.oa4mp.server.loader.oauth2.storage.vi.VirtualIssuer;
 import org.oa4mp.server.loader.qdl.scripting.OA2QDLEnvironment;
 import org.oa4mp.server.api.MyProxyFacadeProvider;
 import org.oa4mp.server.api.ServiceEnvironmentImpl;
@@ -337,7 +337,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
 
     VIStore VIStore;
 
-    public VIStore getVOStore() {
+    public VIStore getVIStore() {
         return VIStore;
     }
 
@@ -629,8 +629,8 @@ public class OA2SE extends ServiceEnvironmentImpl {
                     return null; // no VO set. Most common case.
                 }
                 DebugUtil.trace(this, "got admin client " + ac.getIdentifierString());
-                VirtualIssuer vo = (VirtualIssuer) getVOStore().get(ac.getVirtualIssuer());
-                DebugUtil.trace(this, "got vo  " + (vo == null ? "(none)" : vo.getIdentifierString()));
+                VirtualIssuer vo = (VirtualIssuer) getVIStore().get(ac.getVirtualIssuer());
+                DebugUtil.trace(this, "got vi  " + (vo == null ? "(none)" : vo.getIdentifierString()));
                 if (!vo.isValid()) {
                     throw new GeneralException("invalid virtual issuer \"" + vo.getIdentifierString() + "\"");
                 }
@@ -649,7 +649,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
     public List<Store> listStores() {
         List<Store> stores = super.listStores();
         stores.add(getTxStore());
-        stores.add(getVOStore());
+        stores.add(getVIStore());
         return stores;
     }
 
@@ -702,7 +702,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
             storeList.add(getClientStore());
             storeList.add(getClientApprovalStore());
             storeList.add(getPermissionStore());
-            storeList.add(getVOStore());
+            storeList.add(getVIStore());
             storeList.add(getTransactionStore());
             storeList.add(getTxStore());
         }

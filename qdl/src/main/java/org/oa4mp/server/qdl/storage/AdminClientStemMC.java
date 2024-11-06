@@ -31,7 +31,7 @@ public class AdminClientStemMC<V extends AdminClient> extends StemConverter<V> {
         String issuer = "issuer";
         String maxClients = "max_clients";
         String notifyOnNewClientCreate="new_client_notify";
-        String vo="vo";
+        String vi="vi";
         String voURI="vo_uri";
            */
 

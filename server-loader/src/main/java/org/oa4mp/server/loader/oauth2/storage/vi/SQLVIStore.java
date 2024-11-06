@@ -1,4 +1,4 @@
-package org.oa4mp.server.loader.oauth2.storage.vo;
+package org.oa4mp.server.loader.oauth2.storage.vi;
 
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
@@ -19,8 +19,8 @@ import java.util.Date;
  * <p>Created by Jeff Gaynor<br>
  * on 2/19/21 at  4:48 PM
  */
-public class SQLVOStore<V extends VirtualIssuer> extends MonitoredSQLStore<V> implements VIStore<V> {
-    public SQLVOStore(ConnectionPool connectionPool, Table table, Provider<V> identifiableProvider, MapConverter<V> converter) {
+public class SQLVIStore<V extends VirtualIssuer> extends MonitoredSQLStore<V> implements VIStore<V> {
+    public SQLVIStore(ConnectionPool connectionPool, Table table, Provider<V> identifiableProvider, MapConverter<V> converter) {
         super(connectionPool, table, identifiableProvider, converter);
     }
 

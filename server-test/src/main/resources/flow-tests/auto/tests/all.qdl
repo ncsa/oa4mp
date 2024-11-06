@@ -15,6 +15,7 @@ test.:= [
           [path + 'auto/tests/' +'server-script.qdl', initialization],
           [path + 'auto/tests/' +'oauth-with-refresh.qdl', initialization],
           [path + 'auto/tests/' +'oauth-basic-no-refresh.qdl',initialization],
+          [path + 'auto/tests/' +'oauth-basic-introspection.qdl',initialization],
           [path + 'auto/tests/' +'oauth-rfc9068.qdl',initialization],
           [path + 'auto/tests/' +'oauth-rfc9068-no-scopes.qdl',initialization],
           [path + 'auto/tests/' +'oidc-test-overrides.qdl',initialization],

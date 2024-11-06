@@ -1,4 +1,4 @@
-package org.oa4mp.server.loader.oauth2.storage.vo;
+package org.oa4mp.server.loader.oauth2.storage.vi;
 
 import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
@@ -16,7 +16,7 @@ import java.util.Map;
  * on 12/14/20 at  10:37 AM
  */
 public class VIMemoryStore<V extends VirtualIssuer> extends MonitoredMemoryStore<V> implements VIStore<V> {
-    public VIMemoryStore(VOProvider<V> identifiableProvider,
+    public VIMemoryStore(VIProvider<V> identifiableProvider,
                          VIConverter<V> converter) {
         super(identifiableProvider);
         this.converter = converter;

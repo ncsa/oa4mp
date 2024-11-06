@@ -1,4 +1,4 @@
-package org.oa4mp.server.loader.oauth2.storage.vo;
+package org.oa4mp.server.loader.oauth2.storage.vi;
 
 import edu.uiuc.ncsa.security.storage.monitored.MonitoredKeys;
 
@@ -16,7 +16,7 @@ import java.util.List;
 ║organizations to virtual issuers or existing OA4MP           ║
 ║installs will unrecoverably break!                           ║
 ║                                                             ║
-║These have to remain as legacy artifacts.                    ║
+║This has to remain as a legacy artifact.                     ║
 ╚═════════════════════════════════════════════════════════════╝
  */
 public class VISerializationKeys extends MonitoredKeys {
@@ -31,25 +31,21 @@ public class VISerializationKeys extends MonitoredKeys {
 
 
     String atIssuer = "at_issuer";
-  //  String created = "created";
     String defaultKeyID = "default_key_id";
     String discoveryPath = "discovery_path";
     String issuer = "issuer";
     String jsonWebKeys = "json_web_keys";
- //   String lastModified = "last_modified";
     String title = "title";
     String valid = "valid";
 
     @Override
     public List<String> allKeys() {
         List<String> all = super.allKeys();
-    //    all.add(creationTS());
         all.add(defaultKeyID());
         all.add(discoveryPath());
         all.add(issuer());
         all.add(atIssuer());
         all.add(jsonWebKeys());
-    //    all.add(lastModifiedTS());
         all.add(title());
         all.add(valid());
         return all;

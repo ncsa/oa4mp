@@ -1,0 +1,38 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   Tests a basic client and the introspection endpoint.
+   Test for https://github.com/ncsa/oa4mp/issues/218.
+*/
+params. ≔ {'sub':'jeff'};
+test_id:= 'oauth.conf.basic';
+clc#init($$OA4MP_CLC_INI, test_id);
+
+initialization := size(args())==1⇒args().0:import(load('test#/auto/utils/initialization.mdl'));
+//checks:=initialization#checks();
+ini.:=initialization#get_client_ini(test_id);
+server_defaults.:=initialization# server_defaults();
+//cc.:=initializat:q!ion#get_client_config(test_id);
+
+tokens. := clc#rfc7523(params.);
+⊨ tokens.'access_token'.'lifetime' == 1000*server_defaults.'at_lifetime' : 'wrong access token lifetime';
+⊨ ∃tokens.'refresh_token' : 'did not got a refresh token.';
+⊨ tokens.'refresh_token'.'lifetime' == 1000*server_defaults.'rt_lifetime' : 'wrong refresh token lifetime';
+⊨ size(clc#claims()) == 0 : ' got claims where none should be';
+
+r. := clc#introspect('-at');
+⊨ r.'active' : 'token not active';
+⊨ r.'client_id' == 'auto-test:/oauth/conf';
+⊨ r.'nbf' < r.'exp' : 'incorrect expires. Must be less than not before';
+⊨ r.'exp' - r.'nbf' == server_defaults.'at_lifetime';
+⊨ r.'token_type' == 'urn:ietf:params:oauth:token-type:access_token' : 'incorrect token type';
+⊨ r.'username' == 'jeff' : 'wrong user name in access token info';
+
+s. := clc#introspect('-rt');
+⊨ s.'active' : 'token not active';
+⊨ s.'client_id' == 'auto-test:/oauth/conf';
+⊨ s.'nbf' < s.'exp' : 'incorrect expires. Must be less than not before';
+⊨ s.'exp' - s.'nbf' == server_defaults.'rt_lifetime';
+⊨ s.'token_type' == 'urn:ietf:params:oauth:token-type:refresh_token' : 'incorrect token type';
+⊨ s.'username' == 'jeff' : 'wrong user name in refresh token info';
+say('ok: OAuth confidential, introspection test');

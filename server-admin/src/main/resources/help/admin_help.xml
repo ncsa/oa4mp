@@ -256,7 +256,7 @@ oa2>use admins
 admin_id*                 debug_on                  last_modified_ts          name                      vo_uri
 allow_qdl                 description               list_users                new_client_notify
 config                    email                     list_users_other_clients  secret
-creation_ts               issuer                    max_clients               vo
+creation_ts               issuer                    max_clients               vi
   admins>/commands
 approve          count_clients   list_clients
 approver_search                  list_ersatz

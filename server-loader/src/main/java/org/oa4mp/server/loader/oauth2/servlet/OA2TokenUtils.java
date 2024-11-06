@@ -5,7 +5,7 @@ import org.oa4mp.server.loader.oauth2.storage.RefreshTokenStore;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
 import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
 import org.oa4mp.server.loader.oauth2.storage.tx.TXRecord;
-import org.oa4mp.server.loader.oauth2.storage.vo.VirtualIssuer;
+import org.oa4mp.server.loader.oauth2.storage.vi.VirtualIssuer;
 import org.oa4mp.server.api.util.ClientDebugUtil;
 import org.oa4mp.delegation.common.storage.clients.BaseClient;
 import edu.uiuc.ncsa.security.core.exceptions.InvalidAlgorithmException;

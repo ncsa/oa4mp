@@ -24,18 +24,18 @@ public class OA2JSONPreprocessorTest extends JSONPreprocessorTest {
                     "            \"script\": [\n" +
                     "              \"# Set some variables to keep the verbosity down. These are mostly the IDPs.\",\n" +
                     "              \"# Note that this must run only before the first LDAP query.\",\n" +
-                    "              \"setEnv('vo','voPersonExternalID');\",\n" +
+                    "              \"setEnv('vi','voPersonExternalID');\",\n" +
                     "              \"setEnv('github','http://github.com/login/oauth/authorize');\",\n" +
                     "              \"setEnv('google','http://google.com/accounts/o8/id');\",\n" +
                     "              \"setEnv('orcid','http://orcid.org/oauth/authorize');\",\n" +
                     "              \"setEnv('ncsa','https://idp.ncsa.illinois.edu/idp/shibboleth');\",\n" +
                     "              \"#  Now figure out which IDP was used and set voPersonExternalID so it may be searched for.\",\n" +
                     "              \"xor{\",\n" +
-                    "              \"    if[equals(get('idp'),'${github}')]then[set('${vo}',concat(get('oidc'),'@github.com'))],\",\n" +
-                    "              \"    if[equals(get('idp'),'${google}')]then[set('${vo}',concat(get('oidc'),'@accounts.google.com'))],\",\n" +
-                    "              \"    if[equals(get('idp'),'${orcid}')]then[set('${vo}',replace(get('oidc'),'http://','https://'))],\",\n" +
-                    "              \"    if[hasClaim('eppn')]then[set('${vo}',get('eppn'))],\",\n" +
-                    "              \"    if[hasClaim('eptid')]then[set('${vo}',get('eptid'))]\",\n" +
+                    "              \"    if[equals(get('idp'),'${github}')]then[set('${vi}',concat(get('oidc'),'@github.com'))],\",\n" +
+                    "              \"    if[equals(get('idp'),'${google}')]then[set('${vi}',concat(get('oidc'),'@accounts.google.com'))],\",\n" +
+                    "              \"    if[equals(get('idp'),'${orcid}')]then[set('${vi}',replace(get('oidc'),'http://','https://'))],\",\n" +
+                    "              \"    if[hasClaim('eppn')]then[set('${vi}',get('eppn'))],\",\n" +
+                    "              \"    if[hasClaim('eptid')]then[set('${vi}',get('eptid'))]\",\n" +
                     "              \"};\"\n" +
                     "            ],\n" +
                     "            \"version\": \"1.0\"\n" +
@@ -61,7 +61,7 @@ public class OA2JSONPreprocessorTest extends JSONPreprocessorTest {
         JSONArray caput = new JSONArray();
 
         String[] head =
-                {"setEnv('vo','voPersonExternalID');\n" ,
+                {"setEnv('vi','voPersonExternalID');\n" ,
                 "setEnv('github','http://github.com/login/oauth/authorize');\n" ,
                 "setEnv('google','http://google.com/accounts/o8/id');\n" ,
                 "setEnv('orcid','http://orcid.org/oauth/authorize');\n" ,
