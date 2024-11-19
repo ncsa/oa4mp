@@ -1,0 +1,22 @@
+/*
+   Compliment to fnal-provisioner.qdl. This forks the flow.
+*/
+
+/* Full set of scopes returned is
+ sss ≔ 'storage.read:/dune/resilient/jobsub_stage storage.create:/fermigrid/jobsub/jobs storage.create:/dune/resilient/jobsub_stage compute.create compute.read compute.cancel compute.modify storage.create:/dune/scratch/users/cilogontest storage.read:/dune';
+*/
+sss ≔ 'storage.read:/dune/resilient/jobsub_stage storage.create:/fermigrid/jobsub/jobs storage.create:/dune/resilient/jobsub_stage compute.create';
+ttt ≔ 'compute.read compute.cancel compute.modify storage.create:/dune/scratch/users/cilogontest storage.read:/dune';
+params.'refresh' ≔  {'scope': sss};
+params.'exchange' ≔  {'scope': ttt};
+saved_cfg := '/tmp/fnal-test.json';
+
+clc#init($$OA4MP_CLC_XML_INI, 'localhost:test/fnal/ersatz');
+clc#read(saved_cfg, '-p'); // -p switch tell client that this is an ersatz client
+
+clc#set_param(params.);
+raw. ≔ clc#exchange({'type':'rt','subject':'rt','raw_response':true});
+say('raw exchange response:\n' + print(raw.));
+tokens. ≔ clc#refresh();
+say('refresh response AT:\n' + print(tokens.'access_token'));
+say('refresh response RT:\n' + print(tokens.'refresh_token'));

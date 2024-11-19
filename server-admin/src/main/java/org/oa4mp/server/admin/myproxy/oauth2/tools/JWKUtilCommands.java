@@ -58,8 +58,13 @@ public class JWKUtilCommands extends CommonCommands {
     }
 
     @Override
+    public String getName() {
+        return "jwk";
+    }
+
+    @Override
     public String getPrompt() {
-        return "jwk>";
+        return getName()+">";
     }
 
     @Override

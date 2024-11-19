@@ -13,7 +13,6 @@ import net.sf.json.JSONObject;
 import javax.servlet.http.HttpServletRequest;
 
 import java.util.HashMap;
-
 import static org.oa4mp.server.loader.qdl.claims.CSConstants.*;
 
 /**

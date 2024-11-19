@@ -19,12 +19,16 @@ public class CopyCommands extends CommonCommands {
         this.verifier = verifier;
     }
 
+    @Override
+    public String getName() {
+        return "copy";
+    }
 
     public static final String VERIFY_OPTION = "-verify";
 
     @Override
     public String getPrompt() {
-        return "  copy>";
+        return getName()+">";
     }
 
     @Override

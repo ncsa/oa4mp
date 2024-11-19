@@ -1,0 +1,17 @@
+/*
+   This does the test for provisioning an FNAL client and forking the flow.
+   Has to be run manually
+*/
+saved_cfg := '/tmp/fnal-test.json';
+
+params.'authz' :=  {'scope': 'storage.read:/ wlcg.capabilityset:/duneana wlcg.groups'};
+clc#init($$OA4MP_CLC_XML_INI, 'localhost:test/fnal');
+clc#set_param(params.);
+clc#uri(); // puts it in the clipboard.
+// Stop here, do authz, then grab the callback.
+clc#grant();
+clc#access();
+rm(saved_cfg);
+clc#write(saved_cfg);
+say('wrote FNAL provisioner test state to ' + saved_cfg);
+

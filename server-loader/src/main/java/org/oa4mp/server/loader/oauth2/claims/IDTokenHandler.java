@@ -167,6 +167,14 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
         long idtLifetime = ClientUtils.computeIDTLifetime(transaction, client, oa2se);
         long expiresAt = System.currentTimeMillis() + idtLifetime;
         getUserMetaData().put(EXPIRATION, expiresAt / 1000); // expiration is in SECONDS from the epoch.
+        if(!getUserMetaData().containsKey(SUBJECT)){
+            // Some clients do not have logins per say, e.g. the client credentials flow, in which case
+            // they may set a general subject (e.g. ncsa-robot) as the subject
+            // Hence this may be set in any handler.
+            if(getPhCfg().getClientConfig().hasSubject()){
+                getUserMetaData().put(SUBJECT, getPhCfg().getClientConfig().getSubject());
+            }
+        }
 /*        if(hasTXRecord()){
             getTXRecord().setLifetime(idtLifetime);
             getTXRecord().setExpiresAt(expiresAt);
@@ -278,6 +286,13 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
     @Override
     public void finish(String execPhase) throws Throwable {
         refreshAccountingInformation();
+        if(!getUserMetaData().containsKey(AUDIENCE)){
+            // as per OIDC spec. if not otherwise set, this MUST contain the client id.
+            getUserMetaData().put(AUDIENCE, transaction.getClient().getIdentifierString());
+        }
+        if(!getUserMetaData().containsKey(ISSUER)){
+            getUserMetaData().put(ISSUER, transaction.getClient().getIdentifierString());
+        }
         List<String> basicScopes = Arrays.asList(OA2Scopes.basicScopes);
         HashSet<String> x = new HashSet<>();
         x.addAll(getScopes());
@@ -393,9 +408,12 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
     protected void permissiveFinish(Collection<String> scopes, String execPhase) throws Throwable {
         // only required one by the spec. and only if the server is OIDC.
         if (oa2se.isOIDCEnabled()) {
+            // Fix https://github.com/ncsa/oa4mp/issues/219
+            if(transaction.getScopes().contains(OA2Scopes.SCOPE_OPENID)){}
+            // if no subject, e.g. in the client credentials flow, then this will cause an exception.
             checkClaim(getUserMetaData(), SUBJECT);
         }
-        // The strategy is that th is subtractive: the current metadata may have certain things
+        // The strategy is that this is subtractive: the current metadata may have certain things
         // removed, but everything else is returned.
         //Collection<String> scopes = getScopes();
         // CIL-1411 -- remove any claims not specifically requested by the user.

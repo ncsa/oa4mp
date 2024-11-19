@@ -1,14 +1,18 @@
 package org.oa4mp.server.admin.myproxy.oauth2.tools;
 
-import edu.uiuc.ncsa.sas.SASCLIDriver;
 import edu.uiuc.ncsa.sas.StringIO;
+import edu.uiuc.ncsa.sas.cli.SASCLIDriver;
 import edu.uiuc.ncsa.sas.thing.response.LogonResponse;
 import edu.uiuc.ncsa.sas.webclient.Client;
 import edu.uiuc.ncsa.sas.webclient.ResponseDeserializer;
+import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.util.cli.*;
+import edu.uiuc.ncsa.security.util.cli.CLIDriver;
+import edu.uiuc.ncsa.security.util.cli.CommonCommands;
+import edu.uiuc.ncsa.security.util.cli.HelpUtil;
+import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 import org.apache.commons.lang.StringUtils;
@@ -18,10 +22,10 @@ import org.oa4mp.server.admin.myproxy.oauth2.base.BaseCommands;
 import org.oa4mp.server.admin.myproxy.oauth2.base.ClientStoreCommands;
 import org.oa4mp.server.admin.myproxy.oauth2.base.CopyCommands;
 import org.oa4mp.server.loader.oauth2.OA2SE;
-import org.oa4mp.server.loader.oauth2.functor.claims.OA2FunctorFactory;
 import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -40,11 +44,27 @@ public class OA2Commands extends BaseCommands {
     @Override
     protected void init() {
         super.init();
-        components.add(PERMISSIONS);
+        try {
+            if (!drivers.containsKey(ADMINS)) {
+
+                drivers.put(ADMINS, createCLIDriver(getAdminClientCommands()));
+                drivers.put(PERMISSIONS, createCLIDriver(getPermissionCommands()));
+                drivers.put(TOKENS, createCLIDriver(getTokenCommands()));
+                //   drivers.put(TRANSACTION_COMMAND, createCLIDriver(getTransactionCommands()));
+                drivers.put(VIRTUAL_ISSUER, createCLIDriver(getVICommands()));
+            }
+        } catch (Throwable t) {
+            if (t instanceof RuntimeException) {
+                throw (RuntimeException) t;
+            }
+            throw new GeneralException("Unable to initialize CLI components", t);
+        }
+
+/*        components.add(PERMISSIONS);
         components.add(ADMINS);
         components.add(TOKENS);
         components.add(KEYS);
-        components.add(VIRTUAL_ISSUER);
+        components.add(VIRTUAL_ISSUER);*/
     }
 
     public OA2Commands(MyLoggingFacade logger) {
@@ -53,7 +73,12 @@ public class OA2Commands extends BaseCommands {
 
     @Override
     public String getPrompt() {
-        return "oa4mp>";
+        return getName() + ">";
+    }
+
+    @Override
+    public String getName() {
+        return "oa4mp";
     }
 
     protected ConfigurationLoader<? extends AbstractEnvironment> loader = null;
@@ -73,13 +98,6 @@ public class OA2Commands extends BaseCommands {
         say("Need to write help");
     }
 
-    @Override
-    public ParserCommands getNewParserCommands() throws Throwable {
-        OA2FunctorFactory ff = new OA2FunctorFactory(new HashMap<String, Object>(), new LinkedList<String>());
-        ff.setVerboseOn(true);
-        return new ParserCommands(getMyLogger(), ff);
-    }
-
     OA2SE getOA2SE() throws Exception {
         return (OA2SE) getServiceEnvironment();
     }
@@ -95,7 +113,7 @@ public class OA2Commands extends BaseCommands {
                 return;
             }
             OA2Commands oa2Commands = new OA2Commands(null);
-            oa2Commands.start(args); // read the command line options and such to set the state
+            oa2Commands.startup(args); // read the command line options and such to set the state
             CLIDriver cli = new CLIDriver(oa2Commands); // actually run the driver that parses commands and passes them along
             cli.start();
         } catch (Throwable t) {
@@ -166,24 +184,25 @@ public class OA2Commands extends BaseCommands {
     OA2ClientCommands oa2ClientCommands = null;
 
     @Override
-    public ClientStoreCommands getNewClientStoreCommands() throws Throwable {
+    public ClientStoreCommands getClientCommands() throws Throwable {
         if (oa2ClientCommands == null) {
             oa2ClientCommands = new OA2ClientCommands(getMyLogger(),
                     "  ",
                     getServiceEnvironment().getClientStore(),
-                    getNewClientApprovalStoreCommands(),
+                    getClientApprovalCommands(),
                     getOA2SE().getPermissionStore());
 
             oa2ClientCommands.setRefreshTokensEnabled(getOA2SE().isRefreshTokenEnabled());
             oa2ClientCommands.setSupportedScopes(getOA2SE().getScopes());
             //       oa2ClientCommands.setUucConfiguration(getOA2SE().getUucConfiguration());
             oa2ClientCommands.setEnvironment(getOA2SE());
+            oa2ClientCommands.setIOInterface(getIOInterface());
         }
         return oa2ClientCommands;
     }
 
     @Override
-    public CopyCommands getNewCopyCommands() throws Throwable {
+    public CopyCommands getCopyCommands() throws Throwable {
         return new CopyCommands(getMyLogger(), new OA2CopyTool(), new OA2CopyToolVerifier(), getConfigFile());
     }
 
@@ -200,7 +219,7 @@ public class OA2Commands extends BaseCommands {
 
     VICommands VICommands;
 
-    protected VICommands getVOCommands() throws Throwable {
+    protected VICommands getVICommands() throws Throwable {
         if (VICommands == null) {
             VICommands = new VICommands(getMyLogger(), "  ", getOA2SE().getVIStore());
             VICommands.setEnvironment(getOA2SE());
@@ -218,7 +237,6 @@ public class OA2Commands extends BaseCommands {
                     getOA2SE());
             transactionStoreCommands.setEnvironment(getOA2SE());
         }
-
         return transactionStoreCommands;
     }
 
@@ -230,7 +248,7 @@ public class OA2Commands extends BaseCommands {
             oa2AdminClientCommands = new OA2AdminClientCommands(getMyLogger(),
                     "  ",
                     getOA2SE().getAdminClientStore(),
-                    getNewClientApprovalStoreCommands(),
+                    getClientApprovalCommands(),
                     getOA2SE().getPermissionStore(),
                     getOA2SE().getClientStore());
             oa2AdminClientCommands.setEnvironment(getOA2SE());
@@ -254,9 +272,7 @@ public class OA2Commands extends BaseCommands {
         if (inputLine.hasArg(ADMINS)) {
             commands = getAdminClientCommands();
         }
-  /*      if (inputLine.hasArg(KEYS)) {
-            commands = new SigningCommands(getOA2SE());
-        }*/
+
         if (inputLine.hasArg(PERMISSIONS)) {
             commands = getPermissionCommands();
         }
@@ -264,7 +280,7 @@ public class OA2Commands extends BaseCommands {
             commands = getTokenCommands();
         }
         if (inputLine.hasArg(VIRTUAL_ISSUER)) {
-            commands = getVOCommands();
+            commands = getVICommands();
         }
         if (commands != null) {
             return switchOrRun(inputLine, commands);

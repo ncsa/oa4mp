@@ -71,7 +71,12 @@ import static org.oa4mp.delegation.server.server.RFC8628Constants.*;
  */
 public class OA2CLCCommands extends CommonCommands {
     public String getPrompt() {
-        return "clc>";
+        return getName() + ">";
+    }
+
+    @Override
+    public String getName() {
+        return "clc";
     }
 
     public OA2ClientEnvironment getCe() {
@@ -111,6 +116,10 @@ public class OA2CLCCommands extends CommonCommands {
             debugUtil = ((OA2ClientEnvironment) oa2CommandLineClient.getEnvironment()).getMetaDebugUtil();
         }
         return debugUtil;
+    }
+
+    public boolean hasDebugger() {
+        return debugUtil != null;
     }
 
     /**
@@ -278,6 +287,7 @@ public class OA2CLCCommands extends CommonCommands {
      * Do the device flow using the supplied map for extra parameters. This returns the raw response
      * (parsed as JSON) from the server. If this is to send headers, set them with the
      * {@link ServiceClient#HEADER_KEY}.
+     *
      * @param map
      * @return
      * @throws Exception
@@ -347,8 +357,8 @@ public class OA2CLCCommands extends CommonCommands {
 
         requestString = requestString + "?" + OA2Constants.CLIENT_ID + "=" + oa2ce.getClientId();
         requestString = requestString + "&" + SCOPE + "=" + URLEncoder.encode(scopes, "UTF-8");
-        for(Object key : parameters.keySet()){
-            if(!key.equals(ServiceClient.HEADER_KEY)){
+        for (Object key : parameters.keySet()) {
+            if (!key.equals(ServiceClient.HEADER_KEY)) {
                 requestString = requestString + "&" + key + "=" + URLEncoder.encode(parameters.get(key).toString(), "UTF-8");
             }
         }
@@ -460,7 +470,7 @@ public class OA2CLCCommands extends CommonCommands {
             if (clipboard != null) {
                 StringSelection data = new StringSelection(target);
                 clipboard.setContents(data, data);
-                if(s!=null) {
+                if (s != null) {
                     say(s);
                 }
             }
@@ -1353,6 +1363,9 @@ public class OA2CLCCommands extends CommonCommands {
             say("Oops! No configuration has been loaded.");
             return;
         }
+        if(getDummyAsset() == null){
+            throw new IllegalStateException("No dummy asset has been loaded.");
+        }
         lastException = null;
         try {
             int requestedTokenType = OA2MPService.EXCHANGE_DEFAULT;
@@ -1529,7 +1542,7 @@ public class OA2CLCCommands extends CommonCommands {
             say(json.getString(SYSTEM_MESSAGE_KEY));
         }
         if (json.containsKey("debugger")) {
-            if (getDebugger() != null) {
+            if (hasDebugger()) {
                 getDebugger().fromJSON(json.getJSONObject("debugger"));
             }
         }

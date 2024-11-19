@@ -1,13 +1,16 @@
 package org.oa4mp.server.admin.myproxy.oauth2.tools;
 
-import org.oa4mp.delegation.common.OA4MPVersion;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
-import edu.uiuc.ncsa.security.core.util.*;
+import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
+import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
+import edu.uiuc.ncsa.security.core.util.LoggerProvider;
+import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.cli.*;
 import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
 import edu.uiuc.ncsa.security.util.functor.parser.event.ParserUtil;
 import org.apache.commons.lang.StringUtils;
+import org.oa4mp.delegation.common.OA4MPVersion;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -41,10 +44,12 @@ public class JWKCLI extends ConfigurableCommandsImpl {
         super(logger);
     }
 
+/*
     @Override
-    public List<String> listComponents() {
+    public Set<String> listComponents() {
         return null;
     }
+*/
 
     public void about() {
         int width = 60;
@@ -72,8 +77,13 @@ public class JWKCLI extends ConfigurableCommandsImpl {
     }
 
     @Override
+    public String getName() {
+        return "jwt";
+    }
+
+    @Override
     public String getPrompt() {
-        return "jwt>";
+        return getName()+">";
     }
 
     @Override

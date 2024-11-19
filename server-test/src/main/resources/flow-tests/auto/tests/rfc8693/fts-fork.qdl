@@ -1,0 +1,28 @@
+/*
+   See fts-provisioner.qdl for note.
+   This does parts 2 and 3 of that flow.
+
+  script_load(os_env('NCSA_DEV_INPUT') + '/oa4mp/server-test/src/main/resources/flow-tests/auto/tests/rfc8693/fts-fork.qdl');
+
+*/
+
+path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests';
+script_path(path ~ script_path());
+saved_cfg := '/tmp/fts-test.json';
+ initialization := import(load('test#/auto/utils/initialization.mdl'));
+//test_id:= 'ccf.basic.ersatz';
+test_id:= 'ccf.jwt.ersatz';
+ini.:=initialization#get_client_ini(test_id);
+server_defaults.:=initialization# server_defaults();
+
+clc#init($$OA4MP_CLC_INI, test_id);
+clc#read(saved_cfg, '-p'); // -p switch tell client that this is an ersatz client
+
+params.'refresh' :=  {'scope': 'P Q refresh'}; // initial request is query
+params.'exchange' :=  {'scope': 'S T exchange', 'audience':'my_exchange_audience'}; // initial request is query
+clc#set_param(params.);
+raw. := clc#exchange({'subject':'at','type':'rt', 'raw_response':true});
+say('exchange raw response:\n' + print(raw.));
+tokens. := clc#refresh();
+say('refresh response AT:\n' + print(tokens.'access_token'.'jwt'));
+say('\n\nrefresh response RT:\n' + print(tokens.'refresh_token'.'jwt'));

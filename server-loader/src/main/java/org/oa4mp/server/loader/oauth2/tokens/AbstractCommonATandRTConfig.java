@@ -16,13 +16,11 @@ import java.util.List;
  * on 1/18/21 at  6:32 AM
  */
 public class AbstractCommonATandRTConfig extends AbstractPayloadConfig {
-    public static String SUBJECT_KEY = "subject";
     public static String ISSUER_KEY = "issuer";
     public static String AUDIENCE_KEY = "audience";
     public static String RESOURCE_KEY = "resource";
 
     String issuer;
-    String subject = null;
     List<String> audience = new ArrayList<>();
 
     public List<URI> getResource() {
@@ -43,20 +41,11 @@ public class AbstractCommonATandRTConfig extends AbstractPayloadConfig {
         this.issuer = issuer;
     }
 
-    public boolean hasSubject(){
-        return subject != null;
-    }
-    public String getSubject() {
-        return subject;
-    }
 
-    public void setSubject(String subject) {
-        this.subject = subject;
-    }
 
 
     /**
-     * The list of audiences (i.e. returned in the {@link edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims#AUDIENCE}
+     * The list of audiences (i.e. returned in the {@link org.oa4mp.delegation.server.server.claims.OA2Claims#AUDIENCE}
      * claim) allowed
      * @return
      */
@@ -75,9 +64,7 @@ public class AbstractCommonATandRTConfig extends AbstractPayloadConfig {
           if (jsonObject.containsKey(ISSUER_KEY)) {
               issuer = jsonObject.getString(ISSUER_KEY);
           }
-          if (jsonObject.containsKey(SUBJECT_KEY)) {
-              subject = jsonObject.getString(SUBJECT_KEY);
-          }
+
 
           if (jsonObject.containsKey(AUDIENCE_KEY)) {
               Object obj = jsonObject.get(AUDIENCE_KEY);
@@ -122,9 +109,7 @@ public class AbstractCommonATandRTConfig extends AbstractPayloadConfig {
             json.put(ISSUER_KEY, issuer);
         }
 
-        if (subject != null) {
-            json.put(SUBJECT_KEY, subject);
-        }
+
 
         if (audience != null) {
             json.put(AUDIENCE_KEY, audience);

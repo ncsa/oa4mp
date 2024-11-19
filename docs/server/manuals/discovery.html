@@ -48,7 +48,7 @@
     
         
                     <div class="xleft">
-            Last Published: 2024-10-28
+            Last Published: 2024-11-11
                                 </div>
                 <div class="xright">            
     
@@ -144,22 +144,55 @@
         
 
 
-
 <section>
 <h2><a name="The_Discovery_Service"></a>The Discovery Service</h2>
 
 <p>OA4MP (for OIDC) supports the .well-known endpoint, as per <a class="externalLink" href="https://tools.ietf.org/html/rfc5785">RFC 5785</a>
+    <a class="externalLink" href="https://datatracker.ietf.org/doc/html/rfc8414">OAuth 2 Discovery</a>,
     and <a class="externalLink" href="https://openid.net/specs/openid-connect-discovery-1_0.html">OIDC discovery</a>.
 It should be noted that each instance of OA4MP will have its own location for this which corresponds
 to that instance. This allows for multiple services in a single domain.</p>
 
-<p>You may also use the discovery service to get the public signing keys. This is at the certs endpoint.
+<p>You may also use the discovery service to get the public signing keys. This is at the <b>certs</b> endpoint.
 </p>
 
 <section>
-<h3><a name="Example"></a>Example</h3>
+<h3><a name="By_the_specification"></a>By the specification</h3>
 
-<p>If OA4MP is hosted at https://services.bigstate.edu/oauth2, then the discovery page is at
+<p>According to the specifications (RFC 8414, RFC 5785) a request to the service at the
+<b>.well-known</b> end point must return the information for the OAuth server. This means that</p>
+
+<ul>
+    
+<li>If Apache webserver is fronting Tomcat, you must use <b>mod_rewrite</b> to forward any requests to
+    the OA4MP Discovery servlet</li>
+    
+<li>In a Tomcat only install, you should install the RFC8414 servlet that will automatically forward
+    the requests.</li>
+</ul>
+
+<p>It is also possible to just use the <a class="externalLink" href="https://tomcat.apache.org/tomcat-9.0-doc/rewrite.html">rewrite valve</a>
+in Tomcat to forward requests, however, since it is possible to have multiple OA4MP instances each with its own
+ Discovery service, the RFC8414 servlet is much more flexible.</p>
+
+</section></section><section>
+<h2><a name="A_note_on_issuers."></a>A note on issuers.</h2>
+
+<p>OA4MP allows for multiple issuers with their own keys and hence discovery pages to be created.
+The normal way this works is that a <i>virtual organization</i> is created and </p>
+
+<section>
+<h3><a name="Example_accessing_the_well-known_page"></a>Example accessing the well-known page</h3>
+
+<p>In this case, Tomcat has been configured to return the well-known page for a single OA4MP install using
+    the RFC8414 webapp.
+A request to https://services.bigstate.edu/.well-known/openid-configuration will be forwarded
+to the OA4MP instance and serviced there. See the next example for a typical response.</p>
+
+</section><section>
+<h3><a name="Example_accessing_the_OA4MP_Discovery_service_directly"></a>Example accessing the OA4MP Discovery service directly</h3>
+
+<p>If OA4MP is hosted at https://services.bigstate.edu/oauth2, then the discovery service is at
 https://services.bigstate.edu/oauth2/.well-known/openid-configuration and will return a JSON
 object such as </p>
 
@@ -234,7 +267,6 @@ and this will return a JSON WebKey object:
   }
  ]}
 </pre></div>
-
 </section></section>
 
     </div>

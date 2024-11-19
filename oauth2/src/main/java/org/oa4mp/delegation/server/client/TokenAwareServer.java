@@ -145,7 +145,11 @@ public abstract class TokenAwareServer extends ASImpl {
                 }
             }
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            // It is also possible the issuer is not really resolvable at this point.
+            // Might remove this check in the future on this account.
+            if(DebugUtil.isEnabled()) {
+                e.printStackTrace();
+            }
         }
 
         if (!claims.containsKey(EXPIRATION)) {

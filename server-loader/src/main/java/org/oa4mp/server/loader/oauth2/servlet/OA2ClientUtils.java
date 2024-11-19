@@ -1,12 +1,11 @@
 package org.oa4mp.server.loader.oauth2.servlet;
 
-import edu.uiuc.ncsa.security.core.util.StringUtils;
-import org.oa4mp.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
@@ -15,11 +14,14 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.http.HttpStatus;
 import org.oa4mp.delegation.common.storage.clients.Client;
+import org.oa4mp.delegation.server.OA2ATException;
 import org.oa4mp.delegation.server.OA2Constants;
 import org.oa4mp.delegation.server.OA2Errors;
 import org.oa4mp.delegation.server.OA2GeneralError;
 import org.oa4mp.delegation.server.jwt.JWTRunner;
 import org.oa4mp.delegation.server.server.RFC9068Constants;
+import org.oa4mp.delegation.server.storage.ClientStore;
+import org.oa4mp.server.api.admin.permissions.Permission;
 import org.oa4mp.server.api.storage.servlet.AbstractRegistrationServlet;
 import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.claims.*;
@@ -433,7 +435,44 @@ public class OA2ClientUtils {
         return computedScopes;
 
     }
+     // Fixes https://github.com/ncsa/oa4mp/issues/222
 
+    /**
+     * Create an ersatz client given the information about its provenence.
+     * @param provisioningClientID
+     * @param oa2se
+     * @param ersatzClient
+     * @param ersatzChain
+     * @return
+     */
+    public static OA2Client createErsatz(Identifier provisioningClientID, OA2SE oa2se, OA2Client ersatzClient, List<Identifier> ersatzChain) {
+        List<Identifier> prototypes = new ArrayList<>();
+        if (ersatzClient.isExtendsProvisioners()) {
+            prototypes.add(provisioningClientID); // this is normally not in the chain
+            prototypes.addAll(ersatzChain.subList(0, ersatzChain.size() - 1)); // last element is ersatzClient, so skip
+            prototypes.addAll(ersatzClient.getPrototypes());
+            ersatzClient.setPrototypes(prototypes);
+        }
+        return resolvePrototypes(oa2se, ersatzClient);
+    }
+
+    /**
+     * Used to create the ersatz client when the service transaction has already been setup to have th provisioning
+     * admin and client IDs.
+     * @return
+     */
+    public static OA2Client createErsatz(OA2SE oa2SE, OA2ServiceTransaction t, OA2Client client){
+    try {
+        Permission ersatzChain = oa2SE.getPermissionStore().getErsatzChain(t.getProvisioningAdminID(), t.getProvisioningClientID(), client.getIdentifier());
+        return createErsatz(t.getProvisioningClientID(), oa2SE, client, ersatzChain.getErsatzChain());
+    } catch (UnknownClientException ucx) {
+
+        throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
+                ucx.getMessage(), HttpStatus.SC_INTERNAL_SERVER_ERROR,
+                t.getRequestState(),
+                t.getClient());
+    }
+}
     public static OA2Client resolvePrototypes(OA2SE oa2SE, OA2Client baseClient) {
         return resolvePrototypes(oa2SE.getClientStore(), baseClient);
     }
@@ -452,6 +491,7 @@ public class OA2ClientUtils {
         skipSet.add(oa2ClientKeys.secret());
         skipSet.add(oa2ClientKeys.identifier());
         skipSet.add(oa2ClientKeys.name());
+        skipSet.add(oa2ClientKeys.ersatzInheritIDToken()); // don't override this!
 
         for (Identifier id : baseClient.getPrototypes()) {
             OA2Client currentClient = (OA2Client) store.get(id);

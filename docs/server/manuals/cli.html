@@ -48,7 +48,7 @@
     
         
                     <div class="xleft">
-            Last Published: 2024-10-28
+            Last Published: 2024-11-11
                                 </div>
                 <div class="xright">            
     
@@ -144,7 +144,6 @@
         
 
 
-
 <h1>Command line tools for OA4MP</h1>
 
 These are a set of programs that are accessible from a CLI
@@ -156,142 +155,59 @@ store to another.
 <section>
 <h2><a name="Getting_the_tools"></a>Getting the tools</h2>
 
-
-<p>The latest version of the Oauth 2.0 command line tool is available at
-<a class="externalLink" href="https://github.com/ncsa/oa4mp/releases/latest/oa2-cli.jar">oa2-cli.jar</a>
-You should also get the script that runs this too,
-<a class="externalLink" href="https://github.com/ncsa/oa4mp/releases/latest/oa2-cli">oa2-cli</a>
+<p>
+    Generally you should <a class="externalLink" href="https://github.com/ncsa/oa4mp/releases/latest/download/server-installer.jar">use the installer</a>
+    and follow the instructions for that. This will deploy and configure a fully functional
+    CLI for your server. If you <i>really</i> insist on downloading and running the jar manually,
+    please the <a href="#appendix">Appendix</a>.
 </p>
-</section><section>
-<h2><a name="Configuration"></a>Configuration</h2>
-The tool uses a standard configuration file exactly like the server. Indeed, you can just
+
+<section>
+<h3><a name="Configuration"></a>Configuration</h3>
+
+<p>The tool uses a standard configuration file exactly like the server. Indeed, you can
+(and generally should) just
 point the tool at the server configuration file. You will need to supply the name of
-the configuration in the file you want to use. Aliases can be quite handy here. Given the abilities of
+the configuration in the file you want to use. Configuration file aliases (these are internal
+to the can be quite handy here. Given the abilities of
 the CLI to do quick copies of the store, it pays to have a backup (file) store configured and
 occasionally simple copy the active store to that. There are many possible uses. It is assumed that
-the tools are installed in a location called $OA4MP_HOME. Normally the default for this is
+the tools are installed in a location called $OA4MP_SERVER. Normally the default for this is
 <br /><br />
-OAuth 1.0a: OA4MP_HOME=/opt/oa4mp
-<br /><br />
-OAuth 2.0: OA4MP_HOME=opt/oa2
-
-<b>Note that we will be discussing the OA4MP tools rather than the OA2 tools in what follows.
-    Everything here works the same if you replace oa4mp-* by oa2-*</b>
+OA4MP_SERVER=/opt/oa4mp/server
+</p>
 
 <p>The assumption of the script is that files are in the following directory structure</p>
 
 <ul>
     
-<li>$OA4MP_HOME/etc/admin-cfg.xml - the configuration file</li>
+<li>$OA4MP_SERVER/etc/admin-cfg.xml - the configuration file</li>
     
-<li>$OA4MP_HOME/lib/oa4mp-cli.jar - the jar containing the CLI</li>
+<li>$OA4MP_SERVER/lib/cli.jar - the jar containing the CLI</li>
     
-<li>$OA4MP_HOME/bin/oa4mp-cli - the script for running this. Be sure it is set to be executable.</li>
+<li>$OA4MP_SERVER/bin/cli - the script for running this. Be sure it is set to be executable.</li>
 </ul>
-The default name of the configuration is assumed to be &quot;default&quot; (no quotes). If you invoke the script with
-no arguments it will use this and the above configuration file.
 
-</section><section>
-<h2><a name="Running_the_CLI"></a>Running the CLI</h2>
-Invocation from the command line is usually done with the supplied shell script, oa4mp-cli. The
-invocation syntax is <br />
+<p>The default name of the configuration is assumed to be &quot;default&quot; (no quotes). If you invoke the script with
+    no arguments it will use this and the above configuration file. Invocation syntax is</p>
 
 
 <div>
-<pre>oa4mp-cli [configName configFile]</pre></div>
+<pre>java -jar $OA4MP_SERVER/lib/cli.jar  [configName configFile env]</pre></div>
 
-You should run this as root and might need to set the script to be
-executable if it is not. If you give neither arguments then defaults are used. Invoke with the argument  &quot;--help&quot;
-for more information. If you give one argument it is assumed to be the configuration name
-in the default configuration file.
-</section><section>
-<h2><a name="Command_line_options_for_the_jar."></a>Command line options for the jar.</h2>
-You should run this from the script, but if you want or need to specify
-invoke the jar directly, the invocation options they are listed here.
+<ol style="list-style-type: decimal">
+    
+<li>configName = name of the configuration in the file</li>
+    
+<li>configFile = full path to the configuration file</li>
+    
+<li>env = full path to a properties fiel that has environment variables set in it.
+    (This is specialized and can usually be omitted.)</li>
+</ol>
 
-<table class="bodyTable" style="text-align: left; width: 1157px; height: 165px;" border="1" cellspacing="2" cellpadding="2">
-    <tbody>
-    
-<tr class="a">
-        
-<td style="vertical-align: top;">Argument</td>
-        
-<td style="vertical-align: top;">Value required?</td>
-        
-<td style="vertical-align: top;">Required?</td>
-        
-<td style="vertical-align: top;">Description</td>
-    </tr>
-    
-<tr class="b">
-        
-<td style="vertical-align: top;">-cfg</td>
-        
-<td style="vertical-align: top;">Y</td>
-        
-<td style="vertical-align: top;">Y</td>
-        
-<td style="vertical-align: top;">The full path to the configuration file.</td>
-    </tr>
-    
-<tr class="a">
-        
-<td style="vertical-align: top;">-name</td>
-        
-<td style="vertical-align: top;">F</td>
-        
-<td style="vertical-align: top;">F</td>
-        
-<td style="vertical-align: top;">The name of the configuration within the file. If there is a single configuration
-            in the file, then no name is needed. If there are multiple configurations you must specify which one to use. </td>
-    </tr>
-    
-<tr class="b">
-        
-<td style="vertical-align: top;">-log</td>
-        
-<td style="vertical-align: top;">F</td>
-        
-<td style="vertical-align: top;">F</td>
-        
-<td style="vertical-align: top;">The full path log file. If this is not specified then a file named &quot;log.xml&quot;
-        is dumped into the invocation directory.</td>
-    </tr>
-    
-<tr class="a">
-        
-<td style="vertical-align: top;">-use</td>
-        
-<td style="vertical-align: top;">F</td>
-        
-<td style="vertical-align: top;">F</td>
-        
-<td style="vertical-align: top;">Specify the component to use. Rather than loading the whole CLI then <b>use</b>-ing
-        a components (such as clients) you may simply specify that here.</td>
-    </tr>
-    
-<tr class="b">
-        
-<td style="vertical-align: top;">-v</td>
-        
-<td style="vertical-align: top;">F</td>
-        
-<td style="vertical-align: top;">F</td>
-        
-<td style="vertical-align: top;">No argument. Turns on verbose logging so that much more information is dumped
-        onto the console. This is useful for debugging or just if you want to see what it is up to.</td>
-    </tr>
-</tbody>
-</table>
+<p>Note that you may shorten the list, but cannot, e.g., just supply the configuration file.</p>
 
-<div>
-<pre>
-    java -jar oa4mp-cli.jar -cfg /path/to/cfg.xml -name myConfig -log /path/to/mylog.xml -use approvals
-</pre></div>
-This would load the configuration named &quot;myConfig&quot; from the given file, write the log to a file called
-&quot;mylog.xml&quot; and bring up the approvals component.
-
-</section><section>
+</section></section><section>
 <h2><a name="Help.21"></a>Help!</h2>
 
 <p>For every command you may add the switch --help and you will get
@@ -348,7 +264,9 @@ view the help for the <b>ls</b> command:</p>
 </section><section>
 <h2><a name="Meta_commands"></a>Meta commands</h2>
 
-<p>There are commands to do tasks and there are <i>meta-commands</i> that control how the
+<p>The OA4MP CLI extends the <a class="externalLink" href="https://ncsa.github.io/security-lib/cli/index.html">NCSA CLI framework</a>,
+    so meta commands are more fully discussed there.
+    There are commands to do tasks and there are <i>meta-commands</i> that control how the
 CLI itself operates. These are prefixed with a backslash <b>/</b>. E.g. to quit a component,
 issue</p>
 
@@ -360,8 +278,8 @@ issue</p>
 <div>
 <pre>/?</pre></div>
 
-<p>Extremely use meta-commands are a command history, executing a command in another component
-with out switching from the current one, saving you command history (useful if you want
+<p>Commonly used meta-commands are a command history, executing a command in another component
+without switching from the current one, saving you command history (useful if you want
 to use a set of commands as a basis for some scripting). To list the commands available for
 the admin component, you would issue</p>
 
@@ -401,23 +319,23 @@ the startup banner and prompt:
 
 <div>
 <pre>
-[mybox bin]# ./oa4mp-cli
+[mybox bin]# ./cli
 **********************************************************
 * OA4MP CLI (Command Line Interpreter)                   *
-* Version 6.x-SNAPSHOT                                          *
+* Version 6.0                                          *
 * By Jeff Gaynor  NCSA                                   *
 *  (National Center for Supercomputing Applications)     *
 *                                                        *
 * type 'help' for a list of commands                     *
 *      'exit' or 'quit' to end this session.             *
 **********************************************************
-oa2&gt;
+oa4mp&gt;
 </pre></div>
 If you type &quot;--help&quot; You will get
 
 <div>
 <pre>
-oa2&gt;--help
+oa4mp&gt;--help
 
 Here are the commands available:
 use
@@ -440,7 +358,7 @@ To see the help for, say, the use command you would issue
 
 <div>
 <pre>
-   oa2&gt;use --help
+   oa4mp&gt;use --help
     Choose the component you wish to use.
     you specify the component as use + name. Supported components are
     clients - edit client records
@@ -504,8 +422,8 @@ to clear it. If you have an default id set, you do not need to specify one.</p>
 
 <div>
 <pre>
-    oa2&gt;set_id foo:bar/34456
-    oa2&gt;ls -l
+    oa4mp&gt;set_id foo:bar/34456
+    oa4mp&gt;ls -l
   name : My test thing
     id : foo:bar/34456
 </pre></div>
@@ -551,12 +469,12 @@ you would have something like the following
 
 <div>
 <pre>
-oa2&gt;use clients
+oa4mp&gt;use clients
   clients &gt;size
     Current store has 22 entries
   clients &gt;exit
 exiting ...
-oa2&gt;
+oa4mp&gt;
 </pre></div>
 
 </section><section>
@@ -894,7 +812,7 @@ deserialization commands against it repeatedly as you debug it.</p>
 Invoke as
 
 <div>
-<pre>oa2&gt; use clients</pre></div>
+<pre>oa4mp&gt; use clients</pre></div>
 Operations allowed in addition to the standard ones are
 
 <ul>
@@ -934,7 +852,7 @@ clients&gt;
 Invoke as
 
 <div>
-<pre>oa2&gt; use approvals</pre></div>
+<pre>oa4mp&gt; use approvals</pre></div>
  There are no extra options beyond the standard ones, however, the create command
 takes the unique id of the client record you are going to approve. Once created, you may enter the
 approval information directly.
@@ -944,7 +862,7 @@ approval information directly.
 Invoke as
 
 <div>
-<pre>oa2&gt;use copy</pre></div>
+<pre>oa4mp&gt;use copy</pre></div>
 Supported operation is
 
 <ul>
@@ -958,8 +876,124 @@ then the two stores are compared once the copy has been completed. Note that thi
 for a large store! However, if there is any question it is at times very useful.
 
 
+<h1 id="appendix">Appendix</h1>
+<section>
+<h3><a name="Getting_and_installing_it_manually"></a>Getting and installing it manually</h3>
 
-</section>
+<p>You <i>can</i> just download the jar and configure it manually, though that is a lot more
+    work than the installer. One cogent argument is incorporating the CLI into your own custome scripts.
+    This section is how to run the CLI fromthe jara manually. If you use the installer,
+    skip this section.</p>
+
+<p>The latest version of the OA4MP command line tool is available at
+    <a class="externalLink" href="https://github.com/ncsa/oa4mp/releases/latest/download/cli.jar">cli.jar</a>
+    You should also get the script that runs this too,
+    <a class="externalLink" href="https://github.com/ncsa/oa4mp/releases/latest/cli">cli</a>
+</p>
+
+<p>If you are pointing to the server configuration, you will probably need to run this as root
+    to get access top that file.  If you invoke the CLI with no arguments, it will tell
+    you there is no configuration, but you can use all of the online help.
+    You need the configuration file and name of the configuration generally to get a working
+    CLI.</p>
+
+<section>
+<h4><a name="Running_the_CLI_jar"></a>Running the CLI jar</h4>
+
+<p>invocation syntax is just like any other executable jar</p>
+
+
+<div>
+<pre>java -jar $OA4MP_SERVER/lib/cli.jar  <i>options</i></pre></div>
+
+</section><section>
+<h4><a name="Command_line_options_for_the_jar."></a>Command line options for the jar.</h4>
+You should run this from the script, but if you want or need to specify
+invoke the jar directly, the invocation options they are listed here.
+
+<table class="bodyTable" style="text-align: left; width: 1157px; height: 165px;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">Argument</td>
+        
+<td style="vertical-align: top;">Value required?</td>
+        
+<td style="vertical-align: top;">Required?</td>
+        
+<td style="vertical-align: top;">Description</td>
+    </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">-cfg</td>
+        
+<td style="vertical-align: top;">Y</td>
+        
+<td style="vertical-align: top;">Y</td>
+        
+<td style="vertical-align: top;">The full path to the configuration file.</td>
+    </tr>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">-name</td>
+        
+<td style="vertical-align: top;">F</td>
+        
+<td style="vertical-align: top;">F</td>
+        
+<td style="vertical-align: top;">The name of the configuration within the file. If there is a single configuration
+            in the file, then no name is needed. If there are multiple configurations you must specify which one to use. </td>
+    </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">-log</td>
+        
+<td style="vertical-align: top;">F</td>
+        
+<td style="vertical-align: top;">F</td>
+        
+<td style="vertical-align: top;">The full path log file. If this is not specified then a file named &quot;log.xml&quot;
+            is dumped into the invocation directory.</td>
+    </tr>
+    
+<tr class="a">
+        
+<td style="vertical-align: top;">-use</td>
+        
+<td style="vertical-align: top;">F</td>
+        
+<td style="vertical-align: top;">F</td>
+        
+<td style="vertical-align: top;">Specify the component to use. Rather than loading the whole CLI then <b>use</b>-ing
+            a components (such as clients) you may simply specify that here.</td>
+    </tr>
+    
+<tr class="b">
+        
+<td style="vertical-align: top;">-v</td>
+        
+<td style="vertical-align: top;">F</td>
+        
+<td style="vertical-align: top;">F</td>
+        
+<td style="vertical-align: top;">No argument. Turns on verbose logging so that much more information is dumped
+            onto the console. This is useful for debugging or just if you want to see what it is up to.</td>
+    </tr>
+    </tbody>
+</table>
+
+<div>
+<pre>
+    java -jar cli.jar -cfg /path/to/cfg.xml -name myConfig -log /path/to/mylog.xml -use approvals
+</pre></div>
+This would load the configuration named &quot;myConfig&quot; from the given file, write the log to a file called
+&quot;mylog.xml&quot; and bring up the approvals component.
+
+</section></section></section>
 
     </div>
 </div>

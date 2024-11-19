@@ -1,42 +1,12 @@
 package org.oa4mp.server.proxy;
 
-import edu.uiuc.ncsa.security.servlet.HeaderUtils;
-import org.oa4mp.server.loader.oauth2.OA2SE;
-import org.oa4mp.server.loader.oauth2.claims.IDTokenHandler;
-import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
-import org.oa4mp.server.loader.oauth2.state.ScriptRuntimeEngineFactory;
-import org.oa4mp.server.loader.oauth2.storage.RefreshTokenStore;
-import org.oa4mp.server.loader.oauth2.storage.TokenInfoRecord;
-import org.oa4mp.server.loader.oauth2.storage.TokenInfoRecordMap;
-import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
-import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
-import org.oa4mp.server.loader.oauth2.storage.transactions.OA2TStoreInterface;
-import org.oa4mp.server.loader.oauth2.storage.tx.TXRecord;
-import org.oa4mp.server.loader.oauth2.storage.vi.VirtualIssuer;
-import org.oa4mp.server.loader.oauth2.tokens.UITokenUtils;
-import org.oa4mp.server.api.admin.adminClient.AdminClient;
-import org.oa4mp.server.api.admin.permissions.Permission;
-import org.oa4mp.server.api.admin.permissions.PermissionsStore;
-import org.oa4mp.server.api.storage.servlet.IssuerTransactionState;
-import org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet;
-import org.oa4mp.server.api.util.ClientDebugUtil;
-import org.oa4mp.delegation.common.servlet.TransactionState;
-import org.oa4mp.delegation.common.storage.TransactionStore;
-import org.oa4mp.delegation.common.token.AuthorizationGrant;
-import org.oa4mp.delegation.common.token.RefreshToken;
-import org.oa4mp.delegation.server.jwt.JWTRunner;
-import org.oa4mp.delegation.server.jwt.MyOtherJWTUtil2;
-import org.oa4mp.delegation.server.server.*;
-import org.oa4mp.delegation.server.server.claims.OA2Claims;
-import org.oa4mp.delegation.server.ServiceTransaction;
-import org.oa4mp.delegation.server.request.ATRequest;
-import org.oa4mp.delegation.server.request.IssuerResponse;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.exceptions.TransactionNotFoundException;
 import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
 import edu.uiuc.ncsa.security.core.util.*;
+import edu.uiuc.ncsa.security.servlet.HeaderUtils;
 import edu.uiuc.ncsa.security.servlet.ServiceClientHTTPException;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
@@ -50,9 +20,38 @@ import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.http.HttpStatus;
+import org.oa4mp.delegation.common.servlet.TransactionState;
+import org.oa4mp.delegation.common.storage.TransactionStore;
+import org.oa4mp.delegation.common.token.AuthorizationGrant;
+import org.oa4mp.delegation.common.token.RefreshToken;
 import org.oa4mp.delegation.common.token.impl.*;
 import org.oa4mp.delegation.server.*;
+import org.oa4mp.delegation.server.jwt.JWTRunner;
+import org.oa4mp.delegation.server.jwt.MyOtherJWTUtil2;
+import org.oa4mp.delegation.server.request.ATRequest;
+import org.oa4mp.delegation.server.request.IssuerResponse;
+import org.oa4mp.delegation.server.server.*;
+import org.oa4mp.delegation.server.server.claims.OA2Claims;
+import org.oa4mp.server.api.admin.adminClient.AdminClient;
+import org.oa4mp.server.api.admin.permissions.Permission;
+import org.oa4mp.server.api.admin.permissions.PermissionsStore;
+import org.oa4mp.server.api.storage.servlet.IssuerTransactionState;
+import org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet;
+import org.oa4mp.server.api.util.ClientDebugUtil;
+import org.oa4mp.server.loader.oauth2.OA2SE;
+import org.oa4mp.server.loader.oauth2.claims.IDTokenHandler;
+import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
 import org.oa4mp.server.loader.oauth2.servlet.*;
+import org.oa4mp.server.loader.oauth2.state.ScriptRuntimeEngineFactory;
+import org.oa4mp.server.loader.oauth2.storage.RefreshTokenStore;
+import org.oa4mp.server.loader.oauth2.storage.TokenInfoRecord;
+import org.oa4mp.server.loader.oauth2.storage.TokenInfoRecordMap;
+import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
+import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
+import org.oa4mp.server.loader.oauth2.storage.transactions.OA2TStoreInterface;
+import org.oa4mp.server.loader.oauth2.storage.tx.TXRecord;
+import org.oa4mp.server.loader.oauth2.storage.vi.VirtualIssuer;
+import org.oa4mp.server.loader.oauth2.tokens.UITokenUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -255,10 +254,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         Date now = new Date();
         serviceTransaction.setAuthTime(now); // auth time is now.
         client.setLastAccessed(now);
-        /*
-        exp
-        jti
-         */
+
         JSONObject claims = new JSONObject();
         List<String> audience = HeaderUtils.getParameters(request, AUDIENCE, " ");
         serviceTransaction.setAudience(audience);
@@ -321,7 +317,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 // do nothing.
             }
         }
-     //   serviceTransaction.setAccessTokenLifetime(ClientUtils.computeATLifetime(serviceTransaction, client, getOA2SE()));
+        //   serviceTransaction.setAccessTokenLifetime(ClientUtils.computeATLifetime(serviceTransaction, client, getOA2SE()));
 
         if (request.getParameter(OA2Constants.REFRESH_LIFETIME) != null) {
             String rawATLifetime = getFirstParameterValue(request, OA2Constants.REFRESH_LIFETIME);
@@ -352,7 +348,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 // do nothing.
             }
         }
-      //  serviceTransaction.setIDTokenLifetime(ClientUtils.computeIDTLifetime(serviceTransaction, client, getOA2SE()));
+        //  serviceTransaction.setIDTokenLifetime(ClientUtils.computeIDTLifetime(serviceTransaction, client, getOA2SE()));
 
 
         OA2ServletUtils.processXAs(request, serviceTransaction, client);
@@ -477,7 +473,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             }
         }
 
- //       serviceTransaction.setAccessTokenLifetime(ClientUtils.computeATLifetime(serviceTransaction, client, getOA2SE()));
+        //       serviceTransaction.setAccessTokenLifetime(ClientUtils.computeATLifetime(serviceTransaction, client, getOA2SE()));
         if (jsonRequest.containsKey(OA2Constants.REFRESH_LIFETIME)) {
             String rawRTLifetime = jsonRequest.getString(OA2Constants.REFRESH_LIFETIME);
             try {
@@ -508,7 +504,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 // do nothing.
             }
         }
-     //   serviceTransaction.setIDTokenLifetime(ClientUtils.computeIDTLifetime(serviceTransaction, client, getOA2SE()));
+        //   serviceTransaction.setIDTokenLifetime(ClientUtils.computeIDTLifetime(serviceTransaction, client, getOA2SE()));
         try {
             String[] rawResource = extractArray(jsonRequest, RESOURCE);
             String[] rawAudience = extractArray(jsonRequest, AUDIENCE);
@@ -582,13 +578,13 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         }
         ATIResponse2 atResponse = (ATIResponse2) issuerTransactionState.getIssuerResponse();
         atResponse.setJsonWebKey(key);
-        if(isRFC6749_4_4){
+        if (isRFC6749_4_4) {
             // Only return a refresh token if they explicitly request it with the offline_access
             // scope AND they are allowed to get
-            if(!serviceTransaction.getScopes().contains(OA2Scopes.SCOPE_OFFLINE_ACCESS)){
+            if (!serviceTransaction.getScopes().contains(OA2Scopes.SCOPE_OFFLINE_ACCESS)) {
                 ((ATIResponse2) issuerTransactionState.getIssuerResponse()).setRefreshToken(null);
             }
-            if(!serviceTransaction.getScopes().contains(OA2Scopes.SCOPE_OPENID)){
+            if (!serviceTransaction.getScopes().contains(OA2Scopes.SCOPE_OPENID)) {
                 ((ATIResponse2) issuerTransactionState.getIssuerResponse()).setIdToken(null);
             }
         }
@@ -975,7 +971,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 info("No pending transactions found anywhere for client \"" + client.getIdentifierString() + "\".");
                 throw new OA2ATException(OA2Errors.INVALID_GRANT, "no pending transaction found.", client);
             }
-            if(!client.getIdentifierString().equals(t.getClient().getIdentifierString())){
+            if (!client.getIdentifierString().equals(t.getClient().getIdentifierString())) {
 
                 debugger.trace(this, "transaction found, checking for ersatz client:" + t.summary());
 
@@ -1064,8 +1060,10 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 t2.setATData(atData);
                 t2.setAccessTokenLifetime(ClientUtils.computeATLifetime(t2, client, getOA2SE()));
                 t2.setIDTokenLifetime(ClientUtils.computeIDTLifetime(t2, client, getOA2SE()));
+
                 if (!client.isErsatzInheritIDToken()) {
                     t2.setUserMetaData(new JSONObject());//
+                    // Always update the id
                     t2.getUserMetaData().put(JWT_ID, ((OA2TokenForge) getOA2SE().getTokenForge()).getIDToken().getJti().toString());
                     if (client.getScopes().contains(OA2Scopes.SCOPE_OPENID)) {
                         // or it will bomb in the check that this is an OIDC client.
@@ -1087,10 +1085,10 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             debugger.trace(this, "resolving ersatz client");
             try {
                 Permission p = getOA2SE().getPermissionStore().getErsatzChain(t.getProvisioningAdminID(), t.getProvisioningClientID(), client.getIdentifier());
-                if(p == null){
+                if (p == null) {
                     throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
-                            "permissions not found for admin '" + t.getProvisioningAdminID()+
-                                    "' + and provisioner '" + t.getProvisioningClientID()+ "'", HttpStatus.SC_UNAUTHORIZED,
+                            "permissions not found for admin '" + t.getProvisioningAdminID() +
+                                    "' + and provisioner '" + t.getProvisioningClientID() + "'", HttpStatus.SC_UNAUTHORIZED,
                             t.getRequestState(),
                             client);
                 }
@@ -1395,6 +1393,13 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                                    HttpServletResponse response) throws IOException {
         OA2ServiceTransaction t = rfc8693Thingie.transaction;
         OA2Client client = rfc8693Thingie.client;
+        if (client.isErsatzClient()) {
+            client = OA2ClientUtils.createErsatz(getOA2SE(), t, client);
+/*
+            Permission ersatzChain = getOA2SE().getPermissionStore().getErsatzChain(t.getProvisioningAdminID(), t.getProvisioningClientID(), client.getIdentifier());
+            client = OA2ClientUtils.createErsatz(t.getProvisioningClientID(), getOA2SE(), client, ersatzChain.getErsatzChain());
+*/
+        }
         MetaDebugUtil debugger = rfc8693Thingie.debugger;
         String requestedTokenType = rfc8693Thingie.requestTokenType;
         List<String> scopes = rfc8693Thingie.scopes;
@@ -1679,6 +1684,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
      * @return
      */
     protected OA2Client createErsatz(Identifier provisioningClientID, OA2Client ersatzClient, List<Identifier> ersatzChain) {
+        //Moved this to the OA2ClientUtils where is should be.
+        return OA2ClientUtils.createErsatz(provisioningClientID, getOA2SE(), ersatzClient, ersatzChain);
+/*
         List<Identifier> prototypes = new ArrayList<>();
         if (ersatzClient.isExtendsProvisioners()) {
             prototypes.add(provisioningClientID); // this is normally not in the chain
@@ -1687,6 +1695,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             ersatzClient.setPrototypes(prototypes);
         }
         return OA2ClientUtils.resolvePrototypes(getOA2SE(), ersatzClient);
+*/
     }
 
     /**
@@ -2141,6 +2150,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         if (client == null) {
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, "Could not find the client associated with refresh token \"" + rawRefreshToken + "\"");
         }
+
         debugger.trace(this, "starting token refresh at " + (new Date()));
         // Check if it's a token or JWT
         OA2SE oa2SE = (OA2SE) MyProxyDelegationServlet.getServiceEnvironment();
@@ -2184,6 +2194,10 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 throw x;
             }
             oldTXRT = (TXRecord) getOA2SE().getTxStore().get(BasicIdentifier.newID(oldRT.getJti()));
+        }
+        if (client.isErsatzClient()) {
+            Permission ersatzChain = getOA2SE().getPermissionStore().getErsatzChain(t.getProvisioningAdminID(), t.getProvisioningClientID(), client.getIdentifier());
+            client = OA2ClientUtils.createErsatz(t.getProvisioningClientID(), getOA2SE(), client, ersatzChain.getErsatzChain());
         }
         XMLMap backup = GenericStoreUtils.toXML(getTransactionStore(), t);
         if (debugger instanceof ClientDebugUtil) {

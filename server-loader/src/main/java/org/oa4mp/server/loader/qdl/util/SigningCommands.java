@@ -57,8 +57,13 @@ public class SigningCommands extends CommonCommands {
     OA2SE oa2SE;
 
     @Override
+    public String getName() {
+        return "keys";
+    }
+
+    @Override
     public String getPrompt() {
-        return "keys>";
+        return getName()+">";
     }
 
     protected void createHelp() {

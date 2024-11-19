@@ -25,7 +25,7 @@ public class AdminClientKeys extends BaseClientKeys {
     String issuer = "issuer";
     String maxClients = "max_clients";
     String notifyOnNewClientCreate="new_client_notify";
-    String vo="vi";
+    String vo="vo";
     String voURI="vo_uri";
     String listUsers = "list_users";
     String listUsersInOtherClients = "list_users_other_clients";

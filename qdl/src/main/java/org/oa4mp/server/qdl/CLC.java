@@ -534,12 +534,16 @@ public class CLC implements QDLMetaModule {
                 inputLine.removeSwitch(EXCHANGE_RAW_RESPONSE);
             } else {
                 List<String> args = new ArrayList<>();
-                args.add("-" + inStem.getString("subject"));
+                args.add("exchange"); // need dummy 0th arg or does not parse right.
 
                 if (inStem.containsKey("type")) {
-                    args.add("-subject");
-                    args.add(inStem.getString("type"));
+                    args.add("-"+inStem.getString("type"));
                 }
+                if(inStem.containsKey("subject")) {
+                    args.add("-subject");
+                    args.add( inStem.getString("subject"));
+                }
+
                 if (inStem.containsKey(EXCHANGE_RAW_RESPONSE)) {
                     rawResponse = inStem.getBoolean(EXCHANGE_RAW_RESPONSE);
                 }

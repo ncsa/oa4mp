@@ -1624,7 +1624,8 @@ public class OIDCCMServlet extends EnvServlet {
             if (jsonRequest.containsKey(EA_SUPPORT)) {
                 client.setExtendedAttributeSupport(jsonRequest.getBoolean(EA_SUPPORT));
             }
-            if (jsonRequest.containsKey(ERSATZ_CLIENT_PROVISIONERS)) {
+            if (client.isErsatzClient() && jsonRequest.containsKey(ERSATZ_CLIENT_PROVISIONERS)) {
+                // Fix https://github.com/ncsa/oa4mp/issues/221
                 JSONArray array;
                 try {
                     array = jsonRequest.getJSONArray(ERSATZ_CLIENT_PROVISIONERS);

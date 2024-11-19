@@ -11,7 +11,6 @@ block[
      // 3/20/2022 -- Oopsie! Dave switched to using another client which *always* sends the capability
      // set every time. Remove it if present since these would normally be removed in the access.qdl script.
      SS(y)->say('*** FNAL' +  (is_defined(access_control.)?('[' + access_control.client_id + ']:'):':') + to_string(y));
-
      SS('scopes.=' + print(scopes.));
      SS('tx_scopes.=' + print(tx_scopes.));
      SS('tx_audience.=' + print(tx_audience.));

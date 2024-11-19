@@ -1,14 +1,14 @@
 package org.oa4mp.server.admin.myproxy.oauth2.base;
 
-import org.oa4mp.server.api.OA4MPConfigTags;
-import org.oa4mp.server.api.ServiceEnvironment;
+import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.cli.*;
+import org.oa4mp.server.api.OA4MPConfigTags;
+import org.oa4mp.server.api.ServiceEnvironment;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -19,41 +19,49 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
     public static final String CLIENTS = "clients";
     public static final String CLIENT_APPROVALS = "approvals";
     public static final String COPY = "copy";
-    public String PARSER_COMMAND = "parser";
     public String TRANSACTION_COMMAND = "transactions";
+    protected Map<String, CLIDriver> drivers = new HashMap<>();
 
     protected List<String> components = new ArrayList<>();
 
     protected boolean showHeader = true;
     protected boolean showLogo = true;
 
-    protected void init() {
-        if (components.isEmpty()) {
-            components.add(CLIENTS);
-            components.add(CLIENT_APPROVALS);
-            components.add(COPY);
-            components.add(PARSER_COMMAND);
-            components.add(TRANSACTION_COMMAND);
+    protected void init()  {
+        try {
+            if (drivers.isEmpty()) {
+                drivers.put(CLIENTS, createCLIDriver(getClientCommands()));
+                drivers.put(CLIENT_APPROVALS, createCLIDriver(getClientApprovalCommands()));
+                drivers.put(TRANSACTION_COMMAND, createCLIDriver(getTransactionCommands()));
+            }
+        }catch(Throwable t) {
+            if( t instanceof RuntimeException ){
+                throw (RuntimeException)t;
+            }
+            throw new  GeneralException("Unable to initialize CLI components", t);
         }
     }
 
     @Override
-    public List<String> listComponents() {
+/*    public List<String> listComponents() {
         return components;
+    }*/
+    public Set<String> listComponents() {
+        return drivers.keySet();
     }
 
     public abstract void about();
 
-    public abstract ClientStoreCommands getNewClientStoreCommands() throws Throwable;
+    public abstract ClientStoreCommands getClientCommands() throws Throwable;
 
-    public abstract CopyCommands getNewCopyCommands() throws Throwable;
+    public abstract CopyCommands getCopyCommands() throws Throwable;
 
     protected abstract CommonCommands getTransactionCommands() throws Throwable;
 
 
     protected BaseCommands(MyLoggingFacade logger) {
         super(logger);
-        init();
+     //   init();
     }
 
     @Override
@@ -80,7 +88,7 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
      * @param args
      * @throws Exception
      */
-    protected void start(String[] args) throws Exception {
+    protected void startup(String[] args) throws Exception {
         InputLine inputLine = new InputLine(args);
         showLogo = !inputLine.hasArg("-noLogo");
         showHeader = !inputLine.hasArg("-noHeader");
@@ -112,6 +120,7 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
             System.setOut(out);
             System.setErr(err);
         }
+        init();
     }
 
 
@@ -120,7 +129,7 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
     }
 
 
-    public ClientApprovalStoreCommands getNewClientApprovalStoreCommands() throws Throwable {
+    public ClientApprovalStoreCommands getClientApprovalCommands() throws Throwable {
         return new ClientApprovalStoreCommands(getMyLogger(), "  ", getServiceEnvironment().getClientApprovalStore());
     }
 
@@ -129,10 +138,10 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
         CommonCommands commands = null;
 
         if (inputLine.hasArg(CLIENTS)) {
-            commands = getNewClientStoreCommands();
+            commands = getClientCommands();
         }
         if (inputLine.hasArg(CLIENT_APPROVALS)) {
-            commands = getNewClientApprovalStoreCommands();
+            commands = getClientApprovalCommands();
         }
 /*        if (inputLine.hasArg(COPY)) {
             commands = getNewCopyCommands();
@@ -166,7 +175,9 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
     protected boolean switchOrRun(InputLine inputLine, CommonCommands commands) {
         boolean switchComponent = 1 < inputLine.getArgCount();
 
-        CLIDriver cli = new CLIDriver(commands);
+        CLIDriver cli = new CLIDriver();
+        cli.setIOInterface(commands.getIOInterface());
+        cli.addCommands(commands);
         cli.setEnv(getGlobalEnv());
         cli.setComponentManager(this);
         if (switchComponent) {
@@ -177,28 +188,34 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
         }
         return true;
     }
-
+protected CLIDriver createCLIDriver(CommonCommands commands){
+    CLIDriver cli = new CLIDriver();
+    cli.setIOInterface(commands.getIOInterface());
+    cli.addCommands(commands);
+    cli.setEnv(getGlobalEnv());
+    cli.setComponentManager(this);
+    return cli;
+}
 
     protected boolean hasComponent(String componentName) {
         return componentName.equals(CLIENTS) ||
                 componentName.equals(CLIENT_APPROVALS) ||
-                componentName.equals(COPY) ||
-                componentName.equals(PARSER_COMMAND);
+                componentName.equals(COPY) ;
     }
 
     protected void runComponent(String componentName) throws Throwable {
         CommonCommands commonCommands = null;
-        if (componentName.equals(PARSER_COMMAND)) {
+    /*    if (componentName.equals(PARSER_COMMAND)) {
             commonCommands = getNewParserCommands();
-        }
+        }*/
         if (componentName.equals(CLIENTS)) {
-            commonCommands = getNewClientStoreCommands();
+            commonCommands = getClientCommands();
         }
         if (componentName.equals(CLIENT_APPROVALS)) {
-            commonCommands = getNewClientApprovalStoreCommands();
+            commonCommands = getClientApprovalCommands();
         }
         if (componentName.equals(COPY)) {
-            commonCommands = getNewCopyCommands();
+            commonCommands = getCopyCommands();
         }
         if (commonCommands != null) {
             CLIDriver cli = new CLIDriver(commonCommands);
@@ -207,7 +224,7 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
         }
     }
 
-    public abstract ParserCommands getNewParserCommands() throws Throwable;
+//    public abstract ParserCommands getNewParserCommands() throws Throwable;
 
     protected boolean executeComponent() throws Throwable {
         if (hasOption(USE_COMPONENT_OPTION, USE_COMPONENT_LONG_OPTION)) {
@@ -232,7 +249,6 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
         say(CLIENTS + " - edit client records");
         say(CLIENT_APPROVALS + " - edit client approval records\n");
         say(COPY + " - copy an entire store.\n");
-        say(PARSER_COMMAND + " - debug/use/try out the parser for scripting.\n");
         say("e.g.\n\nuse " + CLIENTS + "\n\nwill call up the client management component.");
         say("Type 'exit' or /q when you wish to exit the component and return to the main menu");
     }

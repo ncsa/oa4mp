@@ -1,0 +1,44 @@
+This blurb concerns how to properly configure FTS-type clients. These are used by
+Rucio, FTS, DUNE and other projects and specific relations.
+
+Using the CLI
+-------------
+
+- Creating a provisioning client needs to have the ID token inherited.
+  Otherwise none of the audience etc. are propagated and checks on it will
+  fail. Alternatetly, you could create it in toto (the aim of no inheritence)
+  if you want.
+
+- Make sure the ersatz client (E) and provisioner (P) are both administered by
+  the same admin. E.g. for provisioner localhost:p3 and ersatz localhost:ccf2 and
+  admin client oa4mp:/admin/oa4mp/test
+
+============
+oa4mp>use admins
+  admins>set_id oa4mp:/admin/oa4mp/test
+  Identifier set to oa4mp:/admin/oa4mp/test
+  admins>link localhost:p3
+  done. The client with identifier "localhost:p3" is now managed by "oa4mp:/admin/oa4mp/test"
+  admins>link localhost:ccf2
+  done. The client with identifier "localhost:ccf2" is now managed by "oa4mp:/admin/oa4mp/test"
+============
+
+
+- Set E to be an ersatz of P, E.g.
+
+============
+  admins>set_ersatz localhost:p3 localhost:ccf2
+  done
+============
+
+You are now ready to use these and configure them.
+
+Using the CM
+------------
+
+- Create your E client first,
+
+ - To set an ersatz client for a provisioner, you must update the provisioner sending the E client's id
+   as a parameter with the key org.oa4mp:/ersatz/provisioners
+
+   Note https://github.com/ncsa/oa4mp/issues/221 should revise this, since it's quite an eccentric choice of words.

@@ -6,6 +6,8 @@ test.:=[
         [(path + 'auto/tests/rfc8693/') + 'github-211.qdl',  '-subject','at'],
         [(path + 'auto/tests/rfc8693/') + 'ersatz-rt.qdl',  '-subject','at'],
         [(path + 'auto/tests/rfc8693/') + 'ersatz-rt.qdl',  '-subject','rt'],
+        [(path + 'auto/tests/rfc8693/') + 'ersatz-rt-refresh.qdl',  '-subject','rt'],
+        [(path + 'auto/tests/rfc8693/') + 'ersatz-rt-refresh.qdl',  '-subject','at'],
         [(path + 'auto/tests/rfc8693/') + 'ersatz-fork.qdl', '-at', '-subject','at'],
         [(path + 'auto/tests/rfc8693/') + 'ersatz-fork.qdl', '-at', '-subject','rt'],
         [(path + 'auto/tests/rfc8693/') + 'ersatz-fork.qdl', '-none', '-subject','at'],
@@ -16,6 +18,5 @@ test.:=[
 
 say('RFC 8693 (token exchange) and 𝕰𝖗s𝖆𝖙𝖟 client tests. These should run automated and require no manual input.');
 say('---------------');
-clc#echo_http_request(true);
-clc#echo_http_response(true);
+
 script_load('runner.qdl', test., true);

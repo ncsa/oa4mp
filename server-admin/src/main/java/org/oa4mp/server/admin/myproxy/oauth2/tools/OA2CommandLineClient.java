@@ -1,7 +1,5 @@
 package org.oa4mp.server.admin.myproxy.oauth2.tools;
 
-import org.oa4mp.server.admin.myproxy.oauth2.base.CommandLineClient;
-import org.oa4mp.delegation.common.OA4MPVersion;
 import edu.uiuc.ncsa.security.core.exceptions.ConnectionException;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
@@ -11,8 +9,8 @@ import edu.uiuc.ncsa.security.util.cli.FormatUtil;
 import edu.uiuc.ncsa.security.util.cli.HelpUtil;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import org.apache.commons.lang.StringUtils;
-
-import java.util.List;
+import org.oa4mp.delegation.common.OA4MPVersion;
+import org.oa4mp.server.admin.myproxy.oauth2.base.CommandLineClient;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -25,17 +23,17 @@ public class OA2CommandLineClient extends CommandLineClient {
     }
 
     @Override
+    public String getName() {
+        return "oa4mp";
+    }
+
+    @Override
     public HelpUtil getHelpUtil() {
         return null;
     }
 
     public OA2CommandLineClient(MyLoggingFacade logger) {
         super(logger);
-    }
-
-    @Override
-    public List<String> listComponents() {
-        return null;
     }
 
     public void setLoader(ConfigurationLoader<? extends AbstractEnvironment> loader) {

@@ -367,7 +367,6 @@ val jwt: String = signedJWT.serialize()     */
         } else {
             if (h.get(ALGORITHM).equals(NONE_JWT)) {
                 DebugUtil.trace(JWTUtil.class, "unsigned id token. Returning payload");
-
                 return p;
 
             }

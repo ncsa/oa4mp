@@ -197,7 +197,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
     }
 
     public boolean hasAudience() {
-        return getState().containsKey(AUDIENCE_KEY) || (getState().get(AUDIENCE_KEY) != null && !((List) getState().get(AUDIENCE_KEY)).isEmpty());
+        return getState().containsKey(AUDIENCE_KEY) && (getState().get(AUDIENCE_KEY) != null && !((List) getState().get(AUDIENCE_KEY)).isEmpty());
 
     }
 

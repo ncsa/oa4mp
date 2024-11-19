@@ -32,6 +32,8 @@ public abstract class AbstractPayloadConfig implements Serializable {
     public static String VERSIONS_KEY = "versions";
     public static String CREATE_TS_KEY = "creation_ts";
     public static String LIFETIME_KEY = "lifetime";
+    public static String SUBJECT_KEY = "subject";
+
 
     protected String type = null;
     List<String> versions;
@@ -45,7 +47,7 @@ public abstract class AbstractPayloadConfig implements Serializable {
     }
 
     public Date getCreationTS() {
-        if(creationTS == null){
+        if (creationTS == null) {
             creationTS = new Date();
         }
         return creationTS;
@@ -62,21 +64,24 @@ public abstract class AbstractPayloadConfig implements Serializable {
     public void fromJSON(JSONObject jsonObject) {
         if (jsonObject.containsKey(LIFETIME_KEY)) {
             Object rawLifetime = jsonObject.get(LIFETIME_KEY);
-            if(rawLifetime instanceof String){
-                lifetime = XMLConfigUtil.getValueSecsOrMillis((String)rawLifetime, false);
-            }else {
+            if (rawLifetime instanceof String) {
+                lifetime = XMLConfigUtil.getValueSecsOrMillis((String) rawLifetime, false);
+            } else {
                 // assume it is a long and let JSON figure it out
                 lifetime = jsonObject.getLong(LIFETIME_KEY);
             }
         }
-        if(jsonObject.containsKey(QDLRuntimeEngine.CONFIG_TAG)) {
-            try{
+        if (jsonObject.containsKey(SUBJECT_KEY)) {
+            setSubject( jsonObject.getString(SUBJECT_KEY));
+        }
+        if (jsonObject.containsKey(QDLRuntimeEngine.CONFIG_TAG)) {
+            try {
                 rawScripts = jsonObject.getJSONObject(QDLRuntimeEngine.CONFIG_TAG);
-            }catch (JSONException jsonException){
+            } catch (JSONException jsonException) {
                 rawScripts = jsonObject.getJSONArray(QDLRuntimeEngine.CONFIG_TAG);
             }
             //rawScripts = jsonObject.getJSONObject(QDLRuntimeEngine.CONFIG_TAG);
-            if(rawScripts == null){
+            if (rawScripts == null) {
                 throw new IllegalArgumentException("error: no recognizable scripts found for \"" + jsonObject.getString(QDLRuntimeEngine.CONFIG_TAG) + "\"");
             }
             setScriptSet(AnotherJSONUtil.createScripts(rawScripts));
@@ -89,45 +94,52 @@ public abstract class AbstractPayloadConfig implements Serializable {
         if (jsonObject.containsKey(VERSIONS_KEY)) {
             versions = jsonObject.getJSONArray(VERSIONS_KEY);
         }
-        if(jsonObject.containsKey(ID_KEY)){
+        if (jsonObject.containsKey(ID_KEY)) {
             id = jsonObject.getString(ID_KEY);
         }
-        if(jsonObject.containsKey(CREATE_TS_KEY)){
+        if (jsonObject.containsKey(CREATE_TS_KEY)) {
             try {
                 Calendar calendar = Iso8601.string2Date(jsonObject.getString(CREATE_TS_KEY));
                 creationTS = calendar.getTime();
-            }catch( ParseException pe){
+            } catch (ParseException pe) {
                 creationTS = new Date(); // set to now.
             }
         }
     }
-    public  JSONObject toJSON(){
+
+    public JSONObject toJSON() {
         JSONObject json = new JSONObject();
         if (type != null) {
             json.put(TYPE_KEY, type);
 
         }
         if (lifetime != null) {
-             json.put(LIFETIME_KEY, lifetime);
-         }
+            json.put(LIFETIME_KEY, lifetime);
+        }
         if (versions != null) {
             json.put(VERSIONS_KEY, versions);
         }
-        if(!StringUtils.isTrivial(id)){
+        if (hasSubject()) {
+            json.put(SUBJECT_KEY, getSubject());
+        }
+        if (!StringUtils.isTrivial(id)) {
             json.put(ID_KEY, id);
         }
         json.put(CREATE_TS_KEY, Iso8601.date2String(getCreationTS()));
         json.put(QDLRuntimeEngine.CONFIG_TAG, rawScripts);
         return json;
     }
-    public  ScriptSet getScriptSet(){
-        if(scriptSet == null){
+
+    public ScriptSet getScriptSet() {
+        if (scriptSet == null) {
             scriptSet = new ScriptSet();
         }
         return scriptSet;
     }
+
     ScriptSet scriptSet;
-    public void setScriptSet(ScriptSet scriptSet){
+
+    public void setScriptSet(ScriptSet scriptSet) {
         this.scriptSet = scriptSet;
     }
 
@@ -146,7 +158,8 @@ public abstract class AbstractPayloadConfig implements Serializable {
     public void setVersions(List<String> versions) {
         this.versions = versions;
     }
-        Long lifetime = -1L;
+
+    Long lifetime = -1L;
 
     public Long getLifetime() {
         return lifetime;
@@ -156,4 +169,17 @@ public abstract class AbstractPayloadConfig implements Serializable {
         this.lifetime = lifetime;
     }
 
+    String subject = null;
+
+    public boolean hasSubject() {
+        return subject != null;
+    }
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
 }

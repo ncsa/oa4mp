@@ -1,0 +1,31 @@
+/*
+  Provisions the client for an FTS client  type flow. To wit,
+  1. The provisioner  uses the CCF and gets an access token
+  2. The FTS (ersatz) client forks the flow for an access token
+  3. The FTS client does a call to the refresh endpoint (with downscopes,
+     audience, etc.) to get an access token and refresh token.
+
+  This script does 1. The scope handling mechanism is just to echo whatever
+  was passed (at least at this point in time). It writes the state to a file.
+  and should be followed up with running fts-fork.qdl
+
+  Run this as
+  script_load(os_env('NCSA_DEV_INPUT') + '/oa4mp/server-test/src/main/resources/flow-tests/auto/tests/rfc8693/fts-provisioner.qdl');
+*/
+path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests';
+script_path(path ~ script_path());
+saved_cfg := '/tmp/fts-test.json';
+//test_id:= 'ccf.basic.provisioner';
+test_id:= 'ccf.jwt.provisioner';
+initialization := import(load('test#/auto/utils/initialization.mdl'));
+ini.:=initialization#get_client_ini(test_id);
+server_defaults.:=initialization# server_defaults();
+clc#init($$OA4MP_CLC_INI, test_id);
+params. := {'scope':'X Y Z wlcg:capabilityset:/dunana', 'audience':'my_aud'};
+tokens. := clc#ccf(params.);
+say('ccf response:\n' + print(tokens.));
+//clc#exchange({'subject':'at','type':'rt'});
+//clc#exchange();
+rm(saved_cfg);
+clc#write(saved_cfg);
+say('wrote FTS provisioner state to ' + saved_cfg);

@@ -1,3 +1,4 @@
  acl#acl_add('localhost:test/fnal');
+ acl#acl_add('localhost:test/fnal/ersatz');
  acl#acl_add('fnal:dwd-7');
  acl#acl_check();
