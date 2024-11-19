@@ -11,13 +11,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="https://github.com/ncsa/oa4mp/issues/221, https://github.com/ncsa/oa4mp/issues/222">
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2AdminClientCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2AdminClientCommands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/admin/adminClient/AdminClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/admin/adminClient/AdminClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/servlet/OA2RegistrationServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/servlet/OA2RegistrationServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/storage/transactions/OA2ServiceTransaction.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/storage/transactions/OA2ServiceTransaction.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/storage/vi/VirtualIssuer.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/storage/vi/VirtualIssuer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/QDLXMLConstants.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/QDLXMLConstants.java" afterDir="false" />
+    <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="https://github.com/ncsa/oa4mp/issues/219, https://github.com/ncsa/oa4mp/issues/216 (more VO renaming of internal variables to vi)">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -173,7 +168,7 @@
       <recent name="edu.uiuc.ncsa.oa4mp.delegation.server.storage.upkeep" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.QDL">
+  <component name="RunManager" selected="Tomcat Server.OA4MP server">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="WIDTH" value="400" />
       <option name="HEIGHT" value="300" />
@@ -1149,15 +1144,7 @@
       <workItem from="1726051918658" duration="61220000" />
       <workItem from="1726656910058" duration="312045000" />
       <workItem from="1730827183985" duration="70712000" />
-      <workItem from="1731622085783" duration="74038000" />
-    </task>
-    <task id="LOCAL-00011" summary="https://github.com/ncsa/oa4mp/issues/166 check for missing/empty refresh token explicitly in refresh endpoint and fail immediately if it is not there.">
-      <option name="closed" value="true" />
-      <created>1707168299538</created>
-      <option name="number" value="00011" />
-      <option name="presentableId" value="LOCAL-00011" />
-      <option name="project" value="LOCAL" />
-      <updated>1707168299538</updated>
+      <workItem from="1731622085783" duration="75146000" />
     </task>
     <task id="LOCAL-00012" summary="https://github.com/ncsa/security-lib/issues/34">
       <option name="closed" value="true" />
@@ -1543,7 +1530,15 @@
       <option name="project" value="LOCAL" />
       <updated>1732051217401</updated>
     </task>
-    <option name="localTasksCounter" value="60" />
+    <task id="LOCAL-00060" summary="https://github.com/ncsa/oa4mp/issues/219, https://github.com/ncsa/oa4mp/issues/216 (more VO renaming of internal variables to vi)">
+      <option name="closed" value="true" />
+      <created>1732051748161</created>
+      <option name="number" value="00060" />
+      <option name="presentableId" value="LOCAL-00060" />
+      <option name="project" value="LOCAL" />
+      <updated>1732051748161</updated>
+    </task>
+    <option name="localTasksCounter" value="61" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1554,7 +1549,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
-    <MESSAGE value="https://github.com/ncsa/oa4mp/issues/196. Document the JWT util and added a startup script for OA4MP installs to create a set of signing keys." />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/197, https://github.com/ncsa/oa4mp/issues/198" />
     <MESSAGE value="Update website" />
     <MESSAGE value="Update of website. Added support for echoing requests in CLC." />
@@ -1579,7 +1573,8 @@
     <MESSAGE value="Fix for https://github.com/ncsa/oa4mp/issues/218. Changed package and some class names related to virtual issuers." />
     <MESSAGE value="RFC 6749 §4.4 documentation, client credentials flow" />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/221, https://github.com/ncsa/oa4mp/issues/222" />
-    <option name="LAST_COMMIT_MESSAGE" value="https://github.com/ncsa/oa4mp/issues/221, https://github.com/ncsa/oa4mp/issues/222" />
+    <MESSAGE value="https://github.com/ncsa/oa4mp/issues/219, https://github.com/ncsa/oa4mp/issues/216 (more VO renaming of internal variables to vi)" />
+    <option name="LAST_COMMIT_MESSAGE" value="https://github.com/ncsa/oa4mp/issues/219, https://github.com/ncsa/oa4mp/issues/216 (more VO renaming of internal variables to vi)" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
