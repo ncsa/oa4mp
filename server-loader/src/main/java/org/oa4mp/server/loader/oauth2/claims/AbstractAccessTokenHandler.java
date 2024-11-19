@@ -489,7 +489,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
         // hierarchy.
         // 1. If they passed it in explicitly, use that
         // 2. If it is set in the configuration, use that
-        // 3. If there is a VO, use that
+        // 3. If there is a VI, use that
         // 4. If all else fails, use the standard issuer
         if (transaction.hasAudience()) {
             atData.put(AUDIENCE, transaction.getAudience());
@@ -497,12 +497,12 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
             if (getATConfig().getAudience() != null && !getATConfig().getAudience().isEmpty()) {
                 atData.put(AUDIENCE, getATConfig().getAudience());
             } else{
-                VirtualIssuer vo = oa2se.getVI(client.getIdentifier());
-                if (vo == null) {
-                    // fail safe. No VO, no configuration, return this service as issuer.
+                VirtualIssuer vi = oa2se.getVI(client.getIdentifier());
+                if (vi == null) {
+                    // fail safe. No VI, no configuration, return this service as issuer.
                     atData.put(AUDIENCE, transaction.getClient().getIdentifierString());
                 } else {
-                    atData.put(AUDIENCE, vo.getAtIssuer());
+                    atData.put(AUDIENCE, vi.getAtIssuer());
                 }
                 // Note that at this point a default audience could be set, but different
                 // protocols have very different ideas. These are set in the individual handlers.

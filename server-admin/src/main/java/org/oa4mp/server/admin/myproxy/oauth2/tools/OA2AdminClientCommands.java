@@ -70,15 +70,15 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
         if (!isEmpty(issuer)) {
             client.setIssuer(issuer);
         }
-        String voURI;
+        String viURI;
         if (client.getVirtualIssuer() == null) {
-            voURI = getPropertyHelp(keys.voURI(), "Give the VO URI", null);
+            viURI = getPropertyHelp(keys.voURI(), "Give the VI URI", null);
         } else {
-            voURI = getPropertyHelp(keys.voURI(), "Give the VO URI", client.getVirtualIssuer().toString());
+            viURI = getPropertyHelp(keys.voURI(), "Give the VI URI", client.getVirtualIssuer().toString());
         }
-        if (!isEmpty(voURI)) {
+        if (!isEmpty(viURI)) {
             try {
-                URI z = URI.create(voURI);
+                URI z = URI.create(viURI);
                 client.setVirtualIssuer(BasicIdentifier.newID(z));
             } catch (Throwable t) {
                 if (DebugUtil.isEnabled()) {

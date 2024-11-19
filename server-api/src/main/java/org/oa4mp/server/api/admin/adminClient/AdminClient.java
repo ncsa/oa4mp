@@ -189,7 +189,7 @@ public class AdminClient extends BaseClient {
                 "admin_id=" + getIdentifier() +
                 ", virtualIssuer=" + virtualIssuer +
                 ", issuer='" + issuer + '\'' +
-                ", externalVOName='" + externalVIName + '\'' +
+                ", externalVIName='" + externalVIName + '\'' +
                 ", maxClients=" + maxClients +
                 ", config=" + config +
                 ", allowQDL=" + allowQDL +

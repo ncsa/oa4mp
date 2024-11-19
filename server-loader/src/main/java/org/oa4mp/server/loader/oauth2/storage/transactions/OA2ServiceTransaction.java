@@ -532,7 +532,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
     /**
      * Sets the provisioning admin partly so we don't have to look it up again and partly so
      * that for very, very long lived transactions, there is absolutely no possibility
-     * that the VO can change.
+     * that the VI can change.
      *
      * @param provisioningAdminID
      */

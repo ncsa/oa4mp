@@ -44,7 +44,7 @@ public class OA2RegistrationServlet extends AbstractRegistrationServlet {
     public static final String CALLBACK_URI = "callbackURI";
     public static final String REFRESH_TOKEN_LIFETIME = "rtLifetime";
     public static final String REFRESH_TOKEN_FIELD_VISIBLE = "rtFieldVisible";
-    public static final String VO_NAME = "voName";
+    public static final String VI_NAME = "viName";
     public static final String LDAP_NAME = "ldap";
     public static final String ISSUER_NAME = "issuer";
     public static final String SCOPES_NAME = "scopes";
@@ -77,7 +77,7 @@ public class OA2RegistrationServlet extends AbstractRegistrationServlet {
             String[] scopes = new String[displayScopes.size()];
             displayScopes.toArray(scopes);
             request.setAttribute(SCOPES_NAME, scopes);
-            request.setAttribute(VO_NAME, VO_NAME);
+            request.setAttribute(VI_NAME, VI_NAME);
             request.setAttribute(LDAP_NAME, LDAP_NAME);
             request.setAttribute(ISSUER_NAME, ISSUER_NAME);
             request.setAttribute(CALLBACK_URI, CALLBACK_URI);

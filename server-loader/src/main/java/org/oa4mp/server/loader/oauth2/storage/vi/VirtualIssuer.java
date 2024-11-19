@@ -105,27 +105,27 @@ public class VirtualIssuer extends Monitored {
     }
 
     public void toXML(XMLStreamWriter xsw) throws XMLStreamException {
-        xsw.writeStartElement(VO_ENTRY);
+        xsw.writeStartElement(VI_ENTRY);
         xsw.writeAttribute(ID_ATTR, getIdentifierString());
-        xsw.writeAttribute(VO_CREATED, Long.toString(getCreationTS().getTime()));
-        xsw.writeAttribute(VO_LAST_MODIFIED, Long.toString(getLastModifiedTS().getTime()));
-        xsw.writeAttribute(VO_LAST_ACCESSED, Long.toString(getLastAccessed().getTime()));
+        xsw.writeAttribute(VI_CREATED, Long.toString(getCreationTS().getTime()));
+        xsw.writeAttribute(VI_LAST_MODIFIED, Long.toString(getLastModifiedTS().getTime()));
+        xsw.writeAttribute(VI_LAST_ACCESSED, Long.toString(getLastAccessed().getTime()));
         xsw.writeAttribute(IS_VALID_ATTR, Boolean.toString(valid));
         if (!isTrivial(issuer)) {
             xsw.writeAttribute(ISSUER, issuer);
         }
         if (!isTrivial(discoveryPath)) {
-            xsw.writeAttribute(VO_DISCOVERY_PATH, discoveryPath);
+            xsw.writeAttribute(VI_DISCOVERY_PATH, discoveryPath);
         }
         if (!isTrivial(title)) {
-            xsw.writeAttribute(VO_TITLE, title);
+            xsw.writeAttribute(VI_TITLE, title);
         }
         if (!isTrivial(defaultKeyID)) {
-            xsw.writeAttribute(VO_DEFAULT_KEY, defaultKeyID);
+            xsw.writeAttribute(VI_DEFAULT_KEY, defaultKeyID);
         }
         if (jsonWebKeys != null) {
             JSONObject json = JSONWebKeyUtil.toJSON(jsonWebKeys);
-            xsw.writeStartElement(VO_JSON_WEB_KEYS);
+            xsw.writeStartElement(VI_JSON_WEB_KEYS);
             // It is base 64 encoded so we don't have to grapple with escaping and such. All we need
             // is that it is faithfully stashed someplace.
             XMLUtils.write(xsw, Base64.encodeBase64String(json.toString().getBytes(StandardCharsets.UTF_8)));
@@ -143,14 +143,14 @@ public class VirtualIssuer extends Monitored {
             switch (xe.getEventType()) {
                 case XMLEvent.START_ELEMENT:
                     switch (xe.asStartElement().getName().getLocalPart()) {
-                        case VO_JSON_WEB_KEYS:
+                        case VI_JSON_WEB_KEYS:
                             String raw = xe.asCharacters().getData();
                             jsonWebKeys = JSONWebKeyUtil.fromJSON(new String(Base64.decodeBase64(raw)));
                             break;
                     } //end inner switch
                     break;
                 case XMLEvent.END_ELEMENT:
-                    if (xe.asEndElement().getName().getLocalPart().equals(VO_ENTRY)) {
+                    if (xe.asEndElement().getName().getLocalPart().equals(VI_ENTRY)) {
                         return;
                     }
                     break;
@@ -159,7 +159,7 @@ public class VirtualIssuer extends Monitored {
             xer.next();
 
         }
-        throw new IllegalStateException("Error: XML file corrupt. No end tag for " + VO_ENTRY);
+        throw new IllegalStateException("Error: XML file corrupt. No end tag for " + VI_ENTRY);
 
     }
 
@@ -173,26 +173,26 @@ public class VirtualIssuer extends Monitored {
                 case ID_ATTR:
                     setIdentifier(BasicIdentifier.newID(v));
                     break;
-                case VO_CREATED:
+                case VI_CREATED:
                     setCreationTS(new Date(Long.parseLong(v)));
                     break;
-                case VO_LAST_MODIFIED:
+                case VI_LAST_MODIFIED:
                     setLastModifiedTS(new Date(Long.parseLong(v)));
                     break;
-                case VO_LAST_ACCESSED:
+                case VI_LAST_ACCESSED:
                     setLastAccessed(new Date(Long.parseLong(v)));
                 case IS_VALID_ATTR:
                     break;
                 case ISSUER:
                     issuer = v;
                     break;
-                case VO_DEFAULT_KEY:
+                case VI_DEFAULT_KEY:
                     defaultKeyID = v;
                     break;
-                case VO_DISCOVERY_PATH:
+                case VI_DISCOVERY_PATH:
                     discoveryPath = v;
                     break;
-                case VO_TITLE:
+                case VI_TITLE:
                     title = v;
             }
         }

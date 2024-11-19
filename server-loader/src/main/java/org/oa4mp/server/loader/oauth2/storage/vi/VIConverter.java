@@ -27,41 +27,41 @@ public class VIConverter<V extends VirtualIssuer> extends MapConverter<V> {
 
     @Override
     public V fromMap(ConversionMap<String, Object> map, V v) {
-        V vo = super.fromMap(map, v);
+        V vi = super.fromMap(map, v);
 
-        vo.setCreationTS(new Date(map.getLong(vok().creationTS())));
-        vo.setLastModifiedTS(new Date(map.getLong(vok().lastModifiedTS())));
+        vi.setCreationTS(new Date(map.getLong(vok().creationTS())));
+        vi.setLastModifiedTS(new Date(map.getLong(vok().lastModifiedTS())));
 
         // Fixes https://github.com/ncsa/oa4mp/issues/149
-        vo.setLastAccessed(new Date(map.getLong(vok().lastAccessed())));
-        vo.setValid(map.getBoolean(vok().valid()));
+        vi.setLastAccessed(new Date(map.getLong(vok().lastAccessed())));
+        vi.setValid(map.getBoolean(vok().valid()));
 
         if (map.containsKey(vok().issuer()) && !isTrivial(map.getString(vok().issuer()))) {
-            vo.setIssuer(map.getString(vok().issuer()));
+            vi.setIssuer(map.getString(vok().issuer()));
         }
         if (map.containsKey(vok().atIssuer()) && !isTrivial(map.getString(vok().atIssuer()))) {
-            vo.setAtIssuer(map.getString(vok().atIssuer()));
+            vi.setAtIssuer(map.getString(vok().atIssuer()));
         }
         if (map.containsKey(vok().defaultKeyID()) && !isTrivial(map.getString(vok().defaultKeyID()))) {
-            vo.setDefaultKeyID(map.getString(vok().defaultKeyID()));
+            vi.setDefaultKeyID(map.getString(vok().defaultKeyID()));
         }
         if (map.containsKey(vok().jsonWebKeys()) && !isTrivial(map.getString(vok().jsonWebKeys()))) {
             try {
                 JSONWebKeys keys = JSONWebKeyUtil.fromJSON(map.getString(vok().jsonWebKeys()));
-                vo.setJsonWebKeys(keys);
+                vi.setJsonWebKeys(keys);
 
             } catch (Throwable e) {
-                DebugUtil.error(this, "Could not deserialize the JSON web keys for this VO.\"" + vo.getIdentifierString() + "\".", e);
+                DebugUtil.error(this, "Could not deserialize the JSON web keys for this VI.\"" + vi.getIdentifierString() + "\".", e);
             }
         }
         if (map.containsKey(vok().discoveryPath()) && !isTrivial(map.getString(vok().discoveryPath()))) {
-            vo.setDiscoveryPath(map.getString(vok().discoveryPath()));
+            vi.setDiscoveryPath(map.getString(vok().discoveryPath()));
         }
 
         if (map.containsKey(vok().title()) && !isTrivial(map.getString(vok().title()))) {
-            vo.setTitle(map.getString(vok().title()));
+            vi.setTitle(map.getString(vok().title()));
         }
-        return vo;
+        return vi;
     }
 
     @Override

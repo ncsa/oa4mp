@@ -602,9 +602,9 @@ public class OA2SE extends ServiceEnvironmentImpl {
     long authorizationGrantLifetime = AUTHORIZATION_GRANT_LIFETIME_DEFAULT;
 
     /**
-     * Given the client id, look up the admin and determine what (if any) the VO is.
-     * The returned value may be null,, meaning there is no VO.
-     * If the VO is disabled, it will not be returned either.<br/><br/>
+     * Given the client id, look up the admin and determine what (if any) the VI is.
+     * The returned value may be null,, meaning there is no VI.
+     * If the VI is disabled, it will not be returned either.<br/><br/>
      * This has its own call here because it involves multiple store lookups. It cannot
      * be done as a join in SQL or some such because there are no guarantees the stores
      * are all SQL -- some may be file stores or even in another unrelated database.

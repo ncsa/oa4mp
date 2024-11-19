@@ -53,7 +53,7 @@ public class OA2TokenUtils {
 
         if (vo != null) {
             keys = vo.getJsonWebKeys();
-            ServletDebugUtil.trace(OA2TokenUtils.class, "Got VO for client " + client.getIdentifierString());
+            ServletDebugUtil.trace(OA2TokenUtils.class, "Got VI for client " + client.getIdentifierString());
         }
         return keys;
     }

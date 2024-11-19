@@ -22,14 +22,14 @@ public interface QDLXMLConstants extends SerializationConstants {
     String STATE = "state";
     String ID_ATTR = "id";
 
-    String VO_ENTRY = "virtual_issuer";
-    String VO_JSON_WEB_KEYS = "json_web_keys";
-    String VO_DEFAULT_KEY = "default_key";
-    String VO_TITLE = "title";
-    String VO_LAST_MODIFIED = "last_modified_at";
-    String VO_LAST_ACCESSED = "last_accessed_at";
-    String VO_CREATED = "created_at";
-    String VO_DISCOVERY_PATH = "discovery_path";
+    String VI_ENTRY = "virtual_issuer";
+    String VI_JSON_WEB_KEYS = "json_web_keys";
+    String VI_DEFAULT_KEY = "default_key";
+    String VI_TITLE = "title";
+    String VI_LAST_MODIFIED = "last_modified_at";
+    String VI_LAST_ACCESSED = "last_accessed_at";
+    String VI_CREATED = "created_at";
+    String VI_DISCOVERY_PATH = "discovery_path";
     // use issuer and id_attr from above
 
 }
