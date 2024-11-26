@@ -1110,4 +1110,42 @@ public class OA2ClientCommands extends ClientStoreCommands {
                 sayi("too many admins, remove permission manually and specify both admin and client ids");
         }
     }
+    // Fix https://github.com/ncsa/oa4mp/issues/224
+    public void service_client(InputLine inputLine)throws Exception{
+        if(showHelp(inputLine)){
+            say("service_client [on | true | off | false] query or set if this client is a service client.");
+            say("A service client is a client that is run by a service, typically this replaces the authorization ");
+            say("leg of OAuth and is a token request. The two major RFC's that cover this are");
+            say("RFC 7523, which specifies using keys generally too and");
+            say("RFC 6749 §4.4, the client credentials flow");
+            return;
+        }
+        OA2Client client = (OA2Client) findItem(inputLine);
+        if(client == null){
+            say("Sorry, client not found");
+            return;
+        }
+        if(inputLine.isEmpty()){
+            say("client " + client.getIdentifierString() + (client.isServiceClient()?"is":"is not") + " a service client");
+            return;
+        }
+        Boolean newValue = null;
+        if(inputLine.hasArg("true") || inputLine.hasArg("on")){
+            newValue = true;
+        }
+        if(inputLine.hasArg("false") || inputLine.hasArg("off")){
+            newValue = false;
+        }
+        if(newValue == null){
+            say("unknown value");
+            return ;
+        }
+        boolean oldValue = client.isServiceClient();
+        if(oldValue == newValue){
+            say("no change to value");
+            return;
+        }
+        client.setServiceClient(newValue);
+        say("client " + client.getIdentifierString() + " has been set to " + (newValue?"on":"off"));
+    }
 }

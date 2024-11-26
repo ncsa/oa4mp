@@ -1,15 +1,15 @@
 package org.oa4mp.delegation.server.client;
 
-import org.oa4mp.delegation.client.request.BasicRequest;
-import org.oa4mp.delegation.common.token.impl.IDTokenImpl;
-import org.oa4mp.delegation.common.token.impl.TokenFactory;
-import org.oa4mp.delegation.server.JWTUtil;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import net.sf.json.JSONObject;
+import org.oa4mp.delegation.client.request.BasicRequest;
+import org.oa4mp.delegation.common.token.impl.IDTokenImpl;
+import org.oa4mp.delegation.common.token.impl.TokenFactory;
+import org.oa4mp.delegation.server.JWTUtil;
 
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -129,11 +129,12 @@ public abstract class TokenAwareServer extends ASImpl {
         if(!claims.containsKey(ISSUER)){
             throw new GeneralException(" ID Token missing " + ISSUER + " claim for \"" + atRequest.getClient().getIdentifierString() + "\"");
         }
-
+        URL host = null;
+        URL remoteHost = null;
         try {
-            URL host = getAddress().toURL();
+            host = getAddress().toURL();
 
-            URL remoteHost = new URL(claims.getString(ISSUER));
+            remoteHost = new URL(claims.getString(ISSUER));
             if(!remoteHost.equals(getIssuer().toURL())){
                 // ok something is off -- port specified? pick it a part a bit more, but
                 // don't sweat it too much
@@ -145,9 +146,13 @@ public abstract class TokenAwareServer extends ASImpl {
                 }
             }
         } catch (MalformedURLException e) {
-            // It is also possible the issuer is not really resolvable at this point.
-            // Might remove this check in the future on this account.
+            // It is possible that the issuer is not actually resolvable at this point,
+            // But generally if we get here, someone has indeed created an invalid issuer
+            // so the token is invalid.
             if(DebugUtil.isEnabled()) {
+                System.err.println(getClass().getSimpleName() + " ID Token:\n" + claims.toString(2));
+                System.err.println("host= " + host + " remoteHost = " + remoteHost);
+                System.err.println("got " + claims.getString(ISSUER) + " expected " + getIssuer());
                 e.printStackTrace();
             }
         }

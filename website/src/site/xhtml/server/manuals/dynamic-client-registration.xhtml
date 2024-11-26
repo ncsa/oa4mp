@@ -30,7 +30,7 @@
 </p>
 <h3>Looking for how to configure the server?</h3>
 <p>If you are running OA4MP, then this facility is configured on the server as per
-<a href="../configuration/client_management-configuration.html">client management configuration</a>.
+    <a href="../configuration/client_management-configuration.html">client management configuration</a>.
 </p>
 <h3>How to become an admin</h3>
 <p>You must register an administrative client as per <a href="administrative-clients.html">here</a>.</p>
@@ -60,8 +60,9 @@
     known to this admin will be returned.</p>
 
 <h3>Getting server defaults</h3>
-<p>You may also get defaults for the service by issuing a request with the query parameter set to org.oa4mp:/server#defaults.
-For instance on my local server</p>
+<p>You may also get defaults for the service by issuing a request with the query parameter set to
+    org.oa4mp:/server#defaults.
+    For instance on my local server</p>
 <pre>
     curl -k --get --data-urlencode "query=org.oa4mp:/server#defaults"  https://localhost:9443/oauth2/oidc-cm
 {
@@ -81,12 +82,12 @@ For instance on my local server</p>
     "use_server_default":-1
 }
 </pre>
-<p>where all time values are in seconds.  The following table summarizes these. Note that
-if you have an admin client and send the credentials, the values for the issuer will
-reflect the values in the virtual organization. Otherwise, they are for the server
-generally. All lifetimes are in seconds. It is true that <i>some</i> of these are on the
-well-known page, however many are not and since there is no canonical way to represent
-them there, a separate call was created.</p>
+<p>where all time values are in seconds. The following table summarizes these. Note that
+    if you have an admin client and send the credentials, the values for the issuer will
+    reflect the values in the virtual organization. Otherwise, they are for the server
+    generally. All lifetimes are in seconds. It is true that <i>some</i> of these are on the
+    well-known page, however many are not and since there is no canonical way to represent
+    them there, a separate call was created.</p>
 
 <table border="2">
     <caption>Valid values</caption>
@@ -97,9 +98,10 @@ them there, a separate call was created.</p>
     <tr align="left" valign="top">
         <td>api_versions</td>
         <td>List of API versions supported on this server. The first is "latest" and equals the second, E.g.
-        ["latest","v5.5","v5.4"] means the maximum version is 5.5 and is a synonym with "latest". Note that "latest"
-        will change with a server upgrade, so you can specify it and your clients will always use whatever
-        the server has deployed. If you specify nothing, then the default is used. </td>
+            ["latest","v5.5","v5.4"] means the maximum version is 5.5 and is a synonym with "latest". Note that "latest"
+            will change with a server upgrade, so you can specify it and your clients will always use whatever
+            the server has deployed. If you specify nothing, then the default is used.
+        </td>
     </tr>
     <tr align="left" valign="top">
         <td>api_version_default</td>
@@ -108,16 +110,17 @@ them there, a separate call was created.</p>
 
     <tr align="left" valign="top">
         <td>at_issuer</td>
-        <td>The default access token issuer, used in access tokens that are JWTs. </td>
+        <td>The default access token issuer, used in access tokens that are JWTs.</td>
     </tr>
     <tr align="left" valign="top">
         <td>at_lifetime</td>
         <td>The default access token lifetime for the server. If a client's at_lifetime is set to -1,
-        this is used.</td>
+            this is used.
+        </td>
     </tr>
     <tr align="left" valign="top">
         <td>auth_grant_lifetime</td>
-        <td>The default lifetime of authorization grants. </td>
+        <td>The default lifetime of authorization grants.</td>
     </tr>
     <tr align="left" valign="top">
         <td>id_token_lifetime</td>
@@ -163,7 +166,8 @@ them there, a separate call was created.</p>
     <tr align="left" valign="top">
         <td>use_server_default</td>
         <td>The value (usually -1) that means "use the server's default here". Typically when listing a
-        client this will be the value for any lifetimes that were not explicitly set at creation.</td>
+            client this will be the value for any lifetimes that were not explicitly set at creation.
+        </td>
     </tr>
 </table>
 <h3>Versions</h3>
@@ -176,16 +180,21 @@ them there, a separate call was created.</p>
 </p>
 <ul>
     <li>as an additional component in the URL path, so a path of <b>https://myserver.org/oauth2/register/v5.5</b>
-    would set the API version to 5.5.</li>
+        would set the API version to 5.5.
+    </li>
     <li>as a query parameter with key <b>api_version</b>. If present, this overrides the path component. E.g.
         <b>https://myserver.org/oauth2/register?api_version=v5.5...</b></li>
 </ul>
 <p>The major versions are </p>
 <ul>
-    <li><b>v5.5</b> -- fully spec compliant and returns <i>all</i> values on the server, even those set as defaults. The aim is
-    to expose more to clients so they can roundtrip more fully.</li>
+    <li><b>v5.5</b> -- fully spec compliant and returns <i>all</i> values on the server, even those set as defaults. The
+        aim is
+        to expose more to clients so they can roundtrip more fully.
+    </li>
     <li><b>v5.4</b> -- limited values, in particular, rt_lifetime and at_lifetime are never allowed to be negative, but
-    zero values for those are reported. (Negative -1 as a value means the client uses whatever the current server default is.)</li>
+        zero values for those are reported. (Negative -1 as a value means the client uses whatever the current server
+        default is.)
+    </li>
 </ul>
 <h3>The toolkit</h3>
 <p>Included with the latest release on <a href="https://github.com/ncsa/oa4mp">GitHub</a>
@@ -416,7 +425,7 @@ them there, a separate call was created.</p>
         <td>-1</td>
         <td>Y</td>
         <td>Integer (in seconds) or <a href="units.html">unit</a></td>
-        <td>This sets the id token lifetime.  Note
+        <td>This sets the id token lifetime. Note
             that is <i>must be less than or equal to the server's default</i>. You should only set this if
             you have a specific need for it an knowledge of what values will work. The default of -1 means to use
             the server default.
@@ -437,7 +446,7 @@ them there, a separate call was created.</p>
         <td>-1</td>
         <td>Y</td>
         <td>Integer (in seconds) or <a href="units.html">unit</a></td>
-        <td>This sets the maximum access token lifetime.  This means that request may ask for a different
+        <td>This sets the maximum access token lifetime. This means that request may ask for a different
             lifetime than in the configuration, but it cannot exceed this. The server default is the
             absolute maximum.
         </td>
@@ -454,16 +463,52 @@ them there, a separate call was created.</p>
         </td>
     </tr>
     <tr align="left" valign="top">
-     <td>max_id_rt_lifetime</td>
-     <td>N</td>
-     <td>-1</td>
-     <td>Y</td>
-     <td>Integer (in seconds)</td>
-     <td>This sets the maximum refresh token lifetime. This means that request may ask for a different
-         lifetime than in the configuration, but it cannot exceed this. The server default is the
-         absolute maximum.
-     </td>
- </tr>
+        <td>max_id_rt_lifetime</td>
+        <td>N</td>
+        <td>-1</td>
+        <td>Y</td>
+        <td>Integer (in seconds)</td>
+        <td>This sets the maximum refresh token lifetime. This means that request may ask for a different
+            lifetime than in the configuration, but it cannot exceed this. The server default is the
+            absolute maximum.
+        </td>
+    </tr>
+    <tr align="left" valign="top">
+        <td>org.oa4mp:/client/status</td>
+        <td>N</td>
+        <td>approved</td>
+        <td>N</td>
+        <td>String</td>
+        <td>This allows you to set the approval status of a client on update. The default when creating a client with an
+            admin client is to approve it, but sometimes it is necessary to revoke it or set it to another status. Note
+            that
+            this must be explicitly sent to have an effect. Values are
+            <ul>
+                <li>approved - approved for all standard oeprations</li>
+                <li>denied - no approval, but the request was specifically denied for some reason</li>
+                <li>none - no particular status. The default when creating a client anonymously</li>
+                <li>pending - no approval, vetting of the client is underway but not resolved one way or the other.</li>
+                <li>revoked - no approval, for a previously approved client</li>
+            </ul>
+            Most of these are used for various stages of vetting clients that are registered over the web. Mostly
+            dynamic registrations will use approved or revoked.
+        </td>
+    </tr>
+
+    <tr align="left" valign="top">
+        <td>org.oa4mp:/ersatz/provisioners</td>
+        <td>N</td>
+        <td>--</td>
+        <td>N</td>
+        <td>String, list of strings</td>
+        <td>Passed in when creating or updating an ersatz client, this is the id of the provisioner. If there are
+            multiples,
+            an array of ids can be sent. <a href="https://oa4mp.org/server/manuals/ersatz_clients.html">See note
+                here</a> for
+            more details.
+        </td>
+    </tr>
+
     <tr align="left" valign="top">
         <td>prototypes</td>
         <td>N</td>
@@ -505,18 +550,18 @@ them there, a separate call was created.</p>
         </td>
     </tr>
     <tr align="left" valign="top">
-          <td>rt_grace_period</td>
-          <td>N</td>
-          <td>-2</td>
-          <td>Y</td>
-          <td>Integer (in seconds) or <a href="units.html">unit</a></td>
-          <td>If you have enabled refresh tokens, this specifies the maximum grace period for
-              token refreshes. That is to say, when a refresh token is refreshed or exchanged,
-              the previous token remains active for this period of time. Setting this zero immediately
-              invalidates the previous token. Specific values are 0 for disabled, -1 for disabling
-              grace periods (equivalent to 0) or -2 to use whatever the server default is for grace periods.
-          </td>
-      </tr>
+        <td>rt_grace_period</td>
+        <td>N</td>
+        <td>-2</td>
+        <td>Y</td>
+        <td>Integer (in seconds) or <a href="units.html">unit</a></td>
+        <td>If you have enabled refresh tokens, this specifies the maximum grace period for
+            token refreshes. That is to say, when a refresh token is refreshed or exchanged,
+            the previous token remains active for this period of time. Setting this zero immediately
+            invalidates the previous token. Specific values are 0 for disabled, -1 for disabling
+            grace periods (equivalent to 0) or -2 to use whatever the server default is for grace periods.
+        </td>
+    </tr>
     <tr align="left" valign="top">
         <td>rt_lifetime</td>
         <td>N</td>
@@ -538,9 +583,9 @@ them there, a separate call was created.</p>
     <tr align="left" valign="top">
         <td>service_client_users</td>
         <td>N</td>
-        <td>false</td>
+        <td>*</td>
         <td>N</td>
-        <td>List</td>
+        <td>* or List</td>
         <td>If this is a service client, restrict the sub claim of requests to the token endpoint to
             what is on this list. If any sub is allowed, set this to *.
         </td>

@@ -155,6 +155,18 @@ public class OA2FSTStore<V extends OA2ServiceTransaction> extends DSFSTransactio
     }
 
     @Override
+    public List<Identifier> getByClientID(Identifier clientID) {
+        List<Identifier> identifiers = new ArrayList<>();
+        for (Identifier id : keySet()) {
+            V transaction = get(id);
+            if (transaction != null ) {
+                identifiers.add(transaction.getIdentifier());
+            }
+        }
+        return identifiers;
+    }
+
+    @Override
     public V getByProxyID(Identifier proxyID) {
         for (Identifier id : keySet()) {
             V transaction = get(id);

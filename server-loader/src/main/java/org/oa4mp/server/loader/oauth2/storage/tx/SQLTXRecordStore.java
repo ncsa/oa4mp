@@ -2,6 +2,7 @@ package org.oa4mp.server.loader.oauth2.storage.tx;
 
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionRecord;
@@ -33,6 +34,33 @@ public class SQLTXRecordStore<V extends TXRecord> extends SQLStore<V> implements
 
     protected TXRecordTable getTXRTable() {
         return (TXRecordTable) getTable();
+    }
+
+    @Override
+    public List<Identifier> getIDsByParentID(Identifier parentID) {
+        List<Identifier> values = new ArrayList<>();
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+
+        V t = null;
+        try {
+            PreparedStatement stmt = c.prepareStatement(getTXRTable().getByParentIDsStatement());
+            stmt.setString(1, parentID.toString());
+            stmt.executeQuery();
+            ResultSet rs = stmt.getResultSet();
+            // Now we have to pull in all the values.
+            while (rs.next()) {
+                values.add(BasicIdentifier.newID(rs.getString(1)));
+            }
+
+            rs.close();
+            stmt.close();
+            releaseConnection(cr);
+        } catch (SQLException e) {
+            destroyConnection(cr);
+            throw new GeneralException("Error getting TX records that have parent \"" + parentID + "\"", e);
+        }
+        return values;
     }
 
     @Override

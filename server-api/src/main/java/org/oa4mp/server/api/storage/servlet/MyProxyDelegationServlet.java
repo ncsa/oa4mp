@@ -267,11 +267,6 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
         }
         warn(ww);
         throw new UnapprovedClientException("Error: " + ww, client);
-/*
-        if (!getServiceEnvironment().getClientApprovalStore().isApproved(client.getIdentifier())) {
-            String ww = "The client with identifier \"" + client.getIdentifier() + "\" has not been approved. Request rejected. Please contact your administrator.";
-        }
-*/
     }
 
     protected boolean isEmpty(String x) {

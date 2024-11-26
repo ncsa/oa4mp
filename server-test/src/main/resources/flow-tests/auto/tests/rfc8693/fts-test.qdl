@@ -1,0 +1,9 @@
+/*
+    It can be very useful for debugging to run these separately, so this test just references those.
+    read note in fts-provisioner script.
+*/
+//debugger(1); // Note with debugger set to 1, the output is in the console, not the GUI window,
+script_load(os_env('NCSA_DEV_INPUT') + '/oa4mp/server-test/src/main/resources/flow-tests/auto/tests/rfc8693/fts-provisioner.qdl');
+script_load(os_env('NCSA_DEV_INPUT') + '/oa4mp/server-test/src/main/resources/flow-tests/auto/tests/rfc8693/fts-fork.qdl');
+
+say('ok: 𝕰𝖗s𝖆𝖙𝖟 FTS provisioner test');

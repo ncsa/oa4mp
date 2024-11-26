@@ -899,9 +899,21 @@ public class CLC implements QDLMetaModule {
 
         @Override
         public Object evaluate(Object[] objects, State state) throws Throwable {
-            checkInit();
+          //  checkInit();
             // Assume that the clc has been initialized first since otherwise it is impossible to load
             // the file (e.g. assetStore is missing, debugger is missing etc.)
+            if(clcCommands == null){
+                clcCommands = new OA2CLCCommands(true, state.getLogger(), new QDLCLC(state.getLogger()));
+            }
+            /*
+               Improvement is to read the JSON file in objects[0] and suck out
+                "config_name": "ccf.jwt.provisioner",
+                "config_file": "/home/ncsa/dev/csd/config/auto-test/clients.ini",
+                and run the init.evaluate method from this class on those directly.
+                The read call should initialize everything though given a generic
+                client.
+            */
+
             clcCommands.read(argsToInputLine(getName(), objects));
             initCalled = true;
             return Boolean.TRUE;

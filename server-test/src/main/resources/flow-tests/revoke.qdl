@@ -4,6 +4,10 @@
    Tests the revocation (and introspection) machinery for a client.
    This creates a flow, then does a sequence of revocations and introspection
    calls to monitor that the machinery works right.
+
+   Aarguments
+   0 = the name of the temporary file to store state in. This is removed before starting
+   1 = A stem of the most recent tokens. This is not actually used.
 */
 /*
    Run it in QDL:
@@ -26,7 +30,7 @@ tokens. := args().1;
    ];
 
 clc#write(temp_file); // save for later.
-debugger(1, 'got tokens from RFC7523, wrote state file #0');
+debugger(1, 'got tokens from client, wrote state file #0 to ' + temp_file);
 debugger(1, 'at:\n' + print(tokens.'access_token'));
 debugger(1, 'rt:\n' + print(tokens.'refresh_token'));
 rc := false;

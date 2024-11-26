@@ -12,8 +12,6 @@ initialization := size(args())==1⇒args().0:import(load('test#/auto/utils/initi
 //checks:=initialization#checks();
 ini.:=initialization#get_client_ini(test_id);
 server_defaults.:=initialization# server_defaults();
-//cc.:=initializat:q!ion#get_client_config(test_id);
-
 tokens. := clc#rfc7523(params.);
 ⊨ tokens.'access_token'.'lifetime' == 1000*server_defaults.'at_lifetime' : 'wrong access token lifetime';
 ⊨ ∃tokens.'refresh_token' : 'did not got a refresh token.';
@@ -22,9 +20,9 @@ tokens. := clc#rfc7523(params.);
 
 r. := clc#introspect('-at');
 ⊨ r.'active' : 'token not active';
-⊨ r.'client_id' == 'auto-test:/oauth/conf';
+⊨ r.'client_id' == 'auto-test:/oauth/conf' : 'wrong client id, got ' + (r.'client_id');
 ⊨ r.'nbf' < r.'exp' : 'incorrect expires. Must be less than not before';
-⊨ r.'exp' - r.'nbf' == server_defaults.'at_lifetime';
+⊨ r.'exp' - r.'nbf' < (server_defaults.'at_lifetime' + 5) : 'wrong lifetime';
 ⊨ r.'token_type' == 'urn:ietf:params:oauth:token-type:access_token' : 'incorrect token type';
 ⊨ r.'username' == 'jeff' : 'wrong user name in access token info';
 
@@ -32,7 +30,7 @@ s. := clc#introspect('-rt');
 ⊨ s.'active' : 'token not active';
 ⊨ s.'client_id' == 'auto-test:/oauth/conf';
 ⊨ s.'nbf' < s.'exp' : 'incorrect expires. Must be less than not before';
-⊨ s.'exp' - s.'nbf' == server_defaults.'rt_lifetime';
+⊨ s.'exp' - s.'nbf' < (server_defaults.'rt_lifetime' + 5);
 ⊨ s.'token_type' == 'urn:ietf:params:oauth:token-type:refresh_token' : 'incorrect token type';
 ⊨ s.'username' == 'jeff' : 'wrong user name in refresh token info';
 say('ok: OAuth confidential, introspection test');

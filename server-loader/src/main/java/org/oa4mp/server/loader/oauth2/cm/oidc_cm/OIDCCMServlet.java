@@ -85,6 +85,7 @@ public class OIDCCMServlet extends EnvServlet {
     public static final String IS_SERVICE_CLIENT = "is_service_client";
     public static final String SERVICE_CLIENT_USERS = "service_client_users";
     public static final String ERSATZ_CLIENT_PROVISIONERS = "org.oa4mp:/ersatz/provisioners";
+    public static final String APPROVAL_STATUS = "org.oa4mp:/client/status";
     // Version
     public static final String API_VERSION_LATEST = "latest";
     /**
@@ -141,7 +142,7 @@ public class OIDCCMServlet extends EnvServlet {
             String rawID = getFirstParameterValue(httpServletRequest, CLIENT_ID);
             try {
                 adminClient = getAndCheckAdminClient(httpServletRequest); // Need this to verify admin client.
-                isAnonymous = adminClient==null; // might return a null
+                isAnonymous = adminClient == null; // might return a null
             } catch (IllegalArgumentException | UnknownClientException iax) {
                 // N.B. "anonymous" means that users may anonymously create clients, which are then
                 // given ids and passwords.
@@ -167,10 +168,10 @@ public class OIDCCMServlet extends EnvServlet {
             MetaDebugUtil debugger;
 
             if (isAnonymous) {
-                 // A client may get itself. It presents either bearer or basic header.
+                // A client may get itself. It presents either bearer or basic header.
                 // RFC 7592 -- only bearer token allowed
                 // Fix for https://github.com/ncsa/oa4mp/issues/117
-            if(!HeaderUtils.hasBearerHeader(httpServletRequest)){
+                if (!HeaderUtils.hasBearerHeader(httpServletRequest)) {
                     throw new IllegalAccessException("Unsupported authorization method.");
                 }
                 String[] creds = HeaderUtils.getCredentialsFromHeaders(httpServletRequest, HeaderUtils.BEARER_HEADER);
@@ -184,13 +185,13 @@ public class OIDCCMServlet extends EnvServlet {
                 // finally after all of that, make sure they have the right password
                 getClient(httpServletRequest);
                 oa2Client = (OA2Client) getOA2SE().getClientStore().get(clientID);
-                if(oa2Client == null){
+                if (oa2Client == null) {
                     throw new UnknownClientException();
                 }
-                if(!getOA2SE().getClientApprovalStore().isApproved(clientID)){
+                if (!getOA2SE().getClientApprovalStore().isApproved(clientID)) {
                     throw new UnapprovedClientException("unapproved client", oa2Client);
                 }
-                if(!oa2Client.isPublicClient()){
+                if (!oa2Client.isPublicClient()) {
                     String secret = creds[HeaderUtils.SECRET_INDEX];
                     String hashedSecret = DigestUtils.sha1Hex(secret);
                     if (!oa2Client.getSecret().equals(hashedSecret)) {
@@ -202,7 +203,7 @@ public class OIDCCMServlet extends EnvServlet {
                 debugger = MyProxyDelegationServlet.createDebugger(oa2Client);
                 debugger.trace(this, "GET returns payload\n" + json.toString(2));
                 writeOK(httpServletResponse, json); //send it back with an ok.
-                 return;
+                return;
             }
 
 /*            if (isAnonymous) {
@@ -930,6 +931,41 @@ public class OIDCCMServlet extends EnvServlet {
                 }
                 newClient.setDebugOn(isDebugOn); // CIL-1538
                 getOA2SE().getClientStore().save(newClient);
+                if (jsonRequest.containsKey(APPROVAL_STATUS)) {
+                    // If the admin wants to explicitly set the approval status, they can.
+                    String status = jsonRequest.getString(APPROVAL_STATUS);
+                    ClientApproval approval = (ClientApproval) getOA2SE().getClientApprovalStore().get(client.getIdentifier());
+                    if (approval == null) {
+                        // unlikely, but create one if needed.
+                        approval = (ClientApproval) getOA2SE().getClientApprovalStore().create();
+                        approval.setIdentifier(client.getIdentifier());
+                        approval.setApprover(adminClient.getIdentifierString());
+                    }
+                    approval.setApprovalTimestamp(new Date());
+                    switch (ClientApproval.Status.valueOf(status)) {
+                        case APPROVED:
+                            approval.setApproved(true);
+                            approval.setStatus(ClientApproval.Status.APPROVED);
+                            break;
+                        case REVOKED:
+                            approval.setApproved(false);
+                            approval.setStatus(ClientApproval.Status.REVOKED);
+                            break;
+                        case PENDING:
+                            approval.setApproved(false);
+                            approval.setStatus(ClientApproval.Status.PENDING);
+                            break;
+                        case NONE:
+                            approval.setApproved(false);
+                            approval.setStatus(ClientApproval.Status.NONE);
+                            break;
+                        case DENIED:
+                            approval.setApproved(false);
+                            approval.setStatus(ClientApproval.Status.DENIED);
+                            break;
+                    }
+                    getOA2SE().getClientApprovalStore().save(approval);
+                }
                 writeOK(resp, toJSONObject(newClient, version, false));
                 //     writeOK(resp, resp);
 

@@ -1,12 +1,14 @@
 /*
   Provisions the client for an FTS client  type flow. To wit,
-  1. The provisioner  uses the CCF and gets an access token
+  1. The provisioner  uses the CCF and gets an access token. Audience and scopes are set initially
   2. The FTS (ersatz) client forks the flow for an access token
   3. The FTS client does a call to the refresh endpoint (with downscopes,
      audience, etc.) to get an access token and refresh token.
 
-  This script does 1. The scope handling mechanism is just to echo whatever
-  was passed (at least at this point in time). It writes the state to a file.
+  This script does 1. The fts-fork.qdl script does 2 and 3.
+  The scope handling mechanism is just to echo whatever
+  was passed (at least at this point in time).
+  It writes the state to a file,
   and should be followed up with running fts-fork.qdl
 
   Run this as
@@ -20,12 +22,12 @@ test_id:= 'ccf.jwt.provisioner';
 initialization := import(load('test#/auto/utils/initialization.mdl'));
 ini.:=initialization#get_client_ini(test_id);
 server_defaults.:=initialization# server_defaults();
+s. := ['X', 'Y', 'Z', 'wlcg:capabilityset:/dunana'];
 clc#init($$OA4MP_CLC_INI, test_id);
-params. := {'scope':'X Y Z wlcg:capabilityset:/dunana', 'audience':'my_aud'};
-tokens. := clc#ccf(params.);
-say('ccf response:\n' + print(tokens.));
-//clc#exchange({'subject':'at','type':'rt'});
-//clc#exchange();
+params. := {'scope':detokenize(s., ' '), 'audience':'my_aud'};
+response. := clc#ccf(params.);
+s1. := tokenize(response.'scope',' ');
+⊨ ⊗∧⊙(s1. ∈ s.) ∧ (s. ∈ s1.)  : 'incorrect scopes, got ' +response.'scope' ;
+debugger(1,'ccf response:\n' + print(response.));
 rm(saved_cfg);
 clc#write(saved_cfg);
-say('wrote FTS provisioner state to ' + saved_cfg);

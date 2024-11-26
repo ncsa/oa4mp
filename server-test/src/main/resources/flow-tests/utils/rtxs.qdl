@@ -1,0 +1,31 @@
+/*
+   Given a client, this will run a series of exchanges and refreshes and return a set
+   of all the access and refresh tokens.
+
+   Arguments
+   0 = the client which has been initialized and gotten the at least the first of tokens
+   1 = integer for the number of times this is to run. Should be at least 2
+
+   This returns args().1 sets of tokens. Each entry is of the form
+   [X, tokens.]
+
+   Where X is a string:
+   txa = access token only tokens are from the exchange endpoint,
+   txr = refresh token only tokens are from the exchange endpoint,
+     r = both access and refresh tokens from the refresh endpoint.
+*/
+clc := args().0;
+count := args().1;
+out. := [;count]
+while[i∈[1;count]]
+ do[
+     if[0==mod(i, 2)]
+   then[
+       if[0==mod(i%2, 2)]
+     then[out.i := ['txa',clc#exchange('-at')];]
+     else[out.i := ['txr',clc#exchange('-rt')];];
+       ]
+   else[out.i := ['r',clc#refresh()];];
+ ]; // end while
+
+ return(out.);

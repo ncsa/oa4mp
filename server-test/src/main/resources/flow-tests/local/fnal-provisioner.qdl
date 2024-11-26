@@ -1,16 +1,33 @@
 /*
    This does the test for provisioning an FNAL client and forking the flow.
-   Has to be run manually
+   ** Has to be run manually **
 */
 saved_cfg := '/tmp/fnal-test.json';
 
 params.'authz' :=  {'scope': 'storage.read:/ wlcg.capabilityset:/duneana wlcg.groups'};
+params.'token' :=  {'scope': 'storage.read:/ wlcg.capabilityset:/duneana wlcg.groups'};
 clc#init($$OA4MP_CLC_XML_INI, 'localhost:test/fnal');
 clc#set_param(params.);
-clc#uri(); // puts it in the clipboard.
-// Stop here, do authz, then grab the callback.
+// Either
+clc#df();
+// OR
+clc#uri(); // puts it in the clipboard. Stop here, do authz, then grab the callback.
 clc#grant();
-clc#access();
+// Scopes granted in initial request from capability set.
+expected_scopes.:= ['compute.cancel',
+                    'compute.create',
+                    'compute.modify',
+                    'compute.read',
+                    'storage.create:/dune/resilient/jobsub_stage',
+                    'storage.create:/dune/scratch/users/cilogontest',
+                    'storage.create:/fermigrid/jobsub/jobs',
+                    'storage.read:/dune',
+                    'storage.read:/dune/resilient/jobsub_stage'];
+
+
+tokens. := clc#access();
+returned_scopes. := tokenize(tokens.'access_token'.'jwt'.'scope', ' ');
+⊨(⊢expected_scopes.) == (⊢returned_scopes.) : 'incorrect scopes ' + (~returned_scopes.∉expected_scopes.⌆returned_scopes.);
 rm(saved_cfg);
 clc#write(saved_cfg);
 say('wrote FNAL provisioner test state to ' + saved_cfg);

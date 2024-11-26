@@ -37,8 +37,21 @@ public class TXRecordTable extends Table {
         getColumnDescriptor().add(new ColumnDescriptorEntry(tkeys().tokenType(), Types.LONGVARCHAR));
     }
 
+    /**
+     * Get the actual token records using the parent ID as the key. See also {@link #getByParentIDsStatement()}
+     * @return
+     */
     public String getSearchByParentIDStatement(){
         return "select * from " + getFQTablename() + " where " + tkeys().parentID + " = ?";
+    }
+
+    /**
+     * Get the identifiers of all records with a given parent ID. In cases where a client is misbehaving,
+     * this may be huge, so we only work with ids.
+     * @return
+     */
+    public String getByParentIDsStatement(){
+        return "select " + tkeys().parentID() + " from " + getFQTablename() + " where " + tkeys().parentID + " = ?";
     }
 
     public String getCountByParentIDStatement(){

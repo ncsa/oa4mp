@@ -48,6 +48,16 @@ public class TXFileStore<V extends TXRecord> extends FileStore<V> implements TXS
         return kids;
     }
     @Override
+    public List<Identifier> getIDsByParentID(Identifier parentID) {
+        List<Identifier> kids = new ArrayList<>();
+        for(V tx : values()){
+            if(tx.parentID.equals(parentID)){
+                kids.add(tx.getIdentifier());
+            }
+        }
+        return kids;
+    }
+    @Override
     public int getCountByParent(Identifier parentID) {
         return getByParentID(parentID).size();
     }

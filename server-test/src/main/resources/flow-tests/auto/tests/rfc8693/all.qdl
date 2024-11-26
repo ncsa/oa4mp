@@ -3,6 +3,8 @@
 // will be found.
 path:='test#/';
 test.:=[
+        [(path + 'auto/tests/rfc8693/') + 'independence-test.qdl', '-at', '-subject','rt'],
+        [(path + 'auto/tests/rfc8693/') + 'fts-test.qdl',  '-subject','at'],
         [(path + 'auto/tests/rfc8693/') + 'github-211.qdl',  '-subject','at'],
         [(path + 'auto/tests/rfc8693/') + 'ersatz-rt.qdl',  '-subject','at'],
         [(path + 'auto/tests/rfc8693/') + 'ersatz-rt.qdl',  '-subject','rt'],
@@ -12,8 +14,8 @@ test.:=[
         [(path + 'auto/tests/rfc8693/') + 'ersatz-fork.qdl', '-at', '-subject','rt'],
         [(path + 'auto/tests/rfc8693/') + 'ersatz-fork.qdl', '-none', '-subject','at'],
         [(path + 'auto/tests/rfc8693/') + 'ersatz-fork.qdl', '-none', '-subject','rt'],
-        [(path + 'auto/tests/rfc8693/') +   'tx-basic.qdl',true], // do exchange with access token
-        [(path + 'auto/tests/rfc8693/') +   'tx-basic.qdl',false] // do exchange with refresh tokens
+        [(path + 'auto/tests/rfc8693/') + 'tx-basic.qdl',true], // do exchange with access token
+        [(path + 'auto/tests/rfc8693/') + 'tx-basic.qdl',false] // do exchange with refresh tokens
         ];
 
 say('RFC 8693 (token exchange) and 𝕰𝖗s𝖆𝖙𝖟 client tests. These should run automated and require no manual input.');

@@ -59,7 +59,6 @@ rt_asserted.:= tokens.'refresh_token'.'jwt';
     claims. := clc#claims();
 //say('rt:\n' + print(rt_asserted.));
 verify();
-say('token ok');
 // Refresh
 tokens. := clc#refresh();
 at_expected.:=['compute.create',
@@ -69,7 +68,6 @@ at_asserted.:= tokens.'access_token'.'jwt';
 rt_asserted.:= tokens.'refresh_token'.'jwt';
     claims. := clc#claims();
 verify();
-say('refresh ok');
 
 // time to get the refresh and exchange tokens
 at_asserted. := clc#exchange('-at','-subject','rt').'access_token'.'jwt';
@@ -80,6 +78,5 @@ at_expected.:=['storage.read:/home/worplesdon/vo3',
                'storage.create:/public/vo3'];
 
 verify();
-say('exchange ok');
 
 say('ok: OIDC WLCG QDL Test');

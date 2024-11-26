@@ -1,0 +1,37 @@
+/*
+   This is invoked with the type of flow you want as the only argument,
+   df = device flow
+   uri = authorization code flow
+   Tests that the flow for DUNE (which will use FTS with their own spin on it) works.
+   This is related to the RFC8693 FTS test. The difference is that rather than start wuth
+   the client credentials flow, it is provisioned with either the device flow or
+   auth code. It gets the maximum scopes in the initial request, then downscopes.
+
+   There are two scripts that run this, fts-provisioner and fts-fork in this directory.
+   They allow for running this without the test harness. This script is for the testing
+   harness.
+*/
+//debugger(1);
+
+cfg.'id'  := 'localhost:test/fnal';
+cfg.'idp'  := 'GitHub';
+cfg.'file' := $$OA4MP_CLC_XML_INI;
+//cfg.'flow_type' := 'df'; // Note to use df you need to set param for the token endpoint
+cfg.'flow_type' := args().0; // Note to use df you need to set param for the token endpoint
+cfg.'description' :=  'Test DUNE flow fork';
+
+params.'authz' :=  {'scope': 'storage.read:/ wlcg.capabilityset:/duneana wlcg.groups'};
+params.'token' :=  {'scope': 'storage.read:/ wlcg.capabilityset:/duneana wlcg.groups'};
+
+rc := script_load('driver.qdl', cfg., params.);
+if[rc!='ok'][return(rc);];
+
+clc#access();
+saved_cfg := '/tmp/fnal-test.json';
+rm(saved_cfg);
+clc#write(saved_cfg);
+debugger(1, 'wrote provisioner to ' + saved_cfg);
+// At this point, we are ready to test the fork.
+//home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests/local/fnal-fork.qdl
+script_load(os_env('NCSA_DEV_INPUT') + '/oa4mp/server-test/src/main/resources/flow-tests/local/fnal-fork.qdl');
+say('FNAL dune fork: ok');

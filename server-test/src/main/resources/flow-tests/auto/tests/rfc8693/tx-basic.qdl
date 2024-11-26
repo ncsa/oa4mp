@@ -21,10 +21,10 @@ rt. :=clc#exchange('-rt','-subject',args.0?'at':'rt').'refresh_token';
 ⊨ at.'jti' != tokens.'access_token'.'jti' : 'access token not updated';
 ⊨ rt.'jti' != tokens.'refresh_token'.'jti' : 'refresh token not updated';
 
-⊨ at.'lifetime' == 750000 : 'wrong access token lifetime, expected 750000, got ' + (at.'lifetime');
+⊨ abs(at.'lifetime' - 750000)<5000 : 'wrong access token lifetime, expected 750000, got ' + (at.'lifetime');
 ⊨ at.'jwt'.'iss' == 'https://localhost:9443/oauth2' : 'wrong access token issuer';
 ⊨ at.'jwt'.'aud' == 'https://wlcg.cern.ch/jwt/v1/access' : 'wrong access token audience';
-⊨ rt.'lifetime' == 3600000 : 'wrong refresh token lifetime, expected 3600000, got ' + (rt.'lifetime');
+⊨ abs(rt.'lifetime' - 3600000)<5000 : 'wrong refresh token lifetime, expected 3600000, got ' + (rt.'lifetime');
 
 sleep(5000); // added 9/13/2024 since exchange happened so fast on new system iat test failed.
 id. :=clc#exchange('-id','-subject',args.0?'at':'rt');

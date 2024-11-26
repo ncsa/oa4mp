@@ -40,6 +40,7 @@ public interface OA2TStoreInterface<V extends OA2ServiceTransaction> extends Sto
     @Override
     boolean hasUserCode(String userCode);
 
+    List<Identifier> getByClientID(Identifier clientID);
     /**
      * Get a transaction by its ID token identifier. Note that to get the token itself,
      * you must use {@link OA2ServiceTransaction#getUserMetaData()}.

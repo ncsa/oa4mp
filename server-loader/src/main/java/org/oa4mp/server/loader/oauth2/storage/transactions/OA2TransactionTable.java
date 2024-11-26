@@ -50,7 +50,9 @@ public class OA2TransactionTable extends DSTransactionTable {
            return "SELECT * FROM " + getFQTablename() + " WHERE " + getOA2Keys().username() + "=?";
        }
 
-
+    public String getByClientIDStatement() {
+        return "SELECT " + getOA2Keys().identifier() + " FROM " + getFQTablename() + " WHERE " + getOA2Keys().clientKey() + "=?";
+    }
     public String getTokenInfoStatement() {
            return "SELECT " +
                    getOA2Keys().identifier() + ", " +

@@ -1,14 +1,5 @@
 package org.oa4mp.server.admin.myproxy.oauth2.tools;
 
-import org.oa4mp.server.loader.oauth2.OA2SE;
-import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
-import org.oa4mp.server.loader.oauth2.servlet.TokenExchangeRecordRetentionPolicy;
-import org.oa4mp.server.loader.oauth2.storage.RefreshTokenRetentionPolicy;
-import org.oa4mp.server.loader.oauth2.storage.RefreshTokenStore;
-import org.oa4mp.server.loader.oauth2.storage.transactions.OA2TStoreInterface;
-import org.oa4mp.server.loader.oauth2.storage.tx.TXRecord;
-import org.oa4mp.server.loader.oauth2.storage.tx.TXStore;
-import org.oa4mp.server.admin.myproxy.oauth2.base.StoreCommands2;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
@@ -16,13 +7,22 @@ import edu.uiuc.ncsa.security.core.cache.Cleanup;
 import edu.uiuc.ncsa.security.core.cache.LockingCleanup;
 import edu.uiuc.ncsa.security.core.exceptions.TransactionNotFoundException;
 import edu.uiuc.ncsa.security.core.util.*;
+import edu.uiuc.ncsa.security.util.cli.InputLine;
+import net.sf.json.JSONObject;
+import org.apache.commons.codec.binary.Base64;
 import org.oa4mp.delegation.common.storage.TransactionStore;
 import org.oa4mp.delegation.common.token.impl.AccessTokenImpl;
 import org.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
 import org.oa4mp.delegation.common.token.impl.TokenImpl;
-import edu.uiuc.ncsa.security.util.cli.InputLine;
-import net.sf.json.JSONObject;
-import org.apache.commons.codec.binary.Base64;
+import org.oa4mp.server.admin.myproxy.oauth2.base.StoreCommands2;
+import org.oa4mp.server.loader.oauth2.OA2SE;
+import org.oa4mp.server.loader.oauth2.servlet.TokenExchangeRecordRetentionPolicy;
+import org.oa4mp.server.loader.oauth2.storage.RefreshTokenRetentionPolicy;
+import org.oa4mp.server.loader.oauth2.storage.RefreshTokenStore;
+import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
+import org.oa4mp.server.loader.oauth2.storage.transactions.OA2TStoreInterface;
+import org.oa4mp.server.loader.oauth2.storage.tx.TXRecord;
+import org.oa4mp.server.loader.oauth2.storage.tx.TXStore;
 
 import java.io.*;
 import java.net.URI;
@@ -721,5 +721,93 @@ public class TransactionStoreCommands extends StoreCommands2 {
     public void bootstrap() throws Throwable {
         super.bootstrap();
         getHelpUtil().load("/help/transaction_help.xml");
+    }
+
+    /**
+     * Removes all transactions and TX records for a given client
+     *
+     * @param inputLine
+     * @throws Exception
+     */
+
+    // Fix https://github.com/ncsa/oa4mp/issues/225
+    public void rm_by_client_id(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            say("rm_by_client_id client_id - remove all current transactions for the given client.");
+            say("client_id = the unique identifier for a client");
+            say("Note that this cannot be undone and any operations for clients on these");
+            say("will start failing instantly.");
+            return;
+        }
+        if (!inputLine.hasArgs()) {
+            say("missing client id.");
+            return;
+        }
+        OA2TStoreInterface<? extends OA2ServiceTransaction> tStore = (OA2TStoreInterface<? extends OA2ServiceTransaction>) getStore();
+        Identifier clientID = BasicIdentifier.newID(inputLine.getLastArg());
+        List<Identifier> ids = tStore.getByClientID(clientID);
+        if (ids.isEmpty()) {
+            say("no transactions found for client id: " + clientID);
+        //    return;
+        }
+        tStore.removeByID(ids);
+        say("removed " + ids.size() + " transactions");
+        long counter = 0;
+        // now for tokens
+        for (Identifier id : ids) {
+            List<Identifier> txValues = getTxStore().getIDsByParentID(id);
+            counter = counter + txValues.size();
+            getTxStore().removeByID(txValues);
+        }
+        if(counter == 0){
+            say("no refresh/exchange records found");
+        }else{
+            say("removed " + counter + "  exchange/refresh records");
+        }
+        say("total items removed from all stores:" + (counter + ids.size()));
+    }
+
+    /**
+     * Print stats about the number of outstanding transactions and exchange/refresh records.
+     * @param inputLine
+     * @throws Exception
+     */
+    // Fix https://github.com/ncsa/oa4mp/issues/225
+    public void client_stats(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            say("client_stats client_id -v - prints report on the number of tokens currently help by this client.");
+            say("client_id = the unique identifier for a client");
+            say("-v = verbose mode. Print numbers of refresh/exchanges per id, otherwise print a single number");
+            return;
+        }
+        if (!inputLine.hasArgs()) {
+            say("missing client id.");
+            return;
+        }
+        boolean isVerbose = inputLine.hasArg("-v");
+        inputLine.removeSwitch("-v");
+        OA2TStoreInterface<? extends OA2ServiceTransaction> tStore = (OA2TStoreInterface<? extends OA2ServiceTransaction>) getStore();
+        Identifier clientID = BasicIdentifier.newID(inputLine.getLastArg());
+        List<Identifier> ids = tStore.getByClientID(clientID);
+        if (ids.isEmpty()) {
+            say("no transactions found for client id: " + clientID);
+            return;
+        }
+        say( ids.size() + " base transaction count");
+        long counter = 0;
+        // now for tokens
+        for (Identifier id : ids) {
+            List<Identifier> txValues = getTxStore().getByParentID(id);
+            counter = counter + txValues.size();
+            if(isVerbose){
+                say(StringUtils.pad(String.valueOf(txValues.size()),10 ) + " | " + id);
+            }
+        }
+        if(counter == 0){
+            say("no refresh/exchange records found");
+        }else{
+            say( counter + " total exchange/refresh records");
+        }
+        say("total transactions and other records:" + (counter + ids.size()));
     }
 }

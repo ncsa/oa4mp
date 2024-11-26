@@ -1,0 +1,57 @@
+/*
+   Test that a for and its provisioner are indeed independent. Boring, but if this
+   breaks, this shows a critical failure for the ersatz system.
+*/
+
+
+saved_cfg := '/tmp/independence-test.json';
+script_load('auto/tests/rfc8693/provisioner.qdl', saved_cfg);
+
+clc#init($$OA4MP_CLC_XML_INI, 'localhost:e1');
+clc#read(saved_cfg , '-p'); // -p switch tell client that this is an ersatz client
+e_tokens. := clc#exchange({'subject':'rt','type':'at'}); // forks flow
+provisioner := j_load('oa4mp.client.clc');
+provisioner#read(saved_cfg);
+
+p_tokens. := provisioner#tokens();
+provisioner#at(e_tokens.'access_token');
+provisioner#rt(e_tokens.'refresh_token');
+
+try[
+   provisioner#refresh();
+]catch[
+  ⊨ false : 'was able to refresh the provisioner with the ersatz refresh token';
+];
+
+try[
+   provisioner#exchange({'subject':'at','type':'at'});
+]catch[
+  ⊨ false : 'provisioner was able to exchange ersatz access token ';
+];
+try[
+   provisioner#exchange({'subject':'rt','type':'at'});
+]catch[
+  ⊨ false : 'provisioner was able to exchange ersatz refresh token ';
+];
+say('ok: 𝕰𝖗s𝖆𝖙𝖟 provisioner is independent its fork.');
+
+ // repeat for the ersatz client
+ clc#at(p_tokens.'access_token');
+ clc#rt(p_tokens.'refresh_token');
+ try[
+    clc#refresh();
+ ]catch[
+   ⊨ false : 'was able to refresh the ersatz client with the provisioner refresh token';
+ ];
+
+ try[
+    clc#exchange({'subject':'at','type':'at'});
+ ]catch[
+   ⊨ false : 'ersatz client was able to exchange provisioner access token ';
+ ];
+ try[
+    clc#exchange({'subject':'rt','type':'at'});
+ ]catch[
+   ⊨ false : 'ersatz client was able to exchange provisioner refresh token ';
+ ];
+ say('ok: 𝕰𝖗s𝖆𝖙𝖟 client is independent of its provisioner.');

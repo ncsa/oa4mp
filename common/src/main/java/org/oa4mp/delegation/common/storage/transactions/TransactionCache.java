@@ -1,6 +1,5 @@
 package org.oa4mp.delegation.common.storage.transactions;
 
-import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.core.cache.CachedMapFacade;
@@ -9,11 +8,11 @@ import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.core.exceptions.UnregisteredObjectException;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
+import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import org.oa4mp.delegation.common.storage.TransactionStore;
 import org.oa4mp.delegation.common.token.AccessToken;
 import org.oa4mp.delegation.common.token.AuthorizationGrant;
 import org.oa4mp.delegation.common.token.Verifier;
-import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 import java.net.URI;
 import java.util.*;
@@ -525,7 +524,12 @@ public class TransactionCache<V extends BasicTransaction> extends CachedMapFacad
     }
 
     @Override
-    public boolean remove(List<Identifiable> objects) {
+    public boolean remove(List<V> objects) {
+        throw new NotImplementedException(" This is not yet implemented for cache");
+    }
+
+    @Override
+    public boolean removeByID(List<Identifier> objects) {
         throw new NotImplementedException(" This is not yet implemented for cache");
     }
 

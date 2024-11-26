@@ -1,5 +1,6 @@
 package org.oa4mp.server.loader.oauth2.storage.transactions;
 
+import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import org.oa4mp.server.loader.oauth2.servlet.RFC8628State;
 import org.oa4mp.server.loader.oauth2.storage.TokenInfoRecord;
 import org.oa4mp.server.loader.oauth2.storage.TokenInfoRecordMap;
@@ -106,6 +107,39 @@ public class OA2SQLTStore<V extends OA2ServiceTransaction> extends DSSQLTransact
         return t;
     }
 
+    /**
+     * Returns the ids of all transactions for a given client. On usage of this is stopping a runaway
+     * client, so there may be a huge number of hits for this.
+     * @param clientID
+     * @return
+     */
+    @Override
+    public List<Identifier> getByClientID(Identifier clientID) {
+        String statement = ((OA2TransactionTable) getTransactionTable()).getByClientIDStatement();
+        if (clientID == null) {
+            throw new IllegalStateException("a null client identifier was supplied");
+        }
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+        List<Identifier> list = new ArrayList<>();
+        V t = null;
+        try {
+            PreparedStatement stmt = c.prepareStatement(statement);
+            stmt.setString(1, clientID.toString());
+            stmt.executeQuery();
+            ResultSet rs = stmt.getResultSet();
+            while (rs.next()) {
+                list.add(BasicIdentifier.newID(rs.getString(1)));
+            }
+            rs.close();
+            stmt.close();
+            releaseConnection(cr);
+        } catch (SQLException e) {
+            throw new GeneralException("could not search for transactions with client id \"" + clientID + "\"", e);
+        }
+        return list;
+    }
+
     @Override
     public List<V> getByUsername(String username) {
         String statement = ((OA2TransactionTable) getTransactionTable()).getByUsernameStatement();
@@ -138,7 +172,7 @@ public class OA2SQLTStore<V extends OA2ServiceTransaction> extends DSSQLTransact
             stmt.close();
             releaseConnection(cr);
         } catch (SQLException e) {
-            throw new GeneralException("coould not get transaction with username \"" + username + "\"", e);
+            throw new GeneralException("could not get transaction with username \"" + username + "\"", e);
         }
         return list;
 

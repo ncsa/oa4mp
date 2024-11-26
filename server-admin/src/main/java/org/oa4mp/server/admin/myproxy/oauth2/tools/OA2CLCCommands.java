@@ -2288,6 +2288,7 @@ public class OA2CLCCommands extends CommonCommands {
     }
 
     JSONObject ccfResponse;
+
 }
 /*
 load localhost:test/rfc9068 /home/ncsa/dev/csd/config/client-oa2.xml

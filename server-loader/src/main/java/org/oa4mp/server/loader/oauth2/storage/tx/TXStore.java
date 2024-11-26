@@ -19,6 +19,7 @@ public interface TXStore<V extends TXRecord> extends Store<V> {
      * @return
      */
     List<V> getByParentID(Identifier parentID);
+    List<Identifier> getIDsByParentID(Identifier parentID);
 
     int getCountByParent(Identifier parentID);
 }

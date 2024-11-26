@@ -65,8 +65,9 @@ import java.util.*;
 import static org.oa4mp.delegation.server.OA2Constants.NONCE;
 import static org.oa4mp.delegation.server.OA2Constants.STATE;
 import static org.oa4mp.delegation.server.server.RFC8693Constants.*;
-import static org.oa4mp.delegation.server.server.claims.OA2Claims.JWT_ID;
-import static org.oa4mp.delegation.server.server.claims.OA2Claims.SUBJECT;
+import static org.oa4mp.delegation.server.server.RFC8693Constants.AUDIENCE;
+import static org.oa4mp.delegation.server.server.RFC8693Constants.RESOURCE;
+import static org.oa4mp.delegation.server.server.claims.OA2Claims.*;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -293,15 +294,11 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         }
         String subject = getFirstParameterValue(request, SUBJECT);
         if (subject == null) {
-            if (scopes.contains(OA2Scopes.SCOPE_OPENID)) {
-                // case here is that they are requesting an id token, but there is no subject
-                // for the ID token.
-                throw new OA2ATException(OA2Errors.INVALID_REQUEST,
-                        "no subject for ID token set",
-                        HttpStatus.SC_BAD_REQUEST,
-                        state, client);
+            // Fix https://github.com/ncsa/oa4mp/issues/219
+            // set default of the client ID and subject.
+            serviceTransaction.setUsername(serviceTransaction.getClient().getIdentifierString());
+            claims.put(OA2Claims.SUBJECT, serviceTransaction.getUsername());
 
-            }
         } else {
             serviceTransaction.setUsername(subject);
             claims.put(OA2Claims.SUBJECT, serviceTransaction.getUsername());
@@ -1069,6 +1066,10 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                         // or it will bomb in the check that this is an OIDC client.
                         t2.getUserMetaData().put(OA2Claims.SUBJECT, client.getIdentifierString());
                     }
+                    // Inherit the issuer no matter what, or the ID token will be invalid.
+                    // Figuring out the issuer in the first place was hard, but if they insist, they can
+                    // reset it later.
+                    t2.getUserMetaData().put(ISSUER, t.getUserMetaData().getString(ISSUER));
                 }
                 debugger = MyProxyDelegationServlet.createDebugger(client); // switch over to logging for the 𝕰𝖗s𝖆𝖙𝖟 client.
                 getTransactionStore().save(t2);

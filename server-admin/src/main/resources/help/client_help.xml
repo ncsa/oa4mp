@@ -583,6 +583,8 @@ This requires a trust relationship
 before setting this property true. Note that part of the specification is that the client
 must use its key to authenticate as well as sign its grant request.
 
+Note this may be queried and set directly in the CLI using the service_client call.
+
 See also: https://datatracker.ietf.org/doc/html/rfc7523#section-2.1 ]]>
     </body>
     </entry>

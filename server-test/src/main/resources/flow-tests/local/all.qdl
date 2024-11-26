@@ -4,7 +4,10 @@
     automated tests, the code paths initially are very different and must be tested.
 */
 path:='test#/';
-test.:=(path + 'local/') + [ 'test_acl.qdl',
+test.:=(path + 'local/') + [
+                             'fnal-dune-df.qdl',
+                             'fnal-dune-uri.qdl',
+                             'test_acl.qdl',
                              'test_qdl.qdl',
                              'cil1550.qdl',
                              'file_claims.qdl',
@@ -25,6 +28,7 @@ test.:=(path + 'local/') + [ 'test_acl.qdl',
                              'fnal-2.qdl',
                              'fnal-3.qdl',
                              'fnal-basic.qdl'];
+
 say('**** Flow test suite for OA4MP. ****');
 say('This will do several local tests for various modes of operation.');
 say('In each case, read carefully what is on the screen and do what it says.');

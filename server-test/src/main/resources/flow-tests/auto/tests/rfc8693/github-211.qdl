@@ -37,4 +37,4 @@ rt. := tokens.'refresh_token';
 ⊨ 4800000 == rt.'lifetime' : 'refresh token has incorrect lifetime';
 ⊨ 'https://wlcg.cern.ch/jwt/refresh1' == rt.'jwt'.'aud' : 'refresh token has incorrect audience';
 
-say('ok: 𝕰𝖗s𝖆𝖙𝖟 requesting a refresh token, post provisioner refresh, using ' + (args.1) + ' for the subject token');
+say('ok: 𝕰𝖗s𝖆𝖙𝖟 (GitHub-211) requesting a refresh token, post provisioner refresh, using ' + (args.1) + ' for the subject token');
