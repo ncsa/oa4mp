@@ -26,7 +26,8 @@ params.'token' :=  {'scope': 'storage.read:/ wlcg.capabilityset:/duneana wlcg.gr
 rc := script_load('driver.qdl', cfg., params.);
 if[rc!='ok'][return(rc);];
 
-clc#access();
+tokens. := clc#access();
+
 saved_cfg := '/tmp/fnal-test.json';
 rm(saved_cfg);
 clc#write(saved_cfg);

@@ -5,7 +5,7 @@
 */
 
 
-debugger(5);
+debugger(1);
 cfg.'id'  := 'localhost:test/rfc9068'; // name of the configuration, not the id!!
 cfg.'idp'  := 'GitHub';
 cfg.'file' := $$OA4MP_CLC_XML_INI;
@@ -33,8 +33,9 @@ define[test(access_token., refresh_token., params.)]
       ];
 
 tokens. := clc#access();
-debugger(1,'tokens after access:\n' + print(tokens.));
 debugger(1,'umd:\n' + print(clc#claims()));
+debugger(1,'at token after access:\n' + print(tokens.'access_token'.'jwt'));
+debugger(1,'rt token after access:\n' + print(tokens.'refresh_token'.'jwt'));
 test(tokens.'access_token', tokens.'refresh_token', params.);
 tokens. := clc#refresh();
 debugger(1,'tokens after refresh:\n' + print(tokens.));

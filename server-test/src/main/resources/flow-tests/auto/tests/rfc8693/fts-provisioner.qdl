@@ -24,10 +24,15 @@ ini.:=initialization#get_client_ini(test_id);
 server_defaults.:=initialization# server_defaults();
 s. := ['X', 'Y', 'Z', 'wlcg:capabilityset:/dunana'];
 clc#init($$OA4MP_CLC_INI, test_id);
-params. := {'scope':detokenize(s., ' '), 'audience':'my_aud'};
+params. := {'scope':detokenize(s., ' '), 'audience':'rucio'};
 response. := clc#ccf(params.);
 s1. := tokenize(response.'scope',' ');
 ⊨ ⊗∧⊙(s1. ∈ s.) ∧ (s. ∈ s1.)  : 'incorrect scopes, got ' +response.'scope' ;
+// Have to excavate the token
+rrr := decode(tokenize(response.'access_token', '.').1); // raw token
+debugger(1,'raw token:' + rrr);
+debugger(1,'access token:\n' + print(from_json(rrr)));
+⊨ (from_json(rrr).'aud' == 'rucio') : 'incorrect aud claim';
 debugger(1,'ccf response:\n' + print(response.));
 rm(saved_cfg);
 clc#write(saved_cfg);

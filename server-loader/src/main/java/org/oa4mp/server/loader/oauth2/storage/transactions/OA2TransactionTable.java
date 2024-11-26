@@ -53,6 +53,16 @@ public class OA2TransactionTable extends DSTransactionTable {
     public String getByClientIDStatement() {
         return "SELECT " + getOA2Keys().identifier() + " FROM " + getFQTablename() + " WHERE " + getOA2Keys().clientKey() + "=?";
     }
+
+
+    /**
+     * Get all of the client IDs in the table for some statisitics
+     * @return
+     */
+    public String getAllClientIDsStatement() {
+        return "SELECT " + getOA2Keys().clientKey() + " FROM " + getFQTablename();
+    }
+
     public String getTokenInfoStatement() {
            return "SELECT " +
                    getOA2Keys().identifier() + ", " +

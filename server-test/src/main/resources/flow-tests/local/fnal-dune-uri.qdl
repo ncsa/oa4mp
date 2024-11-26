@@ -1,2 +1,4 @@
+#! /usr/bin/env -S qdl-run
+
 /* Runs dune flow test for authorization code flow */
 script_load('test#/local/fnal-dune.qdl','uri');

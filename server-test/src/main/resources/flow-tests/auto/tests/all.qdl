@@ -31,6 +31,8 @@ test.:= [
           [path + 'auto/tests/' +'rtx_refreshes.qdl', initialization],
           [path + 'auto/tests/' +'rtx.qdl',initialization],
           [path + 'auto/tests/' +'revoke.qdl'],
+           [(path + 'auto/tests/rfc8693/') + 'independence-test.qdl', '-at', '-subject','rt'],
+          [(path + 'auto/tests/rfc8693/') + 'fts-test.qdl',  '-subject','at'],
           [(path + 'auto/tests/rfc8693/') + 'github-211.qdl',  '-subject','at'],
           [(path + 'auto/tests/rfc8693/') + 'ersatz-rt.qdl',  '-subject','at'],
           [(path + 'auto/tests/rfc8693/') + 'ersatz-rt.qdl',  '-subject','rt'],

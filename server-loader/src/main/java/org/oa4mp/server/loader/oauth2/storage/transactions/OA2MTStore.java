@@ -156,6 +156,18 @@ public class OA2MTStore<V extends OA2ServiceTransaction> extends TransactionMemo
     }
 
     @Override
+    public List<Identifier> getAllClientID() {
+        List<Identifier> identifiers = new ArrayList<>();
+        for (Identifier id : keySet()) {
+            V transaction = get(id);
+            if (transaction != null) {
+                identifiers.add(transaction.getClient().getIdentifier());
+            }
+        }
+        return identifiers;
+    }
+
+    @Override
     public V getByIDTokenID(Identifier idTokenIdentifier) {
         for (Identifier id : keySet()) {
             V transaction = get(id);

@@ -160,7 +160,7 @@ public interface OA2Claims {
      * the number of seconds from 1970-01-01T0:0:0Z as measured in UTC until the date/time
      */
     public static String UPDATED_AT = "updated_at";
-    String[] USER_INFO_CLAIMS = new String[]{AFFILIATION,CERT_SUBJECT_DN,ENTITLEMENT,
+    String[] USER_INFO_CLAIMS = new String[]{AFFILIATION,ENTITLEMENT,
             EPPN,EPTID,EDU_PERSON_ASSURANCE,EDU_PERSON_ENTITLEMENT,EDU_PERSON_ORCID,IDP,IDP_NAME,
             IS_MEMBER_OF,I_TRUST_UIN,OIDC,OPENID,OU,PAIRWISE_ID,SUBJECT_ID,
             UID_NUMBER,VO_PERSON_EXTERNALID,VO_PERSON_ID, LDAP_CN, LDAP_DN, LDAP_SN};

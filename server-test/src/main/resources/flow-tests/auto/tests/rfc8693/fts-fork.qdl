@@ -29,6 +29,6 @@ debugger(1,'exchange raw response:\n' + print(raw.));
 tokens. := clc#refresh();
 r_scope1. := tokenize(tokens.'access_token'.'jwt'.scope, ' ');
 ⊨ ⊗∧⊙(r_scope. ∈ r_scope1.) ∧ (r_scope1. ∈ r_scope.)  : 'incorrect scopes, got ' +response.'scope' ;
-⊨ tokens.'access_token'.'jwt'.'aud' == 'my_aud'; // set in initial request
+⊨ tokens.'access_token'.'jwt'.'aud' == 'rucio' : 'incorrect aud claim'; // set in initial request
 debugger(1,'refresh response AT:\n' + print(tokens.'access_token'.'jwt'));
 debugger(1,'\nrefresh response RT:\n' + print(tokens.'refresh_token'.'jwt'));

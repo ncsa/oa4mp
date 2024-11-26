@@ -1,18 +1,10 @@
 package org.oa4mp.server.loader.oauth2.storage.transactions;
 
-import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import org.oa4mp.server.loader.oauth2.servlet.RFC8628State;
-import org.oa4mp.server.loader.oauth2.storage.TokenInfoRecord;
-import org.oa4mp.server.loader.oauth2.storage.TokenInfoRecordMap;
-import org.oa4mp.server.api.admin.transactions.DSSQLTransactionStore;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.TransactionNotFoundException;
+import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
-import org.oa4mp.delegation.common.token.RefreshToken;
-import org.oa4mp.delegation.common.token.TokenForge;
-import org.oa4mp.delegation.common.token.impl.AccessTokenImpl;
-import org.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionRecord;
@@ -20,12 +12,17 @@ import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
 import edu.uiuc.ncsa.security.storage.sql.internals.Table;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
+import org.oa4mp.delegation.common.token.RefreshToken;
+import org.oa4mp.delegation.common.token.TokenForge;
+import org.oa4mp.delegation.common.token.impl.AccessTokenImpl;
+import org.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
+import org.oa4mp.server.api.admin.transactions.DSSQLTransactionStore;
+import org.oa4mp.server.loader.oauth2.servlet.RFC8628State;
+import org.oa4mp.server.loader.oauth2.storage.TokenInfoRecord;
+import org.oa4mp.server.loader.oauth2.storage.TokenInfoRecordMap;
 
 import javax.inject.Provider;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -136,6 +133,30 @@ public class OA2SQLTStore<V extends OA2ServiceTransaction> extends DSSQLTransact
             releaseConnection(cr);
         } catch (SQLException e) {
             throw new GeneralException("could not search for transactions with client id \"" + clientID + "\"", e);
+        }
+        return list;
+    }
+
+    @Override
+    public List<Identifier> getAllClientID() {
+        String statement = ((OA2TransactionTable) getTransactionTable()).getAllClientIDsStatement();
+
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+        List<Identifier> list = new ArrayList<>();
+        V t = null;
+        try {
+            Statement stmt = c.createStatement();
+            ResultSet rs = stmt.executeQuery(statement);
+            //ResultSet rs = stmt.getResultSet();
+            while (rs.next()) {
+                list.add(BasicIdentifier.newID(rs.getString(1)));
+            }
+            rs.close();
+            stmt.close();
+            releaseConnection(cr);
+        } catch (SQLException e) {
+            throw new GeneralException("could not search transactions for client ids", e);
         }
         return list;
     }

@@ -26,12 +26,12 @@ import org.oa4mp.server.loader.oauth2.storage.tx.TXStore;
 
 import java.io.*;
 import java.net.URI;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import static edu.uiuc.ncsa.security.core.cache.LockingCleanup.lockID;
+import static edu.uiuc.ncsa.security.core.util.StringUtils.center;
 import static edu.uiuc.ncsa.security.core.util.StringUtils.pad2;
 
 /**
@@ -773,22 +773,80 @@ public class TransactionStoreCommands extends StoreCommands2 {
      * @throws Exception
      */
     // Fix https://github.com/ncsa/oa4mp/issues/225
-    public void client_stats(InputLine inputLine) throws Exception {
+    public void stats(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
-            say("client_stats client_id -v - prints report on the number of tokens currently help by this client.");
-            say("client_id = the unique identifier for a client");
-            say("-v = verbose mode. Print numbers of refresh/exchanges per id, otherwise print a single number");
+            say("stats [-client client_id] [-v] [-top n] = prints report on the number of tokens currently help by this client.");
+            say("-client client_id = the unique identifier for a client");
+            say("-v = verbose mode for -client. Print numbers of refresh/exchanges per id, otherwise print a single number");
+            say("-top n = n is an integer. Print the top n most used client ids with counts and percents");
             return;
         }
         if (!inputLine.hasArgs()) {
-            say("missing client id.");
+            say("no arguments");
+            return;
+        }
+        boolean isTop = inputLine.hasArg("-top");
+        int n = 0;
+        String rawN = "";
+        if(isTop){
+            try {
+                 rawN = inputLine.getNextArgFor("-top");
+                n = Integer.parseInt(rawN);
+                if(n <=0){
+                    say("top n should be positive");
+                    return;
+                }
+                inputLine.removeSwitchAndValue("-top");
+            }catch(Throwable t){
+                n = 10;
+                say("sorry, but \"" + rawN + "\" did not parse as a number");
+
+            }
+        }
+        OA2TStoreInterface<? extends OA2ServiceTransaction> tStore = (OA2TStoreInterface<? extends OA2ServiceTransaction>) getStore();
+
+        if(isTop){
+            List<Identifier> ids = tStore.getAllClientID();
+            long total = ids.size();
+            if(total == 0){
+                say("no transactions found");
+                return;
+            }
+            HashMap<Identifier, Long> counts = new HashMap<>();
+            for(Identifier id : ids){
+                if(counts.containsKey(id)) {
+                    counts.put(id, counts.get(id) + 1);
+                }else{
+                    counts.put(id, 0L);
+                }
+            }
+            List<Map.Entry<Identifier, Long>> list = new ArrayList<>(counts.entrySet());
+            list.sort(Map.Entry.comparingByValue());
+            Collections.reverse(list); // from highest to lowest
+            Map<Identifier, Long> sortedCounts = new LinkedHashMap<>();
+            for (Map.Entry<Identifier, Long> entry : list) {
+                sortedCounts.put(entry.getKey(), entry.getValue());
+            }
+            // finally
+            int max = Math.min(n, sortedCounts.size());
+            int i = 0;
+            int fieldWidth = 10;
+            say(center("count",fieldWidth) + "|" +   center("percent",fieldWidth) +   "|  client id");
+            say(  "----------+----------+------------------------------");
+            for(Identifier id : sortedCounts.keySet()){
+                if(max < i++){
+                    break;
+                }
+                say(center(sortedCounts.get(id).toString(), fieldWidth) + "|" + center(String.format("%.3f",((100.00*sortedCounts.get(id))/total))+"%", fieldWidth) + "|  " + id);
+            }
+            say("total transactions:" + total);
             return;
         }
         boolean isVerbose = inputLine.hasArg("-v");
         inputLine.removeSwitch("-v");
-        OA2TStoreInterface<? extends OA2ServiceTransaction> tStore = (OA2TStoreInterface<? extends OA2ServiceTransaction>) getStore();
         Identifier clientID = BasicIdentifier.newID(inputLine.getLastArg());
         List<Identifier> ids = tStore.getByClientID(clientID);
+
         if (ids.isEmpty()) {
             say("no transactions found for client id: " + clientID);
             return;

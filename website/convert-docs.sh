@@ -24,4 +24,5 @@ lowriter --headless --convert-to pdf ${args[0]}/server-admin/src/main/docs/jwt-u
 lowriter --headless --convert-to pdf ${args[0]}/server-admin/src/main/docs/forking_a_flow_quickstart.odt > /dev/null
 lowriter --headless --convert-to pdf ${args[0]}/website/src/main/doc/oa2-client.odt                      > /dev/null
 lowriter --headless --convert-to pdf ${args[0]}/website/src/main/doc/scopes.odt                          > /dev/null
+lowriter --headless --convert-to pdf ${args[0]}/website/src/main/doc/policies.odt                        > /dev/null
 echo "    ... done with OA4MP docs"

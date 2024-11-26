@@ -391,6 +391,10 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
             for (String claim : USER_INFO_CLAIMS) {
                 setCurrentClaim(currentClaims, finalClaims, claim);
             }
+            // Fix https://github.com/ncsa/oa4mp/issues/226
+            if(transaction.getScopes().contains(OA2Scopes.SCOPE_MYPROXY)){
+                setCurrentClaim(currentClaims, finalClaims, CERT_SUBJECT_DN);
+            }
         }
         setUserMetaData(finalClaims);
     }
@@ -405,11 +409,12 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
      * @param execPhase
      * @throws Throwable
      */
-    protected void permissiveFinish(Collection<String> scopes, String execPhase) throws Throwable {
+    protected void permissiveFinish(Collection<String> configuredScopes, String execPhase) throws Throwable {
         // only required one by the spec. and only if the server is OIDC.
+        Collection<String> requestedScopes = transaction.getScopes();
         if (oa2se.isOIDCEnabled()) {
             // Fix https://github.com/ncsa/oa4mp/issues/219
-            if(transaction.getScopes().contains(OA2Scopes.SCOPE_OPENID)){}
+            if(configuredScopes.contains(OA2Scopes.SCOPE_OPENID)){}
             // if no subject, e.g. in the client credentials flow, then this will cause an exception.
             checkClaim(getUserMetaData(), SUBJECT);
         }
@@ -419,15 +424,15 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
         // CIL-1411 -- remove any claims not specifically requested by the user.
         // We need this here since a policy set  may add claims that the user
         // did not request.
-        if (!scopes.contains(OA2Scopes.SCOPE_EMAIL)) {
+        if (!configuredScopes.contains(OA2Scopes.SCOPE_EMAIL)) {
             getUserMetaData().remove(EMAIL);
             getUserMetaData().remove(EMAIL_VERIFIED);
         }
-        if (!scopes.contains(SCOPE_PHONE)) {
+        if (!configuredScopes.contains(SCOPE_PHONE)) {
             getUserMetaData().remove(PHONE_NUMBER);
             getUserMetaData().remove(PHONE_NUMBER_VERIFIED);
         }
-        if (!scopes.contains(OA2Scopes.SCOPE_PROFILE)) {
+        if (!configuredScopes.contains(OA2Scopes.SCOPE_PROFILE)) {
             getUserMetaData().remove(NAME);
             getUserMetaData().remove(MIDDLE_NAME);
             getUserMetaData().remove(NICKNAME);
@@ -436,13 +441,18 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
             getUserMetaData().remove(PREFERRED_USERNAME);
             getUserMetaData().remove(DISPLAY_NAME);
         }
+        // Fix https://github.com/ncsa/oa4mp/issues/226
+        if(!requestedScopes.contains(OA2Scopes.SCOPE_MYPROXY)){
+            getUserMetaData().remove(CERT_SUBJECT_DN);
+        }
+
         // Not having the CILogon userinfo scope but also allowing other scopes means
         // removing specific scopes and letting other scopes -- such COManage memberships -- through.
         // Fix for https://github.com/ncsa/oa4mp/issues/158
-        if (scopes.contains(OA2Scopes.SCOPE_CILOGON_INFO)) {
+        if (requestedScopes.contains(OA2Scopes.SCOPE_CILOGON_INFO)) {
             return; // contract for this is kitchen sink -- return everything not prohibited.
         }
-        if (!scopes.contains(OA2Scopes.SCOPE_USER_INFO)) {
+        if (!requestedScopes.contains(OA2Scopes.SCOPE_USER_INFO)) {
             for (String claim : USER_INFO_CLAIMS) {
                 getUserMetaData().remove(claim);
             }

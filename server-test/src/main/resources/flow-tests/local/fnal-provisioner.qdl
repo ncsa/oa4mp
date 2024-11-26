@@ -24,7 +24,6 @@ expected_scopes.:= ['compute.cancel',
                     'storage.read:/dune',
                     'storage.read:/dune/resilient/jobsub_stage'];
 
-
 tokens. := clc#access();
 returned_scopes. := tokenize(tokens.'access_token'.'jwt'.'scope', ' ');
 ⊨(⊢expected_scopes.) == (⊢returned_scopes.) : 'incorrect scopes ' + (~returned_scopes.∉expected_scopes.⌆returned_scopes.);
