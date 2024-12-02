@@ -1,8 +1,8 @@
 ____________________________________
-Release notes for OA4MP Server version 6.0
+Release notes for OA4MP Server version 6.0.2
 ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 Welcome to OA4MP Server 6.0! This has several fixes, listed on the release
-page on GitHub https://github.com/ncsa/oa4mp/releases/tag/v6.0.
+page on GitHub https://github.com/ncsa/oa4mp/releases/tag/v6.0.2.
 
 Among other features is the addition of support for the client credentials flow
 as well a complete (internal) package rename of classes so all packages now start

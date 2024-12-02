@@ -37,9 +37,9 @@ if[
      return();
 ]; //end if
 
- exec_phase ∉ ['post_token', 'post_refresh', 'post_user_info'] ⇒ return();
- [0≡script_args() ⇒ return(); // do not process claims
+ (exec_phase ∉ ['post_token', 'post_refresh', 'post_user_info']) ⇒ return();
+ 0≡script_args() ⇒ return(); // do not process claims
 
- !is_defined(claims.'isMemberOf') ⇒ return();
+ (!is_defined(claims.'isMemberOf')) ⇒ return();
  if[to_boolean(script_args(0))][claims.'isMemberOf' := claims.isMemberOf\*\name;];
  return();

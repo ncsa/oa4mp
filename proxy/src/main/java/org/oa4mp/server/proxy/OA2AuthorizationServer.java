@@ -3,6 +3,8 @@ package org.oa4mp.server.proxy;
 
 import edu.uiuc.ncsa.myproxy.MPSingleConnectionProvider;
 import edu.uiuc.ncsa.myproxy.MyProxyConnectable;
+import org.oa4mp.delegation.server.*;
+import org.oa4mp.delegation.server.server.claims.OA2Claims;
 import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.servlet.OA2AuthorizedServletUtil;
 import org.oa4mp.server.loader.oauth2.servlet.OA2ClientUtils;
@@ -13,11 +15,7 @@ import org.oa4mp.server.api.storage.servlet.AbstractAuthorizationServlet;
 import org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet;
 import org.oa4mp.delegation.common.token.AccessToken;
 import org.oa4mp.delegation.common.token.impl.TokenUtils;
-import org.oa4mp.delegation.server.OA2Constants;
-import org.oa4mp.delegation.server.OA2Errors;
-import org.oa4mp.delegation.server.OA2GeneralError;
 import org.oa4mp.delegation.server.jwt.JWTRunner;
-import org.oa4mp.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.servlet.HeaderUtils;
 import edu.uiuc.ncsa.security.servlet.PresentableState;
@@ -187,6 +185,10 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
             cb = cb + (cb.indexOf(responseDelimiter) == -1 ? responseDelimiter : "&") + OA2Constants.AUTHORIZATION_CODE + "=" + TokenUtils.b32EncodeToken(idStr);
             if (params.containsKey(OA2Constants.STATE)) {
                 cb = cb + "&" + OA2Constants.STATE + "=" + URLEncoder.encode(params.get(OA2Constants.STATE), "UTF-8");
+            }
+            // Fix https://github.com/ncsa/oa4mp/issues/214 RFC 9207 support
+            if(((OA2ServiceTransaction) trans).getUserMetaData().containsKey(OA2Claims.ISSUER)){
+                cb = cb + (cb.indexOf(responseDelimiter) == -1 ? responseDelimiter : "&")  + OA2Claims.ISSUER + "=" + st.getUserMetaData().get(OA2Claims.ISSUER);
             }
 
         } catch (UnsupportedEncodingException e) {
