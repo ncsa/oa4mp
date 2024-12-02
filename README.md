@@ -57,7 +57,7 @@ There are a few environment variables you should define before doing anything. T
 ## Updating the release version
 
 Do a global replace of the SNAPSHOT tag with the version you are creating. 
-E.g. replace `6.x-SNAPSHOT` with `5.3.5`. Note this must be global in all files since this is used extensively in 
+E.g. replace `6.0.2` with `5.3.5`. Note this must be global in all files since this is used extensively in 
 the documentation. If you are updating teh website, you do not need to update 
 anything in `$NCSA_DEV_INPUT/oa4mp/docs` which will be replaced shortly. 
 
@@ -126,7 +126,7 @@ resolution maven uses tends to have multiple jars created then deploy complains.
 # Building and deploying the website
 
 You can also update the website. You must be able to commit to Github to do this. The basic way this works is that you 
-1. Do a global replace of the SNAPSHOT tag with the version you are creating. E.g. replace `6.x-SNAPSHOT` with `5.3.5`. Note this must be global in all files since this is used extensively in the documentation. You do not need to update anything in `$NCSA_DEV_INPUT/oa4mp/docs` which will be replaced shortly. 
+1. Do a global replace of the SNAPSHOT tag with the version you are creating. E.g. replace `6.0.2` with `5.3.5`. Note this must be global in all files since this is used extensively in the documentation. You do not need to update anything in `$NCSA_DEV_INPUT/oa4mp/docs` which will be replaced shortly. 
 2. run the `build.sh` script to create all of the basic documentation 
 3. run `$NCSA_DEV_INPUT/oa4mp-website/make-website.sh` which creates the entire website and stick it in `$NCSA_DEV_INPUT/oa4mp/docs`
 4. commit everything to Git
