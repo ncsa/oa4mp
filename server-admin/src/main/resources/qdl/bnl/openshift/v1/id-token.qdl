@@ -1,0 +1,122 @@
+/*
+  Registry is at https://comanage.sdcc.bnl.gov/registry/
+
+*/
+
+/*
+    As per https://github.com/cilogon/bnl-policies/blob/main/BNL-SDCC_Policy_Specification.md
+     for EIC-Services:
+
+* OIDC client ID on PROD is currently
+    *  cilogon:/client_id/1ab32a2870b60375ee6bb678f6955a0d
+* OIDC client on TEST is currently
+    * cilogon:/client_id/498fa57b32f3b095c0a2c60aeed0f49c
+* Policy:
+    * Use OIDC tokens
+    * Tokens can only be obtained by COPeople in group Openshift-users
+    * Refresh token is not required.
+    * Access token can be just an opaque string.
+    * Audience for ID token should be set to OIDC client ID.
+    * ID token “sub” claim should be set to “sdccid” of logged in user. This number is currently provisioned into the “voPersonID” field of LDAP.
+    * ID token claim “isMemberOf” should contain a list of Registry groups to which the logged in user belongs. This is currently provisioned into “isMemberOf” in LDAP
+    * The following scopes are allowed openid, profile, email, org.cilogon.userinfo
+    * ID token “acr” claim should convey information from the IDP as to whether the user logged in with Single Factor Authorization(SFA) or Multifactor Authorization(MFA)
+    * Users that are denied authorization at the issuer should be redirected to the help page located at [https://www.sdcc.bnl.gov/registry-login-error.php](https://www.sdcc.bnl.gov/registry-login-error.php)
+        * The following get parameters should be sent
+            * error
+                * Same as would normally go to client callback uri
+            * error_description
+                * Same as would normally go to client callback uri
+            * serviceid
+                * the literal string “openshift”
+    * The allowed IDP list for this client should only include:
+        https://idp.ameslab.gov/idp/shibboleth"
+        https://identityprovider.anl.gov/idp/shibboleth"
+        https://idp.bnl.gov/idp/shibboleth"
+        https://idp.sdcc.bnl.gov/idp"
+        https://idp.fnal.gov/idp/shibboleth"
+        https://idp.ornl.gov/idp"
+*/
+/*
+    Access token support for Jefferson Lab's Openshift-Services client. Typical configuration for the client
+    is
+tokens {
+    identity {
+         type = "identity"
+        qdl {
+            load="bnl/openshift/v1/id-token.qdl"
+            xmd {
+                "exec_phase"=["post_auth"]
+            }
+    }}}
+
+Note that this runs in the post_auth phase only since the sub claim is over-written
+AND the only place that the redirect from the error makes sense is during the auth
+phase since there is a browser to redirect.
+
+{"tokens": {"identity": {
+                             "qdl":  {
+                              "load": "bnl/openshift/v1/id-token.qdl",
+                              "xmd": {"exec_phase": ["post_auth"]}
+                             },
+                             "type": "identity"
+                            }}}
+    // Note. No refresh tokens!
+*/
+//script_load('bnl/acl.qdl');
+script_load('utils/init.qdl'); // set up stuff
+
+   debugger(1);
+     DEBUG := true; // set false everywhere but on my test server.
+ // Robert Hancock's uid.
+  if [DEBUG]
+then [// Note that this does reset these every time called, so the get_user always works
+      // unlike production, where the sub gets reset on the first pass.
+      claims.'eppn':='hancock@bnl.gov';
+      claims.'sub' := 'http://cilogon.org/serverA/users/1774626';
+     ];
+  bnl_moniker := 'BNL Openshift-Services'; // moniker for debugging
+
+user := claims.sub;
+trace(bnl_moniker,'starting id-token for user =' + user);
+trace(bnl_moniker,'IDP =' + claims.'idp');
+
+results. := script_load('bnl/openshift/v1/get_user.qdl', user); // user == claims.sub
+trace(bnl_moniker,'result of user query =' + to_string(results.));
+
+//    ===== Begin error handling
+/*
+    Next bit sets up error handling with messages an a couple of functions
+    so the code is not just bloated
+*/ 
+do_uri(message)-> 'https://www.sdcc.bnl.gov/registry-login-error.php'+
+                                   '?error=access_denied' +
+                                   '&error_description=' + encode(message,1) +
+                                   '&serviceid=openshift';
+do_err(message)->err_uri(message, do_uri(message));
+allowed_idps. := [
+                 'https://idp.ameslab.gov/idp/shibboleth',
+                 'https://identityprovider.anl.gov/idp/shibboleth',
+                 'https://idp.bnl.gov/idp/shibboleth',
+                 'https://idp.sdcc.bnl.gov/idp',
+                 'https://idp.fnal.gov/idp/shibboleth',
+                 'https://idp.ornl.gov/idp'
+                 ];
+            γ := 'Openshift-users'; // required group for access
+
+    err_mask. := [∄results.'sdccid', ∄results.'isMemberOf',    claims.'idp' ∉ allowed_idps.];
+   trace(bnl_moniker,'err_mask.=' + err_mask.);
+
+     err_msg. := ['user not found',  'user not in any groups', 'IDP not supported'];
+// Grab the first error message or set to null if none.
+      message :=   (true ∈ err_mask.) ⇒ (~err_mask. ⌆ err_msg.).0;
+// Finally, handle any of the initial error cases if one is found
+(true ∈ err_mask.) ⇒ do_err(message);
+
+// Last error case: can't test for this until here since we need to know results.isMemberOf exists
+(γ ∉ results.'isMemberOf') ⇒ do_err('user is not in the openshift group');
+//    ===== End error handling
+
+// Now we can just assert the requested claims.
+        claims.'sub' := results.'sdccid';
+ claims.'isMemberOf' := results.'isMemberOf';

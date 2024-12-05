@@ -17,8 +17,8 @@ block[
             bnl_cfg.search_base := ini.'user_search_base';
                    bnl_cfg.type := 'ldap';
               bnl_cfg.ldap_name := 'uid';
-               bnl_cfg.rename.  := {'voPersonID':'sdccid'};
-     bnl_cfg.search_attributes. :=  ['voPersonID'];
+               bnl_cfg.rename.  := {'voPersonID':'sdccid', 'eduPersonOrcid':'orcid'};
+     bnl_cfg.search_attributes. :=  ['voPersonID','isMemberOf', 'eduPersonOrcid'];
                bnl_cfg.username := ini.'name';
                bnl_cfg.password := ini.'pwd';
      return(claims#get_claims(claims#create_source(bnl_cfg.), user));
