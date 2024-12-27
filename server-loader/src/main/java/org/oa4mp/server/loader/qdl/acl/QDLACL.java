@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.oa4mp.server.loader.qdl.scripting.OA2State;
+import org.qdl_lang.exceptions.BadArgException;
 import org.qdl_lang.exceptions.QDLIllegalAccessException;
 import org.qdl_lang.extensions.QDLFunction;
 import org.qdl_lang.extensions.QDLMetaModule;
@@ -128,14 +129,14 @@ public class QDLACL implements QDLMetaModule {
                 ids.add((String) objects[0]);
                 break;
             default:
-                throw new IllegalArgumentException("Error: " + name + " requires a string or stem as its argument");
+                throw new BadArgException("Error: " + name + " requires a string or stem as its argument",0);
 
         }
         // Fix CIL-1668
         boolean failOnBadIds = false;
         if (objects.length == 2) {
             if (!(objects[1] instanceof Boolean)) {
-                throw new IllegalArgumentException("Error: " + name + " requires a boolean as its second argument");
+                throw new BadArgException("Error: " + name + " requires a boolean as its second argument",1);
             }
             failOnBadIds = (Boolean) objects[1];
         }

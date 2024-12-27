@@ -6,6 +6,7 @@ import org.oa4mp.server.loader.oauth2.claims.AbstractAccessTokenHandler;
 import org.oa4mp.server.loader.oauth2.claims.AbstractPayloadConfig;
 import org.oa4mp.server.loader.oauth2.tokens.*;
 import org.oa4mp.server.loader.qdl.scripting.OA2State;
+import org.qdl_lang.exceptions.BadArgException;
 import org.qdl_lang.extensions.QDLMetaModule;
 import org.qdl_lang.state.State;
 import org.qdl_lang.variables.QDLStem;
@@ -209,7 +210,7 @@ public class AccessTokenInitializer implements QDLMetaModule {
                 if ((objects[2] instanceof Boolean)) {
                     doTemplates = (Boolean) objects[2];
                 } else {
-                    throw new IllegalArgumentException(" the third argument must be a boolean");
+                    throw new BadArgException(" the third argument must be a boolean",2);
                 }
             }
             if (objects.length == 4) {

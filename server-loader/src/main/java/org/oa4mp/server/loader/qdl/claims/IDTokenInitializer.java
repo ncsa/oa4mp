@@ -3,6 +3,7 @@ package org.oa4mp.server.loader.qdl.claims;
 import org.oa4mp.server.loader.oauth2.claims.AbstractPayloadConfig;
 import org.oa4mp.server.loader.oauth2.claims.IDTokenHandler;
 import org.oa4mp.server.loader.qdl.scripting.OA2State;
+import org.qdl_lang.exceptions.BadArgException;
 import org.qdl_lang.extensions.QDLMetaModule;
 import org.qdl_lang.state.State;
 import org.qdl_lang.variables.QDLStem;
@@ -69,7 +70,7 @@ public class IDTokenInitializer implements QDLMetaModule {
                 throw new IllegalArgumentException(" Missing second argument must be the execution phase.");
             }
             if (!(objects[1] instanceof String)) {
-                throw new IllegalArgumentException(" The second argument must be a string.");
+                throw new BadArgException(" The second argument must be a string.",1);
 
             }
             String execPhase = (String) objects[1];

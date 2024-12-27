@@ -121,7 +121,7 @@ public class ClientApprovalStoreCommands extends StoreCommands2 {
 
     public void set_status(InputLine inputLine) throws IOException {
         if (showHelp(inputLine)) {
-            say("set_status [id] [new_status] will set the status for the given/current record.");
+            say("set_status [new_status] [id] will set the status for the given/current record.");
             say("This is more reliable than simply updating the status property manually.");
             say("If new_status is given, then it will be set to that and the previous status displayed.");
             say("If new_status is missing, you will be prompted. Allowed values for new_status are");

@@ -1,5 +1,6 @@
 package org.oa4mp.server.qdl.storage;
 
+import org.qdl_lang.exceptions.BadArgException;
 import org.qdl_lang.extensions.QDLFunction;
 import org.qdl_lang.state.State;
 import org.qdl_lang.variables.QDLStem;
@@ -41,7 +42,7 @@ public class PermissionStoreFacade extends StoreFacade {
             checkInit();
 
             if (objects.length != 1 || !(objects[0] instanceof String)) {
-                throw new IllegalArgumentException(getName() + " requires the admin id as its argument");
+                throw new BadArgException(getName() + " requires the admin id as its argument",0);
             }
             return Long.valueOf(getPS().getClientCount(BasicIdentifier.newID((String) objects[0])));
         }
@@ -72,7 +73,7 @@ public class PermissionStoreFacade extends StoreFacade {
             checkInit();
 
             if (objects.length != 1 || !(objects[0] instanceof String)) {
-                throw new IllegalArgumentException(getName() + " requires the admin id as its argument");
+                throw new BadArgException(getName() + " requires the admin id as its argument",0);
             }
             List<Identifier> ids = getPS().getClients(BasicIdentifier.newID((String) objects[0]));
 
@@ -108,7 +109,7 @@ public class PermissionStoreFacade extends StoreFacade {
             checkInit();
 
             if (objects.length != 1 || !(objects[0] instanceof String)) {
-                throw new IllegalArgumentException(getName() + " requires the client id as its argument");
+                throw new BadArgException(getName() + " requires the client id as its argument",0);
             }
             List<Identifier> ids = getPS().getAdmins(BasicIdentifier.newID((String) objects[0]));
 

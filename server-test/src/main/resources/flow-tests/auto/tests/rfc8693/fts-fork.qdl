@@ -5,7 +5,7 @@
   script_load(os_env('NCSA_DEV_INPUT') + '/oa4mp/server-test/src/main/resources/flow-tests/auto/tests/rfc8693/fts-fork.qdl');
 
 */
-
+debugger(1);
 path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests';
 script_path(path ~ script_path());
 saved_cfg := '/tmp/fts-test.json';

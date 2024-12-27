@@ -132,7 +132,7 @@
                 </configuration>
             </plugin>
         </plugins>
-        <finalName>.well-known</finalName>
+        <finalName>well-known</finalName>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>

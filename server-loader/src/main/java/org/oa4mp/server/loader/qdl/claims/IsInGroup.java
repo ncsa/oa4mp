@@ -1,5 +1,6 @@
 package org.oa4mp.server.loader.qdl.claims;
 
+import org.qdl_lang.exceptions.BadArgException;
 import org.qdl_lang.extensions.QDLFunction;
 import org.qdl_lang.state.State;
 import org.qdl_lang.variables.QDLStem;
@@ -48,14 +49,14 @@ public class IsInGroup implements QDLFunction {
         }
         if(!(objects[0] instanceof QDLStem)){
             // This indicates that something wrong was passed, so flag it as a bona fide error.
-            throw new IllegalArgumentException(" The first argument of " + getName() + " must be a stem list of groups.");
+            throw new BadArgException(" The first argument of " + getName() + " must be a stem list of groups.",0);
         }
         QDLStem groups = (QDLStem) objects[0];
         if(groups.size() == 0){
             return Boolean.FALSE;
         }
         if (objects[1] == null | !(objects[1] instanceof String)) {
-            throw new IllegalArgumentException(" The second argument of " + getName() + " must be a string.");
+            throw new BadArgException(" The second argument of " + getName() + " must be a string.",1);
         }
         String name = (String) objects[1];
         for (Object key : groups.keySet()) {

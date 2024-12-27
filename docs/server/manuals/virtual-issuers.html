@@ -1,0 +1,407 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="https://ncsa.github.io/oa4mp/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/oa4mp-logo-small-2.png" alt="OA4MP site CSS"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2024-12-03
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 6.0.2
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OA4MP</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../oa4mp-faq.html">FAQ</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../common/configuration/supported-specifications.html">Supported specification</a>
+            </li>
+              
+    <li class="none">
+                        <a href="https://github.com/ncsa/oa4mp" class="externalLink">Source</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+<h1>Overview</h1>
+
+<p>OA4MP is an OAuth 2 <i>issuer</i>, meaning that it creates tokens. It must set itself as
+    the originator of the token by asserting an <b>iss</b> claim wherever needed. E.g.,
+    <font color="blue">https://math.bigstate.edu/oauth2</font>. A common situation is that
+    an institution requires that the issuer be scoped to itself (so all of the tokens used by group X
+    have an issuer indicated they were created for group X) and have its own set of signing keys.
+    The issuer claim reflects this, e.g. If the Geometry group at Big State University wanted to set
+    up a token issuer for all of its users, a reasonable <b>iss</b> claim in the tokens would be <font color="blue">https://math.bigstate.edu/oauth2/geometry</font>.
+    Specialized issuers are really quite handly since they can ensure that tokens can be ignored or
+    not misued. As such, once savored, people tend to want to have an issuer for each and every
+    project, group, department, you name it.</p>
+
+
+<p>What we don't want is a proliferation of services, with, say, an install for every issuer since
+    that makes
+    for a vast and unremitting maintenance headache. For one thing, there must be
+    a discovery (aka .well-known) page for the issuer that is different from the main
+    page of the server. Keys have to generated, managed and all of the little tasks multiply rapidly and are not
+    trivial.
+    Fortuantely, OA4MP supports
+    <b><i>virtual issuers</i></b> aka <b>VI</b> in the sequel. This makes adding a virtual issuer quite
+    straightforward. You install OA4MP, then create all the virtual issuers you want or need.</p>
+
+<section>
+<h2><a name="What.27s_a_virtual_issuer.3F"></a>What's a virtual issuer?</h2>
+
+<p>This is simply a facility that takes some basic information about what the issuer should do and does it. Much of
+    the machinery is auto-generated by OA4MP so setting up a virtual issuer for an organization is quite simple. Indeed,
+    it usually just works.</p>
+
+</section><section>
+<h2><a name="How_do_they_work.3F"></a>How do they work?</h2>
+
+<p>It is important to understand that if an admin clients use virtual issuers, and then all of the clients it manages
+    us the VI as well. This makes it easy to manage a large system of clients who have specialized signing requirements.
+    (Historical note, these were called virtual organization for a time, but that names was taken over
+    by other projects unrelated to OA4MP, causing confusion. We hence switched to calling these virtual issuers. If you
+    run into the term virtual organization, let us know to fix it and rock on.)</p>
+
+</section><section>
+<h2><a name="Relation_to_administrative_clients"></a>Relation to administrative clients</h2>
+
+<p>After you create a VI, you simply set it for the admin client using the add_admin command in the CLI (in the
+    vi component). This does all the necessary bookkeeping. Note that if an admin client is set to use a virtual issuer,
+    every
+    client it administers automagically now uses that issuer. A practical ramification is that if you convert an admin
+    to using a VI, then any existing flows may break. It is therefore best to set up the VI and the admin(s) before
+    actually creating clients. On the other hand, it does give a great way to move all of your clients to using a VI
+    in one fell swoop.</p>
+
+
+<h1>Creating a virtual issuer</h1>
+
+<p>You need to use the CLI for this. Important prerequisites are that you know what the issuer's name (simple
+    strings are best, such as <b>cern</b> or <b>jpl</b>. Remember that these will end up in URIs as part of identifiers,
+    so complex escaping will make it unreadable.</p>
+
+</section><section>
+<h2><a name="Discovery_aka_well-known_pages"></a>Discovery aka well-known pages</h2>
+
+<p>As per the RFC 8414 specification, the main discovery page for the OA4MP server hosted at <font color="blue">https://math.bigstate.edu</font>
+    would be <font color="blue">https://math.bigstate.edu/.well-known/openid-configuration</font>. If you have a virtual
+    issuer name <i>geometry</i>
+    then the discovery page must be located at
+    <font color="blue">https://math.bigstate.edu/.well-known/openid-configuration/geometry</font>. Internally,
+    OA4MP will generate these live at
+    <font color="blue">https://math.bigstate.edu/oauth2/.well-known/openid-configuration/geometry</font> (assuming you
+    deployed OA4MP to the standard endpoint of oauth2) and simply return requests for the VI's discovery page. This
+    allows you
+    to always just check what is actually there.</p>
+
+
+</section><section>
+<h2><a name="An_example"></a>An example</h2>
+
+<p>In this case OA4MP has been set up at the (mythical) university of Edgestow. The task is to create an
+    issuer for an installed OA4MP server (at https://math.edgestow.edu/oauth2). In the example that follows, lines
+    of input are numbered and the section after has commentary on each line. This seems to be the most readable way to
+    do it.
+    Output from the CLI is not numbers, only user input.
+</p>
+
+<div>
+<pre>
+ 0. oa4mp&gt;use vi
+ 1.   vi&gt;create edgestow:geometry
+ 2. object created, edit (y/n)?y
+     Update the values. A return accepts the existing or default value in []'s
+     For properties you can type /help or --help and print out the online help for the topic.
+ 3. enter the identifier[edgestow:geometry]:
+ 4. enter description[--]:Issuer for Differential Geometry at the University of Edgestow
+ 5. enter the title[--]:Issuer for Differential Geometry at the University of Edgestow
+ 6. enter the issuer[--]:https://math.edgestow.edu/oauth2/geometry
+ 7. enter the access token issuer[https://math.edgestow.edu/oauth2/geometry]:
+ 8. enter the discovery path. NOTE this should be of the form host/path e.g.cilogon.org/ligo:[--]:math.edgestow.edu/geometry
+ 9. Did you want to specify a file with the JSON web keys(y/n)[n]:
+10. Did you want to create a new set?[n]:y
+11. enter type RSA or EC:[RSA]:
+12. Enter key size (default is 2048)
+      Found keys are:
+        1A11D7F309DDF102: alg =RS256, use=sig
+        01FF6CEA64431C8F: alg =RS384, use=sig
+        C51F2F847B928C4B: alg =RS512, use=sig
+13. enter the default key id[1A11D7F309DDF102]:
+      here is the complete object:
+
+           at_issuer : https://math.edgestow.edu/oauth2/geometry
+              created : 1730744581287
+       default_key_id : 1A11D7F309DDF102
+    description : Issuer for Diffe... <i>lots more lines!</i>
+14. save (y/n)? y
+      Updates saved
+</pre></div>
+
+<ol style="list-style-type: decimal">
+    
+<li>Create the virtual issuer with the given ID. The ID is a URI and should be readable. If you do nto supply
+        one, the system will create a random one for you.
+    </li>
+    
+<li>Prompt to edit the newly created object. You can edit it later, but it will have nothing useful in it
+        and will not work until you finish configuring it.
+    </li>
+    
+<li>One last change to alter the identifier if you wish.</li>
+    
+<li>The description is a text string for you to describe to yourself what this is and what it does</li>
+    
+<li>The title is show in other contexts to identify this VI.</li>
+    
+<li>The issuer for this VI. This is asserted as the iss claim in the ID token.</li>
+    
+<li>The access token issuer for this VI. When a JWT for the access token is created, this is asserted as the iss
+        claim. By default this the same as the ID token issuer.
+    </li>
+    
+<li>The discovery path. There is a <a href="#discoveryPage">longer note below</a> about this. It should be the host
+        name and the issuer's moniker it
+        will use in the discovery path
+    </li>
+    
+<li>This allows you to either create the generate the keys (answer <b>n</b> to be prompted for creating them) or
+        specify an existing JWK (JSON WebKey) format file. Answer <b>y</b> to be prompted for the path to the file. This
+        example assumes youa re auto-generating the keys.
+    </li>
+    
+<li>Prompt to generate the keys. <b>y</b> generates them and displays the ID</li>
+    
+<li>Enter the key type. The two types are RSA and EC (for elliptic curve). Each will prompt you for any specifics
+        to that set of keys. Here we accept the default of RSA.
+    </li>
+    
+<li>For RSA keys, the key leangth is required. The larger the key size, the better the security and the longer key
+        generation takes. Note that the key length must be a multiple 256. Each geenrated key has a unique identifier.
+        These are printed and the most common one for whatever the set is, is selected as the default for signing.
+    </li>
+    
+<li>If you wish to select a different default key than the one given, select it from the printed list and
+        paste it (or type) it in. It is case sensitive.
+    </li>
+    
+<li>The entire record is printed and you are asked if you want to save it. If you answer <b>n</b> then the entire
+        set of edits is lost, requiring that you set up the record manually.
+    </li>
+</ol>
+<section><section>
+<h4><a name="Tips"></a>Tips</h4>
+
+<ul>
+    
+<li>You can always enter --help (note double hyphen!) at the prompt and get a help for the
+    given topic, e.g. for the identifier prompt you could issue
+
+<div>
+<pre>   enter the identifier[edgestow:geometry]:--help
+        -----
+        Property: Identifier (**)
+        A standard unique identifier for this VI. Note that any admin client in the VI will use this to identify
+        the VI. Set it for the admin using the add_admin command.
+        -----
+        enter the identifier[edgestow:geometry]:
+</pre></div>
+    </li>
+    
+<li>Default values for the property are in the []'s and the default of &quot;--&quot; means no value is
+    set. Just hit return if you want to accept the default value.</li>
+    
+<li>This is all live. To check that it works, try the well-known page at
+        <font color="blue">https://math.edgestow.edu/.well-known/openid-configuration/geometry&quot;</font> which should
+        be a page that lists all of the appropriate configuration (such as the generated keys).</li>
+</ul>
+
+</section></section></section><section>
+<h2><a name="Example_of_setting_the_VI_for_an_admin_client"></a>Example of setting the VI for an admin client</h2>
+
+<p>
+    Assuming we have an admin client whose identifier is <font color="blue">oa4mp:/admin/edgestow/geometry</font> The
+    proper sequence to
+    set the above VI is
+</p>
+
+<div>
+<pre>
+    vi&gt;set_id edgestow:geometry
+    vi&gt;add_admin oa4mp:/admin/edgestow/geometry
+virtual issuer &quot;edgestow:geometry&quot; set for admin with id &quot;oa4mp:/admin/edgestow/geometry&quot;
+</pre></div>
+
+</section><section id="discoveryPage">
+<h2 id="discoveryPage">Setting up the discovery path using the CLI</h2>
+
+<p>This corresponds to the attribute <b>discovery_path</b> in the CLI's record for the VI. This has a slightly different
+    syntax than you might expect. It is of the form</p>
+
+<div>
+<pre>host/vi</pre></div>
+
+<p>E.g. if your server is deployed at math.bigstate.edu and your vi is geometry, then the entry is</p>
+
+<div>
+<pre>math.bigstate.edu/geometry</pre></div>
+
+<p>Why specify the path? Because OA4MP can live in quite exotic configurations
+    and this tells the system how to generate the general page as expected by the clients. If you have a single
+    instance of OA4MP running, just use the host name and be done with it.</p>
+
+
+<p><small>For instance, there
+    may be half a dozen OA4MP instances on different servers with completely random names that are behind a load
+    balancer that presents itself as the service at <font color="blue">math.bigstate.edu</font>. Requests to this
+    endpoint are forwarded by the load balancer to one of these OA4MP instances. The
+    generated response should have actual name of the service, not that of the local machine servicing the request.</small></p>
+</section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2024
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+

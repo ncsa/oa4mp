@@ -42,4 +42,15 @@ Assuming that Tomcat is installed in $CATALINA_HOME, you should
 (2) Copy the oauth2.war to $CATALINA_HOME/webapps
     This should be noticed by Tomcat and auto-deployed
 
-(3) Test that it is up and running at the oauth2 endpoint.
+(3) Copy ${OA4MP_HOME}/lib/wdll-known.war to $CATALINA_HOME/webapps/.well-known.war
+    This should be noticed and deployed by Tomcat
+
+    NOTE the leading period in the target!! The correct name  of this war is
+    .well-known.war which runs the .well-known service for Tomcat. Unfortunately,
+    in many unix-based operating systems, a file that starts with a period is hidden,
+    making it very hard to upload one or download it. Therefore, it is uploaded
+    without a period. In a standard OA4MP install, this should just work and require
+    little more than deploying it.
+
+(3) Test that it is up and running at the oauth2 endpoint.  You should be able to go
+    to either the registration page or the .well-known/openid-configuration page.

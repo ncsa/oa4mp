@@ -3,6 +3,7 @@ package org.oa4mp.server.loader.qdl.claims;
 import org.oa4mp.server.loader.oauth2.claims.AbstractPayloadConfig;
 import org.oa4mp.server.loader.oauth2.tokens.BasicRefreshTokenHandler;
 import org.oa4mp.server.loader.qdl.scripting.OA2State;
+import org.qdl_lang.exceptions.BadArgException;
 import org.qdl_lang.extensions.QDLMetaModule;
 import org.qdl_lang.state.State;
 import org.qdl_lang.variables.QDLStem;
@@ -72,7 +73,7 @@ public class RefreshTokenInitializer implements QDLMetaModule {
             String execPhase = null;
             if (1 < objects.length) {
                 if (!(objects[1] instanceof String)) {
-                    throw new IllegalArgumentException("Error: The second argument must be a string.");
+                    throw new BadArgException("Error: The second argument must be a string.",1);
                 }
                 execPhase = (String) objects[1];
             }

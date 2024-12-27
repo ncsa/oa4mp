@@ -1,5 +1,6 @@
 package org.oa4mp.server.loader.qdl.claims;
 
+import org.qdl_lang.exceptions.BadArgException;
 import org.qdl_lang.extensions.QDLFunction;
 import org.qdl_lang.state.State;
 import org.qdl_lang.variables.QDLStem;
@@ -32,9 +33,6 @@ public class NewTemplate implements QDLFunction, CSConstants {
 
     @Override
     public Object evaluate(Object[] objects, State state) {
-        if (objects.length != 1) {
-            throw new IllegalArgumentException("Error:" + getName() + " requires the type of the claim source");
-        }
         String type = (String) objects[0];
         QDLStem output = new QDLStem();
         switch (type) {
@@ -66,7 +64,7 @@ public class NewTemplate implements QDLFunction, CSConstants {
                 output.put(CS_CODE_JAVA_CLASS, REQUIRED_TEMPLATE);
                 return output;
         }
-        throw new IllegalArgumentException("Error: unknown configuration type \"" + type + "\".");
+        throw new BadArgException("Error: unknown configuration type \"" + type + "\".",0);
     }
 
 

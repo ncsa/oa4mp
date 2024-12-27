@@ -14,6 +14,7 @@
   Run this as
   script_load(os_env('NCSA_DEV_INPUT') + '/oa4mp/server-test/src/main/resources/flow-tests/auto/tests/rfc8693/fts-provisioner.qdl');
 */
+debugger(1);
 path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests';
 script_path(path ~ script_path());
 saved_cfg := '/tmp/fts-test.json';
@@ -35,4 +36,5 @@ debugger(1,'access token:\n' + print(from_json(rrr)));
 ⊨ (from_json(rrr).'aud' == 'rucio') : 'incorrect aud claim';
 debugger(1,'ccf response:\n' + print(response.));
 rm(saved_cfg);
+raw. := clc#exchange({'subject':'at','type':'rt', 'raw_response':true});
 clc#write(saved_cfg);

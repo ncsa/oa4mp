@@ -263,8 +263,7 @@ val jwt: String = signedJWT.serialize()     */
             throw new UnsupportedProtocolException("unsupported protocol");
         }
         try {
-            signedJWT.verify(verifier);
-            return true;
+            return signedJWT.verify(verifier);
         } catch (JOSEException t) {
             return false;
         }

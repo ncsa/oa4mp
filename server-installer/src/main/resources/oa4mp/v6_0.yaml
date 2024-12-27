@@ -16,6 +16,6 @@
   type: zip
 - sourceURL: https://github.com/ncsa/oa4mp/releases/download/v6.0.2/
   directories:
-    - files: [fs-migrate.jar, oauth2.war, jwt.jar, clc.jar, cli.jar]
+    - files: [fs-migrate.jar, well-known.war, oauth2.war, jwt.jar, clc.jar, cli.jar]
       target_dir: /lib
   type: file_set

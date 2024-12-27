@@ -1351,7 +1351,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
 
             if (client.isRTLifetimeEnabled() && rtiResponse.hasRefreshToken()) {
                 t.setRTData(rtiResponse.getRefreshToken().getPayload());
-                t.setRTJWT(rtiResponse.getIdToken().getToken());
+                t.setRTJWT(rtiResponse.getRefreshToken().getToken());
             }
         } else {
             updateTransactionJWTFromTokenResponse(rtiResponse, t, client);
@@ -1998,7 +1998,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         st2.setATJWT(tokenResponse.getAccessToken().getToken());
         if (client.isRTLifetimeEnabled() && tokenResponse.hasRefreshToken()) {
             st2.setRTData(tokenResponse.getRefreshToken().getPayload());
-            st2.setRTJWT(tokenResponse.getIdToken().getToken());
+            st2.setRTJWT(tokenResponse.getRefreshToken().getToken());
         }
         if (st2.getUserMetaData().containsKey(JWT_ID)) {
             st2.setIDTokenIdentifier(st2.getUserMetaData().getString(JWT_ID));

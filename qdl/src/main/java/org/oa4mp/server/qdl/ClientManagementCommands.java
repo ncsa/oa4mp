@@ -5,6 +5,7 @@ import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2ClientConverter;
 import org.oa4mp.delegation.server.storage.ClientApproval;
+import org.qdl_lang.exceptions.BadArgException;
 import org.qdl_lang.extensions.QDLFunction;
 import org.qdl_lang.extensions.QDLMetaModule;
 import org.qdl_lang.state.State;
@@ -185,30 +186,21 @@ public class ClientManagementCommands implements QDLMetaModule {
         public Object evaluate(Object[] objects, State state) throws Throwable{
             checkInit();
             if (!(objects[0] instanceof QDLStem)) {
-                throw new IllegalArgumentException(" The argument must be a stem variable");
+                throw new BadArgException("The argument must be a stem variable",0);
             }
             QDLStem QDLStem = (QDLStem) objects[0];
             JSON jj = QDLStem.toJSON();
             if (jj.isArray()) {
-                throw new IllegalArgumentException(" The client is not in the expected format.");
+                throw new BadArgException("The client is not in the expected format.", 0);
             }
 
             JSONObject json = (JSONObject) jj;
             // So reverse the process from the read function
-            //try {
                 JSONObject output = new JSONObject();
-                //      output.put("cfg", json.getJSONObject("cfg"));
-                //     json.remove("cfg");
                 output.put("client", json); // everything else.
                 OA2ClientConverter converter = (OA2ClientConverter) getEnvironment().getClientStore().getMapConverter();
                 OA2Client client = converter.fromJSON(output);
                 getEnvironment().getClientStore().save(client);
-            /*} catch (Throwable t) {
-                if (t instanceof RuntimeException) {
-                    throw (RuntimeException) t;
-                }
-                throw new QDLException("Error: could not save the client:" + t.getMessage(), t);
-            }*/
             return Boolean.TRUE;
         }
 
@@ -390,7 +382,7 @@ public class ClientManagementCommands implements QDLMetaModule {
             Boolean toApprove = null;
             if (objects.length == 2) {
                 if (!(objects[1] instanceof Boolean)) {
-                    throw new IllegalArgumentException(" The second argument must be a boolean.");
+                    throw new BadArgException("The second argument must be a boolean.",1);
                 }
                 toApprove = (Boolean) objects[1];
             }

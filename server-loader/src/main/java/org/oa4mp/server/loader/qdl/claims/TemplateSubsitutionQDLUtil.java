@@ -1,6 +1,7 @@
 package org.oa4mp.server.loader.qdl.claims;
 
 import org.oa4mp.server.loader.oauth2.claims.ScopeTemplateUtil;
+import org.qdl_lang.exceptions.BadArgException;
 import org.qdl_lang.extensions.QDLFunction;
 import org.qdl_lang.state.State;
 import org.qdl_lang.variables.QDLStem;
@@ -38,7 +39,7 @@ public class TemplateSubsitutionQDLUtil implements QDLFunction {
             arg = (QDLStem) objects[0];
         }
         if(arg == null){
-            throw new IllegalArgumentException("error: The first argument must be a string or list of strings");
+            throw new BadArgException("error: The first argument must be a string or list of strings",0);
         }
         QDLStem otherClaimStem = (QDLStem) objects[1];
         Map<String, List<String>> groups = new HashMap<>();

@@ -426,7 +426,7 @@ public class CLC implements QDLMetaModule {
                 return ServiceClient.ECHO_RESPONSE;
             }
             if (!(objects[0] instanceof Boolean)) {
-                throw new IllegalArgumentException(getName() + " requires a boolean argument");
+                throw new BadArgException(getName() + " requires a boolean argument", 0);
             }
 
             Boolean oldValue = ServiceClient.ECHO_RESPONSE;
@@ -472,7 +472,7 @@ public class CLC implements QDLMetaModule {
                 return ServiceClient.ECHO_REQUEST;
             }
             if (!(objects[0] instanceof Boolean)) {
-                throw new IllegalArgumentException(getName() + " requires a boolean argument");
+                throw new BadArgException(getName() + " requires a boolean argument",0);
             }
 
             Boolean oldValue = ServiceClient.ECHO_REQUEST;
@@ -702,7 +702,7 @@ public class CLC implements QDLMetaModule {
 
             if (objects.length == 1) {
                 if (!(objects[0] instanceof QDLStem)) {
-                    throw new IllegalArgumentException("If there is an argument, it must be a stem of headers");
+                    throw new BadArgException("If there is an argument, it must be a stem of headers",0);
                 }
                 inStem.put(ServiceClient.HEADER_KEY, objects[0]);
             }
@@ -814,7 +814,7 @@ public class CLC implements QDLMetaModule {
                 return getTokens();
             }
             if (!(objects[0] instanceof QDLStem)) {
-                throw new IllegalArgumentException("the argument to " + getName() + " must be a stem");
+                throw new BadArgException("the argument to " + getName() + " must be a stem",0);
             }
             setTokens((QDLStem) objects[0]);
             return Boolean.TRUE;
@@ -1299,14 +1299,12 @@ public class CLC implements QDLMetaModule {
 
         @Override
         public Object evaluate(Object[] objects, State state) {
-            if (1 < objects.length) {
-                throw new IllegalArgumentException(getName() + " takes at most one argument.");
-            }
+
             if (objects.length == 0) {
                 return tokenToStem(clcCommands.getDummyAsset().getAccessToken());
             }
             if (!(objects[0] instanceof QDLStem)) {
-                throw new IllegalArgumentException("The argument to " + getName() + " must be a stem.");
+                throw new BadArgException("The argument to " + getName() + " must be a stem.", 0);
             }
             QDLStem newAT = (QDLStem) objects[0];
             QDLStem oldAT = tokenToStem(clcCommands.getDummyAsset().getAccessToken());
@@ -1342,14 +1340,12 @@ public class CLC implements QDLMetaModule {
 
         @Override
         public Object evaluate(Object[] objects, State state) {
-            if (1 < objects.length) {
-                throw new IllegalArgumentException(getName() + " takes at most one argument.");
-            }
+
             if (objects.length == 0) {
                 return tokenToStem(clcCommands.getDummyAsset().getRefreshToken());
             }
             if (!(objects[0] instanceof QDLStem)) {
-                throw new IllegalArgumentException("The argument to " + getName() + " must be a stem.");
+                throw new BadArgException("The argument to " + getName() + " must be a stem.",0);
             }
             QDLStem newRT = (QDLStem) objects[0];
             QDLStem oldRT = tokenToStem(clcCommands.getDummyAsset().getRefreshToken());
@@ -1478,7 +1474,7 @@ public class CLC implements QDLMetaModule {
                 clcCommands.set_verbose_on(new InputLine(((Boolean) objects[0]) ? "true" : "false"));
                 return oldValue;
             }
-            throw new IllegalArgumentException("unknown argument for " + getName() + " of type " + (objects[0].getClass().getSimpleName()));
+            throw new BadArgException("unknown argument for " + getName() + " of type " + (objects[0].getClass().getSimpleName()),0);
         }
 
         @Override
@@ -1526,7 +1522,7 @@ public class CLC implements QDLMetaModule {
                 }
                 return oldValue;
             }
-            throw new IllegalArgumentException("unknown argument for " + getName() + " of type " + (objects[0].getClass().getSimpleName()));
+            throw new BadArgException("unknown argument for " + getName() + " of type " + (objects[0].getClass().getSimpleName()),0);
 
         }
 

@@ -8,6 +8,7 @@ import org.oa4mp.server.loader.oauth2.claims.*;
 import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
 import org.oa4mp.server.loader.qdl.scripting.OA2State;
 import org.qdl_lang.evaluate.IOEvaluator;
+import org.qdl_lang.exceptions.BadArgException;
 import org.qdl_lang.expressions.ConstantNode;
 import org.qdl_lang.expressions.Polyad;
 import org.qdl_lang.extensions.QDLFunction;
@@ -50,16 +51,13 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
 
     @Override
     public Object evaluate(Object[] objects, State state) {
-        if (objects.length < 2) {
-            throw new IllegalArgumentException(getName() + " requires at least two arguments");
-        }
         if (!(objects[0] instanceof QDLStem)) {
-            throw new IllegalArgumentException(getName() + " requires a stem variable as its first argument");
+            throw new BadArgException(getName() + " requires a stem variable as its first argument",0);
         }
 
         QDLStem arg = (QDLStem) objects[0];
         if (objects[1] == null || !(objects[1] instanceof String)) {
-            throw new IllegalArgumentException(getName() + " requires the name of the user as its second argument");
+            throw new BadArgException(getName() + " requires the name of the user as its second argument",1);
         }
         String username = (String) objects[1];
         if (!arg.containsKey(CS_DEFAULT_TYPE)) {

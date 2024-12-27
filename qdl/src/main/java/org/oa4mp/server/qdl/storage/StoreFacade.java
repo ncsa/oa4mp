@@ -13,6 +13,7 @@ import org.oa4mp.delegation.common.storage.TransactionStore;
 import org.oa4mp.delegation.server.storage.ClientStore;
 import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
+import org.qdl_lang.exceptions.BadArgException;
 import org.qdl_lang.extensions.QDLFunction;
 import org.qdl_lang.extensions.QDLVariable;
 import org.qdl_lang.state.State;
@@ -143,7 +144,7 @@ public class StoreFacade /*implements QDLMetaModule*/ {
                     break;
                 case 1:
                     if (!(objects[0] instanceof QDLStem)) {
-                        throw new IllegalArgumentException("monadic " + getName() + " requires  a stem.");
+                        throw new BadArgException("monadic " + getName() + " requires  a stem.",0);
                     }
                     QDLStem stem = (QDLStem) objects[0];
                     file = stem.getString(FILE_ARG);
@@ -155,11 +156,11 @@ public class StoreFacade /*implements QDLMetaModule*/ {
                     break;
                 case 2:
                     if (!(objects[0] instanceof QDLStem)) {
-                        throw new IllegalArgumentException("dyadic " + getName() + " requires a stem as its first argument");
+                        throw new BadArgException("dyadic " + getName() + " requires a stem as its first argument",0);
                     }
                     QDLStem stem2 = (QDLStem) objects[0];
                     if (!(objects[1] instanceof String)) {
-                        throw new IllegalArgumentException("dyadic " + getName() + " requires a string, the store type, as its second argument");
+                        throw new BadArgException("dyadic " + getName() + " requires a string, the store type, as its second argument",1);
                     }
                     file = stem2.getString(FILE_ARG);
                     cfgName = stem2.getString(NAME_ARG);
@@ -171,7 +172,7 @@ public class StoreFacade /*implements QDLMetaModule*/ {
                 case 3:
                     for (int j = 0; j < objects.length; j++) {
                         if (!(objects[j] instanceof String)) {
-                            throw new IllegalArgumentException(" argument " + j + " must be a string.");
+                            throw new BadArgException(" argument " + j + " must be a string.",j);
                         }
                     }
                     file = (String) objects[0];
@@ -325,11 +326,8 @@ public class StoreFacade /*implements QDLMetaModule*/ {
 
         @Override
         public Object evaluate(Object[] objects, State state) {
-            if (objects.length != 1) {
-                throw new IllegalArgumentException(getName() + " requires a single argument.");
-            }
             if (!(objects[0] instanceof QDLStem)) {
-                throw new IllegalArgumentException(getName() + " requires a stem argument.");
+                throw new BadArgException(getName() + " requires a stem argument.",0);
             }
             QDLStem stem = (QDLStem) objects[0];
             if (stem.isEmpty()) {
@@ -380,14 +378,11 @@ public class StoreFacade /*implements QDLMetaModule*/ {
 
         @Override
         public Object evaluate(Object[] objects, State state) {
-            if (objects.length != 1) {
-                throw new IllegalArgumentException(getName() + " requires a single argument.");
-            }
             if ((objects[0] instanceof String)) {
                 return getStoreAccessor().fromXML((String) objects[0]);
             }
             if (!(objects[0] instanceof QDLStem)) {
-                throw new IllegalArgumentException(getName() + " requires a string argument or stem of them,.");
+                throw new BadArgException(getName() + " requires a string argument or stem of them,.",0);
             }
             QDLStem arg = (QDLStem) objects[0];
             QDLStem out = new QDLStem();
@@ -442,7 +437,7 @@ public class StoreFacade /*implements QDLMetaModule*/ {
                 if (objects[0] instanceof String) {
                     return getStoreAccessor().create((String) objects[0]);
                 }
-                throw new IllegalArgumentException(" The argument must be a string identifier.");
+                throw new BadArgException(" The argument must be a string identifier.",0);
             }
             return getStoreAccessor().create(null);
         }
@@ -481,10 +476,10 @@ public class StoreFacade /*implements QDLMetaModule*/ {
             if (objects.length == 2) {
                 // then it is of the form (id, int)
                 if (!(objects[0] instanceof String)) {
-                    throw new IllegalArgumentException("dyadic " + getName() + " requires a string as its first argument");
+                    throw new BadArgException("dyadic " + getName() + " requires a string as its first argument",0);
                 }
                 if (!(objects[1] instanceof Long)) {
-                    throw new IllegalArgumentException("dyadic " + getName() + " requires an integer as its seconds argument");
+                    throw new BadArgException("dyadic " + getName() + " requires an integer as its seconds argument",1);
 
                 }
                 QDLStem QDLStem = getStoreAccessor().getVersion(BasicIdentifier.newID((String) objects[0]), (Long) objects[1]);
@@ -499,7 +494,7 @@ public class StoreFacade /*implements QDLMetaModule*/ {
                 return getSingleEntry(objects[0]);
             }
             if (!(objects[0] instanceof QDLStem)) {
-                throw new IllegalArgumentException("monadic " + getName() + " requires a stem as its first argument");
+                throw new BadArgException("monadic " + getName() + " requires a stem as its first argument",0);
             }
             QDLStem argStem = (QDLStem) objects[0];
             if (argStem.isList()) {
@@ -605,7 +600,7 @@ public class StoreFacade /*implements QDLMetaModule*/ {
         public Object evaluate(Object[] objects, State state) {
             checkInit();
             if (!(objects[0] instanceof QDLStem)) {
-                throw new IllegalArgumentException(" The argument must be a stem variable");
+                throw new BadArgException(" The argument must be a stem variable",0);
             }
             QDLStem QDLStem = (QDLStem) objects[0];
             List<Boolean> out = getStoreAccessor().saveOrUpdate(QDLStem, false);
@@ -649,7 +644,7 @@ public class StoreFacade /*implements QDLMetaModule*/ {
         public Object evaluate(Object[] objects, State state) {
             checkInit();
             if (!(objects[0] instanceof QDLStem)) {
-                throw new IllegalArgumentException(" The argument must be a stem variable");
+                throw new BadArgException(" The argument must be a stem variable",0);
             }
             QDLStem QDLStem = (QDLStem) objects[0];
             List<Boolean> out = getStoreAccessor().saveOrUpdate(QDLStem, true);
@@ -728,7 +723,7 @@ public class StoreFacade /*implements QDLMetaModule*/ {
                 if (objects[0] instanceof Boolean) {
                     includeVersions = (Boolean) objects[0];
                 } else {
-                    throw new IllegalArgumentException("The first argument of " + COUNT_NAME + ", if present, must be a boolean.");
+                    throw new BadArgException("The first argument of " + COUNT_NAME + ", if present, must be a boolean.",0);
                 }
             }
             return getStoreAccessor().size(includeVersions);
@@ -775,7 +770,7 @@ public class StoreFacade /*implements QDLMetaModule*/ {
                         return getStoreAccessor().getStoreKeys().identifier();
                     }
                 } else {
-                    throw new IllegalArgumentException(getName() + " requires a boolean as its argument if present");
+                    throw new BadArgException(getName() + " requires a boolean as its argument if present",0);
                 }
             }
             return getStoreAccessor().listKeys();
@@ -818,10 +813,10 @@ public class StoreFacade /*implements QDLMetaModule*/ {
             checkInit();
             if (objects.length == 2) {
                 if (!(objects[0] instanceof String)) {
-                    throw new IllegalArgumentException("dyadic " + getName() + " requires a string as its first argument.");
+                    throw new BadArgException("dyadic " + getName() + " requires a string as its first argument.",0);
                 }
                 if (!(objects[1] instanceof Long)) {
-                    throw new IllegalArgumentException("dyadic " + getName() + " requires a long as its second argument.");
+                    throw new BadArgException("dyadic " + getName() + " requires a long as its second argument.",1);
                 }
                 getStoreAccessor().getStoreArchiver().remove(BasicIdentifier.newID((String) objects[0]), (Long) objects[1]);
                 return Boolean.TRUE;
@@ -832,7 +827,7 @@ public class StoreFacade /*implements QDLMetaModule*/ {
                 return getStoreAccessor().remove(BasicIdentifier.newID(id));
             }
             if (!(objects[0] instanceof QDLStem)) {
-                throw new IllegalArgumentException("monadic " + getName() + " requires a string as its first argument.");
+                throw new BadArgException("monadic " + getName() + " requires a string as its first argument.",0);
             }
             QDLStem arg = (QDLStem) objects[0];
             QDLStem outStem = new QDLStem();
@@ -961,11 +956,11 @@ public class StoreFacade /*implements QDLMetaModule*/ {
             out = new QDLStem();
             QDLStem id = new QDLStem();
             if (!(objects[0] instanceof String)) {
-                throw new IllegalArgumentException("dyadic " + name + " requires a string as its first argument");
+                throw new BadArgException("dyadic " + name + " requires a string as its first argument",0);
             }
             id.put(0L, objects[0]);
             if (!(objects[1] instanceof Long)) {
-                throw new IllegalArgumentException("dyadic " + name + " requires an integer as its second argument");
+                throw new BadArgException("dyadic " + name + " requires an integer as its second argument",1 );
             }
             id.put(1L, objects[1]);
             out.put(0L, id);
@@ -973,7 +968,7 @@ public class StoreFacade /*implements QDLMetaModule*/ {
         }
         // So a single argument
         if (!(objects[0] instanceof QDLStem)) {
-            throw new IllegalArgumentException("monadic " + name + " requires stem as its argument");
+            throw new BadArgException("monadic " + name + " requires stem as its argument",0);
         }
 
         QDLStem temp = (QDLStem) objects[0];
@@ -1017,7 +1012,7 @@ public class StoreFacade /*implements QDLMetaModule*/ {
                             arg = new QDLStem();
                             arg.put(0L, objects[0]);
                         } else {
-                            throw new IllegalArgumentException(getName() + " requires stem or string argument");
+                            throw new BadArgException(getName() + " requires stem or string argument",0);
                         }
                     }
                     break;
@@ -1111,10 +1106,6 @@ public class StoreFacade /*implements QDLMetaModule*/ {
         @Override
         public Object evaluate(Object[] objects, State state) {
             checkInit();
-
-            if (objects.length != 1) {
-                throw new IllegalArgumentException(getName() + " requires a single argument");
-            }
             QDLStem args = null;
             boolean hasStringArg = false;
             if (objects[0] instanceof String) {
@@ -1126,7 +1117,7 @@ public class StoreFacade /*implements QDLMetaModule*/ {
                 args = (QDLStem) objects[0];
             }
             if (args == null) {
-                throw new IllegalArgumentException(getName() + " requires either an id or stem of them as its argument.");
+                throw new BadArgException(getName() + " requires either an id or stem of them as its argument.",0);
             }
             QDLStem out = new QDLStem();
             for (Object key : args.keySet()) {

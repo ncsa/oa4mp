@@ -1,5 +1,6 @@
 package org.oa4mp.server.loader.qdl.claims;
 
+import org.qdl_lang.exceptions.BadArgException;
 import org.qdl_lang.extensions.QDLFunction;
 import org.qdl_lang.state.State;
 import org.qdl_lang.variables.QDLStem;
@@ -41,15 +42,12 @@ public class IsInGroup2 implements QDLFunction {
             return Boolean.FALSE;
         }
 
-        if (objects.length != 2) {
-            throw new IllegalArgumentException(" This function requires two arguments, a stem and a string.");
-        }
         if (objects[0] == null || (!(objects[0] instanceof QDLStem) && !(objects[0] instanceof String))) {
-            throw new IllegalArgumentException(" The first argument of " + getName() + " must be a string or stem of them.");
+            throw new BadArgException(" The first argument of " + getName() + " must be a string or stem of them.",0);
         }
         if (objects[1] == null) {
             // only way to get a java null is to have an undefined variable.
-            throw new IllegalArgumentException(" Undefined second argument for " + getName());
+            throw new BadArgException(" Undefined second argument for " + getName(),1);
         }
 
         if (!(objects[1] instanceof QDLStem)) {

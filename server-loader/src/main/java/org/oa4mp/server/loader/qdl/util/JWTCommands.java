@@ -10,6 +10,7 @@ import org.oa4mp.delegation.server.jwt.MyOtherJWTUtil2;
 import org.oa4mp.server.loader.oauth2.state.ExtendedParameters;
 import org.oa4mp.server.loader.qdl.scripting.OA2State;
 import org.qdl_lang.evaluate.IOEvaluator;
+import org.qdl_lang.exceptions.BadArgException;
 import org.qdl_lang.exceptions.QDLException;
 import org.qdl_lang.extensions.QDLFunction;
 import org.qdl_lang.extensions.QDLVariable;
@@ -148,44 +149,44 @@ public class JWTCommands  {
                         argTypeOk = true;
                         if (args.containsKey(ARG_KEY_TYPE)) {
                             if (!Constant.isString(args.get(ARG_KEY_TYPE))) {
-                                throw new IllegalArgumentException(getName() + " requires a string as the " + ARG_KEY_TYPE + " of the key.");
+                                throw new BadArgException(getName() + " requires a string as the " + ARG_KEY_TYPE + " of the key.",0);
                             }
                             keyType = args.getString(ARG_KEY_TYPE);
                         }
                         if (args.containsKey(ARG_DEFAULT_KEY_ID)) {
                             if (!Constant.isString(args.get(ARG_DEFAULT_KEY_ID))) {
-                                throw new IllegalArgumentException(getName() + " requires a string as the " + ARG_DEFAULT_KEY_ID + " of the generated keys.");
+                                throw new BadArgException(getName() + " requires a string as the " + ARG_DEFAULT_KEY_ID + " of the generated keys.",0);
                             }
                             defaultKeyID = args.getString(ARG_DEFAULT_KEY_ID);
 
                         }
                         if (args.containsKey(ARG_FILE_PATH_TYPE)) {
                             if (!Constant.isString(args.get(ARG_FILE_PATH_TYPE))) {
-                                throw new IllegalArgumentException(getName() + " requires a string as the " + ARG_FILE_PATH_TYPE + " of the generated keys.");
+                                throw new BadArgException(getName() + " requires a string as the " + ARG_FILE_PATH_TYPE + " of the generated keys.",0);
                             }
                             filePath = args.getString(ARG_FILE_PATH_TYPE);
                         }
                         if (args.containsKey(ARG_FILE_OVERWRITE_TYPE)) {
                             if (!(args.get(ARG_KEY_TYPE) instanceof Boolean)) {
-                                throw new IllegalArgumentException(getName() + " requires a boolean as the " + ARG_FILE_OVERWRITE_TYPE + " argument.");
+                                throw new BadArgException(getName() + " requires a boolean as the " + ARG_FILE_OVERWRITE_TYPE + " argument.",0);
                             }
                             overwriteFile = args.getBoolean(ARG_FILE_OVERWRITE_TYPE);
                         }
                         if (args.containsKey(ARG_SET_TO_CURRENT_KEYS_TYPE)) {
                             if (!(args.get(ARG_SET_TO_CURRENT_KEYS_TYPE) instanceof Boolean)) {
-                                throw new IllegalArgumentException(getName() + " requires a boolean as the " + ARG_SET_TO_CURRENT_KEYS_TYPE + " argument.");
+                                throw new BadArgException(getName() + " requires a boolean as the " + ARG_SET_TO_CURRENT_KEYS_TYPE + " argument.",0);
                             }
                             setCurrent = args.getBoolean(ARG_SET_TO_CURRENT_KEYS_TYPE);
                         }
                         if (args.containsKey(ARG_RSA_KEY_SIZE_TYPE)) {
                             if (!(args.get(ARG_RSA_KEY_SIZE_TYPE) instanceof Long)) {
-                                throw new IllegalArgumentException(getName() + " requires an integer as the " + ARG_RSA_KEY_SIZE_TYPE + " argument.");
+                                throw new BadArgException(getName() + " requires an integer as the " + ARG_RSA_KEY_SIZE_TYPE + " argument.",0);
                             }
                             rsaKeySize = args.getLong(ARG_RSA_KEY_SIZE_TYPE).intValue();
                         }
                         if (args.containsKey(ARG_EC_CURVE_TYPE)) {
                             if (!Constant.isString(args.get(ARG_EC_CURVE_TYPE))) {
-                                throw new IllegalArgumentException(getName() + " requires a string as the " + ARG_EC_CURVE_TYPE + " of the generated keys.");
+                                throw new BadArgException(getName() + " requires a string as the " + ARG_EC_CURVE_TYPE + " of the generated keys.",0);
                             }
                             ecCurve = args.getString(ARG_EC_CURVE_TYPE);
                         }
@@ -195,18 +196,18 @@ public class JWTCommands  {
                     if (objects[0] instanceof String) {
                         filePath = (String) objects[0];
                     } else {
-                        throw new IllegalArgumentException("In dyadic " + getName() + ", the first argument must be a string");
+                        throw new BadArgException("In dyadic " + getName() + ", the first argument must be a string",0);
                     }
                     if (objects[1] instanceof Boolean) {
                         overwriteFile = (Boolean) objects[1];
                     } else {
-                        throw new IllegalArgumentException("In dyadic " + getName() + ", the second argument must be a boolean");
+                        throw new BadArgException("In dyadic " + getName() + ", the second argument must be a boolean",1);
 
                     }
                     break;
             }
             if (!argTypeOk) {
-                throw new IllegalArgumentException("Unsupport arg type as first argument to " + getName());
+                throw new BadArgException("Unsupport arg type as first argument to " + getName(),0);
             }
             try {
                 JSONWebKeys newKeys = null;
@@ -321,11 +322,8 @@ public class JWTCommands  {
 
         @Override
         public Object evaluate(Object[] objects, State state) {
-            if (objects.length != 1) {
-                throw new IllegalArgumentException(getName() + " requires a file name");
-            }
             if (!(objects[0] instanceof String)) {
-                throw new IllegalArgumentException(getName() + " requires a string as its argument");
+                throw new BadArgException(getName() + " requires a string as its argument",0);
             }
             String filePath = (String) objects[0];
             try {
@@ -362,14 +360,11 @@ public class JWTCommands  {
 
         @Override
         public Object evaluate(Object[] objects, State state) {
-            if (objects.length != 1) {
-                throw new IllegalArgumentException(getName() + " requires a file name.");
-            }
-            if (!hasJWKS()) {
+             if (!hasJWKS()) {
                 throw new IllegalStateException(" No keys found to save.");
             }
             if (!Constant.isString(objects[0])) {
-                throw new IllegalArgumentException(getName() + " requires a string as its argument");
+                throw new BadArgException(getName() + " requires a string as its argument",0);
             }
             try {
                 writeWebkeys(state, getJsonWebKeyUtil().toJSON(jwks), (String) objects[0]);
@@ -414,19 +409,19 @@ public class JWTCommands  {
                     break;
                 case 1:
                     if (!(objects[0] instanceof Long)) {
-                        throw new IllegalArgumentException(" The first argument must be an integer");
+                        throw new BadArgException(" The first argument must be an integer",0);
                     }
                     Long lCount = (Long) objects[0];
                     count = lCount.intValue();
                     break;
                 case 2:
                     if (!(objects[0] instanceof Long)) {
-                        throw new IllegalArgumentException(" The first argument must be an integer");
+                        throw new BadArgException(" The first argument must be an integer",0);
                     }
                     lCount = (Long) objects[0];
                     count = lCount.intValue();
                     if (!(objects[1] instanceof Long)) {
-                        throw new IllegalArgumentException(" The second argument must be an integer");
+                        throw new BadArgException(" The second argument must be an integer",1);
                     }
                     Long lLength = (Long) objects[1];
                     length = lLength.intValue();
@@ -503,7 +498,7 @@ public class JWTCommands  {
             // so we have one.
             String newId = objects[0].toString();
             if (!getJwks().containsKey(newId)) {
-                throw new IllegalArgumentException(" There is no such key in the collection.");
+                throw new BadArgException(" There is no such key in the collection.",0);
             }
             String oldID = getJwks().getDefaultKeyID();
             getJwks().setDefaultKeyID(newId);
@@ -549,7 +544,7 @@ public class JWTCommands  {
                 return out.fromJSON(getJsonWebKeyUtil().toJSON(jwks));
             }
             if (!(objects[0] instanceof QDLStem)) {
-                throw new IllegalArgumentException("no key specified");
+                throw new BadArgException("no key specified",0);
             }
             QDLStem stem = (QDLStem) objects[0];
             QDLStem old = getJwkStem();
@@ -705,7 +700,7 @@ public class JWTCommands  {
                 try {
                     well_known = URI.create(objects[1].toString());
                 } catch (Throwable t) {
-                    throw new IllegalArgumentException(" The second argument \"" + objects[1] + "\" must be a valid URI.");
+                    throw new BadArgException(" The second argument \"" + objects[1] + "\" must be a valid URI.",1);
                 }
             }
             String token = objects[0].toString();
