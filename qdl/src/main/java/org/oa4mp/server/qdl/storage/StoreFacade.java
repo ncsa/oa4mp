@@ -886,59 +886,6 @@ public class StoreFacade /*implements QDLMetaModule*/ {
             return getStoreTypes();
         }
     }
-
-  /*  public String STORE_HELP_NAME = "store_help";
-
-    public class FacadeHelp implements QDLVariable {
-        @Override
-        public String getName() {
-            return STORE_HELP_NAME;
-        }
-
-
-        String help = null;
-
-
-        @Override
-        public Object getValue() {
-            if (help == null) {
-                StringBuffer s = new StringBuffer();
-                s.append("The store module(s) allow you to access OA4MP stores in QDL. Supported stores are\n");
-                s.append(STORE_TYPE_CLIENT + " for clients.\n");
-                s.append(STORE_TYPE_APPROVALS + "  for approvals of clients (including admin clients)\n");
-                s.append(STORE_TYPE_PERMISSION_STORE + " for managing the permissions between admins and their clients. Use the p_store module\n");
-                s.append(STORE_TYPE_ADMIN_CLIENT_STORE + " for administrative clients\n");
-                s.append(STORE_TYPE_TX_STORE + " for tokens created by the exchange endpoint (RFC 8693)\n");
-                s.append(STORE_TYPE_TRANSACTION + " for pending transactions.\n");
-                s.append("There is a list of these in the variable " + STORE_TYPES_STEM_NAME + " \n");
-                s.append("\n" + "Every store allows for the following commands (online help is available for these in the workspace\n");
-                s.append("using e.g.\n");
-                s.append("\n)help p_store#init\n");
-                s.append("\n" + FROM_XML_NAME + " Take and object's XML serialization (as a string, e.g. in a file) and convert to a stem.\n");
-                s.append(INIT_NAME + " initialize the store. You cannot use a store until you call this.\n");
-                s.append(KEYS_NAME + " Lists the keys possible in the stem for this store.\n");
-                s.append(READ_NAME + " Read an object from the store by identifier. Note the result is stem\n");
-                s.append(REMOVE_NAME + " Remove an object from the store by identifier.\n");
-                s.append(SAVE_NAME + " Save an object to the store. If the object exists, it is updated, otherwise a new object is created in the store.\n");
-                s.append(SEARCH_NAME + " Search the store by key and value for all objects. This returns a list of stems (which may be huge -- plan your queries!)\n");
-                s.append(COUNT_NAME + " The size of the store, i.e., number of objects in the store\n");
-                s.append(TO_XML_NAME + " Serialize a stem object into XML (as a string).\n");
-                s.append(UPDATE_NAME + " Updates an existing object. This will fail if the object does not exist.\n");
-                s.append("*" + PermissionStoreFacade.ADMINS_NAME + " Lists the admins for a given client\n");
-                s.append("*" + PermissionStoreFacade.CLIENTS_NAME + " Lists the clients for a given admin\n");
-                s.append("*" + PermissionStoreFacade.CLIENT_COUNT_NAME + " Return the number of clients this associated with the admin.\n");
-                s.append("* = only available in permission stores.\n");
-                s.append("\nNote that you should create a module for each type of store you want and each store using the " + SystemEvaluator.MODULE_IMPORT + " command\n");
-                s.append("The alias should be descriptive, so something like 'client' or 'trans' and yes, you may have as many\n");
-                s.append("imports as you like talking to different stores -- this is an easy way to move objects from one store to another\n");
-                s.append("\n");
-                s.append("\n");
-                help = s.toString();
-            }
-            return help;
-        }
-    }
-*/
     /**
      * Convert a list of objects to version id stems. The name is the name of the calling function, so
      * error can be better created.

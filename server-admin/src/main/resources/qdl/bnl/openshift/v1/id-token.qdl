@@ -119,4 +119,5 @@ allowed_idps. := [
 
 // Now we can just assert the requested claims.
         claims.'sub' := results.'sdccid';
- claims.'isMemberOf' := results.'isMemberOf';
+ // claims.'isMemberOf' := results.'isMemberOf';
+ claims.'openshift_groups' ≔ ~'Openshift-'<results.'isMemberOf' ⌆ results.'isMemberOf';
