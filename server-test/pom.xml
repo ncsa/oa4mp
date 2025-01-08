@@ -113,7 +113,7 @@
         <dependency>
             <groupId>org.qdl_lang</groupId>
             <artifactId>tests</artifactId>
-            <version>1.6-QDL-SNAPSHOT</version>
+            <version>1.6.0.3</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>

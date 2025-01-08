@@ -17,7 +17,7 @@
         <dependency>
             <groupId>org.qdl_lang</groupId>
             <artifactId>language</artifactId>
-            <version>1.6-QDL-SNAPSHOT</version>
+            <version>1.6.0.3</version>
         </dependency>
 
         <dependency>
@@ -53,7 +53,7 @@
                                     <application-name>${project.name}</application-name>
                                     <application-title>OA4MP</application-title>
                                     <build-time>${timestamp}</build-time>
-                                    <implementation-version>1.6-QDL-SNAPSHOT</implementation-version>
+                                    <implementation-version>1.6.0.3</implementation-version>
                                     <implementation-build>${buildNumber}</implementation-build>
                                     <implementation-title>QDL</implementation-title>
                                 </manifestEntries>

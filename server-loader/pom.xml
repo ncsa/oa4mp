@@ -61,7 +61,7 @@
         <dependency>
             <groupId>org.qdl_lang</groupId>
             <artifactId>language</artifactId>
-            <version>1.6-QDL-SNAPSHOT</version>
+            <version>1.6.0.3</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
