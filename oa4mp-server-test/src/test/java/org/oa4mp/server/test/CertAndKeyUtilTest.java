@@ -36,13 +36,13 @@ public class CertAndKeyUtilTest extends TestCase {
 
         KeyPair keypair = KeyUtil.generateKeyPair();
         // test encoding and decoding.
-        byte[] encodedPrivate = KeyUtil.privateToDER(keypair);
+        String pkcs8Key = KeyUtil.toPKCS8PEM(keypair.getPrivate());
 
-        PrivateKey privKey = KeyUtil.fromPKCS8DER(encodedPrivate);
+        PrivateKey privKey = KeyUtil.fromPKCS8PEM(pkcs8Key);
         assert privKey.equals(keypair.getPrivate());
 
-        byte[] encodedPublic = KeyUtil.publicToDER(keypair);
-        PublicKey pubKey = KeyUtil.fromX509DER(encodedPublic);
+        String rawPublic = KeyUtil.toPKCS8PEM(keypair.getPublic());
+        PublicKey pubKey = KeyUtil.fromPublicPKCS8PEM(rawPublic);
         assert pubKey.equals(keypair.getPublic());
     }
 
@@ -67,7 +67,7 @@ public class CertAndKeyUtilTest extends TestCase {
 
     @Test
     public void testCertPEM() throws Exception {
-        String cert = readFile("test-cert.pem");
+        String cert = readFile("certs/github-com.pem");
         X509Certificate[] certificate = CertUtil.fromX509PEM(cert);
         assert certificate.length == 1 : "Error, incorrect number of certs returned (should be 1, got" + certificate.length + ")";
         assert certificate[0].getSubjectDN() != null; // so it worked
@@ -76,7 +76,7 @@ public class CertAndKeyUtilTest extends TestCase {
     @Test
     public void testX509PublicKey() throws Exception {
         // Read in a public key made someplace else (OpenSSL, actually).
-        String puk = readFile("public-key.pem");
+        String puk = readFile("certs/pkcs8_public.pem");
         PublicKey puk2 = KeyUtil.fromX509PEM(puk);
         // So since we have one, encoded it again and test it against the existing decoding.
         String puk3 = KeyUtil.toX509PEM(puk2);
@@ -86,13 +86,21 @@ public class CertAndKeyUtilTest extends TestCase {
     @Test
     public void testPKCS8Key() throws Exception {
         // show we can read a good one
-        String keyFile = readFile("private-key.pk8");
+        String keyFile = readFile("certs/pkcs8.pem");
         PrivateKey prk = KeyUtil.fromPKCS8PEM(keyFile);
-        assert true; // won't get here unless it parses it right.
         // show we can write one, then read it.
         StringWriter sw = new StringWriter();
         // and test the writer call too
         KeyUtil.toPKCS8PEM(prk, sw);
         assert KeyUtil.fromPKCS8PEM(sw.getBuffer().toString()).equals(prk);
+    }
+
+    public void testPKCS1Key() throws Exception {
+        // show we can read a good one
+        String keyFile = readFile("certs/pkcs1.pem");
+        System.out.println(keyFile);
+        PrivateKey prk = KeyUtil.fromPKCS1PEM(keyFile);
+        System.out.println("alg=" + prk.getAlgorithm());
+        System.out.println("key=\n" + prk);
     }
 }

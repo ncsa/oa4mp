@@ -11,14 +11,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="https://github.com/ncsa/oa4mp/issues/228 Improve error messages from QDL modules so scripts give more detailed messages.">
-      <change afterPath="$PROJECT_DIR$/docs/apidocs/jquery/jquery-3.7.1.min.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/SASOA4MPCLI.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/VICommands.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/SASOA4MPCLI.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/VICommands.html" afterDir="false" />
+    <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="Rebuild of website, fixed a few issues with PDFs, added index.html for https://jira.ncsa.illinois.edu/browse/CIL-2143 and https://github.com/ncsa/oa4mp/issues/229">
+      <change afterPath="$PROJECT_DIR$/oa4mp-server-test/src/test/resources/certs/github-com.pem" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/oa4mp-server-test/src/test/resources/certs/pkcs1.pem" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/oa4mp-server-test/src/test/resources/certs/pkcs8.pem" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/oa4mp-server-test/src/test/resources/certs/pkcs8_public.pem" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/rfc8414/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/client-installer/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client-loader/src/main/java/org/oa4mp/client/loader/servlet/OA2ReadyServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-loader/src/main/java/org/oa4mp/client/loader/servlet/OA2ReadyServlet.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/allclasses-index.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/allclasses-index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/allclasses.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/allclasses.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/allpackages-index.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/allpackages-index.html" afterDir="false" />
@@ -660,8 +661,10 @@
       <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2CopyToolVerifier.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2CopyToolVerifier.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2Monitor.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2Monitor.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2PermissionCommands.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2PermissionCommands.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/SASOA4MPCLI.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/SASOA4MPCLI.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/TokenStoreCommands.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/TokenStoreCommands.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/TransactionStoreCommands.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/TransactionStoreCommands.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/VICommands.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/VICommands.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/ConfigLoaderTool.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/ConfigLoaderTool.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/JSONStoreCommands.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/JSONStoreCommands.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/JWKCLI.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/JWKCLI.html" afterDir="false" />
@@ -675,8 +678,10 @@
       <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/OA2CopyToolVerifier.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/OA2CopyToolVerifier.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/OA2Monitor.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/OA2Monitor.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/OA2PermissionCommands.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/OA2PermissionCommands.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/SASOA4MPCLI.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/SASOA4MPCLI.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/TokenStoreCommands.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/TokenStoreCommands.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/TransactionStoreCommands.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/TransactionStoreCommands.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/VICommands.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/VICommands.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/FSMigrater.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/FSMigrater.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/FSMigrationTool.HelpEntry.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/FSMigrationTool.HelpEntry.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/FSMigrationTool.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/FSMigrationTool.html" afterDir="false" />
@@ -798,16 +803,19 @@
       <change beforePath="$PROJECT_DIR$/docs/server/manuals/using-proxies.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/using-proxies.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/server/manuals/virtual-issuers.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/virtual-issuers.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/summary.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/summary.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/myproxy-logon/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/myproxy-logon/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/myproxy-logon/src/main/java/edu/uiuc/ncsa/myproxy/MyProxyLogon.java" beforeDir="false" afterPath="$PROJECT_DIR$/myproxy-logon/src/main/java/edu/uiuc/ncsa/myproxy/MyProxyLogon.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-test/src/test/java/org/oa4mp/server/test/CertAndKeyUtilTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test/src/test/java/org/oa4mp/server/test/CertAndKeyUtilTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qdl/src/main/docs/oa4mp_running_qdl_scripts.odt" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/src/main/docs/oa4mp_running_qdl_scripts.odt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qdl/src/main/docs/token_handler_configuration.odt" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/src/main/docs/token_handler_configuration.odt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/storage/StoreAccessModule.java" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/storage/StoreAccessModule.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/storage/StoreFacade.java" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/storage/StoreFacade.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/bnl/openshift/v1/id-token.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/bnl/openshift/v1/id-token.qdl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-installer/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-test/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/website/src/main/doc/oa2-client.odt" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/main/doc/oa2-client.odt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/auto/tests/rfc8693/fts-fork.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/auto/tests/rfc8693/fts-fork.qdl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/auto/tests/rfc8693/fts-provisioner.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/auto/tests/rfc8693/fts-provisioner.qdl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/local/fnal-fork.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/local/fnal-fork.qdl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/local/rfc9068.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/local/rfc9068.qdl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/local/test_acl.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/local/test_acl.qdl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-test/src/test/java/org/oa4mp/server/test/ServiceTestSuite2.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/test/java/org/oa4mp/server/test/ServiceTestSuite2.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -1942,14 +1950,6 @@
       <workItem from="1730827183985" duration="70712000" />
       <workItem from="1731622085783" duration="191543000" />
     </task>
-    <task id="LOCAL-00021" summary="Fixes for&#10;https://github.com/ncsa/oa4mp/issues/188&#10;https://github.com/ncsa/oa4mp/issues/187&#10;https://github.com/ncsa/oa4mp/issues/186&#10;https://github.com/ncsa/oa4mp/issues/185&#10;https://github.com/ncsa/oa4mp/issues/181&#10;https://github.com/ncsa/oa4mp/issues/180&#10;https://github.com/ncsa/oa4mp/issues/179">
-      <option name="closed" value="true" />
-      <created>1716242527914</created>
-      <option name="number" value="00021" />
-      <option name="presentableId" value="LOCAL-00021" />
-      <option name="project" value="LOCAL" />
-      <updated>1716242527914</updated>
-    </task>
     <task id="LOCAL-00022" summary="Tomcat regression tests, making sure server scripts are tested and working.">
       <option name="closed" value="true" />
       <created>1716330938353</created>
@@ -2334,7 +2334,15 @@
       <option name="project" value="LOCAL" />
       <updated>1735312034960</updated>
     </task>
-    <option name="localTasksCounter" value="70" />
+    <task id="LOCAL-00070" summary="Rebuild of website, fixed a few issues with PDFs, added index.html for https://jira.ncsa.illinois.edu/browse/CIL-2143 and https://github.com/ncsa/oa4mp/issues/229">
+      <option name="closed" value="true" />
+      <created>1735850580053</created>
+      <option name="number" value="00070" />
+      <option name="presentableId" value="LOCAL-00070" />
+      <option name="project" value="LOCAL" />
+      <updated>1735850580053</updated>
+    </task>
+    <option name="localTasksCounter" value="71" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -2356,7 +2364,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
-    <MESSAGE value="Partial migration of package names." />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/205" />
     <MESSAGE value="Updated package names for website" />
     <MESSAGE value="Renamed teh QDL modules' namespace to start with oa4mp, not the old oa2. Added Java serialization to someclasses to make sure QDL's contract of still (for now) allowing it is not broken." />
@@ -2381,7 +2388,8 @@
     <MESSAGE value="Playing catchup to 6.0.2" />
     <MESSAGE value="Missing file" />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/228 Improve error messages from QDL modules so scripts give more detailed messages." />
-    <option name="LAST_COMMIT_MESSAGE" value="https://github.com/ncsa/oa4mp/issues/228 Improve error messages from QDL modules so scripts give more detailed messages." />
+    <MESSAGE value="Rebuild of website, fixed a few issues with PDFs, added index.html for https://jira.ncsa.illinois.edu/browse/CIL-2143 and https://github.com/ncsa/oa4mp/issues/229" />
+    <option name="LAST_COMMIT_MESSAGE" value="Rebuild of website, fixed a few issues with PDFs, added index.html for https://jira.ncsa.illinois.edu/browse/CIL-2143 and https://github.com/ncsa/oa4mp/issues/229" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="GROUP_MULTIFILE_MERGE_BY_DIRECTORY" value="true" />
   </component>

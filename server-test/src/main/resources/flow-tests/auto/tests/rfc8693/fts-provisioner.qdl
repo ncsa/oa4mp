@@ -14,7 +14,7 @@
   Run this as
   script_load(os_env('NCSA_DEV_INPUT') + '/oa4mp/server-test/src/main/resources/flow-tests/auto/tests/rfc8693/fts-provisioner.qdl');
 */
-debugger(1);
+debugger(10);
 path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests';
 script_path(path ~ script_path());
 saved_cfg := '/tmp/fts-test.json';

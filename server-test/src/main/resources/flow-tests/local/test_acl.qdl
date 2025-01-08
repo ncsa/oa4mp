@@ -3,6 +3,7 @@
 /*
 Test for ACL machinery. This basically either works or doesn't.
 */
+debugger(10);
 cfg.'id'  := 'localhost:/vo1/test0';
 cfg.'idp'  := 'ANY';
 cfg.'file' := $$OA4MP_CLC_XML_INI;
@@ -13,8 +14,8 @@ if[rc!='ok'][return(rc);];
 
 tokens. := clc#access();
 claims. := clc#claims();
-say(print(tokens.));
-say(print(claims.));
+debugger(1, 'ACL test tokens:\n' + print(tokens.));
+debugger(1, 'ACL test claims:\n' + print(claims.));
 at. := tokens.'access_token'.'jwt';
 ⊨ claims.'acl_check' ≡ 'ok' : 'acl check for id token failed';
 ⊨ at.'acl_check' ≡ 'ok' : 'acl check for access token failed';

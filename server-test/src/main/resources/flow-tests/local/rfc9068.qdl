@@ -5,7 +5,7 @@
 */
 
 
-debugger(1);
+debugger(10);
 cfg.'id'  := 'localhost:test/rfc9068'; // name of the configuration, not the id!!
 cfg.'idp'  := 'GitHub';
 cfg.'file' := $$OA4MP_CLC_XML_INI;

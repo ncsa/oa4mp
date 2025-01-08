@@ -634,7 +634,7 @@ public class MyProxyLogon {
         KeyPairGenerator keyGenerator = KeyPairGenerator.getInstance(keyAlg);
         keyGenerator.initialize(getKeySize());
         this.keypair = keyGenerator.genKeyPair();
-        MyPKCS10CertRequest pkcs10 = CertUtil.createCertRequest(this.keypair, pkcs10SigAlgName, DN, pkcs10Provider);
+        MyPKCS10CertRequest pkcs10 = CertUtil.createCertRequest(this.keypair, pkcs10SigAlgName, DN);
         getCredentials(pkcs10.getEncoded());
     }
 
@@ -657,7 +657,7 @@ public class MyProxyLogon {
         // since we are putting the private key in the same file as the certs, we have to
         // add a new line.
         os.write('\n');
-        KeyUtil.toPKCS1PEM(keypair.getPrivate(), os);
+        KeyUtil.toPKCS8PEM(keypair.getPrivate(), os);
     }
 
     public X509Certificate getCertificate() {

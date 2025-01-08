@@ -1,18 +1,5 @@
 package org.oa4mp.client.loader.servlet;
 
-import org.oa4mp.client.api.AssetResponse;
-import org.oa4mp.client.api.ClientEnvironment;
-import org.oa4mp.client.api.servlet.ClientServlet;
-import org.oa4mp.delegation.common.token.AccessToken;
-import org.oa4mp.delegation.common.token.AuthorizationGrant;
-import org.oa4mp.delegation.common.token.impl.AuthorizationGrantImpl;
-import org.oa4mp.delegation.common.token.impl.IDTokenImpl;
-import org.oa4mp.delegation.server.client.ATResponse2;
-import org.oa4mp.delegation.server.client.ATServer2;
-import org.oa4mp.delegation.server.jwt.MyOtherJWTUtil2;
-import org.oa4mp.client.loader.OA2Asset;
-import org.oa4mp.client.loader.OA2ClientEnvironment;
-import org.oa4mp.client.loader.OA2MPService;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
@@ -29,7 +16,20 @@ import net.sf.json.JSONObject;
 import net.sf.json.util.JSONUtils;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpStatus;
+import org.oa4mp.client.api.AssetResponse;
+import org.oa4mp.client.api.ClientEnvironment;
+import org.oa4mp.client.api.servlet.ClientServlet;
+import org.oa4mp.client.loader.OA2Asset;
+import org.oa4mp.client.loader.OA2ClientEnvironment;
+import org.oa4mp.client.loader.OA2MPService;
+import org.oa4mp.delegation.common.token.AccessToken;
+import org.oa4mp.delegation.common.token.AuthorizationGrant;
+import org.oa4mp.delegation.common.token.impl.AuthorizationGrantImpl;
+import org.oa4mp.delegation.common.token.impl.IDTokenImpl;
 import org.oa4mp.delegation.server.*;
+import org.oa4mp.delegation.server.client.ATResponse2;
+import org.oa4mp.delegation.server.client.ATServer2;
+import org.oa4mp.delegation.server.jwt.MyOtherJWTUtil2;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -179,7 +179,7 @@ public class OA2ReadyServlet extends ClientServlet {
                     request.setAttribute("username", assetResponse.getUsername());
                     // FIX OAUTH-216. Note that this is displayed on the client's success page.
                     if (asset.getPrivateKey() != null) {
-                        request.setAttribute("privateKey", KeyUtil.toPKCS1PEM(asset.getPrivateKey()));
+                        request.setAttribute("privateKey", KeyUtil.toPKCS8PEM(asset.getPrivateKey()));
                     } else {
                         request.setAttribute("privateKey", "(none)");
                     }

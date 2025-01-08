@@ -47,7 +47,7 @@ import java.io.File;
         NewCAStoreTest.class,
         NewClientStoreTest.class,
         NewTransactionTest.class,
-        //ClientManagerTest.class,
+        CertAndKeyUtilTest.class,
         //AttributeServerTest.class,
         PermissionServerTest.class,
         //ClientServerTest.class,
