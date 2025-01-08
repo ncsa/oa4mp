@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.oa4mp</groupId>
         <artifactId>oa4mp-parent</artifactId>
-        <version>6.x-SNAPSHOT</version>
+        <version>6.0.3</version>
     </parent>
 
     <artifactId>qdl</artifactId>
@@ -23,7 +23,7 @@
         <dependency>
             <artifactId>server-admin</artifactId>
             <groupId>org.oa4mp</groupId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.0.3</version>
         </dependency>
 
     </dependencies>

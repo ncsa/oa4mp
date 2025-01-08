@@ -6,5 +6,5 @@ package org.oa4mp.delegation.common;
  * on 6/11/24 at  11:26 AM
  */
 public class OA4MPVersion {
-    public static final String VERSION_NUMBER = "6.x-SNAPSHOT";
+    public static final String VERSION_NUMBER = "6.0.3";
 }

@@ -36,9 +36,31 @@ $>git clone (whatever you want)
 $>cd oa4mp
 ```
 
+# How to install.
+
+Go to the release page on GitHub and download either
+
+1. <https://github.com/ncsa/oa4mp/releases/latest/download/server-installer.jar>, to install the server and tools
+2. <https://github.com/ncsa/oa4mp/releases/latest/download/client-installer.jar>, to install the client and tools.
+
+Run whichever you need (you can install both to different directories) as runnable jars, e.g.
+
+```
+$bash>java -jar server-installer.jar
+```
+
+With no arguments you will get the complete instructions on what to do. 
+At the end of the installation, you will have a mostly functional installation
+of OA4MP server or client. Do read the final output from the installer for more
+instructions, if any.
+
 ## How to compile, deploy etc.
 
-There are a couple of ways todo this. You can
+Generally you should not need to do this. Use the installers unless you have some extremely
+specific way you need to extend OA4MP. In other words, this is **not** the way
+to install this. 
+
+There are a couple of ways to build OA4MP. You can
 
 1. compile and install OA4MP locally using just maven
 2. do the entire build with artifacts which may then be released (typically on GitHub)
@@ -57,8 +79,8 @@ There are a few environment variables you should define before doing anything. T
 ## Updating the release version
 
 Do a global replace of the SNAPSHOT tag with the version you are creating. 
-E.g. replace `6.x-SNAPSHOT` with `5.3.5`. Note this must be global in all files since this is used extensively in 
-the documentation. If you are updating teh website, you do not need to update 
+E.g. replace `6.x-SNAPSHOT` with `6.0.3`. Note this must be global in all files since this is used extensively in 
+the documentation. If you are updating the website, you do not need to update 
 anything in `$NCSA_DEV_INPUT/oa4mp/docs` which will be replaced shortly. 
 
 
@@ -126,7 +148,7 @@ resolution maven uses tends to have multiple jars created then deploy complains.
 # Building and deploying the website
 
 You can also update the website. You must be able to commit to Github to do this. The basic way this works is that you 
-1. Do a global replace of the SNAPSHOT tag with the version you are creating. E.g. replace `6.x-SNAPSHOT` with `5.3.5`. Note this must be global in all files since this is used extensively in the documentation. You do not need to update anything in `$NCSA_DEV_INPUT/oa4mp/docs` which will be replaced shortly. 
+1. Do a global replace of the SNAPSHOT tag with the version you are creating. E.g. replace `6.0.3` with `5.3.5`. Note this must be global in all files since this is used extensively in the documentation. You do not need to update anything in `$NCSA_DEV_INPUT/oa4mp/docs` which will be replaced shortly. 
 2. run the `build.sh` script to create all of the basic documentation 
 3. run `$NCSA_DEV_INPUT/oa4mp-website/make-website.sh` which creates the entire website and stick it in `$NCSA_DEV_INPUT/oa4mp/docs`
 4. commit everything to Git

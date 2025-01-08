@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.oa4mp</groupId>
         <artifactId>oa4mp-parent</artifactId>
-        <version>6.x-SNAPSHOT</version>
+        <version>6.0.3</version>
     </parent>
     <artifactId>oa4mp-webapp</artifactId>
     <name>OA4MP web application</name>
