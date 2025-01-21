@@ -1,0 +1,45 @@
+/*
+
+* OIDC client ID on PROD is currently
+    * None
+* OIDC client ID on TEST is currently
+    * [cilogon:/client_id/316405f349a68520afb75500017b0417](https://registry-test.cilogon.org/registry/oa4mp_client/oa4mp_client_co_oidc_clients/edit/197)
+    * [cilogon:/client_id/5112efedc855c95588ac9371deaf7e49](https://registry-test.cilogon.org/registry/oa4mp_client/oa4mp_client_co_oidc_clients/edit/198)
+* Policy:
+    * Use OIDC tokens.
+    * Refresh token is not required.
+    * Membership in the group CO:COU:UVic Staff:members:active is required in order for the flow to continue.
+      Users that are not in the group should be redirected to
+      [https://alliancecan.ca/en](https://alliancecan.ca/en).
+*/
+/*
+Note that this runs in the post_auth phase only since
+the only place that there is a browser to redirect from
+is during the auth phase.
+Configuration for the client is
+
+{"tokens": {
+  "identity": {
+    "qdl":  {
+     "load": "drac/cloudconnect/v1/id-token.qdl",
+     "xmd": {"exec_phase": ["post_auth"]}
+    },
+  "type": "identity"
+  }
+}}
+    // Note. No refresh tokens!
+*/
+script_load('drac/acl.qdl');
+script_load('utils/init.qdl'); // set up stuff
+
+debugger(1);
+drac_cc := 'DRAC Cloud Connect'; // moniker for debugging
+user := claims.sub;
+error_uri := 'https://alliancecan.ca/en';
+trace(drac_cc,'starting id-token for user =' + user);
+
+
+results. := script_load('drac/cloudconnect/v1/get_user.qdl', user); // user == claims.sub
+trace(drac_cc,'result of user query =' + to_string(results.));
+∄results.'isMemberOf' ⇒ err_uri('no groups for user found',error_uri);
+'CO:COU:UVic Staff:members:active'∉ results.'isMemberOf' ⇒ err_uri(error_uri);
