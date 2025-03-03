@@ -106,8 +106,8 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
         // issue now is that the nonce was registered in the init servlet (as it should be for OA1)
         // and now it will be rejected ever more.
         JSONObject j = JSONObject.fromObject(content);
-        String code = j.get("code").toString();
-        String state = j.get("state").toString();
+        String code = j.containsKey("code") ? j.get("code").toString() : null;
+        String state = j.containsKey("state") ? j.get("state").toString() : null;
         // Fix RCAuth https://github.com/rcauth-eu/OA4MP/commit/d052e0a64fe527adb7636fe146179ffbac472380
         if (code != null) {
             request.setAttribute("code", code);
