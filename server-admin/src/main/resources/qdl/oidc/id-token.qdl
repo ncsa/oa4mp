@@ -1,0 +1,64 @@
+/*
+   This is for OIDC compliance testing. It supplies a few test
+   attrbutes for address, phone number and such that a test
+   IDP might not.
+
+   In particular, a full address claim as per 5.1.1 in the OIDC
+   spec.
+
+   Add it  in the configuration of the client as
+
+ tokens{
+  identity{
+     type=identity
+     qdl{
+         load="oidc/id-token.qdl"
+         xmd={exec_phase=["post_token","post_user_info"]}
+       }// end qdl
+     } //end identity token
+   } //end tokens
+*/
+
+say('scopes requested =' + to_string(scopes.));
+// Set up a test address JSON object as per 5.1.1 in the OIDC spec
+  if[('address'∈scopes.) ∧ (∄claims.'address')]
+then[
+       say('*** got address request');
+       address.'street_address' := '1234 Anyroad St.';
+             address.'locality' := 'Anytown';
+               address.'region' := 'Anystate';
+          address.'postal_code' := 'P3X-7Z8'; // stargate address
+              address.'country' := 'Elbonia';
+               claims.'address' := address.;
+    ]; // end address scope check
+
+  if['phone'∈scopes.]
+then[
+     say('*** got phone request');
+     if[∃claims.'phone_number']
+   then[
+        claims.'phone_number_verified' := false;
+       ]
+   else[
+          // A bogus phone number if IDP does not release one
+                   claims.'phone_number' := '+1 (123) 456-7890';
+          claims.'phone_number_verified' := true; // since we created it.
+       ];
+]; // phones scope check
+// Bogus email
+  if['email'∈scopes.]
+then[
+    say('*** got email request');
+     if[∃claims.'email']
+   then[
+         claims.'email_verified' := false; // we don't verify email addresses
+       ]
+   else[
+         // Bogus email if IDP does not release one
+                  claims.'email' := (∃claims.'email')?(claims.'email'):'bob@woofity.edu';
+         claims.'email_verified' := true; // since we created it
+       ];
+  ];
+
+say('final claims' + to_string(claims.));
+print(claims.);

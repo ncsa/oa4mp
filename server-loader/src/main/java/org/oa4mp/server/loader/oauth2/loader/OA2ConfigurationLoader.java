@@ -107,6 +107,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     public static final String CLEANUP_ALARMS_TAG = "cleanupAlarms";
     public static final String CLEANUP_LOCKING_ENABLED = "cleanupLockingEnabled";
     public static final String CLEANUP_FAIL_ON_ERRORS = "cleanupFailOnErrors";
+    public static final String ALLOW_PROMPT_NONE = "allowPromptNone";
 
     public static final String MONITOR_ENABLED = "monitorEnable";
     public static final String MONITOR_INTERVAL = "monitorInterval";
@@ -259,7 +260,8 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     getMonitorInterval(),
                     getMonitorAlarms(),
                     isCCFEnabled(),
-                    getDebugger()
+                    getDebugger(),
+                    isAllowPromptNone()
             );
 
             if (getClaimSource() instanceof BasicClaimsSourceImpl) {
@@ -485,6 +487,18 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
             }
         }
         return qdlConfigurationName;
+    }
+Boolean allowPromptNone = null;
+    public Boolean isAllowPromptNone() {
+        if (allowPromptNone == null) {
+            String raw = getFirstAttribute(cn, ALLOW_PROMPT_NONE);
+            if (raw.equals("true") || raw.equals("on") || raw.equals("enabled")) {
+                allowPromptNone = Boolean.TRUE;
+            }else{
+                allowPromptNone = Boolean.FALSE;
+            }
+        }
+        return allowPromptNone;
     }
 
     String qdlConfigurationName = null;

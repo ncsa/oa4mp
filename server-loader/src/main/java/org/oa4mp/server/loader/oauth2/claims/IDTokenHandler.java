@@ -293,7 +293,7 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
         if(!getUserMetaData().containsKey(ISSUER)){
             getUserMetaData().put(ISSUER, transaction.getClient().getIdentifierString());
         }
-        List<String> basicScopes = Arrays.asList(OA2Scopes.basicScopes);
+        Collection<String> basicScopes = OA2Scopes.ScopeUtil.getBasicScopes();
         HashSet<String> x = new HashSet<>();
         x.addAll(getScopes());
         x.retainAll(basicScopes);
@@ -382,6 +382,11 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
             setCurrentClaim(currentClaims, finalClaims, PREFERRED_USERNAME);
         }
         if (scopes.contains(OA2Scopes.SCOPE_ADDRESS)) {
+            // Note that as per 5.1.1 of the OIDC spec, this is a JSON object
+            // with various entries. The usual lifecycle is to create this in a QDL
+            // script from various bits of information the IDP sends back (if present
+            // there can be a lot of variation) to conform to
+            // the spec., then it is either there or not.
             setCurrentClaim(currentClaims, finalClaims, ADDRESS);
         }
 

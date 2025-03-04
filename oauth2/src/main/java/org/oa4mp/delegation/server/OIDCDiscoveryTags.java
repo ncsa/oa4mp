@@ -20,6 +20,8 @@ public interface OIDCDiscoveryTags {
      String CODE_CHALLENGE_METHOD_SUPPORTED = "code_challenge_method_supported"; // RFC 7636
     String AUTHORIZATION_ENDPOINT = "authorization_endpoint";
     String REGISTRATION_ENDPOINT = "registration_endpoint";
+    String REQUEST_PARAMETER_SUPPORTED = "request_parameter_supported";
+    String REQUEST_URI_PARAMETER_SUPPORTED = "request_uri_parameter_supported";
 
     String JWKS_URI = "jwks_uri";
     String JWKS_CERTS = "certs";

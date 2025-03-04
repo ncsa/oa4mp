@@ -7,7 +7,7 @@
 </head>
 <body>
 <form action="${actionToTake}" method="post">
-    <h2>Welcome to the OA44MP Client Registration Page</h2>
+    <h2>Welcome to the OA4MP Client Registration Page</h2>
 
     <p>This page allows you to register your client with OA4MP.
         To get your client approved,

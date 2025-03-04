@@ -48,6 +48,17 @@
         <td style="vertical-align: top;">Deprecated. Use defaultAccessTokenLifetime instead.
         </td>
     </tr>
+    <tr id="allowPromptNone">
+        <td style="vertical-align: top;">allowPromptNone</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">false</td>
+        <td style="vertical-align: top;">Flag that when "true" (or "on" or "enabled") permits OIDC clients to send the
+            prompt=none parameter along with an id token hint. This side-steps authentication
+            providing that the id token is still valid. Many instances do not allow this feature
+            for security reasons, so by default it is off. It may also be enabled on a per client
+            basis as part of a client's configuration. This switch is for <i>every</i> client.
+        </td>
+    </tr>
     <tr id="authorizationGrantLifetime">
         <td style="vertical-align: top;">authorizationGrantLifetime</td>
         <td style="vertical-align: top;">N</td>

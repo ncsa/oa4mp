@@ -111,7 +111,8 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  long monitorInterval,
                  Collection<LocalTime> monitorAlarms,
                  boolean clientCredentialFlowEnabled,
-                 MetaDebugUtil debugger) {
+                 MetaDebugUtil debugger,
+                 boolean allowPromptNone) {
 
         super(logger,
                 mfp,
@@ -141,6 +142,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
         if (clientSecretLength < 0) {
             throw new MyConfigurationException("The client secret length (=" + clientSecretLength + ") is invalid. It must be a positive integer.");
         }
+        this.allowPromptNone = allowPromptNone;
         this.clientSecretLength = clientSecretLength;
         this.scopes = scopes;
         this.claimSource = claimSource;
@@ -708,4 +710,19 @@ public class OA2SE extends ServiceEnvironmentImpl {
         }
         return storeList;
     }
+
+    /**
+     * Allow prompt = none parameter in OIDC clients. https://github.com/ncsa/oa4mp/issues/236.
+     * This should be configurable.
+     * @return
+     */
+    public boolean isAllowPromptNone() {
+        return allowPromptNone;
+    }
+
+    public void setAllowPromptNone(boolean allowPromptNone) {
+        this.allowPromptNone = allowPromptNone;
+    }
+
+    boolean allowPromptNone = false;
 }

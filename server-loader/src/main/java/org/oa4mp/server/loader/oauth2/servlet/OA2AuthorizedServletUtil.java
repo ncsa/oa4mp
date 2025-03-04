@@ -1,38 +1,42 @@
 package org.oa4mp.server.loader.oauth2.servlet;
 
-import org.oa4mp.server.loader.oauth2.OA2SE;
-import org.oa4mp.server.loader.oauth2.state.ScriptRuntimeEngineFactory;
-import org.oa4mp.server.loader.oauth2.storage.UsernameFindable;
-import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
-import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
-import org.oa4mp.server.loader.oauth2.tokens.AccessTokenConfig;
-import org.oa4mp.server.api.storage.servlet.IssuerTransactionState;
-import org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet;
-import org.oa4mp.delegation.common.servlet.TransactionState;
-import org.oa4mp.delegation.common.token.AuthorizationGrant;
-import org.oa4mp.delegation.server.jwt.JWTRunner;
-import org.oa4mp.delegation.server.server.AGIResponse2;
-import org.oa4mp.delegation.server.server.AGRequest2;
-import org.oa4mp.delegation.server.server.RFC7636Util;
-import org.oa4mp.delegation.server.server.RFC8693Constants;
-import org.oa4mp.delegation.server.server.claims.OA2Claims;
-import org.oa4mp.delegation.server.ServiceTransaction;
-import org.oa4mp.delegation.server.UnapprovedClientException;
-import org.oa4mp.delegation.server.request.AGResponse;
-import org.oa4mp.delegation.server.request.IssuerResponse;
+import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.IllegalAccessException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
+import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.http.HttpStatus;
+import org.oa4mp.delegation.common.servlet.TransactionState;
+import org.oa4mp.delegation.common.token.AuthorizationGrant;
+import org.oa4mp.delegation.common.token.impl.IDTokenImpl;
 import org.oa4mp.delegation.server.*;
+import org.oa4mp.delegation.server.jwt.JWTRunner;
+import org.oa4mp.delegation.server.request.AGResponse;
+import org.oa4mp.delegation.server.request.IssuerResponse;
+import org.oa4mp.delegation.server.server.AGIResponse2;
+import org.oa4mp.delegation.server.server.AGRequest2;
+import org.oa4mp.delegation.server.server.RFC7636Util;
+import org.oa4mp.delegation.server.server.RFC8693Constants;
+import org.oa4mp.delegation.server.server.claims.OA2Claims;
+import org.oa4mp.server.api.storage.servlet.IssuerTransactionState;
+import org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet;
+import org.oa4mp.server.loader.oauth2.OA2SE;
+import org.oa4mp.server.loader.oauth2.state.ScriptRuntimeEngineFactory;
+import org.oa4mp.server.loader.oauth2.storage.UsernameFindable;
+import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
+import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
+import org.oa4mp.server.loader.oauth2.storage.transactions.OA2TStoreInterface;
+import org.oa4mp.server.loader.oauth2.storage.vi.VirtualIssuer;
+import org.oa4mp.server.loader.oauth2.tokens.AccessTokenConfig;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,10 +45,10 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.*;
 
+import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
+import static org.oa4mp.delegation.server.OA2Constants.*;
 import static org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet.createDebugger;
 import static org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet.getServiceEnvironment;
-import static org.oa4mp.delegation.server.OA2Constants.*;
-import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 
 /**
  * This is set of calls to replace the old Authorized Servlet.
@@ -126,7 +130,7 @@ public class OA2AuthorizedServletUtil {
              */
             String codeChallenge = req.getParameter(RFC7636Util.CODE_CHALLENGE);
             String codeChallengeMethod = req.getParameter(RFC7636Util.CODE_CHALLENGE_METHOD);
-            setupPKCE(codeChallenge,codeChallengeMethod,oa2se,transaction,resolvedClient,debugger);
+            setupPKCE(codeChallenge, codeChallengeMethod, oa2se, transaction, resolvedClient, debugger);
             Map<String, String> params = agResponse.getParameters();
             XMLMap backup = GenericStoreUtils.toXML(getServiceEnvironment().getTransactionStore(), transaction);
             preprocess(new TransactionState(req, resp, params, transaction, backup));
@@ -558,6 +562,7 @@ public class OA2AuthorizedServletUtil {
      */
     protected void checkPrompts(OA2ServiceTransaction transaction, Map<String, String> map) {
         if (!map.containsKey(PROMPT)) return;  //nix to do
+
         String prompts = map.get(PROMPT);
         // now we have to see what is in it.
         StringTokenizer st = new StringTokenizer(prompts);
@@ -573,6 +578,7 @@ public class OA2AuthorizedServletUtil {
                     HttpStatus.SC_BAD_REQUEST,
                     map.get(OA2Constants.STATE));
         }
+
         if (prompt.contains(PROMPT_NONE) && 1 < prompt.size()) {
             throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST,
                     "You cannot specify \"none\" for the prompt and any other option",
@@ -580,10 +586,111 @@ public class OA2AuthorizedServletUtil {
                     transaction.getRequestState(),
                     transaction.getCallback());
         }
+        OA2SE oa2SE = (OA2SE) getServiceEnvironment();
+        // Ignored for non-OIDC clients, check this client supports it.
+        if (prompt.contains(PROMPT_NONE) && transaction.getOA2Client().isOIDCClient()) {
+            if(transaction.getOA2Client().isAllowPromptNone()) {
+                // this overrides.
+            }else{
+                throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST,
+                        "Specifying prompt with value  \"none\" is not supported for this client " + ID_TOKEN_HINT,
+                        HttpStatus.SC_BAD_REQUEST,
+                        transaction.getRequestState(),
+                        transaction.getCallback());
+            }
+            if(oa2SE.isAllowPromptNone()){
+                // if server allows it and client does, do it.
 
-        if (prompt.contains(PROMPT_LOGIN)) return;
+            }else{
+                // if server does not allow it, let the client override it.
+                if(!transaction.getOA2Client().isAllowPromptNone()){
+                    throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST,
+                            "Specifying prompt with value  \"none\" is not supported for this client " + ID_TOKEN_HINT,
+                            HttpStatus.SC_BAD_REQUEST,
+                            transaction.getRequestState(),
+                            transaction.getCallback());
+                }
+            }
+            // Fix for https://github.com/ncsa/oa4mp/issues/236
+            if (!map.containsKey(ID_TOKEN_HINT)) {
+                throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST,
+                        "Specifying prompt with value  \"none\" requires an " + ID_TOKEN_HINT,
+                        HttpStatus.SC_BAD_REQUEST,
+                        transaction.getRequestState(),
+                        transaction.getCallback());
+            }
+            boolean ok = false;
+            //     try {
+            VirtualIssuer vi = oa2SE.getVI(transaction.getClient().getIdentifier());
+            boolean isInVI = vi != null;
+            String issuer;
+            JSONWebKeys keys;
+            if (isInVI) {
+                keys = oa2SE.getJsonWebKeys();
+                issuer = oa2SE.getIssuer();
+            } else {
+                keys = vi.getJsonWebKeys();
+                issuer = vi.getIssuer();
+            }
+            JSONObject idTokenHint;
+            try {
+                idTokenHint = JWTUtil.verifyAndReadJWT(map.get(ID_TOKEN_HINT), keys);
+            } catch (Throwable t) {
+                MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(transaction.getOA2Client());
+                debugger.trace("Could not verify ID Token hint JWT token:" + t.getMessage(), t);
+                throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST,
+                        "Invalid token hine for " + ID_TOKEN_HINT,
+                        HttpStatus.SC_BAD_REQUEST,
+                        transaction.getRequestState(),
+                        transaction.getCallback());
+
+            }
+            // At this point, it MUST be an OA4MP issued token that is valid.
+            // now, double check a few things.
+            if (!(idTokenHint.getString(OA2Claims.ISSUER).equals(issuer)
+                    && idTokenHint.getString(OA2Claims.AUDIENCE).equals(transaction.getClient().getIdentifierString())))
+            {
+                throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST,
+                        "ID token not found." + ID_TOKEN_HINT,
+                        HttpStatus.SC_BAD_REQUEST,
+                        transaction.getRequestState(),
+                        transaction.getCallback());
+            }
+
+            Identifier oldIDToken = BasicIdentifier.newID(idTokenHint.getString(OA2Claims.JWT_ID));
+            OA2ServiceTransaction oldTransaction = ((OA2TStoreInterface) oa2SE.getTransactionStore()).getByIDTokenID(oldIDToken);
+            if (oldTransaction == null) {
+                throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST,
+                        "ID token not found." + ID_TOKEN_HINT,
+                        HttpStatus.SC_BAD_REQUEST,
+                        transaction.getRequestState(),
+                        transaction.getCallback());
+            }
+            IDTokenImpl idToken = new IDTokenImpl(oldIDToken.getUri());
+            if (idToken.isExpired()) {
+                throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST,
+                        "Expired ID token ",
+                        HttpStatus.SC_BAD_REQUEST,
+                        transaction.getRequestState(),
+                        transaction.getCallback());
+            }
+            transaction.setIDTokenHint(idTokenHint);
+            transaction.setUsername(oldTransaction.getUsername());
+            transaction.setAuthTime(oldTransaction.getAuthTime());
+            // What about other things? At this point, no scopes, audience, etc.
+            /* */
+            transaction.setPrompt(PROMPT_NONE);
+            return;
+        }
+        if (prompt.contains(PROMPT_LOGIN)) {
+            transaction.setPrompt(PROMPT_LOGIN); // all we need
+            return;
+        }
         // CIL-737 fix: accept select_account
-        if (prompt.contains(PROMPT_SELECT_ACCOUNT)) return;
+        if (prompt.contains(PROMPT_SELECT_ACCOUNT)) {
+            transaction.setPrompt(PROMPT_SELECT_ACCOUNT); // all we need
+            return;
+        }
 
         // CIL-1012 fix: accept prompt = consent.
         // basically we completely ignore this and offline access
@@ -591,12 +698,15 @@ public class OA2AuthorizedServletUtil {
         // In cases where the authorization endpoint is replaced (e.g. by Tomcat
         // or CILogon) then the new authz endpoint must handle the prompt=consent
         // if it does anything other than always require consent.
-        if (prompt.contains(PROMPT_CONSENT)) return;
+        if (prompt.contains(PROMPT_CONSENT)) {
+            transaction.setPrompt(PROMPT_CONSENT); // all we need
+            return;
+        }
 
         // At this point there is neither a "none" or a "login" and we don's support anything else.
 
         throw new OA2RedirectableError(OA2Errors.LOGIN_REQUIRED,
-                "Only " + PROMPT + "=" + PROMPT_LOGIN + " or " + PROMPT_SELECT_ACCOUNT +
+                "Only " + PROMPT + "=" + PROMPT_LOGIN + "," + PROMPT_NONE + " or " + PROMPT_SELECT_ACCOUNT +
                         " are supported on this server.",
                 HttpStatus.SC_BAD_REQUEST,
                 transaction.getRequestState(),

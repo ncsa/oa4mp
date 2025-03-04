@@ -16,6 +16,7 @@ public interface OA2Constants {
      * Use the right one in case something chages in the spec!
      */
     public static String AUTHORIZATION_CODE = "code";
+    public static String AUTHORIZATION_STATE = "state";
     public static String REFRESH_LIFETIME = "rt_lifetime";
     public static String MAX_REFRESH_LIFETIME = "max_rt_lifetime";
     public static String ACCESS_TOKEN_LIFETIME = "at_lifetime";

@@ -655,8 +655,9 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
             // If there are blanks, put quotes around it.
             secret = "\"" + secret + "\"";
         }
-        say("password : " + secret);
-        say("    hash : " + hash);
+        say("client_id : " + client.getIdentifierString());
+        say("   secret : " + secret);
+        say("     hash : " + hash);
     }
 
     @Override

@@ -32,6 +32,9 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 
+import static org.oa4mp.delegation.server.OA2Constants.AUTHORIZATION_CODE;
+import static org.oa4mp.delegation.server.OA2Constants.AUTHORIZATION_STATE;
+
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -106,15 +109,15 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
         // issue now is that the nonce was registered in the init servlet (as it should be for OA1)
         // and now it will be rejected ever more.
         JSONObject j = JSONObject.fromObject(content);
-        String code = j.get("code").toString();
-        String state = j.get("state").toString();
         // Fix RCAuth https://github.com/rcauth-eu/OA4MP/commit/d052e0a64fe527adb7636fe146179ffbac472380
-        if (code != null) {
-            request.setAttribute("code", code);
+        // Fix https://github.com/ncsa/oa4mp/pull/237, https://github.com/ncsa/oa4mp/issues/238
+        if(j.containsKey(AUTHORIZATION_CODE)){
+            request.setAttribute(AUTHORIZATION_CODE, j.get(AUTHORIZATION_CODE).toString());
         }
-        if (state != null) {
-            request.setAttribute("state", state);
+        if(j.containsKey(AUTHORIZATION_STATE)) {
+            request.setAttribute(AUTHORIZATION_STATE, j.get(AUTHORIZATION_STATE).toString());
         }
+
         super.doIt(request, response);
         logOK(request); //CIL-1722
     }
@@ -182,7 +185,7 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
             }
         }
         try {
-            cb = cb + (cb.indexOf(responseDelimiter) == -1 ? responseDelimiter : "&") + OA2Constants.AUTHORIZATION_CODE + "=" + TokenUtils.b32EncodeToken(idStr);
+            cb = cb + (cb.indexOf(responseDelimiter) == -1 ? responseDelimiter : "&") + AUTHORIZATION_CODE + "=" + TokenUtils.b32EncodeToken(idStr);
             if (params.containsKey(OA2Constants.STATE)) {
                 cb = cb + "&" + OA2Constants.STATE + "=" + URLEncoder.encode(params.get(OA2Constants.STATE), "UTF-8");
             }

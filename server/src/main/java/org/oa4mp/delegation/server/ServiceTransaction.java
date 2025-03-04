@@ -1,6 +1,7 @@
 package org.oa4mp.delegation.server;
 
 
+import net.sf.json.JSONObject;
 import org.oa4mp.delegation.common.storage.clients.Client;
 import org.oa4mp.delegation.common.storage.transactions.BasicTransaction;
 import org.oa4mp.delegation.common.token.AuthorizationGrant;
@@ -17,6 +18,52 @@ import java.util.List;
  * on Apr 16, 2010 at  10:36:51 AM
  */
 public class ServiceTransaction extends BasicTransaction {
+    // Thanks to Java inheritence and our package layout, these have to be moved here,
+    // or we have to refactor a great deal of the basic machinery.
+    public String PROMPT_KEY = "prompt";
+    public String ID_TOKEN_HINT_KEY = "id_token_hint";
+    public String STATE_KEY = "state";
+    public String STATE_COMMENT_KEY = "comment";
+
+    // Fix for https://github.com/ncsa/oa4mp/issues/236
+    public boolean hasPromptKey(){
+        return getState().containsKey(PROMPT_KEY);
+    }
+    public String getPrompt(){
+        return getState().getString(PROMPT_KEY);
+    }
+    public void setPrompt(String prompt){
+        getState().put(PROMPT_KEY, prompt);
+    }
+
+    public boolean hasIDTokenHintKey(){
+        return getState().containsKey(ID_TOKEN_HINT_KEY);
+    }
+    public JSONObject getIDTokenHint(){
+        return getState().getJSONObject(ID_TOKEN_HINT_KEY);
+    }
+    public void setIDTokenHint(JSONObject idTokenHint){
+        getState().put(ID_TOKEN_HINT_KEY, idTokenHint);
+    }
+    JSONObject state;
+
+    /**
+     * Generally you should never set the state directly unless you know exactly how it is constructed.
+     *
+     * @param state
+     */
+    public void setState(JSONObject state) {
+        this.state = state;
+    }
+
+    // This is used to store the flow states, claim sources AND the claims in between calls.
+    public JSONObject getState() {
+        if (state == null) {
+            state = new JSONObject();
+            state.put(STATE_COMMENT_KEY, "State for object id \"" + getAuthorizationGrant().getToken() + "\"");
+        }
+        return state;
+    }
     public ServiceTransaction(Identifier identifier) {
         super(identifier);
     }

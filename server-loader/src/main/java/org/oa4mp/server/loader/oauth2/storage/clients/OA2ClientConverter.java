@@ -48,6 +48,9 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         if (map.get(getCK2().callbackUri()) != null) {
             otherV.setCallbackURIs(jsonArrayToCollection(map, getCK2().callbackUri()));
         }
+        if (map.get(getCK2().allowPromptNone()) != null) {
+            otherV.setAllowPromptNone(map.getBoolean( getCK2().allowPromptNone()));
+        }
         if (map.get(getCK2().strictScopes()) != null) {
             otherV.setStrictscopes(map.getBoolean(getCK2().strictScopes()));
         }
@@ -242,6 +245,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
     @Override
     public void toMap(V client, ConversionMap<String, Object> map) {
         super.toMap(client, map);
+        map.put(getCK2().allowPromptNone(), client.isAllowPromptNone());
         map.put(getCK2().rtLifetime(), client.getRtLifetime());
         map.put(getCK2().rtGracePeriod(), client.getRtGracePeriod());
         map.put(getCK2().atLifetime(), client.getAtLifetime());
@@ -335,6 +339,9 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         V v = super.fromJSON(json);
         v.setRtLifetime(getJsonUtil().getJSONValueLong(json, getCK2().rtLifetime()));
         v.setRtGracePeriod(getJsonUtil().getJSONValueLong(json, getCK2().rtGracePeriod()));
+        if (json.containsKey(getCK2().allowPromptNone())) {
+            v.setAllowPromptNone(json.getBoolean( getCK2().allowPromptNone()));
+        }
         if (json.containsKey(getCK2().atLifetime())) {
             v.setAtLifetime(getJsonUtil().getJSONValueLong(json, getCK2().atLifetime()));
         }
@@ -436,6 +443,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
     @Override
     public void toJSON(V client, JSONObject json) {
         super.toJSON(client, json);
+        getJsonUtil().setJSONValue(json, getCK2().allowPromptNone(), client.isAllowPromptNone());
         getJsonUtil().setJSONValue(json, getCK2().rtLifetime(), client.getRtLifetime());
         getJsonUtil().setJSONValue(json, getCK2().idtLifetime(), client.getIdTokenLifetime());
         getJsonUtil().setJSONValue(json, getCK2().rtGracePeriod(), client.getRtGracePeriod());

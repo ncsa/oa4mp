@@ -537,4 +537,9 @@ public class TransactionCache<V extends BasicTransaction> extends CachedMapFacad
     public V getByProxyID(Identifier proxyID) {
         throw new NotImplementedException(" This is not yet implemented for cache");
     }
+
+    @Override
+    public void update(List<Identifier> ids, Map<String, Object> values) throws UnregisteredObjectException {
+        throw new NotImplementedException(" This is not yet implemented for cache");
+    }
 }

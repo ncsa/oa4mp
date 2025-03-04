@@ -112,6 +112,7 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
         }
         // pipe startup messages to dev null:
         if(getIOInterface() instanceof BasicIO) {
+            ((BasicIO) getIOInterface()).getPrintStream();
             PrintStream out = System.out;
             PrintStream err = System.err;
             System.setOut(new PrintStream(OutputStream.nullOutputStream()));

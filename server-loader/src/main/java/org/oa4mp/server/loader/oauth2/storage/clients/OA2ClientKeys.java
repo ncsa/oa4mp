@@ -16,6 +16,7 @@ public class OA2ClientKeys extends ClientKeys {
         secret("public_key");
     }
     String atLifetime = "at_lifetime";
+    String allowPromptNone = "allow_prompt_none";
     String idTokenLifetime = "idt_lifetime";
     String audience="audience";
     String callback_uri = "callback_uri";
@@ -51,6 +52,10 @@ public class OA2ClientKeys extends ClientKeys {
       or you may break the QDL module that handles clients.
      */
 
+    public String allowPromptNone(String... x) {
+        if (0 < x.length) allowPromptNone = x[0];
+        return allowPromptNone;
+    }
     public String idtLifetime(String... x) {
            if (0 < x.length) idTokenLifetime = x[0];
            return idTokenLifetime;

@@ -1,5 +1,6 @@
 package org.oa4mp.server.loader.oauth2.loader;
 
+import org.oa4mp.delegation.server.OA2Scopes;
 import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.claims.ClaimSourceFactoryImpl;
 import org.oa4mp.server.loader.oauth2.servlet.MultiAuthServlet;
@@ -71,6 +72,7 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
         System.setProperty("LOG4J_FORMAT_MSG_NO_LOOKUPS", "true");
 
         OA2SE oa2SE = (OA2SE) getEnvironment();
+        OA2Scopes.ScopeUtil.setBasicScopes(oa2SE.getScopes());
         if (oa2SE.getClientStore() instanceof SQLStore) {
             if (((SQLStore) oa2SE.getClientStore()).getConnectionPool() instanceof DerbyConnectionPool) {
                 DerbyConnectionPool dcp = (DerbyConnectionPool) ((SQLStore) oa2SE.getClientStore()).getConnectionPool();

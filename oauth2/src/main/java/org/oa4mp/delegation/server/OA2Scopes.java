@@ -47,6 +47,14 @@ public interface OA2Scopes {
             return bList;
         }
 
+        /**
+         * If the set of scopes for this instance of OA4MP are not standard, inject them.
+         * @param scopes
+         */
+        public static void setBasicScopes(Collection<String> scopes) {
+            bList = scopes;
+        }
+
         public static Collection<String> intersection(Collection<String> x, Collection<String> y) {
             HashSet<String> x0 = new HashSet<>();
             x0.addAll(x);

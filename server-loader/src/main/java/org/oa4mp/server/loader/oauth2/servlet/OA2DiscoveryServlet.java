@@ -205,6 +205,10 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
         //CIL-738 fix
         json.put(TOKEN_INTROSPECTION_ENDPOINT, requestURI + "/" + INTROSPECTION_ENDPOINT_DEFAULT); //spec
         json.put(TOKEN_REVOCATION_ENDPOINT, requestURI + "/" + REVOCATION_ENDPOINT_DEFAULT); //spec
+        // Fix https://github.com/ncsa/oa4mp/issues/234
+        // As per https://openid.net/specs/openid-connect-core-1_0.html#JWTRequests
+        json.put(REQUEST_PARAMETER_SUPPORTED, false); // we don't support the request parameter
+        json.put(REQUEST_URI_PARAMETER_SUPPORTED, false); // we don't support the request parameter as a uri either.
         JSONArray revAuthMethods = new JSONArray();
         revAuthMethods.add("client_secret_basic");
         json.put(TOKEN_REVOCATION_ENDPOINT_AUTH_METHODS_SUPPORTED, revAuthMethods);

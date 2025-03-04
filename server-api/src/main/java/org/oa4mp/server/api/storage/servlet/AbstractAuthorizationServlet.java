@@ -2,10 +2,6 @@ package org.oa4mp.server.api.storage.servlet;
 
 import edu.uiuc.ncsa.myproxy.MyProxyLogon;
 import edu.uiuc.ncsa.myproxy.NoUsableMyProxyServerFoundException;
-import org.oa4mp.delegation.common.servlet.TransactionState;
-import org.oa4mp.delegation.common.token.AuthorizationGrant;
-import org.oa4mp.delegation.server.ServiceTransaction;
-import org.oa4mp.delegation.server.request.IssuerResponse;
 import edu.uiuc.ncsa.security.core.exceptions.ConnectionException;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.DateUtils;
@@ -13,6 +9,11 @@ import edu.uiuc.ncsa.security.servlet.JSPUtil;
 import edu.uiuc.ncsa.security.servlet.Presentable;
 import edu.uiuc.ncsa.security.servlet.PresentableState;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
+import org.oa4mp.delegation.common.servlet.TransactionState;
+import org.oa4mp.delegation.common.token.AuthorizationGrant;
+import org.oa4mp.delegation.server.OA2Constants;
+import org.oa4mp.delegation.server.ServiceTransaction;
+import org.oa4mp.delegation.server.request.IssuerResponse;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -26,8 +27,8 @@ import java.security.GeneralSecurityException;
 import java.util.Enumeration;
 import java.util.Map;
 
-import static org.oa4mp.server.api.ServiceConstantKeys.TOKEN_KEY;
 import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
+import static org.oa4mp.server.api.ServiceConstantKeys.TOKEN_KEY;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -96,6 +97,7 @@ public abstract class AbstractAuthorizationServlet extends CRServlet implements 
 
         boolean exceptionEncountered = false;
     }
+
     @Override
     public ServiceTransaction verifyAndGet(IssuerResponse iResponse) throws IOException {
         return null;
@@ -193,7 +195,7 @@ public abstract class AbstractAuthorizationServlet extends CRServlet implements 
     }
 
     protected void doProxy(AuthorizedState state) throws Throwable {
-       // nothing here. It must be overridden
+        // nothing here. It must be overridden
     }
 
     public void present(PresentableState state) throws Throwable {
@@ -206,6 +208,11 @@ public abstract class AbstractAuthorizationServlet extends CRServlet implements 
 
         switch (aState.getState()) {
             case AUTHORIZATION_ACTION_START:
+                ServiceTransaction transaction = aState.getTransaction();
+                if (transaction.hasPromptKey() && transaction.getPrompt().equals(OA2Constants.PROMPT_NONE)) {
+                    //https://github.com/ncsa/oa4mp/issues/236
+                    // this is a new transaction, but there must be an existing one for this client
+                }
                 if (getServiceEnvironment().getAuthorizationServletConfig().isUseProxy()) {
                     doProxy(aState);
                     return;
@@ -311,7 +318,8 @@ public abstract class AbstractAuthorizationServlet extends CRServlet implements 
                     pState.setState(AUTHORIZATION_ACTION_START);
                     prepare(pState);
 
-                } catch (GeneralSecurityException | NoUsableMyProxyServerFoundException t) { //CIL-173 fix: process NoUsableMPSFound.
+                } catch (GeneralSecurityException |
+                         NoUsableMyProxyServerFoundException t) { //CIL-173 fix: process NoUsableMPSFound.
                     info("Prompting user to retry");
                     request.setAttribute(RETRY_MESSAGE, getServiceEnvironment().getMessages().get(RETRY_MESSAGE));
                     pState.setState(AUTHORIZATION_ACTION_START);
@@ -384,11 +392,11 @@ public abstract class AbstractAuthorizationServlet extends CRServlet implements 
                 trans.setUsername(userName);
             }
         } else {
-                // Headers not used, just pull it off the form the user POSTs.
-                userName = request.getParameter(AUTHORIZATION_USER_NAME_KEY);
-                password = request.getParameter(AUTHORIZATION_PASSWORD_KEY);
-                checkUser(userName, password);
-                trans.setUsername(userName);
+            // Headers not used, just pull it off the form the user POSTs.
+            userName = request.getParameter(AUTHORIZATION_USER_NAME_KEY);
+            password = request.getParameter(AUTHORIZATION_PASSWORD_KEY);
+            checkUser(userName, password);
+            trans.setUsername(userName);
         }
 
         userName = trans.getUsername();

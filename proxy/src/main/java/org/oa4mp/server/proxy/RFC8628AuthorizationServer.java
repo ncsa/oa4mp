@@ -52,7 +52,12 @@ public class RFC8628AuthorizationServer extends EnvServlet {
     public static final String USER_CODE_KEY = "AuthUserCode";
 
     protected String getInitialPage() {
-        return "/device-init.jsp";
+        return "/" +
+                "" +
+                "" +
+                "" +
+                "" +
+                "+---device-init.jsp";
     }
 
     protected String getRemoteUserInitialPage() {

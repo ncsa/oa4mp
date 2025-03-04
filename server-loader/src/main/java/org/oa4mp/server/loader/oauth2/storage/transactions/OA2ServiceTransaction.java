@@ -45,8 +45,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
     public String FLOW_STATE_KEY = "flow_state";
     public String CLAIMS_SOURCES_STATE_KEY = "claims_sources";
     public String CLAIMS_SOURCES_STATE_KEY2 = "claims_sources2";
-    public String STATE_KEY = "state";
-    public String STATE_COMMENT_KEY = "comment";
+
     public String CLAIMS_KEY = "claims";
     public String SCRIPT_STATE_KEY = "script_state";
     public String SCRIPT_STATE_SERIALZATION_VERSION_KEY = "serialization_version";
@@ -56,7 +55,6 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
     public String QUERIED_ACCESS_TOKEN_SCOPES_KEY = "queriedATScopes";
     public String RETURNED_ACCESS_TOKEN_JWT_KEY = "atJWT";
     public String RETURNED_REFRESH_TOKEN_JWT_KEY = "rtJWT";
-
     public static String RESPONSE_TYPE_KEY = "responseTypes";
 
 
@@ -294,23 +292,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         getState().put(RESOURCE_KEY, r);
     }
 
-    /**
-     * Generally you should never set the state directly unless you know exactly how it is constructed.
-     *
-     * @param state
-     */
-    public void setState(JSONObject state) {
-        this.state = state;
-    }
 
-    // This is used to store the flow states, claim sources AND the claims in between calls.
-    public JSONObject getState() {
-        if (state == null) {
-            state = new JSONObject();
-            state.put(STATE_COMMENT_KEY, "State for object id \"" + getAuthorizationGrant().getToken() + "\"");
-        }
-        return state;
-    }
 
     /**
      * Extended attributes are sent over the wire as specific requests.
@@ -349,7 +331,6 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         }
     }
 
-    JSONObject state;
 
     @Override
     public void setFlowStates(FlowStates flowStates) {

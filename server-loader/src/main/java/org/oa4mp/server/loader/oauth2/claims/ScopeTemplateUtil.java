@@ -39,7 +39,7 @@ public class ScopeTemplateUtil {
        ],false
     	)
      */
-    static List<String> basicScopes = Arrays.asList(OA2Scopes.basicScopes);
+    static Collection<String> basicScopes = OA2Scopes.ScopeUtil.getBasicScopes();
 
     public static Collection<String> doCompareTemplates(Collection<String> computedScopes,
                                                         Collection<String> requestedScopes,

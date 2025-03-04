@@ -17,7 +17,13 @@ NOTE that the args are "eic" for EIC or "jlab" for everything else.
 
 */
 //script_load('jlab/acl.qdl');
+/*
+   Running it locally. Test client has id localhost:test/jlab
+   Set some scopes in the (uri) request so this has something to return E.g.:
+   set_param -a scope "read:/gluex/ write:/gluex/"
 
+   Log in with GitHub.
+*/
 
      DEBUG := true; // set false everywhere but on my test server.
         γ. := null; // groups
@@ -48,12 +54,16 @@ NOTE that the args are "eic" for EIC or "jlab" for everything else.
 
     say('*** JLAB results.isMemberOf=' + to_string(results.isMemberOf));
         σ. := size(tx_scopes.) == 0?scopes.:tx_scopes.; // current requested scopes.
+    say('*** JLAB σ.=' + to_string(σ.));
         β. := mask(α., γ. ∈ results.isMemberOf)∈ σ.; // bit mask of allowed scopes, groups
+    say('*** JLAB β.=' + to_string(β.));
 
       access_token.'aud' := 'ANY';
     access_token.'scope' := detokenize(mask(α.,β.), ' ', 2); // turn in to string, omit trailing space
 // 2022-08-23 add group.
                      γ2. := γ. - ' computing';
+    say('*** JLAB γ2.=' + to_string(γ2.));
+
     access_token.'group' := unique(mask(γ2.,β.)).0; // turn in to string should be unique.
 
 //x. := ['CO:members:all','CO:COU:gluex:members:all','CO:members:active','CO:COU:gluex:members:active','gluex computing']

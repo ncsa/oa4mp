@@ -795,6 +795,14 @@ public class OA2Client extends Client implements OA2ClientScopes {
     }
 
     boolean ersatzInheritIDToken = true;
+    public boolean isAllowPromptNone() {
+        return allowPromptNone;
+    }
 
+    public void setAllowPromptNone(boolean allowPromptNone) {
+        this.allowPromptNone = allowPromptNone;
+    }
+
+    boolean allowPromptNone = false;
 }
 
