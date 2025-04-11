@@ -100,5 +100,19 @@ public class PermissionFileStore<V extends Permission> extends FileStore<V> impl
         return PermissionStoreUtil.getErsatzChain(this, adminID, clientID, ersatzID);
     }
 
+    @Override
+    public List<Permission> getByAdminID(Identifier adminID) {
+        return PermissionStoreUtil.getByAdminID(this, adminID);
+    }
+
+    @Override
+    public List<Permission> getByClientID(Identifier clientID) {
+        return PermissionStoreUtil.getByClientID(this, clientID);
+    }
+
+    @Override
+    public List<Permission> getByErsatzID(Identifier ersatzID) {
+        return PermissionStoreUtil.getByErsatzID(this, ersatzID);
+    }
 }
 

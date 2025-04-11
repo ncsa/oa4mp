@@ -1,9 +1,18 @@
-cfg. := claims#new_template('file');
-//cfg.'file_path' := 'test#/auto/server/test-claims.json';
-remove(cfg.'file_path');
-cfg.'claims' := from_json(file_read('test#/auto/server/test-claims.json'));
-claim_sources. := claim_sources. ~ [claims#create_source(cfg.)]; // test automated getting claims
-say('claims:\n'+print(cfg.'claims'));
+  say('***** idt.qdl *****');
+
+if[exec_phase=='post_auth']
+  [  say('***** POST AUTH *****');
+     cfg. := claims#new_template('file');
+     //cfg.'file_path' := 'test#/auto/server/test-claims.json';
+     remove(cfg.'file_path');
+     cfg.'claims' := from_json(file_read('test#/auto/server/test-claims.json'));
+     claim_sources. := claim_sources. ~ [claims#create_source(cfg.)]; // test automated getting claims
+     say('in idt.qdl claims:\n'+print(cfg.'claims'));
+  ];
+  if[size(resource.) != 0][claims.'resource':= resource.;];
+  if[size(audience.)!=0][claims.'audience':= audience.;];
+
+say('in idt.qdl claims:\n'+print(claims.));
 /*
 lookup.:=claims#get_claims(claims#create_source(cfg.), claims.'sub');
 epe. := lookup.'eduPersonEntitlement';

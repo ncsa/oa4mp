@@ -256,4 +256,75 @@ public class SQLPermissionStore<V extends Permission> extends SQLStore<V> implem
         return !get(adminID, clientID).isEmpty();
     }
 
+    @Override
+    public List<Permission> getByAdminID(Identifier adminID) {
+   return getByID(permissionKeys.adminID(), adminID);
+    }
+
+    PermissionKeys permissionKeys = new PermissionKeys();
+    @Override
+    public List<Permission> getByClientID(Identifier clientID) {
+        return getByID(permissionKeys.clientID(), clientID);
+
+    }
+
+    /**
+     * Since the ersatz chains is a list of identifiers, best we can do is find whatever
+     * has the id using SQL LIKE. This is not 100% accurate, so the lists have to be checked
+     * subsequently, but will certainly get everything needed.
+     * @param ersatzID
+     * @return
+     */
+
+    @Override
+    public List<Permission> getByErsatzID(Identifier ersatzID) {
+        return getByID(permissionKeys.ersatzID(), ersatzID);
+    }
+
+    protected List<Permission> getByID(String colName, Identifier adminID) {
+        ArrayList<Permission> permissions = new ArrayList<>();
+        if (adminID == null) return permissions;
+
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+        try {
+            PreparedStatement stmt;
+            if(permissionKeys.ersatzID().equals(colName)) {
+                stmt = c.prepareStatement("select *  from " +
+                        getTable().getFQTablename() + " where " + colName + " LIKE ?");
+
+            }else{
+                stmt = c.prepareStatement("select *  from " +
+                        getTable().getFQTablename() + " where " + colName + "=?");
+
+            }
+            stmt.setString(1, adminID.toString());
+            stmt.execute();// just execute() since executeQuery(x) would throw an exception regardless of content per JDBC spec.
+
+
+            ResultSet rs = stmt.getResultSet();
+            while (rs.next()) {
+                V newOne = create();
+                ColumnMap map = rsToMap(rs);
+                populate(map, newOne);
+                permissions.add(newOne);
+            }
+            rs.close();
+            stmt.close();
+
+            return permissions;
+        } catch (SQLException e) {
+            destroyConnection(cr);
+            throw new GeneralException("Error: could not get database object", e);
+        } finally {
+            releaseConnection(cr);
+        }
+    }
+/*
+   searchString = "select " + attributes +
+                        " from " + getTable().getFQTablename() +
+                        " where " + key + " LIKE ?";
+ */
+
+
 }

@@ -1,3 +1,6 @@
 /*
    A script for the refresh token.
 */
+
+  if[size(resource.) != 0][refresh_token.'resource':= resource.;];
+  if[size(audience.)!=0][refresh_token.'audience':= audience.;];

@@ -5,13 +5,15 @@
    is the most basic possible. N.B. this is OAuth 2 only, so no claims are returned.
 */
 params. ≔ {'sub':'davenport',
-           'scope':'storage.read: storage.modify: compute.create',
-           'org.oa4mp:/rt/value/foo':'woof'};
+           'scope':'storage.read: storage.modify: compute.create openid',
+           'org.oa4mp:/rt/value/foo':'woof',
+           'resource':'foo:/bar/baz'}; // NOTE cannotset resource here, since RFC states to use that for the audience.
 // another test should be to send the resource parameter which comes back as the access token audience.
-test_id:= 'oauth.rfc9068.qdl';
+test_id:= 'oidc.rfc9068.qdl';
 // set up the client
 clc#init($$OA4MP_CLC_INI, test_id);
-refresh_params.'refresh' :=  {'scope': 'storage.read:/home/davenport/vo3 compute.create storage.modify:/public/pendav/vo3 storage.modify:/public/davenport/vo3'};
+refresh_params.'refresh' :=  {'scope': 'storage.read:/home/davenport/vo3 compute.create storage.modify:/public/pendav/vo3 storage.modify:/public/davenport/vo3',
+                              'resource':'foo:/bar/baz'};
 refresh_params.'exchange' :=  {'scope': 'storage.read:/home/davenport/vo3 compute.create storage.modify:/public/pendav/vo3 storage.modify:/public/davenport/vo3'};
 clc#set_param(refresh_params.);
 
@@ -20,6 +22,7 @@ checks:=initialization#checks();
 ini.:=initialization#get_client_ini(test_id);
 server_defaults.:=initialization# server_defaults();
 cc.:=initialization#get_client_config(test_id); // This is the client configuration from the server
+say('cc:\n' + cc.);
 cc_at.:=cc.'cfg'.'tokens'.'access';
 cc_idt.:=cc.'cfg'.'tokens'.'identity';
 cc_rt.:=cc.'cfg'.'tokens'.'refresh';
@@ -27,7 +30,7 @@ cc_rt.:=cc.'cfg'.'tokens'.'refresh';
 at_expected.:={'iss':server_defaults.'at_issuer',
                'sub':params.'sub',
                'aud':cc_at.'audience',
-               'client_id':ini.'id',
+               //'client_id':ini.'id', // no client_id in scitokens
                'scopes':['storage.read:/home/davenport/vo3', 'compute.create', 'storage.modify:/public/pendav/vo3', 'storage.modify:/public/davenport/vo3']};
 
 
@@ -37,20 +40,24 @@ verify()->
 block[ // set of basic verifications to run repeatedly.
   checks#rfc9068(at_expected., at_asserted.);
   checks#lifetime(cc_at.'lifetime', at_asserted.);
-  ⊨size(claims.) ≡ 0 : 'got claims and should not:\n' + print(claims.);
 ];
 
 // Initial token exchange
 tokens. := clc#rfc7523(params.);
+say('tokens:\n'+ print(tokens.));
 at_asserted.:= tokens.'access_token'.'jwt';
+say('at:\n' + print(at_asserted.));
 rt_asserted.:= tokens.'refresh_token'.'jwt';
     claims. := clc#claims();
+say('claims:\n'+ print(claims.));
 verify();
 
 // Refresh
 tokens. := clc#refresh();
+say('2');
 at_asserted.:= tokens.'access_token'.'jwt';
 rt_asserted.:= tokens.'refresh_token'.'jwt';
+say('rt_asserted:\n' + print(rt_asserted.));
     claims. := clc#claims();
 verify();
 
@@ -60,7 +67,8 @@ rt_asserted. := clc#exchange('-rt','-subject','rt').'refresh_token'.'jwt';
 // OAuth clients do not get ID tokens, so try and this should fail.
 try[
      claims. := clc#exchange('-id','-subject','rt');
+    say('3');
      ⊨ false : 'got claims and should not:\n' + print(claims.);
    ]catch[];
 verify();
-say('ok: OAuth RFC9068 test');
+say('ok: OIDC RFC9068 test');

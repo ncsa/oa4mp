@@ -316,6 +316,7 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
         client = approvalMods(inputLine, client);
         approve(client);
     }
+
     protected void approve(BaseClient client) throws IOException {
 
         // Fix https://github.com/ncsa/oa4mp/issues/109
@@ -348,7 +349,7 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
     protected void rmCleanup(Identifiable x) {
         if (getStore().containsKey(x.getIdentifier())) { // double checks not removing a live record!
             sayi("client still active, cannot remove approval");
-        }else{
+        } else {
             getClientApprovalStore().remove(x.getIdentifier());
             sayi("approval record removed");
         }
@@ -663,7 +664,7 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
     @Override
     public void create(InputLine inputLine) throws IOException {
         BaseClient client = (BaseClient) actualCreate(inputLine, DEFAULT_MAGIC_NUMBER);
-        if(client == null){
+        if (client == null) {
             return;
         }
         if (isOk(readline("approve this client [y/n]?"))) {
@@ -672,87 +673,98 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
     }
 
     @Override
-      public void extraUpdates(Identifiable identifiable, int magicNumber) throws IOException {
-          BaseClient client = (BaseClient) identifiable;
-          BaseClientKeys keys = (BaseClientKeys) getSerializationKeys();
+    public void extraUpdates(Identifiable identifiable, int magicNumber) throws IOException {
+        BaseClient client = (BaseClient) identifiable;
+        BaseClientKeys keys = (BaseClientKeys) getSerializationKeys();
 
-          client.setName(getPropertyHelp(keys.name( ),"enter name", client.getName()));
-          client.setEmail(getPropertyHelp(keys.email(),"enter email", client.getEmail()));
-          String keyOrSecret = getPropertyHelp(keys.secret(), "enter a key, secret or URI (k|s|u) or return to skip", "");
-          switch (keyOrSecret) {
-              case "k":
-              case "K":
-                  getPublicKeyFile(client, keys);
-                  break;
-              case "s":
-              case "S":
-                  getSecret(client, keys);
-                  break;
-              case "u":
-              case "U":
-                  String rr = getPropertyHelp(keys.jwksURI(), "  enter JWKS uri", "");
-                  if(isEmpty(rr)){
-                      say("   skipped");
-                  }else {
-                      client.setJwksURI(URI.create(rr));
-                  }
-                  break;
-              case "":
-                  break;
-              default:
-                  say("unknown option \"" + keyOrSecret + "\"");
-                  // do nothing.
-          }
+        client.setName(getPropertyHelp(keys.name(), "enter name", client.getName()));
+        client.setEmail(getPropertyHelp(keys.email(), "enter email", client.getEmail()));
+        String keyOrSecret = getPropertyHelp(keys.secret(), "enter a key, secret or URI (k|s|u) or return to skip", "");
+        switch (keyOrSecret) {
+            case "k":
+            case "K":
+                getPublicKeyFile(client, keys);
+                break;
+            case "s":
+            case "S":
+                getSecret(client, keys);
+                break;
+            case "u":
+            case "U":
+                String rr = getPropertyHelp(keys.jwksURI(), "  enter JWKS uri", "");
+                if (isEmpty(rr)) {
+                    say("   skipped");
+                } else {
+                    client.setJwksURI(URI.create(rr));
+                }
+                break;
+            case "":
+                break;
+            default:
+                say("unknown option \"" + keyOrSecret + "\"");
+                // do nothing.
+        }
 
-      }
+    }
 
-      /**
-       * Prompt the user for a secret, hashing the result.
-       */
-      protected void getSecret(BaseClient client, BaseClientKeys keys) throws IOException {
-          String input = getPropertyHelp(keys.secret(), "  enter a new secret or return to skip.", client.getSecret());
-          if (isEmpty(input)) {
-              return;
-          }
-          // input is not empty.
-          String secret = DigestUtils.sha1Hex(input);
-          client.setSecret(secret);
-      }
+    /**
+     * Prompt the user for a secret, hashing the result.
+     */
+    protected void getSecret(BaseClient client, BaseClientKeys keys) throws IOException {
+        String input = getPropertyHelp(keys.secret(), "  enter a new secret or return to skip.", client.getSecret());
+        if (isEmpty(input)) {
+            return;
+        }
+        // input is not empty.
+        String secret = DigestUtils.sha1Hex(input);
+        client.setSecret(secret);
+    }
+
     protected void getPublicKeyFile(BaseClient client, BaseClientKeys keys) throws IOException {
-           String input;
-           String fileNotFoundMessage = INDENT + "...uh-oh, I can't find that file. Please enter it again";
-           String secret = client.getSecret();
+        String input;
+        String fileNotFoundMessage = INDENT + "...uh-oh, I can't find that file. Please enter it again";
+        String secret = client.getSecret();
 
-           if (!isEmpty(secret)) {
-               secret = secret.substring(0, Math.min(25, secret.length())) + "...";
-           }
-           boolean askForFile = true;
-           while (askForFile) {
-               input = getPropertyHelp(keys.jwks(), "  enter full path and file name of public key", secret);
-               if (isEmpty(input)) {
-                   return;
-               }
-               if (input.equals(secret)) {
-                   sayi(" public key entry skipped.");
-                   return;
-               }
-               // if this is not the default value, then this *should* be the name of a file.
-               File f;
-               if (input != null) {
-                   f = new File(input);
-                   if (!f.exists()) {
-                       say(fileNotFoundMessage);
-                       continue;
-                   }
-                   try {
-                       client.setJWKS(JSONWebKeyUtil.fromJSON(f));
-                       askForFile = false;
-                   } catch (Throwable e) {
-                       say("error reading file \"" + input + "\", try again");
-                       return;
-                   }
-               }
-           }
-       }
-
+        if (!isEmpty(secret)) {
+            secret = secret.substring(0, Math.min(25, secret.length())) + "...";
+        }
+        boolean askForFile = true;
+        while (askForFile) {
+            input = getPropertyHelp(keys.jwks(), "  enter full path and file name of public key", secret);
+            if (isEmpty(input)) {
+                return;
+            }
+            if (input.equals(secret)) {
+                sayi(" public key entry skipped.");
+                return;
+            }
+            // if this is not the default value, then this *should* be the name of a file.
+            File f;
+            if (input != null) {
+                f = new File(input);
+                if (!f.exists()) {
+                    say(fileNotFoundMessage);
+                    continue;
+                }
+                try {
+                    client.setJWKS(JSONWebKeyUtil.fromJSON(f));
+                    askForFile = false;
+                } catch (Throwable e) {
+                    say("error reading file \"" + input + "\", try again");
+                    return;
+                }
+            }
+        }
+    }
+  // Fix https://github.com/ncsa/security-lib/issues/45 and https://github.com/ncsa/oa4mp/issues/243
+    @Override
+    public ChangeIDRecord doChangeID(Identifiable identifiable, Identifier newID, boolean updatePermissions) {
+        ChangeIDRecord changeIDRecord = super.doChangeID(identifiable, newID, updatePermissions);
+        // find the approval and update it now
+        ClientApproval clientApproval = (ClientApproval) getClientApprovalStore().get(changeIDRecord.oldID);
+        getClientApprovalStore().remove(changeIDRecord.oldID);
+        clientApproval.setIdentifier(newID);
+        getClientApprovalStore().save(clientApproval);
+        return changeIDRecord;
+    }
 }

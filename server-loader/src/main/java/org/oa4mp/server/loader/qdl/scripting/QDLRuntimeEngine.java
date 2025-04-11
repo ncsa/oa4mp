@@ -409,6 +409,8 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
     public static String SCOPES_VAR = "scopes" + STEM_INDEX_MARKER;
     public static String EXTENDED_ATTRIBUTES_VAR = "xas" + STEM_INDEX_MARKER;
     public static String AUDIENCE_VAR = "audience" + STEM_INDEX_MARKER;
+    // Fix https://github.com/ncsa/oa4mp/issues/241
+    public static String RESOURCE_VAR = "resource" + STEM_INDEX_MARKER;
     public static String TX_SCOPES_VAR = "tx_scopes" + STEM_INDEX_MARKER;
     public static String TX_AUDIENCE_VAR = "tx_audience" + STEM_INDEX_MARKER;
     public static String TX_RESOURCE_VAR = "tx_resource" + STEM_INDEX_MARKER;
@@ -517,7 +519,13 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         } else {
             state.setValue(AUDIENCE_VAR, new QDLStem());
         }
-
+        // Fix for https://github.com/ncsa/oa4mp/issues/241
+        List<String> resource = (List<String>) req.getArgs().get(SRE_REQ_RESOURCE);
+        if (resource != null && !resource.isEmpty()) {
+            state.setValue(RESOURCE_VAR, listToStem(resource));
+        } else {
+            state.setValue(RESOURCE_VAR, new QDLStem());
+        }
         Object eas = req.getArgs().get(SRE_REQ_EXTENDED_ATTRIBUTES);
         if (eas != null && (eas instanceof JSONObject)) {
             QDLStem eaStem = new QDLStem();
@@ -735,6 +743,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             respMap.put(SRE_REQ_REFRESH_TOKEN, ((QDLStem) state.getValue(REFRESH_TOKEN_VAR)).toJSON());
         }
         respMap.put(SRE_REQ_AUDIENCE, stemToList((QDLStem) state.getValue(AUDIENCE_VAR)));
+        respMap.put(SRE_REQ_RESOURCE, stemToList((QDLStem) state.getValue(RESOURCE_VAR)));
         Object z = state.getValue(CLAIMS_VAR);
         QDLStem stemClaims;
         if (z instanceof QDLNull) {
@@ -777,21 +786,21 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             // Don't serialize anything the system manages since that may cause confusion later.
             // I.e. This renders all of these variables as transient vis a vis serialization.
             cleanUpState(new String[]{
+                    ACCESS_TOKEN_VAR,
+                    AUDIENCE_VAR,
+                    CLAIMS_VAR,
+                    CLAIM_SOURCES_VAR,
+                    Scripts.EXEC_PHASE,
+                    EXTENDED_ATTRIBUTES_VAR,
+                    FLOW_STATE_VAR,
+                    PROXY_CLAIMS_VAR,
+                    REFRESH_TOKEN_VAR,
+                    RESOURCE_VAR,
+                    SCOPES_VAR,
                     SYS_ERR_VAR,
-                    TX_SCOPES_VAR,
                     TX_AUDIENCE_VAR,
                     TX_RESOURCE_VAR,
-                    CLAIMS_VAR,
-                    PROXY_CLAIMS_VAR,
-                    CLAIM_SOURCES_VAR,
-                    FLOW_STATE_VAR,
-                    SCOPES_VAR,
-                    EXTENDED_ATTRIBUTES_VAR,
-                    ACCESS_TOKEN_VAR,
-                    REFRESH_TOKEN_VAR,
-                    AUDIENCE_VAR,
-                    Scripts.EXEC_PHASE
-
+                    TX_SCOPES_VAR
             });
             if(state.getTransaction().hasScriptStateSerializationVersion()){
                 state.getTransaction().setScriptState(serializeState(state.getTransaction().getScriptStateSerializationVersion()));

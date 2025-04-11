@@ -498,5 +498,18 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
         return adminClient;
     }
 
-
+    @Override
+    protected int updateStorePermissions(Identifier newID, Identifier oldID, boolean copy) {
+        int updateCount = 0;
+        List<Permission> permissions = getEnvironment().getPermissionStore().getByAdminID(oldID);
+        if(!copy){
+            // Do not just copy the permissions with the new ID, remove the old ones.
+            getEnvironment().getPermissionStore().remove(permissions);
+        }
+        for (Permission p : permissions) {
+            p.setAdminID(newID);
+            getEnvironment().getPermissionStore().save(p);
+        }
+        return permissions.size();
+    }
 }

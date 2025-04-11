@@ -330,6 +330,7 @@ public class JWTRunner {
                 // require a great deal of state that is not available yet.
                 map.put(SRE_REQ_SCOPES, transaction.getScopes());
                 map.put(SRE_REQ_AUDIENCE, transaction.getAudience());
+                map.put(SRE_REQ_RESOURCE, transaction.getResource());
                 map.put(SRE_REQ_EXTENDED_ATTRIBUTES, transaction.getExtendedAttributes());
                 map.put(SRE_REQ_FLOW_STATES, transaction.getFlowStates()); // so its a map
                 isPopulated = true;

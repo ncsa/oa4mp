@@ -10,27 +10,29 @@ import edu.uiuc.ncsa.security.core.Identifier;
 public class PermissionStoreUtil {
     /**
      * returns the chain or a null if there is no such chain.
+     *
      * @param permissionsStore
      * @param adminID
      * @param clientID
      * @param ersatzID
      * @return
      */
-    public static Permission getErsatzChain(PermissionsStore permissionsStore, Identifier adminID, Identifier clientID, Identifier ersatzID){
-            PermissionList pList = permissionsStore.getErsatzChains(adminID, clientID);
-            for(Permission p : pList){
-                if(p.canSubstitute()){
-                    if(p.getErsatzChain().get(p.getErsatzChain().size()-1).equals(ersatzID)){
-                        return p;
-                    }
+    public static Permission getErsatzChain(PermissionsStore permissionsStore, Identifier adminID, Identifier clientID, Identifier ersatzID) {
+        PermissionList pList = permissionsStore.getErsatzChains(adminID, clientID);
+        for (Permission p : pList) {
+            if (p.canSubstitute()) {
+                if (p.getErsatzChain().get(p.getErsatzChain().size() - 1).equals(ersatzID)) {
+                    return p;
                 }
             }
-            return null;
+        }
+        return null;
     }
 
 
     /**
      * used in {@link PermissionFileStore} and {@link PermissionMemoryStore} since they must iterate.
+     *
      * @param adminID
      * @param clientID
      * @return
@@ -57,4 +59,35 @@ public class PermissionStoreUtil {
         return permissions;
     }
 
+    public static PermissionList getByAdminID(PermissionsStore<? extends Permission> pStore, Identifier adminID) {
+        PermissionList permissions = new PermissionList();
+        for (Identifier id : pStore.keySet()) {
+            Permission permission = pStore.get(id);
+            if (permission.getAdminID().equals(adminID)) {
+                permissions.add(permission);
+            }
+        }
+        return permissions;
+    }
+
+    public static PermissionList getByClientID(PermissionsStore<? extends Permission> pStore, Identifier clientID) {
+        PermissionList permissions = new PermissionList();
+        for (Identifier id : pStore.keySet()) {
+            Permission permission = pStore.get(id);
+            if (permission.getClientID().equals(clientID)) {
+                permissions.add(permission);
+            }
+        }
+        return permissions;
+    }
+    public static PermissionList getByErsatzID(PermissionsStore<? extends Permission> pStore, Identifier ersatzID) {
+        PermissionList permissions = new PermissionList();
+        for (Identifier id : pStore.keySet()) {
+            Permission permission = pStore.get(id);
+            if (permission.getErsatzChain().contains(ersatzID)) {
+                permissions.add(permission);
+            }
+        }
+        return permissions;
+    }
 }

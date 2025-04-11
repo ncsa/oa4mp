@@ -83,6 +83,7 @@ CREATE TABLE oa4mp.adminClients
 
 CREATE TABLE oa4mp.clients
 (
+   allow_prompt_none         boolean,
    at_lifetime               bigint,
    at_max_lifetime           bigint,
    audience                  clob,

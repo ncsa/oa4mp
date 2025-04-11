@@ -492,7 +492,7 @@ Boolean allowPromptNone = null;
     public Boolean isAllowPromptNone() {
         if (allowPromptNone == null) {
             String raw = getFirstAttribute(cn, ALLOW_PROMPT_NONE);
-            if (raw.equals("true") || raw.equals("on") || raw.equals("enabled")) {
+            if (raw!=null&&(raw.equals("true") || raw.equals("on") || raw.equals("enabled"))) {
                 allowPromptNone = Boolean.TRUE;
             }else{
                 allowPromptNone = Boolean.FALSE;
@@ -1952,7 +1952,7 @@ Boolean ccfEnabled = null;
 
     @Override
     public String getVersionString() {
-        return "OAuth 2 for MyProxy, version " + OA4MPVersion.VERSION_NUMBER;
+        return "OA4MP, version " + OA4MPVersion.VERSION_NUMBER;
     }
 
 }

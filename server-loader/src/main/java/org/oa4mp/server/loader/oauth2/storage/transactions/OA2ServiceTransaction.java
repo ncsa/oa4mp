@@ -292,8 +292,6 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         getState().put(RESOURCE_KEY, r);
     }
 
-
-
     /**
      * Extended attributes are sent over the wire as specific requests.
      *

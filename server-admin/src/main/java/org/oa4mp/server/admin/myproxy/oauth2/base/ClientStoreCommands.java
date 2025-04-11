@@ -1,13 +1,13 @@
 package org.oa4mp.server.admin.myproxy.oauth2.base;
 
-import org.oa4mp.delegation.common.storage.clients.Client;
-import org.oa4mp.delegation.common.storage.clients.ClientKeys;
-import org.oa4mp.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import org.oa4mp.delegation.common.storage.clients.Client;
+import org.oa4mp.delegation.common.storage.clients.ClientKeys;
+import org.oa4mp.delegation.server.storage.ClientApproval;
 
 import java.io.IOException;
 
@@ -119,4 +119,5 @@ public class ClientStoreCommands extends BaseClientStoreCommands {
         ClientKeys keys = (ClientKeys) getMapConverter().getKeys();
         client.setHomeUri(getPropertyHelp(keys.homeURL(), "enter home url", client.getHomeUri()));
     }
+
 }

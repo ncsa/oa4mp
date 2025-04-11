@@ -497,7 +497,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
     protected List<String> processCommaSeparatedList(String key, List<String> legalValues, String moniker, String defaultValue) throws IOException {
         String rawValues = getPropertyHelp(key, "enter a comma separated list of " + moniker + ".", defaultValue);
         LinkedList<String> list = new LinkedList<>();
-        if(StringUtils.isTrivial(rawValues)){
+        if (StringUtils.isTrivial(rawValues)) {
             return list; // nix to do and don't return a list of blanks or some such.
         }
         if (rawValues.equals(defaultValue)) {
@@ -711,85 +711,85 @@ public class OA2ClientCommands extends ClientStoreCommands {
     public static String UUC_FLAG_FOUND = "-found";
     public static String UUC_FLAG_ENABLE = "-enable";
 
-  /*  public void uuc(InputLine inputLine) throws Throwable {
-        if (showHelp(inputLine)) {
-            say("uuc [" +
-                    UUC_FLAG_TEST + " on|true|off|false] [" +
-                    UUC_FLAG_CFG + "] [" +
-                    CL_OUTPUT_FILE_FLAG + " file] [" +
-                    UUC_FLAG_FOUND + "] [" +
-                    UUC_FLAG_ENABLE + "] = unused client cleanup. Run the client cleanup for this store");
-            say(UUC_FLAG_TEST + " = (optional) turn on or off test mode. In test mode, the clients to delete");
-            say("        are simply printed, not actually deleted.");
-            say(UUC_FLAG_CFG + " = simply prints out the configuration, if any.");
-            say(UUC_FLAG_FOUND + " = should the list of client ids that were found.");
-            say(UUC_FLAG_ENABLE + " = manually enable this if it is disabled.");
-            say(CL_OUTPUT_FILE_FLAG + " = write any output to the given file.");
-            say("\nOne use pattern is to put the configuration into the server configuration file and only");
-            say("run it manually in the CLI. In that case, set it to disabled and enable it here.");
-            say("This will not run disabled configurations.");
-            FormatUtil.printFormatListHelp(new BasicIO(), inputLine);
-            return;
-        }
-        if (inputLine.hasArg(UUC_FLAG_CFG)) {
-            if (getUucConfiguration() == null) {
-                say("no config");
-                return;
-            }
-            say(getUucConfiguration().toString(true));
-            return;
-        }
-        boolean writeOutput = inputLine.hasArg(CL_OUTPUT_FILE_FLAG);
-        String outputFilename = null;
-        if (writeOutput) {
-            outputFilename = inputLine.getNextArgFor(CL_OUTPUT_FILE_FLAG);
-            inputLine.removeSwitchAndValue(CL_OUTPUT_FILE_FLAG);
-        }
-        boolean showFound = inputLine.hasArg(UUC_FLAG_FOUND);
-        if (getUucConfiguration() == null) {
-            say("UUC configuration not found");
-            return;
-        }
-        if (inputLine.hasArg(UUC_FLAG_ENABLE)) {
-            getUucConfiguration().enabled = inputLine.hasArg(UUC_FLAG_ENABLE);
-            inputLine.removeSwitch(UUC_FLAG_ENABLE);
-            say("UUC configuration" + (getUucConfiguration().enabled ? "enabled" : "disabled") + " . ");
-            return;
-        }
-        if (!getUucConfiguration().enabled) {
-            say("configuration disabled");
-            return;
-        }
-        if (inputLine.hasArg(UUC_FLAG_TEST)) {
-            String arg = inputLine.getNextArgFor(UUC_FLAG_TEST);
-            if (arg.equalsIgnoreCase("on") || arg.equalsIgnoreCase("true")) {
-                getUucConfiguration().testMode = true;
-            }
-            if (arg.equalsIgnoreCase("off") || arg.equalsIgnoreCase("false")) {
-                getUucConfiguration().testMode = false;
-            }
+    /*  public void uuc(InputLine inputLine) throws Throwable {
+          if (showHelp(inputLine)) {
+              say("uuc [" +
+                      UUC_FLAG_TEST + " on|true|off|false] [" +
+                      UUC_FLAG_CFG + "] [" +
+                      CL_OUTPUT_FILE_FLAG + " file] [" +
+                      UUC_FLAG_FOUND + "] [" +
+                      UUC_FLAG_ENABLE + "] = unused client cleanup. Run the client cleanup for this store");
+              say(UUC_FLAG_TEST + " = (optional) turn on or off test mode. In test mode, the clients to delete");
+              say("        are simply printed, not actually deleted.");
+              say(UUC_FLAG_CFG + " = simply prints out the configuration, if any.");
+              say(UUC_FLAG_FOUND + " = should the list of client ids that were found.");
+              say(UUC_FLAG_ENABLE + " = manually enable this if it is disabled.");
+              say(CL_OUTPUT_FILE_FLAG + " = write any output to the given file.");
+              say("\nOne use pattern is to put the configuration into the server configuration file and only");
+              say("run it manually in the CLI. In that case, set it to disabled and enable it here.");
+              say("This will not run disabled configurations.");
+              FormatUtil.printFormatListHelp(new BasicIO(), inputLine);
+              return;
+          }
+          if (inputLine.hasArg(UUC_FLAG_CFG)) {
+              if (getUucConfiguration() == null) {
+                  say("no config");
+                  return;
+              }
+              say(getUucConfiguration().toString(true));
+              return;
+          }
+          boolean writeOutput = inputLine.hasArg(CL_OUTPUT_FILE_FLAG);
+          String outputFilename = null;
+          if (writeOutput) {
+              outputFilename = inputLine.getNextArgFor(CL_OUTPUT_FILE_FLAG);
+              inputLine.removeSwitchAndValue(CL_OUTPUT_FILE_FLAG);
+          }
+          boolean showFound = inputLine.hasArg(UUC_FLAG_FOUND);
+          if (getUucConfiguration() == null) {
+              say("UUC configuration not found");
+              return;
+          }
+          if (inputLine.hasArg(UUC_FLAG_ENABLE)) {
+              getUucConfiguration().enabled = inputLine.hasArg(UUC_FLAG_ENABLE);
+              inputLine.removeSwitch(UUC_FLAG_ENABLE);
+              say("UUC configuration" + (getUucConfiguration().enabled ? "enabled" : "disabled") + " . ");
+              return;
+          }
+          if (!getUucConfiguration().enabled) {
+              say("configuration disabled");
+              return;
+          }
+          if (inputLine.hasArg(UUC_FLAG_TEST)) {
+              String arg = inputLine.getNextArgFor(UUC_FLAG_TEST);
+              if (arg.equalsIgnoreCase("on") || arg.equalsIgnoreCase("true")) {
+                  getUucConfiguration().testMode = true;
+              }
+              if (arg.equalsIgnoreCase("off") || arg.equalsIgnoreCase("false")) {
+                  getUucConfiguration().testMode = false;
+              }
 
-            inputLine.removeSwitchAndValue(UUC_FLAG_TEST);
-        }
-        BaseClientStore clientStore = (BaseClientStore) getStore();
-        UUCResponse response = clientStore.unusedClientCleanup(getUucConfiguration());
-        say("Stats are " + response);
-        if (writeOutput) {
-            FileWriter fw = new FileWriter(outputFilename);
-            for (String x : response.found) {
-                fw.write(x + "\n");
-            }
-            fw.flush();
-            fw.close();
-            say("output written to " + outputFilename);
-        }
-        if (showFound) {
-            say("found ids are:");
-            FormatUtil.formatList(inputLine, response.found);
-        }
-        say("There were " + response.found.size() + " clients found to remove");
-    }
-*/
+              inputLine.removeSwitchAndValue(UUC_FLAG_TEST);
+          }
+          BaseClientStore clientStore = (BaseClientStore) getStore();
+          UUCResponse response = clientStore.unusedClientCleanup(getUucConfiguration());
+          say("Stats are " + response);
+          if (writeOutput) {
+              FileWriter fw = new FileWriter(outputFilename);
+              for (String x : response.found) {
+                  fw.write(x + "\n");
+              }
+              fw.flush();
+              fw.close();
+              say("output written to " + outputFilename);
+          }
+          if (showFound) {
+              say("found ids are:");
+              FormatUtil.formatList(inputLine, response.found);
+          }
+          say("There were " + response.found.size() + " clients found to remove");
+      }
+  */
     @Override
     protected BaseClient approvalMods(InputLine inputLine, BaseClient client) throws IOException {
         OA2Client oa2Client = (OA2Client) client;
@@ -1084,6 +1084,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
         }
         return client;
     }
+
     // Fixes https://github.com/ncsa/oa4mp/issues/163
     @Override
     protected void rmCleanup(Identifiable x) {
@@ -1093,9 +1094,9 @@ public class OA2ClientCommands extends ClientStoreCommands {
             return;
         }
 
-          List<Identifier> admins = getPermissionsStore().getAdmins(x.getIdentifier());
+        List<Identifier> admins = getPermissionsStore().getAdmins(x.getIdentifier());
         // Fix https://github.com/ncsa/oa4mp/issues/174
-        switch (admins.size()){
+        switch (admins.size()) {
             case 0:
                 // no admins, nothing to do.
                 sayi("done");
@@ -1110,9 +1111,10 @@ public class OA2ClientCommands extends ClientStoreCommands {
                 sayi("too many admins, remove permission manually and specify both admin and client ids");
         }
     }
+
     // Fix https://github.com/ncsa/oa4mp/issues/224
-    public void service_client(InputLine inputLine)throws Exception{
-        if(showHelp(inputLine)){
+    public void service_client(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
             say("service_client [on | true | off | false] query or set if this client is a service client.");
             say("A service client is a client that is run by a service, typically this replaces the authorization ");
             say("leg of OAuth and is a token request. The two major RFC's that cover this are");
@@ -1121,31 +1123,82 @@ public class OA2ClientCommands extends ClientStoreCommands {
             return;
         }
         OA2Client client = (OA2Client) findItem(inputLine);
-        if(client == null){
+        if (client == null) {
             say("Sorry, client not found");
             return;
         }
-        if(inputLine.isEmpty()){
-            say("client " + client.getIdentifierString() + (client.isServiceClient()?"is":"is not") + " a service client");
+        if (inputLine.isEmpty()) {
+            say("client " + client.getIdentifierString() + (client.isServiceClient() ? "is" : "is not") + " a service client");
             return;
         }
         Boolean newValue = null;
-        if(inputLine.hasArg("true") || inputLine.hasArg("on")){
+        if (inputLine.hasArg("true") || inputLine.hasArg("on")) {
             newValue = true;
         }
-        if(inputLine.hasArg("false") || inputLine.hasArg("off")){
+        if (inputLine.hasArg("false") || inputLine.hasArg("off")) {
             newValue = false;
         }
-        if(newValue == null){
+        if (newValue == null) {
             say("unknown value");
-            return ;
+            return;
         }
         boolean oldValue = client.isServiceClient();
-        if(oldValue == newValue){
+        if (oldValue == newValue) {
             say("no change to value");
             return;
         }
         client.setServiceClient(newValue);
-        say("client " + client.getIdentifierString() + " has been set to " + (newValue?"on":"off"));
+        say("client " + client.getIdentifierString() + " has been set to " + (newValue ? "on" : "off"));
+    }
+
+    @Override
+    protected int updateStorePermissions(Identifier newID, Identifier oldID, boolean copy) {
+        // update client IDs
+        List<Permission> permissions = getEnvironment().getPermissionStore().getByClientID(oldID);
+        int updateCount = permissions.size();
+        updateP(oldID, newID, copy, false, permissions);
+        permissions = getEnvironment().getPermissionStore().getByErsatzID(oldID);
+        // now to repeat this for ersatzIDs
+        updateCount = updateCount + permissions.size();
+        updateP(oldID, newID, copy, true, permissions);
+        return updateCount;
+    }
+
+    /**
+     * Returns the number of actual updates.
+     * @param newID
+     * @param copyOnly
+     * @param doErsatzID
+     * @param permissions
+     * @return
+     */
+    private int updateP(Identifier oldID,
+            Identifier newID,
+                         boolean copyOnly,
+                         boolean doErsatzID,
+                         List<Permission> permissions) {
+        int count = 0;
+        if (!copyOnly) {
+            // Do not just copy the permissions with the new ID, remove the old ones.
+            getEnvironment().getPermissionStore().remove(permissions);
+        }
+        for (Permission p : permissions) {
+            if (doErsatzID) {
+                // The call to the store to get the chain may return extra items, since
+                // the chain is JSON. This double checks we are only actually altering
+                // permissions that actually need it.
+                if(p.getErsatzChain().contains(oldID)) {
+                    int ndx = p.getErsatzChain().indexOf(oldID);
+                    p.getErsatzChain().set(ndx, newID); // order must be preserved!!
+                    getEnvironment().getPermissionStore().save(p); // need batch mode for this?
+                    count++;
+                }
+            } else {
+                p.setClientID(newID);
+                getEnvironment().getPermissionStore().save(p); // need batch mode for this?
+                count++;
+            }
+        }
+        return count;
     }
 }

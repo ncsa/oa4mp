@@ -8,6 +8,7 @@ import junit.framework.TestCase;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.StringWriter;
 import java.net.URL;
@@ -57,11 +58,28 @@ public class CertAndKeyUtilTest extends TestCase {
         assert true;
     }
 
-
+    /**
+     * Get the path to the resources for this test. Falls through to main build path if the
+     * path cannot be found due to , e.g. running the build from some other location.
+     * @param fileName
+     * @return
+     * @throws java.io.IOException
+     */
     protected String readFile(String fileName)
             throws java.io.IOException {
         URL url = this.getClass().getResource("/" + fileName);
         File f = new File(url.getFile());
+        System.out.println("CertAndKeyUtilTest:" + f.getAbsolutePath());
+        if(!f.exists()) {
+            // alternate case is that this may be running during the build in which case the wrong
+            // path will be resolved. Try to get it from the system proper
+            String oldPath = f.getAbsolutePath();
+            String p = System.getenv("NCSA_DEV_INPUT") + "/oa4mp/oa4mp-server-test/src/test/resources/" + fileName;
+            f = new File(p);
+            if(!f.exists()) {
+                throw new FileNotFoundException("Could not find resource. Tried " + oldPath + " and " + f.getAbsolutePath());
+            }
+        }
         return PEMFormatUtil.readerToString(new FileReader(f));
     }
 

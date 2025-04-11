@@ -429,7 +429,7 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
         // CIL-1411 -- remove any claims not specifically requested by the user.
         // We need this here since a policy set  may add claims that the user
         // did not request.
-        if (!configuredScopes.contains(OA2Scopes.SCOPE_EMAIL)) {
+         if (!configuredScopes.contains(OA2Scopes.SCOPE_EMAIL)) {
             getUserMetaData().remove(EMAIL);
             getUserMetaData().remove(EMAIL_VERIFIED);
         }

@@ -1,4 +1,4 @@
-debugger(10);
+debugger(1);
 debugger(1, 'starting at, phase = ' + exec_phase);
 debugger(1,'initial at:\n' + print(access_token.));
 

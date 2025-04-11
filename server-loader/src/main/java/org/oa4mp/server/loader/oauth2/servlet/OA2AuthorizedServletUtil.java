@@ -600,9 +600,6 @@ public class OA2AuthorizedServletUtil {
             }
             if(oa2SE.isAllowPromptNone()){
                 // if server allows it and client does, do it.
-
-            }else{
-                // if server does not allow it, let the client override it.
                 if(!transaction.getOA2Client().isAllowPromptNone()){
                     throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST,
                             "Specifying prompt with value  \"none\" is not supported for this client " + ID_TOKEN_HINT,
@@ -610,6 +607,13 @@ public class OA2AuthorizedServletUtil {
                             transaction.getRequestState(),
                             transaction.getCallback());
                 }
+            }else{
+                // if server does not allow it, let the client override it.
+                    throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST,
+                            "Specifying prompt with value  \"none\" is not supported for this server " + ID_TOKEN_HINT,
+                            HttpStatus.SC_BAD_REQUEST,
+                            transaction.getRequestState(),
+                            transaction.getCallback());
             }
             // Fix for https://github.com/ncsa/oa4mp/issues/236
             if (!map.containsKey(ID_TOKEN_HINT)) {

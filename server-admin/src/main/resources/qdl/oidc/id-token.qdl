@@ -18,7 +18,7 @@
      } //end identity token
    } //end tokens
 */
-
+script_load('test#/auto/server/runtime-vars-check.qdl', true, false);
 say('scopes requested =' + to_string(scopes.));
 // Set up a test address JSON object as per 5.1.1 in the OIDC spec
   if[('address'∈scopes.) ∧ (∄claims.'address')]

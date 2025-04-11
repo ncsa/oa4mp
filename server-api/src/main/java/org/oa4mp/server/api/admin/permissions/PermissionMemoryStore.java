@@ -237,4 +237,19 @@ public class PermissionMemoryStore<V extends Permission> extends MemoryStore<V> 
         PermissionKeys key = new PermissionKeys();
         return new PermissionConverter<>(key, identifiableProvider);
     }
+
+    @Override
+    public List<Permission> getByAdminID(Identifier adminID) {
+        return PermissionStoreUtil.getByAdminID(this, adminID);
+    }
+
+    @Override
+    public List<Permission> getByClientID(Identifier clientID) {
+        return PermissionStoreUtil.getByClientID(this, clientID);
+    }
+
+    @Override
+    public List<Permission> getByErsatzID(Identifier ersatzID) {
+        return PermissionStoreUtil.getByErsatzID(this, ersatzID);
+    }
 }
