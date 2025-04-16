@@ -69,14 +69,15 @@ public abstract class BaseClientSQLStore<V extends BaseClient> extends Monitored
         // so now we have to create a very specific left join to get this information, which is why
         // everything has to live in the same database.
         ClientApprovalKeys caKeys = (ClientApprovalKeys) caStore.getMapConverter().getKeys();
-        String clientID = getMapConverter().getKeys().identifier();
+        BaseClientKeys baseClientKeys = (BaseClientKeys) getMapConverter().getKeys();
+        String clientID = baseClientKeys.identifier();
         String approvalID = caKeys.identifier();
         String clientTableName = getTable().getFQTablename();
         String approvalTableName = caStore.getTable().getFQTablename();
-
-        String query = "select p." + clientID + " from " + clientTableName +
+        // https://github.com/ncsa/oa4mp/issues/244 sort the result by client creatio time stamp. Newest first.
+        String query = "select p." + clientID + ", p." + baseClientKeys.creationTS() + " from " + clientTableName +
                 " as p left join " + approvalTableName + " as s on p." + clientID +
-                " = s." + approvalID + " where s." + fieldName + " = ?";
+                " = s." + approvalID + " where s." + fieldName + " = ? ORDER BY p." + baseClientKeys.creationTS() + " DESC";
 
         ConnectionRecord cr = getConnection();
         Connection c = cr.connection;

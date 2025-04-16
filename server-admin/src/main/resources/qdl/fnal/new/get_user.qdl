@@ -22,7 +22,7 @@ block[
             fnal_cfg.search_base := ini.'user_search_base';
                    fnal_cfg.type := 'ldap';
               fnal_cfg.ldap_name := 'voPersonExternalID';
-     fnal_cfg.search_attributes. :=  [EPPN,EPE,IS_MEMBER_OF];
+     fnal_cfg.search_attributes. :=  [EPPN,EPE,IS_MEMBER_OF, 'voPersonID'];
                fnal_cfg.username := ini.'name';
                fnal_cfg.password := ini.'pwd';
       return(claims#get_claims(claims#create_source(fnal_cfg.), script_args(0)));
