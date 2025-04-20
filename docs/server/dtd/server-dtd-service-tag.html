@@ -48,7 +48,7 @@
     
         
                     <div class="xleft">
-            Last Published: 2025-01-07
+            Last Published: 2025-04-20
                                 </div>
                 <div class="xright">            
     
@@ -209,7 +209,23 @@
         </td>
     </tr>
     
-<tr class="a" id="authorizationGrantLifetime">
+<tr class="a" id="allowPromptNone">
+        
+<td style="vertical-align: top;">allowPromptNone</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">false</td>
+        
+<td style="vertical-align: top;">Flag that when &quot;true&quot; (or &quot;on&quot; or &quot;enabled&quot;) permits OIDC clients to send the
+            prompt=none parameter along with an id token hint. This side-steps authentication
+            providing that the id token is still valid. Many instances do not allow this feature
+            for security reasons, so by default it is off. It may also be enabled on a per client
+            basis as part of a client's configuration. This switch is for <i>every</i> client.
+        </td>
+    </tr>
+    
+<tr class="b" id="authorizationGrantLifetime">
         
 <td style="vertical-align: top;">authorizationGrantLifetime</td>
         
@@ -226,7 +242,7 @@
         </td>
     </tr>
     
-<tr class="b" id="cleanupInterval">
+<tr class="a" id="cleanupInterval">
         
 <td style="vertical-align: top;">cleanupInterval</td>
         
@@ -239,7 +255,7 @@
         </td>
     </tr>
     
-<tr class="a" id="cleanupAlarms">
+<tr class="b" id="cleanupAlarms">
         
 <td style="vertical-align: top;">cleanupAlarms</td>
         
@@ -259,7 +275,7 @@
         </td>
     </tr>
     
-<tr class="b" id="cleanupFailOnErrors">
+<tr class="a" id="cleanupFailOnErrors">
         
 <td style="vertical-align: top;">cleanupFailOnErrors</td>
         
@@ -278,7 +294,7 @@
         </td>
     </tr>
     
-<tr class="a" id="cleanupLockingEnabled">
+<tr class="b" id="cleanupLockingEnabled">
         
 <td style="vertical-align: top;">cleanupLockingEnabled</td>
         
@@ -293,7 +309,7 @@
         </td>
     </tr>
     
-<tr class="b" id="clientSecretLength">
+<tr class="a" id="clientSecretLength">
         
 <td style="vertical-align: top;">clientSecretLength</td>
         
@@ -308,7 +324,7 @@
         </td>
     </tr>
     
-<tr class="a" id="debug">
+<tr class="b" id="debug">
         
 <td style="vertical-align: top;">debug</td>
         
@@ -324,7 +340,7 @@
         </td>
     </tr>
     
-<tr class="b" id="defaultAccessTokenLifetime">
+<tr class="a" id="defaultAccessTokenLifetime">
         
 <td style="vertical-align: top;">defaultAccessTokenLifetime</td>
         
@@ -343,7 +359,7 @@
         </td>
     </tr>
     
-<tr class="a" id="defaultIDTokenLifetime">
+<tr class="b" id="defaultIDTokenLifetime">
         
 <td style="vertical-align: top;">defaultIDTokenLifetime</td>
         
@@ -360,7 +376,7 @@
         </td>
     </tr>
     
-<tr class="b" id="defaultRefreshTokenLifetime">
+<tr class="a" id="defaultRefreshTokenLifetime">
         
 <td style="vertical-align: top;">defaultRefreshTokenLifetime</td>
         
@@ -377,7 +393,7 @@
         </td>
     </tr>
     
-<tr class="a" id="demoModeEnabled">
+<tr class="b" id="demoModeEnabled">
         
 <td style="vertical-align: top;">demoModeEnabled</td>
         
@@ -391,7 +407,7 @@
         </td>
     </tr>
     
-<tr class="b" id="disableDefaultStores">
+<tr class="a" id="disableDefaultStores">
         
 <td style="vertical-align: top;">disableDefaultStores</td>
         
@@ -408,7 +424,7 @@
         </td>
     </tr>
     
-<tr class="a" id="enableClientCredentialsFlow">
+<tr class="b" id="enableClientCredentialsFlow">
         
 <td style="vertical-align: top;">enableClientCredentialsFlow</td>
         
@@ -421,7 +437,7 @@
         </td>
     </tr>
     
-<tr class="b" id="enableDeviceFlow">
+<tr class="a" id="enableDeviceFlow">
         
 <td style="vertical-align: top;">enableDeviceFlow</td>
         
@@ -438,7 +454,7 @@
     </tr>
 
     
-<tr class="a" id="enableTokenExchange">
+<tr class="b" id="enableTokenExchange">
         
 <td style="vertical-align: top;">enableTokenExchange</td>
         
@@ -451,7 +467,7 @@
         </td>
     </tr>
     
-<tr class="b" id="enableTwoFactorSupport">
+<tr class="a" id="enableTwoFactorSupport">
         
 <td style="vertical-align: top;">enableTwoFactorSupport</td>
         
@@ -463,7 +479,7 @@
         </td>
     </tr>
     
-<tr class="a" id="issuer">
+<tr class="b" id="issuer">
         
 <td style="vertical-align: top;">issuer</td>
         
@@ -477,7 +493,7 @@
         </td>
     </tr>
     
-<tr class="b" id="maxAccessTokenLifetime">
+<tr class="a" id="maxAccessTokenLifetime">
         
 <td style="vertical-align: top;">maxAccessTokenLifetime</td>
         
@@ -493,7 +509,7 @@
         </td>
     </tr>
     
-<tr class="a" id="maxAllowedNewClientRequests">
+<tr class="b" id="maxAllowedNewClientRequests">
         
 <td style="vertical-align: top;">maxAllowedNewClientRequests</td>
         
@@ -509,7 +525,7 @@
         </td>
     </tr>
     
-<tr class="b" id="maxAuthorizationGrantLifetime">
+<tr class="a" id="maxAuthorizationGrantLifetime">
         
 <td style="vertical-align: top;">maxAuthorizationGrantLifetime</td>
         
@@ -527,7 +543,7 @@
         </td>
     </tr>
     
-<tr class="a" id="maxIDTokenLifetime">
+<tr class="b" id="maxIDTokenLifetime">
         
 <td style="vertical-align: top;">maxIDTokenLifetime</td>
         
@@ -544,7 +560,7 @@
         </td>
     </tr>
     
-<tr class="b" id="maxClientRefreshTokenLifetime">
+<tr class="a" id="maxClientRefreshTokenLifetime">
         
 <td style="vertical-align: top;">maxClientRefreshTokenLifetime</td>
         
@@ -560,7 +576,7 @@
         </td>
     </tr>
     
-<tr class="a" id="maxRefreshTokenLifetime">
+<tr class="b" id="maxRefreshTokenLifetime">
         
 <td style="vertical-align: top;">maxRefreshTokenLifetime</td>
         
@@ -575,7 +591,7 @@
         </td>
     </tr>
     
-<tr class="b" id="enableMonitor">
+<tr class="a" id="enableMonitor">
         
 <td style="vertical-align: top;">monitorEnable</td>
         
@@ -591,7 +607,7 @@
         </td>
     </tr>
     
-<tr class="a" id="monitorInterval">
+<tr class="b" id="monitorInterval">
         
 <td style="vertical-align: top;">monitorInterval</td>
         
@@ -602,7 +618,7 @@
 <td style="vertical-align: top;">How often should the monitor thread run.</td>
     </tr>
     
-<tr class="b" id="monitorAlarms">
+<tr class="a" id="monitorAlarms">
         
 <td style="vertical-align: top;">monitorAlarms</td>
         
@@ -624,7 +640,7 @@
 
     
     
-<tr class="a" id="name">
+<tr class="b" id="name">
         
 <td style="vertical-align: top;">name</td>
         
@@ -637,7 +653,7 @@
         </td>
     </tr>
     
-<tr class="b" id="OIDCEnabled">
+<tr class="a" id="OIDCEnabled">
         
 <td style="vertical-align: top;">OIDCEnabled</td>
         
@@ -653,7 +669,7 @@
         </td>
     </tr>
     
-<tr class="a" id="pingable">
+<tr class="b" id="pingable">
         
 <td style="vertical-align: top;">pingable</td>
         
@@ -669,7 +685,7 @@
     </tr>
 
     
-<tr class="b" id="pollingDirectory">
+<tr class="a" id="pollingDirectory">
         
 <td style="vertical-align: top;">pollingDirectory</td>
         
@@ -690,7 +706,7 @@
         </td>
     </tr>
     
-<tr class="a" id="pollingInterval">
+<tr class="b" id="pollingInterval">
         
 <td style="vertical-align: top;">pollingInterval</td>
         
@@ -705,7 +721,7 @@
     </tr>
 
     
-<tr class="b" id="printTSInDebug">
+<tr class="a" id="printTSInDebug">
         
 <td style="vertical-align: top;">printTSInDebug</td>
         
@@ -721,7 +737,7 @@
     </tr>
 
     
-<tr class="a" id="qdlConfigName">
+<tr class="b" id="qdlConfigName">
         
 <td style="vertical-align: top;">qdlConfigName</td>
         
@@ -737,7 +753,7 @@
         </td>
     </tr>
     
-<tr class="b" id="refreshTokenEnabled">
+<tr class="a" id="refreshTokenEnabled">
         
 <td style="vertical-align: top;">refreshTokenEnabled</td>
         
@@ -753,7 +769,7 @@
         </td>
     </tr>
     
-<tr class="a" id="refreshTokenLifetime">
+<tr class="b" id="refreshTokenLifetime">
         
 <td style="vertical-align: top;">refreshTokenLifetime</td>
         
@@ -765,7 +781,7 @@
         </td>
     </tr>
     
-<tr class="b" id="rfc7636Required">
+<tr class="a" id="rfc7636Required">
         
 <td style="vertical-align: top;">rfc7636Required</td>
         
@@ -781,7 +797,7 @@
         </td>
     </tr>
     
-<tr class="a" id="rtGracePeriod">
+<tr class="b" id="rtGracePeriod">
         
 <td style="vertical-align: top;">rtGracePeriod</td>
         
@@ -798,7 +814,7 @@
         </td>
     </tr>
     
-<tr class="b" id="safe_gc">
+<tr class="a" id="safe_gc">
         
 <td style="vertical-align: top;">safe_gc</td>
         
@@ -814,7 +830,7 @@
         </td>
     </tr>
     
-<tr class="a" id="scheme">
+<tr class="b" id="scheme">
         
 <td style="vertical-align: top;">scheme</td>
         
@@ -830,7 +846,7 @@
         </td>
     </tr>
     
-<tr class="b" id="schemeSpecificPart">
+<tr class="a" id="schemeSpecificPart">
         
 <td style="vertical-align: top;">schemeSpecificPart</td>
         
@@ -843,7 +859,7 @@
         </td>
     </tr>
     
-<tr class="a" id="serverDN">
+<tr class="b" id="serverDN">
         
 <td style="vertical-align: top;">serverDN</td>
         
@@ -859,7 +875,7 @@
     </tr>
 
     
-<tr class="b" id="version">
+<tr class="a" id="version">
         
 <td style="vertical-align: top;">version</td>
         
