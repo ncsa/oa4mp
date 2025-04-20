@@ -1,25 +1,24 @@
 package org.oa4mp.server.admin.myproxy.oauth2.tools;
 
-import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
-import org.oa4mp.server.api.admin.adminClient.AdminClient;
-import org.oa4mp.server.api.admin.adminClient.AdminClientKeys;
-import org.oa4mp.server.api.admin.permissions.Permission;
-import org.oa4mp.server.api.admin.permissions.PermissionList;
-import org.oa4mp.server.api.admin.permissions.PermissionsStore;
-import org.oa4mp.server.admin.myproxy.oauth2.base.BaseClientStoreCommands;
-import org.oa4mp.server.admin.myproxy.oauth2.base.ClientApprovalStoreCommands;
-import org.oa4mp.delegation.common.storage.clients.BaseClient;
-import org.oa4mp.delegation.server.storage.ClientApproval;
-import org.oa4mp.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.util.cli.ArgumentNotFoundException;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import net.sf.json.JSONObject;
+import org.oa4mp.delegation.common.storage.clients.BaseClient;
+import org.oa4mp.delegation.server.storage.ClientApproval;
+import org.oa4mp.delegation.server.storage.ClientStore;
+import org.oa4mp.server.admin.myproxy.oauth2.base.BaseClientStoreCommands;
+import org.oa4mp.server.admin.myproxy.oauth2.base.ClientApprovalStoreCommands;
+import org.oa4mp.server.api.admin.adminClient.AdminClient;
+import org.oa4mp.server.api.admin.adminClient.AdminClientKeys;
+import org.oa4mp.server.api.admin.permissions.Permission;
+import org.oa4mp.server.api.admin.permissions.PermissionList;
+import org.oa4mp.server.api.admin.permissions.PermissionsStore;
+import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
 
 import java.io.IOException;
 import java.net.URI;
@@ -132,21 +131,18 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
     }
 
     protected void showListClientsHelp() {
-        say("list_clients id|index - list all the clients this administrator manages");
+        say("list_clients index - list all the clients this administrator manages");
         say("                        This also lists if the client with the given id has been approved.");
+        printIndexHelp(true);
     }
 
     // For CIL-508
-    public void list_clients(InputLine inputLine) throws Exception {
+    public void list_clients(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
             showListClientsHelp();
             return;
         }
-        AdminClient adminClient = (AdminClient) findItem(inputLine);
-        if (adminClient == null) {
-            say("Sorry, there is no admin client for this identifier.");
-            return;
-        }
+        AdminClient adminClient = (AdminClient) findSingleton(inputLine, "admin client not found");
         List<Identifier> clients = permissionsStore.getClients(adminClient.getIdentifier());
         if (clients == null || clients.isEmpty()) {
             say("(none)");
@@ -160,48 +156,44 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
     }
 
     protected void showCountClientsHelp() {
-        say("count_clients id|index - Count the number of clients this administrator manages");
+        say("count_clients index - Count the number of clients this administrator manages");
         say("                       For databases, this call is more efficient that getting all the clients and counting them.");
+        printIndexHelp(false);
     }
 
 
-    public void count_clients(InputLine inputLine) throws Exception {
+    public void count_clients(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
             showCountClientsHelp();
             return;
         }
-        AdminClient adminClient = (AdminClient) findItem(inputLine);
-        if (adminClient == null) {
+        List<Identifiable> identifiables = findItem(inputLine);
+        if (identifiables == null) {
             say("Sorry, there is no admin client for this identifier.");
             return;
         }
-        say("This admin client manages " + permissionsStore.getClientCount(adminClient.getIdentifier()) + " out of a possible " + adminClient.getMaxClients() + ".");
+        for (Identifiable identifiable : identifiables) {
+            AdminClient adminClient = (AdminClient) identifiable;
+            say("admin client " + adminClient.getIdentifierString() + " manages " + permissionsStore.getClientCount(adminClient.getIdentifier()) + " out of a possible " + adminClient.getMaxClients() + ".");
+        }
+
     }
 
 
     protected void showListAdminsHelp() {
-        say("list_admins id - list the administrators associated with the given client id");
+        say("list_admins index - list the administrators associated with the given client id");
         say("                 Note that you need the actual identifier for the client, not an index.");
+        printIndexHelp(true);
     }
 
-    public void list_admins(InputLine inputLine) throws Exception {
+    public void list_admins(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
             showListAdminsHelp();
             return;
         }
         Identifier clientID = null;
-        try {
-            String rawID = inputLine.getLastArg();
-            if (rawID.startsWith("/")) {
-                // if they supply a leading / just drop it, since the user is being consistent with other cases.
-                rawID = rawID.substring(1);
-            }
-            clientID = BasicIdentifier.newID(rawID);
-        } catch (Throwable t) {
-            say("Sorry, \"" + inputLine.getLastArg() + "\" is not a valid identifier. " + t.getMessage());
-            return;
-        }
-        List<Identifier> admins = permissionsStore.getAdmins(clientID);
+        BaseClient baseClient = (BaseClient) findSingleton(inputLine, "client not found");
+        List<Identifier> admins = permissionsStore.getAdmins(baseClient.getIdentifier());
         if (admins == null || admins.isEmpty()) {
             say("(none)");
             return;
@@ -213,7 +205,6 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
             }
         }
         say(admins.size() + " admin clients");
-
     }
 
     @Override
@@ -226,66 +217,86 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
     public static String LINK_NEW_CLIENT_FLAG = "-new";
     public static String LINK_RANDOM_CLIENT_ID_ARG = "?";
 
-    public void link(InputLine inputLine) {
+    public void link(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
-            say("link client_id [admin_id]- link the client with the given client_id admin client");
-            say("link " + LINK_NEW_CLIENT_FLAG + " " + LINK_RANDOM_CLIENT_ID_ARG + " | client_id [admin_id]- create a new client and link it with the given client_id admin client");
+            say("link client_id index - link the client with the given client_id to the admin client");
+            say("link " + LINK_NEW_CLIENT_FLAG + " (" + LINK_RANDOM_CLIENT_ID_ARG + " | client_id) index- " +
+                    "create a new client and link it with the given client_id admin client");
             say("   You must supply either a new client id or a \"" + LINK_RANDOM_CLIENT_ID_ARG + "\". If a " + LINK_RANDOM_CLIENT_ID_ARG
-                    + " is used, then a random identifier will be created.");
-            say("Note that if you do not pas in an admin_id, the current one is used.");
+                    + " is used, then a random identifier will be created. This merely creates it, you must edit it later.");
+            printIndexHelp(true);
             say("See also: unlink");
             return;
         }
         boolean createNewClient = inputLine.hasArg(LINK_NEW_CLIENT_FLAG);
-        Identifier client_id = null;
-
+        Identifier clientID = null;
+        List<Identifiable> clients;
+        boolean isRS = false;
+        List<Identifier> clientIDs;
         if (createNewClient) {
             String newID = inputLine.getNextArgFor(LINK_NEW_CLIENT_FLAG);
             OA2Client client = (OA2Client) clientStore.create();
             if (newID.equals(LINK_RANDOM_CLIENT_ID_ARG)) {
-                client_id = client.getIdentifier();
+                clientID = client.getIdentifier();
             } else {
-                client_id = BasicIdentifier.newID(newID);
-                if (clientStore.containsKey(client_id)) {
-                    say("sorry but the client with id \"" + client_id + "\" already exists. aborting.");
+                clientID = BasicIdentifier.newID(newID);
+                if (clientStore.containsKey(clientID)) {
+                    say("sorry but the client with id \"" + clientID + "\" already exists. aborting.");
                     return;
                 }
-                client.setIdentifier(client_id);
+                client.setIdentifier(clientID);
             }
             clientStore.save(client);// done creating a new client if need be
             say("new client with id \"" + client.getIdentifierString() + "\" created. You must edit this separately.");
             inputLine.removeSwitchAndValue(LINK_NEW_CLIENT_FLAG);
+            clientIDs = new ArrayList<>(1);
+            clientIDs.add(clientID);
         } else {
-            try {
-                client_id = BasicIdentifier.newID(inputLine.getArg(1)); // arg 0 is the name of the command.
-            } catch (ArgumentNotFoundException argumentNotFoundException) {
-                say("sorry. No id supplied. You must specify the new id you want or use a " + LINK_RANDOM_CLIENT_ID_ARG + " to create a random one");
+            String rawID = inputLine.getArg(1);
+            clients = findByIDOrRS(getEnvironment().getClientStore(), rawID);
+            if (clients == null) {
+                say("sorry. could not find a client or ID");
                 return;
             }
-            inputLine.removeArgAt(1);
+            isRS = true;
+            clientIDs = new ArrayList<>(clients.size());
+            for(Identifiable client : clients) {
+                clientIDs.add(client.getIdentifier());
+            }
         }
         // arguments have been whittled down to the point we can get the admin client.
-
-        AdminClient adminClient = (AdminClient) findItem(inputLine);
+        AdminClient adminClient = (AdminClient) findSingleton(inputLine, "admin client not found");
+        int pass = 0;
+        int fail = 0;
 
         // check if the client already exists.
-        PermissionList permissionList = permissionsStore.get(adminClient.getIdentifier(), client_id);
-        if (permissionList != null && !permissionList.isEmpty()) {
-            say("sorry, this client is already managed by this admin.");
+        for (Identifier client_id : clientIDs) {
+            PermissionList permissionList = permissionsStore.get(adminClient.getIdentifier(), client_id);
+            if (permissionList != null && !permissionList.isEmpty()) {
+                say("sorry, client \"" + client_id + "\" is already managed by this admin.");
+                fail++;
+                continue;
+            }
+            Permission permission = (Permission) permissionsStore.create();
+            // The permissions are what the admin client can do to the OA2 client.
+            permission.setApprove(true);
+            permission.setCreate(true);
+            permission.setDelete(true);
+            permission.setRead(true);
+            permission.setWrite(true);
+            permission.setClientID(client_id);
+            permission.setAdminID(adminClient.getIdentifier());
+            permissionsStore.save(permission);
+            pass++;
+        }
+        if (isRS) {
+            say("done. " + pass + " clients are " + "now managed by \"" + adminClient.getIdentifierString() + "\"");
+            if (0 < fail) {
+                say(fail + " clients were already managed.");
+            }
             return;
         }
-
-        Permission permission = (Permission) permissionsStore.create();
-        // The permissions are what the admin client can do to the OA2 client.
-        permission.setApprove(true);
-        permission.setCreate(true);
-        permission.setDelete(true);
-        permission.setRead(true);
-        permission.setWrite(true);
-        permission.setClientID(client_id);
-        permission.setAdminID(adminClient.getIdentifier());
-        permissionsStore.save(permission);
-        say("done. The client with identifier \"" + client_id + "\" is now managed by \"" + adminClient.getIdentifierString() + "\"");
+        say("done. The client with identifier \"" + clientID + "\" is now managed by \"" + adminClient.getIdentifierString() + "\"");
     }
 
     public static final String UNLINK_ALL_FLAG = "-all";
@@ -308,72 +319,69 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
 
     public static String NO_VERIFY_ALL_FLAG = "-no_verify";
 
-    public void unlink(InputLine inputLine) throws Exception {
+    public void unlink(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
-            say("unlink " + UNLINK_ALL_FLAG + " | client_id  + [" + UNLINK_REMOVE_FLAG + "]  + [" + NO_VERIFY_ALL_FLAG + "] [admin_id]- unlink the client with the given client_id admin client");
-            say(UNLINK_ALL_FLAG + " - (no client_id) unlink all clients, not just the specified one.");
+            say("unlink " + UNLINK_ALL_FLAG + " | (client_id | rs)  + [" + UNLINK_REMOVE_FLAG + "]  + [" + NO_VERIFY_ALL_FLAG + "] index- unlink the client with the given client_id admin client");
+            say(UNLINK_ALL_FLAG + " - (client_id ignored!) unlink all clients, not just the specified one.");
             say(UNLINK_REMOVE_FLAG + " - remove clients that are unlinked.");
-            say(NO_VERIFY_ALL_FLAG + "- if present will suppress asking if you really meant to use the ");
             say("This means that the clients will still exist unless you specifially remove them.");
-            say("Properly speaking, you would use the " + UNLINK_ALL_FLAG + " only before removing the " + UNLINK_ALL_FLAG + " switch.");
-            say("admin client itself and retiring it.");
+            say(NO_VERIFY_ALL_FLAG + "- if present will suppress asking if you really meant to use the " + UNLINK_REMOVE_FLAG + " flag.");
+            say("Scenarios are");
+            say("1. Removing an admin and all its clients. Run this with the " + UNLINK_ALL_FLAG + ", " + UNLINK_REMOVE_FLAG + " and " + NO_VERIFY_ALL_FLAG);
+            say("   flags, then remove the admin itself.");
+            say("2. Removing and admin, but keeping its clients (e.g., to move them to another admin in another virtual issuer.");
+            say("   Run this with the " + UNLINK_ALL_FLAG + " and remove the admin. The clients are still there.");
+            printIndexHelp(false);
             say("See also: link");
             return;
         }
-        if (inputLine.hasArg(SEARCH_RESULT_SET_NAME)) {
+/*        if (inputLine.hasArg(SEARCH_RESULT_SET_NAME)) {
             unlinkRS(inputLine);
             return;
-        }
+        }*/
+        boolean doAll = inputLine.hasArg(UNLINK_ALL_FLAG);
         boolean removeClient = inputLine.hasArg(UNLINK_REMOVE_FLAG);
         inputLine.removeSwitch(UNLINK_REMOVE_FLAG);
 
         boolean noVerifyAll = inputLine.hasArg(NO_VERIFY_ALL_FLAG);
         inputLine.removeSwitch(NO_VERIFY_ALL_FLAG);
-
-        boolean doAll = inputLine.hasArg(UNLINK_ALL_FLAG);
-        inputLine.removeSwitch(UNLINK_ALL_FLAG);
-
-        if (doAll && hasId() && 0 < inputLine.getArgCount()) {
-            say("Sorry, but you have specified a client id and the " + UNLINK_ALL_FLAG + " flag. aborted.");
-            return;
-        }
-        Identifier clientID = null; // arg 0 is name of command
-        if (!doAll) {
-            clientID = BasicIdentifier.newID(inputLine.getArg(1)); // arg 0 is name of command
-            inputLine.removeArgAt(1);
-        }
-
-
-        AdminClient adminClient = (AdminClient) findItem(inputLine);
-        if (adminClient == null) {
-            say("sorry, admin client with id \"" + clientID + "\" not found");
-            return;
-        }
-        OA2Client client = null;
-        // check if the client already exists.
-        List<Identifier> clients;
-        int count = 0;
-        int pcount = 0; // count the permissions processed too.
+        List<Identifier> client_ids;
+        AdminClient adminClient = (AdminClient) findSingleton(inputLine, "admin client not found");
 
         if (doAll) {
-            clients = permissionsStore.getClients(adminClient.getIdentifier());
+            inputLine.removeSwitch(UNLINK_ALL_FLAG);
+            client_ids = permissionsStore.getClients(adminClient.getIdentifier());
             // Fix https://github.com/ncsa/oa4mp/issues/116
-            if(clients.size() == 0){
+            if (client_ids.size() == 0) {
                 say("no clients found");
-                return ;
+                return;
             }
             if (!noVerifyAll) {
-                if (!readline("unlink ALL " + clients.size() + " of the clients for admin \"" + adminClient.getIdentifierString() + "\"?(Y/n)").equals("Y")) {
+                if (!readline("unlink ALL " + client_ids.size() + " of the clients for admin \"" + adminClient.getIdentifierString() + "\"?(Y/n)").equals("Y")) {
                     say("aborting...");
                     return;
                 }
             }
         } else {
-            clients = new ArrayList<>();
-            clients.add(clientID);
+            String rawID = inputLine.getArg(1);
+            inputLine.removeArgAt(1);
+            List<Identifiable> ids = findByIDOrRS(getEnvironment().getClientStore(), rawID);
+            if (ids == null) {
+                say("no clients found. aborting");
+                return;
+            }
+            client_ids = new ArrayList<>(ids.size());
+            // we need the identifiers
+            for(Identifiable id : ids) {
+                client_ids.add(id.getIdentifier());
+            }
         }
 
-        for (Identifier clientIdentifier : clients) {
+        int count = 0;
+        int pcount = 0; // count the permissions processed too.
+
+
+        for (Identifier clientIdentifier : client_ids) {
             count++;
             sayv("removing permissions for " + clientIdentifier);
             PermissionList permissionList = permissionsStore.get(adminClient.getIdentifier(), clientIdentifier);
@@ -390,16 +398,13 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
         say("done. Removed " + count + " clients and processed " + pcount + " permissions");
     }
 
-    public void list_provisioners(InputLine inputLine) throws Exception {
+    public void list_provisioners(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
-            say("list_provisioners ersatz_id [admin_id] = list all of the clients that are provisioners for this ersatz client.");
+            say("list_provisioners ersatz_id index = list all of the clients that are provisioners for this ersatz client.");
+            printIndexHelp(true);
             return;
         }
-        AdminClient adminClient = (AdminClient) findItem(inputLine);
-        if (adminClient == null) {
-            say("Sorry, there is no admin client for this identifier.");
-            return;
-        }
+        AdminClient adminClient = (AdminClient) findSingleton(inputLine, "admi admin client not found");
         if (inputLine.getArgCount() == 0) {
             say("you must supply the ersatz client id");
             return;
@@ -421,16 +426,13 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
 
     }
 
-    public void list_ersatz(InputLine inputLine) throws Exception {
+    public void list_ersatz(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
-            say("list_ersatz client_id [admin_id] = list all of the clients granted substitute privilege.");
+            say("list_ersatz client_id admin_id = list all of the clients granted substitute privilege.");
+            printIndexHelp(true);
             return;
         }
-        AdminClient adminClient = (AdminClient) findItem(inputLine);
-        if (adminClient == null) {
-            say("Sorry, there is no admin client for this identifier.");
-            return;
-        }
+        AdminClient adminClient = (AdminClient) findSingleton(inputLine, "admin client not found");
         if (inputLine.getArgCount() == 0) {
             say("you must supply the client id");
             return;
@@ -455,13 +457,14 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
         say(count + " total ersatz clients for " + clientID);
     }
 
-    public void set_ersatz(InputLine inputLine) throws Exception {
+    public void set_ersatz(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
-            say("set_ersatz client_id ersatz_id [admin_id] = simple case, that sets permission for a single ersatz_id  for client_id");
+            say("set_ersatz client_id ersatz_id index = simple case, that sets permission for a single ersatz_id  for client_id");
             say("in token exchanges. Onus is on the user of the CLI not to set something goofy.");
+            printIndexHelp(true);
             return;
         }
-        AdminClient adminClient = (AdminClient) findItem(inputLine);
+        AdminClient adminClient = (AdminClient) findSingleton(inputLine, "admin client not found");
         if (inputLine.getArgCount() < 2) {
             say("missing argument. You need both a client id and its ersatz id");
             return;
@@ -502,7 +505,7 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
     protected int updateStorePermissions(Identifier newID, Identifier oldID, boolean copy) {
         int updateCount = 0;
         List<Permission> permissions = getEnvironment().getPermissionStore().getByAdminID(oldID);
-        if(!copy){
+        if (!copy) {
             // Do not just copy the permissions with the new ID, remove the old ones.
             getEnvironment().getPermissionStore().remove(permissions);
         }

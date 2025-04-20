@@ -63,13 +63,13 @@ public class ClientApprovalStoreCommands extends StoreCommands2 {
     @Override
     public boolean update(Identifiable identifiable) throws IOException {
         ClientApproval clientApproval = (ClientApproval) identifiable;
-        ClientApprovalKeys keys = (ClientApprovalKeys)getSerializationKeys();
+        ClientApprovalKeys keys = (ClientApprovalKeys) getSerializationKeys();
         info("Starting update for client approval id=" + identifiable.getIdentifierString());
         sayi("Enter the information for the client approval");
-        clientApproval.setApprover(getPropertyHelp(keys.approver(),"name of the approver", clientApproval.getApprover()));
+        clientApproval.setApprover(getPropertyHelp(keys.approver(), "name of the approver", clientApproval.getApprover()));
         // Fix https://github.com/ncsa/oa4mp/issues/168
         clientApproval.setApprovalTimestamp(new Date());
-        boolean isapproved = isOk(getPropertyHelp(keys.approved(),"set approved?", clientApproval.isApproved() ? "y" : "n"));
+        boolean isapproved = isOk(getPropertyHelp(keys.approved(), "set approved?", clientApproval.isApproved() ? "y" : "n"));
         if (isapproved) {
             clientApproval.setApproved(true);
             clientApproval.setStatus(ClientApproval.Status.APPROVED);
@@ -99,32 +99,43 @@ public class ClientApprovalStoreCommands extends StoreCommands2 {
     }
 
     public void showApproveHelp() {
-        say("This is the simple case of approving a client.");
+        say("approve index");
+        say("This is the simple case of approving a client or set of them.");
         say("If you need to set the status to something other than 'approved',");
         say("use the set_status command.");
         say("Some components may prompt you for changes to the client as well.");
-        say("Syntax:\n");
-        say("approve [id | number]\n");
         say("The approval record will be for that client");
+        printIndexHelp(false);
         say("\nSee also: set_status");
     }
 
-    public void approve(InputLine inputLine) throws IOException {
+    public void approve(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
             showApproveHelp();
             return;
         }
-
-        ClientApproval ca = (ClientApproval) findItem(inputLine);
-        approve(ca);
+        int pass = 0;
+        int fail = 0;
+        boolean isapproved = isOk(getInput("set approved?", "y"));
+        String approver = getInput("approver", "");
+        List<Identifiable> identifiables = findItem(inputLine);
+        for (Identifiable identifiable : identifiables) {
+            if(approve((ClientApproval) identifiable, isapproved, approver)){
+                pass++;
+            }else{
+                fail++;
+            }
+        }
+        say("Approved " + pass + ", denied " + fail);
     }
 
-    public void set_status(InputLine inputLine) throws IOException {
+    public void set_status(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
-            say("set_status [new_status] [id] will set the status for the given/current record.");
+            say("set_status [new_status] index - this will set the status for the given/current record(s).");
             say("This is more reliable than simply updating the status property manually.");
             say("If new_status is given, then it will be set to that and the previous status displayed.");
             say("If new_status is missing, you will be prompted. Allowed values for new_status are");
+            printIndexHelp(false);
             say("a | approved");
             say("d | denied");
             say("n | none");
@@ -133,61 +144,72 @@ public class ClientApprovalStoreCommands extends StoreCommands2 {
             say("\nand any value not on this list is rejected.");
             return;
         }
-        Identifiable item = findItem(inputLine);
+        boolean isRS = hasRS(inputLine);
+        List<Identifiable> item = findItem(inputLine);
         if (item == null) {
             say("sorry, no record found.");
             return;
         }
-        ClientApproval approval = (ClientApproval) item;
         String newStatus = null;
         if (inputLine.getArgCount() == 0) {
             newStatus = getInput("enter new status", "a");
         } else {
             newStatus = inputLine.getLastArg();
         }
-        switch (newStatus) {
-            case "a":
-            case "approved":
-                approval.setStatus(ClientApproval.Status.APPROVED);
-                approval.setApproved(true);
-                break;
-            case "d":
-            case "denied":
-                approval.setStatus(ClientApproval.Status.DENIED);
-                approval.setApproved(false);
-                break;
-            case "n":
-            case "none":
-                approval.setStatus(ClientApproval.Status.NONE);
-                approval.setApproved(false);
-                break;
-            case "p":
-            case "pending":
-                approval.setStatus(ClientApproval.Status.PENDING);
-                approval.setApproved(false);
-                break;
-            case "r":
-            case "revoked":
-                approval.setStatus(ClientApproval.Status.REVOKED);
-                approval.setApproved(false);
-                break;
-            default:
-                say("unrecognized status \"" + newStatus + "\".");
-                return;
+        for (Identifiable i : item) {
+            ClientApproval approval = (ClientApproval) i;
+            if(isRS){
+                // Result sets are static and should supply the identifier. Don't just
+                // use the result set since that may overwrite other changes during save.
+                approval = (ClientApproval) getStore().get(approval.getIdentifierString());
+            }
+            switch (newStatus) {
+                case "a":
+                case "approved":
+                    approval.setStatus(ClientApproval.Status.APPROVED);
+                    approval.setApproved(true);
+                    break;
+                case "d":
+                case "denied":
+                    approval.setStatus(ClientApproval.Status.DENIED);
+                    approval.setApproved(false);
+                    break;
+                case "n":
+                case "none":
+                    approval.setStatus(ClientApproval.Status.NONE);
+                    approval.setApproved(false);
+                    break;
+                case "p":
+                case "pending":
+                    approval.setStatus(ClientApproval.Status.PENDING);
+                    approval.setApproved(false);
+                    break;
+                case "r":
+                case "revoked":
+                    approval.setStatus(ClientApproval.Status.REVOKED);
+                    approval.setApproved(false);
+                    break;
+                default:
+                    say("unrecognized status \"" + newStatus + "\".");
+                    return;
+            }
+            getStore().save(approval);
         }
-        getStore().save(approval);
         say("done!");
     }
 
     /**
-     *
      * @param ca
      * @return true if saved.
      * @throws IOException
      */
     public boolean approve(ClientApproval ca) throws IOException {
         boolean isapproved = isOk(getInput("set approved?", ca.isApproved() ? "y" : "n"));
-        ca.setApprover(getInput("approver", ca.getApprover()));
+        String approver = getInput("approver", ca.getApprover());
+       return  approve(ca, isapproved, approver);
+    }
+    protected boolean approve(ClientApproval ca, boolean isapproved, String approver) throws IOException {
+        ca.setApprover(approver);
         if (isapproved) {
             ca.setApproved(true);
             ca.setStatus(ClientApproval.Status.APPROVED);

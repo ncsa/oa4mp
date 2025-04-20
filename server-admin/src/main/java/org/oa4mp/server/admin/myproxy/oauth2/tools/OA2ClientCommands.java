@@ -1,18 +1,5 @@
 package org.oa4mp.server.admin.myproxy.oauth2.tools;
 
-import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
-import org.oa4mp.server.loader.oauth2.servlet.OA2ClientUtils;
-import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
-import org.oa4mp.server.loader.oauth2.storage.clients.OA2ClientKeys;
-import org.oa4mp.server.api.admin.permissions.Permission;
-import org.oa4mp.server.api.admin.permissions.PermissionList;
-import org.oa4mp.server.api.admin.permissions.PermissionsStore;
-import org.oa4mp.server.admin.myproxy.oauth2.base.ClientApprovalStoreCommands;
-import org.oa4mp.server.admin.myproxy.oauth2.base.ClientStoreCommands;
-import org.oa4mp.delegation.common.storage.clients.BaseClient;
-import org.oa4mp.delegation.server.server.config.LDAPConfigurationUtil;
-import org.oa4mp.delegation.server.storage.ClientStore;
-import org.oa4mp.delegation.server.storage.uuc.UUCConfiguration;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
@@ -24,6 +11,19 @@ import edu.uiuc.ncsa.security.util.cli.InputLine;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.oa4mp.delegation.common.storage.clients.BaseClient;
+import org.oa4mp.delegation.server.server.config.LDAPConfigurationUtil;
+import org.oa4mp.delegation.server.storage.ClientStore;
+import org.oa4mp.delegation.server.storage.uuc.UUCConfiguration;
+import org.oa4mp.server.admin.myproxy.oauth2.base.ClientApprovalStoreCommands;
+import org.oa4mp.server.admin.myproxy.oauth2.base.ClientStoreCommands;
+import org.oa4mp.server.api.admin.permissions.Permission;
+import org.oa4mp.server.api.admin.permissions.PermissionList;
+import org.oa4mp.server.api.admin.permissions.PermissionsStore;
+import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
+import org.oa4mp.server.loader.oauth2.servlet.OA2ClientUtils;
+import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
+import org.oa4mp.server.loader.oauth2.storage.clients.OA2ClientKeys;
 
 import java.io.IOException;
 import java.net.URI;
@@ -100,16 +100,18 @@ public class OA2ClientCommands extends ClientStoreCommands {
         say("\nE.g. to add a a few callbacks you would invoke");
         say("cb -add https://foo1, https://foo2,https://foo3 /oa4mp:client/id/234234234234");
         say("\nThis adds the three urls to the current list for the client with the given id.");
+        printIndexHelp(true);
     }
 
 
-    public void cb(InputLine inputLine) throws IOException {
+    public void cb(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
             showCBHelp();
             return;
         }
+
         boolean gotOne = false;
-        OA2Client client = (OA2Client) findItem(inputLine);
+        OA2Client client = (OA2Client) findSingleton(inputLine);
         if (inputLine.hasArg("-add")) {
             gotOne = true;
             Collection<String> cbs = getCBS(inputLine);
@@ -526,10 +528,10 @@ public class OA2ClientCommands extends ClientStoreCommands {
         return list;
     }
 
-    @Override
+    /*@Override
     protected boolean supportsQDL() {
         return true;
-    }
+    }*/
 
     @Override
     protected void showDeserializeHelp() {
@@ -543,7 +545,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
     }
 
     @Override
-    protected boolean updateSingleValue(XMLMap map, String key) throws IOException {
+    protected Object updateSingleValue(XMLMap map, String key) throws IOException {
         // Fixes CIL-1025 -- recognize config attribute as JSON at all times,
         // especially when it is null.
         String currentValue = map.getString(key);
@@ -559,26 +561,34 @@ public class OA2ClientCommands extends ClientStoreCommands {
 
     public void get_comment(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
-            say("get_comment [" + NO_STILE_FLAG + "- display the comment for a give object");
+            say("get_comment [" + NO_STILE_FLAG + "] index- display the comment for a give object");
             say(NO_STILE_FLAG + " - do not show the stile (|) when printing comments");
+            printIndexHelp(false);
             say("See also: set_comment");
             return;
         }
-        Identifiable x = findItem(inputLine);
-        if (x == null) {
+        List<Identifiable> identifiables = findItem(inputLine);
+        if (identifiables == null) {
             say("Object not found");
             return;
         }
         boolean noStile = inputLine.hasArg(NO_STILE_FLAG);
-        OA2Client oa2Client = (OA2Client) x;
-        JSONArray array;
-        List<String> comments = oa2Client.getComment();
-        if (comments == null || comments.isEmpty()) {
-            say("(no comments)");
-            return;
+        for (Identifiable identifiable : identifiables) {
+            OA2Client oa2Client = (OA2Client) identifiable;
+            say(oa2Client.getIdentifierString());
+            List<String> comments = oa2Client.getComment();
+            if (comments == null || comments.isEmpty()) {
+                say("(no comments)");
+                return;
+            }
+            for (String comment : comments) {
+                say((noStile ? "" : "|") + comment);
+            }
+            if (1 < identifiables.size()) {
+                say(""); // spacer
+            }
+
         }
-        for (String comment : comments)
-            say((noStile ? "" : "|") + comment);
     }
 
     public static String END_COMMENT_INPUT_CHAR = ".";
@@ -586,18 +596,15 @@ public class OA2ClientCommands extends ClientStoreCommands {
 
     public void set_comment(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
-            say("set_comment - input a comment line by line");
+            say("set_comment index- input a comment line by line");
             say("Note that input ends when the very first character on a line is a " + END_COMMENT_INPUT_CHAR);
             say("Note that if you want to abort, the first character on a line is a " + ABORT_COMMENT_INPUT_CHAR);
+            printIndexHelp(true);
             say("See also: get_comment");
             return;
         }
-        Identifiable x = findItem(inputLine);
-        if (x == null) {
-            say("Object not found");
-            return;
-        }
-        OA2Client oa2Client = (OA2Client) x;
+
+        OA2Client oa2Client = (OA2Client) findSingleton(inputLine);
 
         say("Input your comment. Starting a line with a " + END_COMMENT_INPUT_CHAR + " ends input, " + ABORT_COMMENT_INPUT_CHAR + " aborts input.");
         List<String> comments = new ArrayList<>();
@@ -614,18 +621,14 @@ public class OA2ClientCommands extends ClientStoreCommands {
         getStore().save(oa2Client);
     }
 
-    public void resolve(InputLine inputLine) throws Exception {
+    public void resolve(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
-            sayi("resolve [id] - resolve a client from its prototypes (if any) and show it");
+            sayi("resolve index - resolve a client from its prototypes (if any) and show it");
+            printIndexHelp(false);
             sayi("See also: serialize");
             return;
         }
-        Identifiable identifiable = findItem(inputLine);
-        if (identifiable == null) {
-            say("no such client");
-            return;
-        }
-        OA2Client oa2Client = OA2ClientUtils.resolvePrototypes((ClientStore) getStore(), (OA2Client) identifiable);
+        OA2Client oa2Client = OA2ClientUtils.resolvePrototypes((ClientStore) getStore(), (OA2Client) findSingleton(inputLine));
         longFormat(oa2Client, true);
     }
 
@@ -636,33 +639,32 @@ public class OA2ClientCommands extends ClientStoreCommands {
         sayi("   command line or put it in a file. Cf. deserialize.");
         sayi("-resolve - if this has prototypes, resolve them all and serialize the ");
         sayi("   resulting object");
+        printIndexHelp(true);
         sayi("See also: deserialize.");
     }
 
     @Override
-    public void serialize(InputLine inputLine) {
+    public void serialize(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
             showSerializeHelp();
             return;
         }
-        Identifiable x = findItem(inputLine);
-        if (x == null) {
-            say("object not found");
-            return;
-        }
+
+        Identifiable identifiable = findSingleton(inputLine, "client not found");
         if (inputLine.hasArg("-resolve")) {
-            x = OA2ClientUtils.resolvePrototypes((ClientStore) getStore(), (OA2Client) x);
+            identifiable = OA2ClientUtils.resolvePrototypes((ClientStore) getStore(), (OA2Client) findSingleton(inputLine));
         }
-        serialize(inputLine, x);
+        serialize(inputLine, identifiable);
     }
 
-    public void ea_support(InputLine inputLine) throws Exception {
+    public void ea_support(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
-            say("ea_support [arg] - show or toggle client extended attribute support");
+            say("ea_support [arg] index - show or toggle client extended attribute support");
             say(" if arg is missing, show the current value");
             say(" if arg is present it must be one of on|true or off|false");
             say("extended attributes are namespace qualified attributes that a client may");
             say("pass in and are simply forwarded to the scripting engine in the variable xas.");
+            printIndexHelp(false);
             say("E.g.");
             say("A typical use would be to pass along the parameter oa4mp:/tokens/access/lifetime=900000");
             say("which would result in the value for xas. of ");
@@ -672,31 +674,37 @@ public class OA2ClientCommands extends ClientStoreCommands {
             say("in the QDL runtime environment. OA4MP does nothing with these except pass them through.");
             return;
         }
-        Identifiable x = findItem(inputLine);
-        if (x == null) {
+        List<Identifiable> identifiables = findItem(inputLine);
+        if (identifiables == null) {
             say("object not found");
             return;
         }
-        OA2Client client = (OA2Client) x;
         if (!inputLine.hasArgs()) {
-            say("has extended attribute support? " + ((OA2Client) x).hasExtendedAttributeSupport());
+            for (Identifiable identifiable : identifiables) {
+                say("has extended attribute support? " + ((OA2Client) identifiables).hasExtendedAttributeSupport());
+            }
             return;
         }
         boolean enable = inputLine.getLastArg().equalsIgnoreCase("on") || inputLine.getLastArg().equalsIgnoreCase("true");
         boolean disable = inputLine.getLastArg().equalsIgnoreCase("off") || inputLine.getLastArg().equalsIgnoreCase("false");
-        if (enable || disable) {
-            if (enable) {
-                client.setExtendedAttributeSupport(true);
-                say("extended attribute support enabled");
+        for (Identifiable identifiable : identifiables) {
+            OA2Client client = (OA2Client) identifiable;
+            if (enable || disable) {
+                if (enable) {
+                    client.setExtendedAttributeSupport(true);
+                    say("extended attribute support enabled");
+                }
+                if (disable) {
+                    client.setExtendedAttributeSupport(false);
+                    say("extended attribute support disabled");
+                }
+                getStore().save(client);
+                return;
+            } else {
+                say("unrecognized option \"" + inputLine.getLastArg() + "\"");
+                return;
             }
-            if (disable) {
-                client.setExtendedAttributeSupport(false);
-                say("extended attribute support disabled");
-            }
-            getStore().save(client);
-            return;
-        } else {
-            say("unrecognized option \"" + inputLine.getLastArg() + "\"");
+
         }
     }
 
@@ -711,85 +719,6 @@ public class OA2ClientCommands extends ClientStoreCommands {
     public static String UUC_FLAG_FOUND = "-found";
     public static String UUC_FLAG_ENABLE = "-enable";
 
-    /*  public void uuc(InputLine inputLine) throws Throwable {
-          if (showHelp(inputLine)) {
-              say("uuc [" +
-                      UUC_FLAG_TEST + " on|true|off|false] [" +
-                      UUC_FLAG_CFG + "] [" +
-                      CL_OUTPUT_FILE_FLAG + " file] [" +
-                      UUC_FLAG_FOUND + "] [" +
-                      UUC_FLAG_ENABLE + "] = unused client cleanup. Run the client cleanup for this store");
-              say(UUC_FLAG_TEST + " = (optional) turn on or off test mode. In test mode, the clients to delete");
-              say("        are simply printed, not actually deleted.");
-              say(UUC_FLAG_CFG + " = simply prints out the configuration, if any.");
-              say(UUC_FLAG_FOUND + " = should the list of client ids that were found.");
-              say(UUC_FLAG_ENABLE + " = manually enable this if it is disabled.");
-              say(CL_OUTPUT_FILE_FLAG + " = write any output to the given file.");
-              say("\nOne use pattern is to put the configuration into the server configuration file and only");
-              say("run it manually in the CLI. In that case, set it to disabled and enable it here.");
-              say("This will not run disabled configurations.");
-              FormatUtil.printFormatListHelp(new BasicIO(), inputLine);
-              return;
-          }
-          if (inputLine.hasArg(UUC_FLAG_CFG)) {
-              if (getUucConfiguration() == null) {
-                  say("no config");
-                  return;
-              }
-              say(getUucConfiguration().toString(true));
-              return;
-          }
-          boolean writeOutput = inputLine.hasArg(CL_OUTPUT_FILE_FLAG);
-          String outputFilename = null;
-          if (writeOutput) {
-              outputFilename = inputLine.getNextArgFor(CL_OUTPUT_FILE_FLAG);
-              inputLine.removeSwitchAndValue(CL_OUTPUT_FILE_FLAG);
-          }
-          boolean showFound = inputLine.hasArg(UUC_FLAG_FOUND);
-          if (getUucConfiguration() == null) {
-              say("UUC configuration not found");
-              return;
-          }
-          if (inputLine.hasArg(UUC_FLAG_ENABLE)) {
-              getUucConfiguration().enabled = inputLine.hasArg(UUC_FLAG_ENABLE);
-              inputLine.removeSwitch(UUC_FLAG_ENABLE);
-              say("UUC configuration" + (getUucConfiguration().enabled ? "enabled" : "disabled") + " . ");
-              return;
-          }
-          if (!getUucConfiguration().enabled) {
-              say("configuration disabled");
-              return;
-          }
-          if (inputLine.hasArg(UUC_FLAG_TEST)) {
-              String arg = inputLine.getNextArgFor(UUC_FLAG_TEST);
-              if (arg.equalsIgnoreCase("on") || arg.equalsIgnoreCase("true")) {
-                  getUucConfiguration().testMode = true;
-              }
-              if (arg.equalsIgnoreCase("off") || arg.equalsIgnoreCase("false")) {
-                  getUucConfiguration().testMode = false;
-              }
-
-              inputLine.removeSwitchAndValue(UUC_FLAG_TEST);
-          }
-          BaseClientStore clientStore = (BaseClientStore) getStore();
-          UUCResponse response = clientStore.unusedClientCleanup(getUucConfiguration());
-          say("Stats are " + response);
-          if (writeOutput) {
-              FileWriter fw = new FileWriter(outputFilename);
-              for (String x : response.found) {
-                  fw.write(x + "\n");
-              }
-              fw.flush();
-              fw.close();
-              say("output written to " + outputFilename);
-          }
-          if (showFound) {
-              say("found ids are:");
-              FormatUtil.formatList(inputLine, response.found);
-          }
-          say("There were " + response.found.size() + " clients found to remove");
-      }
-  */
     @Override
     protected BaseClient approvalMods(InputLine inputLine, BaseClient client) throws IOException {
         OA2Client oa2Client = (OA2Client) client;
@@ -817,6 +746,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
         say("     Optionally list any chains as arrays, a json array or the (default) multi-line format");
         say("ersatz " + E_LINK_FLAG + " ersatz_id | [e0,e1,...] [" + E_ADMIN_ID_FLAG + " adminID] [provisioner_id]- link an existing ersatz client/chain to the current one");
         say("ersatz " + E_UNLINK_FLAG + " ersatz_id | [e0,e1,...] [" + E_ADMIN_ID_FLAG + " adminID] [provisioner_id] - unlink the ersatz client from this client. It does not do anything to the ersatz client.");
+        printIndexHelp(true);
         say();
         say("Note that listing the ersatz clients lists the chains of them, so a typical output might be");
         say("client_id_1");
@@ -901,7 +831,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
         }
         boolean listClients = inputLine.hasArg(E_LIST_FLAG);
         inputLine.removeSwitch(E_LIST_FLAG);
-        OA2Client provisioner = (OA2Client) findItem(inputLine);
+        OA2Client provisioner = (OA2Client) findSingleton(inputLine);
         inputLine.removeSwitch(provisioner.getIdentifierString()); // trick. Remove ID by value if there.
         if (provisioner == null) {
             say("could not find the provisioner...");
@@ -1113,24 +1043,31 @@ public class OA2ClientCommands extends ClientStoreCommands {
     }
 
     // Fix https://github.com/ncsa/oa4mp/issues/224
-    public void service_client(InputLine inputLine) throws Exception {
+    public void service_client(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
-            say("service_client [on | true | off | false] query or set if this client is a service client.");
+            say("service_client [on | true | off | false] index query or set if this client is a service client.");
             say("A service client is a client that is run by a service, typically this replaces the authorization ");
             say("leg of OAuth and is a token request. The two major RFC's that cover this are");
             say("RFC 7523, which specifies using keys generally too and");
             say("RFC 6749 §4.4, the client credentials flow");
+            printIndexHelp(false);
             return;
         }
-        OA2Client client = (OA2Client) findItem(inputLine);
-        if (client == null) {
+        List<Identifiable> identifiables = findItem(inputLine);
+        if (identifiables == null) {
             say("Sorry, client not found");
             return;
+
         }
-        if (inputLine.isEmpty()) {
-            say("client " + client.getIdentifierString() + (client.isServiceClient() ? "is" : "is not") + " a service client");
+        if (inputLine.getArgCount() == 0) {
+            for (Identifiable identifiable : identifiables) {
+                OA2Client client = (OA2Client) identifiable;
+                say("client " + client.getIdentifierString() + (client.isServiceClient() ? " is" : " is not") + " a service client");
+            }
             return;
         }
+
+
         Boolean newValue = null;
         if (inputLine.hasArg("true") || inputLine.hasArg("on")) {
             newValue = true;
@@ -1142,13 +1079,17 @@ public class OA2ClientCommands extends ClientStoreCommands {
             say("unknown value");
             return;
         }
-        boolean oldValue = client.isServiceClient();
-        if (oldValue == newValue) {
-            say("no change to value");
-            return;
+        for (Identifiable identifiable : identifiables) {
+            OA2Client client = (OA2Client) identifiable;
+            boolean oldValue = client.isServiceClient();
+            if (oldValue == newValue) {
+                say("client " + client.getIdentifierString() + " already has " + (newValue ? "on" : "off"));
+                continue;
+            }
+            client.setServiceClient(newValue);
+            getStore().save(client);
+            say("client " + client.getIdentifierString() + " has been set to " + (newValue ? "on" : "off"));
         }
-        client.setServiceClient(newValue);
-        say("client " + client.getIdentifierString() + " has been set to " + (newValue ? "on" : "off"));
     }
 
     @Override
@@ -1166,6 +1107,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
 
     /**
      * Returns the number of actual updates.
+     *
      * @param newID
      * @param copyOnly
      * @param doErsatzID
@@ -1173,10 +1115,10 @@ public class OA2ClientCommands extends ClientStoreCommands {
      * @return
      */
     private int updateP(Identifier oldID,
-            Identifier newID,
-                         boolean copyOnly,
-                         boolean doErsatzID,
-                         List<Permission> permissions) {
+                        Identifier newID,
+                        boolean copyOnly,
+                        boolean doErsatzID,
+                        List<Permission> permissions) {
         int count = 0;
         if (!copyOnly) {
             // Do not just copy the permissions with the new ID, remove the old ones.
@@ -1187,7 +1129,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
                 // The call to the store to get the chain may return extra items, since
                 // the chain is JSON. This double checks we are only actually altering
                 // permissions that actually need it.
-                if(p.getErsatzChain().contains(oldID)) {
+                if (p.getErsatzChain().contains(oldID)) {
                     int ndx = p.getErsatzChain().indexOf(oldID);
                     p.getErsatzChain().set(ndx, newID); // order must be preserved!!
                     getEnvironment().getPermissionStore().save(p); // need batch mode for this?

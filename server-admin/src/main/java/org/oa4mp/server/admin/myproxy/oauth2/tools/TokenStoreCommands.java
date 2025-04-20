@@ -1,14 +1,13 @@
 package org.oa4mp.server.admin.myproxy.oauth2.tools;
 
-import org.oa4mp.server.loader.oauth2.storage.tx.TXRecord;
-import org.oa4mp.server.loader.oauth2.storage.tx.TXStore;
-import org.oa4mp.server.admin.myproxy.oauth2.base.StoreCommands2;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
-import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
+import org.oa4mp.server.admin.myproxy.oauth2.base.StoreCommands2;
+import org.oa4mp.server.loader.oauth2.storage.tx.TXRecord;
+import org.oa4mp.server.loader.oauth2.storage.tx.TXStore;
 
 import java.io.IOException;
 import java.util.Date;
@@ -34,7 +33,7 @@ public class TokenStoreCommands extends StoreCommands2 {
 
     @Override
     public boolean update(Identifiable identifiable) throws IOException {
-        say("Mass update not implemented yet. You can still update individual properties");
+        say("update for all properties not implemented yet. You can still update individual properties");
         return false;
     }
 
@@ -54,14 +53,13 @@ public class TokenStoreCommands extends StoreCommands2 {
         return (TXStore<? extends TXRecord>) getStore();
     }
 
-    public void get_by_parent(InputLine inputLine){
+    public void get_by_parent(InputLine inputLine) throws Throwable {
         if(showHelp(inputLine)){
-            say("get_by_parent id - get a simple list of the exchange records for a given transaction id");
+            say("get_by_parent index - get a simple list of the exchange records for a given transaction id");
+            printIndexHelp(true);
             return;
         }
-        String lastArg = inputLine.getLastArg();
-
-        Identifier parentID = BasicIdentifier.newID(lastArg);
+        Identifier parentID = findSingleton(inputLine).getIdentifier();
         List<? extends TXRecord> txRecords = getTXStore().getByParentID(parentID);
         int i = 0;
         for(TXRecord txRecord : txRecords){

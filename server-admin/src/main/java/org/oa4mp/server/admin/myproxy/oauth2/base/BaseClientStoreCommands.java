@@ -21,6 +21,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.qdl_lang.variables.QDLStem;
 
 import java.io.File;
 import java.io.FileReader;
@@ -306,15 +307,18 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
         clientApprovalStoreCommands.showApproveHelp();
     }
 
-    public void approve(InputLine inputLine) throws IOException {
+    public void approve(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
             showApproveHelp();
             return;
         }
 
-        BaseClient client = (BaseClient) findItem(inputLine);
-        client = approvalMods(inputLine, client);
-        approve(client);
+        List<Identifiable> identifiables = findItem(inputLine);
+        for(Identifiable identifiable : identifiables) {
+            BaseClient client = (BaseClient) identifiable;
+            client = approvalMods(inputLine, client);
+            approve(client);
+        }
     }
 
     protected void approve(BaseClient client) throws IOException {
@@ -488,10 +492,13 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
         return clientApprovalStoreCommands.getResultSets().containsKey(name);
     }
 
+    QDLStem stem;
+
+/*
     @Override
-    public void rs(InputLine inputLine) throws Exception {
+    public void rs(InputLine inputLine) throws Throwable {
         // Have to take into account if the result set is for a set of approvals.
-        if (inputLine.hasArg(RS_SHOW_KEY)) {
+        if (inputLine.hasArg(RS_SHOW_ACTION)) {
             String name = inputLine.getLastArg();
 
             if (isCARS(name)) {
@@ -499,50 +506,42 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
                 return;
             }
         }
-        if (inputLine.hasArg(RS_CLEAR_KEY)) {
+        if (inputLine.hasArg(RS_CLEAR_ACTION)) {
             clientApprovalStoreCommands.setResultSets(new HashMap());
-            inputLine.removeSwitch(RS_CLEAR_KEY);
+            inputLine.removeSwitch(RS_CLEAR_ACTION);
         }
-        if (inputLine.hasArg(RS_REMOVE_KEY)) {
+        if (inputLine.hasArg(RS_REMOVE_ACTION)) {
             String name = inputLine.getLastArg();
             if (isCARS(name)) {
                 clientApprovalStoreCommands.getResultSets().remove(name);
                 return;
             }
         }
-        if (inputLine.hasArg(RS_LIST_INFO_KEY)) {
+        if (inputLine.hasArg(RS_LIST_INFO_ACTION)) {
             // List lists all things, so no test about where the rs is stored.
             clientApprovalStoreCommands.rs(inputLine);
-            inputLine.removeSwitch(RS_LIST_INFO_KEY);
+            inputLine.removeSwitch(RS_LIST_INFO_ACTION);
         }
         super.rs(inputLine);
     }
+*/
 
     @Override
-    public void rm(InputLine inputLine) throws IOException {
-        if (inputLine.hasArg(SEARCH_RESULT_SET_NAME)) {
-            String name = inputLine.getNextArgFor(SEARCH_RESULT_SET_NAME);
-            RSRecord rsRecord = null;
-            // get the right result set.
-            if (clientApprovalStoreCommands.getResultSets().containsKey(name)) {
-                rsRecord = clientApprovalStoreCommands.getResultSets().get(name);
-            } else {
-                rsRecord = resultSets.get(name);
-            }
-
-            if (rsRecord == null) {
-                say("no such stored result.");
+    public void rm(InputLine inputLine) throws Throwable {
+        if (hasRS(inputLine)) {
+            List<Identifiable> ids = findItem(inputLine);
+            if (ids == null) {
+                say("no objects found");
                 return;
             }
-            if (!"Y".equals(readline("Getting ready to remove " + rsRecord.rs.size() + " entries. Proceed?(Y/n)"))) {
+            if (!"Y".equals(readline("Getting ready to remove " + ids.size() + " entries. Proceed?(Y/n)"))) {
                 say("aborted");
                 return;
             }
-            getClientApprovalStore().remove(rsRecord.rs);
-            getStore().remove(rsRecord.rs);
+            getClientApprovalStore().remove(ids);
+            getStore().remove(ids);
 
             say("done!");
-            // now we have to remove all of the identifiers from both the
             return;
         }
 
@@ -593,19 +592,24 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
 
     public static int RESET_SECRET_DEFAULT_SIZE = 64;
 
-    public void reset_secret(InputLine inputLine) throws Exception {
+    public void reset_secret(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
-            say("reset_secret [" + RESET_SECRET_NEW_FLAG + " password] [" + RESET_SECRET_SIZE_FLAG + " byte_count] [id]");
+            say("reset_secret [" + RESET_SECRET_NEW_FLAG + " password] [" + RESET_SECRET_SIZE_FLAG + " byte_count] index");
             say("resets the current secret. This creates the hash of the new password.");
             say(RESET_SECRET_SIZE_FLAG + " = create a random secret with the given number of bytes.");
             say(RESET_SECRET_NEW_FLAG + " = explicitly give the secret and hash it.");
             say("If you specify both a secret and a size, the size is ignored.");
             say("No parameters mean a random secret of " + RESET_SECRET_DEFAULT_SIZE + " bytes (" + (RESET_SECRET_DEFAULT_SIZE * 8) + " bits) is created.");
             say("The password and secret are always printed.");
+            printIndexHelp(true);
             say("\nE.g. setting the password, be sure to put it in quotes to get the whole thing:\n");
             say("clients>reset_secret " + RESET_SECRET_NEW_FLAG + " \"miarzy doats and dozey doats\"");
             say("  password : miarzy doats and dozey doats");
             say("      hash : 4d6e44b6ddceeccfe15e2f67f356cc09bbcec411");
+            return;
+        }
+       if(hasRS(inputLine)){
+            say("result sets not supported for this operation");
             return;
         }
         int size = RESET_SECRET_DEFAULT_SIZE;
@@ -625,40 +629,50 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
             }
         }
 
+        List<Identifiable> identifiables = findItem(inputLine);
+        if (identifiables == null) {
+            say("no client specified.");
+        }
         String secret = null;
         boolean hasPassword = inputLine.hasArg(RESET_SECRET_NEW_FLAG);
         if (hasPassword) {
             secret = inputLine.getNextArgFor(RESET_SECRET_NEW_FLAG);
             inputLine.removeSwitchAndValue(RESET_SECRET_NEW_FLAG);
-        }
-        Identifiable identifiable = findItem(inputLine);
-        if (identifiable == null) {
-            say("no client specified.");
-        }
-        BaseClient client = (BaseClient) identifiable;
-
-        if (!hasPassword) {
-            byte[] y = new byte[size];
-            SecureRandom secureRandom = new SecureRandom();
-            secureRandom.nextBytes(y);
-            secret = Base64.encodeBase64URLSafeString(y);
+            if(identifiables.size() != 1){
+                say("Cannot reset the password for " + identifiables.size() + " clients");
+                return;
+            }
         }
 
+        for(Identifiable identifiable: identifiables) {
+            BaseClient client = (BaseClient) identifiable;
 
-        if (StringUtils.isTrivial(secret)) {
-            say("sorry but could not determine a secret");  // test just in case.
-            return;
+            if (!hasPassword) {
+                byte[] y = new byte[size];
+                SecureRandom secureRandom = new SecureRandom();
+                secureRandom.nextBytes(y);
+                secret = Base64.encodeBase64URLSafeString(y);
+            }
+
+
+            if (StringUtils.isTrivial(secret)) {
+                say("sorry but could not determine a secret for client '" + client.getIdentifier() + "'");  // test just in case.
+                continue;
+            }
+            String hash = DigestUtils.sha1Hex(secret);
+            client.setSecret(hash);
+            getStore().save(client);
+            if (-1 < secret.indexOf(" ")) {
+                // If there are blanks, put quotes around it.
+                secret = "\"" + secret + "\"";
+            }
+            say("client_id : " + client.getIdentifierString());
+            say("   secret : " + secret);
+            say("     hash : " + hash);
+            if(identifiables.size() != 1){
+                say(""); // add a blank line
+            }
         }
-        String hash = DigestUtils.sha1Hex(secret);
-        client.setSecret(hash);
-        getStore().save(client);
-        if (-1 < secret.indexOf(" ")) {
-            // If there are blanks, put quotes around it.
-            secret = "\"" + secret + "\"";
-        }
-        say("client_id : " + client.getIdentifierString());
-        say("   secret : " + secret);
-        say("     hash : " + hash);
     }
 
     @Override
@@ -756,13 +770,18 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
             }
         }
     }
-  // Fix https://github.com/ncsa/security-lib/issues/45 and https://github.com/ncsa/oa4mp/issues/243
+
+    // Fix https://github.com/ncsa/security-lib/issues/45 and https://github.com/ncsa/oa4mp/issues/243
     @Override
     public ChangeIDRecord doChangeID(Identifiable identifiable, Identifier newID, boolean updatePermissions) {
         ChangeIDRecord changeIDRecord = super.doChangeID(identifiable, newID, updatePermissions);
         // find the approval and update it now
         ClientApproval clientApproval = (ClientApproval) getClientApprovalStore().get(changeIDRecord.oldID);
-        getClientApprovalStore().remove(changeIDRecord.oldID);
+        if(clientApproval == null) {
+            clientApproval = (ClientApproval) getClientApprovalStore().create();
+        }else{
+            getClientApprovalStore().remove(changeIDRecord.oldID);
+        }
         clientApproval.setIdentifier(newID);
         getClientApprovalStore().save(clientApproval);
         return changeIDRecord;

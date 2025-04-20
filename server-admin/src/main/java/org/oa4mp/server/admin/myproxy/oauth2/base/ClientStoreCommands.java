@@ -89,15 +89,6 @@ public class ClientStoreCommands extends BaseClientStoreCommands {
     }
 
 
-    @Override
-    protected void doRename(Identifier srcID, Identifier targetID) {
-        super.doRename(srcID, targetID);
-        // Now fix approval
-        cloneApproval(srcID, targetID);
-        getClientApprovalStore().remove(srcID);
-
-    }
-
     private void cloneApproval(Identifier srcID, Identifier targetID) {
         ClientApproval oldCA = (ClientApproval) getClientApprovalStore().get(srcID);
         ClientApproval newCA = (ClientApproval) oldCA.clone();

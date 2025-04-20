@@ -64,7 +64,7 @@ public class TransactionStoreCommands extends StoreCommands2 {
 
     @Override
     public boolean update(Identifiable identifiable) throws IOException {
-        say("Mass update not implemented yet. You can still update individual properties");
+        say("update for all properties not implemented yet. You can still update individual properties");
         return false;
     }
 
@@ -75,15 +75,12 @@ public class TransactionStoreCommands extends StoreCommands2 {
         return t.getIdentifierString() + " auth time: " + t.getAuthTime();
     }
 
-    public void tokens(InputLine inputLine) throws Exception {
+    public void tokens(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
             showExpHelp();
             return;
         }
-        OA2ServiceTransaction t = (OA2ServiceTransaction) findItem(inputLine);
-        if (t == null) {
-            say("sorry, that transaction does not currently exist. ");
-        }
+        OA2ServiceTransaction t = (OA2ServiceTransaction) findSingleton(inputLine);
         int width = 30;
         String stile = " | ";
         boolean showAG = true;
@@ -180,7 +177,7 @@ public class TransactionStoreCommands extends StoreCommands2 {
     }
 
     private void showExpHelp() {
-        say("tokens [-at | -rt | -ag]");
+        say("tokens [-at | -rt | -ag] index");
         sayi("Show information about tokens such as if its a jwt, validity, issue time, expiration times, etc. in human readable format");
         sayi("No arguments means show everything. Flags are");
         sayi("-ag = authorization grant");
@@ -189,14 +186,16 @@ public class TransactionStoreCommands extends StoreCommands2 {
 
         sayi("If the tokens are not set, that is shown too with a set of ----");
         sayi("An asterisk before the token name means that that token has expired.");
+        printIndexHelp(true);
     }
 
-    public void claims(InputLine inputLine) throws Exception {
+    public void claims(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
             showClaimsHelp();
             return;
         }
-        OA2ServiceTransaction t = (OA2ServiceTransaction) findItem(inputLine);
+
+        OA2ServiceTransaction t = (OA2ServiceTransaction) findSingleton(inputLine);
         if (t.getUserMetaData() != null) {
 
             say(t.getUserMetaData().toString(1));
@@ -206,8 +205,9 @@ public class TransactionStoreCommands extends StoreCommands2 {
     }
 
     private void showClaimsHelp() {
-        say("claims");
+        say("claims index");
         sayi("Show the claims associated with this transaction. These are mostly used to create the id token");
+        printIndexHelp(true);
     }
 
     public static final String LS_AT_FLAG = "-at";
@@ -268,7 +268,7 @@ public class TransactionStoreCommands extends StoreCommands2 {
     }
 
     @Override
-    public void ls(InputLine inputLine) {
+    public void ls(InputLine inputLine) throws Throwable {
         // strategy is to fund the actual id and use that to construct the right input line
         // and pass it off to the super function so we don't have to re-invent the wheel.
         if (showHelp(inputLine)) {
@@ -303,9 +303,10 @@ public class TransactionStoreCommands extends StoreCommands2 {
 
     public void set_qdl_state(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
-            say("set_qdl_state " + CL_INPUT_FILE_FLAG + " file_path id");
+            say("set_qdl_state " + CL_INPUT_FILE_FLAG + " file_path index");
             say("replace the qdl state in the transaction with the contents of the file.");
             say("Note that the file is XML and will be converted as needed.");
+            printIndexHelp(true);
             say("See also: show_qdl_state");
             return;
         }
@@ -315,11 +316,7 @@ public class TransactionStoreCommands extends StoreCommands2 {
         }
         String f = inputLine.getNextArgFor(CL_INPUT_FILE_FLAG);
         inputLine.removeSwitchAndValue(CL_OUTPUT_FILE_FLAG);
-        OA2ServiceTransaction t = (OA2ServiceTransaction) findItem(inputLine);
-        if (t == null) {
-            say("sorry, I cannot find that transaction.");
-            return;
-        }
+        OA2ServiceTransaction t = (OA2ServiceTransaction) findSingleton(inputLine, "transaction not found");
         String rawFile = FileUtil.readFileAsString(f);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         GZIPOutputStream gzipOutputStream = new GZIPOutputStream(baos);
@@ -331,13 +328,15 @@ public class TransactionStoreCommands extends StoreCommands2 {
         say("done!");
     }
 
-    public void show_qdl_state(InputLine inputLine) throws Exception {
+    public void show_qdl_state(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
-            say("show_qdl_state [" + LS_AT_FLAG + "|" + LS_RT_FLAG + " " + CL_OUTPUT_FILE_FLAG + " file_path] id");
+            say("show_qdl_state [" + LS_AT_FLAG + "|" + LS_RT_FLAG + " " + CL_OUTPUT_FILE_FLAG + " file_path] index");
             say("Find the given transaction, get the current state from QDL and decode it.");
             say(CL_OUTPUT_FILE_FLAG + " file_path = You may optionally save it to a file.");
+            printIndexHelp(true);
             return;
         }
+
         String f = null;
         boolean saveFile = false;
         if (inputLine.hasArg(CL_OUTPUT_FILE_FLAG)) {
@@ -385,12 +384,7 @@ public class TransactionStoreCommands extends StoreCommands2 {
 
         }
 
-
-        OA2ServiceTransaction transaction = (OA2ServiceTransaction) findItem(inputLine);
-        if (transaction == null) {
-            say("transaction not found.");
-            return;
-        }
+        OA2ServiceTransaction transaction = (OA2ServiceTransaction) findSingleton(inputLine, "transaction not found");
         String rawState = transaction.getScriptState();
 
         if (StringUtils.isTrivial(rawState)) {
@@ -478,21 +472,23 @@ public class TransactionStoreCommands extends StoreCommands2 {
      * @param inputLine
      * @throws Exception
      */
-    public void gc_check(InputLine inputLine) throws Exception {
+    public void gc_check(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
-            say("gc_check [id|index] = check if the transaction would get garbage collected");
+            say("gc_check [id|index|rs] = check if the transaction would get garbage collected");
             say("                      in the current environment.");
             say("Note that the check is done assuming safe GC mode on the server is false.");
             return;
         }
-        Identifiable identifiable = findItem(inputLine);
-        if (identifiable == null) {
+        List<Identifiable> identifiables = findItem(inputLine);
+        if (identifiables == null) {
             say("Sorry, transaction not found");
             return;
         }
         RefreshTokenRetentionPolicy refreshTokenRetentionPolicy =
                 new RefreshTokenRetentionPolicy((RefreshTokenStore) getStore(), getTxStore(), "", false);
-        say("retain? " + refreshTokenRetentionPolicy.retain(identifiable.getIdentifier(), identifiable));
+        for(Identifiable identifiable : identifiables) {
+            say("retain? " + refreshTokenRetentionPolicy.retain(identifiable.getIdentifier(), identifiable));
+        }
     }
 
     public static String GC_SAFE_MODE_FLAG = "-safe_gc";
@@ -618,13 +614,6 @@ public class TransactionStoreCommands extends StoreCommands2 {
         }
     }
 
-    // Todo: Have a general gc facility to test, lock, unlock, etc???
-    public static String GC_CHECK_FLAG = "-check";
-    public static String GC_RUN_FLAG = "-run";
-    public static String GC_IS_LOCKED_FLAG = "-?";
-    public static String GC_IS_UNLOCK_FLAG = "-unlock";
-    public static String GC_IS_LOCK_FLAG = "-lock";
-    public static String GC_IS_ALARMS_FLAG = "-alarms";
 
 
     public void gc_lock(InputLine inputLine) throws Exception {

@@ -1,13 +1,5 @@
 package org.oa4mp.server.admin.myproxy.oauth2.tools;
 
-import edu.uiuc.ncsa.security.core.Identifier;
-import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import org.oa4mp.server.api.admin.adminClient.AdminClient;
-import org.oa4mp.server.loader.oauth2.storage.vi.VISerializationKeys;
-import org.oa4mp.server.loader.oauth2.storage.vi.VIStore;
-import org.oa4mp.server.loader.oauth2.storage.vi.VirtualIssuer;
-import org.oa4mp.server.loader.qdl.util.SigningCommands;
-import org.oa4mp.server.admin.myproxy.oauth2.base.StoreCommands2;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
@@ -18,12 +10,19 @@ import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import edu.uiuc.ncsa.security.util.jwk.JWKUtil2;
+import org.oa4mp.server.admin.myproxy.oauth2.base.StoreCommands2;
+import org.oa4mp.server.api.admin.adminClient.AdminClient;
+import org.oa4mp.server.loader.oauth2.storage.vi.VISerializationKeys;
+import org.oa4mp.server.loader.oauth2.storage.vi.VIStore;
+import org.oa4mp.server.loader.oauth2.storage.vi.VirtualIssuer;
+import org.oa4mp.server.loader.qdl.util.SigningCommands;
 
 import java.io.File;
 import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
+import java.util.List;
 
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 
@@ -155,10 +154,10 @@ public class VICommands extends StoreCommands2 {
         vi.setValid(true);
     }
 
-    public void new_keys(InputLine inputLine) throws Exception {
+    public void new_keys(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
-            say("new_keys");
-            sayi("Create a completely new set of keys,");
+            say("new_keys [id]");
+            sayi("Create a completely new set of keys for a virtual issuer.");
             sayi("You can create a default set of RSA keys with no arguments");
             sayi("A complete set of default elliptic curve keys is done with the " + EC_FLAG);
             sayi("E.g: Generate a new set of default elliptic curve keys");
@@ -172,8 +171,12 @@ public class VICommands extends StoreCommands2 {
 
             return;
         }
-        Identifiable id = findItem(inputLine);
-        if (id == null) {
+        if(hasRS(inputLine)){
+            say("result sets unsupported by this operation");
+            return;
+        }
+        List<Identifiable> identifiables = findItem(inputLine);
+        if (identifiables == null) {
             say("sorry, no such virtual issuer");
             return;
         }
@@ -198,7 +201,7 @@ public class VICommands extends StoreCommands2 {
             }
 
         }
-        VirtualIssuer vo = (VirtualIssuer) id;
+        VirtualIssuer vo = (VirtualIssuer) identifiables.get(0);
         if (vo.getJsonWebKeys() != null) {
             String ok = getInput("Did you want to overwrite the current set of keys?(y/n)", "n");
             if (ok.trim().equalsIgnoreCase("y")) {
@@ -254,18 +257,22 @@ public class VICommands extends StoreCommands2 {
         newKeys(vo, null); // do the spec default
     }
 
-    public void print_keys(InputLine inputLine) throws Exception {
+    public void print_keys(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
             say("print_keys");
             sayi("Print a quick summary of the JSON Web keys");
             return;
         }
-        Identifiable id = findItem(inputLine);
-        if (id == null) {
+        if(hasRS(inputLine)){
+            say("results sets not supported");
+            return;
+        }
+        List<Identifiable> identifiables = findItem(inputLine);
+        if (identifiables == null) {
             say("sorry, no such virtual issuer");
             return;
         }
-        VirtualIssuer vo = (VirtualIssuer) id;
+        VirtualIssuer vo = (VirtualIssuer) identifiables.get(0);
         if (vo.getJsonWebKeys() == null) {
             say("sorry, no JSON web keys set.");
             return;
@@ -299,24 +306,25 @@ public class VICommands extends StoreCommands2 {
 
     public void add_admin(InputLine inputLine) throws Throwable{
         if(showHelp(inputLine)){
-            say("add_admin admin_id [vi_id] - add the admin client to the current or given virtual issuer");
+            say("add_admin admin_id [vi_id] - add the admin client or a result set of them ");
+            say("to the current or given virtual issuer");
+            printIndexHelp(true);
             return;
         }
-        Identifiable id = findItem(inputLine);
-        if (id == null) {
-            say("sorry, no such virtual issuer");
+List<Identifiable> identifiables = findByIDOrRS(getEnvironment().getAdminClientStore(), inputLine.getArg(1));
+        if(identifiables == null){
+            say("no admin id could be found.");
             return;
         }
-        // the position of the admin client id is always the first argument.
-        Identifier adminID = BasicIdentifier.newID(inputLine.getArg(1));
-        if(adminID == null){
-            say("bad syntax -- no admin id could be found.");
-            return;
+        int count = 0;
+        Identifiable vi = findSingleton(inputLine, "virtual issuer not found");
+        for(Identifiable identifiable: identifiables){
+            AdminClient adminClient = (AdminClient) identifiable;
+            adminClient.setVirtualIssuer(vi.getIdentifier());
+            adminClient.setExternalVIName(vi.getIdentifierString());
+            getEnvironment().getAdminClientStore().save(adminClient);
+            count++;
         }
-        AdminClient adminClient = getEnvironment().getAdminClientStore().get(adminID);
-        adminClient.setVirtualIssuer(id.getIdentifier());
-        adminClient.setExternalVIName(id.getIdentifierString());
-        getEnvironment().getAdminClientStore().save(adminClient);
-        say("virtual issuer \"" + id.getIdentifierString() + "\"" + " set for admin client \"" + adminID + "\".");
+        say(count + " admin clients added to virtual issuer \"" + vi.getIdentifierString() + "\"");
     }
 }
