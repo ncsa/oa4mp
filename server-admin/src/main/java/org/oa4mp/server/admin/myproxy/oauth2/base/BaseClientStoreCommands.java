@@ -1,17 +1,12 @@
 package org.oa4mp.server.admin.myproxy.oauth2.base;
 
-import org.oa4mp.delegation.common.storage.clients.BaseClient;
-import org.oa4mp.delegation.common.storage.clients.BaseClientKeys;
-import org.oa4mp.delegation.common.storage.clients.ClientApprovalKeys;
-import org.oa4mp.delegation.server.storage.BaseClientStore;
-import org.oa4mp.delegation.server.storage.ClientApproval;
-import org.oa4mp.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
+import edu.uiuc.ncsa.security.storage.cli.FoundIdentifiables;
 import edu.uiuc.ncsa.security.util.cli.ExitException;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.cli.Sortable;
@@ -21,20 +16,27 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.qdl_lang.variables.QDLStem;
+import org.oa4mp.delegation.common.storage.clients.BaseClient;
+import org.oa4mp.delegation.common.storage.clients.BaseClientKeys;
+import org.oa4mp.delegation.common.storage.clients.ClientApprovalKeys;
+import org.oa4mp.delegation.server.storage.BaseClientStore;
+import org.oa4mp.delegation.server.storage.ClientApproval;
+import org.oa4mp.delegation.server.storage.ClientApprovalStore;
+import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URI;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.oa4mp.delegation.server.storage.ClientApproval.Status.*;
 import static edu.uiuc.ncsa.security.util.cli.CLIDriver.CLEAR_BUFFER_COMMAND;
 import static edu.uiuc.ncsa.security.util.cli.CLIDriver.EXIT_COMMAND;
+import static org.oa4mp.delegation.server.storage.ClientApproval.Status.*;
 
 /**
  * Commands for a base client store. This is the super class to several variations of clients.
@@ -180,6 +182,47 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
     }
 
     @Override
+    protected List<Identifiable> listEntries(List<Identifiable> entries, boolean lineList, boolean verboseList) {
+        if (entries == null || entries.isEmpty()) {
+            say("(no entries found)");
+            return entries;
+        }
+        List<ClientApproval> approvals = getClientApprovalStore().getAll();
+        HashMap<Identifier, ClientApproval> approvalMap = new HashMap<>();
+        for (ClientApproval a : approvals) {
+            approvalMap.put(a.getIdentifier(), a);
+        }
+
+        int i = 0;
+        getSortable().setState(null);
+        entries = getSortable().sort(entries);
+        for (Identifiable x : entries) {
+            ClientApproval tempA = approvalMap.get(x.getIdentifier());
+            if (tempA == null) {
+                tempA = new ClientApproval(x.getIdentifier());
+                tempA.setStatus(ClientApproval.Status.NONE);
+            }
+            if (lineList) {
+                if (i != 0) {
+                    say("-----");
+                }
+                longFormat((BaseClient) x, tempA, false);
+            } else {
+                if (verboseList) {
+                    longFormat((BaseClient) x, tempA, true);
+
+                } else {
+                    say(i + ". " + format((BaseClient) x, tempA));
+
+                }
+                i++;
+            }
+        }
+        return entries;
+
+    }
+
+/*    @Override
     protected List<Identifiable> listAll(boolean useLongFormat, String otherFlags) {
         loadAllEntries();
 
@@ -213,7 +256,7 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
             i++;
         }
         return allEntries;
-    }
+    }*/
 
     ClientApprovalStore clientApprovalStore;
 
@@ -302,23 +345,72 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
         return width;
     }
 
+    public static final String APPROVE_FLAG = "-approved";
+    public static final String APPROVER_KEY = "-approver";
 
     protected void showApproveHelp() {
         clientApprovalStoreCommands.showApproveHelp();
     }
+
 
     public void approve(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
             showApproveHelp();
             return;
         }
-
         List<Identifiable> identifiables = findItem(inputLine);
-        for(Identifiable identifiable : identifiables) {
-            BaseClient client = (BaseClient) identifiable;
-            client = approvalMods(inputLine, client);
-            approve(client);
+        if (identifiables == null || identifiables.isEmpty()) {
+            say("no clients found");
+            return;
         }
+        if (inputLine.getArgCount() == 0 && identifiables.size() == 1) {
+            // legacy case: no other flags and a single id
+            old_approve(inputLine, identifiables.get(0));
+            return;
+        }
+        // set up the client approval mods once, then just switch client.
+        ApprovalModsConfig approvalModsConfig = createApprovalModsConfig(inputLine, null, false);
+        // It is easier for the user to think of turning them off, but got to get
+        // the argument for the method right.
+        String approver;
+        if (inputLine.hasArg(APPROVER_KEY)) {
+            approver = inputLine.getNextArgFor(APPROVER_KEY);
+            inputLine.removeSwitchAndValue(APPROVER_KEY);
+        } else {
+            approver = getInput("Enter the name of the approver:", "");
+            if (approver.isEmpty()) {
+                say("approver required, exiting...");
+                return;
+            }
+        }
+        boolean approvalFlag = inputLine.hasArg(APPROVE_FLAG);
+        Boolean doApproval = true;
+        if (approvalFlag) {
+            doApproval = inputLine.getBooleanNextArgFor(APPROVE_FLAG);
+            if (doApproval == null) {
+                say("unrecognized value for " + APPROVE_FLAG);
+                return;
+            }
+            inputLine.removeSwitchAndValue(APPROVE_FLAG);
+        }
+
+        for (Identifiable identifiable : identifiables) {
+            OA2Client client = (OA2Client) identifiable;
+            approvalModsConfig.client = client;
+            client = (OA2Client) doApprovalMods(approvalModsConfig);
+            ClientApprovalStoreCommands.setupApprovalRecord(getClientApprovalStore(), client.getIdentifier(), doApproval, approver);
+            getStore().update(client);
+        }
+        say(identifiables.size() + " clients " + (doApproval ? "approved." : "unapproved."));
+    }
+
+    protected abstract ApprovalModsConfig createApprovalModsConfig(InputLine inputLine, BaseClient client, boolean doPrompt);
+
+    protected void old_approve(InputLine inputLine, Identifiable identifiable) throws Throwable {
+        // But everyone expects it to behave in the kludgy way for single approvals.
+            BaseClient client = (BaseClient) identifiable;
+            client = doApprovalMods(new ApprovalModsConfig(client, true));
+            approve(client);
     }
 
     protected void approve(BaseClient client) throws IOException {
@@ -341,30 +433,35 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
      * If there are modifications to the client before saving its approval (e.g.
      * admin clients should be prompted for QDL policy) put it here.
      *
-     * @param inputLine
-     * @param client
+     * @param approvalModsConfig
      * @return
      */
-    protected BaseClient approvalMods(InputLine inputLine, BaseClient client) throws IOException {
-        return client;
+    protected BaseClient doApprovalMods(ApprovalModsConfig approvalModsConfig) throws IOException {
+        return approvalModsConfig.client;
     }
 
-    @Override
-    protected void rmCleanup(Identifiable x) {
-        if (getStore().containsKey(x.getIdentifier())) { // double checks not removing a live record!
-            sayi("client still active, cannot remove approval");
-        } else {
-            getClientApprovalStore().remove(x.getIdentifier());
-            sayi("approval record removed");
+    public static class ApprovalModsConfig{
+        public ApprovalModsConfig(BaseClient client, boolean doPrompt) {
+            this.client = client;
+            this.doPrompt = doPrompt;
         }
+
+        public BaseClient client;
+        public boolean doPrompt = true;
+    }
+    @Override
+    protected void rmCleanup(FoundIdentifiables x) {
+        getClientApprovalStore().remove(x);// batch remove
+        say(x.size() + " approvals removed");
     }
 
 
     public void approver_search(InputLine inputLine) {
         if (showHelp(inputLine)) {
-            sayi("approver_search [ " + SEARCH_RESULT_SET_NAME + " rs_name] approver  - search for all " +
+            sayi("approver_search [ "  + SEARCH_SHORT_REGEX_FLAG +"] approver [" + SEARCH_RESULT_SET_NAME + " rs_name]  - search for all " +
                     "approvals by a given approver.");
             sayi(SEARCH_RESULT_SET_NAME + " rs_name - save the result set under then name rs_name");
+            sayi(SEARCH_SHORT_REGEX_FLAG + " - if present, treat the approver as a regex in the search.");
             sayi("Note that this searched for approvers restricted to current store. If you want");
             say("to search the entire set of approvers (and have regexes and dates available)");
             sayi("you should use the approvers component and do your searches there.");
@@ -372,47 +469,45 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
             return;
         }
 
+
         boolean saveRS = inputLine.hasArg(SEARCH_RESULT_SET_NAME);
         String rsName = null;
         if (saveRS) {
             rsName = inputLine.getNextArgFor(SEARCH_RESULT_SET_NAME);
             inputLine.removeSwitchAndValue(SEARCH_RESULT_SET_NAME);
         }
-        String approver = inputLine.getLastArg();
-
-        List<Identifier> ids = ((BaseClientStore) getStore()).getByApprover(approver, getClientApprovalStore());
-        List<Identifiable> acs = new ArrayList<>();
-        int i = 0;
-        for (Identifier id : ids) {
-            // We have to have an Identifiable to stash, but do not want to e.g. suck in
-            // a huge amount of information from the database. So we just get the ids and
-            // create a placeholder. We can do this since we control this.
-            ClientApproval ca = new ClientApproval(id);
-            ca.setApprover(approver);
-            acs.add(ca);
+        boolean isRegex = inputLine.hasArg(SEARCH_REGEX_FLAG) || inputLine.hasArg(SEARCH_SHORT_REGEX_FLAG);
+        inputLine.removeSwitch(SEARCH_REGEX_FLAG);
+        inputLine.removeSwitch(SEARCH_SHORT_REGEX_FLAG);
+        if(0 == inputLine.getArgCount()){
+            say("missing approver. exiting...");
+            return;
         }
+        String approver = inputLine.getLastArg();
         ClientApprovalKeys caKeys = (ClientApprovalKeys) getClientApprovalStore().getMapConverter().getKeys();
+        //List<Identifier> ids = ((BaseClientStore) getStore()).getByApprover(approver, getClientApprovalStore());
+        List<Identifiable> approvals = getClientApprovalStore().search(caKeys.approver(), approver, isRegex);
+        int i = 0;
+
         List<String> fields = new ArrayList<>();
         fields.add(caKeys.identifier());
         fields.add(caKeys.approver());
 
         if (saveRS) {
             // Remove it any same named from the client's saved result sets.
-            if (getResultSets().containsKey(rsName)) {
-                getResultSets().remove(rsName);
-                say("warning: overwriting existing client result set \"" + rsName + "\"");
-            }
-            clientApprovalStoreCommands.getResultSets().put(rsName, new RSRecord(acs, fields));
-            say("got " + acs.size() + " results.");
+            RSRecord rsRecord = new RSRecord(approvals, caKeys.allKeys());
+            getResultSets().put(rsName, rsRecord);
+            say("stored " + approvals.size() + " results.");
         } else {
-            clientApprovalStoreCommands.printRS(inputLine, acs, fields, null);
+            clientApprovalStoreCommands.printRS(inputLine, approvals, fields, null);
         }
     }
 
     public void status_search(InputLine inputLine) {
         if (showHelp(inputLine)) {
-            sayi("status_search [" + SEARCH_RESULT_SET_NAME + " rs_name] status - search for all clients with the given status");
+            sayi("status_search [-size] [" + SEARCH_RESULT_SET_NAME + " rs_name] status - search for all clients with the given status");
             sayi(SEARCH_RESULT_SET_NAME + " rs_name - save the result set under the given name");
+            say("-size = just return the number of clients found in the search.");
             sayi("status - the status. Allowed ones are");
             sayi(StringUtils.RJustify(APPROVED.getStatus(), 10) + " or a = approved");
             sayi(StringUtils.RJustify(DENIED.getStatus(), 10) + " or d = denied");
@@ -426,6 +521,8 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
             return;
         }
 
+        boolean sizeOnly = inputLine.hasArg("-size");
+        inputLine.removeSwitch("-size");
         boolean saveRS = inputLine.hasArg(SEARCH_RESULT_SET_NAME);
         String rsName = null;
         if (saveRS) {
@@ -449,24 +546,31 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
             case "r":
                 rawStatus = REVOKED.getStatus();
                 break;
+            default:
+                say("unknown status: " + rawStatus);
+                return;
         }
         BaseClientStore clientStore = (BaseClientStore) getStore();
         List<Identifier> ids = clientStore.getByStatus(rawStatus, getClientApprovalStore());
 
-        List<Identifiable> acs = new ArrayList<>();
+        if(sizeOnly){
+            say("there are " + ids.size() + " clients with the status " + rawStatus);
+            return;
+        }
+        List<Identifiable> acs = new ArrayList<>(ids.size());
         int i = 0;
+        BigDecimal bd = new BigDecimal(Math.ceil(Math.log10(ids.size())));
+        int numberWidth = bd.intValue() + 1;
         for (Identifier id : ids) {
             // We have to have an Identifiable to stash, but do not want to e.g. suck in
             // a huge amount of information from the database. So we just get the ids and
             // create a placeholder. We can do this since we control this.
-            ClientApproval ca = new ClientApproval(id);
-            ca.setStatus(ClientApproval.Status.resolveByStatusValue(rawStatus));
-            acs.add(ca);
+            acs.add((Identifiable) getStore().get(id));
+            if(!saveRS){
+                say(StringUtils.RJustify((i++)+".", numberWidth) + " " + id.toString());
+            }
         }
-        ClientApprovalKeys caKeys = (ClientApprovalKeys) getClientApprovalStore().getMapConverter().getKeys();
-        List<String> fields = new ArrayList<>();
-        fields.add(caKeys.identifier());
-        fields.add(caKeys.status());
+
 
         if (saveRS) {
             // Remove it any same named from the client's saved result sets.
@@ -475,10 +579,11 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
                 say("warning: overwriting existing client result set \"" + rsName + "\"");
             }
             say("got " + acs.size() + " results");
-            clientApprovalStoreCommands.getResultSets().put(rsName, new RSRecord(acs, fields));
-        } else {
-            clientApprovalStoreCommands.printRS(inputLine, acs, fields, null);
+            getResultSets().put(rsName, new RSRecord(acs, getMapConverter().getKeys().allKeys()));
+            return;
         }
+        say();
+        say(acs.size() + " clients with status " + rawStatus);
     }
 
     /**
@@ -492,7 +597,6 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
         return clientApprovalStoreCommands.getResultSets().containsKey(name);
     }
 
-    QDLStem stem;
 
 /*
     @Override
@@ -526,14 +630,14 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
     }
 */
 
-    @Override
+/*    @Override
     public void rm(InputLine inputLine) throws Throwable {
-        if (hasRS(inputLine)) {
-            List<Identifiable> ids = findItem(inputLine);
-            if (ids == null) {
-                say("no objects found");
-                return;
-            }
+        FoundIdentifiables ids = findItem(inputLine);
+        if (ids == null) {
+            say("no objects found");
+            return;
+        }
+        if (ids.isRS()) {
             if (!"Y".equals(readline("Getting ready to remove " + ids.size() + " entries. Proceed?(Y/n)"))) {
                 say("aborted");
                 return;
@@ -546,7 +650,7 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
         }
 
         super.rm(inputLine); // removes exactly the client
-    }
+    }*/
 
     public void password(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
@@ -608,10 +712,7 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
             say("      hash : 4d6e44b6ddceeccfe15e2f67f356cc09bbcec411");
             return;
         }
-       if(hasRS(inputLine)){
-            say("result sets not supported for this operation");
-            return;
-        }
+
         int size = RESET_SECRET_DEFAULT_SIZE;
         boolean hasSize = inputLine.hasArg(RESET_SECRET_SIZE_FLAG);
         if (hasSize) {
@@ -629,22 +730,26 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
             }
         }
 
-        List<Identifiable> identifiables = findItem(inputLine);
+        FoundIdentifiables identifiables = findItem(inputLine);
         if (identifiables == null) {
             say("no client specified.");
+        }
+        if (identifiables.isSingleton()) {
+            say("only a single object not supported for this operation");
+            return;
         }
         String secret = null;
         boolean hasPassword = inputLine.hasArg(RESET_SECRET_NEW_FLAG);
         if (hasPassword) {
             secret = inputLine.getNextArgFor(RESET_SECRET_NEW_FLAG);
             inputLine.removeSwitchAndValue(RESET_SECRET_NEW_FLAG);
-            if(identifiables.size() != 1){
+            if (identifiables.size() != 1) {
                 say("Cannot reset the password for " + identifiables.size() + " clients");
                 return;
             }
         }
 
-        for(Identifiable identifiable: identifiables) {
+        for (Identifiable identifiable : identifiables) {
             BaseClient client = (BaseClient) identifiable;
 
             if (!hasPassword) {
@@ -669,7 +774,7 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
             say("client_id : " + client.getIdentifierString());
             say("   secret : " + secret);
             say("     hash : " + hash);
-            if(identifiables.size() != 1){
+            if (identifiables.size() != 1) {
                 say(""); // add a blank line
             }
         }
@@ -777,9 +882,9 @@ public abstract class BaseClientStoreCommands extends StoreCommands2 {
         ChangeIDRecord changeIDRecord = super.doChangeID(identifiable, newID, updatePermissions);
         // find the approval and update it now
         ClientApproval clientApproval = (ClientApproval) getClientApprovalStore().get(changeIDRecord.oldID);
-        if(clientApproval == null) {
+        if (clientApproval == null) {
             clientApproval = (ClientApproval) getClientApprovalStore().create();
-        }else{
+        } else {
             getClientApprovalStore().remove(changeIDRecord.oldID);
         }
         clientApproval.setIdentifier(newID);

@@ -12,7 +12,7 @@
            type=default
            qdl{
               load="ui-test/at-echo.qdl"
-              xmd={exec_phase=["post_token","post_refresh","post_user_info"]}
+              xmd={exec_phase=["post_token","post_refresh","post_exchange"]}
            } //end QDL
         } // end access token
         refresh{
@@ -20,10 +20,11 @@
         } //end refresh token
       } //end tokens
 */
-say('at-echo scopes=' + print(scopes.));
+debugger(1);
+debugger(1,'***at-echo raw scopes :' + print(scopes.));
 s. := size(tx_scopes.) == 0 ? scopes. : tx_scopes.;
 a. := size(tx_audience.) == 0? audience. : tx_audience.;
-say('***   at-echo scopes :' + s.);
-say('*** at-echo audience :' + a.);
+debugger(1,'***    at-echo scopes :' + s.);
+debugger(1,'***  at-echo audience :' + a.);
 access_token.'scope' := detokenize(s., ' ');
 0 < size(a.)? access_token.'aud' := detokenize(a., ' ');

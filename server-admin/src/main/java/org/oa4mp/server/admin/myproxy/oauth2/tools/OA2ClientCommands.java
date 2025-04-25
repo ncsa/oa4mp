@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.XMLMap;
+import edu.uiuc.ncsa.security.storage.cli.FoundIdentifiables;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
@@ -26,7 +27,6 @@ import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2ClientKeys;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.*;
 
 import static org.oa4mp.server.loader.oauth2.storage.clients.OA2Client.USE_SERVER_DEFAULT;
@@ -98,7 +98,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
         say("cb -rm [cb1, cb2,...] /index = remove the given callbacks from the client.");
         say("Note that you must supply a list of callbacks");
         say("\nE.g. to add a a few callbacks you would invoke");
-        say("cb -add https://foo1, https://foo2,https://foo3 /oa4mp:client/id/234234234234");
+        say("cb -add [https://foo1, https://foo2,https://foo3 /oa4mp:client/id/234234234234]");
         say("\nThis adds the three urls to the current list for the client with the given id.");
         printIndexHelp(true);
     }
@@ -114,15 +114,23 @@ public class OA2ClientCommands extends ClientStoreCommands {
         OA2Client client = (OA2Client) findSingleton(inputLine);
         if (inputLine.hasArg("-add")) {
             gotOne = true;
-            Collection<String> cbs = getCBS(inputLine);
-            // form is that the last argument is the index, so there has to be at least
-            processDBAdd(client, cbs);
+            List<String> cbs = inputLine.getArgList("-add");
+            client.getCallbackURIs().addAll(cbs);
+            getStore().save(client);
             return;
         }
         if (inputLine.hasArg("-rm")) {
             gotOne = true;
-            Collection<String> cbs = getCBS(inputLine);
-            removeCB(client, cbs);
+            Collection<String> cbs = inputLine.getArgList("-rm");
+            Collection<String> storedCBs = client.getCallbackURIs();
+            List<String> target = new ArrayList<>(storedCBs.size());
+            for (String cb : storedCBs) {
+                if (!cbs.contains(cb)) {
+                    target.add(cb);
+                }
+            }
+            client.setCallbackURIs(target);
+            getStore().save(client);
             return;
         }
         if (inputLine.hasArg("-list")) {
@@ -135,71 +143,6 @@ public class OA2ClientCommands extends ClientStoreCommands {
         }
         if (!gotOne) {
             say("Sorry, no command found. Show help for this topic if you need to.");
-        }
-    }
-
-    protected void removeCB(OA2Client client, Collection<String> cbs) throws IOException {
-        if (cbs.isEmpty()) {
-            //    say("Enter callbacks to remove. A blank line ends input");
-            say("nothing to remove");
-
-        }
-        client.getCallbackURIs().remove(cbs);
-        String response = getInput("Save?(y/n)", "n");
-        if (response.equals("y")) {
-            getStore().save(client);
-            say("done.");
-        } else {
-            say("not saved.");
-        }
-    }
-
-    protected Collection<String> getCBS(InputLine inputLine) {
-        Collection<String> cbs = new LinkedList<>();
-        List<String> allArgs = inputLine.getArgs();
-        // have to pull off the arguments. The input line looks like e.g.
-        // -add A,B, C,  D,E  /index
-        // where we need to normalize it to A,B,C,D,E and then split it, inspect each one as a URL
-        String newCBs = "";
-        for (int i = 1; i < allArgs.size() - 1; i++) {
-            newCBs = newCBs + allArgs.get(i).trim();
-        }
-        if (!newCBs.isEmpty()) {
-            StringTokenizer st = new StringTokenizer(newCBs, ",");
-            while (st.hasMoreTokens()) {
-                String nextToken = st.nextToken();
-                try {
-                    // This exists to verify that the entered value is a URI, naught else.
-                    URI tempURI = URI.create(nextToken);
-                  /*  if (!tempURI.getScheme().equals("https")) {
-                        say("Sorry but the protocol for \"" + nextToken + "\" is not supported. It must be https. Rejected.");
-                    } else {*/
-                    cbs.add(nextToken);
-                    //}
-                } catch (Throwable t) {
-                    say("Sorry but \"" + nextToken + "\" is not a valid URL. Skipped.");
-                }
-            }
-        }
-        return cbs;
-    }
-
-    protected void processDBAdd(OA2Client client, Collection<String> newArgs) throws IOException {
-        if (newArgs.isEmpty()) {
-            //   say("No callbacks, please enter them as a comma separated list. Empty line ends input.");
-            //  String line = readline();
-            say("No callbacks to add.");
-            return;
-        } else {
-            client.getCallbackURIs().addAll(newArgs);
-
-        }
-        String response = getInput("Save changes?(y/n)", "n");
-        if (response.equals("y")) {
-            getStore().save(client);
-            say("Saved.");
-        } else {
-            say("not saved.");
         }
     }
 
@@ -567,7 +510,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
             say("See also: set_comment");
             return;
         }
-        List<Identifiable> identifiables = findItem(inputLine);
+        FoundIdentifiables identifiables = findItem(inputLine);
         if (identifiables == null) {
             say("Object not found");
             return;
@@ -674,38 +617,53 @@ public class OA2ClientCommands extends ClientStoreCommands {
             say("in the QDL runtime environment. OA4MP does nothing with these except pass them through.");
             return;
         }
-        List<Identifiable> identifiables = findItem(inputLine);
+        FoundIdentifiables identifiables = findItem(inputLine);
         if (identifiables == null) {
             say("object not found");
             return;
         }
         if (!inputLine.hasArgs()) {
             for (Identifiable identifiable : identifiables) {
-                say("has extended attribute support? " + ((OA2Client) identifiables).hasExtendedAttributeSupport());
+                if(identifiables.isRS()){
+                    identifiable = (Identifiable) getStore().get(identifiable.getIdentifier());
+                }
+                say("(" + ((OA2Client) identifiable).hasExtendedAttributeSupport() + ")  " + identifiable.getIdentifierString());
             }
             return;
         }
-        boolean enable = inputLine.getLastArg().equalsIgnoreCase("on") || inputLine.getLastArg().equalsIgnoreCase("true");
-        boolean disable = inputLine.getLastArg().equalsIgnoreCase("off") || inputLine.getLastArg().equalsIgnoreCase("false");
-        for (Identifiable identifiable : identifiables) {
-            OA2Client client = (OA2Client) identifiable;
-            if (enable || disable) {
-                if (enable) {
-                    client.setExtendedAttributeSupport(true);
-                    say("extended attribute support enabled");
+        String action = "";
+        final String ACTION_ENABLE = "enabled";
+        final String ACTION_DISABLE = "disabled";
+        if (inputLine.getLastArg().equalsIgnoreCase("on") || inputLine.getLastArg().equalsIgnoreCase("true")) {
+            action = ACTION_ENABLE;
+        } else {
+            if (inputLine.getLastArg().equalsIgnoreCase("off") || inputLine.getLastArg().equalsIgnoreCase("false")) {
+                action = ACTION_DISABLE;
+            } else {
+                action = inputLine.getLastArg();
+            }
+        }
+
+            for (Identifiable identifiable : identifiables) {
+                if(identifiables.isRS()){
+                    identifiable = (Identifiable) getStore().get(identifiable.getIdentifier());
                 }
-                if (disable) {
-                    client.setExtendedAttributeSupport(false);
-                    say("extended attribute support disabled");
+                OA2Client client = (OA2Client) identifiable;
+                switch (action) {
+                    case ACTION_ENABLE:
+                        client.setExtendedAttributeSupport(true);
+                        break;
+                    case ACTION_DISABLE:
+                        client.setExtendedAttributeSupport(false);
+                        break;
+                    default:
+                        say("unknown action \"" + action + "\", aborting");
+                        return;
+
                 }
                 getStore().save(client);
-                return;
-            } else {
-                say("unrecognized option \"" + inputLine.getLastArg() + "\"");
-                return;
             }
-
-        }
+            say(identifiables.size() + " clients ea_support " + action);
     }
 
     @Override
@@ -719,13 +677,46 @@ public class OA2ClientCommands extends ClientStoreCommands {
     public static String UUC_FLAG_FOUND = "-found";
     public static String UUC_FLAG_ENABLE = "-enable";
 
+
+    protected ApprovalModsConfig createApprovalModsConfig(InputLine inputLine, BaseClient client, boolean doPrompt) {
+        boolean useStrictScopes = !inputLine.hasArg(USE_NONSTRICT_SCOPES);
+        inputLine.removeSwitch(USE_NONSTRICT_SCOPES);
+        return new OA2ClientApprovalMods(client, doPrompt, useStrictScopes);
+    }
+
+    public static class OA2ClientApprovalMods extends ApprovalModsConfig {
+        public OA2ClientApprovalMods(BaseClient client, boolean doPrompt, boolean useStrictScopes) {
+            super(client, doPrompt);
+            this.useStrictScopes = useStrictScopes;
+        }
+
+        public boolean useStrictScopes = true;
+    }
+
     @Override
-    protected BaseClient approvalMods(InputLine inputLine, BaseClient client) throws IOException {
-        OA2Client oa2Client = (OA2Client) client;
-        OA2ClientKeys keys = (OA2ClientKeys) getSerializationKeys();
-        oa2Client.setStrictscopes(getPropertyHelp(keys.strictScopes(), "strict scopes?(y/n)", oa2Client.useStrictScopes() ? "y" : "n").equalsIgnoreCase("y"));
+    protected BaseClient doApprovalMods(ApprovalModsConfig approvalModsConfig) throws IOException {
+        OA2Client oa2Client = (OA2Client) approvalModsConfig.client;
+        if (approvalModsConfig.doPrompt) {
+            OA2ClientKeys keys = (OA2ClientKeys) getSerializationKeys();
+            oa2Client.setStrictscopes(getPropertyHelp(keys.strictScopes(), "strict scopes?(y/n)", oa2Client.useStrictScopes() ? "y" : "n").equalsIgnoreCase("y"));
+        } else {
+            oa2Client.setStrictscopes(((OA2ClientApprovalMods) approvalModsConfig).useStrictScopes);
+        }
         return oa2Client;
     }
+
+    public static final String USE_NONSTRICT_SCOPES = "-nonstrict";
+
+    @Override
+    protected void showApproveHelp() {
+        say("approve item -- interactively approve a single client");
+        say("approve [" + APPROVE_FLAG + " true | false] [" + USE_NONSTRICT_SCOPES + " ] " + APPROVER_KEY + " username item --  approve/unapprove a result set");
+        say(USE_NONSTRICT_SCOPES + " = if present, grant the client non-strict scopes. Default si strict scopes.");
+        say(APPROVE_FLAG + " = true (default), set the client as approved. If false, unapprove it.");
+        say(APPROVER_KEY + " userName = (required) the name of the approver. If missing you will be prompted.");
+        printIndexHelp(false);
+    }
+
 
     public static String E_CREATE_FLAG = "-create";
     public static String E_LINK_FLAG = "-link";
@@ -1017,29 +1008,33 @@ public class OA2ClientCommands extends ClientStoreCommands {
 
     // Fixes https://github.com/ncsa/oa4mp/issues/163
     @Override
-    protected void rmCleanup(Identifiable x) {
-        super.rmCleanup(x);
-        if (getStore().containsKey(x.getIdentifier())) { // double checks not removing a live record!
-            sayi("client still active, cannot remove permissions");
-            return;
+    protected void rmCleanup(FoundIdentifiables foundIdentifiables) {
+        super.rmCleanup(foundIdentifiables);
+        int adminCount = 0;
+        int permissionCount = 0;
+        int skippedCount = 0;
+        for (Identifiable x : foundIdentifiables) {
+            List<Identifier> admins = getPermissionsStore().getAdmins(x.getIdentifier());
+            // Fix https://github.com/ncsa/oa4mp/issues/174
+            switch (admins.size()) {
+                case 0:
+                    // no admins, nothing to do.
+                    skippedCount++;
+                    break;
+                case 1:
+                    // Fix https://github.com/ncsa/oa4mp/issues/163
+                    PermissionList permissions = getPermissionsStore().get(admins.get(0), x.getIdentifier());
+                    getPermissionsStore().remove(permissions); // removes all the permission objects
+                    sayi("permissions removed:" + permissions.size());
+                    adminCount++;
+                    permissionCount = permissions.size() + permissionCount;
+                    break;
+                default:
+                    skippedCount++;
+                    sayi("too many admins for \"" + x.getIdentifierString() + "\". Remove permission manually and specify both admin and client ids");
+            }
         }
-
-        List<Identifier> admins = getPermissionsStore().getAdmins(x.getIdentifier());
-        // Fix https://github.com/ncsa/oa4mp/issues/174
-        switch (admins.size()) {
-            case 0:
-                // no admins, nothing to do.
-                sayi("done");
-                break;
-            case 1:
-                // Fix https://github.com/ncsa/oa4mp/issues/163
-                PermissionList permissions = getPermissionsStore().get(admins.get(0), x.getIdentifier());
-                getPermissionsStore().remove(permissions); // removes all the permission objects
-                sayi("permissions removed:" + permissions.size());
-                break;
-            default:
-                sayi("too many admins, remove permission manually and specify both admin and client ids");
-        }
+        say("admins removed: " + adminCount + ", total permissions removed: " + permissionCount + ", skipped (not administered): " + skippedCount);
     }
 
     // Fix https://github.com/ncsa/oa4mp/issues/224
@@ -1053,11 +1048,10 @@ public class OA2ClientCommands extends ClientStoreCommands {
             printIndexHelp(false);
             return;
         }
-        List<Identifiable> identifiables = findItem(inputLine);
+        FoundIdentifiables identifiables = findItem(inputLine);
         if (identifiables == null) {
             say("Sorry, client not found");
             return;
-
         }
         if (inputLine.getArgCount() == 0) {
             for (Identifiable identifiable : identifiables) {

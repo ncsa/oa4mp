@@ -12,6 +12,7 @@ import edu.uiuc.ncsa.security.util.cli.CommandLineTokenizer;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import org.oa4mp.delegation.common.token.impl.TokenUtils;
 import org.oa4mp.server.loader.oauth2.OA2SE;
+import org.qdl_lang.evaluate.SystemEvaluator;
 import org.qdl_lang.parsing.QDLInterpreter;
 import org.qdl_lang.state.State;
 import org.qdl_lang.variables.QDLList;
@@ -29,19 +30,18 @@ import java.util.Vector;
  */
 public abstract class StoreCommands2 extends StoreCommands {
 
-    public StoreCommands2(MyLoggingFacade logger, String defaultIndent, Store store) throws Throwable{
+    public StoreCommands2(MyLoggingFacade logger, String defaultIndent, Store store) throws Throwable {
         super(logger, defaultIndent, store);
     }
 
-    public StoreCommands2(MyLoggingFacade logger, Store store)throws Throwable {
+    public StoreCommands2(MyLoggingFacade logger, Store store) throws Throwable {
         super(logger, store);
     }
 
 
-
     @Override
     public OA2SE getEnvironment() {
-        return (OA2SE)super.getEnvironment();
+        return (OA2SE) super.getEnvironment();
     }
 
     static final String BASE_32_FLAG = "-32";
@@ -110,11 +110,6 @@ public abstract class StoreCommands2 extends StoreCommands {
     }
 
 
-
-
-
-
-
     public static void main(String[] args) {
         CommandLineTokenizer CLT = new CommandLineTokenizer();
         String raw = "update -add -json '{\"fnord\":[\"blarf0\",\"blarf1\"]}' /foo:bar";
@@ -141,8 +136,10 @@ rs show -range [;5] -attr [client_id,creation_ts] X
 rs show -range [-3;0] -attr [client_id,creation_ts] X
 rs show -range [2^2;2^3] -attr [client_id,creation_ts] X
  */
+
     /**
      * Parse lists using QDL. This will remove these are arguments if found.
+     *
      * @param inputLine
      * @param key
      * @return
@@ -151,55 +148,81 @@ rs show -range [2^2;2^3] -attr [client_id,creation_ts] X
     @Override
     protected List processList(InputLine inputLine, String key) throws Exception {
         // Allow singletons, which requires testing and maybe an exception
-        if(!inputLine.hasArg(key)){
+        if (!inputLine.hasArg(key)) {
             return null;
         }
-        try{
+        try {
             int index = Integer.parseInt(inputLine.getNextArgFor(key));
             QDLList qdlList = new QDLList();
             qdlList.add(index);
             inputLine.removeSwitchAndValue(key);
             return qdlList;
-        }catch(Throwable t){
+        } catch (Throwable t) {
             // was not just a number
         }
-        String originalLine = inputLine.getOriginalLine();
-        int startKey = originalLine.indexOf(key);
-        int endListIndex = originalLine.indexOf("]",startKey);
-        int startListIndex = originalLine.indexOf("[",startKey);
-        String list = originalLine.substring(startListIndex,endListIndex+1);
-        if(list.isEmpty()){
-            throw new ObjectNotFoundException("no list was found");
-        }
-        // clean up
-        String newOL = originalLine.substring(0, startKey) + " " + originalLine.substring(endListIndex+1);
-        inputLine.setOriginalLine(newOL);
-        inputLine.reparse();
+        String list = extractRawList(inputLine, key);
+        String varName = "a.";
+        String executableLine = varName + " :=" + list + ";"; // so its a stem
         State state = getState();
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
 
         try {
-            interpreter.execute("a.:=" + list + ";");
-            Object o = state.getValue("a.");
+            interpreter.execute(executableLine);
+            Object o = state.getValue(varName);
             QDLStem qdlStem;
-            if(o instanceof QDLStem){
-                qdlStem = (QDLStem)o;
-                return qdlStem.getQDLList();
-            }else{
-                return null;
+            if (o == null) {
+                throw new ObjectNotFoundException("no such value for'" + key + "'");
             }
+            qdlStem = (QDLStem) o;
+            return qdlStem.getQDLList();
         } catch (Throwable e) {
             throw new GeneralException("Error interpreting list:" + e.getMessage(), e);
         }
     }
 
+    public void run_qdl(InputLine inputLine) throws Throwable {
+        if(showHelp(inputLine)) {
+            say("run_qdl [" + FILE_FLAG + " file_path] [statements]");
+            say("Run either a file using QDL's script_load call or directly interpret");
+            say(" the rest of the line as parseable QDL. Each store has a separate QDL state and");
+            say("interpreter. Since E.g. lists are generally processed as QDL, you can set variables");
+            say("and refer to them, or run other QDL.");
+            say("This is currently experimental.");
+            say();
+            say("E.g.");
+            say("The rest of the line must be completely valid QDL as all that we do is truncate off the commnd and pass the");
+            say("rest to the interpreter:");
+            say("run_qdl script_load('vfs#boot/init.qdl', true, -1);");
+            return;
+
+        }
+        String executableLine = null;
+        String file;
+        if(inputLine.hasArg(FILE_FLAG)) {
+            file = inputLine.getNextArgFor(FILE_FLAG);
+            executableLine = SystemEvaluator.LOAD_COMMAND + "(" + file + ");";
+        }else{
+            String commandName = inputLine.getArg(0);
+            int len = commandName.length();
+            executableLine = inputLine.getOriginalLine().substring(len);
+        }
+        QDLInterpreter interpreter = new QDLInterpreter(null, getState());
+        try {
+            interpreter.execute(executableLine.trim());
+        }catch (Throwable t) {
+            if(isVerbose()){t.printStackTrace();}
+            say("Error interpreting QDL:" + t.getMessage());
+        }
+    }
+
+
     public State getState() {
-        if(state == null){
+        if (state == null) {
             state = new State();
-            // Trick, pre-populate with keys
-            MapConverter mapConverter = (MapConverter)getStore().getXMLConverter();
+            // Trick, pre-populate with keys, so lists of them don't require escaping.
+            MapConverter mapConverter = (MapConverter) getStore().getXMLConverter();
             SerializationKeys serializationKeys = mapConverter.getKeys();
-            for(String key : serializationKeys.allKeys()){
+            for (String key : serializationKeys.allKeys()) {
                 state.setValue(key, key);
             }
         }

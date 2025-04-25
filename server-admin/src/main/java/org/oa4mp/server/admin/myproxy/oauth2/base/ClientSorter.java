@@ -72,7 +72,7 @@ public class ClientSorter extends BasicSorter {
 
     @Override
     public void setState(String args) {
-        if (!args.startsWith("-")) return;
+        if (args == null || !args.startsWith("-")) return;
         if (args.contains(ID_SORT_SWITCH)) {
             sortOnIds = true;
             sortOnDates = false;
@@ -82,7 +82,6 @@ public class ClientSorter extends BasicSorter {
             sortOnIds = false;
             sortOnDates = true;
             return;
-
         }
     }
 }

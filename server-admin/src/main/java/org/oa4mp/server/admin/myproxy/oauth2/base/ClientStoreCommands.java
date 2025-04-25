@@ -15,7 +15,7 @@ import java.io.IOException;
  * <p>Created by Jeff Gaynor<br>
  * on 5/21/13 at  4:21 PM
  */
-public class ClientStoreCommands extends BaseClientStoreCommands {
+public abstract class ClientStoreCommands extends BaseClientStoreCommands {
     public ClientStoreCommands(MyLoggingFacade logger,
                                String defaultIndent,
                                Store clientStore,

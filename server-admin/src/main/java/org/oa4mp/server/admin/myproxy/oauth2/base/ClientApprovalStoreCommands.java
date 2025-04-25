@@ -1,12 +1,15 @@
 package org.oa4mp.server.admin.myproxy.oauth2.base;
 
-import org.oa4mp.delegation.common.storage.clients.ClientApprovalKeys;
 import edu.uiuc.ncsa.security.core.Identifiable;
+import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
-import org.oa4mp.delegation.server.storage.ClientApproval;
+import edu.uiuc.ncsa.security.storage.cli.FoundIdentifiables;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
+import org.oa4mp.delegation.common.storage.clients.ClientApprovalKeys;
+import org.oa4mp.delegation.server.storage.ClientApproval;
+import org.oa4mp.delegation.server.storage.ClientApprovalStore;
 
 import java.io.IOException;
 import java.util.Date;
@@ -97,7 +100,6 @@ public class ClientApprovalStoreCommands extends StoreCommands2 {
         info("Approval update cancelled for id=" + clientApproval.getIdentifierString());
         return false;
     }
-
     public void showApproveHelp() {
         say("approve index");
         say("This is the simple case of approving a client or set of them.");
@@ -118,7 +120,7 @@ public class ClientApprovalStoreCommands extends StoreCommands2 {
         int fail = 0;
         boolean isapproved = isOk(getInput("set approved?", "y"));
         String approver = getInput("approver", "");
-        List<Identifiable> identifiables = findItem(inputLine);
+        FoundIdentifiables identifiables = findItem(inputLine);
         for (Identifiable identifiable : identifiables) {
             if(approve((ClientApproval) identifiable, isapproved, approver)){
                 pass++;
@@ -144,8 +146,7 @@ public class ClientApprovalStoreCommands extends StoreCommands2 {
             say("\nand any value not on this list is rejected.");
             return;
         }
-        boolean isRS = hasRS(inputLine);
-        List<Identifiable> item = findItem(inputLine);
+        FoundIdentifiables item = findItem(inputLine);
         if (item == null) {
             say("sorry, no record found.");
             return;
@@ -158,7 +159,7 @@ public class ClientApprovalStoreCommands extends StoreCommands2 {
         }
         for (Identifiable i : item) {
             ClientApproval approval = (ClientApproval) i;
-            if(isRS){
+            if(item.isRS()){
                 // Result sets are static and should supply the identifier. Don't just
                 // use the result set since that may overwrite other changes during save.
                 approval = (ClientApproval) getStore().get(approval.getIdentifierString());
@@ -208,7 +209,61 @@ public class ClientApprovalStoreCommands extends StoreCommands2 {
         String approver = getInput("approver", ca.getApprover());
        return  approve(ca, isapproved, approver);
     }
+
+    /**
+     * For thoses cases where the record needs to me fetched or created then set to the right values.
+     * This and {@link #setupApprovalRecord(ClientApproval, boolean, String)} are called in this class
+     * and are exposed as static methods to be called by other classes to central approvals.
+     * This does do the save of this record since it has the logic to invoke {@link Store#update(Identifiable)}
+     * versus {@link Store#save(Identifiable)}
+     * @param identifier
+     * @param isapproved
+     * @param approver
+     * @throws IOException
+     */
+    public static ClientApproval setupApprovalRecord(ClientApprovalStore caStore,
+                                                     Identifier identifier,
+                                                     boolean isapproved,
+                                                     String approver) throws IOException {
+        ClientApproval ca;
+        boolean wasCreated = false;
+        if(caStore.containsKey(identifier)){
+            ca = (ClientApproval) caStore.get(identifier);
+        }else{
+            ca = (ClientApproval) caStore.create();
+            ca.setIdentifier(identifier);
+            wasCreated = true;
+        }
+        setupApprovalRecord(ca, isapproved, approver);
+        if(wasCreated){
+            caStore.save(ca);
+        }else{
+            caStore.update(ca);
+        }
+        return ca;
+    }
     protected boolean approve(ClientApproval ca, boolean isapproved, String approver) throws IOException {
+        setupApprovalRecord(ca, isapproved, approver);
+
+
+        if (isOk(readline("save this approval record [y/n]?"))) {
+            getStore().save(ca);
+            sayi("approval saved");
+            info("Approval for id = " + ca.getIdentifierString() + " saved");
+            return true;
+        }
+        sayi("approval was not saved.");
+        info("Approval cancelled for id=" + ca.getIdentifierString());
+        return false;
+    }
+
+    /**
+     * Does the work of setting the approval status, approver etc. Does not save it.
+     * @param ca
+     * @param isapproved
+     * @param approver
+     */
+    public static void setupApprovalRecord(ClientApproval ca, boolean isapproved, String approver) {
         ca.setApprover(approver);
         if (isapproved) {
             ca.setApproved(true);
@@ -228,17 +283,6 @@ public class ClientApprovalStoreCommands extends StoreCommands2 {
                     // no change in either case.
             }
         }
-
-
-        if (isOk(readline("save this approval record [y/n]?"))) {
-            getStore().save(ca);
-            sayi("approval saved");
-            info("Approval for id = " + ca.getIdentifierString() + " saved");
-            return true;
-        }
-        sayi("approval was not saved.");
-        info("Approval cancelled for id=" + ca.getIdentifierString());
-        return false;
     }
 
     protected void show(boolean showApproved, String regex) throws Exception {
@@ -300,5 +344,16 @@ public class ClientApprovalStoreCommands extends StoreCommands2 {
     public void bootstrap() throws Throwable {
         super.bootstrap();
         getHelpUtil().load("/help/approver_help.xml");
+    }
+
+    @Override
+    public void change_id(InputLine inputLine) throws Throwable {
+        say("Changing IDs for client approvals is not supported since the client shares the same id. ");
+        say("Change the id of the client and the approvals will be updated automatically.");
+    }
+
+    @Override
+    protected int updateStorePermissions(Identifier newID, Identifier oldID, boolean copy) {
+        throw new UnsupportedOperationException("Not supported for approvals.");
     }
 }

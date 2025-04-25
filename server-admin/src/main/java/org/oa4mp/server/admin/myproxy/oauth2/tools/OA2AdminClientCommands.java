@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.storage.cli.FoundIdentifiables;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import net.sf.json.JSONObject;
 import org.oa4mp.delegation.common.storage.clients.BaseClient;
@@ -167,7 +168,7 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
             showCountClientsHelp();
             return;
         }
-        List<Identifiable> identifiables = findItem(inputLine);
+        FoundIdentifiables identifiables = findItem(inputLine);
         if (identifiables == null) {
             say("Sorry, there is no admin client for this identifier.");
             return;
@@ -260,7 +261,7 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
             }
             isRS = true;
             clientIDs = new ArrayList<>(clients.size());
-            for(Identifiable client : clients) {
+            for (Identifiable client : clients) {
                 clientIDs.add(client.getIdentifier());
             }
         }
@@ -372,7 +373,7 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
             }
             client_ids = new ArrayList<>(ids.size());
             // we need the identifiers
-            for(Identifiable id : ids) {
+            for (Identifiable id : ids) {
                 client_ids.add(id.getIdentifier());
             }
         }
@@ -492,12 +493,35 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
         super.bootstrap();
         getHelpUtil().load("/help/admin_help.xml");
     }
+    public static final String APPROVAL_QDL_ENABLE = "-qdl";
+
+    public static class AdminApprovalModsConfig extends ApprovalModsConfig{
+        public AdminApprovalModsConfig(BaseClient client, boolean doPrompt, boolean enableQDL) {
+            super(client, doPrompt);
+            this.enableQDL = enableQDL;
+        }
+
+        boolean enableQDL = false;
+    }
+    @Override
+    protected ApprovalModsConfig createApprovalModsConfig(InputLine inputLine, BaseClient client, boolean doPrompt) {
+        boolean enableQDL = false;
+        if(inputLine.hasArg(APPROVAL_QDL_ENABLE)) {
+            enableQDL = true;
+            inputLine.removeSwitch(APPROVAL_QDL_ENABLE);
+        }
+        return new AdminApprovalModsConfig(client, doPrompt, enableQDL);
+    }
 
     @Override
-    protected BaseClient approvalMods(InputLine inputLine, BaseClient client) throws IOException {
+    protected BaseClient doApprovalMods(ApprovalModsConfig approvalModsConfig) throws IOException {
         // Fix https://github.com/ncsa/oa4mp/issues/109
-        AdminClient adminClient = (AdminClient) client;
-        adminClient.setAllowQDL("y".equals(getInput("Allow QDL in scripts?(y/n)", adminClient.isAllowQDL() ? "y" : "n")));
+        AdminClient adminClient = (AdminClient) approvalModsConfig.client;
+        if(approvalModsConfig.doPrompt) {
+            adminClient.setAllowQDL("y".equals(getInput("Allow QDL in scripts?(y/n)", adminClient.isAllowQDL() ? "y" : "n")));
+        }else{
+            adminClient.setAllowQDL(((AdminApprovalModsConfig)approvalModsConfig).enableQDL);
+        }
         return adminClient;
     }
 
@@ -515,4 +539,5 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
         }
         return permissions.size();
     }
+
 }

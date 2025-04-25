@@ -1,10 +1,12 @@
 package org.oa4mp.server.admin.myproxy.oauth2.tools;
 
 import edu.uiuc.ncsa.security.core.Identifiable;
+import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
+import edu.uiuc.ncsa.security.storage.cli.FoundIdentifiables;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
@@ -12,6 +14,7 @@ import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import edu.uiuc.ncsa.security.util.jwk.JWKUtil2;
 import org.oa4mp.server.admin.myproxy.oauth2.base.StoreCommands2;
 import org.oa4mp.server.api.admin.adminClient.AdminClient;
+import org.oa4mp.server.api.admin.adminClient.AdminClientKeys;
 import org.oa4mp.server.loader.oauth2.storage.vi.VISerializationKeys;
 import org.oa4mp.server.loader.oauth2.storage.vi.VIStore;
 import org.oa4mp.server.loader.oauth2.storage.vi.VirtualIssuer;
@@ -21,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -171,15 +175,15 @@ public class VICommands extends StoreCommands2 {
 
             return;
         }
-        if(hasRS(inputLine)){
-            say("result sets unsupported by this operation");
-            return;
-        }
-        List<Identifiable> identifiables = findItem(inputLine);
+        FoundIdentifiables identifiables = findItem(inputLine);
         if (identifiables == null) {
             say("sorry, no such virtual issuer");
             return;
+        }      if(!identifiables.isSingleton()){
+            say("only a single object is supported by this operation");
+            return;
         }
+
         int keySize = 2048;
         boolean isEllipticCurve = inputLine.hasArg(EC_FLAG);
         String curve = null; // default
@@ -263,15 +267,15 @@ public class VICommands extends StoreCommands2 {
             sayi("Print a quick summary of the JSON Web keys");
             return;
         }
-        if(hasRS(inputLine)){
-            say("results sets not supported");
-            return;
-        }
-        List<Identifiable> identifiables = findItem(inputLine);
+        FoundIdentifiables identifiables = findItem(inputLine);
         if (identifiables == null) {
             say("sorry, no such virtual issuer");
             return;
+        }        if(!identifiables.isSingleton()){
+            say("only single object are supported");
+            return;
         }
+
         VirtualIssuer vo = (VirtualIssuer) identifiables.get(0);
         if (vo.getJsonWebKeys() == null) {
             say("sorry, no JSON web keys set.");
@@ -326,5 +330,63 @@ List<Identifiable> identifiables = findByIDOrRS(getEnvironment().getAdminClientS
             count++;
         }
         say(count + " admin clients added to virtual issuer \"" + vi.getIdentifierString() + "\"");
+    }
+
+    /* There should be no permissions in the store that are updated. VIs are not directly referenced
+      in permissions.
+     */
+    @Override
+    protected int updateStorePermissions(Identifier newID, Identifier oldID, boolean copy) {
+        return 0;
+    }
+
+    @Override
+    public ChangeIDRecord doChangeID(Identifiable identifiable, Identifier newID, boolean updatePermissions) {
+        ChangeIDRecord changeIDRecord = super.doChangeID(identifiable, newID, updatePermissions);
+        Identifier oldID = changeIDRecord.oldID;
+        // now we have to find the admin records that use this
+        AdminClientKeys adminClientKeys = new AdminClientKeys();
+        List<AdminClient> admins = getEnvironment().getAdminClientStore().search(adminClientKeys.vo(),oldID.toString(), false);
+        for(AdminClient adminClient: admins){
+            adminClient.setVirtualIssuer(newID);
+            if(adminClient.getExternalVIName().equals(oldID.toString())){
+                adminClient.setExternalVIName(newID.toString());
+            };
+            getEnvironment().getAdminClientStore().save(adminClient);
+        }
+        changeIDRecord.updateCount = changeIDRecord.updateCount +admins.size();
+        return changeIDRecord;
+    }
+    public void list_admins(InputLine inputLine) throws Throwable {
+        if(showHelp(inputLine)){
+            say("list_admins [-rs name] id - list the admin IDs for the current VI.");
+            say("You may save them in a result set if you want.");
+            say("This is restricted to a single VI.");
+            return;
+        }
+        Identifiable identifiable = findSingleton(inputLine);
+        if (identifiable == null) {
+            say("no VI found.");
+            return;
+        }
+        String rsName = null;
+        boolean hasRS = inputLine.hasArg(RESULT_SET_KEY);
+        if(hasRS){
+            rsName = inputLine.getNextArgFor(RESULT_SET_KEY);
+            inputLine.removeSwitchAndValue(RESULT_SET_KEY);
+        }
+        AdminClientKeys adminClientKeys = new AdminClientKeys();
+        List<AdminClient> admins  = getEnvironment().getAdminClientStore().search(adminClientKeys.vo(),identifiable.getIdentifierString(), false);
+        if(hasRS) {
+            List<Identifiable> hackyList = new ArrayList<Identifiable>(admins.size());
+            hackyList.addAll(admins); // since java won't allow certain casts.
+            RSRecord rsRecord = new RSRecord(hackyList, adminClientKeys.allKeys());
+            getResultSets().put(rsName, rsRecord);
+        }
+        for(AdminClient adminClient: admins){
+            say(adminClient.getIdentifierString());
+        }
+        say("found " + admins.size() + " admin clients");
+
     }
 }

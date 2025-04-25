@@ -34,7 +34,7 @@
     }
 </style>
 <body>
-<h2>Welcome to the OOA4MP Device Flow Consent Page</h2>
+<h2>Welcome to the OA4MP Device Flow Consent Page</h2>
 The Client below is requesting access to your account.
 <p>
 

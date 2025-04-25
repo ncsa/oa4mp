@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.security.core.cache.Cleanup;
 import edu.uiuc.ncsa.security.core.cache.LockingCleanup;
 import edu.uiuc.ncsa.security.core.exceptions.TransactionNotFoundException;
 import edu.uiuc.ncsa.security.core.util.*;
+import edu.uiuc.ncsa.security.storage.cli.FoundIdentifiables;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
@@ -474,12 +475,13 @@ public class TransactionStoreCommands extends StoreCommands2 {
      */
     public void gc_check(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
-            say("gc_check [id|index|rs] = check if the transaction would get garbage collected");
+            say("gc_check index = check if the transaction would get garbage collected");
             say("                      in the current environment.");
             say("Note that the check is done assuming safe GC mode on the server is false.");
+            printIndexHelp(false);
             return;
         }
-        List<Identifiable> identifiables = findItem(inputLine);
+        FoundIdentifiables identifiables = findItem(inputLine);
         if (identifiables == null) {
             say("Sorry, transaction not found");
             return;
@@ -856,5 +858,18 @@ public class TransactionStoreCommands extends StoreCommands2 {
             say( counter + " total exchange/refresh records");
         }
         say("total transactions and other records:" + (counter + ids.size()));
+    }
+
+    @Override
+    public void change_id(InputLine inputLine) throws Throwable {
+        say("Changing transaction ids is not supported at this time.");
+    }
+
+    /*
+        Typically there there are no such records and nobody should change the id of one of these.
+         */
+    @Override
+    protected int updateStorePermissions(Identifier newID, Identifier oldID, boolean copy) {
+        throw new UnsupportedOperationException("Not supported.");
     }
 }

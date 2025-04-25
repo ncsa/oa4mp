@@ -73,4 +73,14 @@ public class TokenStoreCommands extends StoreCommands2 {
         super.bootstrap();
         getHelpUtil().load("/help/token_help.xml");
     }
+
+    @Override
+    public void change_id(InputLine inputLine) throws Throwable {
+        throw new UnsupportedOperationException("Not supported for exhange records.");
+    }
+
+    @Override
+    protected int updateStorePermissions(Identifier newID, Identifier oldID, boolean copy) {
+        throw new UnsupportedOperationException("Not supported for exhange records.");
+    }
 }

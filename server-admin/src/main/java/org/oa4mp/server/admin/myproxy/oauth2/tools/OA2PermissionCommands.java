@@ -1,5 +1,7 @@
 package org.oa4mp.server.admin.myproxy.oauth2.tools;
 
+import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.util.cli.InputLine;
 import org.oa4mp.server.api.admin.permissions.Permission;
 import org.oa4mp.server.api.admin.permissions.PermissionKeys;
 import org.oa4mp.server.api.admin.permissions.PermissionsStore;
@@ -107,5 +109,13 @@ public class OA2PermissionCommands extends StoreCommands2 {
         getHelpUtil().load("/help/permission_help.xml");
     }
 
+    @Override
+    public void change_id(InputLine inputLine) throws Throwable {
+        say("Changing ids for permissions is not supported");
+    }
 
+    @Override
+    protected int updateStorePermissions(Identifier newID, Identifier oldID, boolean copy) {
+        throw new UnsupportedOperationException("Not supported for permissions.");
+    }
 }
