@@ -106,7 +106,7 @@ public class TransactionConverter<V extends OA4MPServiceTransaction> extends Ser
         if (t.getClient() == null) {
             map.put(getDSTK().clientKey(), null);
         } else {
-            map.put(getDSTK().clientKey(), t.getClient().getIdentifier());
+            map.put(getDSTK().clientKey(), t.getClient().getIdentifierString());
         }
         if (t.getUsername() == null) {
             map.put(getDSTK().username(), null);

@@ -22,7 +22,9 @@ import org.oa4mp.server.loader.oauth2.storage.RefreshTokenRetentionPolicy;
 import org.oa4mp.server.loader.oauth2.storage.RefreshTokenStore;
 import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
 import org.oa4mp.server.loader.oauth2.storage.transactions.OA2TStoreInterface;
+import org.oa4mp.server.loader.oauth2.storage.transactions.OA2TransactionKeys;
 import org.oa4mp.server.loader.oauth2.storage.tx.TXRecord;
+import org.oa4mp.server.loader.oauth2.storage.tx.TXRecordSerializationKeys;
 import org.oa4mp.server.loader.oauth2.storage.tx.TXStore;
 
 import java.io.*;
@@ -73,7 +75,8 @@ public class TransactionStoreCommands extends StoreCommands2 {
     @Override
     protected String format(Identifiable identifiable) {
         OA2ServiceTransaction t = (OA2ServiceTransaction) identifiable;
-        return t.getIdentifierString() + " auth time: " + t.getAuthTime();
+        return "id : " + t.getIdentifierString() + " | " +
+                "auth time : " + t.getAuthTime();
     }
 
     public void tokens(InputLine inputLine) throws Throwable {
@@ -213,6 +216,7 @@ public class TransactionStoreCommands extends StoreCommands2 {
 
     public static final String LS_AT_FLAG = "-at";
     public static final String LS_RT_FLAG = "-rt";
+    public static final String LS_IDT_FLAG = "-idt";
 
     /**
      * note that this (and {@link #getIDByRT(InputLine)} are a bit specific in that they look things up
@@ -244,6 +248,27 @@ public class TransactionStoreCommands extends StoreCommands2 {
         return null;
     }
 
+    protected Identifier getIDByIDT(InputLine inputLine) {
+        OA2TransactionKeys tKeys = (OA2TransactionKeys) getMapConverter().getKeys();
+        TXRecordSerializationKeys txKeys = (TXRecordSerializationKeys) getTxStore().getMapConverter().getKeys();
+        String rawIDT = inputLine.getNextArgFor(LS_IDT_FLAG);
+        OA2ServiceTransaction serviceTransaction = null;
+
+        List tStoreList = getStore().search(tKeys.idTokenIdentifier(), rawIDT, false);
+        if (!tStoreList.isEmpty()) {
+            serviceTransaction = (OA2ServiceTransaction) tStoreList.get(0);
+            return serviceTransaction.getIdentifier();
+        }
+        // So not found, implies it reside in a TX record someplace. Find it.
+        List txStoreList = getTxStore().search(txKeys.token(), rawIDT, false);
+        if (!txStoreList.isEmpty()) {
+            TXRecord txRecord = (TXRecord) txStoreList.get(0);
+            return txRecord.getParentID();
+        }
+        return null;
+    }
+
+
     protected Identifier getIDByRT(InputLine inputLine) {
         String rawRT = inputLine.getNextArgFor(LS_RT_FLAG);
         if (StringUtils.isTrivial(rawRT)) {
@@ -274,32 +299,108 @@ public class TransactionStoreCommands extends StoreCommands2 {
         // and pass it off to the super function so we don't have to re-invent the wheel.
         if (showHelp(inputLine)) {
             showLSHelp();
-            say("For transaction stores, you may also specify listing by using the access token or refresh token:");
-            say("ls [" + LS_AT_FLAG + " | " + LS_RT_FLAG + " token]");
+            say("For transaction stores, you may also specify listing by using the access, identity or refresh token:");
+            say("ls [" + LS_AT_FLAG + " | " + LS_IDT_FLAG + " | " + LS_RT_FLAG + " token]");
             say("Note that other switches, such as " + VERBOSE_COMMAND + " work as well.");
             return;
         }
-        if (inputLine.hasArg(LS_AT_FLAG)) {
-            Identifier identifier = getIDbyAT(inputLine);
+        Identifier identifier = null;
+        boolean getByToken = inputLine.hasArg(LS_AT_FLAG, LS_RT_FLAG, LS_IDT_FLAG);
+        if (getByToken) {
+            identifier = getTokenByType(inputLine);
             if (identifier == null) {
-                say("sorry, but no argument supplied.");
-                return;
-            }
-            inputLine.removeSwitchAndValue(LS_AT_FLAG);
-            inputLine.appendArg("/" + identifier);
-        }
+                String tokenType = "(unknown)";
+                if (inputLine.hasArg(LS_AT_FLAG)) {
+                    tokenType = "access";
+                }
 
-        if (inputLine.hasArg(LS_RT_FLAG)) {
-            Identifier identifier = getIDByRT(inputLine);
-            if (identifier == null) {
-                say("sorry, but no argument supplied.");
+                if (inputLine.hasArg(LS_RT_FLAG)) {
+                    tokenType = "refresh";
+                }
+                if (inputLine.hasArg(LS_IDT_FLAG)) {
+                    tokenType = "identity";
+                }
+                say("Sorry but no such " + tokenType + " token found.");
                 return;
             }
             inputLine.removeSwitchAndValue(LS_RT_FLAG);
             inputLine.appendArg("/" + identifier);
         }
+        Identifier oldID = null;
+        if (getByToken) {
+            // zero it out so even if they set an id, they can still search by id token.
+            oldID = getID();
+            setID(null);
+        }
+        try {
+            super.ls(inputLine);
+        } catch (Throwable t) {
+        }
+        // set it back.
+        if (getByToken) {
+            setID(oldID);
+        }
+    }
 
-        super.ls(inputLine);
+    protected Identifier getTokenByType(InputLine inputLine) {
+        Identifier identifier = null;
+        if (inputLine.hasArg(LS_AT_FLAG)) {
+            identifier = getIDbyAT(inputLine);
+        }
+
+        if (inputLine.hasArg(LS_RT_FLAG)) {
+            identifier = getIDByRT(inputLine);
+        }
+        if (inputLine.hasArg(LS_IDT_FLAG)) {
+            identifier = getIDByIDT(inputLine);
+        }
+        return identifier;
+    }
+
+
+    // Fix https://github.com/ncsa/oa4mp/issues/245
+    @Override
+    public void set_id(InputLine inputLine) throws Throwable {
+        if (showHelp(inputLine)) {
+            say("set_id [" + LS_AT_FLAG + " | " + LS_IDT_FLAG + " | " + LS_RT_FLAG + "] token]");
+            say(LS_AT_FLAG + " search as the access token");
+            say(LS_IDT_FLAG  + "search as the id token");
+            say(LS_RT_FLAG  + "search as the refresh token");
+            say("Otherwise, try to find the identifier of the record for the given type");
+            say("If only the token given, that is the identifier and use that.");
+            say("This will also snoop through exchange records and resolve tokens off of those.");
+            say("E.g.");
+            say("set_id oa4mp:/rfc7523/transaction/9373267");
+            say("would set the token identifier");
+            say("set_id " + LS_AT_FLAG + " oa4mp:/790064?type=accessToken&ts=1745336738943&version=v2.0&lifetime=900000");
+            say("would look up the transaction by the given (in this case) access token, then set the identifier");
+            say("to the found transactions id.");
+
+        }
+        // Boilerplated off the ls function.
+        Identifier identifier = null;
+        boolean getByToken = inputLine.hasArg(LS_AT_FLAG, LS_RT_FLAG, LS_IDT_FLAG);
+        if (getByToken) {
+            identifier = getTokenByType(inputLine);
+            if (identifier == null) {
+                String tokenType = "(unknown)";
+                if (inputLine.hasArg(LS_AT_FLAG)) {
+                    tokenType = "access";
+                }
+
+                if (inputLine.hasArg(LS_RT_FLAG)) {
+                    tokenType = "refresh";
+                }
+                if (inputLine.hasArg(LS_IDT_FLAG)) {
+                    tokenType = "identity";
+                }
+                say("Sorry but no such " + tokenType + " token found.");
+            }else{
+                setID(identifier);
+            }
+        }else {
+            super.set_id(inputLine);
+        }
     }
 
     public void set_qdl_state(InputLine inputLine) throws Throwable {
@@ -441,7 +542,7 @@ public class TransactionStoreCommands extends StoreCommands2 {
             return;
         }
 
-        format(serviceTransaction);
+        say(format(serviceTransaction));
     }
 
     public void get_by_proxy_id(InputLine inputLine) throws Exception {
@@ -462,7 +563,7 @@ public class TransactionStoreCommands extends StoreCommands2 {
             return;
         }
 
-        format(serviceTransaction);
+        say(format(serviceTransaction));
     }
 
     /**
@@ -488,7 +589,7 @@ public class TransactionStoreCommands extends StoreCommands2 {
         }
         RefreshTokenRetentionPolicy refreshTokenRetentionPolicy =
                 new RefreshTokenRetentionPolicy((RefreshTokenStore) getStore(), getTxStore(), "", false);
-        for(Identifiable identifiable : identifiables) {
+        for (Identifiable identifiable : identifiables) {
             say("retain? " + refreshTokenRetentionPolicy.retain(identifiable.getIdentifier(), identifiable));
         }
     }
@@ -617,7 +718,6 @@ public class TransactionStoreCommands extends StoreCommands2 {
     }
 
 
-
     public void gc_lock(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             say("gc_lock [-rm | ? | -alarms]");
@@ -739,7 +839,7 @@ public class TransactionStoreCommands extends StoreCommands2 {
         List<Identifier> ids = tStore.getByClientID(clientID);
         if (ids.isEmpty()) {
             say("no transactions found for client id: " + clientID);
-        //    return;
+            //    return;
         }
         tStore.removeByID(ids);
         say("removed " + ids.size() + " transactions");
@@ -750,9 +850,9 @@ public class TransactionStoreCommands extends StoreCommands2 {
             counter = counter + txValues.size();
             getTxStore().removeByID(txValues);
         }
-        if(counter == 0){
+        if (counter == 0) {
             say("no refresh/exchange records found");
-        }else{
+        } else {
             say("removed " + counter + "  exchange/refresh records");
         }
         say("total items removed from all stores:" + (counter + ids.size()));
@@ -760,6 +860,7 @@ public class TransactionStoreCommands extends StoreCommands2 {
 
     /**
      * Print stats about the number of outstanding transactions and exchange/refresh records.
+     *
      * @param inputLine
      * @throws Exception
      */
@@ -779,16 +880,16 @@ public class TransactionStoreCommands extends StoreCommands2 {
         boolean isTop = inputLine.hasArg("-top");
         int n = 0;
         String rawN = "";
-        if(isTop){
+        if (isTop) {
             try {
-                 rawN = inputLine.getNextArgFor("-top");
+                rawN = inputLine.getNextArgFor("-top");
                 n = Integer.parseInt(rawN);
-                if(n <=0){
+                if (n <= 0) {
                     say("top n should be positive");
                     return;
                 }
                 inputLine.removeSwitchAndValue("-top");
-            }catch(Throwable t){
+            } catch (Throwable t) {
                 n = 10;
                 say("sorry, but \"" + rawN + "\" did not parse as a number");
 
@@ -796,18 +897,18 @@ public class TransactionStoreCommands extends StoreCommands2 {
         }
         OA2TStoreInterface<? extends OA2ServiceTransaction> tStore = (OA2TStoreInterface<? extends OA2ServiceTransaction>) getStore();
 
-        if(isTop){
+        if (isTop) {
             List<Identifier> ids = tStore.getAllClientID();
             long total = ids.size();
-            if(total == 0){
+            if (total == 0) {
                 say("no transactions found");
                 return;
             }
             HashMap<Identifier, Long> counts = new HashMap<>();
-            for(Identifier id : ids){
-                if(counts.containsKey(id)) {
+            for (Identifier id : ids) {
+                if (counts.containsKey(id)) {
                     counts.put(id, counts.get(id) + 1);
-                }else{
+                } else {
                     counts.put(id, 0L);
                 }
             }
@@ -822,13 +923,13 @@ public class TransactionStoreCommands extends StoreCommands2 {
             int max = Math.min(n, sortedCounts.size());
             int i = 0;
             int fieldWidth = 10;
-            say(center("count",fieldWidth) + "|" +   center("percent",fieldWidth) +   "|  client id");
-            say(  "----------+----------+------------------------------");
-            for(Identifier id : sortedCounts.keySet()){
-                if(max < i++){
+            say(center("count", fieldWidth) + "|" + center("percent", fieldWidth) + "|  client id");
+            say("----------+----------+------------------------------");
+            for (Identifier id : sortedCounts.keySet()) {
+                if (max < i++) {
                     break;
                 }
-                say(center(sortedCounts.get(id).toString(), fieldWidth) + "|" + center(String.format("%.3f",((100.00*sortedCounts.get(id))/total))+"%", fieldWidth) + "|  " + id);
+                say(center(sortedCounts.get(id).toString(), fieldWidth) + "|" + center(String.format("%.3f", ((100.00 * sortedCounts.get(id)) / total)) + "%", fieldWidth) + "|  " + id);
             }
             say("total transactions:" + total);
             return;
@@ -842,20 +943,20 @@ public class TransactionStoreCommands extends StoreCommands2 {
             say("no transactions found for client id: " + clientID);
             return;
         }
-        say( ids.size() + " base transaction count");
+        say(ids.size() + " base transaction count");
         long counter = 0;
         // now for tokens
         for (Identifier id : ids) {
             List<Identifier> txValues = getTxStore().getByParentID(id);
             counter = counter + txValues.size();
-            if(isVerbose){
-                say(StringUtils.pad(String.valueOf(txValues.size()),10 ) + " | " + id);
+            if (isVerbose) {
+                say(StringUtils.pad(String.valueOf(txValues.size()), 10) + " | " + id);
             }
         }
-        if(counter == 0){
+        if (counter == 0) {
             say("no refresh/exchange records found");
-        }else{
-            say( counter + " total exchange/refresh records");
+        } else {
+            say(counter + " total exchange/refresh records");
         }
         say("total transactions and other records:" + (counter + ids.size()));
     }
