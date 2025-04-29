@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.cli.FoundIdentifiables;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import net.sf.json.JSONObject;
@@ -182,9 +183,12 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
 
 
     protected void showListAdminsHelp() {
-        say("list_admins index - list the administrators associated with the given client id");
-        say("                 Note that you need the actual identifier for the client, not an index.");
-        printIndexHelp(true);
+        say("list_admins client_id - list the administrators associated with the given client id");
+        say("                 You may specify an result set of clients (not admin clients).");
+        say("E.g.");
+        say("admins>list_admins - [1,3,4,5] my_clients");
+        say("would list the admin clients for entries 1, 3, 4 and 5 in the result set my_clients");
+        printIndexHelp(false);
     }
 
     public void list_admins(InputLine inputLine) throws Throwable {
@@ -192,20 +196,35 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
             showListAdminsHelp();
             return;
         }
-        Identifier clientID = null;
-        BaseClient baseClient = (BaseClient) findSingleton(inputLine, "client not found");
-        List<Identifier> admins = permissionsStore.getAdmins(baseClient.getIdentifier());
-        if (admins == null || admins.isEmpty()) {
-            say("(none)");
+        if(inputLine.getArgCount() == 0){
+            say("no clients identifier found");
             return;
         }
-        for (Identifier id : admins) {
-            AdminClient adminClient = (AdminClient) getStore().get(id);
-            if (adminClient != null) { // if there are dead ids in the store, don't bomb with an NPE.
-                say(format(adminClient, (ClientApproval) getClientApprovalStore().get(adminClient.getIdentifier())));
+        Identifier clientID = BasicIdentifier.newID(inputLine.getLastArg());
+        FoundIdentifiables foundClients = findItem(getEnvironment().getClientStore(), inputLine,true);
+        //BaseClient baseClient = (BaseClient) getEnvironment().getClientStore().get(clientID);
+        if(foundClients == null) {
+            say("client not found.");
+            return;
+        }
+        for (Identifiable identifiable : foundClients) {
+            BaseClient baseClient = (BaseClient) identifiable;
+            List<Identifier> admins = permissionsStore.getAdmins(baseClient.getIdentifier());
+            say(admins.size() + " admins for " + baseClient.getIdentifierString());
+            if (admins == null || admins.isEmpty()) {
+                say("(none)");
+                return;
+            }
+            for (Identifier id : admins) {
+                AdminClient adminClient = (AdminClient) getStore().get(id);
+                if (adminClient != null) { // if there are dead ids in the store, don't bomb with an NPE.
+                    say(format(adminClient, (ClientApproval) getClientApprovalStore().get(adminClient.getIdentifier())));
+                }
+            }
+            if(1 < foundClients.size()){
+                say(StringUtils.hLine("-", 40));
             }
         }
-        say(admins.size() + " admin clients");
     }
 
     @Override

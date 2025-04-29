@@ -2,7 +2,6 @@ package org.oa4mp.installer;
 
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.FileUtil;
-import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.installer.WebInstaller;
 import edu.uiuc.ncsa.security.storage.sql.SQLStore;
 import edu.uiuc.ncsa.security.storage.sql.derby.DerbyConnectionPool;
@@ -17,6 +16,9 @@ import java.util.List;
 import java.util.Map;
 
 import static edu.uiuc.ncsa.security.core.configuration.StorageConfigurationTags.DERBY_STORE_TYPE_FILE;
+import static edu.uiuc.ncsa.security.core.util.StringUtils.RJustify;
+import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
+
 
 /**
  * This centralizes the common code for the server and client installers. In particular, it allows
@@ -115,7 +117,7 @@ public abstract class AbstractInstaller extends WebInstaller {
         is.close();
         // Now for a little trickery. Run the templates on the store
         store = doReplace(store);
-        if (StringUtils.isTrivial(store)) {
+        if (isTrivial(store)) {
             throw new NFWException("missing tiles for store \"" + getArgMap().getString(STORE_FLAG) + "\"");
         }
         getTemplates().put("${STORE}", store);
@@ -142,12 +144,12 @@ public abstract class AbstractInstaller extends WebInstaller {
     protected void printMoreArgHelp() throws IOException {
         super.printMoreArgHelp();
         say(STORE_FLAG + " = the storage for this service. You may use one of");
-        say(StringUtils.RJustify(STORE_TYPE_DERBY_FILE, 20) + " = (default) use an auto-configured Derby database locally");
-        say(StringUtils.RJustify(STORE_TYPE_DERBY, 20) + " = use yor derby server. ");
-        say(StringUtils.RJustify(STORE_TYPE_MYSQL, 20) + " = use your MySQL database.");
-        say(StringUtils.RJustify(STORE_TYPE_MARIA_DB, 20) + " = use your MariaDB database.");
-        say(StringUtils.RJustify(STORE_TYPE_POSTGRES, 20) + " = use your PostgreSQL database.");
-        say(StringUtils.RJustify(STORE_TYPE_FILE_STORE, 20) + " = use a file store. (only for testing, really)");
+        say(RJustify(STORE_TYPE_DERBY_FILE, 20) + " = (default) use an auto-configured Derby database locally");
+        say(RJustify(STORE_TYPE_DERBY, 20) + " = use yor derby server. ");
+        say(RJustify(STORE_TYPE_MYSQL, 20) + " = use your MySQL database.");
+        say(RJustify(STORE_TYPE_MARIA_DB, 20) + " = use your MariaDB database.");
+        say(RJustify(STORE_TYPE_POSTGRES, 20) + " = use your PostgreSQL database.");
+        say(RJustify(STORE_TYPE_FILE_STORE, 20) + " = use a file store. (only for testing, really)");
     }
 
     @Override

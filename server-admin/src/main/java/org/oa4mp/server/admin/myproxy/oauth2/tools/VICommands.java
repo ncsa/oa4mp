@@ -12,7 +12,7 @@ import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import edu.uiuc.ncsa.security.util.jwk.JWKUtil2;
-import org.oa4mp.server.admin.myproxy.oauth2.base.StoreCommands2;
+import org.oa4mp.server.admin.myproxy.oauth2.base.OA4MPStoreCommands;
 import org.oa4mp.server.api.admin.adminClient.AdminClient;
 import org.oa4mp.server.api.admin.adminClient.AdminClientKeys;
 import org.oa4mp.server.loader.oauth2.storage.vi.VISerializationKeys;
@@ -34,7 +34,7 @@ import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
  * <p>Created by Jeff Gaynor<br>
  * on 2/22/21 at  8:01 AM
  */
-public class VICommands extends StoreCommands2 {
+public class VICommands extends OA4MPStoreCommands {
 
     public static final String EC_FLAG = "-ec";
     public static final String RSA_SIZE_FLAG = "-size";

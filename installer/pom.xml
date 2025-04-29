@@ -34,5 +34,11 @@
         <artifactId>derby</artifactId>
         <version>10.14.2.0</version>
     </dependency>
+    <dependency>
+        <groupId>edu.uiuc.ncsa.security</groupId>
+        <artifactId>core</artifactId>
+        <version>6.x-SNAPSHOT</version>
+        <scope>compile</scope>
+    </dependency>
 </dependencies>
 </project>

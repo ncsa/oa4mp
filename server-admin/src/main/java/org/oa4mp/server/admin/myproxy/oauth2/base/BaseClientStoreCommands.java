@@ -43,7 +43,7 @@ import static org.oa4mp.delegation.server.storage.ClientApproval.Status.*;
  * <p>Created by Jeff Gaynor<br>
  * on 12/8/16 at  1:03 PM
  */
-public abstract class BaseClientStoreCommands extends StoreCommands2 {
+public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
 
     public BaseClientStoreCommands(MyLoggingFacade logger, String defaultIndent, Store clientStore,
                                    ClientApprovalStoreCommands clientApprovalStoreCommands) throws Throwable {

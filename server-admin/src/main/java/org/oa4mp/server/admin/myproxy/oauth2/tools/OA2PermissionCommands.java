@@ -5,7 +5,7 @@ import edu.uiuc.ncsa.security.util.cli.InputLine;
 import org.oa4mp.server.api.admin.permissions.Permission;
 import org.oa4mp.server.api.admin.permissions.PermissionKeys;
 import org.oa4mp.server.api.admin.permissions.PermissionsStore;
-import org.oa4mp.server.admin.myproxy.oauth2.base.StoreCommands2;
+import org.oa4mp.server.admin.myproxy.oauth2.base.OA4MPStoreCommands;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
@@ -20,7 +20,7 @@ import java.util.HashMap;
  * <p>Created by Jeff Gaynor<br>
  * on 4/7/17 at  3:11 PM
  */
-public class OA2PermissionCommands extends StoreCommands2 {
+public class OA2PermissionCommands extends OA4MPStoreCommands {
     public OA2PermissionCommands(MyLoggingFacade logger, String defaultIndent, Store store) throws Throwable {
         super(logger, defaultIndent, store);
     }

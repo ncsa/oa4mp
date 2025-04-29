@@ -2,7 +2,7 @@ package org.oa4mp.server.qdl.storage;
 
 import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
 import org.oa4mp.server.admin.myproxy.oauth2.base.StoreArchiver;
-import org.oa4mp.server.admin.myproxy.oauth2.base.StoreCommands2;
+import org.oa4mp.server.admin.myproxy.oauth2.base.OA4MPStoreCommands;
 import org.qdl_lang.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * This gives QDL the ability to look into stores such as clients, approvals, etc.
  * programatically. It is designed to be similar to the CLI for OA4MP, hence
- * more or less a take off of {@link StoreCommands2}.
+ * more or less a take off of {@link OA4MPStoreCommands}.
  * This class is used by others for accessing a store, so it assumes that the inputs
  * have been checked (e.g. that a method is called with the right value). As such
  * the error handling here is pretty barebones.
@@ -123,7 +123,7 @@ public class QDLStoreAccessor {
 
 
     /**
-     * Does the same as the {@link StoreCommands2#serialize(InputLine)}
+     * Does the same as the {@link OA4MPStoreCommands#serialize(InputLine)}
      * Take a stem and convert it to an object then to XML format.<br/><br/>
      * Note this is <b>not</b> used for serialization of the store, just to exchange entries in the store.
      *
@@ -147,7 +147,7 @@ public class QDLStoreAccessor {
 
 
     /**
-     * Does the same as {@link StoreCommands2#deserialize(InputLine)}
+     * Does the same as {@link OA4MPStoreCommands#deserialize(InputLine)}
      * Take a string and turn it into an object (in this case, a stem)
      *
      * @param x

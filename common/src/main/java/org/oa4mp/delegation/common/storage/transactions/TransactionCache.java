@@ -47,6 +47,11 @@ public class TransactionCache<V extends BasicTransaction> extends CachedMapFacad
         init();
     }
 
+    @Override
+    public List<V> search(String key, boolean isNull) {
+        throw new NotImplementedException();
+    }
+
     public TransactionIndices getTransactionIndices() {
         if (transactionIndices == null) {
             transactionIndices = new TransactionIndices();

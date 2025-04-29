@@ -64,9 +64,9 @@ import java.util.*;
 
 import static org.oa4mp.delegation.server.OA2Constants.NONCE;
 import static org.oa4mp.delegation.server.OA2Constants.STATE;
-import static org.oa4mp.delegation.server.server.RFC8693Constants.*;
 import static org.oa4mp.delegation.server.server.RFC8693Constants.AUDIENCE;
 import static org.oa4mp.delegation.server.server.RFC8693Constants.RESOURCE;
+import static org.oa4mp.delegation.server.server.RFC8693Constants.*;
 import static org.oa4mp.delegation.server.server.claims.OA2Claims.*;
 
 /**
@@ -247,7 +247,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         String uri = serviceTransaction.getIdentifier().getUri().toString();
         if (-1 == uri.indexOf("/rfc6749_4_4")) {
             uri = uri.substring(0, uri.indexOf("/")) + "/rfc6749_4_4" + uri.substring(uri.indexOf("/"));
+            uri = uri + "/" + (new Date()).getTime();
             serviceTransaction.setIdentifier(BasicIdentifier.newID(uri));
+            serviceTransaction.setAuthorizationGrant(new AuthorizationGrantImpl(URI.create(uri)));
         }
         serviceTransaction.setRequestState(state);
         serviceTransaction.setNonce(nonce);
@@ -419,11 +421,21 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         String nonce = jsonRequest.containsKey(NONCE) ? jsonRequest.getString(NONCE) : null;
 
         OA2ServiceTransaction serviceTransaction = (OA2ServiceTransaction) getOA2SE().getTransactionStore().create();
+/*
         String uri = serviceTransaction.getIdentifier().getUri().toString();
         if (-1 == uri.indexOf("/rfc7523")) {
             uri = uri.substring(0, uri.indexOf("/")) + "/rfc7523" + uri.substring(uri.indexOf("/"));
             serviceTransaction.setIdentifier(BasicIdentifier.newID(uri));
         }
+*/
+        URI newURI = Identifiers.uniqueIdentifier("oa4mp:/rfc7523", "transaction", Identifiers.VERSION_2_0_TAG, serviceTransaction.getAuthzGrantLifetime());
+        // FIXME This should really come from the token forge, but that means making a few Issuer/response classes
+        String sURI = newURI.toString();
+        String[] ss = sURI.split("\\?");
+        ss[0] = ss[0]+"/" + (new Date()).getTime();
+        newURI = URI.create(ss[0] );
+        serviceTransaction.setIdentifier(BasicIdentifier.newID(newURI));
+        serviceTransaction.setAuthorizationGrant(new AuthorizationGrantImpl(newURI));
         serviceTransaction.setRequestState(state);
         serviceTransaction.setNonce(nonce);
         serviceTransaction.setClient(client);
@@ -431,6 +443,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         serviceTransaction.setAuthTime(now); // auth time is now.
         client.setLastAccessed(now);
         String user = jsonRequest.getString(OA2Claims.SUBJECT);
+
+
         if (client.getServiceClientUsers().contains("*")) {
             serviceTransaction.setUsername(user);
         } else {

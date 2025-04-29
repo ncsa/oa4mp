@@ -19,7 +19,7 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 5/22/13 at  1:51 PM
  */
-public class ClientApprovalStoreCommands extends StoreCommands2 {
+public class ClientApprovalStoreCommands extends OA4MPStoreCommands {
 
     public static final String SHOW_UNAPPROVED_FLAG = "-n";
 

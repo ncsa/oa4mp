@@ -1,5 +1,4 @@
   say('***** idt.qdl *****');
-
 if[exec_phase=='post_auth']
   [  say('***** POST AUTH *****');
      cfg. := claims#new_template('file');

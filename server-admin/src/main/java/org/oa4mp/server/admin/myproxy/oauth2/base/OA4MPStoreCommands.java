@@ -22,19 +22,21 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Vector;
 
+import static edu.uiuc.ncsa.security.util.cli.CLIDriver.LIST_ALL_METHODS_COMMAND;
+
 /**
  * This class exists because we cannot quite get the dependencies right otherwise. Mostly it is to have access
  * to converters for de/serialization and searching
  * <p>Created by Jeff Gaynor<br>
  * on 7/2/18 at  10:06 AM
  */
-public abstract class StoreCommands2 extends StoreCommands {
+public abstract class OA4MPStoreCommands extends StoreCommands {
 
-    public StoreCommands2(MyLoggingFacade logger, String defaultIndent, Store store) throws Throwable {
+    public OA4MPStoreCommands(MyLoggingFacade logger, String defaultIndent, Store store) throws Throwable {
         super(logger, defaultIndent, store);
     }
 
-    public StoreCommands2(MyLoggingFacade logger, Store store) throws Throwable {
+    public OA4MPStoreCommands(MyLoggingFacade logger, Store store) throws Throwable {
         super(logger, store);
     }
 
@@ -148,9 +150,10 @@ rs show -range [2^2;2^3] -attr [client_id,creation_ts] X
     @Override
     protected List processList(InputLine inputLine, String key) throws Exception {
         // Allow singletons, which requires testing and maybe an exception
-        if (!inputLine.hasArg(key)) {
+        if (!inputLine.hasArg(key) || key==null) {
             return null;
         }
+        String originalLine = inputLine.getOriginalLine();
         try {
             int index = Integer.parseInt(inputLine.getNextArgFor(key));
             QDLList qdlList = new QDLList();
@@ -176,6 +179,12 @@ rs show -range [2^2;2^3] -attr [client_id,creation_ts] X
             qdlStem = (QDLStem) o;
             return qdlStem.getQDLList();
         } catch (Throwable e) {
+            // last ditch effort...
+            inputLine = new InputLine(originalLine);
+            List x = inputLine.getArgList(key);
+            if(x != null) {
+                return x;
+            }
             throw new GeneralException("Error interpreting list:" + e.getMessage(), e);
         }
     }
@@ -215,6 +224,12 @@ rs show -range [2^2;2^3] -attr [client_id,creation_ts] X
         }
     }
 
+@Override
+    protected void printIndexHelp(boolean singletonsOnly) {
+        super.printIndexHelp(singletonsOnly);
+say("and for QDL lists, see");
+    say(LIST_ALL_METHODS_COMMAND  + " qdl_lists");
+    }
 
     public State getState() {
         if (state == null) {

@@ -15,7 +15,7 @@ import org.oa4mp.delegation.common.storage.TransactionStore;
 import org.oa4mp.delegation.common.token.impl.AccessTokenImpl;
 import org.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
 import org.oa4mp.delegation.common.token.impl.TokenImpl;
-import org.oa4mp.server.admin.myproxy.oauth2.base.StoreCommands2;
+import org.oa4mp.server.admin.myproxy.oauth2.base.OA4MPStoreCommands;
 import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.servlet.TokenExchangeRecordRetentionPolicy;
 import org.oa4mp.server.loader.oauth2.storage.RefreshTokenRetentionPolicy;
@@ -34,14 +34,13 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import static edu.uiuc.ncsa.security.core.cache.LockingCleanup.lockID;
-import static edu.uiuc.ncsa.security.core.util.StringUtils.center;
-import static edu.uiuc.ncsa.security.core.util.StringUtils.pad2;
+import static edu.uiuc.ncsa.security.core.util.StringUtils.*;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 11/16/20 at  3:16 PM
  */
-public class TransactionStoreCommands extends StoreCommands2 {
+public class TransactionStoreCommands extends OA4MPStoreCommands {
     public TransactionStoreCommands(MyLoggingFacade logger, String defaultIndent, OA2SE oa2se) throws Throwable {
         super(logger, defaultIndent, oa2se.getTransactionStore());
         this.oa2se = oa2se;
@@ -84,9 +83,11 @@ public class TransactionStoreCommands extends StoreCommands2 {
             showExpHelp();
             return;
         }
-        OA2ServiceTransaction t = (OA2ServiceTransaction) findSingleton(inputLine);
+        FoundIdentifiables foundIdentifiables = findItem(inputLine);
+
         int width = 30;
         String stile = " | ";
+        String plus = "-+-";
         boolean showAG = true;
         boolean showAT = true;
         boolean showRT = true;
@@ -94,9 +95,10 @@ public class TransactionStoreCommands extends StoreCommands2 {
             showAG = inputLine.hasArg("-ag");
             showAT = inputLine.hasArg("-at");
             showRT = inputLine.hasArg("-rt");
-        }
-        if ((!showAG && showAT && showRT)) {
-            return;
+            if ((!showAG && !showAT && !showRT)) {
+                say("unrecognized option(s). ");
+                return;
+            }
         }
 
         say(pad2("token type", 15)
@@ -110,40 +112,59 @@ public class TransactionStoreCommands extends StoreCommands2 {
                 + pad2("expires at", width)
                 + stile
                 + "lifetime (ms.)");
-        if (showAG) {
-            showExp("auth grant",
-                    DateUtils.MAX_TIMEOUT,
-                    t.isAuthGrantValid(),
-                    (TokenImpl) t.getAuthorizationGrant(),
-                    width,
-                    stile);
-        }
-        if (showAT) {
-            if (!t.hasAccessToken()) {
-                say(pad2("access token", 15) + stile + "-----");
-            } else {
-                showExp("access token",
-                        t.getAccessTokenLifetime(),
-                        t.isAccessTokenValid(),
-                        (TokenImpl) t.getAccessToken(),
+        String hLine = StringUtils.hLine("-",15)
+                + plus
+                + hLine("-",3)
+                + plus
+                + hLine("-",7)
+                + plus
+                + hLine("-",width)
+                + plus
+                + hLine("-",width)
+                + plus
+                + hLine("-",width);
+        say(hLine);
+        for (Identifiable identifiable : foundIdentifiables) {
+            OA2ServiceTransaction t = (OA2ServiceTransaction) identifiable;
+if(1 < foundIdentifiables.size()){
+    say(t.getIdentifierString());
+    say(hLine);
+}
+            if (showAG) {
+                showExp("auth grant",
+                        DateUtils.MAX_TIMEOUT,
+                        t.isAuthGrantValid(),
+                        (TokenImpl) t.getAuthorizationGrant(),
                         width,
                         stile);
             }
-        }
-        if (showRT) {
-            if (!t.hasRefreshToken()) {
-                say(pad2("refresh token", 15) + stile + "-----");
-            } else {
-                showExp("refresh token",
-                        t.getRefreshTokenLifetime(),
-                        t.isRefreshTokenValid(),
-                        (TokenImpl) t.getRefreshToken(),
-                        width,
-                        stile);
+            if (showAT) {
+                if (!t.hasAccessToken()) {
+                    say(pad2("access token", 15) + stile + "-----");
+                } else {
+                    showExp("access token",
+                            t.getAccessTokenLifetime(),
+                            t.isAccessTokenValid(),
+                            (TokenImpl) t.getAccessToken(),
+                            width,
+                            stile);
+                }
             }
-        }
-
-
+            if (showRT) {
+                if (!t.hasRefreshToken()) {
+                    say(pad2("refresh token", 15) + stile + "-----");
+                } else {
+                    showExp("refresh token",
+                            t.getRefreshTokenLifetime(),
+                            t.isRefreshTokenValid(),
+                            (TokenImpl) t.getRefreshToken(),
+                            width,
+                            stile);
+                }
+            }
+                say(hLine);
+        }// end loop
+//
     }
 
     protected void showExp(String tokenName,
@@ -190,7 +211,7 @@ public class TransactionStoreCommands extends StoreCommands2 {
 
         sayi("If the tokens are not set, that is shown too with a set of ----");
         sayi("An asterisk before the token name means that that token has expired.");
-        printIndexHelp(true);
+        printIndexHelp(false);
     }
 
     public void claims(InputLine inputLine) throws Throwable {
@@ -199,19 +220,28 @@ public class TransactionStoreCommands extends StoreCommands2 {
             return;
         }
 
-        OA2ServiceTransaction t = (OA2ServiceTransaction) findSingleton(inputLine);
-        if (t.getUserMetaData() != null) {
-
-            say(t.getUserMetaData().toString(1));
-        } else {
-            say("(no claims found)");
+        FoundIdentifiables identifiables = findItem(inputLine);
+        for(Identifiable identifiable : identifiables) {
+            OA2ServiceTransaction t = (OA2ServiceTransaction) identifiable;
+            if(1 < identifiables.size()){
+                say(t.getIdentifierString());
+                say(hLine("-", t.getIdentifierString().length()));
+            }
+            if (t.getUserMetaData() != null) {
+                say(t.getUserMetaData().toString(1));
+            } else {
+                say("(no claims found)");
+            }
+            if(1 < identifiables.size()){
+                say();
+            }
         }
     }
 
     private void showClaimsHelp() {
         say("claims index");
         sayi("Show the claims associated with this transaction. These are mostly used to create the id token");
-        printIndexHelp(true);
+        printIndexHelp(false);
     }
 
     public static final String LS_AT_FLAG = "-at";
@@ -302,6 +332,7 @@ public class TransactionStoreCommands extends StoreCommands2 {
             say("For transaction stores, you may also specify listing by using the access, identity or refresh token:");
             say("ls [" + LS_AT_FLAG + " | " + LS_IDT_FLAG + " | " + LS_RT_FLAG + " token]");
             say("Note that other switches, such as " + VERBOSE_COMMAND + " work as well.");
+            say("See also: set_id, which takes flags in this component.");
             return;
         }
         Identifier identifier = null;
@@ -323,13 +354,13 @@ public class TransactionStoreCommands extends StoreCommands2 {
                 say("Sorry but no such " + tokenType + " token found.");
                 return;
             }
-            inputLine.removeSwitchAndValue(LS_RT_FLAG);
+            inputLine.removeSwitchAndValue(LS_AT_FLAG, LS_RT_FLAG, LS_IDT_FLAG);
             inputLine.appendArg("/" + identifier);
         }
-        Identifier oldID = null;
+        List<Identifier> oldIDs = null;
         if (getByToken) {
             // zero it out so even if they set an id, they can still search by id token.
-            oldID = getID();
+            oldIDs = getID();
             setID(null);
         }
         try {
@@ -338,7 +369,7 @@ public class TransactionStoreCommands extends StoreCommands2 {
         }
         // set it back.
         if (getByToken) {
-            setID(oldID);
+            setID(oldIDs);
         }
     }
 
@@ -364,8 +395,8 @@ public class TransactionStoreCommands extends StoreCommands2 {
         if (showHelp(inputLine)) {
             say("set_id [" + LS_AT_FLAG + " | " + LS_IDT_FLAG + " | " + LS_RT_FLAG + "] token]");
             say(LS_AT_FLAG + " search as the access token");
-            say(LS_IDT_FLAG  + "search as the id token");
-            say(LS_RT_FLAG  + "search as the refresh token");
+            say(LS_IDT_FLAG + "search as the id token");
+            say(LS_RT_FLAG + "search as the refresh token");
             say("Otherwise, try to find the identifier of the record for the given type");
             say("If only the token given, that is the identifier and use that.");
             say("This will also snoop through exchange records and resolve tokens off of those.");
@@ -395,10 +426,12 @@ public class TransactionStoreCommands extends StoreCommands2 {
                     tokenType = "identity";
                 }
                 say("Sorry but no such " + tokenType + " token found.");
-            }else{
-                setID(identifier);
+            } else {
+                List<Identifier> x = new ArrayList<>();
+                x.add(identifier);
+                setID(x);
             }
-        }else {
+        } else {
             super.set_id(inputLine);
         }
     }
@@ -408,17 +441,18 @@ public class TransactionStoreCommands extends StoreCommands2 {
             say("set_qdl_state " + CL_INPUT_FILE_FLAG + " file_path index");
             say("replace the qdl state in the transaction with the contents of the file.");
             say("Note that the file is XML and will be converted as needed.");
-            printIndexHelp(true);
+            printIndexHelp(false);
             say("See also: show_qdl_state");
             return;
         }
+        FoundIdentifiables foundIdentifiables = findItem(inputLine);
         if (!inputLine.hasArg(CL_INPUT_FILE_FLAG)) {
             say("sorry, but you must specify a file");
             return;
         }
         String f = inputLine.getNextArgFor(CL_INPUT_FILE_FLAG);
         inputLine.removeSwitchAndValue(CL_OUTPUT_FILE_FLAG);
-        OA2ServiceTransaction t = (OA2ServiceTransaction) findSingleton(inputLine, "transaction not found");
+
         String rawFile = FileUtil.readFileAsString(f);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         GZIPOutputStream gzipOutputStream = new GZIPOutputStream(baos);
@@ -426,8 +460,11 @@ public class TransactionStoreCommands extends StoreCommands2 {
         gzipOutputStream.flush();
         gzipOutputStream.close();
         String encoded = Base64.encodeBase64URLSafeString(baos.toByteArray());
-        t.setScriptState(encoded);
-        say("done!");
+        for(Identifiable i : foundIdentifiables) {
+            OA2ServiceTransaction t = (OA2ServiceTransaction) i;
+            t.setScriptState(encoded);
+        }
+        say(foundIdentifiables.size() + " processed, done!");
     }
 
     public void show_qdl_state(InputLine inputLine) throws Throwable {
@@ -435,7 +472,7 @@ public class TransactionStoreCommands extends StoreCommands2 {
             say("show_qdl_state [" + LS_AT_FLAG + "|" + LS_RT_FLAG + " " + CL_OUTPUT_FILE_FLAG + " file_path] index");
             say("Find the given transaction, get the current state from QDL and decode it.");
             say(CL_OUTPUT_FILE_FLAG + " file_path = You may optionally save it to a file.");
-            printIndexHelp(true);
+            printIndexHelp(false);
             return;
         }
 
@@ -589,8 +626,14 @@ public class TransactionStoreCommands extends StoreCommands2 {
         }
         RefreshTokenRetentionPolicy refreshTokenRetentionPolicy =
                 new RefreshTokenRetentionPolicy((RefreshTokenStore) getStore(), getTxStore(), "", false);
+        String retainTitle = "retain?";
+        int retainTitleWidth = retainTitle.length();
+        String idTitle = "id";
+        say(retainTitle + " | " + idTitle);
         for (Identifiable identifiable : identifiables) {
-            say("retain? " + refreshTokenRetentionPolicy.retain(identifiable.getIdentifier(), identifiable));
+            String out = StringUtils.center(refreshTokenRetentionPolicy.retain(identifiable.getIdentifier(), identifiable)?"y":"n", retainTitleWidth);
+            out = out + " | " + identifiable.getIdentifier();
+            say(out);
         }
     }
 
@@ -827,7 +870,8 @@ public class TransactionStoreCommands extends StoreCommands2 {
             say("rm_by_client_id client_id - remove all current transactions for the given client.");
             say("client_id = the unique identifier for a client");
             say("Note that this cannot be undone and any operations for clients on these");
-            say("will start failing instantly.");
+            say("will start failing instantly. This kills all pending transactions for the client");
+            say("and is normally only used if there is a security breach that requires it shutting the client off asap.");
             return;
         }
         if (!inputLine.hasArgs()) {
