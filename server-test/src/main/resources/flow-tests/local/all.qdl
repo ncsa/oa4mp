@@ -20,7 +20,7 @@ test.:=(path + 'local/') + [
                              'rfc9068.qdl',
                              'scitokens.qdl',
                              'scitokens2.qdl',
-                             'test_ncsa.qdl',
+//                           'test_ncsa.qdl', // NCSA LDAP decomissioned. Test can't run.
                              'vo_test.qdl',
                               'wlcg.qdl',
                              'fnal-0.qdl',
