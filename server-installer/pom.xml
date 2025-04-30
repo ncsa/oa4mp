@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.oa4mp</groupId>
         <artifactId>oa4mp-parent</artifactId>
-        <version>6.x-SNAPSHOT</version>
+        <version>6.1-rc0</version>
     </parent>
 
     <artifactId>server-installer</artifactId>
@@ -21,7 +21,7 @@
          <dependency>
              <groupId>org.oa4mp</groupId>
              <artifactId>installer</artifactId>
-             <version>6.x-SNAPSHOT</version>
+             <version>6.1-rc0</version>
          </dependency>
      </dependencies>
     <build>

@@ -33,7 +33,7 @@ echo "  creating target dirs for installer in $PWD"
 # **IF** there are arguments for the target of this, use them. Otherwise use the default
 OA4MP_ROOT=${1:-$DEFAULT_OA4MP_ROOT}
 
-echo "OA4MP Version: 6.x-SNAPSHOT" > version.txt
+echo "OA4MP Version: 6.1-rc0" > version.txt
 
 # Now make the directories
 mkdir "bin"

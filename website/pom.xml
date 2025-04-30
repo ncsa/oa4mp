@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.oa4mp</groupId>
-    <version>6.x-SNAPSHOT</version>
+    <version>6.1-rc0</version>
 
     <artifactId>website</artifactId>
     <packaging>jar</packaging>
@@ -19,78 +19,78 @@
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>client</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.1-rc0</version>
         </dependency>
 
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>common</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.1-rc0</version>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>core</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.1-rc0</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>servlet</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.1-rc0</version>
         </dependency>
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>server</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.1-rc0</version>
         </dependency>
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>common</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.1-rc0</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>util</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.1-rc0</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>myproxy-logon</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.1-rc0</version>
         </dependency>
 
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>client-api</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.1-rc0</version>
         </dependency>
 
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>client-loader</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.1-rc0</version>
         </dependency>
 
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>server-api</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.1-rc0</version>
         </dependency>
 
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>server-loader</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.1-rc0</version>
         </dependency>
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>oauth2</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.1-rc0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.velocity</groupId>
@@ -171,7 +171,7 @@
                     <dependency>
                         <groupId>edu.uiuc.ncsa.maven.skin</groupId>
                         <artifactId>skin</artifactId>
-                        <version>6.x-SNAPSHOT</version>
+                        <version>6.1-rc0</version>
                     </dependency>
                 </dependencies>
             </plugin>
