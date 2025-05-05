@@ -1,6 +1,11 @@
 #! /usr/bin/env -S qdl-run
 path:='test#/';
-test.:=(path + 'dev/') + ['df.qdl',
+test.:=(path + 'dev/') + [
+                           'fnal-dunepro.qdl',
+                           'fnal-duneana.qdl',
+                           'fnal-fermilab.qdl',
+                           'df.qdl',
+                           'df.qdl',
                            'comanage.qdl',
                            'functor.qdl',
                            'ncsa_qdl.qdl',

@@ -299,7 +299,7 @@ public class VICommands extends OA4MPStoreCommands {
     @Override
     protected String format(Identifiable identifiable) {
         VirtualIssuer vo = (VirtualIssuer) identifiable;
-        return vo.getIdentifierString() + " title:" + vo.getTitle() + " create time: " + vo.getCreationTS();
+        return vo.getIdentifierString() + " (" + vo.getTitle() + ") created on " + vo.getCreationTS();
     }
 
     @Override

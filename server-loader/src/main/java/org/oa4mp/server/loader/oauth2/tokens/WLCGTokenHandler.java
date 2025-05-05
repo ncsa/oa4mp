@@ -37,13 +37,18 @@ public class WLCGTokenHandler extends AbstractAccessTokenHandler implements WLCG
         atData.put(WLCG_VERSION_TAG, WLCG_VERSION_1_0);
         // We set the subject to the EPPN if it is present.
         if (transaction.getUserMetaData() != null && transaction.getUserMetaData().containsKey("eppn")) {
-            atData.put(SUBJECT, transaction.getUserMetaData().getString("eppn"));
+            if(!atData.containsKey(SUBJECT)) {
+                // don't keep resetting it, especially since they may have changed it and expect that to persist.
+                atData.put(SUBJECT, transaction.getUserMetaData().getString("eppn"));
+            }
         }
         // WLCG also supports a few constants from the 9068 spec.
         if (getUserMetaData().containsKey(RFC9068Constants.AUTHENTICATION_CLASS_REFERENCE)) {
             atData.put(RFC9068Constants.AUTHENTICATION_CLASS_REFERENCE, getUserMetaData().get(RFC9068Constants.AUTHENTICATION_CLASS_REFERENCE));
         }
-        atData.put(RFC9068Constants.AUTHENTICATION_TIME, transaction.getAuthTime().getTime() / 1000);
+        if(!atData.containsKey(RFC9068Constants.AUTHENTICATION_TIME)) { // don't keep resetting it on all RTX's
+            atData.put(RFC9068Constants.AUTHENTICATION_TIME, transaction.getAuthTime().getTime() / 1000);
+        }
         // Some IDPS might also include this. Send it along if present.
         if (getUserMetaData().containsKey(EDUPERSON_ASSURANCE)) {
             atData.put(EDUPERSON_ASSURANCE, getUserMetaData().get(EDUPERSON_ASSURANCE));

@@ -34,6 +34,6 @@ try[
 try[
   script_load('anon-cleanup.qdl', client_id);
 ]catch[
-  say('there was a problem deleting the client with id ' + client_id);
+  say('there was a problem deleting the client with id ' + client_id + ' ' + error_message );
 ];
 say('ok: Anonymous client with extra (ignored) parameters.');

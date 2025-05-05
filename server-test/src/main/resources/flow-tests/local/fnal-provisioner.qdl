@@ -1,6 +1,10 @@
 /*
    This does the test for provisioning an FNAL client and forking the flow.
-   ** Has to be run manually **
+                    ╔══════════════════════════════════╗
+                    ║This has to be run manually       ║
+                    ║it is intended for direct testing,║
+                    ║not run as a script               ║
+                    ╚══════════════════════════════════╝
 */
 saved_cfg := '/tmp/fnal-test.json';
 

@@ -16,7 +16,6 @@
 cfg.'id'  := 'localhost:test/fnal';
 cfg.'idp'  := 'GitHub';
 cfg.'file' := $$OA4MP_CLC_XML_INI;
-//cfg.'flow_type' := 'df'; // Note to use df you need to set param for the token endpoint
 cfg.'flow_type' := args().0; // Note to use df you need to set param for the token endpoint
 cfg.'description' :=  'Test DUNE flow fork';
 
@@ -35,4 +34,4 @@ debugger(1, 'wrote provisioner to ' + saved_cfg);
 // At this point, we are ready to test the fork.
 //home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests/local/fnal-fork.qdl
 script_load(os_env('NCSA_DEV_INPUT') + '/oa4mp/server-test/src/main/resources/flow-tests/local/fnal-fork.qdl');
-say('FNAL dune fork: ok');
+say('FNAL dune fork test: ok');

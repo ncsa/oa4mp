@@ -10,60 +10,46 @@ block[
      // the original scope request.
      // 3/20/2022 -- Oopsie! Dave switched to using another client which *always* sends the capability
      // set every time. Remove it if present since these would normally be removed in the access.qdl script.
-     SS(y)->say('*** FNAL' +  (is_defined(access_control.)?('[' + access_control.client_id + ']:'):':') + to_string(y));
-     SS('scopes.=' + print(scopes.));
-     SS('tx_scopes.=' + print(tx_scopes.));
-     SS('tx_audience.=' + print(tx_audience.));
-     SS('tx_resource.=' + print(tx_resource.));
-
+     debugger(1,'*** FNAL initial access token.=' + print(access_token., {'box':true, 'width':72}));
      tx_scopes. := ~mask(tx_scopes., starts_with(tx_scopes., CS_HEAD)!= 0) ;
      tx_scopes. := ~mask(tx_scopes., starts_with(tx_scopes., 'wlcg.groups:')!= 0) ;
-     xi. := claims#resolve_templates(at_claims.EPE., tx_scopes., false); // resolves any scopes explicitly granted to user
-     SS('rtx xi.:\n' + print(xi.));
+     xi. := claims#resolve_templates(user_record.EPE., tx_scopes., false); // resolves any scopes explicitly granted to user
+     debugger(1,'*** FNAL rtx xi.:\n' + print(xi.));
 
-     cs. := []~mask(scopes., -1 < starts_with(scopes., CS_HEAD));
-     SS('FNAL rtx cs.=' + print(cs.));
-     if[
-         1 == size(cs.)
-     ][
+     requested_cs. := ~mask(scopes., -1 < starts_with(scopes., CS_HEAD));
+     // Checks that we have a single usable capability set.
+     0 == size(requested_cs.) ⇒ raise_error('No requested capabilities.', 1000, {'error_type':'access_denied'});
+     1 < size(requested_cs.) ⇒ raise_error('Multiple capabilities not allowed', 1000, {'error_type':'access_denied'});
+     requested_cs := requested_cs.0; // there is one
+     (requested_cs ∉ user_record.EPE) ⇒ raise_error('User does not have access to this capability set.', 1000, {'error_type':'access_denied'});
 
-         SS('rtx got ' + CS + ':\n' + print(cs.));
-          record. :=  script_load('fnal/new/get_service.qdl',  (cs.0-CS_HEAD)+'@fnal.gov');
+     debugger(1,'*** FNAL rtx got ' + CS + ':\n' + print(requested_cs.));
+     service_record. :=  script_load('fnal/new/get_service.qdl',  (requested_cs.0-CS_HEAD)+'@fnal.gov');
 
-         SS('rtx record:\n' + print(record.));
-         if[
-              0 < size(record.)
-         ][
-              if[is_defined(record.VOPAUID)][claims.vault_uid := record.VOPAUID;];
-              if[is_defined(record.EPPN)][access_token.sub := record.EPPN;];
-              if[
-                 is_defined(record.EPE.)
-              ][
-                  is_uri(x)->is_defined(to_uri(x).scheme);
-                  // do any substitutions in the templates.
-                  s_rec. := claims#template_substitution(record.EPE., claims.); // use s_rec not record.EPE now
-                  SS('rtx s_rec. post subst:\n' + print(s_rec.));
-                  uq_. := []~mask(s_rec., !for_each(@is_uri, s_rec.)); // unqualified names
-                  SS('rtx uq_.:\n' + print(uq_.));
-                  // If uq_. is empty, i.e., no unqualified names, then skip extracting them.
-                    if[0 < size(uq_.)]
-                  then[uq_. := mask(uq_.,reduce(@||, for_each(@==, tx_scopes., uq_.)));
-                       SS('rtx uq_. after reduce:\n' + print(uq_.));
-                      ];
-                  // Get any specific overrides.
-                  eta. := claims#resolve_templates(s_rec., tx_scopes., false);
-                  SS('rtx eta.:\n' + print(eta.));
-                   xi. := xi. ~ eta. ~ uq_.; // duplicates ok here, removed later
-              ]; // end if LDAP has entries for CS.
-         ]; // end if something in LDAP to process
-     ]; // end if capabilities are requested.
+     debugger(1,'*** FNAL rtx service record:\n' + print(service_record.));
 
-      SS('rtx final xi.:\n' + print(xi.));
+     ∃service_record.VOPAUID ⇒ claims.vault_uid := service_record.VOPAUID;
+     ∃service_record.EPPN    ⇒ access_token.'sub' := service_record.EPPN;
 
-      access_token.scope := detokenize(unique(xi.), ' ', 2); // turn in to string, omit duplications, trailing space
-      SS('rtx access token scope = \'' + access_token.scope + '\'');
+       if[∃service_record.EPE.]
+     then[
+           // Requests for scopes now just reduce from initially granted permissions.
+           // I.e. this is all scope reduction/checking
+           is_uri(x)->is_defined(to_uri(x).scheme);
+           // do any substitutions in the templates.
+           s_rec. := claims#template_substitution(service_record.EPE., claims.); // altered service_record.EPE is s_rec.
+           uq_. := []~mask(s_rec., !for_each(@is_uri, s_rec.)); // unqualified entries, like compute.cancel
+           // If uq_. is empty, i.e., no unqualified names, then skip extracting them.
+             if[0 < size(uq_.)]
+           then[uq_. := mask(uq_.,reduce(@||, for_each(@==, tx_scopes., uq_.)));];
+           // Get any specific overrides.
+           eta. := claims#resolve_templates(s_rec., tx_scopes., false);
+            xi. := xi. ~ eta. ~ uq_.; // duplicates ok here, removed later
+     ]; // end if, when LDAP has entries for capability set
 
-     if[is_defined(record.EPPN)][access_token.sub := record.EPPN;];
-     SS('rtx done!');
+     debugger(1,'*** FNAL rtx.qdl final access token:\n' + print(access_token., {'box':true, 'width':72}));
+     debugger(1,'*** FNAL rtx done!');
+     access_token.'scope' := detokenize(unique(xi.), ' '); // turn in to string, omit duplications, trailing space
+     return(access_token.);
 ];
 

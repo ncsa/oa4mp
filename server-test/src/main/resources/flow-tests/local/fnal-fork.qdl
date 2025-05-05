@@ -1,39 +1,39 @@
 /*
-   Compliment to fnal-provisioner.qdl. This forks the flow.
+    This forks the flow from the FNAL provisioner for duneana.
 */
 
-/* Full set of scopes returned is
- sss ≔ 'storage.read:/dune/resilient/jobsub_stage storage.create:/fermigrid/jobsub/jobs storage.create:/dune/resilient/jobsub_stage compute.create compute.read compute.cancel compute.modify storage.create:/dune/scratch/users/cilogontest storage.read:/dune';
-*/
+
 saved_cfg := '/tmp/fnal-test.json';
 
 clc#init($$OA4MP_CLC_XML_INI, 'localhost:test/fnal/ersatz');
 clc#read(saved_cfg, '-p'); // -p switch tell client that this is an ersatz client
-debugger(10,'loaded fork script');
-sss. ≔ ['storage.read:/dune/resilient/jobsub_stage',
-        'storage.create:/fermigrid/jobsub/jobs',
-        'storage.create:/dune/resilient/jobsub_stage',
+debugger(1,'loaded fork script');
+refresh_request_scopes. ≔ ['storage.read:/resilient/jobsub_stage',
+        'storage.create:/scratch/users/cilogontest',
+        'storage.create:/resilient/jobsub_stage',
         'compute.create'];
-ttt. ≔ ['compute.read',
+exchange_request_scopes. ≔ ['compute.read',
         'compute.cancel',
         'compute.modify',
-        'storage.create:/dune/scratch/users/cilogontest',
+        'storage.create:/scratch/users/cilogontest',
         'storage.read:/dune'];
-params.'refresh' ≔  {'scope': detokenize(sss., ' ')};
-params.'exchange' ≔  {'scope': detokenize(ttt., ' ')};
+params.'refresh' ≔  {'scope': detokenize(refresh_request_scopes., ' ')};
+params.'exchange' ≔  {'scope': detokenize(exchange_request_scopes., ' ')};
 
 clc#set_param(params.);
 //clc#java_trace(true);
 raw. ≔ clc#exchange({'type':'rt','subject':'rt','raw_response':true});
 debugger(1,'raw RT exchange response:\n' + print(raw.));
 tokens. ≔ clc#refresh();
-returned_scopes. := tokenize(tokens.'access_token'.'jwt'.'scope', ' ');
-⊨(⊢sss.) == (⊢returned_scopes.) : 'incorrect scopes ' + (~returned_scopes.∉sss.⌆returned_scopes.);
 debugger(1,'refresh response AT:\n' + print(tokens.'access_token'));
 debugger(1,'refresh response RT:\n' + print(tokens.'refresh_token'));
+returned_scopes. := tokenize(tokens.'access_token'.'jwt'.'scope', ' ');
+⊨(⊢refresh_request_scopes.) == (⊢returned_scopes.) : 'incorrect scopes, expected:\n' + print(refresh_request_scopes.) + ',\ngot\n' + print(returned_scopes.);// + (~returned_scopes.∉refresh_request_scopes.⌆returned_scopes.);
+debugger(1,'Got past scope check');
 
 // and one further exchange to show it works.
 raw. ≔ clc#exchange({'type':'at','subject':'rt','raw_response':true});
 debugger(1,'raw AT exchange response:\n' + print(raw.));
 returned_scopes. := tokenize(raw.'scope',' ');
-⊨(⊢ttt.) == (⊢returned_scopes.) : 'incorrect scopes ' + (~returned_scopes.∉ttt.⌆returned_scopes.);
+debugger(1,'raw AT returned scopes:\n' + print(returned_scopes.));
+⊨(⊢exchange_request_scopes.) == (⊢returned_scopes.) : 'incorrect scopes ' + (~returned_scopes.∉exchange_request_scopes.⌆returned_scopes.);

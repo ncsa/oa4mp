@@ -84,9 +84,9 @@ remove(idt_expected.'eduPersonEntitlement');
 verify()->
 block[ // set of basic verifications to run repeatedly.
   checks#wlcg(claims., at_expected., at_asserted.);
-⊨ at_asserted.'sub' ≡ ((∃claims.'eppn')?claims.'eppn':user_id) : 'wrong AT subject'; // OA4MP policy is to return the eppn if present.
-⊨ rt_asserted.'aud' ≡ 'https://wlcg.cern.ch/jwt/v1/refresh' : 'wrong RT audience';
-⊨ at_asserted.'iss' ≡ server_defaults.'issuer' : 'wrong AT issuer';
+⊨ at_asserted.'sub' ≡ user_id : 'wrong AT subject, got ' + (at_asserted.'sub'); // Explicitly set sub in request
+⊨ rt_asserted.'aud' ≡ 'https://wlcg.cern.ch/jwt/v1/refresh' : 'wrong RT audience, got ' + (rt_asserted.'aud');
+⊨ at_asserted.'iss' ≡ server_defaults.'issuer' : 'wrong AT issuer, got ' + (at_asserted.'iss') + ', expected ' + (server_defaults.'issuer');
 
   checks#lifetime(server_defaults.'at_lifetime', at_asserted.);
   checks#lifetime(server_defaults.'id_token_lifetime', claims.);

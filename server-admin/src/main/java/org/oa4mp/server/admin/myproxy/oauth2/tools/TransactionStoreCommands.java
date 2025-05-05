@@ -366,6 +366,8 @@ if(1 < foundIdentifiables.size()){
         try {
             super.ls(inputLine);
         } catch (Throwable t) {
+            say("uh-oh... there wasn an error:" + t.getMessage());
+            return;
         }
         // set it back.
         if (getByToken) {

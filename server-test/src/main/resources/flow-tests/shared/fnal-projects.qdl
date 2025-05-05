@@ -1,0 +1,79 @@
+#! /usr/bin/env -S qdl-run
+/*
+   CIL-2231 tests. This tests the three basic FNAL types of project and tracks the
+   subjects, and other information.  There are several sources for the information
+   and these are critical regression tests to work right.
+*/
+
+project := args().1; // The project to test for.
+
+cfg.'id'  := args().0; // client id
+cfg.'idp'  := 'GitHub';
+cfg.'file' := $$OA4MP_CLC_XML_INI;
+cfg.'flow_type' := 'df'; // Note to use df you need to set param for the token endpoint
+cfg.'description' :=  'FNAL project test for ' + project;
+
+ev. := script_load('test#/shared/expected_values.qdl', project);
+
+// Initial request is query for all possible allowed scopes.
+//params.'authz' :=  {'scope': 'wlcg.capabilityset:/' + project + ' wlcg.groups'};
+params.'token' :=  {'scope': 'wlcg.capabilityset:/' + project + ' wlcg.groups'};
+// refresh request is specific to each project
+params.'refresh' :=  {'scope': detokenize(ev.'refresh'.'request', ' ')};
+// Testing for complete reduction of scopes to just flags. Same for all
+params.'exchange' :=  {'scope': 'compute.read compute.cancel compute.modify compute.create'};
+// Now load the expected values that come back from the server. See file for info.
+// some of these are quite large.
+rc := script_load('driver.qdl', cfg., params.);
+if[rc!='ok'][return(rc);];
+
+/* Initial access token */
+tokens. := clc#access();
+at. := tokens.'access_token'.'jwt';
+rt. := tokens.'refresh_token'.'jwt';
+claims. := clc#claims();
+iat := claims.'iat'; // for later, to check it changes
+⊨ claims.'eppn' == ev.'idt'.'eppn' : 'wrong eppn. expected ' + (ev.'idt'.'eppn') + ' got ' + (claims.'eppn');
+⊨ is_defined(claims.'wlcg.credkey')  : 'missing wlcg.credkey';
+⊨ ev.'credkey' == claims.'wlcg.credkey'  : 'wrong wlcg.credkey, expected '+ (ev.'credkey') + ' got:' + (claims.'wlcg.credkey');
+⊨ is_defined(at.'wlcg.ver') : 'Not a WLCG token';
+⊨ at.'aud' == 'https://wlcg.cern.ch/jwt/v1/any' : 'incorrect access token audience';
+⊨ rt.'aud' == 'https://wlcg.cern.ch/jwt/v1/any' : 'incorrect refresh token audience';
+//⊨ at.'sub' == (project=='dunepro'?'dunepro@fnal.gov':'cilogontest@fnal.gov'): 'initial access token wrong subject, got:' + at.'sub';
+⊨ at.'sub' == ev.'at'.'sub': 'initial access token wrong subject, expected ' + (ev.'at'.'sub') + ' got:' + (at.'sub');
+expected_scopes. := [];
+
+ss. := tokenize(at.'scope', ' '); // change returned scopes to a list
+// say((⊢expected_scopes.)∆ (⊢ss.));
+⊨ reduce(@&&, ev.'at'.'response' ∈ ss.) : 'initial incorrect access token scopes. Expected:\n' + print(ev.'at'.'response') + '\ngot:\n' + print(ss.);
+⊨ abs(tokens.'access_token'.'lifetime' - 750000)<2000 : 'wrong lifetime, expected 750000, got ' + (tokens.'access_token'.'lifetime');
+
+/* Refresh */
+tokens. := clc#refresh();
+at. := tokens.'access_token'.'jwt';
+rt. := tokens.'refresh_token'.'jwt';
+claims. :=clc#claims();
+⊨ claims.'iat' != iat : 'id token timestamp did not change. This implies the token is not updating.';
+⊨ claims.'eppn' == ev.'idt'.'eppn' : 'post refresh wrong eppn, expected ' + (ev.'idt'.'eppn') + ' got ' + (claims.'eppn');
+⊨ is_defined(claims.'wlcg.credkey')  : 'missing wlcg.credkey';
+// if cred key changes, vault can't find this, so check it is still correct
+⊨ ev.'credkey' == claims.'wlcg.credkey'  : 'wrong wlcg.credkey, expected '+ (ev.'credkey') + ' got:' + (claims.'wlcg.credkey');
+⊨ is_defined(at.'wlcg.ver') : 'Not a WLCG token';
+⊨ at.'aud' == 'https://wlcg.cern.ch/jwt/v1/any' : 'incorrect access token audience';
+⊨ rt.'aud' == 'https://wlcg.cern.ch/jwt/v1/any' : 'incorrect refresh token audience';
+⊨ at.'sub' == ev.'refresh'.'sub': ' post refresh, access token has wrong subject, expected ' + (ev.'refresh'.'sub') + ' got ' + (at.'sub');
+ss. := tokenize(at.'scope', ' ');
+⊨ reduce(@&&, ev.'refresh'.'response' ∈ ss.) : 'post refresh incorrect access token scopes Expected:\n'
+                                               + print(ev.'refresh'.'response') + '\ngot:\n' + print(ss.);
+⊨ abs(tokens.'access_token'.'lifetime' - 750000)<2000 : 'wrong lifetime, expected 750000, got ' + (tokens.'access_token'.'lifetime');
+
+/* Exchange */
+at. := clc#exchange('-at').'access_token';
+rt. := clc#exchange('-rt').'refresh_token';
+expected_scopes. := ['compute.create', 'compute.read', 'compute.cancel', 'compute.modify'];
+⊨ at.'jwt'.'sub' == ev.'tx'.'sub': ' post exchange, access token has wrong subject, expected ' + (ev.'tx'.'sub') + ' got ' + (at.'jwt'.'sub');
+ss. := tokenize(at.'jwt'.'scope', ' ');
+⊨ reduce(@&&, expected_scopes. ∈ ss.) : 'after exchange incorrect access token scopes, expected\n' + print(expected_scopes.) + '\ngot\n' + print(ss.) ;
+⊨ abs(at.'lifetime' -750000)<2000 : 'wrong lifetime, expected 750000, got ' + (at.'lifetime');
+
+say('FNAL ' + project + ' project test: ok');

@@ -21,12 +21,22 @@ iat := claims.'iat'; // for later, to check it changes
 ⊨ is_defined(at.'wlcg.ver') : 'Not a WLCG token';
 ⊨ at.'aud' == 'https://wlcg.cern.ch/jwt/v1/any' : 'incorrect access token audience';
 ⊨ rt.'aud' == 'https://wlcg.cern.ch/jwt/v1/any' : 'incorrect refresh token audience';
-⊨ at.'sub' == 'cilogontest@fnal.gov': 'wrong subject';
-expected_scopes. := ['compute.create', 'compute.read', 'compute.cancel', 'compute.modify', 'storage.create:/dune/scratch/users/cilogontest', 'storage.read:/dune'];
+⊨ at.'sub' == 'cilogontestsub0001': 'wrong subject';
+expected_scopes. := ['compute.cancel',
+                      'compute.create',
+                      'compute.modify',
+                      'compute.read',
+                      'storage.create:/persistent/jobsub/jobs',
+                      'storage.create:/resilient/jobsub_stage',
+                      'storage.create:/scratch/users/cilogontest',
+                      'storage.read:/',
+                      'storage.read:/resilient/jobsub_stage'
+                     ];
 ss. := tokenize(at.'scope', ' ');
-⊨ reduce(@&&, expected_scopes. ∈ ss.) : 'incorrect access token scopes';
+⊨ reduce(@&&, expected_scopes. ∈ ss.) : 'incorrect initial access token scopes, got\n' + print(at.'scope') + '\nexpected:\n ' + print(expected_scopes.);
 ⊨ abs(tokens.'access_token'.'lifetime' - 750000)<2000 : 'wrong lifetime, expected 750000, got ' + (tokens.'access_token'.'lifetime');
 
+/* Refresh */
 tokens. := clc#refresh();
 at. := tokens.'access_token'.'jwt';
 rt. := tokens.'refresh_token'.'jwt';
@@ -38,16 +48,28 @@ claims. := clc#claims();
 ⊨ is_defined(at.'wlcg.ver') : 'Not a WLCG token';
 ⊨ at.'aud' == 'https://wlcg.cern.ch/jwt/v1/any' : 'incorrect access token audience';
 ⊨ rt.'aud' == 'https://wlcg.cern.ch/jwt/v1/any' : 'incorrect refresh token audience';
-⊨ at.'sub' == 'cilogontest@fnal.gov': 'wrong subject';
-expected_scopes. := ['compute.create', 'compute.read', 'compute.cancel', 'compute.modify', 'storage.create:/dune/scratch/users/cilogontest', 'storage.read:/dune'];
+⊨ at.'sub' == 'cilogontestsub0001': 'wrong subject, got '+ (at.'sub') + ', expected ' + ('cilogonsub0001');
+//expected_scopes. := ['compute.create', 'compute.read', 'compute.cancel', 'compute.modify', 'storage.create:/dune/scratch/users/cilogontest', 'storage.read:/dune'];
 ss. := tokenize(at.'scope', ' ');
 ⊨ reduce(@&&, expected_scopes. ∈ ss.) : 'incorrect access token scopes';
 ⊨ abs(tokens.'access_token'.'lifetime' - 750000)<2000 : 'wrong lifetime, expected 750000, got ' + (tokens.'access_token'.'lifetime');
+
+/* Exchange */
+at. := clc#exchange('-at').'access_token';
+rt. := clc#exchange('-rt').'refresh_token';
+⊨ at.'jwt'.'sub' == 'cilogontestsub0001': ' post exchange, access token has wrong subject, expected ' + ('cilogontestsub0001') + ' got ' + (at.'jwt'.'sub');
+ss. := tokenize(at.'jwt'.'scope', ' ');
+⊨ reduce(@&&, expected_scopes. ∈ ss.) : 'after exchange incorrect access token scopes, expected\n' + print(expected_scopes.) + '\ngot\n' + print(ss.) ;
+⊨ abs(at.'lifetime' -750000)<2000 : 'wrong lifetime, expected 750000, got ' + (at.'lifetime');
+
+
+/*
 at.'access_token' := clc#exchange('-at');
 rt.'refresh_token' := clc#exchange('-rt');
 expected_scopes. := ['compute.create', 'compute.read', 'compute.cancel', 'compute.modify'];
 ss. := tokenize(at.'scope', ' ');
 ⊨ reduce(@&&, expected_scopes. ∈ ss.) : 'incorrect access token scopes';
 ⊨ abs(tokens.'access_token'.'lifetime' -750000)<2000 : 'wrong lifetime, expected 750000, got ' + (tokens.'access_token'.'lifetime');
+*/
 
-say('FNAL test: ok');
+say('FNAL basic test: ok');

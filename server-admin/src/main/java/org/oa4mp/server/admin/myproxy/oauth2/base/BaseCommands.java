@@ -144,12 +144,7 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
         if (inputLine.hasArg(CLIENT_APPROVALS)) {
             commands = getClientApprovalCommands();
         }
-/*        if (inputLine.hasArg(COPY)) {
-            commands = getNewCopyCommands();
-        }
-        if (inputLine.hasArg(PARSER_COMMAND)) {
-            commands = getNewParserCommands();
-        }*/
+
         if (inputLine.hasArg(TRANSACTION_COMMAND)) {
             commands = getTransactionCommands();
         }
@@ -160,6 +155,7 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
         if (super.use(inputLine)) {
             return true;
         }
+        say("could not find the component named \"" + inputLine.getArg(1) + "\". Type 'use --help' for help");
 
         return false;
     }

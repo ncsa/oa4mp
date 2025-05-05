@@ -2,71 +2,80 @@
   Do the access (very first) phase here. In this phase, the information is gotten from LDAP
   for the capability set and all capabilities are returned (this is a query) along
   with any extras.
+
+  SEE NOTE AT END
 */
 
 block[
-    theta. := []~mask(scopes. , -1 < starts_with(scopes., CS_HEAD)); //requested capability sets
-    say('*** FNAL CS_HEAD ==' + to_string(CS_HEAD));
-    say('*** FNAL scopes. ==' + to_string(scopes.));
-    say('*** FNAL theta. == ' + to_string(theta.));
-    if[
-       	 0 == size(theta.) // no requested capabilities
-      ][
-      raise_error('No requested capabilities.', 1000, {'error_type':'access_denied'});
-/*
-                 sys_err.ok := false;
-            sys_err.message := 'No requested capabilities.';
-         sys_err.error_type := 'access_denied';
-            return(∅);
-*/
-    ];
+    requested_cs. := ~mask(scopes. , -1 < starts_with(scopes., CS_HEAD)); //requested capability sets
+    debugger(1,'*** FNAL scopes. ==' + to_string(scopes.));
+    debugger(1,'*** FNAL requested_cs. == ' + to_string(requested_cs.));
+    debugger(1,'*** FNAL user_record:\n' + print(user_record.));
+    // Checks that we have a single usable capability set.
+  	 0 == size(requested_cs.) ⇒ raise_error('No requested capabilities.', 1000, {'error_type':'access_denied'});
+   	 1 < size(requested_cs.) ⇒ raise_error('Multiple capabilities not allowed', 1000, {'error_type':'access_denied'});
+     requested_cs := requested_cs.0; // there is one  	        
+     (requested_cs ∉ user_record.EPE) ⇒ raise_error('User does not have access to this capability set.', 1000, {'error_type':'access_denied'});
 
-    if[
-       	 1 < size(theta.)        // Only one capability set at most is allowed.
-      ][
-                 sys_err.ok := false;
-            sys_err.message := 'Multiple capabilities not allowed';
-         sys_err.error_type := 'access_denied';
-            return(∅);
-    ];
-
-    if[
-      !has_value(theta.0, at_claims.EPE.) // make sure that the requested scope is in the claim
-    ][
-                 sys_err.ok := false;
-            sys_err.message := 'User does not have access to this capability set.';
-         sys_err.error_type := 'access_denied';
-            return(∅);
-    ];
-
-    xi. := claims#resolve_templates(at_claims.EPE., scopes., true);  // first pass, get explicitly allowed scopes
-
-    ccc := theta.0 - CS_HEAD;
-    record. :=  script_load('fnal/new/get_service.qdl',  ccc+'@fnal.gov');
+    templates. := claims#resolve_templates(user_record.EPE, scopes., true);  // first pass, get explicitly allowed scopes
+    debugger(1,'*** FNAL (resolved) templates:\n' + print(templates.));
+    service_name := requested_cs - CS_HEAD;
+    debugger(1, 'service name =' + service_name);
+    service_record. :=  script_load('fnal/new/get_service.qdl',  service_name+'@fnal.gov');
          // Check that the user does indeed have access to this capability set.
 
-    say('*** FNAL record =' + to_string(record.));
-    xi. := mask(xi., xi. != theta.0); // remove capability set from returned scopes.
-    say('*** FNAL xi after CS remove =' + to_string(xi.));
+    debugger(1,'*** FNAL service_record:\n' + print(service_record., {'box':true, 'width':72}));
+    templates. := excise(templates., requested_cs); // remove capability set from returned scopes.
+    debugger(1,'*** FNAL templates after CS remove:\n' + print(templates.));
 
-    if[
-       	0 < size(record.)
-      ][
-        if[is_defined(record.VOPAUID)][claims.vault_uid := record.VOPAUID;];
-        if[is_defined(record.EPPN)][access_token.sub := record.EPPN;];
-        if[
-             is_defined(record.EPE.)
-          ][
-             // do any substitutions in the templates.
-             s_rec. := claims#template_substitution(record.EPE., claims.);
-             say('*** FNAL eta. post subst =' + to_string(s_rec.));
-             // Get any specific overrides.
-             eta. := claims#resolve_templates(s_rec., scopes., true);
-             say('*** FNAL eta. =' + to_string(eta.));
-             xi. := xi. ~ eta. ~ s_rec.; // duplicates ok here, removed later
-         ]; // no capabilites means do nothing.
-      ];
+    ∃service_record.VOPAUID ⇒ claims.vault_uid := service_record.VOPAUID;
+    ∃service_record.EPPN    ⇒ access_token.'sub' := service_record.EPPN;
+    if[∃service_record.EPE.]
+  then[
+         // do any substitutions in the service record templates.
+         // Initial token request is query for all capability sets
+         s_rec. := claims#template_substitution(service_record.EPE., claims.);
+         debugger(1,'*** FNAL service record post subst:\n' + print(s_rec.));
+         // Get any specific overrides.
+         eta. := claims#resolve_templates(s_rec., scopes., true);
+         debugger(1,'*** FNAL eta.:\n' + print(eta.));
+         templates. := templates. ~ eta. ~ s_rec.; // duplicates ok here, removed later
+      ]; // end if, no capabilites means do nothing.
 
-   access_token.scope := detokenize(unique(xi.), ' ', 2); // turn in to string, omit duplications, trailing space
-   if[is_defined(record.EPPN)][access_token.sub := record.EPPN;];  // ⍝
+   access_token.'scope' := detokenize(unique(templates.), ' '); // turn in to string
+   return(access_token.);
 ];
+
+/*
+How to run this from the command line.
+---------------------------------------
+This is the ambient state when this script is called:
+
+          EPE := 'eduPersonEntitlement';
+      VOPAUID := 'voPersonApplicationUID';
+         EPPN := 'eduPersonPrincipalName';
+ IS_MEMBER_OF := 'isMemberOf';
+    vault_uid := 'wlcg.credkey';
+           CS := 'wlcg.capabilityset'; // qualifier
+      CS_HEAD := CS + ':/';
+access_token. :=
+{'aud':'https://wlcg.cern.ch/jwt/v1/any', 'auth_time':1746123246, 'exp':1746124003, 'iat':1746123253, 'iss':'http://localhost:9443/custom/issuer', 'jti':'https://localhost:9443/oauth2/3ed2a7c529d9b7a08fb9d22daad4cb69?type=accessToken&ts=1746123253115&version=v2.0&lifetime=750019', 'my_at_claim':'my_at_claim', 'nbf':1746123248, 'scope':'compute.create compute.read compute.cancel compute.modify', 'sub':'cilogontest@fnal.gov', 'wlcg.ver':'1.0'};
+
+user_record.:=
+{'eduPersonEntitlement':['wlcg.capabilityset:/duneana','wlcg.capabilityset:/dunepro','wlcg.capabilityset:/fermilab'], 'eduPersonPrincipalName':'cilogontest@fnal.gov', 'voPersonID':'FNALcilogontest'};
+
+scopes.:=
+['org.cilogon.userinfo','openid','profile','email','storage.read:/','wlcg.capabilityset:/duneana','wlcg.groups'];
+
+ss := '/home/ncsa/dev/ncsa-git/oa4mp/server-admin/src/main/resources/qdl/fnal/new/access.qdl';
+
+claims. := {'uid':'cilogontest'};
+
+claims := j_load('oa4mp.util.claims');
+
+// --- the actual call
+
+script_load(ss);
+
+** This returns the access token, but all output is to the debugger, hence in the command line window.
+*/

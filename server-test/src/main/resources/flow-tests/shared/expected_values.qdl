@@ -1,0 +1,152 @@
+/*
+   For the FNAL project tests. This takes the name of the project and
+   returns a stem of expected values for the projects
+   keys and values table:
+
+   key      |  subkey   |  What is it
+   ---------+----------+------------------------------------------
+   credkey  |          | identifier for vault, head of IDP EPPN
+   ---------+----------+------------------------------------------
+   idt      | sub      | Expected sub claim
+   ---------+----------+------------------------------------------
+            | eppn     | IDP EPPN
+   ---------+----------+------------------------------------------
+   at       | sub      | Expected sub for access token
+   ---------+----------+------------------------------------------
+            | response | List of scopes returned from initial request.
+   ---------+----------+------------------------------------------
+   refresh  | sub      | Expected sub after token refresh
+   ---------+----------+------------------------------------------
+            | request  | List of requested scopes
+   ---------+----------+------------------------------------------
+            | response | List of expected scopes in response
+   ---------+----------+------------------------------------------
+   tx       | sub      | Expected sub claim after exchange
+   ---------+----------+------------------------------------------
+            | response | List of scopes after exchange
+   ---------+----------+------------------------------------------
+*/
+project := args().0;
+ev. := [];
+if[project == 'dunepro'][
+  ev.'credkey' := 'dunepro';
+  ev.'idt'.'sub' := 'dunepro@fnal.gov';
+  ev.'idt'.'eppn' := 'cilogontest@fnal.gov';
+  ev.'at'.'sub' := 'dunepro@fnal.gov';
+  ev.'at'.'response':= ['compute.cancel',
+                      'compute.create',
+                      'compute.modify',
+                      'compute.read',
+                      'storage.create:/',
+                      'storage.create:/persistent/jobsub/jobs',
+                      'storage.create:/resilient/jobsub_stage',
+                      'storage.read:/',
+                      'storage.read:/resilient/jobsub_stage'
+                       ];
+  ev.'refresh'.'request':=['compute.cancel',
+                           'compute.read',
+                           'compute.unknown',
+                           'storage.create:/',
+                           'storage.create:/bad/dir',
+                           'storage.create:/persistent/jobsub/jobs',
+                           'storage.create:/resilient/jobsub_stage/sub0',
+                           'storage.read:/resilient/jobsub_stage/sub0',
+                           'storage.read:/'
+                          ];
+  ev.'refresh'.'response':=['compute.cancel',
+                            'compute.read',
+                            'storage.create:/',
+                            'storage.read:/',
+                            'storage.create:/persistent/jobsub/jobs',
+                            'storage.create:/resilient/jobsub_stage/sub0',
+                            'storage.read:/resilient/jobsub_stage/sub0'
+                          ];
+  ev.'refresh'.'sub' := 'dunepro@fnal.gov';
+  ev.'tx'.'sub' :='dunepro@fnal.gov';
+];
+
+if[project == 'duneana'][
+  ev.'credkey' := 'cilogontest';
+  ev.'idt'.'sub' := 'cilogonsub0001';
+  ev.'idt'.'eppn' := 'cilogontest@fnal.gov';
+  ev.'at'.'sub' := 'cilogontestsub0001';
+  ev.'at'.'response' := ['compute.cancel',
+                         'compute.create',
+                         'compute.modify',
+                         'compute.read',
+                         'storage.create:/persistent/jobsub/jobs',
+                         'storage.create:/resilient/jobsub_stage',
+                         'storage.create:/scratch/users/cilogontest',
+                         'storage.read:/',
+                         'storage.read:/resilient/jobsub_stage'
+                            ];
+
+
+  ev.'refresh'.'request':=['compute.cancel',
+                           'compute.read',
+                           'compute.unknown',
+                           'storage.create:/',
+                           'storage.create:/bad/dir',
+                           'storage.create:/resilient/jobsub_stage',
+                           'storage.create:/resilient/jobsub_stage/sub0',
+                           'storage.create:/scratch/users/cilogontest',
+                           'storage.create:/scratch/users/cilogontest/sub0'
+                          ];
+
+  ev.'refresh'.'response':=['compute.cancel',
+                            'compute.read',
+                            'storage.create:/resilient/jobsub_stage',
+                            'storage.create:/resilient/jobsub_stage/sub0',
+                            'storage.create:/scratch/users/cilogontest',
+                            'storage.create:/scratch/users/cilogontest/sub0'
+                            ];
+  ev.'refresh'.'sub' := 'cilogontestsub0001';
+  ev.'tx'.'sub' :='cilogontestsub0001';
+];
+
+if[project == 'fermilab'][
+  ev.'credkey' := 'cilogontest';
+  ev.'idt'.'sub' := 'cilogonsub0001';
+  ev.'idt'.'eppn' := 'cilogontest@fnal.gov';
+  ev.'at'.'sub' := 'cilogontestsub0001';
+  ev.'at'.'response' := ['compute.cancel',
+                         'compute.create',
+                         'compute.modify',
+                         'compute.read',
+                         'storage.create:/fermigrid/jobsub/jobs',
+                         'storage.create:/fermilab/users/cilogontest',
+                         'storage.read:/fermilab/users/cilogontest'
+                         ];
+
+  ev.'refresh'.'request':=['compute.cancel',
+                           'compute.create',
+                           'compute.modify',
+                           'compute.unknown',
+                           'compute.read',
+                           'storage.create:/fermigrid/jobsub/jobs',
+                           'storage.create:/fermilab/users/cilogontest',
+                           'storage.create:/fermilab/users/cilogontest/sub0',
+                           'storage.read:/fermilab/users/cilogontest',
+                           'storage.read:/fermilab/users/cilogontest/sub0',
+                           'storage.read:/bobs/secret/directory'
+                          ];
+
+  ev.'refresh'.'response':=['compute.cancel',
+                            'compute.create',
+                            'compute.modify',
+                            'compute.read',
+                            'storage.create:/fermigrid/jobsub/jobs',
+                            'storage.create:/fermilab/users/cilogontest',
+                            'storage.create:/fermilab/users/cilogontest/sub0',
+                            'storage.read:/fermilab/users/cilogontest',
+                            'storage.read:/fermilab/users/cilogontest/sub0'
+                            ];
+  ev.'refresh'.'sub' := 'cilogontestsub0001';
+  ev.'tx'.'sub' :='cilogontestsub0001';
+];
+
+return(ev.);
+
+//⊨ (project=='dunepro'?'dunepro':'cilogontest') == claims.'wlcg.credkey'  : 'wrong wlcg.credkey, got:' + (claims.'wlcg.credkey');
+//⊨ at.'sub' == (project=='dunepro'?'dunepro@fnal.gov':'cilogontest@fnal.gov'): 'initial access token wrong subject, got:' + at.'sub';
+//

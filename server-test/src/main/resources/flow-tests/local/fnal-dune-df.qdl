@@ -1,4 +1,4 @@
 #! /usr/bin/env -S qdl-run
 
 /* Runs dune flow test for device flow */
-script_load('test#/local/fnal-dune.qdl','df');
+script_load('test#/local/fnal-dune-fork.qdl','df');

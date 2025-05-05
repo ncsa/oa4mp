@@ -8,54 +8,47 @@ script_load('fnal/acl.qdl');
     vault_uid := 'wlcg.credkey';
            CS := 'wlcg.capabilityset'; // qualifier
       CS_HEAD := CS + ':/';
- say('*** FNAL args ' + to_string(script_args(-1)));
 
 script_load('test#/auto/server/runtime-vars-check.qdl', true, false); // regression testing. DO NOT DEPLOY
-say('initial claims:\n' + print(claims.));
-say('xas.=' + print(xas.));
+debugger(2);
 
-    at_claims. := script_load('fnal/new/get_user.qdl', claims.eppn);
+user_record. := script_load('fnal/new/get_user.qdl', claims.eppn);
 
-    say('*** FNAL at_claims. =' + to_string(at_claims.));
+debugger(2,'*** FNAL user_record.\n' + print(user_record., 72));
 
-    access_token.sub := claims.eppn; // set this no matter what.
-    if[is_defined(at_claims.EPPN)][access_token.sub := at_claims.EPPN;]; // ⍝
-if[
-   !is_defined(at_claims.EPE.)
-]then[
-   say('*** FNAL at_claims.EPE. undefined');
-   access_token.scope := ''; // return empty scopes.
-   return(); // nothing to do. No capabilities ==>  no scopes.
-]; //end if
+  if[exec_phase == 'post_token'] // so first pass only
+then[
+      debugger(1,'*** FNAL ('+ exec_phase + ') setting access token sub from claims.eppn to ' + (claims.'eppn'));
+      access_token.'sub' := claims.'eppn'; // set this no matter what.
+     if[∃user_record.EPPN]
+       [
+         debugger(1,'*** FNAL setting access token sub from user record ' + (access_token.'sub') + ' to ' + (user_record.EPPN));
+         access_token.'sub' := user_record.EPPN;
+         claims.'sub' := user_record.EPPN;
+       ]; // end if
+    ]; // end if
+
+  if[∄user_record.EPE.]
+then[
+     access_token.'scope' := ''; // return empty scopes.
+     return(); // nothing to do. No capabilities ==>  no scopes.
+    ]; //end if
 
 /* Finish off id token -- figure out any groups */
-if[
-    is_defined(at_claims.isMemberOf.)
-  ][
-   say('*** FNAL running groups');
-    // Process any WLCG groups is there is member information
-    wlcg_groups :='wlcg.groups';// need this later to assign stem value.
+  if[∃user_record.'isMemberOf']
+then[
+      // Process any WLCG groups is there is member information
+       wlcg_groups :='wlcg.groups';// need this later to assign stem value.
+      wlcg_groups. := script_run('fnal/wlcg_groups.qdl', scopes., user_record.'isMemberOf');
+      if[size(wlcg_groups.) != 0]
+        [
+           access_token.wlcg_groups := wlcg_groups.;
+           remove(user_record.'isMemberOf');
+        ]; //end if
+    ]; //end if
 
-    wlcg_groups. := script_run('fnal/wlcg_groups.qdl', scopes., at_claims.isMemberOf.);
-    if[
-       	 size(wlcg_groups.) != 0
-       ][
-           access_token.wlcg_groups. := wlcg_groups.;
-           remove(at_claims.isMemberOf.);
-    ];
-];
+  if[exec_phase == 'post_token' || size(tx_scopes.) == 0]
+then[script_load('fnal/new/access.qdl');]
+else[script_load('fnal/new/rtx.qdl');];
 
-/* Scope processing starts here */
-
-if[
-   exec_phase == 'post_token' || size(tx_scopes.) == 0
-  ][
-     script_load('fnal/new/access.qdl');
-     if[!sys_err.ok][return();]; // If there was an error, bail.
-
-]else[
-      say('*** FNAL at.qdl, starting rtx2');
-     script_load('fnal/new/rtx.qdl');
-];
-
- if[0<size(tx_audience.) || 0 < size(tx_resource.)][access_token.aud. := tx_audience.~tx_resource.;];
+ (0<size(tx_audience.) || 0 < size(tx_resource.)) ⇒ access_token.'aud' := tx_audience.~tx_resource.;

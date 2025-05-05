@@ -8,23 +8,19 @@
 block[
             // ini. := file_read('vfs#/scripts/fnal/ldap.ini',2).'dev';
             ini. := file_read('/home/ncsa/dev/csd/config/ini/fnal-ldap.ini',2).'prod';
-                say('*** get_user,qdl');
-                say(print(ini.));
-                say(print(claims.));
                    fnal_cfg. := claims#new_template('ldap');
               fnal_cfg.auth_type := 'simple';
-                //fnal_cfg.address := 'ldap-test.cilogon.org';
                 fnal_cfg.address := ini.'server';
                    fnal_cfg.port := 636;
              fnal_cfg.claim_name := 'uid';
           fnal_cfg.fail_on_error := true;
-            //fnal_cfg.search_base := 'ou=people,o=Fermilab,o=CO,dc=dev,dc=fnal,dc=gov';
             fnal_cfg.search_base := ini.'user_search_base';
                    fnal_cfg.type := 'ldap';
               fnal_cfg.ldap_name := 'voPersonExternalID';
      fnal_cfg.search_attributes. :=  [EPPN,EPE,IS_MEMBER_OF, 'voPersonID'];
                fnal_cfg.username := ini.'name';
                fnal_cfg.password := ini.'pwd';
-      return(claims#get_claims(claims#create_source(fnal_cfg.), script_args(0)));
+      out. := claims#get_claims(claims#create_source(fnal_cfg.), args().0);
+      return(out.);
 ];
 

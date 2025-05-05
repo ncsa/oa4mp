@@ -5,8 +5,6 @@
 */
 path:='test#/';
 test.:=(path + 'local/') + [
-                             'fnal-dune-df.qdl',
-                             'fnal-dune-uri.qdl',
                              'test_acl.qdl',
                              'test_qdl.qdl',
                              'cil1550.qdl',
@@ -23,11 +21,16 @@ test.:=(path + 'local/') + [
 //                           'test_ncsa.qdl', // NCSA LDAP decomissioned. Test can't run.
                              'vo_test.qdl',
                               'wlcg.qdl',
-                             'fnal-0.qdl',
+                             'fnal-0.qdl', // next few test failures
                              'fnal-1.qdl',
                              'fnal-2.qdl',
-                             'fnal-3.qdl',
-                             'fnal-basic.qdl'];
+                             'fnal-basic.qdl', // FNAL regression testing
+                             'fnal-dune-df.qdl',
+                             'fnal-dune-uri.qdl',
+                             'fnal-duneana.qdl',
+                             'fnal-dunepro.qdl',
+                             'fnal-fermilab.qdl'
+                             ];
 
 say('**** Flow test suite for OA4MP. ****');
 say('This will do several local tests for various modes of operation.');
