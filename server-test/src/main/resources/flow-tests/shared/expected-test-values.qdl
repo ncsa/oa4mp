@@ -1,0 +1,111 @@
+/*
+  See note for expected_values.qdl. These are the values for the test LDAP.
+*/
+project := args().0;
+ev. := [];
+if[project == 'dunepro'][
+  ev.'credkey' := 'dunepro';
+  ev.'idt'.'sub' := 'dunepro@fnal.gov';
+  ev.'idt'.'eppn' := 'cilogontest@fnal.gov';
+  ev.'at'.'sub' := 'dunepro@fnal.gov';
+  ev.'at'.'response':= ['compute.cancel',
+                        'compute.create',
+                        'compute.modify',
+                        'compute.read',
+                        'storage.create:/dune',
+                        'storage.create:/dune/resilient/jobsub_stage',
+                        'storage.read:/dune',
+                        'storage.read:/dune/resilient/jobsub_stage'
+                       ];
+
+  ev.'refresh'.'request':=['compute.cancel',
+                           'compute.read',
+                           'compute.unknown',
+                           'storage.create:/bad/dir',
+                           'storage.create:/dune/resilient/jobsub_stage/sub0',
+                           'storage.read:/dune/resilient/jobsub_stage/sub0'
+                          ];
+  ev.'refresh'.'response':=['compute.cancel',
+                            'compute.read',
+                            'storage.create:/dune/resilient/jobsub_stage/sub0',
+                            'storage.read:/dune/resilient/jobsub_stage/sub0'
+                          ];
+  ev.'refresh'.'sub' := 'dunepro@fnal.gov';
+  ev.'tx'.'sub' :='dunepro@fnal.gov';
+];
+
+if[project == 'duneana'][
+  ev.'credkey' := 'cilogontest';
+  ev.'idt'.'sub' := 'cilogonsub0001';
+  ev.'idt'.'eppn' := 'cilogontest@fnal.gov';
+  ev.'at'.'sub' := 'cilogontestsub0001';
+  ev.'at'.'response' := ['compute.cancel',
+                         'compute.create',
+                         'compute.modify',
+                         'compute.read',
+                         'storage.create:/dune/resilient/jobsub_stage',
+                         'storage.create:/dune/scratch/users/cilogontest',
+                         'storage.read:/dune',
+                         'storage.read:/dune/resilient/jobsub_stage'
+                        ];
+  ev.'refresh'.'request':=['compute.cancel',
+                           'compute.read',
+                           'compute.unknown',
+                           'storage.create:/',
+                           'storage.create:/bad/dir',
+                           'storage.create:/dune/resilient/jobsub_stage',
+                           'storage.create:/dune/resilient/jobsub_stage/sub0',
+                           'storage.create:/dune/scratch/users/cilogontest',
+                           'storage.create:/dune/scratch/users/cilogontest/sub0'
+                          ];
+
+  ev.'refresh'.'response':=['compute.cancel',
+                            'compute.read',
+                            'storage.create:/dune/resilient/jobsub_stage',
+                            'storage.create:/dune/resilient/jobsub_stage/sub0',
+                            'storage.create:/dune/scratch/users/cilogontest',
+                            'storage.create:/dune/scratch/users/cilogontest/sub0'
+                            ];
+  ev.'refresh'.'sub' := 'cilogontestsub0001';
+  ev.'tx'.'sub' :='cilogontestsub0001';
+];
+
+if[project == 'fermilab'][
+  ev.'credkey' := 'cilogontest';
+  ev.'idt'.'sub' := 'cilogonsub0001';
+  ev.'idt'.'eppn' := 'cilogontest@fnal.gov';
+  ev.'at'.'sub' := 'cilogontestsub0001';
+  ev.'at'.'response' := ['compute.cancel',
+                         'compute.create',
+                         'compute.modify',
+                         'compute.read',
+                         'storage.create:/fermilab/users/cilogontest',
+                         'storage.read:/fermilab/users/cilogontest'
+                        ];
+
+  ev.'refresh'.'request':=['compute.cancel',
+                           'compute.modify',
+                           'compute.unknown',
+                           'storage.create:/fermilab/users/cilogontest',
+                           'storage.create:/fermilab/users/cilogontest/sub0',
+                           'storage.read:/fermilab/users/cilogontest',
+                           'storage.read:/fermilab/users/cilogontest/sub0',
+                           'storage.read:/bobs/secret/directory'
+                          ];
+
+  ev.'refresh'.'response':=['compute.cancel',
+                            'compute.modify',
+                            'storage.create:/fermilab/users/cilogontest',
+                            'storage.create:/fermilab/users/cilogontest/sub0',
+                            'storage.read:/fermilab/users/cilogontest',
+                            'storage.read:/fermilab/users/cilogontest/sub0'
+                            ];
+  ev.'refresh'.'sub' := 'cilogontestsub0001';
+  ev.'tx'.'sub' :='cilogontestsub0001';
+];
+
+return(ev.);
+
+//⊨ (project=='dunepro'?'dunepro':'cilogontest') == claims.'wlcg.credkey'  : 'wrong wlcg.credkey, got:' + (claims.'wlcg.credkey');
+//⊨ at.'sub' == (project=='dunepro'?'dunepro@fnal.gov':'cilogontest@fnal.gov'): 'initial access token wrong subject, got:' + at.'sub';
+//

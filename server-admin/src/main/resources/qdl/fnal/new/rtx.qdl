@@ -24,7 +24,10 @@ block[
      (requested_cs ∉ user_record.EPE) ⇒ raise_error('User does not have access to this capability set.', 1000, {'error_type':'access_denied'});
 
      debugger(1,'*** FNAL rtx got ' + CS + ':\n' + print(requested_cs.));
-     service_record. :=  script_load('fnal/new/get_service.qdl',  (requested_cs.0-CS_HEAD)+'@fnal.gov');
+     //DEV-BLOCK
+     service_record. :=  script_load('fnal/new/get_service.qdl',  (requested_cs.0-CS_HEAD)+'@fnal.gov', ldap_name);
+     //END DEV-BLOCK
+     //service_record. :=  script_load('fnal/new/get_service.qdl',  (requested_cs.0-CS_HEAD)+'@fnal.gov');
 
      debugger(1,'*** FNAL rtx service record:\n' + print(service_record.));
 

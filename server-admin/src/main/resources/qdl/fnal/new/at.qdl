@@ -1,5 +1,5 @@
 script_load('fnal/acl.qdl');
- 
+ debugger(1);
  // Constants for later
           EPE := 'eduPersonEntitlement';
       VOPAUID := 'voPersonApplicationUID';
@@ -9,10 +9,16 @@ script_load('fnal/acl.qdl');
            CS := 'wlcg.capabilityset'; // qualifier
       CS_HEAD := CS + ':/';
 
+// DEV-block Next block is for my dev machine. Set this to test | dev | prod depending upon which test suite run.
+ldap_name := 'prod';
 script_load('test#/auto/server/runtime-vars-check.qdl', true, false); // regression testing. DO NOT DEPLOY
-debugger(2);
+user_record. := script_load('fnal/new/get_user.qdl', claims.eppn, ldap_name);
+size(user_record.) == 0 ? raise_error('no user record found for ' + claims.eppn);
+// END DEV-block
 
-user_record. := script_load('fnal/new/get_user.qdl', claims.eppn);
+/* Uncomment next line, comment out dev block for other machines */
+//user_record. := script_load('fnal/new/get_user.qdl', claims.eppn);
+
 
 debugger(2,'*** FNAL user_record.\n' + print(user_record., 72));
 

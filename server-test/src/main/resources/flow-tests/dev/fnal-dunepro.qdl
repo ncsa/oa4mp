@@ -1,2 +1,2 @@
 #! /usr/bin/env -S qdl-run
-script_load('test#/shared/fnal-projects.qdl', 'dev:test/fnal', 'dunepro');
+script_load('test#/shared/fnal-projects.qdl', 'dev:test/fnal', 'dunepro', 'test');

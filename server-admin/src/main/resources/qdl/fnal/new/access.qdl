@@ -21,7 +21,11 @@ block[
     debugger(1,'*** FNAL (resolved) templates:\n' + print(templates.));
     service_name := requested_cs - CS_HEAD;
     debugger(1, 'service name =' + service_name);
-    service_record. :=  script_load('fnal/new/get_service.qdl',  service_name+'@fnal.gov');
+    // DEV-block
+    service_record. :=  script_load('fnal/new/get_service.qdl',  service_name+'@fnal.gov', ldap_name);
+    // END DEV-block
+
+    //service_record. :=  script_load('fnal/new/get_service.qdl',  service_name+'@fnal.gov');
          // Check that the user does indeed have access to this capability set.
 
     debugger(1,'*** FNAL service_record:\n' + print(service_record., {'box':true, 'width':72}));

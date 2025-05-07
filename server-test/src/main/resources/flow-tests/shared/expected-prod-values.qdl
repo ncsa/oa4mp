@@ -25,6 +25,10 @@
    ---------+----------+------------------------------------------
             | response | List of scopes after exchange
    ---------+----------+------------------------------------------
+
+   5/5/2025 -- Turns out this tests against PROD and not TEST LDAP. These are
+   not the same (FNAL has this as a known issue that these do not synch automatically
+   and are trying to fix it).
 */
 project := args().0;
 ev. := [];

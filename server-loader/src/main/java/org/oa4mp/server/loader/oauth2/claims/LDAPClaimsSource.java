@@ -1,15 +1,5 @@
 package org.oa4mp.server.loader.oauth2.claims;
 
-import org.oa4mp.server.loader.oauth2.OA2SE;
-import org.oa4mp.server.loader.oauth2.servlet.GroupHandler;
-import org.oa4mp.server.loader.oauth2.servlet.NCSAGroupHandler;
-import org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet;
-import org.oa4mp.delegation.server.server.UnsupportedScopeException;
-import org.oa4mp.delegation.server.server.claims.ClaimSourceConfiguration;
-import org.oa4mp.delegation.server.server.config.LDAPConfiguration;
-import org.oa4mp.delegation.server.server.config.LDAPConfigurationUtil;
-import org.oa4mp.delegation.server.ServiceTransaction;
-import org.qdl_lang.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.Logable;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
@@ -19,6 +9,16 @@ import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.oa4mp.delegation.server.ServiceTransaction;
+import org.oa4mp.delegation.server.server.UnsupportedScopeException;
+import org.oa4mp.delegation.server.server.claims.ClaimSourceConfiguration;
+import org.oa4mp.delegation.server.server.config.LDAPConfiguration;
+import org.oa4mp.delegation.server.server.config.LDAPConfigurationUtil;
+import org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet;
+import org.oa4mp.server.loader.oauth2.OA2SE;
+import org.oa4mp.server.loader.oauth2.servlet.GroupHandler;
+import org.oa4mp.server.loader.oauth2.servlet.NCSAGroupHandler;
+import org.qdl_lang.variables.QDLStem;
 
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
@@ -164,7 +164,13 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
             // Fix for https://jira.ncsa.illinois.edu/browse/CIL-1943
             String msg =  throwable.getClass().getSimpleName() + " talking to LDAP:" + throwable.getMessage();
             debugger.warn(this, msg);
-            warn(msg);
+            // Fix https://github.com/ncsa/oa4mp/issues/246
+            if(getConfiguration().isNotifyOnFail()){
+                warn(msg);
+            }
+            if(getConfiguration().isFailOnError()) {
+                throw new LDAPException(msg, throwable);
+            }
             return;
         }
         debugger.error(this, "Error accessing LDAP", throwable);
@@ -230,7 +236,6 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
         }
         try {
             String searchName = getSearchName(claims, request, transaction);
-            //       String searchName = "jgaynor";
             debugger.trace(this, name + " search name=" + searchName);
 
             if (searchName != null) {
@@ -329,6 +334,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
         DirContext dirContext = null;
         // Fix https://github.com/ncsa/oa4mp/issues/113
         int retryCount = Math.max(1, getLDAPCfg().getRetryCount()); // make sure it trips once
+        Throwable lastException = null;
         for(int i = 0; i < retryCount; i++){
             while (stringTokenizer.hasMoreTokens()) {
                 try {
@@ -340,6 +346,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
                     // Do nothing. Allow for errors.
                     String msg = e.getClass().getSimpleName() + " failure for LDAP server # " + i + ": " + e.getMessage();
                     debugger.trace(this, msg, e);
+                    lastException = e;
                 }
             }
            if(0 < getLDAPCfg().getMaxWait()){
@@ -353,6 +360,8 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
                }
            }
         }
+        // Fix https://github.com/ncsa/oa4mp/issues/246 let handleException do the work so it's centralized
+        handleException(lastException, debugger); // failed the max number of times, so handle the error.
         return null;
     }
 

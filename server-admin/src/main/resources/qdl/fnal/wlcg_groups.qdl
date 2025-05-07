@@ -11,6 +11,7 @@
 
     Author: Jeff Gaynor
    Created: 2021-06-18T21:36:17.458Z
+  Revised : 2025-05-07T11:35:02.781Z
 
    Arg #0 is the key. This may accept
      (a) simply wlcg.groups in which case all groups are returned
@@ -22,30 +23,25 @@
    identity token as well, make sure you only hand back one copy.
 
 */
-        scopes. ≔  args(0);
-  found_groups. ≔  args(1);
-  say('      scopes :' + to_string(scopes.));
-  say('found_groups :' + to_string(found_groups.));
+debugger(1);
+     fq_groups. ≔  args().0;
+    all_groups. ≔  args().1;
+  debugger(1,'   ');
+  debugger(1,'processing wlcg_groups');
+  debugger(1,'   fq groups : ' + to_string(fq_groups.));
+  debugger(1,'  all groups : ' + to_string(all_groups.));
               w ≔  'wlcg.groups';
+          has_w ≔  w ∈ fq_groups.;  // check if single scope of wlcg.groups is passed in
+     fq_groups. ≔ fq_groups. !~ w; // remove w
+  debugger(1,'       has_w : ' + to_string(has_w));
           caput ≔  w + ':'; // head of WLCG requested group.
-  group_scopes. ≔  ~mask(scopes., ¯1 < starts_with(scopes., [w])); // get scopes that start with w
-  say('group_scopes :' + to_string(group_scopes.));
+  found_groups. ≔  (('^'+caput+'.*') ≈   fq_groups.)⌆fq_groups. ; // get groups that start with caput
+  debugger(1,'found groups : ' + to_string(found_groups.));
 
-          has_w ≔  w ∈ group_scopes.;  // check if single scope of wlcg.groups is passed in
-  say('       has_w :' + to_string(has_w));
-  group_scopes. ≔  mask(group_scopes., group_scopes. ≠ w); // remove w  if it is there,
-
-    // trivial responses
-    // no requested wlcg groups.
-    (¬has_w) ∧ size(group_scopes.) ≡ 0 ⇒  return([]);
-    // has_w is true, , no other qualifications, return all groups less w.
-    //size(group_scopes.) ≡ 0 ⇒ return(~mask(found_groups., found_groups. ≠ w));
-    size(group_scopes.) ≡ 0 ⇒ return(found_groups. !~ w);
-
-  group_scopes. ≔  ~group_scopes. - caput;
-
-  //return(~mask(group_scopes., has_value(group_scopes., found_groups.)));
-  return(~ (group_scopes.∈ found_groups.) ⌆ group_scopes. );
+    // trivial responses. No found groups and w means return all, otherwise, none
+     size(found_groups.) ≡ 0 ⇒ (has_w ⇒ return(all_groups.) : return([]));
+   found_groups. ≔  found_groups. - caput; // remove the FQ
+  return(~ (found_groups.∈ all_groups.) ⌆ found_groups. );
 /*
    Test:
      g. := ['/cms/uscms', '/cms/ALARM','/cms/users']; // typical isMemberOf list is unqualified
@@ -63,8 +59,25 @@
 [/cms/uscms]
 
      script_run(ss, ['openid'], g.); // request no groups
+ // All together as assertions
+ ⊨    ⊗∧⊙(['/cms/uscms']≡script_run(ss, s., g.))`* : 'failed to return singleton subset'; // request a subset
+ ⊨    ⊗∧⊙(['/cms/uscms','/cms/ALARM','/cms/users'] ≡ script_run(ss, [w], g.))`* : 'failed to return all';
+ ⊨    ⊗∧⊙(['/cms/uscms'] ≡ script_run(ss, ['openid','wlcg.groups:/cms/uscms', 'wlcg.groups:/cms/foo'],g.))`* : 'failed to reject unknown';
+ ⊨    0 ≡ size(script_run(ss, ['openid'], g.)) : 'failed to return none';
 
+(no output means alles ok.)
 
+ // All together manually
+     script_run(ss, s., g.); // request a subset
+     script_run(ss, [w], g.); // request all groups
+     script_run(ss, ['openid','wlcg.groups:/cms/uscms', 'wlcg.groups:/cms/foo'],g.); // request for group they do not have access to
+     script_run(ss, ['openid'], g.); // request no groups
+
+     [/cms/uscms]
+     [/cms/uscms,/cms/ALARM,/cms/users]
+     [/cms/uscms]
+     []
+⊨
      s. := ['openid','profile','email','org.cilogon.userinfo','wlcg.capabilityset:/fermilab','wlcg.groups:/fermilab']
      g. := ['/cms/uscms', '/fermilab']
 

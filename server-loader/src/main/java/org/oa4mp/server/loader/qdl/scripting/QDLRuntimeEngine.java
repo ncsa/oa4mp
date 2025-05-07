@@ -89,7 +89,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
      */
     protected void init(OA2ServiceTransaction transaction) {
         state = (OA2State) StateUtils.newInstance();
-        if(OA2State.getRootState() == null){
+        if (OA2State.getRootState() == null) {
             // After deserialiozation it might not have this set. Set it.
             OA2State.setRootState(state);
         }
@@ -237,7 +237,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         // with 2.1 and only if the bombs try 2.0. 
         try {
             deserializeJSON2_1(rawState);
-        }catch(Throwable t){
+        } catch (Throwable t) {
             deserializeStateXML2_0(rawState);
         }
     }
@@ -339,6 +339,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         } catch (RaiseErrorException rex) {
             // Allow for throwing sys_err as a regular error, rather than having specialized machinery
             processSRX(rex);
+
         }
         return createSRResponse();
     }
@@ -379,10 +380,11 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             }
             scriptRuntimeException.setRequestedType(requestedType);
             throw scriptRuntimeException;
-        } else {
-            getState().getLogger().warn("Unhandled QDL exception:" + raiseErrorException.getMessage(), raiseErrorException);
-            DebugUtil.error("Unhandled QDL exception", raiseErrorException);
         }
+        getState().getLogger().warn("Unhandled QDL exception:" + raiseErrorException.getMessage(), raiseErrorException);
+        DebugUtil.error("Unhandled QDL exception", raiseErrorException);
+        throw raiseErrorException; // throw it for sure, just log it didn't have an error code.
+
     }
 
     /*
@@ -486,7 +488,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         proxyClaimsStem.fromJSON(proxyClaims);
         state.setValue(PROXY_CLAIMS_VAR, proxyClaimsStem);
         QDLStem authHeaders = new QDLStem();
-        if(req.getArgs().containsKey(SRE_REQ_AUTH_HEADERS)){
+        if (req.getArgs().containsKey(SRE_REQ_AUTH_HEADERS)) {
             authHeaders.fromJSON((JSONObject) req.getArgs().get(SRE_REQ_AUTH_HEADERS));
         }
         state.setValue(AUTH_HEADERS_VAR, authHeaders);
@@ -588,7 +590,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         state.setValue(TX_AUDIENCE_VAR, txAud);
         state.setValue(TX_RESOURCE_VAR, txRes);
         QDLStem originalScopes = new QDLStem();
-        if(state.getTransaction().hasATReturnedOriginalScopes()) {
+        if (state.getTransaction().hasATReturnedOriginalScopes()) {
             ArrayList arrayList = new ArrayList();
             arrayList.addAll(state.getTransaction().getATReturnedOriginalScopes());
             originalScopes.getQDLList().appendAll(arrayList);
@@ -802,9 +804,9 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
                     TX_RESOURCE_VAR,
                     TX_SCOPES_VAR
             });
-            if(state.getTransaction().hasScriptStateSerializationVersion()){
+            if (state.getTransaction().hasScriptStateSerializationVersion()) {
                 state.getTransaction().setScriptState(serializeState(state.getTransaction().getScriptStateSerializationVersion()));
-            } else{
+            } else {
                 state.getTransaction().setScriptState(serializeState(SerializationConstants.VERSION_2_1_TAG));
             }
             state.getTransaction().setScriptStateSerialzationVersion(SerializationConstants.VERSION_2_1_TAG); // moving forward

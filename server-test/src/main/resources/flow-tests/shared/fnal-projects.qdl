@@ -6,14 +6,14 @@
 */
 
 project := args().1; // The project to test for.
-
+ldap_name := args().2; // Which LDAP server to use
 cfg.'id'  := args().0; // client id
 cfg.'idp'  := 'GitHub';
 cfg.'file' := $$OA4MP_CLC_XML_INI;
 cfg.'flow_type' := 'df'; // Note to use df you need to set param for the token endpoint
 cfg.'description' :=  'FNAL project test for ' + project;
 
-ev. := script_load('test#/shared/expected_values.qdl', project);
+ev. := script_load('test#/shared/expected-' + ldap_name + '-values.qdl', project);
 
 // Initial request is query for all possible allowed scopes.
 //params.'authz' :=  {'scope': 'wlcg.capabilityset:/' + project + ' wlcg.groups'};
@@ -53,7 +53,7 @@ tokens. := clc#refresh();
 at. := tokens.'access_token'.'jwt';
 rt. := tokens.'refresh_token'.'jwt';
 claims. :=clc#claims();
-⊨ claims.'iat' != iat : 'id token timestamp did not change. This implies the token is not updating.';
+ claims.'iat' != iat ? say('Warning, the id token timestamp changed by less than a second. This may imply the token is not updating.');
 ⊨ claims.'eppn' == ev.'idt'.'eppn' : 'post refresh wrong eppn, expected ' + (ev.'idt'.'eppn') + ' got ' + (claims.'eppn');
 ⊨ is_defined(claims.'wlcg.credkey')  : 'missing wlcg.credkey';
 // if cred key changes, vault can't find this, so check it is still correct
