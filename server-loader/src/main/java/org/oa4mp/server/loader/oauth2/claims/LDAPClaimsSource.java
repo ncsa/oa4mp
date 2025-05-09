@@ -129,8 +129,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
         return myLogger;
     }
 
-    public void handleException(Throwable throwable, MetaDebugUtil debugger) {
-/*   All NamingException subclasses:
+    /*   All NamingException subclasses for reference:
 
      AttributeInUseException,
      AttributeModificationException,
@@ -160,6 +159,8 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
      SchemaViolationException,
      ServiceUnavailableException
  */
+    public void handleException(Throwable throwable, MetaDebugUtil debugger) {
+
         if (throwable instanceof NamingException) {
             // Fix for https://jira.ncsa.illinois.edu/browse/CIL-1943
             String msg =  throwable.getClass().getSimpleName() + " talking to LDAP:" + throwable.getMessage();
@@ -343,7 +344,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
                     debugger.trace(this, "Found LDAP server for address=\"" + currentServerAddress + "\"");
                     return (LdapContext) dirContext.lookup(getLDAPCfg().getSearchBase());
                 } catch (Throwable e) {
-                    // Do nothing. Allow for errors.
+                    // Do nothing. Allow for errors until very end.
                     String msg = e.getClass().getSimpleName() + " failure for LDAP server # " + i + ": " + e.getMessage();
                     debugger.trace(this, msg, e);
                     lastException = e;

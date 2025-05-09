@@ -4,6 +4,7 @@ script_load('fnal/acl.qdl');
           EPE := 'eduPersonEntitlement';
       VOPAUID := 'voPersonApplicationUID';
          EPPN := 'eduPersonPrincipalName';
+       VOPXID := 'voPersonExternalID';
  IS_MEMBER_OF := 'isMemberOf';
     vault_uid := 'wlcg.credkey';
            CS := 'wlcg.capabilityset'; // qualifier

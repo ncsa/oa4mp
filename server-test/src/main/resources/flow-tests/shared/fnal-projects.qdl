@@ -16,7 +16,6 @@ cfg.'description' :=  'FNAL project test for ' + project;
 ev. := script_load('test#/shared/expected-' + ldap_name + '-values.qdl', project);
 
 // Initial request is query for all possible allowed scopes.
-//params.'authz' :=  {'scope': 'wlcg.capabilityset:/' + project + ' wlcg.groups'};
 params.'token' :=  {'scope': 'wlcg.capabilityset:/' + project + ' wlcg.groups'};
 // refresh request is specific to each project
 params.'refresh' :=  {'scope': detokenize(ev.'refresh'.'request', ' ')};
@@ -30,8 +29,11 @@ if[rc!='ok'][return(rc);];
 /* Initial access token */
 tokens. := clc#access();
 at. := tokens.'access_token'.'jwt';
+say('access token:\n' + print(at.));
 rt. := tokens.'refresh_token'.'jwt';
+say('refresh token:\n' + print(rt.));
 claims. := clc#claims();
+say('id token:\n' + print(claims.));
 iat := claims.'iat'; // for later, to check it changes
 ⊨ claims.'eppn' == ev.'idt'.'eppn' : 'wrong eppn. expected ' + (ev.'idt'.'eppn') + ' got ' + (claims.'eppn');
 ⊨ is_defined(claims.'wlcg.credkey')  : 'missing wlcg.credkey';

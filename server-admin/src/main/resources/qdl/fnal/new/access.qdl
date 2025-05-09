@@ -12,10 +12,10 @@ block[
     debugger(1,'*** FNAL requested_cs. == ' + to_string(requested_cs.));
     debugger(1,'*** FNAL user_record:\n' + print(user_record.));
     // Checks that we have a single usable capability set.
-  	 0 == size(requested_cs.) ⇒ raise_error('No requested capabilities.', 1000, {'error_type':'access_denied'});
-   	 1 < size(requested_cs.) ⇒ raise_error('Multiple capabilities not allowed', 1000, {'error_type':'access_denied'});
+  	 0 == size(requested_cs.) ⇒ raise_error('No requested capabilities.', oa4mp_error, {'error_type':'access_denied'});
+   	 1 < size(requested_cs.) ⇒ raise_error('Multiple capabilities not allowed', oa4mp_error, {'error_type':'access_denied'});
      requested_cs := requested_cs.0; // there is one  	        
-     (requested_cs ∉ user_record.EPE) ⇒ raise_error('User does not have access to this capability set.', 1000, {'error_type':'access_denied'});
+     (requested_cs ∉ user_record.EPE) ⇒ raise_error('User does not have access to this capability set.', oa4mp_error, {'error_type':'access_denied'});
 
     templates. := claims#resolve_templates(user_record.EPE, scopes., true);  // first pass, get explicitly allowed scopes
     debugger(1,'*** FNAL (resolved) templates:\n' + print(templates.));

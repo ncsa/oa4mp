@@ -4,11 +4,11 @@ cfg.'id'  := 'localhost:test/fnal';
 cfg.'idp'  := 'GitHub';
 cfg.'file' := $$OA4MP_CLC_XML_INI;
 cfg.'description' :=  'Test FNAL with no scopes -- fails';
-cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
+cfg.'flow_type' := 'df'; // Note to use df you need to set param for the token endpoint
 
 
 // Next test -- request multiple capability sets.
-params.'authz' :=  {'scope': 'wlcg.capabilityset:/fermilab wlcg.capabilityset:/dune'};
+params.'token' :=  {'scope': 'wlcg.capabilityset:/fermilab wlcg.capabilityset:/dune'};
 cfg.'description' :=  'Test FNAL with multiple scopes -- fails';
 rc := script_load('driver.qdl', cfg., params.);
 if[rc!='ok'][return(rc);];

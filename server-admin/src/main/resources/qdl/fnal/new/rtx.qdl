@@ -18,10 +18,10 @@ block[
 
      requested_cs. := ~mask(scopes., -1 < starts_with(scopes., CS_HEAD));
      // Checks that we have a single usable capability set.
-     0 == size(requested_cs.) ⇒ raise_error('No requested capabilities.', 1000, {'error_type':'access_denied'});
-     1 < size(requested_cs.) ⇒ raise_error('Multiple capabilities not allowed', 1000, {'error_type':'access_denied'});
+     0 == size(requested_cs.) ⇒ raise_error('No requested capabilities.', oa4mp_error, {'error_type':'access_denied'});
+     1 < size(requested_cs.) ⇒ raise_error('Multiple capabilities not allowed', oa4mp_error, {'error_type':'access_denied'});
      requested_cs := requested_cs.0; // there is one
-     (requested_cs ∉ user_record.EPE) ⇒ raise_error('User does not have access to this capability set.', 1000, {'error_type':'access_denied'});
+     (requested_cs ∉ user_record.EPE) ⇒ raise_error('User does not have access to this capability set.', oa4mp_error, {'error_type':'access_denied'});
 
      debugger(1,'*** FNAL rtx got ' + CS + ':\n' + print(requested_cs.));
      //DEV-BLOCK

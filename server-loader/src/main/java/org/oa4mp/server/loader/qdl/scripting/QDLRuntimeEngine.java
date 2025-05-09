@@ -350,7 +350,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
      * @param raiseErrorException
      */
     void processSRX(RaiseErrorException raiseErrorException) {
-        if (raiseErrorException.getErrorCode() == QDLRuntimeEngine.OA4MP_ERROR_CODE) {
+        if (raiseErrorException.getErrorCode().equals(QDLRuntimeEngine.OA4MP_ERROR_CODE)) {
             QDLStem sysErr = raiseErrorException.getState();
             // In OAuth this is the error_description
             //String message = sysErr.getString(SYS_ERR_MESSAGE);

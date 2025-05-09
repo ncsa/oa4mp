@@ -3,10 +3,10 @@
 cfg.'id'  := 'localhost:test/fnal';
 cfg.'idp'  := 'GitHub';
 cfg.'file' := $$OA4MP_CLC_XML_INI;
-cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
+cfg.'flow_type' := 'df'; // Note to use df you need to set param for the token endpoint
 cfg.'description' :=  'Test FNAL with basic scopes. No new scopes uploaded.';
 
-params.'authz' :=  {'scope': 'storage.read:/ wlcg.capabilityset:/duneana wlcg.groups'};
+params.'token' :=  {'scope': 'storage.read:/ wlcg.capabilityset:/duneana wlcg.groups'};
 rc := script_load('driver.qdl', cfg., params.);
 if[rc!='ok'][return(rc);];
 

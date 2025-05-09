@@ -32,6 +32,5 @@ rm(saved_cfg);
 clc#write(saved_cfg);
 debugger(1, 'wrote provisioner to ' + saved_cfg);
 // At this point, we are ready to test the fork.
-//home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests/local/fnal-fork.qdl
 script_load(os_env('NCSA_DEV_INPUT') + '/oa4mp/server-test/src/main/resources/flow-tests/local/fnal-fork.qdl');
 say('FNAL dune fork test: ok');
