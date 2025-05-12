@@ -163,7 +163,6 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
                     JSONArray array = (JSONArray) temp;
                     if (array.size() != 1) {
                         ServletDebugUtil.trace(this, "Got " + array.size() + " LDAP configurations. Using first one only...");
-                        //    throw new GeneralException("Error: multiple LDAP configurations encountered for id \"" + otherV.getIdentifierString() + "\". Convert manually.");
                     }
                     ldap = (JSONObject) array.get(0);
 
@@ -181,7 +180,6 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         if (map.containsKey(getCK2().cfg())) {
             String rawCfg = map.getString(getCK2().cfg());
             if (rawCfg != null && !rawCfg.isEmpty()) {
-                //    cfg = JSONObject.fromObject(map.getString(getCK2().cfg()));
                 // Extra hoop allows us to process HOCON format in addition to JSON.
                 String tempcfg = map.getString(getCK2().cfg());
                 if (!isTrivial(tempcfg)) {
@@ -190,10 +188,8 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
                     String rawJSON = conf.root().render(ConfigRenderOptions.concise());
                     cfg = JSONObject.fromObject(rawJSON);
                     otherV.setRawConfig(tempcfg);
-                    //      otherV.setConfig(cfg);
                 }
             }
-            //otherV.setConfig(JSONObject.fromObject(map.getString(getCK2().cfg())));
         }
 
         if (ldap == null || ldap.isEmpty()) {
@@ -202,7 +198,6 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
                 // so by this point, no configuration has been found either.
                 cfg = new JSONObject();
             }
-            //         OA2ClientFunctorScriptsUtil.setSaved(cfg, true);
 
 
         } else {

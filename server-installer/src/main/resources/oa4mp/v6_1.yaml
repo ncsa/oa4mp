@@ -1,0 +1,21 @@
+---
+- sourceURL: https://github.com/ncsa/oa4mp/releases/download/v6.1-rc1/
+  directories:
+    - permissions:
+        - {preprocess: true, update: false, source: etc/cfg.xml}
+        - {preprocess: true, update: false, source: bin/clc, exec: true}
+        - {preprocess: true, update: false, source: bin/cli, exec: true}
+        - {preprocess: true, update: false, source: bin/jwt, exec: true}
+        - {preprocess: true, update: false, source: bin/migrate, exec: true}
+        - {preprocess: true, update: false, source: etc/create_keys.cmd}
+        - {update: false, source: etc/oa4mp-message.template}
+        - {update: false, source: etc/oa4mp-subject.template}
+      files: [server-archive.jar]
+      ignore: [/META-INF/]
+      target_dir: /
+  type: zip
+- sourceURL: https://github.com/ncsa/oa4mp/releases/download/v6.1-rc1/
+  directories:
+    - files: [fs-migrate.jar, well-known.war, oauth2.war, jwt.jar, clc.jar, cli.jar]
+      target_dir: /lib
+  type: file_set
