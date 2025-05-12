@@ -10,7 +10,7 @@
       ignore: [/META-INF/]
       target_dir: /
   type: zip
-- sourceURL: https://github.com/ncsa/oa4mp/releases/download/v6.1-rc1/
+- sourceURL: https://github.com/ncsa/oa4mp/releases/download/v6.1.0/
   directories:
     - files: [client2.war, jwt.jar, clc.jar]
       target_dir: /lib

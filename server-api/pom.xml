@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.oa4mp</groupId>
         <artifactId>oa4mp-parent</artifactId>
-        <version>6.1-rc1</version>
+        <version>6.1.0</version>
     </parent>
 
     <artifactId>server-api</artifactId>
@@ -28,7 +28,7 @@
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>server</artifactId>
-            <version>6.1-rc1</version>
+            <version>6.1.0</version>
         </dependency>
         <dependency>
             <groupId>net.sf.opencsv</groupId>
@@ -38,14 +38,14 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>util</artifactId>
-            <version>6.1-rc1</version>
+            <version>6.1.0</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>servlet</artifactId>
-            <version>6.1-rc1</version>
+            <version>6.1.0</version>
         </dependency>
         <dependency>
             <groupId>net.sf.json-lib</groupId>
@@ -57,7 +57,7 @@
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>myproxy-logon</artifactId>
-            <version>6.1-rc1</version>
+            <version>6.1.0</version>
         </dependency>
 
         <dependency>
@@ -75,7 +75,7 @@
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>client-loader</artifactId>
-            <version>6.1-rc1</version>
+            <version>6.1.0</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

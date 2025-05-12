@@ -28,12 +28,12 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>servlet</artifactId>
-            <version>6.1-rc1</version>
+            <version>6.1.0</version>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>core</artifactId>
-            <version>6.1-rc1</version>
+            <version>6.1.0</version>
         </dependency>
     </dependencies>
     <build>
