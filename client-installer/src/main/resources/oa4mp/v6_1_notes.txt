@@ -2,7 +2,7 @@ ____________________________________
 Release notes for OA4MP Client version 6.1
 ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 Welcome to OA4MP Client 6.1! This has several fixes, listed on the release
-page on GitHub https://github.com/ncsa/oa4mp/releases/tag/v6.1-rc1.
+page on GitHub https://github.com/ncsa/oa4mp/releases/tag/v6.1.0.
 
 This will install both the command line client (CLC) and download the current
 war file for a Tomcat deploy. These are independent, but both read the same

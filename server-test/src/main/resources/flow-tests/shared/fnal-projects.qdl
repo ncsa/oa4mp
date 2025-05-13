@@ -29,11 +29,8 @@ if[rc!='ok'][return(rc);];
 /* Initial access token */
 tokens. := clc#access();
 at. := tokens.'access_token'.'jwt';
-say('access token:\n' + print(at.));
 rt. := tokens.'refresh_token'.'jwt';
-say('refresh token:\n' + print(rt.));
 claims. := clc#claims();
-say('id token:\n' + print(claims.));
 iat := claims.'iat'; // for later, to check it changes
 ⊨ claims.'eppn' == ev.'idt'.'eppn' : 'wrong eppn. expected ' + (ev.'idt'.'eppn') + ' got ' + (claims.'eppn');
 ⊨ is_defined(claims.'wlcg.credkey')  : 'missing wlcg.credkey';
@@ -46,7 +43,6 @@ iat := claims.'iat'; // for later, to check it changes
 expected_scopes. := [];
 
 ss. := tokenize(at.'scope', ' '); // change returned scopes to a list
-// say((⊢expected_scopes.)∆ (⊢ss.));
 ⊨ reduce(@&&, ev.'at'.'response' ∈ ss.) : 'initial incorrect access token scopes. Expected:\n' + print(ev.'at'.'response') + '\ngot:\n' + print(ss.);
 ⊨ abs(tokens.'access_token'.'lifetime' - 750000)<2000 : 'wrong lifetime, expected 750000, got ' + (tokens.'access_token'.'lifetime');
 
