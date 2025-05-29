@@ -14,7 +14,6 @@ cfg.'flow_type' := 'df'; // Note to use df you need to set param for the token e
 cfg.'description' :=  'FNAL project test for ' + project;
 
 ev. := script_load('test#/shared/expected-' + ldap_name + '-values.qdl', project);
-
 // Initial request is query for all possible allowed scopes.
 params.'token' :=  {'scope': 'wlcg.capabilityset:/' + project + ' wlcg.groups'};
 // refresh request is specific to each project
