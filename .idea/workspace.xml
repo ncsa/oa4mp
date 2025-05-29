@@ -13,7 +13,12 @@
   <component name="ChangeListManager">
     <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="Fixed typo.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/shared/fnal-projects.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/shared/fnal-projects.qdl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/client-installer/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rfc8414/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/rfc8414/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-installer/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-test/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/buildNumber.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -98,54 +103,54 @@
     <option name="showMembers" value="true" />
     <option name="showModules" value="false" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.CLC.executor": "Run",
-    "Application.CLI.executor": "Run",
-    "Application.OA4MPClientInstaller.executor": "Run",
-    "Application.OA4MPServerInstaller.executor": "Run",
-    "Application.QDL CLC.executor": "Run",
-    "Application.QDL.executor": "Debug",
-    "Application.QDLConfigLoader.executor": "Debug",
-    "Application.SAS CLI.executor": "Debug",
-    "Application.org.oa4mp.server.installer.OA4MPServerInstaller.executor": "Run",
-    "DefaultHtmlFileTemplate": "HTML File",
-    "JUnit.QDLTests.testVFSFileClaimSourceA.executor": "Run",
-    "JUnit.Test Suite.executor": "Run",
-    "Java Scratch.Scratch (3).executor": "Run",
-    "Java Scratch.Scratch.executor": "Run",
-    "Maven.myproxy-website [clean,install].executor": "Run",
-    "Maven.oa4mp-parent [clean,install].executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "Tomcat Server.OA4MP server.executor": "Debug",
-    "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "6.1.0",
-    "jdk.selected.JAVA_MODULE": "11 (2)",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/home/ncsa/dev/ncsa-git/oa4mp/server-installer/src/main/resources/oa4mp",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Libraries",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.29887053",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.CLC.executor&quot;: &quot;Run&quot;,
+    &quot;Application.CLI.executor&quot;: &quot;Run&quot;,
+    &quot;Application.OA4MPClientInstaller.executor&quot;: &quot;Run&quot;,
+    &quot;Application.OA4MPServerInstaller.executor&quot;: &quot;Run&quot;,
+    &quot;Application.QDL CLC.executor&quot;: &quot;Run&quot;,
+    &quot;Application.QDL.executor&quot;: &quot;Debug&quot;,
+    &quot;Application.QDLConfigLoader.executor&quot;: &quot;Debug&quot;,
+    &quot;Application.SAS CLI.executor&quot;: &quot;Debug&quot;,
+    &quot;Application.org.oa4mp.server.installer.OA4MPServerInstaller.executor&quot;: &quot;Run&quot;,
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;JUnit.QDLTests.testVFSFileClaimSourceA.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.Test Suite.executor&quot;: &quot;Run&quot;,
+    &quot;Java Scratch.Scratch (3).executor&quot;: &quot;Run&quot;,
+    &quot;Java Scratch.Scratch.executor&quot;: &quot;Run&quot;,
+    &quot;Maven.myproxy-website [clean,install].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.oa4mp-parent [clean,install].executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;Tomcat Server.OA4MP server.executor&quot;: &quot;Debug&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;6.1.0&quot;,
+    &quot;jdk.selected.JAVA_MODULE&quot;: &quot;11 (2)&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/ncsa/dev/ncsa-git/oa4mp/server-installer/src/main/resources/oa4mp&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Libraries&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.29887053&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
-      "Markdown",
-      "PLAIN_TEXT",
-      "JSON",
-      "JAVA"
+  &quot;keyToStringList&quot;: {
+    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
+      &quot;Markdown&quot;,
+      &quot;PLAIN_TEXT&quot;,
+      &quot;JSON&quot;,
+      &quot;JAVA&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/server-installer/src/main/resources/oa4mp" />
@@ -353,20 +358,6 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="OA4MPClientInstaller" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="org.oa4mp.client.installer.OA4MPClientInstaller" />
-      <module name="client-installer" />
-      <option name="PROGRAM_PARAMETERS" value="notes" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="org.oa4mp.client.installer.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="OA4MPServerInstaller" type="Application" factoryName="Application" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.oa4mp.installer.OA4MPServerInstaller" />
       <module name="server-installer" />
@@ -441,20 +432,6 @@
         <option name="credential" />
         <option name="region" />
         <option name="useCurrentConnection" value="false" />
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="QDLConfigLoader" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="org.oa4mp.server.qdl.clc.QDLConfigLoader" />
-      <module name="qdl" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="org.oa4mp.server.qdl.clc.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
       </extension>
       <method v="2">
         <option name="Make" enabled="true" />
@@ -662,17 +639,6 @@
       <option name="TEST_SEARCH_SCOPE">
         <value defaultName="moduleWithDependencies" />
       </option>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="Derby Scratch" type="Java Scratch" temporary="true">
-      <option name="ALTERNATIVE_JRE_PATH" value="11 (2)" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
-      <option name="MAIN_CLASS_NAME" value="Scratch" />
-      <module name="server-test" />
-      <option name="SCRATCH_FILE_URL" value="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_10.java" />
-      <shortenClasspath name="NONE" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -1043,9 +1009,6 @@
       <item itemvalue="Application.CLI" />
       <item itemvalue="Application.QDL CLC" />
       <item itemvalue="Application.QDL" />
-      <item itemvalue="Application.QDLConfigLoader" />
-      <item itemvalue="Application.OA4MPClientInstaller" />
-      <item itemvalue="Java Scratch.Derby Scratch" />
       <item itemvalue="Java Scratch.Scratch (1)" />
       <item itemvalue="Java Scratch.Scratch (2)" />
       <item itemvalue="Java Scratch.Scratch" />
@@ -1056,11 +1019,11 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Java Scratch.Scratch" />
         <item itemvalue="JUnit.QDLTests.testVFSFileClaimSourceA" />
-        <item itemvalue="Application.QDLConfigLoader" />
         <item itemvalue="Java Scratch.Scratch 2" />
-        <item itemvalue="Application.OA4MPClientInstaller" />
+        <item itemvalue="Java Scratch.Scratch" />
+        <item itemvalue="Java Scratch.Scratch (2)" />
+        <item itemvalue="Java Scratch.Scratch (1)" />
       </list>
     </recent_temporary>
   </component>
