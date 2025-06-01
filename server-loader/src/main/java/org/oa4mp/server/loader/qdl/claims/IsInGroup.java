@@ -4,6 +4,8 @@ import org.qdl_lang.exceptions.BadArgException;
 import org.qdl_lang.extensions.QDLFunction;
 import org.qdl_lang.state.State;
 import org.qdl_lang.variables.QDLStem;
+import org.qdl_lang.variables.values.BooleanValue;
+import org.qdl_lang.variables.values.QDLValue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +31,7 @@ public class IsInGroup implements QDLFunction {
     }
 
     @Override
-    public Object evaluate(Object[] objects, State state) {
+    public QDLValue evaluate(QDLValue[] objects, State state) {
         // First argument is a stem of groups. This is a list that has
         // stem elements of the form stem.name and stem.id. The name is the
         // name of the group.
@@ -38,41 +40,41 @@ public class IsInGroup implements QDLFunction {
         // a lot of edge cases (empty list, e.g.)
         if (objects == null) {
           //  throw new IllegalArgumentException("Error: no arguments for " + getName());
-            return Boolean.FALSE;
+            return BooleanValue.False;
         }
         if (objects.length != 2) {
             throw new IllegalArgumentException(" This function requires two arguments, a stem and a string.");
         }
 
         if (objects[0]==null) {
-            return Boolean.FALSE;
+            return BooleanValue.False;
         }
-        if(!(objects[0] instanceof QDLStem)){
+        if(!(objects[0].isStem())){
             // This indicates that something wrong was passed, so flag it as a bona fide error.
             throw new BadArgException(" The first argument of " + getName() + " must be a stem list of groups.",0);
         }
-        QDLStem groups = (QDLStem) objects[0];
+        QDLStem groups = objects[0].asStem();
         if(groups.size() == 0){
-            return Boolean.FALSE;
+            return BooleanValue.False;
         }
-        if (objects[1] == null | !(objects[1] instanceof String)) {
+        if (objects[1] == null | !(objects[1].isString())) {
             throw new BadArgException(" The second argument of " + getName() + " must be a string.",1);
         }
-        String name = (String) objects[1];
+        String name = objects[1].asString();
         for (Object key : groups.keySet()) {
-            Object obj = groups.get(key);
+            QDLValue obj = groups.get(key);
             // two options, either they parsed it in to a group structure OR its just a raw string
-            if (obj instanceof QDLStem) {
-                QDLStem group = (QDLStem) obj;
+            if (obj.isStem()) {
+                QDLStem group = obj.asStem();
                 if (group.containsKey(GROUP_ENTRY_NAME) && group.getString(GROUP_ENTRY_NAME).equals(name)) {
-                    return Boolean.TRUE;
+                    return BooleanValue.True;
                 }
             } else {
                 // Failing that, try to process it as a string.
-                if (obj.toString().equals(name)) return Boolean.TRUE;
+                if (obj.toString().equals(name)) return BooleanValue.True;
             }
         }
-        return Boolean.FALSE;
+        return BooleanValue.False;
     }
 
 

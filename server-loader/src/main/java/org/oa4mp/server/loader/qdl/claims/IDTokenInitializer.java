@@ -8,11 +8,14 @@ import org.qdl_lang.extensions.QDLMetaModule;
 import org.qdl_lang.state.State;
 import org.qdl_lang.variables.QDLStem;
 import net.sf.json.JSONObject;
+import org.qdl_lang.variables.values.BooleanValue;
+import org.qdl_lang.variables.values.QDLValue;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static edu.uiuc.ncsa.security.util.scripting.ScriptingConstants.*;
+import static org.qdl_lang.variables.values.QDLValue.asQDLValue;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -59,7 +62,7 @@ public class IDTokenInitializer implements QDLMetaModule {
         public abstract void doMethod(String execPhase) throws Throwable;
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public QDLValue evaluate(QDLValue[] objects, State state) {
             super.evaluate(objects, state);
             QDLStem idtoken = checkArg(objects, getName(), 0);
             QDLStem output = new QDLStem();
@@ -69,11 +72,11 @@ public class IDTokenInitializer implements QDLMetaModule {
             if (1 < objects.length) {
                 throw new IllegalArgumentException(" Missing second argument must be the execution phase.");
             }
-            if (!(objects[1] instanceof String)) {
+            if (!(objects[1].isString())) {
                 throw new BadArgException(" The second argument must be a string.",1);
 
             }
-            String execPhase = (String) objects[1];
+            String execPhase = objects[1].asString();
             getidTokenHandler().setUserMetaData((JSONObject) idtoken.toJSON());
             try {
                 doMethod(execPhase);
@@ -82,7 +85,7 @@ public class IDTokenInitializer implements QDLMetaModule {
             }
 
             output.fromJSON(getidTokenHandler().getUserMetaData());
-            return output;
+            return asQDLValue(output);
         }
 
     }
@@ -216,7 +219,7 @@ public class IDTokenInitializer implements QDLMetaModule {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public QDLValue evaluate(QDLValue[] objects, State state) {
             // This is different than the others, so we have to do all of the steps for evaluation
             checkState(state);
             if (!isInit) {
@@ -225,9 +228,9 @@ public class IDTokenInitializer implements QDLMetaModule {
             try {
                 getidTokenHandler().checkClaims();
             } catch (Throwable throwable) {
-                return Boolean.FALSE;
+                return BooleanValue.False;
             }
-            return Boolean.TRUE;
+            return BooleanValue.True;
         }
 
         @Override

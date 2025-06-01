@@ -1,14 +1,14 @@
 package org.oa4mp.server.loader.qdl.util;
 
-import org.qdl_lang.extensions.JavaModule;
-import org.qdl_lang.module.Module;
-import org.qdl_lang.state.State;
-import org.qdl_lang.xml.XMLMissingCloseTagException;
-import org.qdl_lang.xml.XMLUtilsV2;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JWKUtil2;
 import org.apache.commons.codec.binary.Base64;
+import org.qdl_lang.expressions.module.Module;
+import org.qdl_lang.extensions.JavaModule;
+import org.qdl_lang.state.State;
+import org.qdl_lang.xml.XMLMissingCloseTagException;
+import org.qdl_lang.xml.XMLUtilsV2;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;

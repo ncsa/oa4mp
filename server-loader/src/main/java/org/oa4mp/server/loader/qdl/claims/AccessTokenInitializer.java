@@ -10,9 +10,12 @@ import org.qdl_lang.exceptions.BadArgException;
 import org.qdl_lang.extensions.QDLMetaModule;
 import org.qdl_lang.state.State;
 import org.qdl_lang.variables.QDLStem;
+import org.qdl_lang.variables.values.QDLValue;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.qdl_lang.variables.values.QDLValue.asQDLValue;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -38,7 +41,7 @@ public class AccessTokenInitializer implements QDLMetaModule {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public QDLValue evaluate(QDLValue[] objects, State state) {
             super.evaluate(objects, state);
             // init(type, access_token.);
 
@@ -56,7 +59,7 @@ public class AccessTokenInitializer implements QDLMetaModule {
             newToken.putAll(j);
             getAtHandler().setPayload(newToken);
             newAT.fromJSON(newToken);
-            return newAT;
+            return asQDLValue(newAT);
         }
 
         protected void setupHandler(Object[] objects) {
@@ -195,7 +198,7 @@ public class AccessTokenInitializer implements QDLMetaModule {
         Keep this! It is very different from the standard for these methods since there is a flag for evaluating templates.
          */
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public QDLValue evaluate(QDLValue[] objects, State state) {
             if (objects.length != getArgCount()[0] && objects.length != getArgCount()[1]) {
                 throw new IllegalArgumentException("" + getName() + " requires 2 or 3  arguments and you supplied " + objects.length);
             }
@@ -207,15 +210,15 @@ public class AccessTokenInitializer implements QDLMetaModule {
             Boolean doTemplates = Boolean.TRUE;
             Boolean isQuery = Boolean.FALSE;
             if (objects.length == 3) {
-                if ((objects[2] instanceof Boolean)) {
-                    doTemplates = (Boolean) objects[2];
+                if ((objects[2].isBoolean())) {
+                    doTemplates = objects[2].asBoolean() ;
                 } else {
                     throw new BadArgException(" the third argument must be a boolean",2);
                 }
             }
             if (objects.length == 4) {
-                if ((objects[3] instanceof Boolean)) {
-                    isQuery = (Boolean) objects[3];
+                if ((objects[3].isBoolean())) {
+                    isQuery = objects[3].asBoolean();
                 } else {
                     throw new IllegalArgumentException("Error: the fourth argument must be a boolean");
                 }
@@ -229,7 +232,7 @@ public class AccessTokenInitializer implements QDLMetaModule {
             }
 
             output.fromJSON(getAtHandler().getPayload());
-            return output;
+            return asQDLValue(output);
         }
 
 

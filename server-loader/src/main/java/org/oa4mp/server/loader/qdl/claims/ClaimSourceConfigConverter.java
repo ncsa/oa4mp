@@ -240,11 +240,11 @@ public class ClaimSourceConfigConverter implements CSConstants {
                  */
                 QDLStem renames = null;
                 if (arg.containsKey(CS_LDAP_RENAME)) {
-                    renames = (QDLStem) arg.get(CS_LDAP_RENAME);
+                    renames = arg.get(CS_LDAP_RENAME).asStem();
                 }
                 Collection lists = null;
                 if (arg.containsKey(CS_LDAP_LISTS)) {
-                    QDLStem listNames = (QDLStem) arg.get(CS_LDAP_LISTS);
+                    QDLStem listNames = arg.get(CS_LDAP_LISTS).asStem();
                     lists = listNames.values();
                 } else {
                     lists = new ArrayList();
@@ -252,7 +252,7 @@ public class ClaimSourceConfigConverter implements CSConstants {
 
                 Collection groups;
                 if (arg.containsKey(CS_LDAP_GROUP_NAMES)) {
-                    QDLStem groupStem = (QDLStem) arg.get(CS_LDAP_GROUP_NAMES);
+                    QDLStem groupStem = arg.get(CS_LDAP_GROUP_NAMES).asStem();
                     groups = groupStem.values();
                 } else {
                     groups = new ArrayList();
@@ -260,7 +260,7 @@ public class ClaimSourceConfigConverter implements CSConstants {
 
                 if (arg.containsKey(CS_LDAP_SEARCH_ATTRIBUTES)) {
                     // no attribute means they are getting everything. Let them.
-                    QDLStem searchAttr = (QDLStem) arg.get(CS_LDAP_SEARCH_ATTRIBUTES);
+                    QDLStem searchAttr = arg.get(CS_LDAP_SEARCH_ATTRIBUTES).asStem();
                     Map<String, LDAPConfigurationUtil.AttributeEntry> attrs = new HashMap<>();
 
                     for (Object key : searchAttr.keySet()) {

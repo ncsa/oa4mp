@@ -1,12 +1,13 @@
 package org.oa4mp.server.qdl.storage;
 
+import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import org.oa4mp.server.api.admin.permissions.Permission;
 import org.oa4mp.server.api.admin.permissions.PermissionKeys;
 import org.qdl_lang.variables.QDLList;
 import org.qdl_lang.variables.QDLStem;
-import edu.uiuc.ncsa.security.core.Identifier;
-import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import edu.uiuc.ncsa.security.storage.data.MapConverter;
+import org.qdl_lang.variables.values.StringValue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -112,7 +113,7 @@ public class PermissionStemMC<V extends Permission> extends StemConverter<V> {
             QDLList list = new QDLList();
             // have to convert each to a string
             for(Identifier id : ids){
-                list.add(id.toString());
+                list.add(new StringValue(id.toString()));
             }
             QDLStem e = new QDLStem();
             e.setQDLList(list);

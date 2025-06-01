@@ -5,11 +5,14 @@ import org.qdl_lang.exceptions.BadArgException;
 import org.qdl_lang.extensions.QDLFunction;
 import org.qdl_lang.state.State;
 import org.qdl_lang.variables.QDLStem;
+import org.qdl_lang.variables.values.QDLValue;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.qdl_lang.variables.values.QDLValue.asQDLValue;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -30,24 +33,24 @@ public class TemplateSubsitutionQDLUtil implements QDLFunction {
     }
 
     @Override
-    public Object evaluate(Object[] objects, State state) {
+    public QDLValue evaluate(QDLValue[] objects, State state) {
         QDLStem arg = null;
-        if(objects[0] instanceof String){
+        if(objects[0].isString()){
             arg = new QDLStem();
             arg.listAdd(objects[0]);
-        }else if(objects[0] instanceof QDLStem){
-            arg = (QDLStem) objects[0];
+        }else if(objects[0].isStem()){
+            arg = objects[0].asStem();
         }
         if(arg == null){
             throw new BadArgException("error: The first argument must be a string or list of strings",0);
         }
-        QDLStem otherClaimStem = (QDLStem) objects[1];
+        QDLStem otherClaimStem = objects[1].asStem();
         Map<String, List<String>> groups = new HashMap<>();
 
         if (objects.length == 3) {
-            QDLStem groupClaimStem = (QDLStem) objects[2];
+            QDLStem groupClaimStem = objects[2].asStem();
             for (Object key : groupClaimStem.keySet()) {
-                QDLStem ss = (QDLStem) groupClaimStem.get(key);
+                QDLStem ss = groupClaimStem.get(key).asStem();
                 groups.put(String.valueOf(key), ss.getQDLList().toJSON());
             }
         }
@@ -59,7 +62,7 @@ public class TemplateSubsitutionQDLUtil implements QDLFunction {
         QDLStem outStem = new QDLStem();
         outStem.addList(out);
 
-        return outStem;
+        return asQDLValue(outStem);
     }
 
     @Override

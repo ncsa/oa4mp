@@ -27,8 +27,9 @@ import org.qdl_lang.scripting.Scripts;
 import org.qdl_lang.state.LibLoader;
 import org.qdl_lang.state.StateUtils;
 import org.qdl_lang.variables.QDLList;
-import org.qdl_lang.variables.QDLNull;
 import org.qdl_lang.variables.QDLStem;
+import org.qdl_lang.variables.values.QDLValue;
+import org.qdl_lang.variables.values.StemValue;
 import org.qdl_lang.workspace.WorkspaceCommands;
 import org.qdl_lang.xml.SerializationConstants;
 import org.qdl_lang.xml.SerializationState;
@@ -46,6 +47,7 @@ import java.util.zip.GZIPOutputStream;
 
 import static org.oa4mp.server.loader.oauth2.flows.FlowType.*;
 import static org.qdl_lang.variables.QDLStem.STEM_INDEX_MARKER;
+import static org.qdl_lang.variables.values.QDLValue.asQDLValue;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -438,14 +440,14 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
      */
     protected void createSRRequest(ScriptRunRequest req) {
 
-        state.setValue(Scripts.EXEC_PHASE, req.getAction()); // set what is being executed
+        state.setValue(Scripts.EXEC_PHASE, asQDLValue(req.getAction())); // set what is being executed
         QDLStem sysErr = new QDLStem();
         // Set sys_err.ok  here so scripts don't have to keep checking if it is defined.
         // Old script error handling by setting a global variable
         sysErr.put(SYS_ERR_OK, Boolean.TRUE);
-        state.setValue(SYS_ERR_VAR, sysErr);
+        state.setValue(SYS_ERR_VAR, asQDLValue(sysErr));
         // New way, raise an error with this reserved error code.
-        state.setValue(OA4MP_ERROR_CODE_NAME, OA4MP_ERROR_CODE);
+        state.setValue(OA4MP_ERROR_CODE_NAME, asQDLValue(OA4MP_ERROR_CODE));
         if (state.getOa2se().getMailUtil().isEnabled()) {
             QDLStem mailStem = new QDLStem();
 
@@ -455,86 +457,86 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             try {
                 // CIL-1873 support for email notifications from QDL.
                 if (state.getOa2se().getMailUtil().getSubjectTemplate() == null) {
-                    body.add("(no subject)");
+                    body.add(asQDLValue("(no subject)"));
                 } else {
-                    body.add(state.getOa2se().getMailUtil().getSubjectTemplate());
+                    body.add(asQDLValue(state.getOa2se().getMailUtil().getSubjectTemplate()));
                 }
                 if (state.getOa2se().getMailUtil().getMessageTemplate() == null) {
-                    body.add("(no content)");
+                    body.add(asQDLValue("(no content)"));
                 } else {
                     StringTokenizer stringTokenizer = new StringTokenizer(state.getOa2se().getMailUtil().getMessageTemplate(), "\n");
                     while (stringTokenizer.hasMoreTokens()) {
-                        body.add(stringTokenizer.nextToken());
+                        body.add(asQDLValue(stringTokenizer.nextToken()));
                     }
                 }
                 mailStem.put(MAIL_MESSAGE_VAR, new QDLStem(body));
             } catch (IOException iox) {
                 getState().getLogger().warn("could not get mail message for QDL runtime environment");
             }
-            state.setValue(MAIL_VAR, mailStem);
+            state.setValue(MAIL_VAR, asQDLValue(mailStem));
         }
         FlowStates2 flowStates = (FlowStates2) req.getArgs().get(SRE_REQ_FLOW_STATES);
-        state.setValue(FLOW_STATE_VAR, toStem(flowStates));
+        state.setValue(FLOW_STATE_VAR, asQDLValue(toStem(flowStates)));
 
         JSONObject claims = (JSONObject) req.getArgs().get(SRE_REQ_CLAIMS);
         QDLStem claimStem = new QDLStem();
         if (claims != null) {
             claimStem.fromJSON(claims);
         }
-        state.setValue(CLAIMS_VAR, claimStem);
+        state.setValue(CLAIMS_VAR, asQDLValue(claimStem));
 
         JSONObject proxyClaims = (JSONObject) req.getArgs().get(SRE_REQ_PROXY_CLAIMS);
         QDLStem proxyClaimsStem = new QDLStem();
         proxyClaimsStem.fromJSON(proxyClaims);
-        state.setValue(PROXY_CLAIMS_VAR, proxyClaimsStem);
+        state.setValue(PROXY_CLAIMS_VAR, asQDLValue(proxyClaimsStem));
         QDLStem authHeaders = new QDLStem();
         if (req.getArgs().containsKey(SRE_REQ_AUTH_HEADERS)) {
             authHeaders.fromJSON((JSONObject) req.getArgs().get(SRE_REQ_AUTH_HEADERS));
         }
-        state.setValue(AUTH_HEADERS_VAR, authHeaders);
+        state.setValue(AUTH_HEADERS_VAR, asQDLValue(authHeaders));
         if (req.getArgs().containsKey(SRE_REQ_ACCESS_TOKEN)) {
             // Fixes https://github.com/ncsa/oa4mp/issues/188
             JSONObject at = (JSONObject) req.getArgs().get(SRE_REQ_ACCESS_TOKEN);
             QDLStem atStem = new QDLStem();
             atStem.fromJSON(at);
-            state.setValue(ACCESS_TOKEN_VAR, atStem);
+            state.setValue(ACCESS_TOKEN_VAR, asQDLValue(atStem));
         }
         if (req.getArgs().containsKey(SRE_REQ_REFRESH_TOKEN)) {
             JSONObject at = (JSONObject) req.getArgs().get(SRE_REQ_REFRESH_TOKEN);
             QDLStem atStem = new QDLStem();
             atStem.fromJSON(at);
-            state.setValue(REFRESH_TOKEN_VAR, atStem);
+            state.setValue(REFRESH_TOKEN_VAR, asQDLValue(atStem));
 
         }
         List<String> scopes = (List<String>) req.getArgs().get(SRE_REQ_SCOPES);
         if (scopes != null && !scopes.isEmpty()) {
             // It is possible for a minimal OAuth 2 client to have no scopes.
-            state.setValue(SCOPES_VAR, listToStem(scopes));
+            state.setValue(SCOPES_VAR, asQDLValue(listToStem(scopes)));
         } else {
-            state.setValue(SCOPES_VAR, new QDLStem());
+            state.setValue(SCOPES_VAR,  new StemValue());
 
         }
 
         List<String> audience = (List<String>) req.getArgs().get(SRE_REQ_AUDIENCE);
         if (audience != null && !audience.isEmpty()) {
-            state.setValue(AUDIENCE_VAR, listToStem(audience));
+            state.setValue(AUDIENCE_VAR, asQDLValue(listToStem(audience)));
         } else {
-            state.setValue(AUDIENCE_VAR, new QDLStem());
+            state.setValue(AUDIENCE_VAR, new StemValue());
         }
         // Fix for https://github.com/ncsa/oa4mp/issues/241
         List<String> resource = (List<String>) req.getArgs().get(SRE_REQ_RESOURCE);
         if (resource != null && !resource.isEmpty()) {
-            state.setValue(RESOURCE_VAR, listToStem(resource));
+            state.setValue(RESOURCE_VAR, asQDLValue(listToStem(resource)));
         } else {
-            state.setValue(RESOURCE_VAR, new QDLStem());
+            state.setValue(RESOURCE_VAR, new StemValue());
         }
         Object eas = req.getArgs().get(SRE_REQ_EXTENDED_ATTRIBUTES);
         if (eas != null && (eas instanceof JSONObject)) {
             QDLStem eaStem = new QDLStem();
             eaStem.fromJSON((JSONObject) eas);
-            state.setValue(EXTENDED_ATTRIBUTES_VAR, eaStem);
+            state.setValue(EXTENDED_ATTRIBUTES_VAR, asQDLValue(eaStem));
         } else {
-            state.setValue(EXTENDED_ATTRIBUTES_VAR, new QDLStem());
+            state.setValue(EXTENDED_ATTRIBUTES_VAR, new StemValue());
         }
 
         QDLStem sources = new QDLStem();
@@ -550,7 +552,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
                 }
             }
         }
-        state.setValue(CLAIM_SOURCES_VAR, sources);
+        state.setValue(CLAIM_SOURCES_VAR, asQDLValue(sources));
         // Now do access control
         // gives variable
         // access_control.
@@ -567,7 +569,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         QDLStem adminStem = new QDLStem();
         adminStem.addList(adminIDs);
         acl.put("admins.", adminStem);
-        state.setValue(ACCESS_CONTROL, acl);
+        state.setValue(ACCESS_CONTROL, asQDLValue(acl));
         // these are always defined.
         QDLStem txScopes = new QDLStem();
         QDLStem txRes = new QDLStem();
@@ -582,20 +584,20 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             }
             if (txr.hasResources()) {
                 for (URI uri : txr.getResource()) {
-                    txRes.listAdd(uri.toString());
+                    txRes.listAdd(asQDLValue(uri.toString()));
                 }
             }
         }
-        state.setValue(TX_SCOPES_VAR, txScopes);
-        state.setValue(TX_AUDIENCE_VAR, txAud);
-        state.setValue(TX_RESOURCE_VAR, txRes);
+        state.setValue(TX_SCOPES_VAR,   asQDLValue(txScopes));
+        state.setValue(TX_AUDIENCE_VAR, asQDLValue(txAud));
+        state.setValue(TX_RESOURCE_VAR, asQDLValue(txRes));
         QDLStem originalScopes = new QDLStem();
         if (state.getTransaction().hasATReturnedOriginalScopes()) {
             ArrayList arrayList = new ArrayList();
             arrayList.addAll(state.getTransaction().getATReturnedOriginalScopes());
             originalScopes.getQDLList().appendAll(arrayList);
         }
-        state.setValue(AT_ORIGINAL_SCOPES, originalScopes);
+        state.setValue(AT_ORIGINAL_SCOPES, asQDLValue(originalScopes));
 
     }
 
@@ -636,7 +638,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             // String index = Integer.toString(i) + "."; // make sure its a stem
             // if they added extra stuff, skip it. 
             if (QDLStem.containsKey((long) i)) {
-                QDLStem cfg = (QDLStem) QDLStem.get((long) i);
+                QDLStem cfg = QDLStem.get((long) i).asStem();
                 claimSources.add(getConfigToCS().convert(cfg, state, state.getOa2se()));
             }
         }
@@ -732,26 +734,26 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             }
         }
         Map respMap = new HashMap();
-        QDLStem flowStem = (QDLStem) state.getValue(FLOW_STATE_VAR);
+        QDLStem flowStem =  state.getValue(FLOW_STATE_VAR).asStem();
 
         respMap.put(SRE_REQ_FLOW_STATES, toFS(flowStem));
-        respMap.put(SRE_REQ_CLAIM_SOURCES, toSources((QDLStem) state.getValue(CLAIM_SOURCES_VAR)));
-        respMap.put(SRE_REQ_SCOPES, stemToList((QDLStem) state.getValue(SCOPES_VAR)));
-        respMap.put(SRE_REQ_EXTENDED_ATTRIBUTES, ((QDLStem) state.getValue(EXTENDED_ATTRIBUTES_VAR)).toJSON());
+        respMap.put(SRE_REQ_CLAIM_SOURCES, toSources(state.getValue(CLAIM_SOURCES_VAR).asStem()));
+        respMap.put(SRE_REQ_SCOPES, stemToList(state.getValue(SCOPES_VAR).asStem()));
+        respMap.put(SRE_REQ_EXTENDED_ATTRIBUTES, state.getValue(EXTENDED_ATTRIBUTES_VAR).asStem().toJSON());
         if (state.getValue(ACCESS_TOKEN_VAR) != null) {
-            respMap.put(SRE_REQ_ACCESS_TOKEN, ((QDLStem) state.getValue(ACCESS_TOKEN_VAR)).toJSON());
+            respMap.put(SRE_REQ_ACCESS_TOKEN, state.getValue(ACCESS_TOKEN_VAR).asStem().toJSON());
         }
         if (state.getValue(REFRESH_TOKEN_VAR) != null) {
-            respMap.put(SRE_REQ_REFRESH_TOKEN, ((QDLStem) state.getValue(REFRESH_TOKEN_VAR)).toJSON());
+            respMap.put(SRE_REQ_REFRESH_TOKEN, state.getValue(REFRESH_TOKEN_VAR).asStem().toJSON());
         }
-        respMap.put(SRE_REQ_AUDIENCE, stemToList((QDLStem) state.getValue(AUDIENCE_VAR)));
-        respMap.put(SRE_REQ_RESOURCE, stemToList((QDLStem) state.getValue(RESOURCE_VAR)));
-        Object z = state.getValue(CLAIMS_VAR);
+        respMap.put(SRE_REQ_AUDIENCE, stemToList(state.getValue(AUDIENCE_VAR).asStem()));
+        respMap.put(SRE_REQ_RESOURCE, stemToList(state.getValue(RESOURCE_VAR).asStem()));
+        QDLValue z = state.getValue(CLAIMS_VAR);
         QDLStem stemClaims;
-        if (z instanceof QDLNull) {
+        if (z.isNull()) {
             stemClaims = new QDLStem();
         } else {
-            stemClaims = (QDLStem) state.getValue(CLAIMS_VAR);
+            stemClaims = state.getValue(CLAIMS_VAR).asStem();
         }
         JSON j = stemClaims.toJSON();
         if (j.isArray()) {
@@ -765,13 +767,13 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         Now for token exchange stuff
          */
         if (state.isDefined(TX_SCOPES_VAR)) {
-            respMap.put(SRE_TX_REQ_SCOPES, stemToList((QDLStem) state.getValue(TX_SCOPES_VAR)));
+            respMap.put(SRE_TX_REQ_SCOPES, stemToList(state.getValue(TX_SCOPES_VAR).asStem()));
         }
         if (state.isDefined(TX_AUDIENCE_VAR)) {
-            respMap.put(SRE_TX_REQ_AUDIENCE, stemToList((QDLStem) state.getValue(TX_AUDIENCE_VAR)));
+            respMap.put(SRE_TX_REQ_AUDIENCE, stemToList(state.getValue(TX_AUDIENCE_VAR).asStem()));
         }
         if (state.isDefined(TX_RESOURCE_VAR)) {
-            List<String> res = stemToList((QDLStem) state.getValue(TX_RESOURCE_VAR));
+            List<String> res = stemToList( state.getValue(TX_RESOURCE_VAR).asStem());
 
             ArrayList<URI> zz = new ArrayList<>();
             for (String r : res) {

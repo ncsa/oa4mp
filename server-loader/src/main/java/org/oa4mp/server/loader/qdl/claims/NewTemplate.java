@@ -4,9 +4,12 @@ import org.qdl_lang.exceptions.BadArgException;
 import org.qdl_lang.extensions.QDLFunction;
 import org.qdl_lang.state.State;
 import org.qdl_lang.variables.QDLStem;
+import org.qdl_lang.variables.values.QDLValue;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.qdl_lang.variables.values.QDLValue.asQDLValue;
 
 /**
  * Creates a template for a given type of claim sourse.
@@ -32,13 +35,13 @@ public class NewTemplate implements QDLFunction, CSConstants {
 
 
     @Override
-    public Object evaluate(Object[] objects, State state) {
-        String type = (String) objects[0];
+    public QDLValue evaluate(QDLValue[] objects, State state) {
+        String type = objects[0].asString();
         QDLStem output = new QDLStem();
         switch (type) {
             case CS_TYPE_FILE:
                 output.put(CS_DEFAULT_TYPE, CS_TYPE_FILE);
-                return output;
+                return asQDLValue(output);
             case CS_TYPE_LDAP:
                 output = new QDLStem();
                 output.put(CS_DEFAULT_TYPE, CS_TYPE_LDAP);
@@ -48,21 +51,21 @@ public class NewTemplate implements QDLFunction, CSConstants {
                 output.put(CS_LDAP_SEARCH_NAME, REQUIRED_TEMPLATE);
                 output.put(CS_LDAP_SEARCH_FILTER_ATTRIBUTE, REQUIRED_TEMPLATE);
                 output.put(CS_LDAP_AUTHZ_TYPE, REQUIRED_TEMPLATE);
-                return output;
+                return asQDLValue(output);
             case CS_TYPE_NCSA:
                 output.put(CS_DEFAULT_TYPE, CS_TYPE_NCSA); // That's it!
-                return output;
+                return asQDLValue(output);
             case CS_TYPE_FILTER_HEADERS:
                 output.put(CS_DEFAULT_TYPE, CS_TYPE_FILTER_HEADERS);
                 output.put(CS_HEADERS_PREFIX, REQUIRED_TEMPLATE);
-                return output;
+                return asQDLValue(output);
             case CS_TYPE_ALL_HEADERS:
                 output.put(CS_DEFAULT_TYPE, CS_TYPE_ALL_HEADERS);
-                return output;
+                return asQDLValue(output);
             case CS_TYPE_CODE:
                 output.put(CS_DEFAULT_TYPE, CS_TYPE_CODE);
                 output.put(CS_CODE_JAVA_CLASS, REQUIRED_TEMPLATE);
-                return output;
+                return asQDLValue(output);
         }
         throw new BadArgException("Error: unknown configuration type \"" + type + "\".",0);
     }

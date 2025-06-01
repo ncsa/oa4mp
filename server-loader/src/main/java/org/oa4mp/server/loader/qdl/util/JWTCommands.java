@@ -17,14 +17,18 @@ import org.qdl_lang.extensions.QDLVariable;
 import org.qdl_lang.state.State;
 import org.qdl_lang.util.QDLFileUtil;
 import org.qdl_lang.variables.Constant;
-import org.qdl_lang.variables.QDLNull;
 import org.qdl_lang.variables.QDLStem;
+import org.qdl_lang.variables.values.BooleanValue;
+import org.qdl_lang.variables.values.QDLNullValue;
+import org.qdl_lang.variables.values.QDLValue;
+import org.qdl_lang.variables.values.StringValue;
 
 import java.net.URI;
 import java.security.SecureRandom;
 import java.util.*;
 
 import static org.oa4mp.server.loader.oauth2.state.ExtendedParameters.OA4MP_NS;
+import static org.qdl_lang.variables.values.QDLValue.asQDLValue;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -123,7 +127,7 @@ public class JWTCommands  {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public QDLValue evaluate(QDLValue[] objects, State state) {
             // {'type':'RSA'|'EC', 'file':'path','force':true|false, 'set':true|false}
             String keyType = "RSA";
             String ecCurve = null;
@@ -140,12 +144,12 @@ public class JWTCommands  {
                     break;
                 case 1:
 
-                    if (objects[0] instanceof String) {
+                    if (objects[0].isString()) {
                         argTypeOk = true;
-                        filePath = (String) objects[0];
+                        filePath = objects[0].asString();
                     }
-                    if (objects[0] instanceof QDLStem) {
-                        QDLStem args = (QDLStem) objects[0];
+                    if (objects[0].isStem()) {
+                        QDLStem args = objects[0].asStem();
                         argTypeOk = true;
                         if (args.containsKey(ARG_KEY_TYPE)) {
                             if (!Constant.isString(args.get(ARG_KEY_TYPE))) {
@@ -154,38 +158,38 @@ public class JWTCommands  {
                             keyType = args.getString(ARG_KEY_TYPE);
                         }
                         if (args.containsKey(ARG_DEFAULT_KEY_ID)) {
-                            if (!Constant.isString(args.get(ARG_DEFAULT_KEY_ID))) {
+                            if (!args.get(ARG_DEFAULT_KEY_ID).isString()) {
                                 throw new BadArgException(getName() + " requires a string as the " + ARG_DEFAULT_KEY_ID + " of the generated keys.",0);
                             }
                             defaultKeyID = args.getString(ARG_DEFAULT_KEY_ID);
 
                         }
                         if (args.containsKey(ARG_FILE_PATH_TYPE)) {
-                            if (!Constant.isString(args.get(ARG_FILE_PATH_TYPE))) {
+                            if (!args.get(ARG_FILE_PATH_TYPE).isString()) {
                                 throw new BadArgException(getName() + " requires a string as the " + ARG_FILE_PATH_TYPE + " of the generated keys.",0);
                             }
                             filePath = args.getString(ARG_FILE_PATH_TYPE);
                         }
                         if (args.containsKey(ARG_FILE_OVERWRITE_TYPE)) {
-                            if (!(args.get(ARG_KEY_TYPE) instanceof Boolean)) {
+                            if (!args.get(ARG_KEY_TYPE).isBoolean()) {
                                 throw new BadArgException(getName() + " requires a boolean as the " + ARG_FILE_OVERWRITE_TYPE + " argument.",0);
                             }
                             overwriteFile = args.getBoolean(ARG_FILE_OVERWRITE_TYPE);
                         }
                         if (args.containsKey(ARG_SET_TO_CURRENT_KEYS_TYPE)) {
-                            if (!(args.get(ARG_SET_TO_CURRENT_KEYS_TYPE) instanceof Boolean)) {
+                            if (!args.get(ARG_SET_TO_CURRENT_KEYS_TYPE).isBoolean()) {
                                 throw new BadArgException(getName() + " requires a boolean as the " + ARG_SET_TO_CURRENT_KEYS_TYPE + " argument.",0);
                             }
                             setCurrent = args.getBoolean(ARG_SET_TO_CURRENT_KEYS_TYPE);
                         }
                         if (args.containsKey(ARG_RSA_KEY_SIZE_TYPE)) {
-                            if (!(args.get(ARG_RSA_KEY_SIZE_TYPE) instanceof Long)) {
+                            if (!args.get(ARG_RSA_KEY_SIZE_TYPE).isLong()) {
                                 throw new BadArgException(getName() + " requires an integer as the " + ARG_RSA_KEY_SIZE_TYPE + " argument.",0);
                             }
                             rsaKeySize = args.getLong(ARG_RSA_KEY_SIZE_TYPE).intValue();
                         }
                         if (args.containsKey(ARG_EC_CURVE_TYPE)) {
-                            if (!Constant.isString(args.get(ARG_EC_CURVE_TYPE))) {
+                            if (!args.get(ARG_EC_CURVE_TYPE).isStem()) {
                                 throw new BadArgException(getName() + " requires a string as the " + ARG_EC_CURVE_TYPE + " of the generated keys.",0);
                             }
                             ecCurve = args.getString(ARG_EC_CURVE_TYPE);
@@ -193,13 +197,13 @@ public class JWTCommands  {
                     }
                     break;
                 case 2:
-                    if (objects[0] instanceof String) {
-                        filePath = (String) objects[0];
+                    if (objects[0].isString()) {
+                        filePath = objects[0].asString();
                     } else {
                         throw new BadArgException("In dyadic " + getName() + ", the first argument must be a string",0);
                     }
-                    if (objects[1] instanceof Boolean) {
-                        overwriteFile = (Boolean) objects[1];
+                    if (objects[1].isBoolean()) {
+                        overwriteFile = objects[1].asBoolean();
                     } else {
                         throw new BadArgException("In dyadic " + getName() + ", the second argument must be a boolean",1);
 
@@ -245,7 +249,7 @@ public class JWTCommands  {
                 }
                 QDLStem outKeys = new QDLStem();
                 outKeys.fromJSON(jsonObject);
-                return outKeys;
+                return asQDLValue(outKeys);
 
             } catch (Throwable e) {
                 if (e instanceof RuntimeException) {
@@ -321,11 +325,11 @@ public class JWTCommands  {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
-            if (!(objects[0] instanceof String)) {
+        public QDLValue evaluate(QDLValue[] objects, State state) {
+            if (!(objects[0].isString())) {
                 throw new BadArgException(getName() + " requires a string as its argument",0);
             }
-            String filePath = (String) objects[0];
+            String filePath = objects[0].asString();
             try {
                 //String rawJSON = new String(Files.readAllBytes(f.toPath()));
                 String rawJSON = QDLFileUtil.readTextFile(state, filePath);
@@ -334,7 +338,7 @@ public class JWTCommands  {
                 throw new QDLException("Error reading keys file:" + e.getMessage(), e);
             }
 
-            return true;
+            return BooleanValue.True;
         }
 
         @Override
@@ -359,21 +363,19 @@ public class JWTCommands  {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public QDLValue evaluate(QDLValue[] objects, State state) {
              if (!hasJWKS()) {
                 throw new IllegalStateException(" No keys found to save.");
             }
-            if (!Constant.isString(objects[0])) {
+            if (!objects[0].isString()) {
                 throw new BadArgException(getName() + " requires a string as its argument",0);
             }
             try {
-                writeWebkeys(state, getJsonWebKeyUtil().toJSON(jwks), (String) objects[0]);
+                writeWebkeys(state, getJsonWebKeyUtil().toJSON(jwks), objects[0].asString());
             } catch (Throwable e) {
                 throw new QDLException(" could not save keys to " + objects[0], e);
             }
-
-            return true;
-
+            return BooleanValue.True;
         }
 
         @Override
@@ -400,7 +402,7 @@ public class JWTCommands  {
         int defaultLength = 32;
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public QDLValue evaluate(QDLValue[] objects, State state) {
             List<String> sKeys = null;
             int count = 1;
             int length = defaultLength;
@@ -408,34 +410,34 @@ public class JWTCommands  {
                 case 0:
                     break;
                 case 1:
-                    if (!(objects[0] instanceof Long)) {
+                    if (!(objects[0].isLong())) {
                         throw new BadArgException(" The first argument must be an integer",0);
                     }
-                    Long lCount = (Long) objects[0];
+                    Long lCount = objects[0].asLong();
                     count = lCount.intValue();
                     break;
                 case 2:
-                    if (!(objects[0] instanceof Long)) {
+                    if (!(objects[0].isLong())) {
                         throw new BadArgException(" The first argument must be an integer",0);
                     }
-                    lCount = (Long) objects[0];
+                    lCount = objects[0].asLong();
                     count = lCount.intValue();
-                    if (!(objects[1] instanceof Long)) {
+                    if (!(objects[1].isLong())) {
                         throw new BadArgException(" The second argument must be an integer",1);
                     }
-                    Long lLength = (Long) objects[1];
+                    Long lLength = objects[1].asLong();
                     length = lLength.intValue();
                     break;
             }
             sKeys = createKeys(count, length);
             if (count == 1) {
-                return sKeys.get(0);
+                return asQDLValue(sKeys.get(0));
             }
             List<Object> dummy = new ArrayList<>();
             dummy.addAll(sKeys); // how to cast a list of strings to a list of objects.
             QDLStem QDLStem = new QDLStem();
             QDLStem.addList(dummy);
-            return QDLStem;
+            return asQDLValue(QDLStem);
         }
 
         protected List<String> createKeys(int count, int length) {
@@ -488,21 +490,21 @@ public class JWTCommands  {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public QDLValue evaluate(QDLValue[] objects, State state) {
             if (!hasJWKS()) {
-                return "";
+                return new StringValue();
             }
             if (objects.length == 0) {
-                return getJwks().getDefaultKeyID();
+                return asQDLValue(getJwks().getDefaultKeyID());
             }
             // so we have one.
-            String newId = objects[0].toString();
+            String newId = objects[0].asString();
             if (!getJwks().containsKey(newId)) {
                 throw new BadArgException(" There is no such key in the collection.",0);
             }
             String oldID = getJwks().getDefaultKeyID();
             getJwks().setDefaultKeyID(newId);
-            return oldID;
+            return asQDLValue(oldID);
         }
 
         @Override
@@ -533,26 +535,26 @@ public class JWTCommands  {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable {
+        public QDLValue evaluate(QDLValue[] objects, State state) throws Throwable {
             if (objects.length == 0) {
                 // query current keys
                 if (jwks == null) {
-                    return QDLNull.getInstance();
+                    return QDLNullValue.getNullValue();
                 }
                 QDLStem out = new QDLStem();
                 // improvement is to have a parallel version of this and just return it.
-                return out.fromJSON(getJsonWebKeyUtil().toJSON(jwks));
+                return asQDLValue(out.fromJSON(getJsonWebKeyUtil().toJSON(jwks)));
             }
-            if (!(objects[0] instanceof QDLStem)) {
+            if (!(objects[0].isStem())) {
                 throw new BadArgException("no key specified",0);
             }
-            QDLStem stem = (QDLStem) objects[0];
+            QDLStem stem = objects[0].asStem();
             QDLStem old = getJwkStem();
             setJwks(getJsonWebKeyUtil().fromJSON(stem.toJSON()));
             if (old == null) {
-                return QDLNull.getInstance();
+                return QDLNullValue.getNullValue();
             }
-            return old;
+            return asQDLValue(old);
         }
 
 
@@ -586,7 +588,7 @@ public class JWTCommands  {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public QDLValue evaluate(QDLValue[] objects, State state) {
             if (state instanceof OA2State) {
                 setJwks(((OA2State) state).getJsonWebKeys());
             }
@@ -603,11 +605,11 @@ public class JWTCommands  {
                 kid = getJwks().getDefaultKeyID();
 
             }
-            QDLStem arg = (QDLStem) objects[0];
+            QDLStem arg = objects[0].asStem();
 
 
             try {
-                return JWTUtil.createJWT((JSONObject) arg.toJSON(), getJwks().get(kid));
+                return asQDLValue(JWTUtil.createJWT((JSONObject) arg.toJSON(), getJwks().get(kid)));
 
             } catch (Throwable e) {
                 throw new QDLException("Error creating JWT:" + e.getMessage(), e);
@@ -649,7 +651,7 @@ public class JWTCommands  {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public QDLValue evaluate(QDLValue[] objects, State state) {
             if (!hasJWKS()) {
                 throw new IllegalStateException(" No keys have been set.");
             }
@@ -665,7 +667,7 @@ public class JWTCommands  {
                 entry.put(JWKUtil2.KEY_TYPE, jwk.type);
                 QDLStem.put(id, entry);
             }
-            return QDLStem;
+            return asQDLValue(QDLStem);
         }
 
         @Override
@@ -691,14 +693,14 @@ public class JWTCommands  {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public QDLValue evaluate(QDLValue[] objects, State state) {
             if (!hasJWKS()) {
                 throw new IllegalStateException(" No keys have been set.");
             }
             URI well_known = null;
             if (objects.length == 2) {
                 try {
-                    well_known = URI.create(objects[1].toString());
+                    well_known = URI.create(objects[1].asString());
                 } catch (Throwable t) {
                     throw new BadArgException(" The second argument \"" + objects[1] + "\" must be a valid URI.",1);
                 }
@@ -714,7 +716,7 @@ public class JWTCommands  {
             }
             QDLStem QDLStem = new QDLStem();
             QDLStem.fromJSON(json);
-            return QDLStem;
+            return asQDLValue(QDLStem);
         }
 
         @Override
@@ -748,13 +750,13 @@ public class JWTCommands  {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
-            String token = objects[0].toString();
+        public QDLValue evaluate(QDLValue[] objects, State state) {
+            String token = objects[0].asString();
 
             JSONObject[] array = JWTUtil.readJWT(token);
             QDLStem QDLStem = new QDLStem();
             QDLStem.fromJSON(array[JWTUtil.HEADER_INDEX]);
-            return QDLStem;
+            return asQDLValue(QDLStem);
         }
 
         @Override
@@ -781,13 +783,13 @@ public class JWTCommands  {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
-            String token = objects[0].toString();
+        public QDLValue evaluate(QDLValue[] objects, State state) {
+            String token = objects[0].asString();
 
             JSONObject[] array = JWTUtil.readJWT(token);
             QDLStem QDLStem = new QDLStem();
             QDLStem.fromJSON(array[JWTUtil.PAYLOAD_INDEX]);
-            return QDLStem;
+            return asQDLValue(QDLStem);
         }
 
         @Override
@@ -944,10 +946,9 @@ public class JWTCommands  {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public QDLValue evaluate(QDLValue[] objects, State state) {
             UUID uuid = UUID.randomUUID();
-
-            return uuid.toString();
+            return asQDLValue(uuid.toString());
         }
 
         @Override

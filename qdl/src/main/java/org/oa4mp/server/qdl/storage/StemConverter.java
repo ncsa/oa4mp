@@ -1,6 +1,5 @@
 package org.oa4mp.server.qdl.storage;
 
-import org.qdl_lang.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
@@ -9,6 +8,9 @@ import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.data.ConversionMap;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
+import org.qdl_lang.variables.QDLStem;
+import org.qdl_lang.variables.values.QDLValue;
+import org.qdl_lang.variables.values.StringValue;
 
 import java.util.Collection;
 import java.util.Date;
@@ -88,22 +90,36 @@ public abstract class StemConverter<V extends Identifiable> extends MapConverter
 
     @Override
     public V fromMap(Map<String, Object> map, V v) {
+        return fromMap(convertToStem(map), v);
+/*
         if (map instanceof QDLStem) {
             return fromMap((QDLStem) map, v);
         }
         System.err.print("MapConverter.fromMap(): failed for " + v);
         throw new NotImplementedException(" not implement for non ConversionMap objects");
 
+*/
     }
 
+    public QDLStem convertToStem(Map<String, Object> map) {
+        QDLStem stem = new QDLStem();
+        for(String key : map.keySet()) {
+            stem.put(key, QDLValue.asQDLValue(map.get(key)));
+        }
+
+        return stem;
+    }
     @Override
     public void toMap(V value, Map<String, Object> data) {
+/*
+
         if (data instanceof QDLStem) {
             toMap(value, (QDLStem) data);
             return;
         }
-        System.err.print("MapConverter.fromMap(): failed for " + data);
+        System.err.print("MapConverter.fromMap(): failed for " + data);*/
         throw new NotImplementedException(" not implement for non ConversionMap objects");
+
 
     }
 
@@ -116,7 +132,7 @@ public abstract class StemConverter<V extends Identifiable> extends MapConverter
      */
     protected Date toDate(QDLStem stem, String key) {
         Date date = new Date();
-        date.setTime(stem.getLong(key));
+        date.setTime(stem.get(key).asLong());
         return date;
     }
 
@@ -128,7 +144,7 @@ public abstract class StemConverter<V extends Identifiable> extends MapConverter
      * @return
      */
     protected List toList(QDLStem stem, String key) {
-        QDLStem target = (QDLStem) stem.get(key);
+        QDLStem target = stem.get(key).asStem();
         return target.getQDLList().toJSON();  // returns a JSONArray
     }
 
@@ -146,7 +162,7 @@ public abstract class StemConverter<V extends Identifiable> extends MapConverter
 
             for (Object s : c) {
                 if (s != null) {
-                    target.listAdd(s.toString());
+                    target.listAdd(new StringValue(s.toString()));
                 }
             }
             stem.put(key + QDLStem.STEM_INDEX_MARKER, target);

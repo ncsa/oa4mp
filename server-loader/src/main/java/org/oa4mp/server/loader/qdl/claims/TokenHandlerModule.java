@@ -2,9 +2,9 @@ package org.oa4mp.server.loader.qdl.claims;
 
 import org.oa4mp.server.loader.qdl.scripting.OA2State;
 import org.oa4mp.server.loader.qdl.scripting.QDLRuntimeEngine;
+import org.qdl_lang.expressions.module.Module;
 import org.qdl_lang.extensions.JavaModule;
 import org.qdl_lang.extensions.QDLFunction;
-import org.qdl_lang.module.Module;
 import org.qdl_lang.state.State;
 
 import java.net.URI;

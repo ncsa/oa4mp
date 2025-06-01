@@ -4,11 +4,14 @@ import org.qdl_lang.exceptions.BadArgException;
 import org.qdl_lang.extensions.QDLFunction;
 import org.qdl_lang.state.State;
 import org.qdl_lang.variables.QDLStem;
+import org.qdl_lang.variables.values.BooleanValue;
+import org.qdl_lang.variables.values.QDLValue;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.oa4mp.server.loader.oauth2.claims.Groups.GROUP_ENTRY_NAME;
+import static org.qdl_lang.variables.values.QDLValue.asQDLValue;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -29,7 +32,7 @@ public class IsInGroup2 implements QDLFunction {
     }
 
     @Override
-    public Object evaluate(Object[] objects, State state) {
+    public QDLValue evaluate(QDLValue[] objects, State state) {
         // First argument is a either a group (single string) or list of them.
         // Second argument is the stem of groups. This is a list that has
         // stem elements of the form stem.name and stem.id. The name is the
@@ -39,10 +42,10 @@ public class IsInGroup2 implements QDLFunction {
         // a lot of edge cases (empty list, e.g.)
         if (objects == null) {
             //  throw new IllegalArgumentException(" no arguments for " + getName());
-            return Boolean.FALSE;
+            return BooleanValue.False;
         }
 
-        if (objects[0] == null || (!(objects[0] instanceof QDLStem) && !(objects[0] instanceof String))) {
+        if (objects[0] == null || (!(objects[0].isStem()) && !(objects[0].isString()))) {
             throw new BadArgException(" The first argument of " + getName() + " must be a string or stem of them.",0);
         }
         if (objects[1] == null) {
@@ -50,43 +53,43 @@ public class IsInGroup2 implements QDLFunction {
             throw new BadArgException(" Undefined second argument for " + getName(),1);
         }
 
-        if (!(objects[1] instanceof QDLStem)) {
+        if (!(objects[1].isStem())) {
             // This indicates that something wrong was passed, so flag it as a bona fide error.
             throw new IllegalArgumentException(" The second argument of " + getName() + " must be a stem list of groups.");
         }
-        QDLStem groups = (QDLStem) objects[1];
+        QDLStem groups = objects[1].asStem();
         if (groups.size() == 0) {
-            return Boolean.FALSE;
+            return BooleanValue.False;
         }
 
         QDLStem groupNames;
-        boolean isScalar = objects[0] instanceof String;
+        boolean isScalar = objects[0].isString();
         if (isScalar) {
             groupNames = new QDLStem();
             groupNames.listAdd(objects[0]);
 
         } else {
-            groupNames = (QDLStem) objects[0];
+            groupNames = objects[0].asStem();
         }
         QDLStem result = new QDLStem();
         for (Object keys : groupNames.keySet()) {
-            String name = String.valueOf(groupNames.get(keys));
+            String name = groupNames.get(keys).asString();
             Boolean rValue = Boolean.FALSE;
             for (Object key : groups.keySet()) {
-                Object obj = groups.get(key);
+                QDLValue obj = groups.get(key);
                 // two options, either they parsed it in to a group structure OR its just a raw list of strings
-                if (obj instanceof QDLStem) {
-                    QDLStem group = (QDLStem) obj;
+                if (obj.isStem()) {
+                    QDLStem group = obj.asStem();
                     if (group.containsKey(GROUP_ENTRY_NAME) && group.getString(GROUP_ENTRY_NAME).equals(name)) {
                         rValue = Boolean.TRUE;
                         break;
                     }
                 } else {
-                    if(!(obj instanceof String)){
+                    if(!(obj.isString())) {
                         throw new IllegalArgumentException("Error: unrecognized element in group.'" + obj + "'");
                     }
                     // Failing that, try to process it as a string.
-                    if (obj.toString().equals(name)) {
+                    if (obj.asString().equals(name)) {
                         rValue = Boolean.TRUE;
                         break;
                     }
@@ -102,7 +105,7 @@ public class IsInGroup2 implements QDLFunction {
         if (isScalar) {
             return result.get(0L);
         }
-        return result;
+        return asQDLValue(result);
 
     }
 

@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Vector;
 
 import static edu.uiuc.ncsa.security.util.cli.CLIDriver.LIST_ALL_METHODS_COMMAND;
+import static org.qdl_lang.variables.values.QDLValue.asQDLValue;
 
 /**
  * This class exists because we cannot quite get the dependencies right otherwise. Mostly it is to have access
@@ -238,7 +239,7 @@ say("and for QDL lists, see");
             MapConverter mapConverter = (MapConverter) getStore().getXMLConverter();
             SerializationKeys serializationKeys = mapConverter.getKeys();
             for (String key : serializationKeys.allKeys()) {
-                state.setValue(key, key);
+                state.setValue(key, asQDLValue(key));
             }
         }
         return state;

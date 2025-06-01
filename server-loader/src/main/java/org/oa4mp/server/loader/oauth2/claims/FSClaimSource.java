@@ -204,7 +204,9 @@ public class FSClaimSource extends BasicClaimsSourceImpl {
         QDLStem stem = super.toQDL();
         stem.put(CS_DEFAULT_TYPE, CS_TYPE_FILE);
 
-        stem.put(CS_FILE_FILE_PATH, getConfiguration().getProperty(FSClaimSource.FILE_PATH_KEY));
+        if(null != getConfiguration().getProperty(FSClaimSource.FILE_PATH_KEY)) {
+            stem.put(CS_FILE_FILE_PATH, getConfiguration().getProperty(FSClaimSource.FILE_PATH_KEY));
+        }
         if (getConfiguration().getProperty(FSClaimSource.FILE_CLAIM_KEY) != null) {
             stem.put(CS_FILE_CLAIM_KEY, getConfiguration().getProperty(FSClaimSource.FILE_CLAIM_KEY));
         }

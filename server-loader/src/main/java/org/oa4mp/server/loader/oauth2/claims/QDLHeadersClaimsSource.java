@@ -90,7 +90,7 @@ public class QDLHeadersClaimsSource extends BasicClaimsSourceImpl {
         if (!hasOA2State()) {
             return claims;
         }
-        QDLStem authHeaders = (QDLStem) getOa2State().getValue(QDLRuntimeEngine.AUTH_HEADERS_VAR);
+        QDLStem authHeaders = getOa2State().getValue(QDLRuntimeEngine.AUTH_HEADERS_VAR).asStem();
         if(authHeaders == null || authHeaders.isEmpty()){
             return claims;
         }

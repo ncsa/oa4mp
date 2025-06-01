@@ -13,14 +13,16 @@ import org.qdl_lang.expressions.ConstantNode;
 import org.qdl_lang.expressions.Polyad;
 import org.qdl_lang.extensions.QDLFunction;
 import org.qdl_lang.state.State;
-import org.qdl_lang.variables.Constant;
 import org.qdl_lang.variables.QDLList;
 import org.qdl_lang.variables.QDLStem;
+import org.qdl_lang.variables.values.QDLValue;
+import org.qdl_lang.variables.values.StringValue;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.qdl_lang.variables.QDLStem.STEM_INDEX_MARKER;
+import static org.qdl_lang.variables.values.QDLValue.asQDLValue;
 
 /**
  * QDLFunction to convert claims to a stem. For use in the OA4MP QDL module.
@@ -50,36 +52,36 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
     }
 
     @Override
-    public Object evaluate(Object[] objects, State state) {
-        if (!(objects[0] instanceof QDLStem)) {
+    public QDLValue evaluate(QDLValue[] objects, State state) {
+        if (!(objects[0].isStem())) {
             throw new BadArgException(getName() + " requires a stem variable as its first argument",0);
         }
 
-        QDLStem arg = (QDLStem) objects[0];
-        if (objects[1] == null || !(objects[1] instanceof String)) {
+        QDLStem arg = objects[0].asStem();
+        if (objects[1] == null || !(objects[1].isString())) {
             throw new BadArgException(getName() + " requires the name of the user as its second argument",1);
         }
-        String username = (String) objects[1];
+        String username = objects[1].asString();
         if (!arg.containsKey(CS_DEFAULT_TYPE)) {
             throw new IllegalStateException(getName() + " must have the type of claim source");
         }
         QDLStem headers = null;
         if (arg.getString(CS_DEFAULT_TYPE).equals(CS_TYPE_FILTER_HEADERS)) {
-            headers = (QDLStem) arg.get("headers.");
+            headers = arg.get("headers.").asStem();
         }
         switch (arg.getString(CS_DEFAULT_TYPE)) {
             case CS_TYPE_CODE:
-                return doCode(arg, username, headers, state);
+                return asQDLValue(doCode(arg, username, headers, state));
             case CS_TYPE_FILE:
-                return doFS(arg, username, state);
+                return asQDLValue(doFS(arg, username, state));
             case CS_TYPE_LDAP:
-                return doLDAP(arg, username, state);
+                return asQDLValue(doLDAP(arg, username, state));
             case CS_TYPE_FILTER_HEADERS:
-                return doHeaders(arg, username, headers, state);
+                return asQDLValue(doHeaders(arg, username, headers, state));
             case CS_TYPE_ALL_HEADERS:
-                return doQDLHeaders(arg, username, headers, state);
+                return asQDLValue(doQDLHeaders(arg, username, headers, state));
             case CS_TYPE_NCSA:
-                return doNCSA(arg, username, state);
+                return asQDLValue(doNCSA(arg, username, state));
         }
         return null;
     }
@@ -278,7 +280,7 @@ get_claims(cfg., 'dweitzel2@unl.edu')
         }else{
             if (arg.containsKey(CS_FILE_FILE_PATH)) {
                 Polyad polyad = new Polyad(IOEvaluator.READ_FILE);
-                polyad.addArgument(new ConstantNode(arg.getString(CS_FILE_FILE_PATH), Constant.STRING_TYPE));
+                polyad.addArgument(new ConstantNode(asQDLValue(arg.getString(CS_FILE_FILE_PATH))));
                 state.getMetaEvaluator().evaluate(polyad, state);
                 rawJSON = polyad.getResult().toString();
             }
@@ -303,12 +305,12 @@ get_claims(cfg., 'dweitzel2@unl.edu')
         mystem.put(CS_DEFAULT_TYPE, CS_TYPE_FILE);
         mystem.put(CS_FILE_FILE_PATH, DebugUtil.getDevPath() + "/oa4mp/server-test/src/main/resources/test-claims.json");
         CreateSourceConfig csc = new CreateSourceConfig();
-        QDLStem out = (QDLStem) csc.evaluate(new Object[]{mystem}, null);
+        QDLStem out = csc.evaluate(new QDLValue[]{asQDLValue(mystem)}, null).asStem();
         System.out.println(out.toJSON().toString(2));
 
 
         ClaimsSourceGetter cst = new ClaimsSourceGetter();
-        QDLStem claims = (QDLStem) cst.evaluate(new Object[]{mystem, "jeff"}, null);
+        QDLStem claims = cst.evaluate(new QDLValue[]{asQDLValue(mystem), new StringValue( "jeff")}, null).asStem();
         System.out.println("File claim source configuration:");
         System.out.println(claims.toJSON().toString(2));
     }
@@ -323,10 +325,10 @@ get_claims(cfg., 'dweitzel2@unl.edu')
         mystem.put(CS_LDAP_SEARCH_NAME, "uid");
         mystem.put(CS_LDAP_AUTHZ_TYPE, "none");
         CreateSourceConfig createSourceConfig = new CreateSourceConfig();
-        QDLStem cfg = (QDLStem) createSourceConfig.evaluate(new Object[]{mystem}, null);
+        QDLStem cfg = createSourceConfig.evaluate(new QDLValue[]{asQDLValue(mystem)}, null).asStem();
 
         ClaimsSourceGetter cst = new ClaimsSourceGetter();
-        QDLStem claims = (QDLStem) cst.evaluate(new Object[]{cfg, "jgaynor"}, null);
+        QDLStem claims = cst.evaluate(new QDLValue[]{asQDLValue(cfg), new StringValue("jgaynor")}, null).asStem();
         System.out.println(claims.toJSON().toString(2));
 
     }
@@ -338,7 +340,7 @@ get_claims(cfg., 'dweitzel2@unl.edu')
         csc.doNCSA(new QDLStem(), cfg); // populates the cfg
         System.out.println("NCSA default config:" + cfg.toString(1));
         ClaimsSourceGetter cst = new ClaimsSourceGetter();
-        QDLStem claims = (QDLStem) cst.evaluate(new Object[]{cfg, "jgaynor"}, null);
+        QDLStem claims = cst.evaluate(new QDLValue[]{asQDLValue(cfg), new StringValue("jgaynor")}, null).asStem();
         System.out.println(claims.toString(2));
 
     }
@@ -368,7 +370,7 @@ get_claims(cfg., 'dweitzel2@unl.edu')
         mystem.put(CS_LDAP_GROUP_NAMES, groupNames);
         System.out.println("\n-----\nldap cfg:\n-----\n" + mystem.toString(1));
         ClaimsSourceGetter cst = new ClaimsSourceGetter();
-        QDLStem claims = (QDLStem) cst.evaluate(new Object[]{mystem, "jgaynor"}, null);
+        QDLStem claims = cst.evaluate(new QDLValue[]{asQDLValue(mystem), new StringValue("jgaynor")}, null).asStem();
         System.out.println(claims.toString(2));
 
     }

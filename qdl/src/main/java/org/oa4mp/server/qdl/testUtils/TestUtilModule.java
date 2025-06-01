@@ -2,7 +2,7 @@ package org.oa4mp.server.qdl.testUtils;
 
 import org.qdl_lang.extensions.JavaModule;
 import org.qdl_lang.extensions.QDLFunction;
-import org.qdl_lang.module.Module;
+import org.qdl_lang.expressions.module.Module;
 import org.qdl_lang.state.State;
 
 import java.net.URI;

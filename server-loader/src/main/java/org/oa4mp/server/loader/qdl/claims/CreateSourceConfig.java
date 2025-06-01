@@ -1,12 +1,17 @@
 package org.oa4mp.server.loader.qdl.claims;
 
+import edu.uiuc.ncsa.security.core.exceptions.IllegalAccessException;
 import org.qdl_lang.extensions.QDLFunction;
 import org.qdl_lang.state.State;
 import org.qdl_lang.variables.QDLStem;
-import edu.uiuc.ncsa.security.core.exceptions.IllegalAccessException;
+import org.qdl_lang.variables.values.BooleanValue;
+import org.qdl_lang.variables.values.QDLValue;
+import org.qdl_lang.variables.values.StringValue;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.qdl_lang.variables.values.QDLValue.asQDLValue;
 
 /**
  * This fills in all of the missing configuration values with their defaults. Sp the contract is
@@ -30,15 +35,15 @@ public class CreateSourceConfig implements QDLFunction, CSConstants {
     }
 
     @Override
-    public Object evaluate(Object[] objects, State state) {
+    public QDLValue evaluate(QDLValue[] objects, State state) {
         if (objects == null || objects.length == 0) {
             throw new IllegalArgumentException(getName() + " requires one argument");
         }
 
-        if (!(objects[0] instanceof QDLStem)) {
+        if (!(objects[0].isStem())) {
             throw new IllegalAccessException(getName() + " requires a stem variable as its argument.");
         }
-        QDLStem arg = (QDLStem) objects[0];
+        QDLStem arg = objects[0].asStem();
         if (!arg.containsKey(CS_DEFAULT_TYPE)) {
             throw new IllegalArgumentException("Error: You must specify a type for the claim source");
         }
@@ -46,19 +51,19 @@ public class CreateSourceConfig implements QDLFunction, CSConstants {
         setBasicValues(arg, output);
         switch (arg.getString(CS_DEFAULT_TYPE)) {
             case CS_TYPE_FILE:
-                return doFS(arg, output);
+                return asQDLValue(doFS(arg, output));
             case CS_TYPE_NCSA:
-                return doNCSA(arg, output);
+                return asQDLValue(doNCSA(arg, output));
             case CS_TYPE_LDAP:
-                return doLDAP(arg, output);
+                return asQDLValue(doLDAP(arg, output));
             case CS_TYPE_FILTER_HEADERS:
-                return doHeaders(arg, output);
+                return asQDLValue(doHeaders(arg, output));
             case CS_TYPE_ALL_HEADERS:
-                return doQDLHeaders(arg, output);
+                return asQDLValue(doQDLHeaders(arg, output));
             case CS_TYPE_CODE:
-                return doCode(arg, output);
+                return asQDLValue(doCode(arg, output));
         }
-        return output;
+        return asQDLValue(output);
     }
 
     private QDLStem doCode(QDLStem arg, QDLStem output) {
@@ -125,7 +130,7 @@ public class CreateSourceConfig implements QDLFunction, CSConstants {
         if (!arg.containsKey(CS_LDAP_SERVER_ADDRESS)) {
             throw new IllegalArgumentException("Error:" + CS_LDAP_SERVER_ADDRESS + " is required for ldap configurations");
         }
-        setValue(arg, output, CS_LDAP_CONTEXT_NAME, "");
+        setValue(arg, output, CS_LDAP_CONTEXT_NAME, new StringValue());
         return output.union(arg);
     }
 
@@ -137,7 +142,7 @@ public class CreateSourceConfig implements QDLFunction, CSConstants {
      * @param argKey
      */
     protected void setValue(QDLStem arg, QDLStem config, String argKey) {
-        setValue(arg, config, argKey, argKey);
+        setValue(arg, config, argKey, asQDLValue(argKey));
     }
 
 
@@ -145,11 +150,13 @@ public class CreateSourceConfig implements QDLFunction, CSConstants {
         if (!arg.containsKey(CS_FILE_FILE_PATH) && !arg.containsKey(CS_FILE_STEM_CLAIMS)) {
             throw new IllegalArgumentException("Error: No " + CS_FILE_FILE_PATH + " specified. You must specify this.");
         }
-        setValue(arg, output, CS_FILE_FILE_PATH, null);
+        if(arg.containsKey(CS_FILE_FILE_PATH)) {
+            setValue(arg, output, CS_FILE_FILE_PATH, null);
+        }
         return output.union(arg);
     }
 
-    protected void setValue(QDLStem arg, QDLStem output, String key, Object defaultValue) {
+    protected void setValue(QDLStem arg, QDLStem output, String key, QDLValue defaultValue) {
         if (arg == null) {
             output.put(key, defaultValue);
             return;
@@ -164,11 +171,11 @@ public class CreateSourceConfig implements QDLFunction, CSConstants {
      * @param output
      */
     protected void setBasicValues(QDLStem arg, QDLStem output) {
-        setValue(arg, output, CS_DEFAULT_TYPE, CS_DEFAULT_TYPE);
-        setValue(arg, output, CS_DEFAULT_IS_ENABLED, Boolean.TRUE);
-        setValue(arg, output, CS_DEFAULT_FAIL_ON_ERROR, Boolean.FALSE);
-        setValue(arg, output, CS_DEFAULT_NOTIFY_ON_FAIL, Boolean.TRUE);
-        setValue(arg, output, CS_DEFAULT_ID, CS_DEFAULT_ID_VALUE);
+        setValue(arg, output, CS_DEFAULT_TYPE, asQDLValue(CS_DEFAULT_TYPE));
+        setValue(arg, output, CS_DEFAULT_IS_ENABLED, BooleanValue.True);
+        setValue(arg, output, CS_DEFAULT_FAIL_ON_ERROR, BooleanValue.False);
+        setValue(arg, output, CS_DEFAULT_NOTIFY_ON_FAIL, BooleanValue.True);
+        setValue(arg, output, CS_DEFAULT_ID, asQDLValue(CS_DEFAULT_ID_VALUE));
     }
 
 
@@ -202,8 +209,8 @@ public class CreateSourceConfig implements QDLFunction, CSConstants {
         mystem.put(CS_LDAP_SEARCH_BASE, "ou=People,dc=ncsa,dc=illinois,dc=edu");
 
         CreateSourceConfig csc = new CreateSourceConfig();
-        System.out.println(((QDLStem) csc.evaluate(new Object[]{"ldap"}, null)).toJSON().toString(1));
-        QDLStem out = (QDLStem) csc.evaluate(new Object[]{mystem}, null);
+        System.out.println(csc.evaluate(new QDLValue[]{new StringValue("ldap")}, null).asStem().toJSON().toString(1));
+        QDLStem out = csc.evaluate(new QDLValue[]{asQDLValue(mystem)}, null).asStem();
         System.out.println(out.toJSON().toString(2));
 
     }

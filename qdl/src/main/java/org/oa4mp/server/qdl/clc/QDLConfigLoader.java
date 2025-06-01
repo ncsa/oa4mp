@@ -212,7 +212,7 @@ public class QDLConfigLoader<T extends OA2ClientEnvironment> extends OA2ClientLo
                     } else {
                         if (obj instanceof QDLStem) {
                             QDLStem ea = (QDLStem) obj;
-                            extendedAttributes.put(key, ea.getQDLList().values());
+                            extendedAttributes.put(key, ea.getQDLList().toStringList());
                         }
                     }
                 }

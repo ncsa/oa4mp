@@ -8,11 +8,14 @@ import org.qdl_lang.extensions.QDLMetaModule;
 import org.qdl_lang.state.State;
 import org.qdl_lang.variables.QDLStem;
 import net.sf.json.JSONObject;
+import org.qdl_lang.variables.values.QDLValue;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static edu.uiuc.ncsa.security.util.scripting.ScriptingConstants.*;
+import static org.qdl_lang.variables.values.QDLValue.asQDLValue;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 10/12/20 at  6:16 AM
@@ -65,17 +68,17 @@ public class RefreshTokenInitializer implements QDLMetaModule {
         protected abstract void doMethod(String execPhase) throws Throwable;
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public QDLValue evaluate(QDLValue[] objects, State state) {
             super.evaluate(objects, state);
             QDLStem rt = checkArg(objects, getName(), 0);
             QDLStem output = new QDLStem();
             getRtHandler().setRTData((JSONObject) rt.toJSON());
             String execPhase = null;
             if (1 < objects.length) {
-                if (!(objects[1] instanceof String)) {
+                if (!(objects[1].isString())) {
                     throw new BadArgException("Error: The second argument must be a string.",1);
                 }
-                execPhase = (String) objects[1];
+                execPhase = objects[1].asString();
             }
             try {
                 //getRtHandler().finish();
@@ -84,7 +87,7 @@ public class RefreshTokenInitializer implements QDLMetaModule {
                 handleException(throwable);
             }
             output.fromJSON(getRtHandler().getPayload());
-            return output;
+            return asQDLValue(output);
         }
 
     }

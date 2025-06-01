@@ -3,8 +3,8 @@ package org.oa4mp.server.loader.qdl;
 import org.oa4mp.server.loader.qdl.acl.AccessControlModule;
 import org.oa4mp.server.loader.qdl.claims.ClaimsModule;
 import org.oa4mp.server.loader.qdl.util.JWTModule;
+import org.qdl_lang.expressions.module.Module;
 import org.qdl_lang.extensions.QDLLoader;
-import org.qdl_lang.module.Module;
 
 import java.util.ArrayList;
 import java.util.List;

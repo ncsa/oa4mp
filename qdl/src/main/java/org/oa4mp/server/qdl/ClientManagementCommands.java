@@ -19,9 +19,13 @@ import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
 import net.sf.json.JSON;
 import net.sf.json.JSONObject;
 import org.apache.commons.configuration.tree.ConfigurationNode;
+import org.qdl_lang.variables.values.BooleanValue;
+import org.qdl_lang.variables.values.QDLValue;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.qdl_lang.variables.values.QDLValue.asQDLValue;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -71,7 +75,7 @@ public class ClientManagementCommands implements QDLMetaModule {
 
     protected void init(String configFile, String cfgName) throws Throwable {
 
-            setConfigurationNode(XMLConfigUtil.findConfiguration(configFile, cfgName, "service"));
+        setConfigurationNode(XMLConfigUtil.findConfiguration(configFile, cfgName, "service"));
         initCalled = true;
     }
 
@@ -94,9 +98,9 @@ public class ClientManagementCommands implements QDLMetaModule {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable {
+        public QDLValue evaluate(QDLValue[] objects, State state) throws Throwable {
             init(objects[0].toString(), objects[1].toString());
-            return true;
+            return BooleanValue.True;
         }
 
 
@@ -124,11 +128,11 @@ public class ClientManagementCommands implements QDLMetaModule {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable {
+        public QDLValue evaluate(QDLValue[] objects, State state) throws Throwable {
             checkInit();
 //            try {
-                OA2Client client = (OA2Client) getEnvironment().getClientStore().get(BasicIdentifier.newID(objects[0].toString()));
-                return toStem(client);
+            OA2Client client = (OA2Client) getEnvironment().getClientStore().get(BasicIdentifier.newID(objects[0].toString()));
+            return asQDLValue(toStem(client));
 /*
             } catch (Throwable t) {
                 throw new QDLException("Error: Could not find the client with id \"" + objects[0].toString() + "\"");
@@ -183,12 +187,12 @@ public class ClientManagementCommands implements QDLMetaModule {
         //  client. := cm#read('${id}')
         // cm#save(client.)
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable{
+        public QDLValue evaluate(QDLValue[] objects, State state) throws Throwable {
             checkInit();
-            if (!(objects[0] instanceof QDLStem)) {
-                throw new BadArgException("The argument must be a stem variable",0);
+            if (!(objects[0].isStem())) {
+                throw new BadArgException("The argument must be a stem variable", 0);
             }
-            QDLStem QDLStem = (QDLStem) objects[0];
+            QDLStem QDLStem = objects[0].asStem();
             JSON jj = QDLStem.toJSON();
             if (jj.isArray()) {
                 throw new BadArgException("The client is not in the expected format.", 0);
@@ -196,12 +200,12 @@ public class ClientManagementCommands implements QDLMetaModule {
 
             JSONObject json = (JSONObject) jj;
             // So reverse the process from the read function
-                JSONObject output = new JSONObject();
-                output.put("client", json); // everything else.
-                OA2ClientConverter converter = (OA2ClientConverter) getEnvironment().getClientStore().getMapConverter();
-                OA2Client client = converter.fromJSON(output);
-                getEnvironment().getClientStore().save(client);
-            return Boolean.TRUE;
+            JSONObject output = new JSONObject();
+            output.put("client", json); // everything else.
+            OA2ClientConverter converter = (OA2ClientConverter) getEnvironment().getClientStore().getMapConverter();
+            OA2Client client = converter.fromJSON(output);
+            getEnvironment().getClientStore().save(client);
+            return BooleanValue.True;
         }
 
 
@@ -228,24 +232,19 @@ public class ClientManagementCommands implements QDLMetaModule {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable{
+        public QDLValue evaluate(QDLValue[] objects, State state) throws Throwable {
             checkInit();
-            String key = objects[0].toString();
-            String regex = objects[1].toString();
+            String key = objects[0].asString();
+            String regex = objects[1].asString();
             int index = 0;
             QDLStem output = new QDLStem();
 
-           // try {
-                List<OA2Client> clients = getEnvironment().getClientStore().search(key, regex, true);
-                // make it in to a list
-                for (OA2Client c : clients) {
-                    output.put(index++ + ".", toStem(c));
-                }
-            /*} catch (Exception e) {
-                e.printStackTrace();
-            }*/
-            return output;
-
+            List<OA2Client> clients = getEnvironment().getClientStore().search(key, regex, true);
+            // make it in to a list
+            for (OA2Client c : clients) {
+                output.put(index++ + ".", toStem(c));
+            }
+            return asQDLValue(output);
         }
 
         @Override
@@ -272,13 +271,9 @@ public class ClientManagementCommands implements QDLMetaModule {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable{
+        public QDLValue evaluate(QDLValue[] objects, State state) throws Throwable {
             checkInit();
-        //    try {
-                return getEnvironment().getClientStore().size();
-        /*    } catch (Exception e) {
-                throw new QDLException("Error: COuld not determine the size of the store:" + e.getMessage(), e);
-            }*/
+            return asQDLValue( getEnvironment().getClientStore().size());
         }
 
 
@@ -305,11 +300,11 @@ public class ClientManagementCommands implements QDLMetaModule {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable{
+        public QDLValue evaluate(QDLValue[] objects, State state) throws Throwable {
             checkInit();
-                Identifier id = BasicIdentifier.newID(objects[0].toString());
-                getEnvironment().getClientStore().remove(id);
-         return Boolean.TRUE;
+            Identifier id = BasicIdentifier.newID(objects[0].toString());
+            getEnvironment().getClientStore().remove(id);
+            return BooleanValue.True;
         }
 
 
@@ -336,15 +331,15 @@ public class ClientManagementCommands implements QDLMetaModule {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable{
+        public QDLValue evaluate(QDLValue[] objects, State state) throws Throwable {
             checkInit();
             OA2ClientConverter cc = null;
-                cc = (OA2ClientConverter) getEnvironment().getClientStore().getMapConverter();
-          List<Object> x = new ArrayList<>();
+            cc = (OA2ClientConverter) getEnvironment().getClientStore().getMapConverter();
+            List<Object> x = new ArrayList<>();
             x.addAll(cc.getKeys().allKeys());
             QDLStem QDLStem = new QDLStem();
             QDLStem.addList(x);
-            return QDLStem;
+            return asQDLValue(QDLStem);
         }
 
 
@@ -374,34 +369,34 @@ public class ClientManagementCommands implements QDLMetaModule {
         //  q. := cm#search('client_id', '.*23.*')
         //   cm#approve(q.0.client_id)
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable{
+        public QDLValue evaluate(QDLValue[] objects, State state) throws Throwable {
             checkInit();
 
             Identifier id = BasicIdentifier.newID(objects[0].toString());
 
             Boolean toApprove = null;
             if (objects.length == 2) {
-                if (!(objects[1] instanceof Boolean)) {
-                    throw new BadArgException("The second argument must be a boolean.",1);
+                if (!(objects[1].isBoolean())) {
+                    throw new BadArgException("The second argument must be a boolean.", 1);
                 }
-                toApprove = (Boolean) objects[1];
+                toApprove = objects[1].asBoolean();
             }
 
-                Boolean isApproved = getEnvironment().getClientApprovalStore().isApproved(id);
-                if (objects.length == 1) {
-                    return isApproved;
+            Boolean isApproved = getEnvironment().getClientApprovalStore().isApproved(id);
+            if (objects.length == 1) {
+                return asQDLValue(isApproved);
+            }
+            ClientApproval approval = new ClientApproval(id);
+            approval.setApproved(toApprove);
+            if (toApprove) {
+                approval.setStatus(ClientApproval.Status.APPROVED);
+            } else {
+                if (!isApproved) {
+                    approval.setStatus(ClientApproval.Status.REVOKED);
                 }
-                ClientApproval approval = new ClientApproval(id);
-                approval.setApproved(toApprove);
-                if (toApprove) {
-                    approval.setStatus(ClientApproval.Status.APPROVED);
-                } else {
-                    if (!isApproved) {
-                        approval.setStatus(ClientApproval.Status.REVOKED);
-                    }
-                }
-                getEnvironment().getClientApprovalStore().save(approval);
-                return isApproved;
+            }
+            getEnvironment().getClientApprovalStore().save(approval);
+            return asQDLValue(isApproved);
         }
 
 

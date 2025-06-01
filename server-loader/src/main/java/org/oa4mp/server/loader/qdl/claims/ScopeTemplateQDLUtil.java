@@ -8,14 +8,18 @@ import org.qdl_lang.expressions.ConstantNode;
 import org.qdl_lang.expressions.Polyad;
 import org.qdl_lang.extensions.QDLFunction;
 import org.qdl_lang.state.State;
-import org.qdl_lang.variables.QDLList;
-import org.qdl_lang.variables.QDLNull;
 import org.qdl_lang.variables.QDLStem;
+import org.qdl_lang.variables.values.LongValue;
+import org.qdl_lang.variables.values.QDLValue;
+import org.qdl_lang.variables.values.StemValue;
+import org.qdl_lang.variables.values.StringValue;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import static org.qdl_lang.variables.values.QDLValue.asQDLValue;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -37,41 +41,41 @@ public class ScopeTemplateQDLUtil implements Serializable {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public QDLValue evaluate(QDLValue[] objects, State state) {
             // 2 stems and a boolean
 
-            if(objects[0] == null || objects[0] == QDLNull.getInstance()){
+            if(objects[0] == null || objects[0].isNull()){
                 // no computed scopes
-                return new QDLStem(); // no computed scopes means nothing to return.
+                return new StemValue(); // no computed scopes means nothing to return.
             }
 
-            if(objects[0] instanceof QDLList){
+       /*     if(objects[0] instanceof QDLList){
                 if(((QDLList)objects[0]).isEmpty()){
                     return new QDLStem();
                 }
-            }
+            }*/
 
-            if (!(objects[0] instanceof QDLStem)) {
+            if (!(objects[0].isStem())) {
                 throw new BadArgException(" " + getName() +"(0)  (computed scopes) must be a stem, got a '" + objects[0] + "'",0);
             }
-            QDLStem allowedStem = (QDLStem) objects[0];
+            QDLStem allowedStem = objects[0].asStem();
             if(allowedStem.isEmpty()){
-                return new QDLStem();
+                return new StemValue();
             }
-            if (!(objects[1] instanceof QDLStem)) {
+            if (!(objects[1].isStem())) {
                 throw new BadArgException(" " + getName() + "(1) (requested scopes)  must be a stem, got a '" + objects[1] + "'",1);
             }
 
-            QDLStem requestedStem = (QDLStem) objects[1];
+            QDLStem requestedStem = objects[1].asStem();
             if(requestedStem.isEmpty()){
-                return new QDLStem();
+                return new StemValue();
             }
-            if (!(objects[2] instanceof Boolean)) {
+            if (!(objects[2].isBoolean())) {
                 throw new BadArgException(" " + getName() + "(2) (queries available scopes?)  must be a boolean, got '" + objects[2] + "'.",2);
             }
 
-            Boolean isQuery = (Boolean) objects[2];
-            return doIt(allowedStem, requestedStem, isQuery);
+            Boolean isQuery = objects[2].asBoolean();
+            return asQDLValue(doIt(allowedStem, requestedStem, isQuery));
         }
 
         @Override
@@ -113,22 +117,6 @@ public class ScopeTemplateQDLUtil implements Serializable {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
-            // 2 stems and a boolean
-            if (!(objects[0] instanceof QDLStem)) {
-                throw new BadArgException("Error: The first argument (for the computed scopes) must be a stem.",0);
-            }
-            QDLStem allowedStem = (QDLStem) objects[0];
-            if (!(objects[1] instanceof QDLStem)) {
-                throw new BadArgException("Error: The second argument (for the requested scopes) must be a stem.",1);
-            }
-
-            QDLStem requestedStem = (QDLStem) objects[1];
-
-            return doIt(allowedStem, requestedStem, true);
-        }
-
-        @Override
         public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
             doxx.add(getName() + "(allowed_scopes., requested_scopes.)");
@@ -145,6 +133,22 @@ public class ScopeTemplateQDLUtil implements Serializable {
             doxx.add("N.B: " + QUERY_SCOPES_NAME + "('x.,y.) == " + RESOLVE_TEMPLATES_NAME + "(x.,y., true)");
             doxx.add("See also: " + DOWNSCOPE_NAME + ", " + RESOLVE_TEMPLATES_NAME);
             return doxx;
+        }
+
+        @Override
+        public QDLValue evaluate(QDLValue[] objects, State state) {
+            // 2 stems and a boolean
+            if (!(objects[0].isStem())) {
+                throw new BadArgException("Error: The first argument (for the computed scopes) must be a stem.",0);
+            }
+            QDLStem allowedStem = objects[0].asStem();
+            if (!(objects[1].isStem())) {
+                throw new BadArgException("Error: The second argument (for the requested scopes) must be a stem.",1);
+            }
+
+            QDLStem requestedStem =  objects[1].asStem()  ;
+
+            return asQDLValue(doIt(allowedStem, requestedStem, true));
         }
     }
 
@@ -163,19 +167,19 @@ public class ScopeTemplateQDLUtil implements Serializable {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public QDLValue evaluate(QDLValue[] objects, State state) {
             // 2 stems and a boolean
 
-            if (!(objects[0] instanceof QDLStem)) {
+            if (!(objects[0].isStem())) {
                 throw new BadArgException("Error: The first argument (for the computed scopes) must be a stem.",0);
             }
-            QDLStem allowedStem = (QDLStem) objects[0];
-            if (!(objects[1] instanceof QDLStem)) {
+            QDLStem allowedStem = objects[0].asStem();
+            if (!(objects[1].isStem())) {
                 throw new BadArgException("Error: The second argument (for the requested scopes) must be a stem.",1);
             }
 
-            QDLStem requestedStem = (QDLStem) objects[1];
-            return doIt(allowedStem, requestedStem, false);
+            QDLStem requestedStem = objects[1].asStem();
+            return asQDLValue(doIt(allowedStem, requestedStem, false));
         }
 
         @Override
@@ -230,20 +234,20 @@ public class ScopeTemplateQDLUtil implements Serializable {
          * @return
          */
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public QDLValue evaluate(QDLValue[] objects, State state) {
             QDLStem parameters;
-            if (objects[0] instanceof QDLStem) {
-                parameters = (QDLStem) objects[0];
+            if (objects[0].isStem()) {
+                parameters = objects[0].asStem();
             } else {
                 throw new BadArgException(TO_SCOPE_STRING_NAME + " requires a stem as its argument",0);
             }
             //access_token.'scope' := detokenize(unique(permissions.), ' ', 2); // turn in to string, omit
             Polyad unique = new Polyad(StemEvaluator.UNIQUE_VALUES);
-            unique.addArgument(new ConstantNode(parameters));
+            unique.addArgument(new ConstantNode(asQDLValue(parameters)));
             Polyad detokenize = new Polyad(StringEvaluator.DETOKENIZE);
             detokenize.addArgument(unique);
-            detokenize.addArgument(new ConstantNode(" "));
-            detokenize.addArgument(new ConstantNode(2L));
+            detokenize.addArgument(new ConstantNode(new StringValue(" ")));
+            detokenize.addArgument(new ConstantNode(new LongValue(2L)));
             detokenize.evaluate(state);
 
 

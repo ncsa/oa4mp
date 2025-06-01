@@ -12,12 +12,15 @@ import org.qdl_lang.extensions.QDLFunction;
 import org.qdl_lang.extensions.QDLMetaModule;
 import org.qdl_lang.state.State;
 import org.qdl_lang.variables.Constant;
-import org.qdl_lang.variables.QDLStem;
+import org.qdl_lang.variables.values.BooleanValue;
+import org.qdl_lang.variables.values.QDLValue;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
+
+import static org.qdl_lang.variables.values.QDLValue.asQDLValue;
 
 /**
  * <H2>ACL Use</H2>
@@ -82,7 +85,7 @@ public class QDLACL implements QDLMetaModule {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public QDLValue evaluate(QDLValue[] objects, State state) {
             acceptOrReject(objects, state, getName(), false);
             return null;
         }
@@ -107,7 +110,7 @@ public class QDLACL implements QDLMetaModule {
 
     public static String ADD_TO_ACL_NAME = "acl_add";
 
-    protected Boolean acceptOrReject(Object[] objects,
+    protected Boolean acceptOrReject(QDLValue[] qdlValues,
                                      State state,
                                      String name,
                                      boolean accept // accept or reject refers to which method invoked this: add or blacklist
@@ -116,17 +119,17 @@ public class QDLACL implements QDLMetaModule {
             throw new IllegalArgumentException("Error: This requires an OA2State object.");
         }
         OA2State oa2State = (OA2State) state;
-        if (objects.length == 0) {
+        if (qdlValues.length == 0) {
             throw new IllegalArgumentException("Error: " + name + " requires an argument");
         }
         List<Object> ids;
-        switch (Constant.getType(objects[0])) {
+        switch (qdlValues[0].getType()) {
             case Constant.STEM_TYPE:
-                ids = ((QDLStem) objects[0]).getQDLList().toJSON();
+                ids = qdlValues[0].asStem().getQDLList().toJSON();
                 break;
             case Constant.STRING_TYPE:
                 ids = new ArrayList<>();
-                ids.add((String) objects[0]);
+                ids.add(qdlValues[0].asString());
                 break;
             default:
                 throw new BadArgException("Error: " + name + " requires a string or stem as its argument",0);
@@ -134,11 +137,11 @@ public class QDLACL implements QDLMetaModule {
         }
         // Fix CIL-1668
         boolean failOnBadIds = false;
-        if (objects.length == 2) {
-            if (!(objects[1] instanceof Boolean)) {
+        if (qdlValues.length == 2) {
+            if (!(qdlValues[1].isBoolean())) {
                 throw new BadArgException("Error: " + name + " requires a boolean as its second argument",1);
             }
-            failOnBadIds = (Boolean) objects[1];
+            failOnBadIds = qdlValues[1].asBoolean();
         }
         ArrayList<String> badIds = new ArrayList<>();
         for (Object id : ids) {
@@ -210,8 +213,8 @@ public class QDLACL implements QDLMetaModule {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
-            return acceptOrReject(objects, state, getName(), true);
+        public QDLValue evaluate(QDLValue[] objects, State state) {
+            return asQDLValue(acceptOrReject(objects, state, getName(), true));
         }
 
 
@@ -254,7 +257,7 @@ public class QDLACL implements QDLMetaModule {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public QDLValue evaluate(QDLValue[] objects, State state) {
             if (!(state instanceof OA2State)) {
                 throw new IllegalArgumentException(" This requires an OA2State object.");
             }
@@ -284,54 +287,22 @@ public class QDLACL implements QDLMetaModule {
                 if (oa2State.isStrictACLs()) {
                     throw new QDLIllegalAccessException(" client '" + oa2State.getClientID() + "' does not have permission to access this resource.");
                 }
-                return Boolean.FALSE;
+                return BooleanValue.False;
             }
             if (getWhiteList().contains(ACL_ACCEPT_ALL.toString())) {
-                return Boolean.TRUE;
+                return BooleanValue.True;
             }
             // Direct check.
             if (getWhiteList().contains(oa2State.getClientID().toString())) {
-                return Boolean.TRUE;
+                return BooleanValue.True;
             }
             for (Identifier adminID : oa2State.getAdminIDs()) {
                 if (getWhiteList().contains(adminID.toString())) {
-                    return Boolean.TRUE;
+                    return BooleanValue.True;
                 }
             }
             throw new QDLIllegalAccessException("Error: client '" + oa2State.getClientID() + "' does not have permission to access this resource.");
 
-            // ===========
-/*
-            if (oa2State.getAclBlackList().contains(oa2State.getClientID())) {
-                // Full stop.
-                throw new QDLIllegalAccessException(" client '" + oa2State.getClientID() + "' does not have permission to access this resource.");
-            }
-            for (Identifier adminID : oa2State.getAdminIDs()) {
-                if (oa2State.getAclBlackList().contains(adminID)) {
-                    throw new QDLIllegalAccessException(" client '" + oa2State.getClientID() + "' does not have permission to access this resource.");
-                }
-            }
-            if (oa2State.getAclList().isEmpty()) {
-                if (oa2State.isStrictACLs()) {
-                    throw new QDLIllegalAccessException(" client '" + oa2State.getClientID() + "' does not have permission to access this resource.");
-                }
-                return Boolean.FALSE;
-            }
-            if (oa2State.getAclList().contains(ACL_ACCEPT_ALL)) {
-                return Boolean.TRUE;
-            }
-            // Direct check.
-            if (oa2State.getAclList().contains(oa2State.getClientID())) {
-                return Boolean.TRUE;
-            }
-            for (Identifier adminID : oa2State.getAdminIDs()) {
-                if (oa2State.getAclList().contains(adminID)) {
-                    return Boolean.TRUE;
-                }
-            }
-            throw new QDLIllegalAccessException("Error: client '" + oa2State.getClientID() + "' does not have permission to access this resource.");
-
-*/
         }
 
         @Override

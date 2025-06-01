@@ -20,6 +20,10 @@ import org.qdl_lang.state.State;
 import org.qdl_lang.variables.QDLList;
 import org.qdl_lang.variables.QDLNull;
 import org.qdl_lang.variables.QDLStem;
+import org.qdl_lang.variables.values.BooleanValue;
+import org.qdl_lang.variables.values.QDLNullValue;
+import org.qdl_lang.variables.values.QDLValue;
+import org.qdl_lang.variables.values.StringValue;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -29,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
+import static org.qdl_lang.variables.values.QDLValue.asQDLValue;
 
 /**
  * The class with the inner classes that do all the work here.
@@ -136,17 +141,17 @@ public class StoreFacade /*implements QDLMetaModule*/ {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable {
+        public QDLValue evaluate(QDLValue[] objects, State state) throws Throwable {
             boolean verboseOn = false;
             switch (objects.length) {
                 case 0:
                     // used for re-initializing this, e.g. post serialization.
                     break;
                 case 1:
-                    if (!(objects[0] instanceof QDLStem)) {
-                        throw new BadArgException("monadic " + getName() + " requires  a stem.",0);
+                    if (!(objects[0].isStem())) {
+                        throw new BadArgException("monadic " + getName() + " requires  a stem.", 0);
                     }
-                    QDLStem stem = (QDLStem) objects[0];
+                    QDLStem stem = objects[0].asStem();
                     file = stem.getString(FILE_ARG);
                     cfgName = stem.getString(NAME_ARG);
                     storeType = stem.getString(TYPE_ARG);
@@ -155,36 +160,36 @@ public class StoreFacade /*implements QDLMetaModule*/ {
                     }
                     break;
                 case 2:
-                    if (!(objects[0] instanceof QDLStem)) {
-                        throw new BadArgException("dyadic " + getName() + " requires a stem as its first argument",0);
+                    if (!(objects[0].isStem())) {
+                        throw new BadArgException("dyadic " + getName() + " requires a stem as its first argument", 0);
                     }
-                    QDLStem stem2 = (QDLStem) objects[0];
-                    if (!(objects[1] instanceof String)) {
-                        throw new BadArgException("dyadic " + getName() + " requires a string, the store type, as its second argument",1);
+                    QDLStem stem2 = objects[0].asStem();
+                    if (!objects[1].isString()) {
+                        throw new BadArgException("dyadic " + getName() + " requires a string, the store type, as its second argument", 1);
                     }
                     file = stem2.getString(FILE_ARG);
                     cfgName = stem2.getString(NAME_ARG);
-                    storeType = (String) objects[1];
+                    storeType = objects[1].asString();
                     if (stem2.containsKey(VERBOSE_ON_ARG)) {
                         verboseOn = stem2.getBoolean(VERBOSE_ON_ARG);
                     }
                     break;
                 case 3:
                     for (int j = 0; j < objects.length; j++) {
-                        if (!(objects[j] instanceof String)) {
-                            throw new BadArgException(" argument " + j + " must be a string.",j);
+                        if (!(objects[j].isString())) {
+                            throw new BadArgException(" argument " + j + " must be a string.", j);
                         }
                     }
-                    file = (String) objects[0];
-                    cfgName = (String) objects[1];
-                    storeType = (String) objects[2];
+                    file = objects[0].asString();
+                    cfgName = objects[1].asString();
+                    storeType = objects[2].asString();
                     break;
                 default:
                     throw new IllegalArgumentException("Incorrect argument count");
             }
 
             doSetup(verboseOn);
-            return true;
+            return BooleanValue.True;
         }
 
         /*
@@ -325,29 +330,29 @@ public class StoreFacade /*implements QDLMetaModule*/ {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
-            if (!(objects[0] instanceof QDLStem)) {
-                throw new BadArgException(getName() + " requires a stem argument.",0);
+        public QDLValue evaluate(QDLValue[] objects, State state) {
+            if (!(objects[0].isStem())) {
+                throw new BadArgException(getName() + " requires a stem argument.", 0);
             }
-            QDLStem stem = (QDLStem) objects[0];
+            QDLStem stem = objects[0].asStem();
             if (stem.isEmpty()) {
-                return "";
+                return new StringValue();
             }
             // last hurdle, make sure it's not just a list of stems
             if (!stem.isList()) {
-                return getStoreAccessor().toXML((QDLStem) objects[0]);
+                return asQDLValue(getStoreAccessor().toXML(objects[0].asStem()));
             }
             QDLStem out = new QDLStem();
             for (Object key : stem.keySet()) {
                 try {
                     // Skip items that fail, replacing them with nulls
-                    out.putLongOrString(key, getStoreAccessor().toXML((QDLStem) stem.get(key)));
+                    out.putLongOrString(key, getStoreAccessor().toXML(stem.get(key).asStem()));
                 } catch (Throwable t) {
                     getLogger().warn("Could not convert object to XML:" + t.getMessage(), t);
-                    out.putLongOrString(key, QDLNull.getInstance());
+                    out.putLongOrString(key, QDLNullValue.getNullValue());
                 }
             }
-            return out;
+            return asQDLValue(out);
         }
 
         @Override
@@ -377,14 +382,14 @@ public class StoreFacade /*implements QDLMetaModule*/ {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
-            if ((objects[0] instanceof String)) {
-                return getStoreAccessor().fromXML((String) objects[0]);
+        public QDLValue evaluate(QDLValue[] objects, State state) {
+            if ((objects[0].isString())) {
+                return asQDLValue(getStoreAccessor().fromXML(objects[0].asString()));
             }
-            if (!(objects[0] instanceof QDLStem)) {
-                throw new BadArgException(getName() + " requires a string argument or stem of them,.",0);
+            if (!(objects[0].isStem())) {
+                throw new BadArgException(getName() + " requires a string argument or stem of them,.", 0);
             }
-            QDLStem arg = (QDLStem) objects[0];
+            QDLStem arg = objects[0].asStem();
             QDLStem out = new QDLStem();
             for (Object key : arg.keySet()) {
                 Object obj = arg.get(key);
@@ -395,7 +400,7 @@ public class StoreFacade /*implements QDLMetaModule*/ {
                 }
 
             }
-            return out;
+            return asQDLValue(out);
         }
 
         @Override
@@ -432,14 +437,14 @@ public class StoreFacade /*implements QDLMetaModule*/ {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public QDLValue evaluate(QDLValue[] objects, State state) {
             if (objects.length == 1) {
-                if (objects[0] instanceof String) {
-                    return getStoreAccessor().create((String) objects[0]);
+                if (objects[0].isString()) {
+                    return asQDLValue(getStoreAccessor().create(objects[0].asString()));
                 }
-                throw new BadArgException(" The argument must be a string identifier.",0);
+                throw new BadArgException(" The argument must be a string identifier.", 0);
             }
-            return getStoreAccessor().create(null);
+            return asQDLValue(getStoreAccessor().create(null));
         }
 
         @Override
@@ -470,43 +475,43 @@ public class StoreFacade /*implements QDLMetaModule*/ {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable {
+        public QDLValue evaluate(QDLValue[] objects, State state) throws Throwable {
             checkInit();
             boolean isScalar = false;
             if (objects.length == 2) {
                 // then it is of the form (id, int)
-                if (!(objects[0] instanceof String)) {
-                    throw new BadArgException("dyadic " + getName() + " requires a string as its first argument",0);
+                if (!(objects[0].isString())) {
+                    throw new BadArgException("dyadic " + getName() + " requires a string as its first argument", 0);
                 }
-                if (!(objects[1] instanceof Long)) {
-                    throw new BadArgException("dyadic " + getName() + " requires an integer as its seconds argument",1);
+                if (!(objects[1].isLong())) {
+                    throw new BadArgException("dyadic " + getName() + " requires an integer as its seconds argument", 1);
 
                 }
-                QDLStem QDLStem = getStoreAccessor().getVersion(BasicIdentifier.newID((String) objects[0]), (Long) objects[1]);
+                QDLStem QDLStem = getStoreAccessor().getVersion(BasicIdentifier.newID(objects[0].asString()), objects[1].asLong());
                 if (QDLStem.isEmpty()) {
-                    return QDLNull.getInstance();
+                    return QDLNullValue.getNullValue();
                 }
-                return QDLStem;
+                return asQDLValue(QDLStem);
             }
             // only length 1 allowed at this point
             // most basic case. Just asking for an id.
-            if (objects[0] instanceof String) {
-                return getSingleEntry(objects[0]);
+            if (objects[0].isString()) {
+                return asQDLValue(getSingleEntry(objects[0]));
             }
-            if (!(objects[0] instanceof QDLStem)) {
-                throw new BadArgException("monadic " + getName() + " requires a stem as its first argument",0);
+            if (!(objects[0].isStem())) {
+                throw new BadArgException("monadic " + getName() + " requires a stem as its first argument", 0);
             }
-            QDLStem argStem = (QDLStem) objects[0];
+            QDLStem argStem = objects[0].asStem();
             if (argStem.isList()) {
                 // then it is assumed to be [id, int] and a version
                 if (isValueStem(argStem)) {
                     // this is a simple versioned id.
                     QDLList ql = argStem.getQDLList();
-                    QDLStem QDLStem = getStoreAccessor().getVersion(BasicIdentifier.newID((String) ql.get(0L)), (Long) ql.get(1L));
+                    QDLStem QDLStem = getStoreAccessor().getVersion(BasicIdentifier.newID(ql.get(0L).asString()), ql.get(1L).asLong());
                     if (QDLStem.isEmpty()) {
-                        return QDLNull.getInstance();
+                        return QDLNullValue.getNullValue();
                     }
-                    return QDLStem;
+                    return asQDLValue(QDLStem);
                 }
             }
 
@@ -514,19 +519,19 @@ public class StoreFacade /*implements QDLMetaModule*/ {
             // Finally, we have a generic stem of id or [id,version]
             QDLStem outStem = new QDLStem();
             for (Object key : argStem.keySet()) {
-                Object value = argStem.get(key);
+                QDLValue value = argStem.get(key);
                 Object result = QDLNull.getInstance();
-                if (value instanceof String) {
+                if (value.isString()) {
                     result = getSingleEntry(value);
                 }
-                if (isValueStem(value)) {
-                    QDLList ql = ((QDLStem) value).getQDLList();
+                if (value.isStem()) {
+                    QDLList ql = value.asStem().getQDLList();
                     result = getVersionedSingleEntry(ql.get(0L), ql.get(1L));
                 }
                 outStem.putLongOrString(key, result);
             }
 
-            return outStem;
+            return asQDLValue(outStem);
         }
 
 
@@ -536,16 +541,16 @@ public class StoreFacade /*implements QDLMetaModule*/ {
          * @param object
          * @return
          */
-        private Object getSingleEntry(Object object) {
-            QDLStem QDLStem = getStoreAccessor().get(BasicIdentifier.newID((String) object));
+        private Object getSingleEntry(QDLValue object) {
+            QDLStem QDLStem = getStoreAccessor().get(BasicIdentifier.newID(object.asString()));
             if (QDLStem.isEmpty()) {
-                return QDLNull.getInstance();
+                return QDLNullValue.getNullValue();
             }
             return QDLStem;
         }
 
-        private Object getVersionedSingleEntry(Object object, Object version) throws IOException {
-            QDLStem QDLStem = getStoreAccessor().getVersion(BasicIdentifier.newID((String) object), (Long) version);
+        private Object getVersionedSingleEntry(QDLValue object, Object version) throws IOException {
+            QDLStem QDLStem = getStoreAccessor().getVersion(BasicIdentifier.newID(object.asString()), (Long) version);
             if (QDLStem.isEmpty()) {
                 return QDLNull.getInstance();
             }
@@ -580,7 +585,7 @@ public class StoreFacade /*implements QDLMetaModule*/ {
             return false;
         }
         QDLList ql = ((QDLStem) value).getQDLList();
-        return ql.size() == 2 && (ql.get(0L) instanceof String) && (ql.get(1L) instanceof Long);
+        return ql.size() == 2 && (ql.get(0L).isString()) && (ql.get(1L).isLong());
     }
 
     protected String UPDATE_NAME = "update";
@@ -597,22 +602,22 @@ public class StoreFacade /*implements QDLMetaModule*/ {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public QDLValue evaluate(QDLValue[] objects, State state) {
             checkInit();
-            if (!(objects[0] instanceof QDLStem)) {
-                throw new BadArgException(" The argument must be a stem variable",0);
+            if (!(objects[0].isStem())) {
+                throw new BadArgException(" The argument must be a stem variable", 0);
             }
-            QDLStem QDLStem = (QDLStem) objects[0];
+            QDLStem QDLStem = objects[0].asStem();
             List<Boolean> out = getStoreAccessor().saveOrUpdate(QDLStem, false);
             if (out.size() == 0) {
-                return Boolean.FALSE;
+                return BooleanValue.False;
             }
             if (out.size() == 1) {
-                return out.get(0);
+                return asQDLValue(out.get(0));
             }
             QDLStem QDLStem1 = new QDLStem();
             QDLStem1.addList(out);
-            return QDLStem1;
+            return asQDLValue(QDLStem1);
         }
 
         @Override
@@ -641,22 +646,22 @@ public class StoreFacade /*implements QDLMetaModule*/ {
         //  client. := cm#read('${id}')
         // cm#save(client.)
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public QDLValue evaluate(QDLValue[] objects, State state) {
             checkInit();
-            if (!(objects[0] instanceof QDLStem)) {
-                throw new BadArgException(" The argument must be a stem variable",0);
+            if (!(objects[0].isStem())) {
+                throw new BadArgException(" The argument must be a stem variable", 0);
             }
-            QDLStem QDLStem = (QDLStem) objects[0];
+            QDLStem QDLStem = objects[0].asStem();
             List<Boolean> out = getStoreAccessor().saveOrUpdate(QDLStem, true);
             if (out.size() == 0) {
-                return Boolean.FALSE;
+                return BooleanValue.False;
             }
             if (out.size() == 1) {
-                return out.get(0);
+                return asQDLValue(out.get(0));
             }
             QDLStem QDLStem1 = new QDLStem();
             QDLStem1.addList(out);
-            return QDLStem1;
+            return asQDLValue(QDLStem1);
         }
 
 
@@ -684,11 +689,11 @@ public class StoreFacade /*implements QDLMetaModule*/ {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public QDLValue evaluate(QDLValue[] objects, State state) {
             checkInit();
-            String key = objects[0].toString();
-            String regex = objects[1].toString();
-            return getStoreAccessor().search(key, regex, true);
+            String key = objects[0].asString();
+            String regex = objects[1].asString();
+            return asQDLValue(getStoreAccessor().search(key, regex, true));
         }
 
         @Override
@@ -716,17 +721,17 @@ public class StoreFacade /*implements QDLMetaModule*/ {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public QDLValue evaluate(QDLValue[] objects, State state) {
             checkInit();
             boolean includeVersions = false;
             if (objects.length == 1) {
-                if (objects[0] instanceof Boolean) {
-                    includeVersions = (Boolean) objects[0];
+                if (objects[0].isBoolean()) {
+                    includeVersions = objects[0].asBoolean();
                 } else {
-                    throw new BadArgException("The first argument of " + COUNT_NAME + ", if present, must be a boolean.",0);
+                    throw new BadArgException("The first argument of " + COUNT_NAME + ", if present, must be a boolean.", 0);
                 }
             }
-            return getStoreAccessor().size(includeVersions);
+            return asQDLValue(getStoreAccessor().size(includeVersions));
         }
 
 
@@ -761,19 +766,19 @@ public class StoreFacade /*implements QDLMetaModule*/ {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public QDLValue evaluate(QDLValue[] objects, State state) {
             //checkInit();
 
             if (objects.length == 1) {
-                if ((objects[0] instanceof Boolean)) {
-                    if ((Boolean) objects[0]) {
-                        return getStoreAccessor().getStoreKeys().identifier();
+                if ((objects[0].isBoolean())) {
+                    if (objects[0].asBoolean()) {
+                        return asQDLValue(getStoreAccessor().getStoreKeys().identifier());
                     }
                 } else {
-                    throw new BadArgException(getName() + " requires a boolean as its argument if present",0);
+                    throw new BadArgException(getName() + " requires a boolean as its argument if present", 0);
                 }
             }
-            return getStoreAccessor().listKeys();
+            return asQDLValue(getStoreAccessor().listKeys());
         }
 
 
@@ -809,33 +814,33 @@ public class StoreFacade /*implements QDLMetaModule*/ {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public QDLValue evaluate(QDLValue[] objects, State state) {
             checkInit();
             if (objects.length == 2) {
-                if (!(objects[0] instanceof String)) {
-                    throw new BadArgException("dyadic " + getName() + " requires a string as its first argument.",0);
+                if (!(objects[0].isString())) {
+                    throw new BadArgException("dyadic " + getName() + " requires a string as its first argument.", 0);
                 }
-                if (!(objects[1] instanceof Long)) {
-                    throw new BadArgException("dyadic " + getName() + " requires a long as its second argument.",1);
+                if (!(objects[1].isLong())) {
+                    throw new BadArgException("dyadic " + getName() + " requires a long as its second argument.", 1);
                 }
-                getStoreAccessor().getStoreArchiver().remove(BasicIdentifier.newID((String) objects[0]), (Long) objects[1]);
-                return Boolean.TRUE;
+                getStoreAccessor().getStoreArchiver().remove(BasicIdentifier.newID(objects[0].asString()), objects[1].asLong());
+                return BooleanValue.True;
             }
             String id = null;
-            if (objects[0] instanceof String) {
-                id = (String) objects[0];
-                return getStoreAccessor().remove(BasicIdentifier.newID(id));
+            if (objects[0].isString()) {
+                id = objects[0].asString();
+                return asQDLValue(getStoreAccessor().remove(BasicIdentifier.newID(id)));
             }
-            if (!(objects[0] instanceof QDLStem)) {
-                throw new BadArgException("monadic " + getName() + " requires a string as its first argument.",0);
+            if (!(objects[0].isStem())) {
+                throw new BadArgException("monadic " + getName() + " requires a string as its first argument.", 0);
             }
-            QDLStem arg = (QDLStem) objects[0];
+            QDLStem arg = objects[0].asStem();
             QDLStem outStem = new QDLStem();
             for (Object key : arg.keySet()) {
-                Object value = arg.get(key);
-                if (value instanceof String) {
-                    outStem.putLongOrString(key, getStoreAccessor().remove(BasicIdentifier.newID((String) value)));
-                }else{
+                QDLValue value = arg.get(key);
+                if (value.isString()) {
+                    outStem.putLongOrString(key, getStoreAccessor().remove(BasicIdentifier.newID(value.asString())));
+                } else {
                     VID vid = toVID(value);
                     if (vid != null) {
                         try {
@@ -847,20 +852,20 @@ public class StoreFacade /*implements QDLMetaModule*/ {
                     }
                 }
             }
-            return outStem;
+            return asQDLValue(outStem);
         }
 
 
         @Override
         public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
-            switch (argCount){
+            switch (argCount) {
                 case 1:
                     doxx.add(getName() + "(id | ids.) - delete a single object with id, or a stem of them.");
                     doxx.add("The elements of the stem may be simple strings or [id, version] pairs.");
                     break;
                 case 2:
-                    doxx.add(getName()+ "(id, version) - remove the given version from the system.");
+                    doxx.add(getName() + "(id, version) - remove the given version from the system.");
                     break;
             }
             doxx.add("This returns a conformable argument with a true if the object is no longer on the");
@@ -886,6 +891,7 @@ public class StoreFacade /*implements QDLMetaModule*/ {
             return getStoreTypes();
         }
     }
+
     /**
      * Convert a list of objects to version id stems. The name is the name of the calling function, so
      * error can be better created.
@@ -894,7 +900,7 @@ public class StoreFacade /*implements QDLMetaModule*/ {
      * @param name
      * @return
      */
-    protected QDLStem convertArgsToVersionIDs(Object[] objects, String name) {
+    protected QDLStem convertArgsToVersionIDs(QDLValue[] objects, String name) {
         QDLStem out = null;
         if (2 < objects.length) {
             throw new IllegalArgumentException("too many arguments for " + name + ".");
@@ -902,30 +908,30 @@ public class StoreFacade /*implements QDLMetaModule*/ {
         if (objects.length == 2) {
             out = new QDLStem();
             QDLStem id = new QDLStem();
-            if (!(objects[0] instanceof String)) {
-                throw new BadArgException("dyadic " + name + " requires a string as its first argument",0);
+            if (!(objects[0].isString())) {
+                throw new BadArgException("dyadic " + name + " requires a string as its first argument", 0);
             }
             id.put(0L, objects[0]);
-            if (!(objects[1] instanceof Long)) {
-                throw new BadArgException("dyadic " + name + " requires an integer as its second argument",1 );
+            if (!(objects[1].isLong())) {
+                throw new BadArgException("dyadic " + name + " requires an integer as its second argument", 1);
             }
             id.put(1L, objects[1]);
             out.put(0L, id);
             return out;
         }
         // So a single argument
-        if (!(objects[0] instanceof QDLStem)) {
-            throw new BadArgException("monadic " + name + " requires stem as its argument",0);
+        if (!(objects[0].isStem())) {
+            throw new BadArgException("monadic " + name + " requires stem as its argument", 0);
         }
 
-        QDLStem temp = (QDLStem) objects[0];
+        QDLStem temp = objects[0].asStem();
         if (temp.isList() && temp.size() == 2) {
-            if ((temp.get(0L) instanceof String) && (temp.get(1L) instanceof Long)) {
+            if ((temp.get(0L).isString()) && (temp.get(1L).isLong())) {
                 out = new QDLStem();
                 out.put(0L, temp);
             }
         }
-        return (QDLStem) objects[0]; // It was the right format
+        return objects[0].asStem(); // It was the right format
     }
 
     protected String VERSION_CREATE_NAME = "version";
@@ -945,21 +951,21 @@ public class StoreFacade /*implements QDLMetaModule*/ {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public QDLValue evaluate(QDLValue[] objects, State state) {
             checkInit();
             QDLStem arg;
             boolean isScalar = false;
             switch (objects.length) {
                 case 1:
-                    if (objects[0] instanceof QDLStem) {
-                        arg = (QDLStem) objects[0];
+                    if (objects[0].isStem()) {
+                        arg = objects[0].asStem();
                     } else {
-                        if (objects[0] instanceof String) {
+                        if (objects[0].isString()) {
                             isScalar = true;
                             arg = new QDLStem();
                             arg.put(0L, objects[0]);
                         } else {
-                            throw new BadArgException(getName() + " requires stem or string argument",0);
+                            throw new BadArgException(getName() + " requires stem or string argument", 0);
                         }
                     }
                     break;
@@ -969,10 +975,10 @@ public class StoreFacade /*implements QDLMetaModule*/ {
                     throw new IllegalArgumentException(getName() + " requires at most a single argument");
             }
             QDLStem out = getStoreAccessor().archive(arg);
-            if(isScalar){
+            if (isScalar) {
                 out.getQDLList().get(0L); // make conformable.
             }
-            return out;
+            return asQDLValue(out);
 
         }
 
@@ -1051,26 +1057,26 @@ public class StoreFacade /*implements QDLMetaModule*/ {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public QDLValue evaluate(QDLValue[] objects, State state) {
             checkInit();
             QDLStem args = null;
             boolean hasStringArg = false;
-            if (objects[0] instanceof String) {
+            if (objects[0].isString()) {
                 args = new QDLStem();
                 args.put(0L, objects[0]);
                 hasStringArg = true;
             }
-            if (objects[0] instanceof QDLStem) {
-                args = (QDLStem) objects[0];
+            if (objects[0].isStem()) {
+                args = objects[0].asStem();
             }
             if (args == null) {
-                throw new BadArgException(getName() + " requires either an id or stem of them as its argument.",0);
+                throw new BadArgException(getName() + " requires either an id or stem of them as its argument.", 0);
             }
             QDLStem out = new QDLStem();
             for (Object key : args.keySet()) {
-                Identifier id = toIdentifier(args.get(key));
+                Identifier id = toIdentifier(args.get(key).asString());
                 if (id == null) {
-                    out.putLongOrString(key, QDLNull.getInstance()); // no valid id means a null
+                    out.putLongOrString(key, QDLNullValue.getNullValue()); // no valid id means a null
                     continue;
                 }
                 QDLStem entry = new QDLStem();
@@ -1080,7 +1086,7 @@ public class StoreFacade /*implements QDLMetaModule*/ {
             if (hasStringArg) {
                 return out.get(0L); // preserve shape.
             }
-            return out;
+            return asQDLValue(out);
         }
 
         @Override
@@ -1123,18 +1129,18 @@ public class StoreFacade /*implements QDLMetaModule*/ {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public QDLValue evaluate(QDLValue[] objects, State state) {
             QDLStem args = convertArgsToVersionIDs(objects, getName());
             QDLStem out = new QDLStem();
             for (Object key : args.keySet()) {
                 VID vid = toVID(args.get(key));
                 if (vid == null) {
-                    out.putLongOrString(key, Boolean.FALSE);
+                    out.putLongOrString(key, BooleanValue.False);
                     continue;
                 }
                 out.putLongOrString(key, getStoreAccessor().getStoreArchiver().restore(vid.id, vid.version));
             }
-            return out;
+            return asQDLValue(out);
         }
 
         @Override

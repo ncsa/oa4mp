@@ -6,9 +6,12 @@ import org.qdl_lang.state.State;
 import org.qdl_lang.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import org.qdl_lang.variables.values.QDLValue;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.qdl_lang.variables.values.QDLValue.asQDLValue;
 
 /**
  * Adds in a few features specific to permission stores.
@@ -38,13 +41,13 @@ public class PermissionStoreFacade extends StoreFacade {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public QDLValue evaluate(QDLValue[] objects, State state) {
             checkInit();
 
-            if (objects.length != 1 || !(objects[0] instanceof String)) {
+            if (objects.length != 1 || !(objects[0].isString())) {
                 throw new BadArgException(getName() + " requires the admin id as its argument",0);
             }
-            return Long.valueOf(getPS().getClientCount(BasicIdentifier.newID((String) objects[0])));
+            return asQDLValue(Long.valueOf(getPS().getClientCount(BasicIdentifier.newID(objects[0].asString()))));
         }
 
 
@@ -69,19 +72,19 @@ public class PermissionStoreFacade extends StoreFacade {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public QDLValue evaluate(QDLValue[] objects, State state) {
             checkInit();
 
-            if (objects.length != 1 || !(objects[0] instanceof String)) {
+            if (objects.length != 1 || !(objects[0].isString())) {
                 throw new BadArgException(getName() + " requires the admin id as its argument",0);
             }
-            List<Identifier> ids = getPS().getClients(BasicIdentifier.newID((String) objects[0]));
+            List<Identifier> ids = getPS().getClients(BasicIdentifier.newID(objects[0].asString()));
 
             QDLStem stem = new QDLStem();
             for (Identifier id : ids) {
-                stem.listAdd(id.toString());
+                stem.listAdd(asQDLValue(id.toString()));
             }
-            return stem;
+            return asQDLValue(stem);
         }
 
         @Override
@@ -105,19 +108,19 @@ public class PermissionStoreFacade extends StoreFacade {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public QDLValue evaluate(QDLValue[] objects, State state) {
             checkInit();
 
-            if (objects.length != 1 || !(objects[0] instanceof String)) {
+            if (objects.length != 1 || !(objects[0].isString())) {
                 throw new BadArgException(getName() + " requires the client id as its argument",0);
             }
-            List<Identifier> ids = getPS().getAdmins(BasicIdentifier.newID((String) objects[0]));
+            List<Identifier> ids = getPS().getAdmins(BasicIdentifier.newID(objects[0].asString()));
 
             QDLStem stem = new QDLStem();
             for (Identifier id : ids) {
-                stem.listAdd(id.toString());
+                stem.listAdd(asQDLValue(id.toString()));
             }
-            return stem;
+            return asQDLValue(stem);
         }
 
         @Override

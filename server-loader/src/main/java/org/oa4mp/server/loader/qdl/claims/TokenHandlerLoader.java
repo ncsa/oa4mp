@@ -1,7 +1,8 @@
 package org.oa4mp.server.loader.qdl.claims;
 
 import org.qdl_lang.extensions.QDLLoader;
-import org.qdl_lang.module.Module;
+import org.qdl_lang.expressions.module.Module;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.List;
  */
 public class TokenHandlerLoader implements QDLLoader {
     @Override
-    public List<Module> load() {
+    public List<org.qdl_lang.expressions.module.Module> load() {
         ArrayList<Module> modules = new ArrayList<>();
         modules.add(new TokenHandlerModule().newInstance(null));
         return modules;

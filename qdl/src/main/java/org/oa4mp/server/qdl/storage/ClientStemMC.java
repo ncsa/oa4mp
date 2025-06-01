@@ -1,10 +1,5 @@
 package org.oa4mp.server.qdl.storage;
 
-import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
-import org.oa4mp.server.loader.oauth2.storage.clients.OA2ClientConverter;
-import org.oa4mp.server.loader.oauth2.storage.clients.OA2ClientKeys;
-import org.qdl_lang.variables.QDLList;
-import org.qdl_lang.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
@@ -14,12 +9,18 @@ import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
+import org.oa4mp.server.loader.oauth2.storage.clients.OA2ClientConverter;
+import org.oa4mp.server.loader.oauth2.storage.clients.OA2ClientKeys;
+import org.qdl_lang.variables.QDLList;
+import org.qdl_lang.variables.QDLStem;
+import org.qdl_lang.variables.values.StringValue;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A {@link edu.uiuc.ncsa.qdl.variables.StemConverter} to convert stems and clients.
+ * A {@link StemConverter} to convert stems and clients.
  * <p>Created by Jeff Gaynor<br>
  * on 12/20/20 at  7:24 AM
  */
@@ -141,7 +142,7 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
             v.setCallbackURIs(toList(stem, kk().callbackUri()));
         }
         if (stem.containsKey(kk().cfg())) {
-            QDLStem j = (QDLStem) stem.get(kk().cfg());
+            QDLStem j =  stem.get(kk().cfg()).asStem();
             v.setConfig((JSONObject) j.toJSON());
         }
 
@@ -161,15 +162,15 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
         }
 
         if (stem.containsKey(kk().ea())) {
-            QDLStem j = (QDLStem) stem.get(kk().ea());
+            QDLStem j = stem.get(kk().ea()).asStem();
             v.setExtendedAttributes((JSONObject) j.toJSON());
         }
         if (isStringKeyOK(stem, kk().issuer())) {
             v.setIssuer(stem.getString(kk().issuer()));
         }
         if (stem.containsKey(kk().ldap())) {
-            if (stem.get(kk().ldap()) instanceof QDLStem) {
-                QDLStem ldap = (QDLStem) stem.get(kk().ldap());
+            if (stem.get(kk().ldap()).isStem()) {
+                QDLStem ldap = stem.get(kk().ldap()).asStem();
                 JSONArray array = (JSONArray) ldap.toJSON();
                 v.setLdaps(getCC().getLdapConfigurationUtil().fromJSON(array));
             }
@@ -327,7 +328,7 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
         if(v.hasPrototypes()){
             QDLList list = new QDLList();
             for(Identifier id : v.getPrototypes()){
-                list.add(id.toString());
+                list.add(new StringValue(id.toString()));
             }
             stem.put(kk().prototypes(), list);
         }

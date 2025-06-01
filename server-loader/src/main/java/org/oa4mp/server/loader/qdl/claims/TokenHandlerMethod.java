@@ -1,17 +1,17 @@
 package org.oa4mp.server.loader.qdl.claims;
 
 import org.oa4mp.server.loader.oauth2.OA2SE;
-import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
 import org.oa4mp.server.loader.oauth2.claims.AbstractPayloadConfig;
 import org.oa4mp.server.loader.oauth2.claims.PayloadHandlerConfigImpl;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
+import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
 import org.oa4mp.server.loader.oauth2.storage.tx.TXRecord;
 import org.oa4mp.server.loader.qdl.scripting.OA2State;
 import org.qdl_lang.exceptions.QDLException;
 import org.qdl_lang.extensions.QDLFunction;
 import org.qdl_lang.state.State;
-import org.qdl_lang.variables.QDLNull;
 import org.qdl_lang.variables.QDLStem;
+import org.qdl_lang.variables.values.QDLValue;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 public abstract class TokenHandlerMethod implements QDLFunction {
     @Override
-    public Object evaluate(Object[] objects, State state) {
+    public QDLValue evaluate(QDLValue[] objects, State state) {
         oa2State = checkState(state); // Fingers and toes, cast it to the right thing and set it.
         return null;  // dummy. This just sets up QDLFunction to be evaluated.
     }
@@ -74,14 +74,14 @@ public abstract class TokenHandlerMethod implements QDLFunction {
      * @param argIndex
      * @return
      */
-    protected QDLStem checkArg(Object[] objects, String name, int argIndex) {
+    protected QDLStem checkArg(QDLValue[] objects, String name, int argIndex) {
 
-        if(objects[argIndex] == null || (objects[argIndex] instanceof QDLNull)){
+        if(objects[argIndex] == null || (objects[argIndex].isNull())){
             // just make one
             return new QDLStem();
         }
-        if (objects[argIndex] instanceof QDLStem) {
-            return (QDLStem) objects[argIndex];
+        if (objects[argIndex].isStem()) {
+            return objects[argIndex].asStem();
         }
         throw new IllegalArgumentException(name + " requires a stem argument #" + argIndex);
     }

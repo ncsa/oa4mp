@@ -12,12 +12,15 @@ import org.qdl_lang.state.State;
 import org.qdl_lang.variables.QDLStem;
 import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
 import net.sf.json.JSONObject;
+import org.qdl_lang.variables.values.LongValue;
+import org.qdl_lang.variables.values.QDLValue;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import static org.oa4mp.server.loader.oauth2.storage.clients.OA2Client.USE_SERVER_DEFAULT;
+import static org.qdl_lang.variables.values.QDLValue.asQDLValue;
 
 /**
  * This is mostly for testing. It allows access to utilities the server uses to verify
@@ -41,19 +44,19 @@ public class TestUtils implements QDLMetaModule {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable {
+        public QDLValue evaluate(QDLValue[] objects, State state) throws Throwable {
             // args are server_defaults., client.
             // args are server_defaults., client., requested_lifetime
             long requestedLifetime = checkArgs(objects, getName());
-            QDLStem serverDefaults = (QDLStem) objects[0];
-            QDLStem client = (QDLStem) objects[1];
+            QDLStem serverDefaults = objects[0].asStem();
+            QDLStem client = objects[1].asStem();
 
-            return ClientUtils.computeTokenLifetime(1000*serverDefaults.getLong(OA2Constants.MAX_ID_TOKEN_LIFETIME),
+            return asQDLValue(ClientUtils.computeTokenLifetime(1000*serverDefaults.getLong(OA2Constants.MAX_ID_TOKEN_LIFETIME),
                     1000*serverDefaults.getLong(OA2Constants.ID_TOKEN_LIFETIME),
                     1000*client.getLong(OA2Constants.ID_TOKEN_LIFETIME),
                     1000*client.getLong(OA2Constants.MAX_ID_TOKEN_LIFETIME),
                     getClientCfgLifetime(client, "identity"),
-                    requestedLifetime);
+                    requestedLifetime));
         }
 
         @Override
@@ -98,17 +101,17 @@ public class TestUtils implements QDLMetaModule {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable {
+        public QDLValue evaluate(QDLValue[] objects, State state) throws Throwable {
             long requestedLifetime = checkArgs(objects, getName());
-            QDLStem serverDefaults = (QDLStem) objects[0];
-            QDLStem client = (QDLStem) objects[1];
+            QDLStem serverDefaults = objects[0].asStem();
+            QDLStem client = objects[1].asStem();
 
-            return ClientUtils.computeTokenLifetime(1000*serverDefaults.getLong(OA2Constants.MAX_ACCESS_TOKEN_LIFETIME),
+            return asQDLValue(ClientUtils.computeTokenLifetime(1000*serverDefaults.getLong(OA2Constants.MAX_ACCESS_TOKEN_LIFETIME),
                     1000*serverDefaults.getLong(OA2Constants.ACCESS_TOKEN_LIFETIME),
                     1000*client.getLong(oa2ClientKeys.atLifetime()),
                     1000*client.getLong(OA2Constants.MAX_ACCESS_TOKEN_LIFETIME), // used in the CM
                     getClientCfgLifetime(client, "access"),
-                    requestedLifetime);
+                    requestedLifetime));
         }
 
         @Override
@@ -131,16 +134,16 @@ public class TestUtils implements QDLMetaModule {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable {
+        public QDLValue evaluate(QDLValue[] objects, State state) throws Throwable {
             long requestedLifetime = checkArgs(objects, getName());
-            QDLStem serverDefaults = (QDLStem) objects[0];
-            QDLStem client = (QDLStem) objects[1];
-            return ClientUtils.computeTokenLifetime(1000*serverDefaults.getLong(OA2Constants.MAX_REFRESH_LIFETIME),
+            QDLStem serverDefaults = objects[0].asStem();
+            QDLStem client = objects[1].asStem();
+            return asQDLValue(ClientUtils.computeTokenLifetime(1000*serverDefaults.getLong(OA2Constants.MAX_REFRESH_LIFETIME),
                     1000*serverDefaults.getLong(OA2Constants.REFRESH_LIFETIME),
                     1000*client.getLong(oa2ClientKeys.rtLifetime()),
                     1000*client.getLong(OA2Constants.MAX_REFRESH_LIFETIME),
                     getClientCfgLifetime(client, "refresh"),
-                    requestedLifetime);
+                    requestedLifetime));
 
         }
 
@@ -158,15 +161,15 @@ public class TestUtils implements QDLMetaModule {
      * @param name
      * @return
      */
-    protected long checkArgs(Object[] objects, String name) {
-        if (!(objects[0] instanceof QDLStem)) {
+    protected long checkArgs(QDLValue[] objects, String name) {
+        if (!(objects[0].isStem())) {
             throw new IllegalArgumentException(name + "(0) must be a stem, got a " + (objects[0] == null ? "null":objects[0].getClass().getSimpleName()));
         }
-        if (!(objects[1] instanceof QDLStem)) {
+        if (!(objects[1].isStem())) {
             throw new IllegalArgumentException(name + "(1) must be a stem, got a " + (objects[1]==null?"null":objects[1].getClass().getSimpleName()));
         }
 
-        return objects.length == 3 ? (Long) objects[2] : USE_SERVER_DEFAULT;
+        return objects.length == 3 ? objects[2].asLong() : USE_SERVER_DEFAULT;
     }
 
     protected List<String> getLifetimeDoc(String name, int argCount) {
@@ -214,26 +217,17 @@ public class TestUtils implements QDLMetaModule {
          * @throws Throwable
          */
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable {
+        public QDLValue evaluate(QDLValue[] objects, State state) throws Throwable {
             checkArgs(objects, getName()); // don't need output
-            QDLStem serverDefaults = (QDLStem) objects[0];
-            QDLStem client = (QDLStem) objects[1];
+            QDLStem serverDefaults = objects[0].asStem();
+            QDLStem client = objects[1].asStem();
             if(serverDefaults.getLong(OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_TAG) == OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_DISABLED){
-                return 0L;
+                return LongValue.Zero;
             }
             if(client.getLong(oa2ClientKeys.rtGracePeriod()) == OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_USE_SERVER_DEFAULT){
-               return serverDefaults.getLong(OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_TAG);
+               return asQDLValue(serverDefaults.getLong(OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_TAG));
             }
-            return client.getLong(oa2ClientKeys.rtGracePeriod());
-            /*
-                    if (!oa2SE.isRTGracePeriodEnabled()) {
-            return 0L; // means no grace period.
-        }
-        if (client.getRtGracePeriod() == OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_USE_SERVER_DEFAULT) {
-            return oa2SE.getRtGracePeriod();
-        }
-        return client.getRtGracePeriod();
-             */
+            return asQDLValue(client.getLong(oa2ClientKeys.rtGracePeriod()));
         }
 
         @Override
@@ -257,21 +251,21 @@ public class TestUtils implements QDLMetaModule {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable {
+        public QDLValue evaluate(QDLValue[] objects, State state) throws Throwable {
             return convert(objects[0]);
         }
 
-        protected Object convert(Object object){
-            if(object instanceof String){
-                return convertSingle((String)object);
+        protected QDLValue convert(QDLValue object){
+            if(object.isString()){
+                return asQDLValue(convertSingle(object.asString()));
             }
-            if(object instanceof QDLStem){
-                QDLStem stem = (QDLStem) object;
+            if(object.isStem()){
+                QDLStem stem = object.asStem();
                 QDLStem outStem = new QDLStem();
                 for(Object key : stem.keySet()){
                     outStem.putLongOrString(key, convert(stem.get(key)));
                 }
-                return outStem;
+                return asQDLValue(outStem);
             }
             return object; // do nothing.
         }

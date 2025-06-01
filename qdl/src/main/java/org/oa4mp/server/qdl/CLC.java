@@ -1,33 +1,37 @@
 package org.oa4mp.server.qdl;
 
+import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.util.DateUtils;
+import edu.uiuc.ncsa.security.core.util.DebugConstants;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
+import edu.uiuc.ncsa.security.servlet.ServiceClient;
+import edu.uiuc.ncsa.security.util.cli.InputLine;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import org.oa4mp.client.loader.OA2ClientEnvironment;
+import org.oa4mp.delegation.common.token.impl.*;
+import org.oa4mp.delegation.server.server.claims.OA2Claims;
 import org.oa4mp.server.admin.myproxy.oauth2.tools.OA2CLCCommands;
 import org.oa4mp.server.admin.myproxy.oauth2.tools.OA2CommandLineClient;
 import org.oa4mp.server.qdl.clc.QDLCLC;
-import org.oa4mp.delegation.server.server.claims.OA2Claims;
-import org.oa4mp.client.loader.OA2ClientEnvironment;
-import org.oa4mp.delegation.common.token.impl.*;
 import org.qdl_lang.exceptions.BadArgException;
 import org.qdl_lang.exceptions.MissingArgException;
 import org.qdl_lang.extensions.QDLFunction;
 import org.qdl_lang.extensions.QDLMetaModule;
 import org.qdl_lang.state.State;
 import org.qdl_lang.variables.QDLList;
-import org.qdl_lang.variables.QDLNull;
 import org.qdl_lang.variables.QDLStem;
-import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
-import edu.uiuc.ncsa.security.core.util.DateUtils;
-import edu.uiuc.ncsa.security.core.util.DebugConstants;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import edu.uiuc.ncsa.security.servlet.ServiceClient;
-import edu.uiuc.ncsa.security.util.cli.InputLine;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import org.qdl_lang.variables.values.BooleanValue;
+import org.qdl_lang.variables.values.QDLNullValue;
+import org.qdl_lang.variables.values.QDLValue;
+import org.qdl_lang.variables.values.StringValue;
 
 import java.net.URI;
 import java.util.*;
 
 import static edu.uiuc.ncsa.security.core.util.StringUtils.pad;
+import static org.qdl_lang.variables.values.QDLValue.asQDLValue;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -87,7 +91,7 @@ public class CLC implements QDLMetaModule {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable {
+        public QDLValue evaluate(QDLValue[] objects, State state) throws Throwable {
             try {
                 if (!initCalled) {
                     QDLCLC qdlclc = new QDLCLC(null);
@@ -109,12 +113,13 @@ public class CLC implements QDLMetaModule {
                 }
                 throw e;
             }
-            return true;
+            return BooleanValue.True;
         }
 
         protected OA2ClientEnvironment createEnvironment(QDLStem ini, String name) {
             OA2ClientEnvironment ce = new OA2ClientEnvironment();
-            ce.setScopes(ini.getStem("scopes").getQDLList());
+            JSONArray jsonArray = ini.getStem("scopes").getQDLList().toJSON();
+            ce.setScopes(QDLValue.castToQDLValues(jsonArray));
             return ce;
         }
 
@@ -142,14 +147,14 @@ public class CLC implements QDLMetaModule {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable {
+        public QDLValue evaluate(QDLValue[] objects, State state) throws Throwable {
             QDLStem claims = new QDLStem();
             if (clcCommands.getIdToken() == null || clcCommands.getIdToken().getPayload() == null) {
-                return claims;
+                return asQDLValue(claims);
             }
             JSONObject jsonObject = clcCommands.getIdToken().getPayload();
             claims.fromJSON(jsonObject);
-            return claims;
+            return asQDLValue(claims);
         }
 
         @Override
@@ -176,14 +181,14 @@ public class CLC implements QDLMetaModule {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable {
+        public QDLValue evaluate(QDLValue[] objects, State state) throws Throwable {
             QDLStem g = new QDLStem();
             clcCommands.grant(argsToInputLine(getName(), objects));
             if (clcCommands.getGrant() == null) {
                 throw new GeneralException("unable to get grant");
             }
             g.fromJSON(clcCommands.getGrant().toJSON());
-            return g;
+            return asQDLValue(g);
         }
 
         @Override
@@ -216,15 +221,15 @@ public class CLC implements QDLMetaModule {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable {
+        public QDLValue evaluate(QDLValue[] objects, State state) throws Throwable {
             checkInit();
             String args = DUMMY_ARG;
             boolean verify = false;
             boolean rawResponse = false;
             boolean hasHeaders = false;
             if (objects.length == 1) {
-                if (objects[0] instanceof QDLStem) {
-                    QDLStem input = (QDLStem) objects[0];
+                if (objects[0].isStem()) {
+                    QDLStem input = objects[0].asStem();
                     if (input.containsKey("verify")) {
                         verify = input.getBoolean("verify");
                     }
@@ -250,13 +255,13 @@ public class CLC implements QDLMetaModule {
                 try {
                     JSONObject jsonObject = JSONObject.fromObject(clcCommands.getCurrentATResponse().getRawResponse());
                     out.fromJSON(jsonObject);
-                    return out;
+                    return asQDLValue(out);
                 } catch (Throwable t) {
 
                 }
-                return clcCommands.getCurrentATResponse().getRawResponse();
+                return asQDLValue(clcCommands.getCurrentATResponse().getRawResponse());
             }
-            return getTokens();
+            return asQDLValue(getTokens());
         }
 
         @Override
@@ -294,12 +299,12 @@ public class CLC implements QDLMetaModule {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable {
+        public QDLValue evaluate(QDLValue[] objects, State state) throws Throwable {
             clcCommands.get_cert(argsToInputLine(getName(), objects));
             if (clcCommands.hasX509Certificates()) {
-                return clcCommands.getX509CertificateString();
+                return asQDLValue(clcCommands.getX509CertificateString());
             }
-            return "";
+            return new StringValue();
         }
 
         List<String> dd = new ArrayList<>();
@@ -329,13 +334,13 @@ public class CLC implements QDLMetaModule {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable {
+        public QDLValue evaluate(QDLValue[] objects, State state) throws Throwable {
             checkInit();
             URI c = clcCommands.getCurrentURI();
             if (c == null) {
-                return QDLNull.getInstance();
+                return QDLNullValue.getNullValue();
             }
-            return c.toString();
+            return asQDLValue(c.toString());
         }
 
         @Override
@@ -361,11 +366,11 @@ public class CLC implements QDLMetaModule {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable {
+        public QDLValue evaluate(QDLValue[] objects, State state) throws Throwable {
             checkInit();
             clcCommands.uri(argsToInputLine(getName(), objects));
 
-            return clcCommands.getCurrentURI().toString();
+            return asQDLValue(clcCommands.getCurrentURI().toString());
         }
 
         @Override
@@ -391,11 +396,11 @@ public class CLC implements QDLMetaModule {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable {
+        public QDLValue evaluate(QDLValue[] objects, State state) throws Throwable {
             checkInit();
             //clcCommands.refresh(argsToInputLine(getName(), objects));
             clcCommands.refresh();
-            return getTokens();
+            return asQDLValue(getTokens());
         }
 
         @Override
@@ -421,17 +426,17 @@ public class CLC implements QDLMetaModule {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable {
+        public QDLValue evaluate(QDLValue[] objects, State state) throws Throwable {
             if (objects.length == 0) {
-                return ServiceClient.ECHO_RESPONSE;
+                return asQDLValue(ServiceClient.ECHO_RESPONSE);
             }
-            if (!(objects[0] instanceof Boolean)) {
+            if (!(objects[0].isBoolean())) {
                 throw new BadArgException(getName() + " requires a boolean argument", 0);
             }
 
             Boolean oldValue = ServiceClient.ECHO_RESPONSE;
-            ServiceClient.ECHO_RESPONSE = (Boolean) objects[0];
-            return oldValue;
+            ServiceClient.ECHO_RESPONSE = objects[0].asBoolean();
+            return asQDLValue(oldValue);
         }
 
         @Override
@@ -467,17 +472,17 @@ public class CLC implements QDLMetaModule {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable {
+        public QDLValue evaluate(QDLValue[] objects, State state) throws Throwable {
             if (objects.length == 0) {
-                return ServiceClient.ECHO_REQUEST;
+                return asQDLValue(ServiceClient.ECHO_REQUEST);
             }
-            if (!(objects[0] instanceof Boolean)) {
+            if (!(objects[0].isBoolean())) {
                 throw new BadArgException(getName() + " requires a boolean argument",0);
             }
 
             Boolean oldValue = ServiceClient.ECHO_REQUEST;
-            ServiceClient.ECHO_REQUEST = (Boolean) objects[0];
-            return oldValue;
+            ServiceClient.ECHO_REQUEST = objects[0].asBoolean();
+            return asQDLValue(oldValue);
         }
 
         @Override
@@ -516,15 +521,15 @@ public class CLC implements QDLMetaModule {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable {
+        public QDLValue evaluate(QDLValue[] objects, State state) throws Throwable {
             checkInit();
             QDLStem inStem = null;
             boolean hasHeaders = false;
             boolean rawResponse = false;
             InputLine inputLine;
             if (objects.length == 1) {
-                if (objects[0] instanceof QDLStem) {
-                    inStem = (QDLStem) objects[0];
+                if (objects[0].isStem()) {
+                    inStem = objects[0].asStem();
                 }
             }
 
@@ -565,20 +570,20 @@ public class CLC implements QDLMetaModule {
                 // if they request an id token, return it.
                 QDLStem x = new QDLStem();
                 x.fromJSON(clcCommands.getIdToken().getPayload());
-                return x;
+                return asQDLValue(x);
             }
             if (isRefreshToken) {
                 QDLStem x = new QDLStem();
                 x.put("refresh_token", tokenToStem(clcCommands.getDummyAsset().getRefreshToken()));
-                return x;
+                return asQDLValue(x);
             }
 
             if (rawResponse) {
                 QDLStem out = new QDLStem();
                 out.fromJSON(clcCommands.getExchangeResponse());
-                return out;
+                return asQDLValue(out);
             }
-            return getTokens();
+            return asQDLValue(getTokens());
         }
 
         @Override
@@ -628,15 +633,15 @@ public class CLC implements QDLMetaModule {
      * consumed by the CLC.
      *
      * @param name
-     * @param objects
+     * @param qdlValues
      * @return
      */
-    protected InputLine argsToInputLine(String name, Object[] objects) {
+    protected InputLine argsToInputLine(String name, QDLValue[] qdlValues) {
         ArrayList<String> args = new ArrayList<>();
         args.add(name);// name of function
-        for (Object ooo : objects) {
-            if (ooo instanceof String) {
-                args.add(((String) ooo).trim());
+        for (QDLValue ooo : qdlValues) {
+            if (ooo.isString()) {
+                args.add(ooo.asString().trim());
             }
         }
         String[] strings = new String[]{};
@@ -669,10 +674,10 @@ public class CLC implements QDLMetaModule {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable {
+        public QDLValue evaluate(QDLValue[] objects, State state) throws Throwable {
             checkInit();
             clcCommands.revoke(argsToInputLine(getName(), objects));
-            return Boolean.TRUE;
+            return BooleanValue.True;
         }
 
         @Override
@@ -695,20 +700,20 @@ public class CLC implements QDLMetaModule {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable {
+        public QDLValue evaluate(QDLValue[] objects, State state) throws Throwable {
             checkInit();
             QDLStem outStem = new QDLStem();
             QDLStem inStem = new QDLStem();
 
             if (objects.length == 1) {
-                if (!(objects[0] instanceof QDLStem)) {
+                if (!(objects[0].isStem())) {
                     throw new BadArgException("If there is an argument, it must be a stem of headers",0);
                 }
                 inStem.put(ServiceClient.HEADER_KEY, objects[0]);
             }
             JSONObject json = clcCommands.df(inStem);
             outStem.fromJSON(json);
-            return outStem;
+            return asQDLValue(outStem);
         }
 
         @Override
@@ -742,12 +747,12 @@ public class CLC implements QDLMetaModule {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable {
+        public QDLValue evaluate(QDLValue[] objects, State state) throws Throwable {
             checkInit();
             QDLStem QDLStem = new QDLStem();
             clcCommands.introspect(argsToInputLine(getName(), objects));
             QDLStem.fromJSON(clcCommands.getIntrospectResponse());
-            return QDLStem;
+            return asQDLValue(QDLStem);
         }
 
         @Override
@@ -773,7 +778,7 @@ public class CLC implements QDLMetaModule {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable {
+        public QDLValue evaluate(QDLValue[] objects, State state) throws Throwable {
             checkInit();
             QDLStem out = new QDLStem();
             // remember that this call returns essentially a snapshot of the current user info on the
@@ -782,7 +787,7 @@ public class CLC implements QDLMetaModule {
             JSONObject json = new JSONObject();
             json.putAll(userInfo.getMap());
             out.fromJSON(json);
-            return out;
+            return asQDLValue(out);
         }
 
         @Override
@@ -808,16 +813,16 @@ public class CLC implements QDLMetaModule {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public QDLValue evaluate(QDLValue[] objects, State state) {
             checkInit();
             if (objects.length == 0) {
-                return getTokens();
+                return asQDLValue(getTokens());
             }
-            if (!(objects[0] instanceof QDLStem)) {
+            if (!(objects[0].isStem())) {
                 throw new BadArgException("the argument to " + getName() + " must be a stem",0);
             }
-            setTokens((QDLStem) objects[0]);
-            return Boolean.TRUE;
+            setTokens(objects[0].asStem());
+            return BooleanValue.True;
         }
 
         @Override
@@ -857,14 +862,14 @@ public class CLC implements QDLMetaModule {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable {
+        public QDLValue evaluate(QDLValue[] objects, State state) throws Throwable {
             String args = DUMMY_ARG + " " + objects[0];
             if (objects.length == 2) {
                 args = args + " -m " + objects[1];
             }
             checkInit();
             clcCommands.write(new InputLine(args));
-            return Boolean.TRUE;
+            return BooleanValue.True;
         }
 
         @Override
@@ -898,7 +903,7 @@ public class CLC implements QDLMetaModule {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable {
+        public QDLValue evaluate(QDLValue[] objects, State state) throws Throwable {
           //  checkInit();
             // Assume that the clc has been initialized first since otherwise it is impossible to load
             // the file (e.g. assetStore is missing, debugger is missing etc.)
@@ -916,7 +921,7 @@ public class CLC implements QDLMetaModule {
 
             clcCommands.read(argsToInputLine(getName(), objects));
             initCalled = true;
-            return Boolean.TRUE;
+            return BooleanValue.True;
         }
 
         @Override
@@ -951,11 +956,11 @@ public class CLC implements QDLMetaModule {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable {
+        public QDLValue evaluate(QDLValue[] objects, State state) throws Throwable {
             if (objects.length == 0) {
                 clcCommands.clear(new InputLine(), true);
             }
-            return Boolean.TRUE;
+            return BooleanValue.True;
         }
 
         List<String> doxx = new ArrayList<>();
@@ -985,24 +990,25 @@ public class CLC implements QDLMetaModule {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public QDLValue evaluate(QDLValue[] objects, State state) {
             QDLStem stem = new QDLStem();
             QDLList qdlList = null;
             boolean isScalar = false;
             if (objects.length == 0) {
                 qdlList = new QDLList();
-                qdlList.appendAll(Arrays.asList(PARAM_FLAG_AUTHZ_SHORT, PARAM_FLAG_TOKEN, PARAM_FLAG_REFRESH, PARAM_FLAG_EXCHANGE));
+                qdlList.appendAll(QDLValue.castToQDLValueList(new Object[]{PARAM_FLAG_AUTHZ_SHORT, PARAM_FLAG_TOKEN, PARAM_FLAG_REFRESH, PARAM_FLAG_EXCHANGE}));
+//                qdlList.appendAll(Arrays.asList(PARAM_FLAG_AUTHZ_SHORT, PARAM_FLAG_TOKEN, PARAM_FLAG_REFRESH, PARAM_FLAG_EXCHANGE));
             }
             if (objects.length == 1) {
-                if (objects[0] instanceof String) {
+                if (objects[0].isString()) {
                     isScalar = true;
                     qdlList = new QDLList();
                     qdlList.add(objects[0]);
                 } else {
-                    if (!(objects[0] instanceof QDLStem)) {
+                    if (!(objects[0].isStem())) {
                         throw new BadArgException(getName() + " requires a stem or list as its argument", null);
                     }
-                    qdlList = ((QDLStem) objects[0]).getQDLList();
+                    qdlList = objects[0].asStem().getQDLList();
                 }
             }
             for (Object key : qdlList.values()) {
@@ -1033,12 +1039,12 @@ public class CLC implements QDLMetaModule {
                         v.put(key2, params.get(key2));
                     }
                     if (isScalar) {
-                        return v; // only one.
+                        return asQDLValue(v); // only one.
                     }
                     stem.put(key.toString(), v);
                 }
             }
-            return stem;
+            return asQDLValue(stem);
         }
 
         List<String> doxx = new ArrayList<>();
@@ -1089,14 +1095,14 @@ public class CLC implements QDLMetaModule {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public QDLValue evaluate(QDLValue[] objects, State state) {
             if (objects.length != 1) {
                 throw new MissingArgException(getName() + " requires an argument", null);
             }
-            if (!(objects[0] instanceof QDLStem)) {
+            if (!(objects[0].isStem())) {
                 throw new BadArgException(getName() + " requires a stem as its argument", null);
             }
-            QDLStem stem = (QDLStem) objects[0];
+            QDLStem stem = objects[0].asStem();
             for (Object key : stem.keySet()) {
                 HashMap<String, Object> params = null;
                 switch (key.toString()) {
@@ -1120,9 +1126,9 @@ public class CLC implements QDLMetaModule {
                         // do nothing.
                 }
                 if (params != null) {
-                    Object obj = stem.get(key);
-                    if (obj instanceof QDLStem) {
-                        QDLStem args = (QDLStem) obj;
+                    QDLValue obj = stem.get(key);
+                    if (obj.isStem()) {
+                        QDLStem args = obj.asStem();
                         for (Object keyArg : args.keySet()) {
                             if (keyArg instanceof String) {
                                 params.put((String) keyArg, args.getString((String) keyArg));
@@ -1131,7 +1137,7 @@ public class CLC implements QDLMetaModule {
                     }
                 }
             }
-            return Boolean.TRUE;
+            return BooleanValue.True;
         }
 
         List<String> doc = new ArrayList<>();
@@ -1298,18 +1304,18 @@ public class CLC implements QDLMetaModule {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public QDLValue evaluate(QDLValue[] objects, State state) {
 
             if (objects.length == 0) {
-                return tokenToStem(clcCommands.getDummyAsset().getAccessToken());
+                return asQDLValue(tokenToStem(clcCommands.getDummyAsset().getAccessToken()));
             }
-            if (!(objects[0] instanceof QDLStem)) {
+            if (!(objects[0].isStem())) {
                 throw new BadArgException("The argument to " + getName() + " must be a stem.", 0);
             }
-            QDLStem newAT = (QDLStem) objects[0];
+            QDLStem newAT = objects[0].asStem();
             QDLStem oldAT = tokenToStem(clcCommands.getDummyAsset().getAccessToken());
             clcCommands.getDummyAsset().setAccessToken(stemToAT(newAT));
-            return oldAT;
+            return asQDLValue(oldAT);
         }
 
         List<String> dd = null;
@@ -1339,18 +1345,18 @@ public class CLC implements QDLMetaModule {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) {
+        public QDLValue evaluate(QDLValue[] objects, State state) {
 
             if (objects.length == 0) {
-                return tokenToStem(clcCommands.getDummyAsset().getRefreshToken());
+                return asQDLValue(tokenToStem(clcCommands.getDummyAsset().getRefreshToken()));
             }
-            if (!(objects[0] instanceof QDLStem)) {
+            if (!(objects[0].isStem())) {
                 throw new BadArgException("The argument to " + getName() + " must be a stem.",0);
             }
-            QDLStem newRT = (QDLStem) objects[0];
+            QDLStem newRT = objects[0].asStem();
             QDLStem oldRT = tokenToStem(clcCommands.getDummyAsset().getRefreshToken());
             clcCommands.getDummyAsset().setRefreshToken(stemToRT(newRT));
-            return oldRT;
+            return asQDLValue(oldRT);
         }
 
         List<String> dd = null;
@@ -1383,12 +1389,12 @@ public class CLC implements QDLMetaModule {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable {
+        public QDLValue evaluate(QDLValue[] objects, State state) throws Throwable {
             checkInit();
             Map parameters = argToMap(objects, getName());
             clcCommands.rfc7523(parameters);
 
-            return getTokens();
+            return asQDLValue(getTokens());
         }
 
         @Override
@@ -1464,15 +1470,15 @@ public class CLC implements QDLMetaModule {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable {
+        public QDLValue evaluate(QDLValue[] objects, State state) throws Throwable {
             checkInit();
             if (objects.length == 0) {
-                return clcCommands.isVerbose();
+                return asQDLValue(clcCommands.isVerbose());
             }
             boolean oldValue = clcCommands.isVerbose();
-            if (objects[0] instanceof Boolean) {
-                clcCommands.set_verbose_on(new InputLine(((Boolean) objects[0]) ? "true" : "false"));
-                return oldValue;
+            if (objects[0].isBoolean()) {
+                clcCommands.set_verbose_on(new InputLine((objects[0].asBoolean()) ? "true" : "false"));
+                return asQDLValue(oldValue);
             }
             throw new BadArgException("unknown argument for " + getName() + " of type " + (objects[0].getClass().getSimpleName()),0);
         }
@@ -1506,21 +1512,21 @@ public class CLC implements QDLMetaModule {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable {
+        public QDLValue evaluate(QDLValue[] objects, State state) throws Throwable {
             checkInit();
             boolean oldValue = DebugUtil.isEnabled() && DebugUtil.getDebugLevel() == DebugConstants.DEBUG_LEVEL_TRACE;
             if (objects.length == 0) {
-                return oldValue;
+                return asQDLValue(oldValue);
             }
-            if (objects[0] instanceof Boolean) {
-                if ((Boolean) objects[0]) {
+            if (objects[0].isBoolean()) {
+                if (objects[0].asBoolean()) {
                     DebugUtil.setEnabled(true);
                     DebugUtil.setDebugLevel(DebugUtil.DEBUG_LEVEL_TRACE);
                 } else {
                     DebugUtil.setEnabled(false);
                     DebugUtil.setDebugLevel(DebugUtil.DEBUG_LEVEL_OFF);
                 }
-                return oldValue;
+                return asQDLValue(oldValue);
             }
             throw new BadArgException("unknown argument for " + getName() + " of type " + (objects[0].getClass().getSimpleName()),0);
 
@@ -1556,11 +1562,11 @@ public class CLC implements QDLMetaModule {
         }
 
         @Override
-        public Object evaluate(Object[] objects, State state) throws Throwable {
+        public QDLValue evaluate(QDLValue[] objects, State state) throws Throwable {
             checkInit();
             Boolean useRFC7523 = Boolean.FALSE;
-            if (0 < objects.length && (objects[0] instanceof QDLStem)) {
-                QDLStem inStem = (QDLStem) objects[0];
+            if (0 < objects.length && (objects[0].isStem())) {
+                QDLStem inStem = objects[0].asStem();
                 useRFC7523 = inStem.containsKey(CLIENT_CREDENTIALS_RFC7523);
                 if (useRFC7523) {
                     useRFC7523 = inStem.getBoolean(CLIENT_CREDENTIALS_RFC7523);
@@ -1573,7 +1579,7 @@ public class CLC implements QDLMetaModule {
             if (clcCommands.getCcfResponse() != null) {
                 QDLStem.fromJSON(clcCommands.getCcfResponse());
             }
-            return QDLStem;
+            return asQDLValue(QDLStem);
         }
 
         @Override
