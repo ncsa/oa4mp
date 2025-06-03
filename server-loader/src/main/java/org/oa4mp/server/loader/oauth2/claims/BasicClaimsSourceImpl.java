@@ -1,5 +1,6 @@
 package org.oa4mp.server.loader.oauth2.claims;
 
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.flows.FlowStates2;
 import org.oa4mp.server.loader.oauth2.functor.FunctorRuntimeEngine;
@@ -317,14 +318,21 @@ public class BasicClaimsSourceImpl implements ClaimSource {
     @Override
     public QDLStem toQDL() {
         QDLStem stem = new QDLStem();
-        stem.put(CS_DEFAULT_TYPE, CS_TYPE_BASIC);
-        stem.put(CS_DEFAULT_ID, getConfiguration().getId());
-        stem.put(CS_DEFAULT_FAIL_ON_ERROR, getConfiguration().isFailOnError());
-        stem.put(CS_DEFAULT_IS_ENABLED, getConfiguration().isEnabled());
-        stem.put(CS_DEFAULT_NOTIFY_ON_FAIL, getConfiguration().isNotifyOnFail());
-        stem.put(CS_DEFAULT_NAME, getConfiguration().getName());
-        stem.put(CS_LDAP_RETRY_COUNT, (long)getConfiguration().getRetryCount());
-        stem.put(CS_LDAP_MAX_RETRY_SLEEP, getConfiguration().getMaxWait());
+        addToStem(stem, CS_DEFAULT_TYPE, CS_TYPE_BASIC);
+        addToStem(stem, CS_DEFAULT_ID, getConfiguration().getId());
+        addToStem(stem, CS_DEFAULT_FAIL_ON_ERROR, getConfiguration().isFailOnError());
+        addToStem(stem, CS_DEFAULT_IS_ENABLED, getConfiguration().isEnabled());
+        addToStem(stem, CS_DEFAULT_NOTIFY_ON_FAIL, getConfiguration().isNotifyOnFail());
+        addToStem(stem, CS_DEFAULT_NAME, getConfiguration().getName());
+        addToStem(stem, CS_LDAP_RETRY_COUNT, (long)getConfiguration().getRetryCount());
+        addToStem(stem, CS_LDAP_MAX_RETRY_SLEEP, getConfiguration().getMaxWait());
         return stem;
+    }
+    protected void addToStem(QDLStem stem, String key,  Object value) {
+        if(value==null) return;
+        if(value instanceof String) {
+            if(StringUtils.isTrivial((String)value)) return;
+        }
+        stem.put(key, value);
     }
 }

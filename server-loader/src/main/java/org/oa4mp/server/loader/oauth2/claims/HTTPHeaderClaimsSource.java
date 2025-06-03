@@ -1,12 +1,11 @@
 package org.oa4mp.server.loader.oauth2.claims;
 
+import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
+import net.sf.json.JSONObject;
+import org.oa4mp.delegation.server.ServiceTransaction;
 import org.oa4mp.delegation.server.server.UnsupportedScopeException;
 import org.oa4mp.delegation.server.server.claims.ClaimSourceConfiguration;
-import org.oa4mp.delegation.server.ServiceTransaction;
 import org.qdl_lang.variables.QDLStem;
-import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
-import edu.uiuc.ncsa.security.core.util.StringUtils;
-import net.sf.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Enumeration;
@@ -122,10 +121,8 @@ public class HTTPHeaderClaimsSource extends BasicClaimsSourceImpl {
     @Override
     public QDLStem toQDL() {
         QDLStem arg = super.toQDL();
-        arg.put(CS_DEFAULT_TYPE, CS_TYPE_FILTER_HEADERS);
-        if (!StringUtils.isTrivial(getCaput())) {
-            arg.put(CS_HEADERS_PREFIX, getCaput());
-        }
+        addToStem(arg,CS_DEFAULT_TYPE, CS_TYPE_FILTER_HEADERS);
+        addToStem(arg,CS_HEADERS_PREFIX, getCaput());
         return arg;
     }
 }

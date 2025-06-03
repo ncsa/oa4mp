@@ -11,66 +11,25 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="Updating build infor for 6.1.1 release">
+    <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="Changes reflecting https://github.com/ncsa/qdl/issues/123. All tests working as per requirements.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/client-installer/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/CLC.java" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/CLC.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/CLCLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/CLCLoader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/CLCModule.java" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/CLCModule.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/CMLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/CMLoader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/ClientManagementCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/ClientManagementCommands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/ClientManagementModule.java" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/ClientManagementModule.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/QDLToolsLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/QDLToolsLoader.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/clc/QDLConfigLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/clc/QDLConfigLoader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/storage/ClientStemMC.java" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/storage/ClientStemMC.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/storage/PStoreAccessLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/storage/PStoreAccessLoader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/storage/PStoreAccessModule.java" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/storage/PStoreAccessModule.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/storage/PermissionStemMC.java" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/storage/PermissionStemMC.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/storage/PermissionStoreFacade.java" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/storage/PermissionStoreFacade.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/storage/StemConverter.java" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/storage/StemConverter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/storage/StoreAccessLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/storage/StoreAccessLoader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/storage/StoreAccessModule.java" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/storage/StoreAccessModule.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/storage/StoreFacade.java" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/storage/StoreFacade.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/testUtils/TestUtilModule.java" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/testUtils/TestUtilModule.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/testUtils/TestUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/testUtils/TestUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/testUtils/TestUtilsLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/testUtils/TestUtilsLoader.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rfc8414/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/rfc8414/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/base/OA4MPStoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/base/OA4MPStoreCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/ui-test/at-echo.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/ui-test/at-echo.qdl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-installer/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/claims/BasicClaimsSourceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/claims/BasicClaimsSourceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/claims/CodeClaimSource.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/claims/CodeClaimSource.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/claims/FSClaimSource.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/claims/FSClaimSource.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/claims/HTTPHeaderClaimsSource.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/claims/HTTPHeaderClaimsSource.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/claims/LDAPClaimsSource.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/claims/LDAPClaimsSource.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/claims/QDLHeadersClaimsSource.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/claims/QDLHeadersClaimsSource.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/loader/OA2ServletInitializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/loader/OA2ServletInitializer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/state/ScriptRuntimeEngineFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/state/ScriptRuntimeEngineFactory.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/OA2QDLLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/OA2QDLLoader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/acl/ACLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/acl/ACLoader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/acl/AccessControlModule.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/acl/AccessControlModule.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/acl/QDLACL.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/acl/QDLACL.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/claims/AccessTokenInitializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/claims/AccessTokenInitializer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/claims/ClaimSourceConfigConverter.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/claims/ClaimSourceConfigConverter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/claims/ClaimsLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/claims/ClaimsLoader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/claims/ClaimsModule.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/claims/ClaimsModule.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/claims/ClaimsSourceGetter.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/claims/ClaimsSourceGetter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/claims/CreateSourceConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/claims/CreateSourceConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/claims/IDTokenInitializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/claims/IDTokenInitializer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/claims/IsInGroup.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/claims/IsInGroup.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/claims/IsInGroup2.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/claims/IsInGroup2.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/claims/NewTemplate.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/claims/NewTemplate.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/claims/RefreshTokenInitializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/claims/RefreshTokenInitializer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/claims/ScopeTemplateQDLUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/claims/ScopeTemplateQDLUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/claims/TemplateSubsitutionQDLUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/claims/TemplateSubsitutionQDLUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/claims/TokenHandlerLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/claims/TokenHandlerLoader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/claims/TokenHandlerMethod.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/claims/TokenHandlerMethod.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/claims/TokenHandlerModule.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/claims/TokenHandlerModule.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/scripting/OA2State.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/scripting/OA2State.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/scripting/QDLRuntimeEngine.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/scripting/QDLRuntimeEngine.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/util/JWTCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/util/JWTCommands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/util/JWTLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/util/JWTLoader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/util/JWTModule.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/util/JWTModule.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-test/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-test/src/test/java/org/oa4mp/server/test/QDLTestUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/test/java/org/oa4mp/server/test/QDLTestUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/driver.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/driver.qdl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/local/derby.log" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/local/derby.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/local/test_qdl.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/local/test_qdl.qdl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -1172,14 +1131,8 @@
       <workItem from="1746048974306" duration="138440000" />
       <workItem from="1747773920538" duration="5227000" />
       <workItem from="1747997700408" duration="12968000" />
-    </task>
-    <task id="LOCAL-00034" summary="Update website">
-      <option name="closed" value="true" />
-      <created>1719659801613</created>
-      <option name="number" value="00034" />
-      <option name="presentableId" value="LOCAL-00034" />
-      <option name="project" value="LOCAL" />
-      <updated>1719659801613</updated>
+      <workItem from="1748786031746" duration="4184000" />
+      <workItem from="1748896211549" duration="23534000" />
     </task>
     <task id="LOCAL-00035" summary="Update of website. Added support for echoing requests in CLC.">
       <option name="closed" value="true" />
@@ -1565,7 +1518,15 @@
       <option name="project" value="LOCAL" />
       <updated>1747141636992</updated>
     </task>
-    <option name="localTasksCounter" value="83" />
+    <task id="LOCAL-00083" summary="Changes reflecting https://github.com/ncsa/qdl/issues/123. All tests working as per requirements.">
+      <option name="closed" value="true" />
+      <created>1748785420082</created>
+      <option name="number" value="00083" />
+      <option name="presentableId" value="LOCAL-00083" />
+      <option name="project" value="LOCAL" />
+      <updated>1748785420082</updated>
+    </task>
+    <option name="localTasksCounter" value="84" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1587,7 +1548,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
-    <MESSAGE value="https://github.com/ncsa/oa4mp/issues/216 and https://github.com/ncsa/oa4mp/issues/217" />
     <MESSAGE value="Updating help, website" />
     <MESSAGE value="Fix for https://github.com/ncsa/oa4mp/issues/218. Changed package and some class names related to virtual issuers." />
     <MESSAGE value="RFC 6749 §4.4 documentation, client credentials flow" />
@@ -1612,7 +1572,8 @@
     <MESSAGE value="https://jira.ncsa.illinois.edu/browse/CIL-2231 fallout. Changes to FNAL's LDAP for the cilogontest user broke several existing tests, so as part of comprehensive testing, these were rewritten and improved." />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/246 LDAP errors not quite getting propagated back to the QDL layer." />
     <MESSAGE value="Integrating fixes for 6.1.0" />
-    <option name="LAST_COMMIT_MESSAGE" value="Integrating fixes for 6.1.0" />
+    <MESSAGE value="Changes reflecting https://github.com/ncsa/qdl/issues/123. All tests working as per requirements." />
+    <option name="LAST_COMMIT_MESSAGE" value="Changes reflecting https://github.com/ncsa/qdl/issues/123. All tests working as per requirements." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="GROUP_MULTIFILE_MERGE_BY_DIRECTORY" value="true" />
   </component>
@@ -1776,7 +1737,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/claims/HTTPHeaderClaimsSource.java</url>
-          <line>116</line>
+          <line>115</line>
           <option name="timeStamp" value="451" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -1921,7 +1882,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/clc/QDLConfigLoader.java</url>
-          <line>719</line>
+          <line>731</line>
           <option name="timeStamp" value="686" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -1938,11 +1899,6 @@
           <url>jar://$MAVEN_REPOSITORY$/org/qdl_lang/language/1.6-QDL-SNAPSHOT/language-1.6-QDL-SNAPSHOT-sources.jar!/org/qdl_lang/workspace/WorkspaceCommands.java</url>
           <line>7014</line>
           <option name="timeStamp" value="697" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>jar://$MAVEN_REPOSITORY$/org/qdl_lang/language/1.6-QDL-SNAPSHOT/language-1.6-QDL-SNAPSHOT-sources.jar!/org/qdl_lang/workspace/QDLWorkspace.java</url>
-          <line>571</line>
-          <option name="timeStamp" value="699" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/OA2ATServlet.java</url>
@@ -1983,11 +1939,6 @@
           <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/state/ScriptRuntimeEngineFactory.java</url>
           <line>66</line>
           <option name="timeStamp" value="770" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>jar://$MAVEN_REPOSITORY$/org/qdl_lang/language/1.6-QDL-SNAPSHOT/language-1.6-QDL-SNAPSHOT-sources.jar!/org/qdl_lang/evaluate/SystemEvaluator.java</url>
-          <line>1969</line>
-          <option name="timeStamp" value="772" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/org/qdl_lang/tests/1.6-QDL-SNAPSHOT/tests-1.6-QDL-SNAPSHOT-tests.jar!/org/qdl_lang/TestUtils.class</url>
@@ -2033,16 +1984,6 @@
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/sas-server/6.x-SNAPSHOT/sas-server-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/sas/SASServlet.java</url>
           <line>253</line>
           <option name="timeStamp" value="855" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/oauth2/src/main/java/org/oa4mp/delegation/server/client/TokenAwareServer.java</url>
-          <line>121</line>
-          <option name="timeStamp" value="863" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/oauth2/src/main/java/org/oa4mp/delegation/server/client/TokenAwareServer.java</url>
-          <line>122</line>
-          <option name="timeStamp" value="864" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/oauth2/src/main/java/org/oa4mp/delegation/server/client/TokenAwareServer.java</url>
@@ -2273,14 +2214,49 @@
           <option name="timeStamp" value="1107" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>jar://$MAVEN_REPOSITORY$/org/qdl_lang/language/1.6-QDL-SNAPSHOT/language-1.6-QDL-SNAPSHOT-sources.jar!/org/qdl_lang/variables/values/QDLValue.java</url>
-          <line>316</line>
-          <option name="timeStamp" value="1108" />
+          <url>jar://$MAVEN_REPOSITORY$/org/qdl_lang/language/1.6-QDL-SNAPSHOT/language-1.6-QDL-SNAPSHOT-sources.jar!/org/qdl_lang/evaluate/SystemEvaluator.java</url>
+          <line>1968</line>
+          <option name="timeStamp" value="1114" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2CLCCommands.java</url>
+          <line>147</line>
+          <option name="timeStamp" value="1123" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/OA2ATServlet.java</url>
+          <line>370</line>
+          <option name="timeStamp" value="1132" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/servlet/OA2ServletUtils.java</url>
+          <line>148</line>
+          <option name="timeStamp" value="1140" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/claims/BasicClaimsSourceImpl.java</url>
+          <line>320</line>
+          <option name="timeStamp" value="1141" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/org/qdl_lang/language/1.6-QDL-SNAPSHOT/language-1.6-QDL-SNAPSHOT-sources.jar!/org/qdl_lang/variables/values/QDLValue.java</url>
-          <line>193</line>
-          <option name="timeStamp" value="1111" />
+          <line>41</line>
+          <option name="timeStamp" value="1151" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2CLCCommands.java</url>
+          <line>2262</line>
+          <option name="timeStamp" value="1157" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/CLC.java</url>
+          <line>1573</line>
+          <option name="timeStamp" value="1159" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/CLC.java</url>
+          <line>1439</line>
+          <option name="timeStamp" value="1160" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-method">
           <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/storage/transactions/OA2MTStore.java</url>

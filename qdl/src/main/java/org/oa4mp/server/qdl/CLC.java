@@ -1130,9 +1130,7 @@ public class CLC implements QDLMetaModule {
                     if (obj.isStem()) {
                         QDLStem args = obj.asStem();
                         for (Object keyArg : args.keySet()) {
-                            if (keyArg instanceof String) {
-                                params.put((String) keyArg, args.getString((String) keyArg));
-                            }
+                                params.put((String) keyArg, args.get(keyArg).getValue());
                         }
                     }
                 }
@@ -1425,27 +1423,27 @@ public class CLC implements QDLMetaModule {
         }
     }
 
-    private static Map argToMap(Object[] objects, String name) {
+    private static Map argToMap(QDLValue[] objects, String name) {
         Map parameters = new HashMap();
         if (objects.length == 1) {
-            if (objects[0] instanceof String) {
+            if (objects[0].isString()) {
                 parameters.put(OA2Claims.SUBJECT, objects[0]);
             } else {
-                if (objects[0] instanceof QDLStem) {
-                    QDLStem stem = (QDLStem) objects[0];
+                if (objects[0].isStem()) {
+                    QDLStem stem = objects[0].asStem();
                     for (Object key : stem.keySet()) {
-                        Object value = stem.get(key);
-                        if (value instanceof QDLStem) {
-                            QDLStem qdlStem = (QDLStem) value;
+                        QDLValue value = stem.get(key);
+                        if (value.isStem()) {
+                            QDLStem qdlStem = value.asStem();
                             if (qdlStem.isList()) {
                                 JSONArray array = new JSONArray();
-                                array.addAll(qdlStem.getQDLList());
+                                array.addAll(QDLValue.castToJavaValues(qdlStem.getQDLList()));
                                 parameters.put(key, array);
                             } else {
                                 throw new IllegalArgumentException("General stems are not supported as values, just lists");
                             }
                         } else {
-                            parameters.put(key, value);
+                            parameters.put(key, value.getValue());
                         }
                     }
                 } else {

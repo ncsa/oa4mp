@@ -2,7 +2,6 @@ package org.oa4mp.server.loader.oauth2.claims;
 
 import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.qdl_lang.variables.QDLStem;
-import edu.uiuc.ncsa.security.core.util.StringUtils;
 
 import static org.oa4mp.server.loader.qdl.claims.CSConstants.*;
 
@@ -30,13 +29,10 @@ public class CodeClaimSource extends BasicClaimsSourceImpl {
 
     @Override
     public QDLStem toQDL() {
-        QDLStem arg = super.toQDL();
-        arg.put(CS_DEFAULT_TYPE, CS_TYPE_CODE);
-
-        if (!StringUtils.isTrivial(getClassName())) {
-            arg.put(CS_CODE_JAVA_CLASS, getClassName());
-        }
-        return arg;
+        QDLStem stem = super.toQDL();
+        addToStem(stem,CS_DEFAULT_TYPE, CS_TYPE_CODE);
+        addToStem(stem,CS_CODE_JAVA_CLASS, getClassName());
+        return stem;
     }
 
     public String getClassName() {

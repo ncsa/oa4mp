@@ -98,7 +98,7 @@ public class FSClaimSource extends BasicClaimsSourceImpl {
     protected JSONObject realProcessing(JSONObject claims, HttpServletRequest request, ServiceTransaction transaction) throws UnsupportedScopeException {
         // Finally, we can do something...
         JSONObject jsonObject;
-        if(getConfiguration().getProperty(FSClaimSource.DEFAULT_ALL_CLAIMS_KEY)==null){
+        if (getConfiguration().getProperty(FSClaimSource.DEFAULT_ALL_CLAIMS_KEY) == null) {
             try {
                 if (rawJSON == null) {
                     rawJSON = readFile();
@@ -107,9 +107,9 @@ public class FSClaimSource extends BasicClaimsSourceImpl {
                 DebugUtil.error(this, "Error reading file \"" + e.getMessage() + "\".", e);
                 throw new GeneralException(e);
             }
-             jsonObject = JSONObject.fromObject(rawJSON);
+            jsonObject = JSONObject.fromObject(rawJSON);
 
-        }else{
+        } else {
             jsonObject = (JSONObject) getConfiguration().getProperty(FSClaimSource.DEFAULT_ALL_CLAIMS_KEY);
         }
         JSONObject json;
@@ -193,7 +193,7 @@ public class FSClaimSource extends BasicClaimsSourceImpl {
         if (stem.containsKey(CS_DEFAULT_CLAIM_NAME_KEY)) {
             xp.put(FSClaimSource.DEFAULT_CLAIM_KEY, stem.getString(CS_DEFAULT_CLAIM_NAME_KEY));
         }
-        if(stem.containsKey(CS_FILE_STEM_CLAIMS)){
+        if (stem.containsKey(CS_FILE_STEM_CLAIMS)) {
             xp.put(FSClaimSource.DEFAULT_ALL_CLAIMS_KEY, stem.getStem(CS_FILE_STEM_CLAIMS).toJSON());
         }
         cfg.setProperties(xp);
@@ -202,23 +202,16 @@ public class FSClaimSource extends BasicClaimsSourceImpl {
     @Override
     public QDLStem toQDL() {
         QDLStem stem = super.toQDL();
-        stem.put(CS_DEFAULT_TYPE, CS_TYPE_FILE);
-
-        if(null != getConfiguration().getProperty(FSClaimSource.FILE_PATH_KEY)) {
-            stem.put(CS_FILE_FILE_PATH, getConfiguration().getProperty(FSClaimSource.FILE_PATH_KEY));
-        }
-        if (getConfiguration().getProperty(FSClaimSource.FILE_CLAIM_KEY) != null) {
-            stem.put(CS_FILE_CLAIM_KEY, getConfiguration().getProperty(FSClaimSource.FILE_CLAIM_KEY));
-        }
-        stem.put(CS_USE_DEFAULT_KEY, isUseDefaultClaims());
-        if(getConfiguration().getProperty(FSClaimSource.DEFAULT_ALL_CLAIMS_KEY) !=null){
+        addToStem(stem,CS_DEFAULT_TYPE, CS_TYPE_FILE);
+        addToStem(stem,CS_FILE_FILE_PATH, getConfiguration().getProperty(FSClaimSource.FILE_PATH_KEY));
+        addToStem(stem,CS_FILE_CLAIM_KEY, getConfiguration().getProperty(FSClaimSource.FILE_CLAIM_KEY));
+        addToStem(stem,CS_USE_DEFAULT_KEY, isUseDefaultClaims());
+        addToStem(stem,CS_DEFAULT_CLAIM_NAME_KEY, getDefaultClaimName());
+        if (getConfiguration().getProperty(FSClaimSource.DEFAULT_ALL_CLAIMS_KEY) != null) {
             JSONObject jsonObject = (JSONObject) getConfiguration().getProperty(FSClaimSource.DEFAULT_ALL_CLAIMS_KEY);
             QDLStem x = new QDLStem();
             x.fromJSON(jsonObject);
             stem.put(CS_FILE_STEM_CLAIMS, x);
-        }
-        if (getDefaultClaimName() != null) {
-            stem.put(CS_DEFAULT_CLAIM_NAME_KEY, getDefaultClaimName());
         }
         return stem;
     }

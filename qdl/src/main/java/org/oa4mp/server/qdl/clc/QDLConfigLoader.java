@@ -1,20 +1,5 @@
 package org.oa4mp.server.qdl.clc;
 
-import org.oa4mp.client.api.loader.AbstractClientLoader;
-import org.oa4mp.client.api.storage.AssetStore;
-import org.oa4mp.client.api.storage.FSAssetStore;
-import org.oa4mp.client.api.storage.MemoryAssetStore;
-import org.oa4mp.server.api.ServiceConstantKeys;
-import org.oa4mp.delegation.common.storage.clients.Client;
-import org.oa4mp.delegation.server.OA2Constants;
-import org.oa4mp.delegation.server.OIDCDiscoveryTags;
-import org.oa4mp.delegation.server.server.config.SSLConfigurationUtil2;
-import org.oa4mp.client.loader.OA2ClientEnvironment;
-import org.oa4mp.client.loader.OA2ClientLoaderImpl;
-import org.qdl_lang.exceptions.IndexError;
-import org.qdl_lang.parsing.IniParserDriver;
-import org.qdl_lang.variables.Constant;
-import org.qdl_lang.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.configuration.StorageConfigurationTags;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.LoggerProvider;
@@ -23,6 +8,23 @@ import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import edu.uiuc.ncsa.security.util.jwk.JWKUtil2;
 import edu.uiuc.ncsa.security.util.ssl.SSLConfiguration;
 import net.sf.json.JSONObject;
+import org.oa4mp.client.api.loader.AbstractClientLoader;
+import org.oa4mp.client.api.storage.AssetStore;
+import org.oa4mp.client.api.storage.FSAssetStore;
+import org.oa4mp.client.api.storage.MemoryAssetStore;
+import org.oa4mp.client.loader.OA2ClientEnvironment;
+import org.oa4mp.client.loader.OA2ClientLoaderImpl;
+import org.oa4mp.delegation.common.storage.clients.Client;
+import org.oa4mp.delegation.server.OA2Constants;
+import org.oa4mp.delegation.server.OIDCDiscoveryTags;
+import org.oa4mp.delegation.server.server.config.SSLConfigurationUtil2;
+import org.oa4mp.server.api.ServiceConstantKeys;
+import org.qdl_lang.exceptions.IndexError;
+import org.qdl_lang.parsing.IniParserDriver;
+import org.qdl_lang.variables.Constant;
+import org.qdl_lang.variables.QDLStem;
+import org.qdl_lang.variables.values.QDLValue;
+import org.qdl_lang.variables.values.StemValue;
 
 import javax.inject.Provider;
 import java.io.File;
@@ -76,12 +78,16 @@ public class QDLConfigLoader<T extends OA2ClientEnvironment> extends OA2ClientLo
             return target;  // This extends nothing
         }
         // Next figures out if the extends entry is a string or a list of strings
-        Object obj = target.getByMultiIndex(EXTENDS); // reuse obj;
+        StemValue sValue = new StemValue();;
+        sValue.fromPath(EXTENDS);
+        //QDLValue obj = target.getByMultiIndex(EXTENDS); // reuse obj;
+        QDLValue obj = target.get(sValue); // reuse obj;
+
         QDLStem ext;
-        if (obj instanceof QDLStem) {
-            ext = (QDLStem) obj; //ext is the list of extensions
+        if (obj.isStem()) {
+            ext = obj.asStem(); //ext is the list of extensions
         } else {
-            if (obj instanceof String) {
+            if (obj.isString()) {
                 ext = new QDLStem();
                 ext.put(0L, obj);
             } else {
@@ -93,9 +99,12 @@ public class QDLConfigLoader<T extends OA2ClientEnvironment> extends OA2ClientLo
         }
         // So ext is now a list of antecessors.
         // Spec says to do resolutions in order, so in [a0, a1, a2, ...] a0 is overridden by a1, etc.
-        for (Object value : ext.getQDLList().values()) {
-            String name = (String) value;
-            QDLStem y = resolveExtends(all, (QDLStem) all.getByMultiIndex(name));
+        for (QDLValue value : ext.getQDLList().values()) {
+            String name = value.asString();
+            sValue = new StemValue();
+            sValue.fromPath(name);
+            //QDLStem y = resolveExtends(all, (QDLStem) (QDLStem) all.getByMultiIndex(name));
+            QDLStem y = resolveExtends(all, all.get(sValue).asStem());
             target = target.union(y);
         }
         target.remove(EXTENDS); // So this is resolved and won't be redone later
@@ -107,9 +116,12 @@ public class QDLConfigLoader<T extends OA2ClientEnvironment> extends OA2ClientLo
     }
 
     protected QDLStem NEWinitialize(QDLStem s, String configName) {
-        Object obj = null;
+        QDLValue obj = null;
         try {
-            obj = s.getByMultiIndex(configName); // because the constructor
+            StemValue sValue = new StemValue();
+            sValue.fromPath(configName);
+            //obj = s.getByMultiIndex(configName); // because the constructor
+            obj = s.get(sValue); // because the constructor
         } catch (IndexError indexError) {
             throw new IllegalArgumentException(configName + " is not an entry");
         }
@@ -117,10 +129,10 @@ public class QDLConfigLoader<T extends OA2ClientEnvironment> extends OA2ClientLo
             throw new IllegalArgumentException(configName + " is not an entry");
         }
 
-        if (!(obj instanceof QDLStem)) {
+        if (!(obj.isStem())) {
             throw new IllegalArgumentException(configName + " must be a stem, but was a " + obj.getClass().getSimpleName());
         }
-        return resolveExtends(s, (QDLStem) obj);
+        return resolveExtends(s, obj.asStem());
     }
 
     QDLStem config;
@@ -150,19 +162,19 @@ public class QDLConfigLoader<T extends OA2ClientEnvironment> extends OA2ClientLo
         if (scopes == null) {
             scopes = new ArrayList<>();
         }
-        Object obj = getConfig().get(SCOPES);
-        if (obj == null) {
+        QDLValue qdlValue = getConfig().get(SCOPES);
+        if (qdlValue == null) {
             return scopes;
         }
-        if (obj instanceof String) {
-            scopes.add((String) obj);
+        if (qdlValue.isString()) {
+            scopes.add(qdlValue.asString());
         } else {
-            if (!(scopes instanceof QDLStem)) {
-                QDLStem ss = (QDLStem) obj;
+            if (!(scopes instanceof QDLStem)) { // It is *possible* some external call set this, so check.
+                QDLStem ss = qdlValue.asStem();
                 for (Object key : ss.keySet()) {
-                    Object value = ss.get(key);
-                    if (value instanceof String) {
-                        scopes.add((String) value);
+                    QDLValue value = ss.get(key);
+                    if (value.isString()) {
+                        scopes.add(value.asString());
                     }
                 }
             }
@@ -204,14 +216,14 @@ public class QDLConfigLoader<T extends OA2ClientEnvironment> extends OA2ClientLo
                         continue;
                     }
                     String key = (String) k;
-                    Object obj = eas.get(key);
-                    if (obj instanceof String) {
+                    QDLValue obj = eas.get(key);
+                    if (obj.isString()) {
                         List<String> ll = new ArrayList<>();
-                        ll.add((String) obj);
+                        ll.add(obj.asString());
                         extendedAttributes.put(key, ll);
                     } else {
-                        if (obj instanceof QDLStem) {
-                            QDLStem ea = (QDLStem) obj;
+                        if (obj.isStem()) {
+                            QDLStem ea = obj.asStem();
                             extendedAttributes.put(key, ea.getQDLList().toStringList());
                         }
                     }

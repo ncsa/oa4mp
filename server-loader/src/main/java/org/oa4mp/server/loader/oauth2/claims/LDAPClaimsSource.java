@@ -826,17 +826,16 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
     public QDLStem toQDL() {
         QDLStem stem = super.toQDL();
         LDAPConfigurationUtil cUtil = new LDAPConfigurationUtil();
-        stem.put(CS_DEFAULT_TYPE, CS_TYPE_LDAP);
-
         LDAPConfiguration cfg2 = (LDAPConfiguration) getConfiguration();
-        stem.put(CS_LDAP_SEARCH_NAME, cfg2.getSearchNameKey());
-        stem.put(CS_LDAP_SERVER_ADDRESS, cfg2.getServer());
-        stem.put(CS_LDAP_SEARCH_BASE, cfg2.getSearchBase()); // Fixes CIL-1328
-        stem.put(CS_LDAP_CONTEXT_NAME, cfg2.getContextName());
-        stem.put(CS_LDAP_ADDITIONAL_FILTER, cfg2.getAdditionalFilter());
-        stem.put(CS_LDAP_PORT, new Long(cfg2.getPort()));
-        stem.put(CS_LDAP_AUTHZ_TYPE, cUtil.getAuthName(cfg2.getAuthType()));
-        stem.put(CS_LDAP_SEARCH_FILTER_ATTRIBUTE, cfg2.getSearchFilterAttribute());
+        addToStem(stem,CS_DEFAULT_TYPE, CS_TYPE_LDAP);
+        addToStem(stem,CS_LDAP_SEARCH_NAME, cfg2.getSearchNameKey());
+        addToStem(stem,CS_LDAP_SERVER_ADDRESS, cfg2.getServer());
+        addToStem(stem,CS_LDAP_SEARCH_BASE, cfg2.getSearchBase()); // Fixes CIL-1328
+        addToStem(stem,CS_LDAP_CONTEXT_NAME, cfg2.getContextName());
+        addToStem(stem,CS_LDAP_ADDITIONAL_FILTER, cfg2.getAdditionalFilter());
+        addToStem(stem,CS_LDAP_PORT, new Long(cfg2.getPort()));
+        addToStem(stem,CS_LDAP_AUTHZ_TYPE, cUtil.getAuthName(cfg2.getAuthType()));
+        addToStem(stem,CS_LDAP_SEARCH_FILTER_ATTRIBUTE, cfg2.getSearchFilterAttribute());
         if (cfg2.hasSearchScope()) {
             stem.put(CS_LDAP_SEARCH_SCOPE, cfg2.getSearchScope());
         }
