@@ -196,7 +196,7 @@
         </user-data-constraint>
       </security-constraint>
  <!-- no matter which security constraint(s) are allowed, this next bit has to be
-      ucommented to since it is what allows for loging -->
+      ucommented to since it is what allows for logging -->
        <login-config>
           <auth-method>BASIC</auth-method>
         </login-config>

@@ -1,19 +1,5 @@
 package org.oa4mp.server.proxy;
 
-import org.oa4mp.server.loader.oauth2.OA2SE;
-import org.oa4mp.server.loader.oauth2.servlet.RFC8628Constants2;
-import org.oa4mp.server.loader.oauth2.servlet.RFC8628State;
-import org.oa4mp.server.loader.oauth2.storage.RFC8628Store;
-import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
-import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
-import org.oa4mp.server.api.storage.servlet.AbstractAuthorizationServlet;
-import org.oa4mp.server.api.storage.servlet.AuthorizationServletConfig;
-import org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet;
-import org.oa4mp.server.admin.myproxy.oauth2.tools.OA2CLCCommands;
-import org.oa4mp.server.admin.myproxy.oauth2.tools.OA2CommandLineClient;
-import org.oa4mp.delegation.server.OA2ATException;
-import org.oa4mp.delegation.server.OA2Constants;
-import org.oa4mp.delegation.server.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.TransactionNotFoundException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
@@ -22,56 +8,73 @@ import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.servlet.ServiceClientHTTPException;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import net.sf.json.JSONObject;
+import org.oa4mp.delegation.server.OA2ATException;
+import org.oa4mp.delegation.server.OA2Constants;
+import org.oa4mp.delegation.server.server.claims.OA2Claims;
+import org.oa4mp.server.admin.myproxy.oauth2.tools.OA2CLCCommands;
+import org.oa4mp.server.admin.myproxy.oauth2.tools.OA2CommandLineClient;
+import org.oa4mp.server.api.storage.servlet.AbstractAuthorizationServlet;
+import org.oa4mp.server.api.storage.servlet.AuthorizationServletConfig;
+import org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet;
+import org.oa4mp.server.loader.oauth2.OA2SE;
+import org.oa4mp.server.loader.oauth2.servlet.RFC8628Constants2;
+import org.oa4mp.server.loader.oauth2.servlet.RFC8628State;
+import org.oa4mp.server.loader.oauth2.state.ExtendedParameters;
+import org.oa4mp.server.loader.oauth2.storage.RFC8628Store;
+import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
+import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
 
 import javax.servlet.http.HttpServletResponse;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
 import java.util.*;
 
+import static java.net.URLEncoder.encode;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.oa4mp.server.api.storage.servlet.AbstractAuthorizationServlet.*;
 import static org.oa4mp.server.proxy.OA2AuthorizationServer.scopesToString;
 
 /**
- * Class with shared proxy utilities
+ * Class with shared proxy utilities. The client uses this to send requests via the proxy.
+ * The server hosting the proxy uses the RFC8628 servlets to process these.
  * <p>Created by Jeff Gaynor<br>
  * on 3/4/22 at  4:55 PM
  */
 public class ProxyUtils {
 
+    /**
+     * For device flows, if requiring local consent is enabled, this is the parameter that is
+     * sent. It is the redirect on the proxy side back to this site's consent machinery.
+     */
+    public static final String LOCAL_DF_CONSENT_XA = ExtendedParameters.OA4MP_NS + ":/proxy/df/consent_uri";
+
     protected static void doProxy(OA2SE oa2SE, RFC8628AuthorizationServer.PendingState pendingState) throws Throwable {
         RFC8628Store<? extends OA2ServiceTransaction> rfc8628Store = (RFC8628Store) oa2SE.getTransactionStore();
         OA2ServiceTransaction t = rfc8628Store.getByUserCode("");
-        doProxyRedirect(oa2SE, t, pendingState.getResponse());
+        startProxyAuthCodeFlow(oa2SE, t, pendingState.getResponse());
     }
 
     protected static void doProxy(OA2SE oa2SE, AbstractAuthorizationServlet.AuthorizedState state) throws Throwable {
         OA2ServiceTransaction t = (OA2ServiceTransaction) state.getTransaction();
-        doProxyRedirect(oa2SE, t, state.getResponse());
+        startProxyAuthCodeFlow(oa2SE, t, state.getResponse());
     }
 
     /**
-     * In the Authorization servlet, this creates the redirect to the proxy and redirects the user's browser.
+     * Starts the authorization code flow in the proxy. It redirects the user's browser. When done, the
+     * callback the proxy uses is to the {@link ProxyCallbackServlet}'s ready endpoint.
      *
      * @param oa2SE
      * @param t
      * @param response
      * @throws Throwable
      */
-    protected static void doProxyRedirect(OA2SE oa2SE, OA2ServiceTransaction t, HttpServletResponse response) throws Throwable {
+    protected static void startProxyAuthCodeFlow(OA2SE oa2SE, OA2ServiceTransaction t, HttpServletResponse response) throws Throwable {
 
         OA2CLCCommands clcCommands = createCLC(oa2SE, t);
         MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(t.getOA2Client());
         debugger.trace(ProxyUtils.class, "doProxyRedirect, response committed? " + response.isCommitted());
         AbstractAuthorizationServlet.MyHttpServletResponseWrapper wrapper = new AbstractAuthorizationServlet.MyHttpServletResponseWrapper(response);
         // set the specific scopes.
-        //InputLine inputLine = new InputLine("set_param", OA2CLCCommands.SHORT_REQ_PARAM_SWITCH, OA2Constants.SCOPE, scopesToString(t));
-        // Github#86 https://github.com/ncsa/oa4mp/issues/86 request max configured scopes.
-        /*OA2Client oa2Client = t.getOA2Client();
-        Set<String> requestScopes = new HashSet<>();
-        requestScopes.addAll(clcCommands.getCe().getScopes());
-        if (oa2Client.hasRequestScopes()) {
-            requestScopes.retainAll(oa2Client.getProxyRequestScopes());
-        }*/
         Collection<String> requestScopes = getRequestScopes(t, clcCommands);
 
         //InputLine inputLine = new InputLine("set_param", OA2CLCCommands.SHORT_REQ_PARAM_SWITCH, OA2Constants.SCOPE, scopesToString(clcCommands.getCe().getScopes()));
@@ -79,7 +82,7 @@ public class ProxyUtils {
         clcCommands.set_param(inputLine);
         debugger.trace(ProxyUtils.class, "doProxyRedirect setting input:" + inputLine);
         Identifier identifier = BasicIdentifier.randomID();
-        String id = Base64.getEncoder().encodeToString(identifier.toString().getBytes(StandardCharsets.UTF_8));
+        String id = Base64.getEncoder().encodeToString(identifier.toString().getBytes(UTF_8));
         t.setProxyId(identifier.toString());
         t.setAuthGrantValid(true);
         InputLine inputLine2 = new InputLine("set_param", OA2CLCCommands.SHORT_REQ_PARAM_SWITCH, OA2Constants.STATE, id);
@@ -92,11 +95,13 @@ public class ProxyUtils {
         // Here's where we need to poke at this.
         oa2SE.getTransactionStore().save(t); // save that proxy id!
         debugger.trace(ProxyUtils.class, "doProxyRedirect, wrapper committed? " + wrapper.isCommitted());
-        wrapper.sendRedirect(uri.toString());
+        String uriString = uri.toString();
+
+        wrapper.sendRedirect(uriString);
     }
 
     /**
-     * Sets up device flow with proxy and populates the {@link RFC8628State} with the information
+     * Starts device flow with proxy and populates the {@link RFC8628State} with the information
      * from the proxy. This returns the proxy's user code.
      *
      * @param oa2SE
@@ -105,23 +110,10 @@ public class ProxyUtils {
      * @return
      * @throws Exception
      */
-    protected static String getProxyUserCode(OA2SE oa2SE, OA2ServiceTransaction t, RFC8628State rfc8628State) throws Throwable {
+    protected static String startProxyDeviceFlow(OA2SE oa2SE, OA2ServiceTransaction t, RFC8628State rfc8628State) throws Throwable {
         MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(t.getOA2Client());
         debugger.trace(ProxyUtils.class, "starting getProxyUserCode");
         OA2CLCCommands clcCommands = createCLC(oa2SE, t);
-
-
-        //InputLine inputLine = new InputLine("set_param", OA2CLCCommands.SHORT_REQ_PARAM_SWITCH, OA2Constants.SCOPE, scopesToString(t));
-        // Github#86 https://github.com/ncsa/oa4mp/issues/86 request max configured scopes.
-/*
-        OA2Client oa2Client = t.getOA2Client();
-        HashSet<String> requestScopes = new HashSet<>();
-        requestScopes.addAll(clcCommands.getCe().getScopes());
-        if (oa2Client.hasRequestScopes()) {
-            requestScopes.retainAll(oa2Client.getProxyRequestScopes());
-        }
-*/
-        //InputLine inputLine = new InputLine("set_param", OA2CLCCommands.SHORT_REQ_PARAM_SWITCH, OA2Constants.SCOPE, scopesToString(clcCommands.getCe().getScopes()));
         Collection<String> requestScopes = getRequestScopes(t, clcCommands);
 
         InputLine inputLine = new InputLine("set_param", OA2CLCCommands.SHORT_REQ_PARAM_SWITCH, OA2Constants.SCOPE, scopesToString(requestScopes));
@@ -164,9 +156,8 @@ public class ProxyUtils {
 
 
     /**
-     * Takes the user code in the service transaction (which has been found) and does
-     * the redirect to the proxy for login. For RFC8628. After this call, the user's
-     * browser is on the proxy site.
+     * Takes the verification_uri_complete from the CLC (on the proxy site) and forwards the user's browser so
+     * they can log in on the proxy server.
      *
      * @param oa2SE
      * @param t
@@ -183,6 +174,10 @@ public class ProxyUtils {
         OA2CLCCommands clcCommands = getCLC(oa2SE, t);
         JSONObject dfResponse = clcCommands.getDfResponse();
         String rawCB = dfResponse.getString(RFC8628Constants2.VERIFICATION_URI_COMPLETE);
+        if(oa2SE.getAuthorizationServletConfig().isLocalDFConsent()){
+            String callback = oa2SE.getServiceAddress() + "/device?action=" + AUTHORIZATION_ACTION_DF_CONSENT_VALUE + "&user_code=" + t.getUserCode();
+            rawCB = rawCB + "&" + encode(LOCAL_DF_CONSENT_XA, UTF_8) + "=" + encode(callback, UTF_8);
+        }
         debugger.trace(ProxyUtils.class, "userCodeToProxyRedirect got DF response, raw callback =" + rawCB);
         debugger.trace(ProxyUtils.class, "userCodeToProxyRedirect wrapper committed? " + wrapper.isCommitted());
         wrapper.sendRedirect(rawCB);
@@ -204,9 +199,6 @@ public class ProxyUtils {
             throw new TransactionNotFoundException("No pending proxy transaction was found");
         }
         clcCommands.fromJSON(proxyState);
-/*        clcCommands.setPrintOuput(t.getOA2Client().isDebugOn());
-        clcCommands.setVerbose(t.getOA2Client().isDebugOn());
-        clcCommands.setDebugOn(t.getOA2Client().isDebugOn());*/
         return clcCommands;
     }
 
@@ -242,7 +234,14 @@ public class ProxyUtils {
         return clcCommands;
     }
 
-    protected static void doRFC8628AT(OA2SE oa2SE, OA2ServiceTransaction t) throws Throwable {
+    /**
+     * Gets the access token from the Proxy. This then finishes setting up the claims locally.
+     * @param oa2SE
+     * @param t
+     * @throws Throwable
+     */
+    protected static void getProxyAccessToken(OA2SE oa2SE, OA2ServiceTransaction t) throws Throwable {
+        if(t.isProxyAccessTokenComplete()) return; // already done
         MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(t.getOA2Client());
 
         // Now we have determined that this is a pending transaction
@@ -261,7 +260,7 @@ public class ProxyUtils {
         } catch (Throwable throwable) {
             debugger.trace(ProxyUtils.class, "error contacting proxy", throwable);
             if (throwable instanceof ServiceClientHTTPException) {
-                throw toOA2X((ServiceClientHTTPException) throwable, t);
+                throw toOA2ATException((ServiceClientHTTPException) throwable, t);
             }
             throw throwable;
         }
@@ -270,7 +269,7 @@ public class ProxyUtils {
             Throwable throwable = clcCommands.getLastException(); // This is a ServiceClientHTTPException so just pass it along
 
             if (throwable instanceof ServiceClientHTTPException) {
-                throw toOA2X((ServiceClientHTTPException) throwable, t);
+                throw toOA2ATException((ServiceClientHTTPException) throwable, t);
             }
 
             debugger.trace(ProxyUtils.class, "doRFC8628AT error contacting proxy", throwable);
@@ -282,6 +281,7 @@ public class ProxyUtils {
             t.setProxyState(clcCommands.toJSON());
             debugger.trace(ProxyUtils.class, "doRFC8628AT saving proxy state.");
             setClaimsFromProxy(t, clcCommands.getIdToken().getPayload(), debugger);
+            t.setProxyAccessTokenComplete(true);
             oa2SE.getTransactionStore().save(t);
         } catch (Throwable throwable) {
             if (debugger.isEnabled()) {
@@ -292,7 +292,13 @@ public class ProxyUtils {
         debugger.trace(ProxyUtils.class, "doRFC8628AT done.");
     }
 
-    protected static OA2ATException toOA2X(ServiceClientHTTPException serviceClientHTTPException, OA2ServiceTransaction t) {
+    /**
+     * Handles various types of exceptions, transforming them  to an {@link OA2ATException}.
+     * @param serviceClientHTTPException
+     * @param t
+     * @return
+     */
+    protected static OA2ATException toOA2ATException(ServiceClientHTTPException serviceClientHTTPException, OA2ServiceTransaction t) {
         JSONObject content = JSONObject.fromObject(serviceClientHTTPException.getContent());
         throw new OA2ATException(content.getString(OA2Constants.ERROR),
                 content.getString(OA2Constants.ERROR_DESCRIPTION),
@@ -300,6 +306,12 @@ public class ProxyUtils {
 
     }
 
+    /**
+     * Takes the claims returned fromthe proxy and adds them to the transaction
+     * @param t
+     * @param proxyClaims
+     * @param debugger
+     */
     protected static void setClaimsFromProxy(OA2ServiceTransaction t, JSONObject proxyClaims, MetaDebugUtil debugger) {
         debugger.trace(ProxyUtils.class, "setClaimsFromProxy starting");
         JSONObject claims = t.getUserMetaData();

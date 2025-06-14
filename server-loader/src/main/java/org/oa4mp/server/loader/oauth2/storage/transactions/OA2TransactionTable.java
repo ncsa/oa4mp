@@ -1,9 +1,9 @@
 package org.oa4mp.server.loader.oauth2.storage.transactions;
 
-import org.oa4mp.server.api.admin.transactions.DSTransactionTable;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnDescriptorEntry;
+import org.oa4mp.server.api.admin.transactions.DSTransactionTable;
 
-import java.sql.Types;
+import static java.sql.Types.*;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -22,25 +22,26 @@ public class OA2TransactionTable extends DSTransactionTable {
     @Override
     public void createColumnDescriptors() {
         super.createColumnDescriptors();
-        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().atJWT(), Types.LONGVARCHAR));
-        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().authTime(), Types.TIMESTAMP));
-        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().authzGrantLifetime(), Types.BIGINT));
-        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().expiresIn(), Types.BIGINT));
-        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().idTokenIdentifier(), Types.LONGVARCHAR));
-        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().idTokenLifetime(), Types.BIGINT));
-        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().isRFC8628(), Types.BOOLEAN));
-        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().nonce(), Types.LONGVARCHAR));
-        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().proxyID(), Types.LONGVARCHAR));
-        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().refreshToken(), java.sql.Types.LONGVARCHAR));
-        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().refreshTokenExpiresAt(), Types.BIGINT));
-        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().refreshTokenLifetime(), Types.BIGINT));
-        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().refreshTokenValid(), Types.BOOLEAN));
-        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().reqState(), Types.LONGVARCHAR));
-        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().rtJWT(), Types.LONGVARCHAR));
-        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().scopes(), Types.LONGVARCHAR));
-        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().states(), Types.LONGVARCHAR));
-        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().userCode(), Types.LONGVARCHAR));
-        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().validatedScopes(), Types.LONGVARCHAR));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().atJWT(), LONGVARCHAR));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().authTime(), TIMESTAMP));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().authzGrantLifetime(), BIGINT));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().consentPageOK(), BOOLEAN));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().expiresIn(), BIGINT));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().idTokenIdentifier(), LONGVARCHAR));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().idTokenLifetime(), BIGINT));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().isRFC8628(), BOOLEAN));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().nonce(), LONGVARCHAR));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().proxyID(), LONGVARCHAR));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().refreshToken(), LONGVARCHAR));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().refreshTokenExpiresAt(), BIGINT));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().refreshTokenLifetime(), BIGINT));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().refreshTokenValid(), BOOLEAN));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().reqState(), LONGVARCHAR));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().rtJWT(), LONGVARCHAR));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().scopes(), LONGVARCHAR));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().states(), LONGVARCHAR));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().userCode(), LONGVARCHAR));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(getOA2Keys().validatedScopes(), LONGVARCHAR));
     }
 
     public String getByRefreshTokenStatement() {

@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import java.util.HashMap;
 import static org.oa4mp.server.loader.qdl.claims.CSConstants.*;
+import static org.qdl_lang.variables.StemUtility.put;
 
 /**
  * This will return all the headers as a stem.
@@ -107,7 +108,7 @@ public class QDLHeadersClaimsSource extends BasicClaimsSourceImpl {
                 } else {
                     if (key.startsWith(getPrefix())) {
                         Object v = authHeaders.get(key);
-                        out.put(key.substring(getPrefix().length()), v);
+                        put(out,key.substring(getPrefix().length()), v);
                     }
                 }
             }
@@ -129,12 +130,12 @@ public class QDLHeadersClaimsSource extends BasicClaimsSourceImpl {
     @Override
     public QDLStem toQDL() {
         QDLStem arg = super.toQDL();
-        arg.put(CS_DEFAULT_TYPE, CS_TYPE_ALL_HEADERS);
+        put(arg,CS_DEFAULT_TYPE, CS_TYPE_ALL_HEADERS);
         if (!StringUtils.isTrivial(getPrefix())) {
             if(isRegex()){
-                arg.put(CS_HEADERS_REGEX, getPrefix());
+                put(arg,CS_HEADERS_REGEX, getPrefix());
             } else{
-                arg.put(CS_HEADERS_PREFIX, getPrefix());
+                put(arg,CS_HEADERS_PREFIX, getPrefix());
             }
         }
         return arg;

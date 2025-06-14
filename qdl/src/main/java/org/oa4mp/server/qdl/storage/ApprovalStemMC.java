@@ -6,6 +6,8 @@ import org.qdl_lang.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
+import static org.qdl_lang.variables.StemUtility.put;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 12/21/20 at  6:11 AM
@@ -52,15 +54,15 @@ public class ApprovalStemMC<V extends ClientApproval> extends StemConverter<V> {
        stem =  super.toMap(v, stem);
 
         if (v.getStatus() == null) {
-            stem.put(kk().status(), ClientApproval.Status.NONE.getStatus());
+            put(stem,kk().status(), ClientApproval.Status.NONE.getStatus());
         } else {
-            stem.put(kk().status(), v.getStatus().getStatus());
+            put(stem,kk().status(), v.getStatus().getStatus());
         }
-        stem.put(kk().approvalTS(), v.getApprovalTimestamp().getTime());
+        put(stem,kk().approvalTS(), v.getApprovalTimestamp().getTime());
         if (!StringUtils.isTrivial(v.getApprover())) {
-            stem.put(kk().approver(), v.getApprover());
+            put(stem,kk().approver(), v.getApprover());
         }
-        stem.put(kk().approved(), v.isApproved());
+        put(stem, kk().approved(), v.isApproved());
         return stem;
     }
 }

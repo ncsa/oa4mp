@@ -23,6 +23,8 @@ import org.qdl_lang.exceptions.IndexError;
 import org.qdl_lang.parsing.IniParserDriver;
 import org.qdl_lang.variables.Constant;
 import org.qdl_lang.variables.QDLStem;
+import org.qdl_lang.variables.values.LongValue;
+import org.qdl_lang.variables.values.QDLKey;
 import org.qdl_lang.variables.values.QDLValue;
 import org.qdl_lang.variables.values.StemValue;
 
@@ -39,6 +41,7 @@ import static org.oa4mp.client.api.ClientXMLTags.CERT_LIFETIME;
 import static org.oa4mp.client.api.ClientXMLTags.*;
 import static org.oa4mp.client.api.loader.AbstractClientLoader.defaultCertLifetime;
 import static org.oa4mp.delegation.server.OA2Constants.*;
+import static org.qdl_lang.variables.StemUtility.put;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -89,7 +92,7 @@ public class QDLConfigLoader<T extends OA2ClientEnvironment> extends OA2ClientLo
         } else {
             if (obj.isString()) {
                 ext = new QDLStem();
-                ext.put(0L, obj);
+                ext.put(LongValue.Zero, obj);
             } else {
                 throw new IllegalArgumentException("The extends list must contain only strings");
             }
@@ -171,7 +174,7 @@ public class QDLConfigLoader<T extends OA2ClientEnvironment> extends OA2ClientLo
         } else {
             if (!(scopes instanceof QDLStem)) { // It is *possible* some external call set this, so check.
                 QDLStem ss = qdlValue.asStem();
-                for (Object key : ss.keySet()) {
+                for (QDLKey key : ss.keySet()) {
                     QDLValue value = ss.get(key);
                     if (value.isString()) {
                         scopes.add(value.asString());
@@ -211,11 +214,11 @@ public class QDLConfigLoader<T extends OA2ClientEnvironment> extends OA2ClientLo
             if (getConfig().containsKey(EXTENDED_ATTRIBUTES)) {
                 QDLStem eas = getConfig().getStem(EXTENDED_ATTRIBUTES);
                 // convert to just strings
-                for (Object k : eas.keySet()) {
+                for (QDLKey k : eas.keySet()) {
                     if (!Constant.isString(k)) {
                         continue;
                     }
-                    String key = (String) k;
+                    String key = k.asString();
                     QDLValue obj = eas.get(key);
                     if (obj.isString()) {
                         List<String> ll = new ArrayList<>();
@@ -310,7 +313,7 @@ public class QDLConfigLoader<T extends OA2ClientEnvironment> extends OA2ClientLo
                 if (ssl.containsKey(TRUST_STORE_TAG)) {
                     // set this as the default. The assumption is that if there is a trust store, they
                     // don't want the default, though they can override it in the configuration.
-                    ssl.getStem(TRUST_STORE_TAG).put(TRUST_STORE_USE_DEFAULT_TRUST_MANAGER, false);
+                    put(ssl.getStem(TRUST_STORE_TAG), TRUST_STORE_USE_DEFAULT_TRUST_MANAGER, false);
                 }
                 renameSSLkeys(ssl);
                 sslConfiguration = SSLConfigurationUtil2.fromJSON((JSONObject) ssl.toJSON());
@@ -330,17 +333,17 @@ public class QDLConfigLoader<T extends OA2ClientEnvironment> extends OA2ClientLo
         if (ssl.containsKey(TRUST_STORE_TAG)) {
             QDLStem trustStore = ssl.getStem(TRUST_STORE_TAG);
             QDLStem renameKeys = new QDLStem();
-            renameKeys.put(QDLConfigTags.TRUST_STORE_TYPE, SSLConfigurationUtil2.SSL_TRUSTSTORE_TYPE);
-            renameKeys.put(QDLConfigTags.TRUST_STORE_PATH, SSLConfigurationUtil2.SSL_TRUSTSTORE_PATH);
-            renameKeys.put(QDLConfigTags.TRUST_STORE_CERT_DN, SSLConfigurationUtil2.SSL_TRUSTSTORE_CERTIFICATE_DN);
-            renameKeys.put(QDLConfigTags.TRUST_STORE_PASSWORD, SSLConfigurationUtil2.SSL_TRUSTSTORE_PASSWORD);
-            renameKeys.put(QDLConfigTags.SSL_USE_JAVA_TRUST_STORE, SSLConfigurationUtil2.SSL_TRUSTSTORE_USE_JAVA_TRUSTSTORE);
-            renameKeys.put(QDLConfigTags.TRUST_STORE_STRICT_HOSTNAME, SSLConfigurationUtil2.SSL_TRUSTSTORE_IS_STRICT_HOSTNAMES);
-            renameKeys.put(QDLConfigTags.TRUST_STORE_USE_DEFAULT_TRUST_MANAGER, SSLConfigurationUtil2.SSL_TRUSTSTORE_USE_DEFAULT_TRUST_MANAGER);
+            put(renameKeys,QDLConfigTags.TRUST_STORE_TYPE, SSLConfigurationUtil2.SSL_TRUSTSTORE_TYPE);
+            put(renameKeys,QDLConfigTags.TRUST_STORE_PATH, SSLConfigurationUtil2.SSL_TRUSTSTORE_PATH);
+            put(renameKeys,QDLConfigTags.TRUST_STORE_CERT_DN, SSLConfigurationUtil2.SSL_TRUSTSTORE_CERTIFICATE_DN);
+            put(renameKeys,QDLConfigTags.TRUST_STORE_PASSWORD, SSLConfigurationUtil2.SSL_TRUSTSTORE_PASSWORD);
+            put(renameKeys,QDLConfigTags.SSL_USE_JAVA_TRUST_STORE, SSLConfigurationUtil2.SSL_TRUSTSTORE_USE_JAVA_TRUSTSTORE);
+            put(renameKeys,QDLConfigTags.TRUST_STORE_STRICT_HOSTNAME, SSLConfigurationUtil2.SSL_TRUSTSTORE_IS_STRICT_HOSTNAMES);
+            put(renameKeys,QDLConfigTags.TRUST_STORE_USE_DEFAULT_TRUST_MANAGER, SSLConfigurationUtil2.SSL_TRUSTSTORE_USE_DEFAULT_TRUST_MANAGER);
             trustStore.renameKeys(renameKeys, true);
             // now to rename the trust_store
             renameKeys = new QDLStem();
-            renameKeys.put(QDLConfigTags.TRUST_STORE_TAG, SSLConfigurationUtil2.SSL_TRUSTSTORE_TAG);
+            put(renameKeys,QDLConfigTags.TRUST_STORE_TAG, SSLConfigurationUtil2.SSL_TRUSTSTORE_TAG);
             ssl.renameKeys(renameKeys, true);
         }
 

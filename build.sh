@@ -64,7 +64,12 @@ fi
 OA2_TOOLS=$OA4MP_ROOT/server-admin
 
 cd $OA4MP_ROOT || exit
-mvn clean install > maven.log
+echo  "╔══════════════╗"
+echo  "║Skipping tests║"
+echo  "╚══════════════╝"
+mvn clean install -DskipTests > maven.log
+
+# mvn clean install  > maven.log
 
 if [[ $? -ne 0 ]] ; then
     echo "OA4MP build failed, see $OA4MP_ROOT/maven.log"

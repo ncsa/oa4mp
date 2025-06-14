@@ -35,7 +35,6 @@ test.:= path + [
 say('Running all client management tests');
 say('--------------------');
 http := j_load('http');
-
 q:=load('test#/utils/cm.mdl');
 use(q);
 start_time := date_ms();

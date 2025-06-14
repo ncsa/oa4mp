@@ -4,8 +4,18 @@
 <html>
 <head>
     <title>MyProxy Delegation Service Client Registration Page</title>
+    <link rel="stylesheet"
+          type="text/css"
+          media="all"
+          href="static/oa4mp.css"/
 </head>
 <body>
+<body>
+<div id="topimgfill">
+    <div id="topimg"/>
+</div>
+<br clear="all"/>
+<div class="main">
 <form action="${actionToTake}" method="post">
     <h2>Welcome to the OA4MP Client Registration Page</h2>
 
@@ -91,6 +101,6 @@
     <input type="hidden" id="status" name="${action}"
            value="${request}"/>
 </form>
-
+</div>
 </body>
 </html>

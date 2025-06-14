@@ -11,6 +11,8 @@ import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import net.sf.json.JSONObject;
 
+import static org.qdl_lang.variables.StemUtility.put;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 12/21/20 at  6:33 AM
@@ -71,22 +73,22 @@ public class TXRStemMC<V extends TXRecord> extends StemConverter<V> {
     public QDLStem toMap(V v, QDLStem stem) {
         stem = super.toMap(v, stem);
         fromList(v.getAudience(), stem, kk().audience());
-        stem.put(kk().expiresAt(), v.getExpiresAt());
-        stem.put(kk().lifetime(), v.getLifetime());
-        stem.put(kk().issuedAt(), v.getIssuedAt());
+        put(stem,kk().expiresAt(), v.getExpiresAt());
+        put(stem,kk().lifetime(), v.getLifetime());
+        put(stem,kk().issuedAt(), v.getIssuedAt());
         if (!StringUtils.isTrivial(v.getIssuer())) {
-            stem.put(kk().issuer(), v.getIssuer());
+            put(stem,kk().issuer(), v.getIssuer());
         }
         if(v.getErsatzClient()!=null) {setNonNullStemValue(stem, kk().ersatzID(), v.getErsatzClient().getIdentifierString());}
         // 5
-        stem.put(kk().isValid(), v.isValid());
+        put(stem,kk().isValid(), v.isValid());
         if (v.getParentID() != null) {
-            stem.put(kk().parentID(), v.getParentID().getUri().toString());
+            put(stem,kk().parentID(), v.getParentID().getUri().toString());
         }
         fromList(v.getResource(), stem, kk().resource());
         fromList(v.getScopes(), stem, kk().scopes());
         if (!StringUtils.isTrivial(v.getTokenType())) {
-            stem.put(kk().tokenType(), v.getTokenType());
+            put(stem,kk().tokenType(), v.getTokenType());
         }
         // 10 attributes
         return stem;

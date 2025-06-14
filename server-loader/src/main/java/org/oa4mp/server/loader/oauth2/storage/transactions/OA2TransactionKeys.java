@@ -18,6 +18,7 @@ public class OA2TransactionKeys extends DSTransactionKeys {
     protected String authTime = "auth_time";
     protected String atJWT = "at_jwt";
     protected String authzGrantLifetime = "authz_grant_lifetime";
+    protected String consentPageOK = "consent_page_ok";
     protected String expiresIn = "expires_in";
     // https://github.com/ncsa/oa4mp/issues/128
     protected String idTokenIdentifier  = "id_token_identifier";
@@ -37,6 +38,11 @@ public class OA2TransactionKeys extends DSTransactionKeys {
     /*
      If you add keys or change these, you need to update TransactionStemMC or QDL support will break
      */
+
+    public String consentPageOK(String... x) {
+        if (0 < x.length) consentPageOK = x[0];
+        return consentPageOK;
+    }
     public String idTokenIdentifier(String... x) {
         if (0 < x.length) idTokenIdentifier = x[0];
         return idTokenIdentifier;

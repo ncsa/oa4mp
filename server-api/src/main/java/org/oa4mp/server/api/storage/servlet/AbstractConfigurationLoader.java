@@ -55,16 +55,21 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
     protected MultiDSPermissionStoreProvider mpp;
     protected ServiceEnvironmentImpl.MessagesProvider messagesProvider = null;
 
+    /**
+     * Get the value from the configuration node as a boolean. This returns the default value if
+     * no such configuration value. or if it does not parse to something reasonable.
+     * @param sn
+     * @param tagName
+     * @param defaultValue
+     * @return
+     */
     boolean getCfgBoolean(ConfigurationNode sn, String tagName, boolean defaultValue) {
         String x = getFirstAttribute(sn, tagName);
         if (x == null || x.length() == 0) return defaultValue;
-        boolean b = defaultValue;
-        try {
-            b = Boolean.parseBoolean(x);
-        } catch (Throwable t) {
-            return defaultValue;
-        }
-        return b;
+        x = x.trim().toLowerCase();
+        if("true".equals(x) || "on".equals(x)) {return true;}
+        if("false".equals(x.trim()) || "off".equals(x)) {return false;}
+        return defaultValue;
     }
 
 
@@ -103,9 +108,13 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
                             throw new IllegalArgumentException("The file \"" + cfgFile + "\" cannot be read. Check your permissions");
                         }
                         String cfgName = getFirstAttribute(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_PROXY_CONFIG_NAME);
+                        boolean localDFConsent = getCfgBoolean(sn,
+                                OA4MPConfigTags.AUTHORIZATION_SERVLET_PROXY_DF_LOCAL_CONSENT_REQUIRED,
+                                false);
+
                         // A missing config file is bad. However, if there is exactly one configuration in the file
                         // it does not need to be named, so the cfgName can be omitted.
-                      authorizationServletConfig = new AuthorizationServletConfig(cfgFile, cfgName==null?"":cfgName);
+                      authorizationServletConfig = new AuthorizationServletConfig(cfgFile, cfgName==null?"":cfgName, localDFConsent);
                       // Grab any authz URI or the discovery page does not get set right!
                         authorizationURI = getFirstAttribute(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_URI);
                         if(authorizationURI != null){

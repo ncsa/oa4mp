@@ -28,6 +28,7 @@ import java.security.SecureRandom;
 import java.util.*;
 
 import static org.oa4mp.server.loader.oauth2.state.ExtendedParameters.OA4MP_NS;
+import static org.qdl_lang.variables.StemUtility.put;
 import static org.qdl_lang.variables.values.QDLValue.asQDLValue;
 
 /**
@@ -657,15 +658,15 @@ public class JWTCommands  {
             }
             QDLStem QDLStem = new QDLStem();
             if (getJwks().hasDefaultKey()) {
-                QDLStem.put("default", getJwks().getDefaultKeyID());
+                put(QDLStem, "default", getJwks().getDefaultKeyID());
             }
             for (String id : getJwks().keySet()) {
                 JSONWebKey jwk = getJwks().get(id);
                 QDLStem entry = new QDLStem();
-                entry.put(MyOtherJWTUtil2.ALGORITHM, jwk.algorithm);
-                entry.put(JWKUtil2.USE, jwk.use);
-                entry.put(JWKUtil2.KEY_TYPE, jwk.type);
-                QDLStem.put(id, entry);
+                put(entry, MyOtherJWTUtil2.ALGORITHM, jwk.algorithm);
+                put(entry, JWKUtil2.USE, jwk.use);
+                put(entry, JWKUtil2.KEY_TYPE, jwk.type);
+                put(QDLStem, id, entry);
             }
             return asQDLValue(QDLStem);
         }

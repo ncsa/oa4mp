@@ -7,6 +7,8 @@ import org.qdl_lang.state.LibLoader;
 import org.qdl_lang.state.State;
 import org.qdl_lang.variables.QDLStem;
 
+import static org.qdl_lang.variables.StemUtility.put;
+
 /**
  * Remember that a reference to this class goes into the QDL configuration &lt;modules&gt;
  * tag and its function is to simply put a convenient listing of whatever classes it has
@@ -20,17 +22,17 @@ public class OA2LibLoader implements LibLoader {
     @Override
     public void add(State state) {
         QDLStem lib = new QDLStem();
-        lib.put("description", "OA4MP tools for ACLs, JWTs, claims as well as token handlers");
+        put(lib,"description", "OA4MP tools for ACLs, JWTs, claims as well as token handlers");
         state.addLibEntries(libKey, createEntries());
     }
     protected QDLStem createEntries(){
         QDLStem lib = new QDLStem();
-        lib.put("description", "OA4MP tools for ACLs, JWTs, claims as well as token handlers");
+        put(lib,"description", "OA4MP tools for ACLs, JWTs, claims as well as token handlers");
         QDLStem subLib = new QDLStem();
-        subLib.put("claims", ClaimsLoader.class.getCanonicalName());
-        subLib.put("jwt", JWTLoader.class.getCanonicalName());
-        subLib.put("acl", ACLoader.class.getCanonicalName());
-        lib.put("util", subLib);
+        put(subLib,"claims", ClaimsLoader.class.getCanonicalName());
+        put(subLib,"jwt", JWTLoader.class.getCanonicalName());
+        put(subLib,"acl", ACLoader.class.getCanonicalName());
+        put(lib,"util", subLib);
         return lib;
     }
 }

@@ -27,6 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static org.oa4mp.server.loader.qdl.claims.CSConstants.*;
+import static org.qdl_lang.variables.StemUtility.put;
 
 /**
  * The most basic implementation of a {@link ClaimSource}.
@@ -333,6 +334,6 @@ public class BasicClaimsSourceImpl implements ClaimSource {
         if(value instanceof String) {
             if(StringUtils.isTrivial((String)value)) return;
         }
-        stem.put(key, value);
+        put(stem, key, value);
     }
 }

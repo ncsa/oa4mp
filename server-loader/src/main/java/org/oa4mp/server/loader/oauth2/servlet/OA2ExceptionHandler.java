@@ -175,6 +175,10 @@ public class OA2ExceptionHandler implements ExceptionHandler {
 
     protected void handleOA2Error(OA2GeneralError oa2GeneralError, HttpServletResponse response) throws IOException {
         DebugUtil.trace(this, "error = " + oa2GeneralError);
+        oa2GeneralError.printStackTrace();
+        if(oa2GeneralError.getCause()  !=null ){
+            oa2GeneralError.getCause().printStackTrace();
+        }
         PrintWriter writer = response.getWriter();
         response.setStatus(oa2GeneralError.getHttpStatus());
         writer.println(OA2Constants.ERROR + "=\"" + encode(oa2GeneralError.getError()) + "\"");

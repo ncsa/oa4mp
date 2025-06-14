@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import static org.oa4mp.server.loader.qdl.claims.CSConstants.*;
+import static org.qdl_lang.variables.StemUtility.put;
 
 /**
  * A claim source backed by a file system. The file simply contains a JSON object of userids and attributes
@@ -211,7 +212,7 @@ public class FSClaimSource extends BasicClaimsSourceImpl {
             JSONObject jsonObject = (JSONObject) getConfiguration().getProperty(FSClaimSource.DEFAULT_ALL_CLAIMS_KEY);
             QDLStem x = new QDLStem();
             x.fromJSON(jsonObject);
-            stem.put(CS_FILE_STEM_CLAIMS, x);
+            put(stem,CS_FILE_STEM_CLAIMS, x);
         }
         return stem;
     }

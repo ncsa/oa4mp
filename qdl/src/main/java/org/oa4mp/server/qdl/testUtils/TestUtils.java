@@ -13,6 +13,7 @@ import org.qdl_lang.variables.QDLStem;
 import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
 import net.sf.json.JSONObject;
 import org.qdl_lang.variables.values.LongValue;
+import org.qdl_lang.variables.values.QDLKey;
 import org.qdl_lang.variables.values.QDLValue;
 
 import java.util.ArrayList;
@@ -262,8 +263,8 @@ public class TestUtils implements QDLMetaModule {
             if(object.isStem()){
                 QDLStem stem = object.asStem();
                 QDLStem outStem = new QDLStem();
-                for(Object key : stem.keySet()){
-                    outStem.putLongOrString(key, convert(stem.get(key)));
+                for(QDLKey key : stem.keySet()){
+                    outStem.put(key, convert(stem.get(key)));
                 }
                 return asQDLValue(outStem);
             }

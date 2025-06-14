@@ -20,7 +20,10 @@
 <html>
 <head>
     <title>MyProxy Delegation Portal Authorization Page</title>
-
+    <link rel="stylesheet"
+          type="text/css"
+          media="all"
+          href="static/oa4mp.css"/>
 </head>
 <style type="text/css">
     .hidden {
@@ -32,6 +35,11 @@
     }
 </style>
 <body>
+<div id="topimgfill">
+    <div id="topimg"/>
+</div>
+<br clear="all"/>
+<div class="main">
 <h2>Welcome to the OAuth 2.0 for MyProxy Client Authorization Page</h2>
 The Client below is requesting access to your account. If you approve,
 please sign in with your username and password.
@@ -106,6 +114,6 @@ please sign in with your username and password.
         </tr>
     </table>
 </form>
-
+</div>
 </body>
 </html>

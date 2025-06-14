@@ -15,6 +15,7 @@ import org.qdl_lang.extensions.QDLFunction;
 import org.qdl_lang.state.State;
 import org.qdl_lang.variables.QDLList;
 import org.qdl_lang.variables.QDLStem;
+import org.qdl_lang.variables.values.LongValue;
 import org.qdl_lang.variables.values.QDLValue;
 import org.qdl_lang.variables.values.StringValue;
 
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.qdl_lang.variables.QDLStem.STEM_INDEX_MARKER;
+import static org.qdl_lang.variables.StemUtility.put;
 import static org.qdl_lang.variables.values.QDLValue.asQDLValue;
 
 /**
@@ -214,7 +216,7 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
             String key = k.toString();
             Object obj = claims.get(k);
             if (obj instanceof JSONObject) {
-                out.put(k + STEM_INDEX_MARKER, claimsToStem((JSONObject) obj));
+                put(out,k + STEM_INDEX_MARKER, claimsToStem((JSONObject) obj));
             } else {
                 if (obj instanceof JSONArray) {
                     JSONArray array = (JSONArray) obj;
@@ -232,9 +234,9 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
                     }
                     QDLStem st1 = new QDLStem();
                     st1.setQDLList(sl);
-                    out.put(key + STEM_INDEX_MARKER, st1);
+                    put(out,key + STEM_INDEX_MARKER, st1);
                 } else {
-                    out.put(key, obj.toString());
+                    put(out,key, obj.toString());
                 }
             }
         }
@@ -302,8 +304,8 @@ get_claims(cfg., 'dweitzel2@unl.edu')
 
     protected static void testFS() {
         QDLStem mystem = new QDLStem();
-        mystem.put(CS_DEFAULT_TYPE, CS_TYPE_FILE);
-        mystem.put(CS_FILE_FILE_PATH, DebugUtil.getDevPath() + "/oa4mp/server-test/src/main/resources/test-claims.json");
+        put(mystem, CS_DEFAULT_TYPE, CS_TYPE_FILE);
+        put(mystem, CS_FILE_FILE_PATH, DebugUtil.getDevPath() + "/oa4mp/server-test/src/main/resources/test-claims.json");
         CreateSourceConfig csc = new CreateSourceConfig();
         QDLStem out = csc.evaluate(new QDLValue[]{asQDLValue(mystem)}, null).asStem();
         System.out.println(out.toJSON().toString(2));
@@ -318,12 +320,12 @@ get_claims(cfg., 'dweitzel2@unl.edu')
     protected static void testLDAP2() {
         QDLStem mystem = new QDLStem();
 
-        mystem.put(CS_DEFAULT_TYPE, CS_TYPE_LDAP);
-        mystem.put(CS_LDAP_SERVER_ADDRESS, "ldap1.ncsa.illinois.edu,ldap2.ncsa.illinois.edu");
-        mystem.put(CS_LDAP_SEARCH_FILTER_ATTRIBUTE, "uid");
-        mystem.put(CS_LDAP_SEARCH_BASE, "ou=People,dc=ncsa,dc=illinois,dc=edu");
-        mystem.put(CS_LDAP_SEARCH_NAME, "uid");
-        mystem.put(CS_LDAP_AUTHZ_TYPE, "none");
+        put(mystem,CS_DEFAULT_TYPE, CS_TYPE_LDAP);
+        put(mystem,CS_LDAP_SERVER_ADDRESS, "ldap1.ncsa.illinois.edu,ldap2.ncsa.illinois.edu");
+        put(mystem,CS_LDAP_SEARCH_FILTER_ATTRIBUTE, "uid");
+        put(mystem,CS_LDAP_SEARCH_BASE, "ou=People,dc=ncsa,dc=illinois,dc=edu");
+        put(mystem,CS_LDAP_SEARCH_NAME, "uid");
+        put(mystem,CS_LDAP_AUTHZ_TYPE, "none");
         CreateSourceConfig createSourceConfig = new CreateSourceConfig();
         QDLStem cfg = createSourceConfig.evaluate(new QDLValue[]{asQDLValue(mystem)}, null).asStem();
 
@@ -347,13 +349,13 @@ get_claims(cfg., 'dweitzel2@unl.edu')
 
     protected static void testLDAP() {
         QDLStem mystem = new QDLStem();
-        mystem.put(CS_DEFAULT_TYPE, CS_TYPE_LDAP);
-        mystem.put(CS_LDAP_SERVER_ADDRESS, "ldap4.ncsa.illinois.edu,ldap2.ncsa.illinois.edu,ldap1.ncsa.illinois.edu");
-        mystem.put(CS_LDAP_AUTHZ_TYPE, "none");
-        mystem.put(CS_LDAP_SEARCH_NAME, "uid");
-        mystem.put(CS_DEFAULT_IS_ENABLED, Boolean.TRUE);
-        mystem.put(CS_LDAP_SEARCH_FILTER_ATTRIBUTE, "uid");
-        mystem.put(CS_LDAP_SEARCH_BASE, "ou=People,dc=ncsa,dc=illinois,dc=edu");
+        put(mystem,CS_DEFAULT_TYPE, CS_TYPE_LDAP);
+        put(mystem,CS_LDAP_SERVER_ADDRESS, "ldap4.ncsa.illinois.edu,ldap2.ncsa.illinois.edu,ldap1.ncsa.illinois.edu");
+        put(mystem,CS_LDAP_AUTHZ_TYPE, "none");
+        put(mystem,CS_LDAP_SEARCH_NAME, "uid");
+        put(mystem,CS_DEFAULT_IS_ENABLED, Boolean.TRUE);
+        put(mystem,CS_LDAP_SEARCH_FILTER_ATTRIBUTE, "uid");
+        put(mystem,CS_LDAP_SEARCH_BASE, "ou=People,dc=ncsa,dc=illinois,dc=edu");
 
         ArrayList<Object> searchAttr = new ArrayList<>();
         searchAttr.add("mail");
@@ -365,9 +367,9 @@ get_claims(cfg., 'dweitzel2@unl.edu')
         sa.addList(searchAttr);
         QDLStem groupNames = new QDLStem();
 
-        groupNames.put("0", "memberOf");
-        mystem.put(CS_LDAP_SEARCH_ATTRIBUTES, sa);
-        mystem.put(CS_LDAP_GROUP_NAMES, groupNames);
+        groupNames.put(LongValue.Zero, "memberOf");
+        put(mystem,CS_LDAP_SEARCH_ATTRIBUTES, sa);
+        put(mystem,CS_LDAP_GROUP_NAMES, groupNames);
         System.out.println("\n-----\nldap cfg:\n-----\n" + mystem.toString(1));
         ClaimsSourceGetter cst = new ClaimsSourceGetter();
         QDLStem claims = cst.evaluate(new QDLValue[]{asQDLValue(mystem), new StringValue("jgaynor")}, null).asStem();

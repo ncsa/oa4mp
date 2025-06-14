@@ -47,6 +47,7 @@ import java.util.zip.GZIPOutputStream;
 
 import static org.oa4mp.server.loader.oauth2.flows.FlowType.*;
 import static org.qdl_lang.variables.QDLStem.STEM_INDEX_MARKER;
+import static org.qdl_lang.variables.StemUtility.put;
 import static org.qdl_lang.variables.values.QDLValue.asQDLValue;
 
 /**
@@ -444,7 +445,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         QDLStem sysErr = new QDLStem();
         // Set sys_err.ok  here so scripts don't have to keep checking if it is defined.
         // Old script error handling by setting a global variable
-        sysErr.put(SYS_ERR_OK, Boolean.TRUE);
+        put(sysErr,SYS_ERR_OK, Boolean.TRUE);
         state.setValue(SYS_ERR_VAR, asQDLValue(sysErr));
         // New way, raise an error with this reserved error code.
         state.setValue(OA4MP_ERROR_CODE_NAME, asQDLValue(OA4MP_ERROR_CODE));
@@ -452,7 +453,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             QDLStem mailStem = new QDLStem();
 
             QDLStem mailCfg = QDLMail.convertMEToStem(state.getOa2se().getMailUtil().getMailEnvironment());
-            mailStem.put(MAIL_CFG_VAR, mailCfg);
+            put(mailStem,MAIL_CFG_VAR, mailCfg);
             QDLList body = new QDLList();
             try {
                 // CIL-1873 support for email notifications from QDL.
@@ -469,7 +470,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
                         body.add(asQDLValue(stringTokenizer.nextToken()));
                     }
                 }
-                mailStem.put(MAIL_MESSAGE_VAR, new QDLStem(body));
+                put(mailStem,MAIL_MESSAGE_VAR, new QDLStem(body));
             } catch (IOException iox) {
                 getState().getLogger().warn("could not get mail message for QDL runtime environment");
             }
@@ -547,7 +548,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             for (ClaimSource source : (List<ClaimSource>) req.getArgs().get(SRE_REQ_CLAIM_SOURCES)) {
                 if (source.hasConfiguration()) {
                     //sources.put(i + ".", ConfigtoCS.convert(source));
-                    sources.put(i + ".", source.toQDL());
+                    put(sources,i + ".", source.toQDL());
                     i++;
                 }
             }
@@ -560,7 +561,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         // access_control.admins. == list of administrators for this client.
         QDLStem acl = new QDLStem();
         // There is always a client id.
-        acl.put("client_id", state.getClientID().toString());
+        put(acl,"client_id", state.getClientID().toString());
         // Convert to a list of strings. List of admins may be empty.
         ArrayList<Object> adminIDs = new ArrayList<>();
         for (Identifier id : state.getAdminIDs()) {
@@ -568,7 +569,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         }
         QDLStem adminStem = new QDLStem();
         adminStem.addList(adminIDs);
-        acl.put("admins.", adminStem);
+        put(acl,"admins.", adminStem);
         state.setValue(ACCESS_CONTROL, asQDLValue(acl));
         // these are always defined.
         QDLStem txScopes = new QDLStem();
@@ -605,7 +606,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         QDLStem scopeStem = new QDLStem();
         for (int i = 0; i < scopes.size(); i++) {
             String index = Integer.toString(i);
-            scopeStem.put(index, scopes.get(i));
+            put(scopeStem,index, scopes.get(i));
         }
         return scopeStem;
     }
@@ -647,14 +648,14 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
 
     public QDLStem toStem(FlowStates2 flowStates) {
         QDLStem QDLStem = new QDLStem();
-        QDLStem.put(getGTName(ACCEPT_REQUESTS), flowStates.acceptRequests);
-        QDLStem.put(getGTName(ACCESS_TOKEN), flowStates.accessToken);
-        QDLStem.put(getGTName(GET_CERT), flowStates.getCert);
-        QDLStem.put(getGTName(GET_CLAIMS), flowStates.getClaims);
-        QDLStem.put(getGTName(ID_TOKEN), flowStates.idToken);
-        QDLStem.put(getGTName(REFRESH_TOKEN), flowStates.refreshToken);
-        QDLStem.put(getGTName(USER_INFO), flowStates.userInfo);
-        QDLStem.put(getGTName(AT_DO_TEMPLATES), flowStates.at_do_templates);
+        put(QDLStem, getGTName(ACCEPT_REQUESTS), flowStates.acceptRequests);
+        put(QDLStem, getGTName(ACCESS_TOKEN), flowStates.accessToken);
+        put(QDLStem, getGTName(GET_CERT), flowStates.getCert);
+        put(QDLStem, getGTName(GET_CLAIMS), flowStates.getClaims);
+        put(QDLStem, getGTName(ID_TOKEN), flowStates.idToken);
+        put(QDLStem, getGTName(REFRESH_TOKEN), flowStates.refreshToken);
+        put(QDLStem, getGTName(USER_INFO), flowStates.userInfo);
+        put(QDLStem, getGTName(AT_DO_TEMPLATES), flowStates.at_do_templates);
 
         return QDLStem;
     }

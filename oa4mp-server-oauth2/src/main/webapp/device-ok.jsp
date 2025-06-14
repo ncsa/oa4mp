@@ -6,10 +6,21 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page session="false" %>
 <html>
-<head><title>User Code Accepted!</title></head>
+<head><title>User Code Accepted!</title>
+    <link rel="stylesheet"
+          type="text/css"
+          media="all"
+          href="static/oa4mp.css"/>
+</head>
 <body>
-<h2>User Code Accepted!</h2>
+<div id="topimgfill">
+    <div id="topimg"/>
+</div>
+<br clear="all"/>
+<div class="main">
+    <h2>User Code Accepted!</h2>
 
-<p>You may now proceed with this flow to get tokens.</p>
+    <p>You may now proceed with this flow to get tokens.</p>
+</div>
 </body>
 </html>

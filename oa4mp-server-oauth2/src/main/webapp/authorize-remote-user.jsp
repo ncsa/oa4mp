@@ -20,7 +20,10 @@
 <html>
 <head>
     <title>MyProxy Delegation Portal Authorization Page</title>
-
+    <link rel="stylesheet"
+          type="text/css"
+          media="all"
+          href="static/oa4mp.css"/>
 </head>
 <style type="text/css">
     .hidden {
@@ -32,7 +35,12 @@
     }
 </style>
 <body>
-<h2>Welcome to the OAuth 2.0 for MyProxy Client Authorization Page</h2>
+<div id="topimgfill">
+    <div id="topimg"/>
+</div>
+<br clear="all"/>
+<div class="main">
+<h2>Welcome to the OA4MP Client Authorization Page</h2>
 The Client below is requesting access to your account. If you approve,
 please accept, otherwise, cancel.
 <p>
@@ -80,6 +88,6 @@ please accept, otherwise, cancel.
     <input type="hidden" id="state" name="${stateKey}" value="${authorizationState}"/>
 
 </form>
-
+</div>
 </body>
 </html>

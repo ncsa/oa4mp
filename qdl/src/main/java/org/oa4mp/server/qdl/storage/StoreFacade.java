@@ -20,10 +20,7 @@ import org.qdl_lang.state.State;
 import org.qdl_lang.variables.QDLList;
 import org.qdl_lang.variables.QDLNull;
 import org.qdl_lang.variables.QDLStem;
-import org.qdl_lang.variables.values.BooleanValue;
-import org.qdl_lang.variables.values.QDLNullValue;
-import org.qdl_lang.variables.values.QDLValue;
-import org.qdl_lang.variables.values.StringValue;
+import org.qdl_lang.variables.values.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -33,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
+import static org.qdl_lang.variables.StemUtility.put;
 import static org.qdl_lang.variables.values.QDLValue.asQDLValue;
 
 /**
@@ -46,12 +44,12 @@ public class StoreFacade /*implements QDLMetaModule*/ {
     public QDLStem getStoreTypes() {
         if (types == null) {
             types = new QDLStem();
-            types.put("client", STORE_TYPE_CLIENT);
-            types.put("approval", STORE_TYPE_APPROVALS);
-            types.put("admin", STORE_TYPE_ADMIN_CLIENT_STORE);
-            types.put("permission", STORE_TYPE_PERMISSION_STORE);
-            types.put("transaction", STORE_TYPE_TRANSACTION);
-            types.put("tx", STORE_TYPE_TX_STORE);
+            put(types,"client", STORE_TYPE_CLIENT);
+            put(types,"approval", STORE_TYPE_APPROVALS);
+            put(types,"admin", STORE_TYPE_ADMIN_CLIENT_STORE);
+            put(types,"permission", STORE_TYPE_PERMISSION_STORE);
+            put(types,"transaction", STORE_TYPE_TRANSACTION);
+            put(types,"tx", STORE_TYPE_TX_STORE);
         }
         return types;
     }
@@ -343,13 +341,13 @@ public class StoreFacade /*implements QDLMetaModule*/ {
                 return asQDLValue(getStoreAccessor().toXML(objects[0].asStem()));
             }
             QDLStem out = new QDLStem();
-            for (Object key : stem.keySet()) {
+            for (QDLKey key : stem.keySet()) {
                 try {
                     // Skip items that fail, replacing them with nulls
-                    out.putLongOrString(key, getStoreAccessor().toXML(stem.get(key).asStem()));
+                    out.put(key, getStoreAccessor().toXML(stem.get(key).asStem()));
                 } catch (Throwable t) {
                     getLogger().warn("Could not convert object to XML:" + t.getMessage(), t);
-                    out.putLongOrString(key, QDLNullValue.getNullValue());
+                    out.put(key, QDLNullValue.getNullValue());
                 }
             }
             return asQDLValue(out);
@@ -391,12 +389,12 @@ public class StoreFacade /*implements QDLMetaModule*/ {
             }
             QDLStem arg = objects[0].asStem();
             QDLStem out = new QDLStem();
-            for (Object key : arg.keySet()) {
+            for (QDLKey key : arg.keySet()) {
                 Object obj = arg.get(key);
                 if (obj instanceof String) {
-                    out.putLongOrString(key, getStoreAccessor().fromXML((String) obj));
+                    out.put(key, getStoreAccessor().fromXML((String) obj));
                 } else {
-                    out.putLongOrString(key, QDLNull.getInstance());
+                    out.put(key, QDLNull.getInstance());
                 }
 
             }
@@ -518,7 +516,7 @@ public class StoreFacade /*implements QDLMetaModule*/ {
 
             // Finally, we have a generic stem of id or [id,version]
             QDLStem outStem = new QDLStem();
-            for (Object key : argStem.keySet()) {
+            for (QDLKey key : argStem.keySet()) {
                 QDLValue value = argStem.get(key);
                 Object result = QDLNull.getInstance();
                 if (value.isString()) {
@@ -528,7 +526,7 @@ public class StoreFacade /*implements QDLMetaModule*/ {
                     QDLList ql = value.asStem().getQDLList();
                     result = getVersionedSingleEntry(ql.get(0L), ql.get(1L));
                 }
-                outStem.putLongOrString(key, result);
+                outStem.put(key, result);
             }
 
             return asQDLValue(outStem);
@@ -836,18 +834,18 @@ public class StoreFacade /*implements QDLMetaModule*/ {
             }
             QDLStem arg = objects[0].asStem();
             QDLStem outStem = new QDLStem();
-            for (Object key : arg.keySet()) {
+            for (QDLKey key : arg.keySet()) {
                 QDLValue value = arg.get(key);
                 if (value.isString()) {
-                    outStem.putLongOrString(key, getStoreAccessor().remove(BasicIdentifier.newID(value.asString())));
+                    outStem.put(key, getStoreAccessor().remove(BasicIdentifier.newID(value.asString())));
                 } else {
                     VID vid = toVID(value);
                     if (vid != null) {
                         try {
                             getStoreAccessor().getStoreArchiver().remove(vid.id, vid.version);
-                            outStem.putLongOrString(key, Boolean.TRUE);
+                            outStem.put(key, Boolean.TRUE);
                         } catch (Exception e) {
-                            outStem.putLongOrString(key, Boolean.FALSE);
+                            outStem.put(key, Boolean.FALSE);
                         }
                     }
                 }
@@ -911,12 +909,12 @@ public class StoreFacade /*implements QDLMetaModule*/ {
             if (!(objects[0].isString())) {
                 throw new BadArgException("dyadic " + name + " requires a string as its first argument", 0);
             }
-            id.put(0L, objects[0]);
+            id.put(LongValue.Zero, objects[0]);
             if (!(objects[1].isLong())) {
                 throw new BadArgException("dyadic " + name + " requires an integer as its second argument", 1);
             }
-            id.put(1L, objects[1]);
-            out.put(0L, id);
+            id.put(LongValue.One, objects[1]);
+            out.put(LongValue.Zero, id);
             return out;
         }
         // So a single argument
@@ -928,7 +926,7 @@ public class StoreFacade /*implements QDLMetaModule*/ {
         if (temp.isList() && temp.size() == 2) {
             if ((temp.get(0L).isString()) && (temp.get(1L).isLong())) {
                 out = new QDLStem();
-                out.put(0L, temp);
+                out.put(LongValue.Zero, temp);
             }
         }
         return objects[0].asStem(); // It was the right format
@@ -963,7 +961,7 @@ public class StoreFacade /*implements QDLMetaModule*/ {
                         if (objects[0].isString()) {
                             isScalar = true;
                             arg = new QDLStem();
-                            arg.put(0L, objects[0]);
+                            arg.put(LongValue.Zero, objects[0]);
                         } else {
                             throw new BadArgException(getName() + " requires stem or string argument", 0);
                         }
@@ -1063,7 +1061,7 @@ public class StoreFacade /*implements QDLMetaModule*/ {
             boolean hasStringArg = false;
             if (objects[0].isString()) {
                 args = new QDLStem();
-                args.put(0L, objects[0]);
+                args.put(LongValue.Zero, objects[0]);
                 hasStringArg = true;
             }
             if (objects[0].isStem()) {
@@ -1073,15 +1071,15 @@ public class StoreFacade /*implements QDLMetaModule*/ {
                 throw new BadArgException(getName() + " requires either an id or stem of them as its argument.", 0);
             }
             QDLStem out = new QDLStem();
-            for (Object key : args.keySet()) {
+            for (QDLKey key : args.keySet()) {
                 Identifier id = toIdentifier(args.get(key).asString());
                 if (id == null) {
-                    out.putLongOrString(key, QDLNullValue.getNullValue()); // no valid id means a null
+                    out.put(key, QDLNullValue.getNullValue()); // no valid id means a null
                     continue;
                 }
                 QDLStem entry = new QDLStem();
                 entry.addList(getStoreAccessor().getStoreArchiver().getVersionNumbers(id));
-                out.putLongOrString(key, entry);
+                out.put(key, entry);
             }
             if (hasStringArg) {
                 return out.get(0L); // preserve shape.
@@ -1132,13 +1130,13 @@ public class StoreFacade /*implements QDLMetaModule*/ {
         public QDLValue evaluate(QDLValue[] objects, State state) {
             QDLStem args = convertArgsToVersionIDs(objects, getName());
             QDLStem out = new QDLStem();
-            for (Object key : args.keySet()) {
+            for (QDLKey key : args.keySet()) {
                 VID vid = toVID(args.get(key));
                 if (vid == null) {
-                    out.putLongOrString(key, BooleanValue.False);
+                    out.put(key, BooleanValue.False);
                     continue;
                 }
-                out.putLongOrString(key, getStoreAccessor().getStoreArchiver().restore(vid.id, vid.version));
+                out.put(key, getStoreAccessor().getStoreArchiver().restore(vid.id, vid.version));
             }
             return asQDLValue(out);
         }
@@ -1162,18 +1160,5 @@ public class StoreFacade /*implements QDLMetaModule*/ {
             return doxx;
         }
     }
-
-    protected String DIFFERENCE_NAME = "diff";
-
-
-/*    @Override
-    public JSONObject serializeToJSON() {
-        return null;
-    }
-
-    @Override
-    public void deserializeFromJSON(JSONObject jsonObject) {
-
-    }*/
 }
 

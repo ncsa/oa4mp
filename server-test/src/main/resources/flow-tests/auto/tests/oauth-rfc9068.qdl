@@ -14,7 +14,6 @@ clc#init($$OA4MP_CLC_INI, test_id);
 refresh_params.'refresh' :=  {'scope': 'storage.read:/home/davenport/vo3 compute.create storage.modify:/public/pendav/vo3 storage.modify:/public/davenport/vo3'};
 refresh_params.'exchange' :=  {'scope': 'storage.read:/home/davenport/vo3 compute.create storage.modify:/public/pendav/vo3 storage.modify:/public/davenport/vo3'};
 clc#set_param(refresh_params.);
-
 initialization := size(args())==1⇒args().0:import(load('test#/auto/utils/initialization.mdl'));
 checks:=initialization#checks();
 ini.:=initialization#get_client_ini(test_id);

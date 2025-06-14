@@ -17,6 +17,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import static org.qdl_lang.variables.StemUtility.put;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 12/20/20 at  7:06 AM
@@ -61,7 +63,7 @@ public abstract class StemConverter<V extends Identifiable> extends MapConverter
         if (stem == null) {
             stem = new QDLStem();
         }
-        stem.put(getKeys().identifier(), v.getIdentifierString());
+        put(stem,getKeys().identifier(), v.getIdentifierString());
         return stem;
     }
 
@@ -165,7 +167,7 @@ public abstract class StemConverter<V extends Identifiable> extends MapConverter
                     target.listAdd(new StringValue(s.toString()));
                 }
             }
-            stem.put(key + QDLStem.STEM_INDEX_MARKER, target);
+            put(stem,key + QDLStem.STEM_INDEX_MARKER, target);
         }
     }
 
@@ -177,7 +179,7 @@ public abstract class StemConverter<V extends Identifiable> extends MapConverter
      */
     protected void setNonNullStemValue(QDLStem stem, String key, Object value){
         if(value != null){
-            stem.put(key, value);
+            put(stem,key, value);
         }
     }
 }

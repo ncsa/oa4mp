@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static edu.uiuc.ncsa.security.core.util.BasicIdentifier.newID;
+import static org.qdl_lang.variables.StemUtility.put;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -103,10 +104,10 @@ public class PermissionStemMC<V extends Permission> extends StemConverter<V> {
     public QDLStem toMap(V v, QDLStem stem) {
         stem = super.toMap(v, stem);
         if (v.getAdminID() != null) {
-            stem.put(kk().adminID(), v.getAdminID().toString());
+            put(stem, kk().adminID(), v.getAdminID().toString());
         }
         if (v.getClientID() != null) {
-            stem.put(kk().clientID(), v.getClientID().toString());
+            put(stem, kk().clientID(), v.getClientID().toString());
         }
         if (v.getErsatzChain() != null && !v.getErsatzChain().isEmpty()) {
             List<Identifier> ids = v.getErsatzChain();
@@ -117,16 +118,16 @@ public class PermissionStemMC<V extends Permission> extends StemConverter<V> {
             }
             QDLStem e = new QDLStem();
             e.setQDLList(list);
-            stem.put(kk().ersatzID(), list);
+            put(stem,kk().ersatzID(), list);
         }
 
-        stem.put(kk().substitute(), v.canSubstitute());
-        stem.put(kk().canApprove(), v.isApprove());
-        stem.put(kk().canCreate(), v.isCreate());
-        stem.put(kk().canRemove(), v.isDelete());
+        put(stem, kk().substitute(), v.canSubstitute());
+        put(stem, kk().canApprove(), v.isApprove());
+        put(stem, kk().canCreate(), v.isCreate());
+        put(stem, kk().canRemove(), v.isDelete());
         // 7
-        stem.put(kk().readable(), v.isRead());
-        stem.put(kk().writeable(), v.isWrite());
+        put(stem,kk().readable(), v.isRead());
+        put(stem,kk().writeable(), v.isWrite());
         // 8 attributes
         return stem;
     }

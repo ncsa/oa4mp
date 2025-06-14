@@ -19,6 +19,8 @@ import org.qdl_lang.variables.values.StringValue;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.qdl_lang.variables.StemUtility.put;
+
 /**
  * A {@link StemConverter} to convert stems and clients.
  * <p>Created by Jeff Gaynor<br>
@@ -289,21 +291,21 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
         if (v.getConfig() != null && !v.getConfig().isEmpty()) {
             QDLStem cfg = new QDLStem();
             cfg.fromJSON(v.getConfig());
-            stem.put(kk().cfg(), cfg);
+            put(stem, kk().cfg(), cfg);
         }
-        stem.put(kk().dfInterval(), v.getDfInterval());
+        put(stem,kk().dfInterval(), v.getDfInterval());
         // 5
-        stem.put(kk().dfLifetime(), v.getDfLifetime());
+        put(stem,kk().dfLifetime(), v.getDfLifetime());
         if (v.getExtendedAttributes() != null && !v.getExtendedAttributes().isEmpty()) {
             QDLStem ea = new QDLStem();
             ea.fromJSON(v.getExtendedAttributes());
-            stem.put(kk().ea(), ea);
+            put(stem,kk().ea(), ea);
         }
-        stem.put(kk().maxIDTLifetime(), v.getMaxIDTLifetime());
-        stem.put(kk().maxATLifetime(), v.getMaxATLifetime());
-        stem.put(kk().maxRTLifetime(), v.getMaxRTLifetime());
-        stem.put(kk().rtGracePeriod(), v.getRtGracePeriod());
-        stem.put(kk().ersatzClient(), v.isErsatzClient());
+        put(stem,kk().maxIDTLifetime(), v.getMaxIDTLifetime());
+        put(stem,kk().maxATLifetime(), v.getMaxATLifetime());
+        put(stem,kk().maxRTLifetime(), v.getMaxRTLifetime());
+        put(stem,kk().rtGracePeriod(), v.getRtGracePeriod());
+        put(stem,kk().ersatzClient(), v.isErsatzClient());
         setNonNullStemValue(stem, kk().ersatzInheritIDToken(), v.isErsatzInheritIDToken());
 
         setNonNullStemValue(stem, kk().issuer(), v.getIssuer());
@@ -311,7 +313,7 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
             JSONArray jsonArray = getCC().getLdapConfigurationUtil().toJSON(v.getLdaps());
             QDLStem ldap = new QDLStem();
             ldap.fromJSON(jsonArray);
-            stem.put(kk().ldap(), ldap);
+            put(stem,kk().ldap(), ldap);
         }
         setNonNullStemValue(stem, kk().publicClient(), v.isPublicClient());
         // 12
@@ -330,7 +332,7 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
             for(Identifier id : v.getPrototypes()){
                 list.add(new StringValue(id.toString()));
             }
-            stem.put(kk().prototypes(), list);
+            put(stem,kk().prototypes(), list);
         }
         // 15 attributes
         return stem;

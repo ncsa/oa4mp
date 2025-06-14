@@ -20,7 +20,10 @@
 <html>
 <head>
     <title>OA4MP Device Authorization Page.</title>
-
+    <link rel="stylesheet"
+          type="text/css"
+          media="all"
+          href="static/oa4mp.css"/>
 </head>
 <style type="text/css">
     .hidden {
@@ -32,42 +35,47 @@
     }
 </style>
 <body>
-<h2>Welcome to the OAuth 2.0 for MyProxy (OA4MP) device Authorization Page.</h2>
-please enter the user code your received.
-<p>
+<div id="topimgfill">
+    <div id="topimg"/>
+</div>
+<br clear="all"/>
+<div class="main">
+    <h2>Welcome to the OAuth 2.0 for MyProxy (OA4MP) device Authorization Page.</h2>
+    please enter the user code your received.
+    <p>
 
-<form action="${actionToTake}" method="POST">
+    <form action="${actionToTake}" method="POST">
 
-    <table border=1>
-        <tr valign="top">
-            <th>Device flow</th>
-        </tr>
-        <tr>
-            <td>User code:</td>
-            <td><input type="text" size="25" name="${AuthUserCode}"
-                       value="${userCode}"/></td>
-        </tr>
-        <tr>
-            <td colspan="2">&nbsp;</td>
-        </tr>
-        <tr>
-            <td>
-                <input type="submit" style="float: left;" value="Accept"/>
-                <input type="button" style="float: right;" name="cancel" value="Cancel"/>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="2"><b><font color="red">${retryMessage}</font></b></td>
-        </tr>
-    </table>
+        <table border=1>
+            <tr valign="top">
+                <th>Device flow</th>
+            </tr>
+            <tr>
+                <td>User code:</td>
+                <td><input type="text" size="25" name="${AuthUserCode}"
+                           value="${userCode}"/></td>
+            </tr>
+            <tr>
+                <td colspan="2">&nbsp;</td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="submit" style="float: left;" value="Accept"/>
+                    <input type="button" style="float: right;" name="cancel" value="Cancel"/>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2"><b><font color="red">${retryMessage}</font></b></td>
+            </tr>
+        </table>
 
-    <!-- Close sign in table -->
-    <input type="hidden" id="status" name="${action}"
-           value="${actionOk}"/>
-    <input type="hidden" id="token" name="identifier" value="${identifier}"/>
-    <input type="hidden" id="counter" name="counter" value="${count}"/>
+        <!-- Close sign in table -->
+        <input type="hidden" id="status" name="${action}"
+               value="${actionOk}"/>
+        <input type="hidden" id="token" name="identifier" value="${identifier}"/>
+        <input type="hidden" id="counter" name="counter" value="${count}"/>
 
-</form>
-
+    </form>
+</div>
 </body>
 </html>

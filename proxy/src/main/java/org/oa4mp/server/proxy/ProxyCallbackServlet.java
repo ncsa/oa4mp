@@ -1,26 +1,28 @@
 package org.oa4mp.server.proxy;
 
+import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.exceptions.TransactionNotFoundException;
+import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
+import edu.uiuc.ncsa.security.servlet.JSPUtil;
+import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
+import edu.uiuc.ncsa.security.storage.XMLMap;
+import edu.uiuc.ncsa.security.util.cli.InputLine;
+import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.oa4mp.delegation.server.OA2Constants;
+import org.oa4mp.delegation.server.ServiceTransaction;
+import org.oa4mp.delegation.server.jwt.JWTRunner;
+import org.oa4mp.delegation.server.request.IssuerResponse;
+import org.oa4mp.server.admin.myproxy.oauth2.tools.OA2CLCCommands;
+import org.oa4mp.server.admin.myproxy.oauth2.tools.OA2CommandLineClient;
+import org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet;
 import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.servlet.OA2ClientUtils;
 import org.oa4mp.server.loader.oauth2.servlet.OA2ServletUtils;
 import org.oa4mp.server.loader.oauth2.state.ScriptRuntimeEngineFactory;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
 import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
-import org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet;
-import org.oa4mp.server.admin.myproxy.oauth2.tools.OA2CLCCommands;
-import org.oa4mp.server.admin.myproxy.oauth2.tools.OA2CommandLineClient;
-import org.oa4mp.delegation.server.OA2Constants;
-import org.oa4mp.delegation.server.jwt.JWTRunner;
-import org.oa4mp.delegation.server.ServiceTransaction;
-import org.oa4mp.delegation.server.request.IssuerResponse;
-import edu.uiuc.ncsa.security.core.Identifier;
-import edu.uiuc.ncsa.security.core.exceptions.TransactionNotFoundException;
-import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
-import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
-import edu.uiuc.ncsa.security.storage.XMLMap;
-import edu.uiuc.ncsa.security.util.cli.InputLine;
-import net.sf.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -30,6 +32,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
+import static org.oa4mp.server.api.ServiceConstantKeys.TOKEN_KEY;
 import static org.oa4mp.server.proxy.ProxyUtils.setClaimsFromProxy;
 
 /**
@@ -73,7 +77,6 @@ public class ProxyCallbackServlet extends OA2AuthorizationServer {
         }
         MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(t.getOA2Client());
         debugger.trace(this, "request uri= " + request.getRequestURI());
-
         // Now we have determined that this is a pending transaction
         debugger.trace(this, "loading proxy client");
         OA2CLCCommands clcCommands = new OA2CLCCommands(getMyLogger(), new OA2CommandLineClient(getMyLogger()));
@@ -104,14 +107,30 @@ public class ProxyCallbackServlet extends OA2AuthorizationServer {
         } catch (Throwable throwable) {
             OA2ServletUtils.handleScriptEngineException(this, oa2SE, throwable, createDebugger(t.getClient()), t, backup);
         }
-        oa2SE.getTransactionStore().save(t);
         // At this point, the user has logged in, the transaction state should be correct, so we need to
         // create the correct callback and return it.
         Map<String, String> cbParams = new HashMap<>();
         cbParams.put(OA2Constants.STATE, t.getRequestState()); // Make sure that the original state that was sent is returned to the client callback
-        String cb = createCallback(t, cbParams);
-        response.sendRedirect(cb);
+        createCallback(t, cbParams);
+        oa2SE.getTransactionStore().save(t);
+     //   response.sendRedirect(cb);
+        setClientConsentAttributes(request, t);
+        JSPUtil.fwd(request, response, "/proxy-consent.jsp");
     }
+    protected void setClientConsentAttributes(HttpServletRequest request, OA2ServiceTransaction t) {
+        request.setAttribute(AUTHORIZATION_ACTION_KEY, AUTHORIZATION_ACTION_KEY);
+        request.setAttribute("actionOk", AUTHORIZATION_ACTION_OK_VALUE);
+        request.setAttribute("authorizationGrant", t.getIdentifierString());
+        request.setAttribute("tokenKey", CONST(TOKEN_KEY));
+        // OAuth 2.0 specific values that must be preserved.
+        request.setAttribute("stateKey", "state");
+        request.setAttribute("authorizationState", t.getRequestState());
 
+        request.setAttribute("clientHome", escapeHtml(t.getClient().getHomeUri()));
+        request.setAttribute("clientName", escapeHtml(t.getClient().getName()));
+        request.setAttribute("clientScopes", StringEscapeUtils.escapeHtml(scopesToString(t)));
+
+        request.setAttribute("actionToTake", request.getContextPath() + "/authorize");
+    }
 
 }

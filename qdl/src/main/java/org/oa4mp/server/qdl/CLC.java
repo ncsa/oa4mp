@@ -22,15 +22,13 @@ import org.qdl_lang.extensions.QDLMetaModule;
 import org.qdl_lang.state.State;
 import org.qdl_lang.variables.QDLList;
 import org.qdl_lang.variables.QDLStem;
-import org.qdl_lang.variables.values.BooleanValue;
-import org.qdl_lang.variables.values.QDLNullValue;
-import org.qdl_lang.variables.values.QDLValue;
-import org.qdl_lang.variables.values.StringValue;
+import org.qdl_lang.variables.values.*;
 
 import java.net.URI;
 import java.util.*;
 
 import static edu.uiuc.ncsa.security.core.util.StringUtils.pad;
+import static org.qdl_lang.variables.StemUtility.put;
 import static org.qdl_lang.variables.values.QDLValue.asQDLValue;
 
 /**
@@ -50,9 +48,9 @@ public class CLC implements QDLMetaModule {
 
     protected QDLStem getTokens() {
         QDLStem result = new QDLStem();
-        result.put("access_token", tokenToStem(clcCommands.getDummyAsset().getAccessToken()));
+        put(result,"access_token", tokenToStem(clcCommands.getDummyAsset().getAccessToken()));
         if (clcCommands.getDummyAsset().hasRefreshToken()) {
-            result.put("refresh_token", tokenToStem(clcCommands.getDummyAsset().getRefreshToken()));
+            put(result,"refresh_token", tokenToStem(clcCommands.getDummyAsset().getRefreshToken()));
         }
         return result;
     }
@@ -574,7 +572,7 @@ public class CLC implements QDLMetaModule {
             }
             if (isRefreshToken) {
                 QDLStem x = new QDLStem();
-                x.put("refresh_token", tokenToStem(clcCommands.getDummyAsset().getRefreshToken()));
+                put(x,"refresh_token", tokenToStem(clcCommands.getDummyAsset().getRefreshToken()));
                 return asQDLValue(x);
             }
 
@@ -992,7 +990,7 @@ public class CLC implements QDLMetaModule {
         @Override
         public QDLValue evaluate(QDLValue[] objects, State state) {
             QDLStem stem = new QDLStem();
-            QDLList qdlList = null;
+            QDLList<? extends QDLValue> qdlList = null;
             boolean isScalar = false;
             if (objects.length == 0) {
                 qdlList = new QDLList();
@@ -1011,7 +1009,7 @@ public class CLC implements QDLMetaModule {
                     qdlList = objects[0].asStem().getQDLList();
                 }
             }
-            for (Object key : qdlList.values()) {
+            for (QDLValue key : qdlList.values()) {
                 HashMap<String, Object> params = null;
                 switch (key.toString()) {
                     case PARAM_FLAG_AUTHZ:
@@ -1036,12 +1034,12 @@ public class CLC implements QDLMetaModule {
                 if (params != null) {
                     QDLStem v = new QDLStem();
                     for (String key2 : params.keySet()) {
-                        v.put(key2, params.get(key2));
+                        put(v,key2, params.get(key2));
                     }
                     if (isScalar) {
                         return asQDLValue(v); // only one.
                     }
-                    stem.put(key.toString(), v);
+                    put(stem,key.toString(), v);
                 }
             }
             return asQDLValue(stem);
@@ -1103,7 +1101,7 @@ public class CLC implements QDLMetaModule {
                 throw new BadArgException(getName() + " requires a stem as its argument", null);
             }
             QDLStem stem = objects[0].asStem();
-            for (Object key : stem.keySet()) {
+            for (QDLKey key : stem.keySet()) {
                 HashMap<String, Object> params = null;
                 switch (key.toString()) {
                     case PARAM_FLAG_AUTHZ:
@@ -1129,8 +1127,8 @@ public class CLC implements QDLMetaModule {
                     QDLValue obj = stem.get(key);
                     if (obj.isStem()) {
                         QDLStem args = obj.asStem();
-                        for (Object keyArg : args.keySet()) {
-                                params.put((String) keyArg, args.get(keyArg).getValue());
+                        for (QDLKey keyArg : args.keySet()) {
+                                params.put(keyArg.asString(), args.get(keyArg).getValue());
                         }
                     }
                 }
@@ -1171,7 +1169,7 @@ public class CLC implements QDLMetaModule {
     protected QDLStem tokenToStem(TokenImpl token) {
         QDLStem stem = new QDLStem();
         JSONObject json = clcCommands.resolveFromToken(token, false);
-        stem.put("raw_token", token.getToken()); // always get this
+        put(stem,"raw_token", token.getToken()); // always get this
         if (json == null) {
             // was not a JWT. No other way to tell except to try it.
             if (TokenUtils.isBase32(token.getToken())) {
@@ -1180,40 +1178,40 @@ public class CLC implements QDLMetaModule {
 
                 accessToken2.decodeToken(token.getToken());
                 token = accessToken2;
-                stem.put("jti", token.getToken());
+                put(stem,"jti", token.getToken());
                 //say("   decoded token:" + accessToken.getToken());
             }
             Date expirationDate = DateUtils.getDate(token.getToken());
             expirationDate.setTime(expirationDate.getTime() + token.getLifetime());
             Boolean isExpired = expirationDate.getTime() < System.currentTimeMillis();
-            stem.put("expired", isExpired);
+            put(stem,"expired", isExpired);
             if (!isExpired) {
-                stem.put("lifetime", token.getLifetime());
-                stem.put("ts", token.getIssuedAt());
-                stem.put("expires", token.getIssuedAt() + token.getLifetime());
+                put(stem,"lifetime", token.getLifetime());
+                put(stem,"ts", token.getIssuedAt());
+                put(stem,"expires", token.getIssuedAt() + token.getLifetime());
             }
         } else {
             // It is a JWT
             QDLStem jwt = new QDLStem();
             jwt.fromJSON(json);
-            stem.put("jwt", jwt);
-            stem.put("jti", jwt.getString("jti"));
+            put(stem,"jwt", jwt);
+            put(stem,"jti", jwt.getString("jti"));
             Long expiration = -1L;
             Long timestamp = -1L;
             if (json.containsKey(OA2Claims.ISSUED_AT)) {
                 timestamp = json.getLong(OA2Claims.ISSUED_AT) * 1000L;
-                stem.put("ts", timestamp); // since its in sec., convert to ms.
+                put(stem,"ts", timestamp); // since its in sec., convert to ms.
             }
             if (json.containsKey(OA2Claims.EXPIRATION)) {
                 expiration = json.getLong(OA2Claims.EXPIRATION) * 1000L;
-                stem.put("expires", expiration);
-                stem.put("lifetime", expiration - timestamp);
+                put(stem,"expires", expiration);
+                put(stem,"lifetime", expiration - timestamp);
             }
             if (0 < expiration && 0 < timestamp) {
                 if (System.currentTimeMillis() < expiration) {
-                    stem.put("expired", Boolean.FALSE);
+                    put(stem,"expired", Boolean.FALSE);
                 } else {
-                    stem.put("expired", Boolean.TRUE);
+                    put(stem,"expired", Boolean.TRUE);
                 }
             }
         }
@@ -1431,19 +1429,19 @@ public class CLC implements QDLMetaModule {
             } else {
                 if (objects[0].isStem()) {
                     QDLStem stem = objects[0].asStem();
-                    for (Object key : stem.keySet()) {
+                    for (QDLKey key : stem.keySet()) {
                         QDLValue value = stem.get(key);
                         if (value.isStem()) {
                             QDLStem qdlStem = value.asStem();
                             if (qdlStem.isList()) {
                                 JSONArray array = new JSONArray();
-                                array.addAll(QDLValue.castToJavaValues(qdlStem.getQDLList()));
-                                parameters.put(key, array);
+                                array.addAll(QDLValue.castToJavaValues((List<QDLValue>) qdlStem.getQDLList()));
+                                parameters.put(key.getValue(), array);
                             } else {
                                 throw new IllegalArgumentException("General stems are not supported as values, just lists");
                             }
                         } else {
-                            parameters.put(key, value.getValue());
+                            parameters.put(key.getValue(), value.getValue());
                         }
                     }
                 } else {

@@ -11,9 +11,12 @@ public class AuthorizationServletConfig {
      * @param cfgFile
      * @param cfgName
      */
-    public AuthorizationServletConfig(String cfgFile, String cfgName){
+    public AuthorizationServletConfig(String cfgFile,
+                                      String cfgName,
+                                      boolean localDFConsent){
         this.cfgFile = cfgFile;
         this.cfgName = cfgName;
+        this.localDFConsent = localDFConsent;
         setUseProxy(true);
     }
 
@@ -33,9 +36,26 @@ public class AuthorizationServletConfig {
         this.verifyUsername = verifyUsername;
         this.convertDNToGlobusID = convertDNToGlobusID;
         this.authorizationURI = authorizationURI;
+        this.localDFConsent = true; // always request it in local mode, since we control the whole thing.
         setUseProxy(false);
     }
 
+    /**
+     * This is used only if proxy mode is set true. It tells the local system to sent
+     * OA4MP specific request parameters along with the proxy request to have the
+     * proxying client forward the user to a consent screen rather than ending the
+     * interaction.
+     * @return
+     */
+    public boolean isLocalDFConsent() {
+        return localDFConsent;
+    }
+
+    public void setLocalDFConsent(boolean localDFConsent) {
+        this.localDFConsent = localDFConsent;
+    }
+
+    boolean localDFConsent = false;
     public boolean isUseProxy() {
         return useProxy;
     }

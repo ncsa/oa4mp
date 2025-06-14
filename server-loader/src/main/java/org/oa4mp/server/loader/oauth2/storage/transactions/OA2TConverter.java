@@ -73,6 +73,9 @@ public class OA2TConverter<V extends OA2ServiceTransaction> extends TransactionC
                 st.setAuthorizationGrant(ag);
             }
         }
+        if(map.containsKey(getTCK().consentPageOK())) {
+            st.setConsentPageOK(map.getBoolean(getTCK().consentPageOK()));
+        }
         if (map.containsKey(getTCK().atJWT())) {
             st.setATJWT(map.getString(getTCK().atJWT()));
         }
@@ -194,6 +197,7 @@ public class OA2TConverter<V extends OA2ServiceTransaction> extends TransactionC
         }
 
         map.put(getTCK().authzGrantLifetime(), t.getAuthzGrantLifetime());
+        map.put(getTCK().consentPageOK(), t.isConsentPageOK());
         map.put(getTCK().expiresIn(), t.getAccessTokenLifetime());
         map.put(getTCK().refreshTokenLifetime(), t.getRefreshTokenLifetime());
         map.put(getTCK().refreshTokenExpiresAt(), t.getRefreshTokenExpiresAt());

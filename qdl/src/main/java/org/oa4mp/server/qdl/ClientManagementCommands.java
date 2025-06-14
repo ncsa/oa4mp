@@ -25,6 +25,7 @@ import org.qdl_lang.variables.values.QDLValue;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.qdl_lang.variables.StemUtility.put;
 import static org.qdl_lang.variables.values.QDLValue.asQDLValue;
 
 /**
@@ -242,7 +243,7 @@ public class ClientManagementCommands implements QDLMetaModule {
             List<OA2Client> clients = getEnvironment().getClientStore().search(key, regex, true);
             // make it in to a list
             for (OA2Client c : clients) {
-                output.put(index++ + ".", toStem(c));
+                put(output, index++ + ".", toStem(c));
             }
             return asQDLValue(output);
         }

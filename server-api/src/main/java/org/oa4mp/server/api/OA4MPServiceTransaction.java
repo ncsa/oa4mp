@@ -13,6 +13,16 @@ import static edu.uiuc.ncsa.security.core.util.BeanUtils.checkEquals;
 public class OA4MPServiceTransaction extends ServiceTransaction {
     static final long serialVersionUID = 0xcafed00d2L;
 
+
+    public boolean isConsentPageOK() {
+        return consentPageOK;
+    }
+
+    public void setConsentPageOK(boolean consentPageOK) {
+        this.consentPageOK = consentPageOK;
+    }
+
+    boolean consentPageOK = false;
     public OA4MPServiceTransaction(Identifier identifier) {
         super(identifier);
     }

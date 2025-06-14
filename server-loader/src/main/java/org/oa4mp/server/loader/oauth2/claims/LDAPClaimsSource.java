@@ -30,6 +30,7 @@ import java.net.URI;
 import java.util.*;
 
 import static org.oa4mp.server.loader.qdl.claims.CSConstants.*;
+import static org.qdl_lang.variables.StemUtility.put;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -837,12 +838,12 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
         addToStem(stem,CS_LDAP_AUTHZ_TYPE, cUtil.getAuthName(cfg2.getAuthType()));
         addToStem(stem,CS_LDAP_SEARCH_FILTER_ATTRIBUTE, cfg2.getSearchFilterAttribute());
         if (cfg2.hasSearchScope()) {
-            stem.put(CS_LDAP_SEARCH_SCOPE, cfg2.getSearchScope());
+            put(stem, CS_LDAP_SEARCH_SCOPE, cfg2.getSearchScope());
         }
 
         if (cfg2.getAuthType() == LDAPConfigurationUtil.LDAP_AUTH_SIMPLE_KEY) {
-            stem.put(CS_LDAP_PASSWORD, cfg2.getPassword());
-            stem.put(CS_LDAP_SECURITY_PRINCIPAL, cfg2.getSecurityPrincipal());
+            put(stem, CS_LDAP_PASSWORD, cfg2.getPassword());
+            put(stem, CS_LDAP_SECURITY_PRINCIPAL, cfg2.getSecurityPrincipal());
         }
 
         if (cfg2.getSearchAttributes() != null && !cfg2.getSearchAttributes().isEmpty()) {
@@ -854,7 +855,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
                 LDAPConfigurationUtil.AttributeEntry attributeEntry = cfg2.getSearchAttributes().get(key);
                 names.add(attributeEntry.sourceName);
                 if (attributeEntry.targetName != null && !attributeEntry.targetName.equals(attributeEntry.sourceName)) {
-                    renames.put(attributeEntry.sourceName, attributeEntry.targetName);
+                    put(renames,attributeEntry.sourceName, attributeEntry.targetName);
                 }
                 if (attributeEntry.isGroup) {
                     groups.add(attributeEntry.sourceName);
@@ -864,20 +865,20 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
                 }
                 QDLStem nameStem = new QDLStem();
                 nameStem.addList(names);
-                stem.put(CS_LDAP_SEARCH_ATTRIBUTES, nameStem);
+                put(stem,CS_LDAP_SEARCH_ATTRIBUTES, nameStem);
 
                 if (groups.size() != 0) {
                     QDLStem groupStem = new QDLStem();
                     groupStem.addList(groups);
-                    stem.put(CS_LDAP_GROUP_NAMES, groupStem);
+                    put(stem,CS_LDAP_GROUP_NAMES, groupStem);
                 }
                 if (isList.size() != 0) {
                     QDLStem listStem = new QDLStem();
                     listStem.addList(isList);
-                    stem.put(CS_LDAP_LISTS, listStem);
+                    put(stem,CS_LDAP_LISTS, listStem);
                 }
                 if (renames.size() != 0) {
-                    stem.put(CS_LDAP_RENAME, renames);
+                    put(stem,CS_LDAP_RENAME, renames);
                 }
             }
 

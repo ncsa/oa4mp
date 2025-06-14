@@ -13,6 +13,8 @@ import net.sf.json.JSONObject;
 
 import java.util.*;
 
+import static org.qdl_lang.variables.StemUtility.put;
+
 /**
  * The claim source configurations made for QDL are really just the barebones defaults. The actual configurations
  * are large and sometimes nastily complex Java objects, so this configuration will convert a stem
@@ -36,7 +38,7 @@ public class ClaimSourceConfigConverter implements CSConstants {
         QDLStem stem = new QDLStem();
         ClaimSourceConfiguration cfg = claimsSource.getConfiguration();
         setDefaultsInStem(cfg, stem);
-        stem.put(CS_DEFAULT_TYPE, type); // set the type in the stem for later.
+        put(stem,CS_DEFAULT_TYPE, type); // set the type in the stem for later.
         LDAPConfiguration cfg2 = null;
 
         switch (type) {
@@ -50,57 +52,57 @@ public class ClaimSourceConfigConverter implements CSConstants {
                     throw new IllegalStateException("Error: No java class has been set for a custom claim source.");
                 }
                 for (String key : cfg.getProperties().keySet()) {
-                    stem.put(key, cfg.getProperty(key)); // First cut is just use strings
+                    put(stem,key, cfg.getProperty(key)); // First cut is just use strings
                 }
 
                 break;
             case CS_TYPE_FILE:
                 FSClaimSource fsClaimSource = (FSClaimSource) claimsSource;
-                stem.put(CS_FILE_FILE_PATH, cfg.getProperty(FSClaimSource.FILE_PATH_KEY));
+                put(stem,CS_FILE_FILE_PATH, cfg.getProperty(FSClaimSource.FILE_PATH_KEY));
                 if (cfg.getProperty(FSClaimSource.FILE_CLAIM_KEY) != null) {
-                    stem.put(CS_FILE_CLAIM_KEY, cfg.getProperty(FSClaimSource.FILE_CLAIM_KEY));
+                    put(stem,CS_FILE_CLAIM_KEY, cfg.getProperty(FSClaimSource.FILE_CLAIM_KEY));
                 }
-                stem.put(CS_USE_DEFAULT_KEY, fsClaimSource.isUseDefaultClaims());
+                put(stem,CS_USE_DEFAULT_KEY, fsClaimSource.isUseDefaultClaims());
                 if (fsClaimSource.getDefaultClaimName() != null) {
-                    stem.put(CS_DEFAULT_CLAIM_NAME_KEY, fsClaimSource.getDefaultClaimName());
+                    put(stem,CS_DEFAULT_CLAIM_NAME_KEY, fsClaimSource.getDefaultClaimName());
                 }
                 break;
             case CS_TYPE_FILTER_HEADERS:
                 if (cfg.getProperty(HTTPHeaderClaimsSource.PREFIX_KEY) != null) {
-                    stem.put(CS_HEADERS_PREFIX, cfg.getProperty(HTTPHeaderClaimsSource.PREFIX_KEY));
+                    put(stem,CS_HEADERS_PREFIX, cfg.getProperty(HTTPHeaderClaimsSource.PREFIX_KEY));
                 }
                 break;
             case CS_TYPE_ALL_HEADERS:
                 if (cfg.getProperty(QDLHeadersClaimsSource.PREFIX_KEY) != null) {
-                    stem.put(CS_HEADERS_PREFIX, cfg.getProperty(QDLHeadersClaimsSource.PREFIX_KEY));
+                    put(stem,CS_HEADERS_PREFIX, cfg.getProperty(QDLHeadersClaimsSource.PREFIX_KEY));
                 }
                 if (cfg.getProperty(QDLHeadersClaimsSource.REGEX_KEY) != null) {
-                    stem.put(CS_HEADERS_REGEX, cfg.getProperty(QDLHeadersClaimsSource.REGEX_KEY));
+                    put(stem,CS_HEADERS_REGEX, cfg.getProperty(QDLHeadersClaimsSource.REGEX_KEY));
                 }
 
                 break;
             case CS_TYPE_NCSA:
                 cfg2 = (LDAPConfiguration) claimsSource.getConfiguration();
-                stem.put(CS_LDAP_SEARCH_FILTER_ATTRIBUTE, cfg2.getSearchFilterAttribute());
+                put(stem,CS_LDAP_SEARCH_FILTER_ATTRIBUTE, cfg2.getSearchFilterAttribute());
                 break;
             case CS_TYPE_LDAP:
                 LDAPConfigurationUtil cUtil = new LDAPConfigurationUtil();
 
                 cfg2 = (LDAPConfiguration) claimsSource.getConfiguration();
-                stem.put(CS_LDAP_SEARCH_NAME, cfg2.getSearchNameKey());
-                stem.put(CS_LDAP_SERVER_ADDRESS, cfg2.getServer());
-                stem.put(CS_LDAP_SEARCH_BASE, cfg2.getSearchBase()); // Fixes CIL-1328
-                stem.put(CS_LDAP_CONTEXT_NAME, cfg2.getContextName());
-                stem.put(CS_LDAP_ADDITIONAL_FILTER, cfg2.getAdditionalFilter());
-                stem.put(CS_LDAP_PORT, new Long(cfg2.getPort()));
-                stem.put(CS_LDAP_AUTHZ_TYPE, cUtil.getAuthName(cfg2.getAuthType()));
-                stem.put(CS_LDAP_SEARCH_FILTER_ATTRIBUTE, cfg2.getSearchFilterAttribute());
+                put(stem,CS_LDAP_SEARCH_NAME, cfg2.getSearchNameKey());
+                put(stem,CS_LDAP_SERVER_ADDRESS, cfg2.getServer());
+                put(stem,CS_LDAP_SEARCH_BASE, cfg2.getSearchBase()); // Fixes CIL-1328
+                put(stem,CS_LDAP_CONTEXT_NAME, cfg2.getContextName());
+                put(stem,CS_LDAP_ADDITIONAL_FILTER, cfg2.getAdditionalFilter());
+                put(stem,CS_LDAP_PORT, new Long(cfg2.getPort()));
+                put(stem,CS_LDAP_AUTHZ_TYPE, cUtil.getAuthName(cfg2.getAuthType()));
+                put(stem,CS_LDAP_SEARCH_FILTER_ATTRIBUTE, cfg2.getSearchFilterAttribute());
                 if (cfg2.hasSearchScope()) {
-                    stem.put(CS_LDAP_SEARCH_SCOPE, cfg2.getSearchScope());
+                    put(stem,CS_LDAP_SEARCH_SCOPE, cfg2.getSearchScope());
                 }
                 if (cfg2.getAuthType() == LDAPConfigurationUtil.LDAP_AUTH_SIMPLE_KEY) {
-                    stem.put(CS_LDAP_PASSWORD, cfg2.getPassword());
-                    stem.put(CS_LDAP_SECURITY_PRINCIPAL, cfg2.getSecurityPrincipal());
+                    put(stem,CS_LDAP_PASSWORD, cfg2.getPassword());
+                    put(stem,CS_LDAP_SECURITY_PRINCIPAL, cfg2.getSecurityPrincipal());
                 }
 
                 if (cfg2.getSearchAttributes() != null && !cfg2.getSearchAttributes().isEmpty()) {
@@ -112,7 +114,7 @@ public class ClaimSourceConfigConverter implements CSConstants {
                         LDAPConfigurationUtil.AttributeEntry attributeEntry = cfg2.getSearchAttributes().get(key);
                         names.add(attributeEntry.sourceName);
                         if (attributeEntry.targetName != null && !attributeEntry.targetName.equals(attributeEntry.sourceName)) {
-                            renames.put(attributeEntry.sourceName, attributeEntry.targetName);
+                            put(renames,attributeEntry.sourceName, attributeEntry.targetName);
                         }
                         if (attributeEntry.isGroup) {
                             groups.add(attributeEntry.sourceName);
@@ -122,20 +124,20 @@ public class ClaimSourceConfigConverter implements CSConstants {
                         }
                         QDLStem nameStem = new QDLStem();
                         nameStem.addList(names);
-                        stem.put(CS_LDAP_SEARCH_ATTRIBUTES, nameStem);
+                        put(stem,CS_LDAP_SEARCH_ATTRIBUTES, nameStem);
 
                         if (groups.size() != 0) {
                             QDLStem groupStem = new QDLStem();
                             groupStem.addList(groups);
-                            stem.put(CS_LDAP_GROUP_NAMES, groupStem);
+                            put(stem,CS_LDAP_GROUP_NAMES, groupStem);
                         }
                         if (isList.size() != 0) {
                             QDLStem listStem = new QDLStem();
                             listStem.addList(isList);
-                            stem.put(CS_LDAP_LISTS, listStem);
+                            put(stem,CS_LDAP_LISTS, listStem);
                         }
                         if (renames.size() != 0) {
-                            stem.put(CS_LDAP_RENAME, renames);
+                            put(stem,CS_LDAP_RENAME, renames);
                         }
                     }
 
@@ -327,13 +329,13 @@ public class ClaimSourceConfigConverter implements CSConstants {
     }
 
     protected static void setDefaultsInStem(ClaimSourceConfiguration cfg, QDLStem arg) {
-        arg.put(CS_DEFAULT_ID, cfg.getId());
-        arg.put(CS_DEFAULT_FAIL_ON_ERROR, cfg.isFailOnError());
-        arg.put(CS_DEFAULT_IS_ENABLED, cfg.isEnabled());
-        arg.put(CS_DEFAULT_NOTIFY_ON_FAIL, cfg.isNotifyOnFail());
-        arg.put(CS_DEFAULT_NAME, cfg.getName());
-        arg.put(CS_LDAP_RETRY_COUNT, (long) cfg.getRetryCount());
-        arg.put(CS_LDAP_MAX_RETRY_SLEEP, cfg.getMaxWait());
+        put(arg,CS_DEFAULT_ID, cfg.getId());
+        put(arg,CS_DEFAULT_FAIL_ON_ERROR, cfg.isFailOnError());
+        put(arg,CS_DEFAULT_IS_ENABLED, cfg.isEnabled());
+        put(arg,CS_DEFAULT_NOTIFY_ON_FAIL, cfg.isNotifyOnFail());
+        put(arg,CS_DEFAULT_NAME, cfg.getName());
+        put(arg,CS_LDAP_RETRY_COUNT, (long) cfg.getRetryCount());
+        put(arg,CS_LDAP_MAX_RETRY_SLEEP, cfg.getMaxWait());
 
     }
 }

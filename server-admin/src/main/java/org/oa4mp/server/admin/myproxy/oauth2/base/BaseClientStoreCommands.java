@@ -22,7 +22,6 @@ import org.oa4mp.delegation.common.storage.clients.ClientApprovalKeys;
 import org.oa4mp.delegation.server.storage.BaseClientStore;
 import org.oa4mp.delegation.server.storage.ClientApproval;
 import org.oa4mp.delegation.server.storage.ClientApprovalStore;
-import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
 
 import java.io.File;
 import java.io.FileReader;
@@ -395,9 +394,9 @@ public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
         }
 
         for (Identifiable identifiable : identifiables) {
-            OA2Client client = (OA2Client) identifiable;
+            BaseClient client = (BaseClient) identifiable;
             approvalModsConfig.client = client;
-            client = (OA2Client) doApprovalMods(approvalModsConfig);
+            client =  doApprovalMods(approvalModsConfig);
             ClientApprovalStoreCommands.setupApprovalRecord(getClientApprovalStore(), client.getIdentifier(), doApproval, approver);
             getStore().update(client);
         }

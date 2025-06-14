@@ -9,6 +9,7 @@ import org.qdl_lang.variables.values.QDLValue;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.qdl_lang.variables.StemUtility.put;
 import static org.qdl_lang.variables.values.QDLValue.asQDLValue;
 
 /**
@@ -40,31 +41,30 @@ public class NewTemplate implements QDLFunction, CSConstants {
         QDLStem output = new QDLStem();
         switch (type) {
             case CS_TYPE_FILE:
-                output.put(CS_DEFAULT_TYPE, CS_TYPE_FILE);
+                put(output,CS_DEFAULT_TYPE, CS_TYPE_FILE);
                 return asQDLValue(output);
             case CS_TYPE_LDAP:
                 output = new QDLStem();
-                output.put(CS_DEFAULT_TYPE, CS_TYPE_LDAP);
-
-                output.put(CS_LDAP_SERVER_ADDRESS, REQUIRED_TEMPLATE);
-                output.put(CS_LDAP_SEARCH_BASE, REQUIRED_TEMPLATE);
-                output.put(CS_LDAP_SEARCH_NAME, REQUIRED_TEMPLATE);
-                output.put(CS_LDAP_SEARCH_FILTER_ATTRIBUTE, REQUIRED_TEMPLATE);
-                output.put(CS_LDAP_AUTHZ_TYPE, REQUIRED_TEMPLATE);
+                put(output,CS_DEFAULT_TYPE, CS_TYPE_LDAP);
+                put(output,CS_LDAP_SERVER_ADDRESS, REQUIRED_TEMPLATE);
+                put(output,CS_LDAP_SEARCH_BASE, REQUIRED_TEMPLATE);
+                put(output,CS_LDAP_SEARCH_NAME, REQUIRED_TEMPLATE);
+                put(output,CS_LDAP_SEARCH_FILTER_ATTRIBUTE, REQUIRED_TEMPLATE);
+                put(output,CS_LDAP_AUTHZ_TYPE, REQUIRED_TEMPLATE);
                 return asQDLValue(output);
             case CS_TYPE_NCSA:
-                output.put(CS_DEFAULT_TYPE, CS_TYPE_NCSA); // That's it!
+                put(output,CS_DEFAULT_TYPE, CS_TYPE_NCSA); // That's it!
                 return asQDLValue(output);
             case CS_TYPE_FILTER_HEADERS:
-                output.put(CS_DEFAULT_TYPE, CS_TYPE_FILTER_HEADERS);
-                output.put(CS_HEADERS_PREFIX, REQUIRED_TEMPLATE);
+                put(output,CS_DEFAULT_TYPE, CS_TYPE_FILTER_HEADERS);
+                put(output,CS_HEADERS_PREFIX, REQUIRED_TEMPLATE);
                 return asQDLValue(output);
             case CS_TYPE_ALL_HEADERS:
-                output.put(CS_DEFAULT_TYPE, CS_TYPE_ALL_HEADERS);
+                put(output,CS_DEFAULT_TYPE, CS_TYPE_ALL_HEADERS);
                 return asQDLValue(output);
             case CS_TYPE_CODE:
-                output.put(CS_DEFAULT_TYPE, CS_TYPE_CODE);
-                output.put(CS_CODE_JAVA_CLASS, REQUIRED_TEMPLATE);
+                put(output,CS_DEFAULT_TYPE, CS_TYPE_CODE);
+                put(output,CS_CODE_JAVA_CLASS, REQUIRED_TEMPLATE);
                 return asQDLValue(output);
         }
         throw new BadArgException("Error: unknown configuration type \"" + type + "\".",0);

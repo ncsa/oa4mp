@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.oa4mp.server.loader.oauth2.claims.Groups.GROUP_ENTRY_NAME;
+import static org.qdl_lang.variables.StemUtility.put;
 import static org.qdl_lang.variables.values.QDLValue.asQDLValue;
 
 /**
@@ -95,10 +96,10 @@ public class IsInGroup2 implements QDLFunction {
                     }
                 }
             }    if(keys instanceof Long){
-                result.put((Long)keys, rValue);
+                put(result,keys, rValue);
 
             } else{
-                result.put((String)keys, rValue);
+                put(result,keys, rValue);
 
             }
         }

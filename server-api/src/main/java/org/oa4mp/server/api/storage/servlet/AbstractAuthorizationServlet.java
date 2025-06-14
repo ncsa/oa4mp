@@ -14,6 +14,7 @@ import org.oa4mp.delegation.common.token.AuthorizationGrant;
 import org.oa4mp.delegation.server.OA2Constants;
 import org.oa4mp.delegation.server.ServiceTransaction;
 import org.oa4mp.delegation.server.request.IssuerResponse;
+import org.oa4mp.server.api.OA4MPServiceTransaction;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -117,6 +118,10 @@ public abstract class AbstractAuthorizationServlet extends CRServlet implements 
     public static final String AUTHORIZATION_USER_NAME_VALUE = "userName"; // only used for setting the username, if it comes in a header.
     public static final String AUTHORIZATION_PASSWORD_KEY = "AuthPassword";
     public static final String AUTHORIZATION_ACTION_OK_VALUE = "ok";
+    public static final String AUTHORIZATION_ACTION_DONE_VALUE = "done";
+    public static final String AUTHORIZATION_ACTION_DF_CONSENT_VALUE = "df_consent";
+    public static final int AUTHORIZATION_ACTION_DONE = 2;
+    public static final int AUTHORIZATION_ACTION_DF_CONSENT = 3;
     public static final int AUTHORIZATION_ACTION_OK = 1;
     public static final int AUTHORIZATION_ACTION_START = 0;
     public static final String RETRY_MESSAGE = "retryMessage";
@@ -304,10 +309,11 @@ public abstract class AbstractAuthorizationServlet extends CRServlet implements 
         switch (pState.getState()) {
             case AUTHORIZATION_ACTION_OK:
                 trans.setAuthGrantValid(true); // As per the spec, if the code gets to here then authentication worked.
-                getTransactionStore().save(trans);
                 // get the cert and store it. Then forward user.
                 try {
                     createRedirect(request, response, trans);
+                    ((OA4MPServiceTransaction) trans).setConsentPageOK(true);
+                    getTransactionStore().save(trans);
                     // There is nothing to present, since the spec requires a redirect
                     // at this point.
                     return;
@@ -335,11 +341,24 @@ public abstract class AbstractAuthorizationServlet extends CRServlet implements 
         present(pState);
     }
 
+    /**
+     * Basically a switch statement for the auth actions, but with the special case that no action means
+     * {@link #AUTHORIZATION_ACTION_START}, since that is an initial request with no state.
+     * @param request
+     * @return
+     */
     public static int getState(HttpServletRequest request) {
         String action = request.getParameter(AUTHORIZATION_ACTION_KEY);
         ServletDebugUtil.trace(AbstractAuthorizationServlet.class, "action = " + action);
         if (action == null || action.length() == 0) return AUTHORIZATION_ACTION_START;
-        if (action.equals(AUTHORIZATION_ACTION_OK_VALUE)) return AUTHORIZATION_ACTION_OK;
+        switch (action) {
+            case AUTHORIZATION_ACTION_OK_VALUE:
+                return AUTHORIZATION_ACTION_OK;
+            case AUTHORIZATION_ACTION_DONE_VALUE:
+                return AUTHORIZATION_ACTION_DONE;
+            case AUTHORIZATION_ACTION_DF_CONSENT_VALUE:
+                return AUTHORIZATION_ACTION_DF_CONSENT;
+        }
         throw new GeneralException("Error: unknown authorization request action = \"" + action + "\"");
     }
 
@@ -410,8 +429,8 @@ public abstract class AbstractAuthorizationServlet extends CRServlet implements 
         // Change is to close this connection after verifying it works.
         doRealCertRequest(trans, statusString); // Oauth 1 will get the cert, OAuth 2 will do nothing here, getting the cert later.
 
-        debug("4.a. verifier = " + trans.getVerifier() + ", " + statusString);
         String cb = createCallback(trans, getFirstParameters(request));
+
         info("4.a. starting redirect to " + cb + ", " + statusString);
         response.sendRedirect(cb);
         info("4.b. Redirect to callback " + cb + " ok, " + statusString);

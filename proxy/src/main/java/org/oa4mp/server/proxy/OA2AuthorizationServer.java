@@ -3,34 +3,35 @@ package org.oa4mp.server.proxy;
 
 import edu.uiuc.ncsa.myproxy.MPSingleConnectionProvider;
 import edu.uiuc.ncsa.myproxy.MyProxyConnectable;
-import org.oa4mp.delegation.server.*;
-import org.oa4mp.delegation.server.server.claims.OA2Claims;
-import org.oa4mp.server.loader.oauth2.OA2SE;
-import org.oa4mp.server.loader.oauth2.servlet.OA2AuthorizedServletUtil;
-import org.oa4mp.server.loader.oauth2.servlet.OA2ClientUtils;
-import org.oa4mp.server.loader.oauth2.state.ScriptRuntimeEngineFactory;
-import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
-import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
-import org.oa4mp.server.api.storage.servlet.AbstractAuthorizationServlet;
-import org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet;
-import org.oa4mp.delegation.common.token.AccessToken;
-import org.oa4mp.delegation.common.token.impl.TokenUtils;
-import org.oa4mp.delegation.server.jwt.JWTRunner;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.servlet.HeaderUtils;
 import edu.uiuc.ncsa.security.servlet.PresentableState;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.http.HttpStatus;
+import org.oa4mp.delegation.common.token.AccessToken;
+import org.oa4mp.delegation.common.token.impl.TokenUtils;
+import org.oa4mp.delegation.server.OA2Constants;
+import org.oa4mp.delegation.server.OA2Errors;
+import org.oa4mp.delegation.server.OA2GeneralError;
+import org.oa4mp.delegation.server.ServiceTransaction;
+import org.oa4mp.delegation.server.jwt.JWTRunner;
+import org.oa4mp.delegation.server.server.claims.OA2Claims;
+import org.oa4mp.server.api.storage.servlet.AbstractAuthorizationServlet;
+import org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet;
+import org.oa4mp.server.loader.oauth2.OA2SE;
+import org.oa4mp.server.loader.oauth2.servlet.OA2AuthorizedServletUtil;
+import org.oa4mp.server.loader.oauth2.servlet.OA2ClientUtils;
+import org.oa4mp.server.loader.oauth2.state.ScriptRuntimeEngineFactory;
+import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
+import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.security.GeneralSecurityException;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Map;
+import java.util.*;
 
 import static org.oa4mp.delegation.server.OA2Constants.AUTHORIZATION_CODE;
 import static org.oa4mp.delegation.server.OA2Constants.AUTHORIZATION_STATE;
@@ -50,8 +51,15 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
     public String AUTHORIZED_ENDPOINT = "/authorized";
     public String AUTHORIZATION_REFRESH_TOKEN_LIFETIME_VALUE = "rtLifetime";
 
+    /**
+     * Turn the scopes into a string. Since the user may send the same scope repetedly
+     * @param t
+     * @return
+     */
     protected static String scopesToString(OA2ServiceTransaction t) {
-        return scopesToString(t.getScopes());
+        Collection<String> scopes = t.getScopes();
+
+        return scopesToString(scopes);
     }
 
     protected static String scopesToString(Collection<String> listOfScopes) {
@@ -197,6 +205,7 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace(); // now way this can happen, but if it does, we want to know about it.
         }
+        ((OA2ServiceTransaction) trans).setCreatedCallback(cb);
         return cb;
     }
 

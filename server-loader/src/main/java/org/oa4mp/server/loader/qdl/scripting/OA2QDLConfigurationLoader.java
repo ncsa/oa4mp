@@ -64,7 +64,8 @@ public class OA2QDLConfigurationLoader<T extends OA2QDLEnvironment> extends QDLC
                 getServerScriptSet(),
                 getLibLoader(),
                 useLogo(),
-                isSkipBadModulesOnLoad());
+                isSkipBadModulesOnLoad(),
+                isPreprocessorOn());
     }
 
     Boolean skipBadModulesOnLoad = null;

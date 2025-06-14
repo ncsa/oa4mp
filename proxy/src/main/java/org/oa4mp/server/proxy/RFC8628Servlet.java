@@ -153,7 +153,7 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
 
         String userCode; //what the user is presented with
         if (oa2SE.getAuthorizationServletConfig().isUseProxy()) {
-            userCode = ProxyUtils.getProxyUserCode(oa2SE, t, rfc8628State);
+            userCode = ProxyUtils.startProxyDeviceFlow(oa2SE, t, rfc8628State);
             lifetime = rfc8628State.lifetime; // This is set from the proxy and must be propagated to the user.
 
         } else {
@@ -193,6 +193,7 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
 
 
         t.setRFC8628State(rfc8628State);
+
         debugger.trace(this, "saving transaction");
         getTransactionStore().save(t);
 

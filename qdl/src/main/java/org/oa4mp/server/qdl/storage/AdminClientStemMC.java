@@ -9,6 +9,8 @@ import net.sf.json.JSONObject;
 
 import java.net.URI;
 
+import static org.qdl_lang.variables.StemUtility.put;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 12/23/20 at  6:21 AM
@@ -107,23 +109,23 @@ public class AdminClientStemMC<V extends AdminClient> extends StemConverter<V> {
         stem = super.toMap(v, stem);
         setNonNullStemValue(stem, kk().creationTS(), v.getCreationTS().getTime());
         setNonNullStemValue(stem, kk().email(), v.getEmail());
-        stem.put(kk().debugOn(), v.isDebugOn());
+        put(stem, kk().debugOn(), v.isDebugOn());
         setNonNullStemValue(stem, kk().lastModifiedTS(), v.getLastModifiedTS().getTime());
         setNonNullStemValue(stem, kk().name(), v.getName());
         setNonNullStemValue(stem, kk().secret(), v.getSecret());
 
-        stem.put(kk().allowQDL(), v.isAllowQDL());
-        stem.put(kk().generateIDs(), v.isGenerateIDs());
-        stem.put(kk().useTimestampsInIds(), v.isUseTimestampInIDs());
-        stem.put(kk().allowCustomIDs(), v.isAllowCustomIDs());
+        put(stem,kk().allowQDL(), v.isAllowQDL());
+        put(stem,kk().generateIDs(), v.isGenerateIDs());
+        put(stem,kk().useTimestampsInIds(), v.isUseTimestampInIDs());
+        put(stem,kk().allowCustomIDs(), v.isAllowCustomIDs());
         if(v.getIdHead() != null){
-            stem.put(kk().idHead(), v.getIdHead().toString());
+            put(stem, kk().idHead(), v.getIdHead().toString());
         }
-        stem.put(kk().listUsers(), v.isListUsers());
-        stem.put(kk().listUsersInOtherClients(), v.isListUsersInOtherClients());
+        put(stem, kk().listUsers(), v.isListUsers());
+        put(stem, kk().listUsersInOtherClients(), v.isListUsersInOtherClients());
         setNonNullStemValue(stem, kk().config(), v.getConfig().toString());
         setNonNullStemValue(stem, kk().issuer(), v.getIssuer());
-        stem.put(kk().maxClients(), Long.valueOf(v.getMaxClients()));
+        put(stem,kk().maxClients(), Long.valueOf(v.getMaxClients()));
         setNonNullStemValue(stem, kk().allowQDLCodeBlocks(), v.allowQDLCodeBlocks());
 
         setNonNullStemValue(stem, kk().voURI(), v.getVirtualIssuer().toString());

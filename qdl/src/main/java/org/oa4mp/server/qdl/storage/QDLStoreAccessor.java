@@ -17,6 +17,7 @@ import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
+import org.qdl_lang.variables.values.QDLKey;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -307,7 +308,7 @@ public class QDLStoreAccessor {
      */
     public QDLStem archive(QDLStem arg) {
         QDLStem output = new QDLStem();
-        for (Object key : arg.keySet()) {
+        for (QDLKey key : arg.keySet()) {
             String s = String.valueOf(arg.get(key));
             Identifiable oldVersion = (Identifiable) getStore().get(BasicIdentifier.newID(s));
             MapConverter mc = (MapConverter) getStore().getXMLConverter();
@@ -315,7 +316,7 @@ public class QDLStoreAccessor {
             Identifiable newVersion = getStore().create();
             mc.toMap(oldVersion, map);
             Long newIndex = getStoreArchiver().create(oldVersion.getIdentifier());
-            output.putLongOrString(key, newIndex);
+            output.put(key, newIndex);
         }
         return output;
     }

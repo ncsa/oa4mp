@@ -5,12 +5,14 @@ import org.qdl_lang.extensions.QDLFunction;
 import org.qdl_lang.state.State;
 import org.qdl_lang.variables.QDLStem;
 import org.qdl_lang.variables.values.BooleanValue;
+import org.qdl_lang.variables.values.LongValue;
 import org.qdl_lang.variables.values.QDLValue;
 import org.qdl_lang.variables.values.StringValue;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.qdl_lang.variables.StemUtility.put;
 import static org.qdl_lang.variables.values.QDLValue.asQDLValue;
 
 /**
@@ -97,25 +99,25 @@ public class CreateSourceConfig implements QDLFunction, CSConstants {
 
      */
     protected QDLStem doNCSA(QDLStem arg, QDLStem output) {
-        output.put(CS_LDAP_SERVER_ADDRESS, "ldap4.ncsa.illinois.edu,ldap2.ncsa.illinois.edu,ldap1.ncsa.illinois.edu");
-        output.put(CS_LDAP_PORT, 636L);
-        output.put(CS_DEFAULT_TYPE, "ldap");
-        output.put(CS_LDAP_SEARCH_NAME, "uid"); //
-        output.put(CS_LDAP_SEARCH_FILTER_ATTRIBUTE, "uid");
-        output.put(CS_DEFAULT_IS_ENABLED, Boolean.TRUE);
-        output.put(CS_DEFAULT_FAIL_ON_ERROR, Boolean.FALSE); // failures are not show stoppers
-        output.put(CS_DEFAULT_NOTIFY_ON_FAIL, Boolean.TRUE); // tell us all about it though.
-        output.put(CS_LDAP_SEARCH_BASE, "ou=People,dc=ncsa,dc=illinois,dc=edu");
+        put(output,CS_LDAP_SERVER_ADDRESS, "ldap4.ncsa.illinois.edu,ldap2.ncsa.illinois.edu,ldap1.ncsa.illinois.edu");
+        put(output,CS_LDAP_PORT, 636L);
+        put(output,CS_DEFAULT_TYPE, "ldap");
+        put(output,CS_LDAP_SEARCH_NAME, "uid"); //
+        put(output,CS_LDAP_SEARCH_FILTER_ATTRIBUTE, "uid");
+        put(output,CS_DEFAULT_IS_ENABLED, Boolean.TRUE);
+        put(output,CS_DEFAULT_FAIL_ON_ERROR, Boolean.FALSE); // failures are not show stoppers
+        put(output,CS_DEFAULT_NOTIFY_ON_FAIL, Boolean.TRUE); // tell us all about it though.
+        put(output,CS_LDAP_SEARCH_BASE, "ou=People,dc=ncsa,dc=illinois,dc=edu");
         QDLStem searchAtt = new QDLStem();
-        searchAtt.put(0L, "mail");
-        searchAtt.put(1L, "uid");
-        searchAtt.put(2L, "uidNumber");
-        searchAtt.put(3L, "cn");
-        searchAtt.put(4L, "memberOf");
-        output.put("search_attributes.", searchAtt);
+        put(searchAtt,0L, "mail");
+        put(searchAtt,1L, "uid");
+        put(searchAtt,2L, "uidNumber");
+        put(searchAtt,3L, "cn");
+        put(searchAtt,4L, "memberOf");
+        put(output,"search_attributes.", searchAtt);
         QDLStem groups = new QDLStem();
-        groups.put(0L, "memberOf");
-        output.put("groups.", groups);
+        put(groups,0L, "memberOf");
+        put(output,"groups.", groups);
         return output.union(arg);
     }
 
@@ -190,10 +192,10 @@ public class CreateSourceConfig implements QDLFunction, CSConstants {
 
     public static void main(String[] args) {
         QDLStem mystem = new QDLStem();
-        mystem.put(CS_DEFAULT_TYPE, CS_TYPE_LDAP);
-        mystem.put(CS_LDAP_SERVER_ADDRESS, "ldap-test2.ncsa.illinois.edu");
-        mystem.put(CS_LDAP_AUTHZ_TYPE, "none");
-        mystem.put(CS_LDAP_SEARCH_NAME, "username");
+        put(mystem,CS_DEFAULT_TYPE, CS_TYPE_LDAP);
+        put(mystem,CS_LDAP_SERVER_ADDRESS, "ldap-test2.ncsa.illinois.edu");
+        put(mystem,CS_LDAP_AUTHZ_TYPE, "none");
+        put(mystem,CS_LDAP_SEARCH_NAME, "username");
         ArrayList<Object> searchAttr = new ArrayList<>();
         searchAttr.add("mail");
         searchAttr.add("uid");
@@ -203,10 +205,10 @@ public class CreateSourceConfig implements QDLFunction, CSConstants {
         QDLStem sa = new QDLStem();
         sa.addList(searchAttr);
         QDLStem groupNames = new QDLStem();
-        groupNames.put("0", "memberOf");
-        mystem.put(CS_LDAP_SEARCH_ATTRIBUTES, sa);
-        mystem.put(CS_LDAP_GROUP_NAMES, groupNames);
-        mystem.put(CS_LDAP_SEARCH_BASE, "ou=People,dc=ncsa,dc=illinois,dc=edu");
+        groupNames.put(LongValue.Zero, "memberOf");
+        put(mystem,CS_LDAP_SEARCH_ATTRIBUTES, sa);
+        put(mystem,CS_LDAP_GROUP_NAMES, groupNames);
+        put(mystem,CS_LDAP_SEARCH_BASE, "ou=People,dc=ncsa,dc=illinois,dc=edu");
 
         CreateSourceConfig csc = new CreateSourceConfig();
         System.out.println(csc.evaluate(new QDLValue[]{new StringValue("ldap")}, null).asStem().toJSON().toString(1));

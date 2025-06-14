@@ -7,6 +7,8 @@ import org.oa4mp.server.qdl.testUtils.TestUtilModule;
 import org.qdl_lang.config.QDLEnvironment;
 import org.qdl_lang.variables.QDLStem;
 
+import static org.qdl_lang.variables.StemUtility.put;
+
 /**
  * Instantiated in the {@link QDLEnvironment} to populate
  * the lib entry. This is never directly used in the code though.
@@ -19,12 +21,12 @@ public class OA2LibLoader2 extends OA2LibLoader {
     protected QDLStem createEntries() {
         QDLStem lib = super.createEntries();
         QDLStem subLib = new QDLStem();
-        subLib.put( "cm", CMLoader.class.getCanonicalName());
-        subLib.put( "clc", CLCLoader.class.getCanonicalName());
-        subLib.put( "store", StoreAccessLoader.class.getCanonicalName());
-        subLib.put( "p_store", PStoreAccessLoader.class.getCanonicalName());
-        subLib.put( "test_utils", TestUtilModule.class.getCanonicalName());
-        lib.put("client", subLib);
+        put(subLib, "cm", CMLoader.class.getCanonicalName());
+        put(subLib, "clc", CLCLoader.class.getCanonicalName());
+        put(subLib, "store", StoreAccessLoader.class.getCanonicalName());
+        put(subLib, "p_store", PStoreAccessLoader.class.getCanonicalName());
+        put(subLib, "test_utils", TestUtilModule.class.getCanonicalName());
+        put(lib,"client", subLib);
         return lib;
     }
 }

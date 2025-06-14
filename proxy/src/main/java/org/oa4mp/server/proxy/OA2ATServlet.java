@@ -1869,6 +1869,13 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         if (debugger instanceof ClientDebugUtil) {
             ((ClientDebugUtil) debugger).setTransaction(st2);
         }
+        if(getOA2SE().getAuthorizationServletConfig().isLocalDFConsent() && !st2.isConsentPageOK()){
+            throw new OA2ATException(OA2Errors.CONSENT_REQUIRED,
+                    "consent required",
+                    HttpStatus.SC_BAD_REQUEST,
+                    null,
+                    st2.getClient());
+        }
         debugger.trace(this, "starting to get access token ");
         if (!st2.getFlowStates().acceptRequests || !st2.getFlowStates().accessToken || !st2.getFlowStates().idToken) {
             throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
@@ -2672,6 +2679,13 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                     HttpStatus.SC_BAD_REQUEST,
                     null);
         }
+        if(getOA2SE().getAuthorizationServletConfig().isLocalDFConsent() && !transaction.isConsentPageOK()){
+            throw new OA2ATException(OA2Errors.CONSENT_REQUIRED,
+                    "consent required",
+                    HttpStatus.SC_BAD_REQUEST,
+                    null,
+                    transaction.getClient());
+        }
 
         if (!transaction.getClient().getIdentifierString().equals(client.getIdentifierString())) {
             throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
@@ -2692,7 +2706,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         if (getOA2SE().getAuthorizationServletConfig().isUseProxy()) {
             //forward to the proxy. If it succeeds there, set the rfc state to valid.
             try {
-                ProxyUtils.doRFC8628AT(getOA2SE(), transaction);
+                ProxyUtils.getProxyAccessToken(getOA2SE(), transaction);
             } catch (Throwable throwable) {
                 rollback(backup); // something blew up in the proxy. Let someone fix it and retry
                 if (throwable instanceof OA2GeneralError) {
@@ -2700,7 +2714,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 }
 
                 if (throwable instanceof ServiceClientHTTPException) {
-                    throw ProxyUtils.toOA2X((ServiceClientHTTPException) throwable, transaction);
+                    throw ProxyUtils.toOA2ATException((ServiceClientHTTPException) throwable, transaction);
                 }
                 throw new OA2ATException("server_error", throwable.getMessage(),
                         HttpStatus.SC_INTERNAL_SERVER_ERROR, transaction.getRequestState());
@@ -2771,7 +2785,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             ((ATIResponse2) issuerTransactionState.getIssuerResponse()).setJsonWebKey(vo.getJsonWebKeys().get(vo.getDefaultKeyID()));
         }
         debugger.trace(this, "writing AT response");
-
         writeATResponse(response, issuerTransactionState);
 
     }
