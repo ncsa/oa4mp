@@ -1,7 +1,10 @@
 package org.oa4mp.server.loader.oauth2.state;
 
+import edu.uiuc.ncsa.security.util.scripting.ScriptRunRequest;
+import edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse;
+import edu.uiuc.ncsa.security.util.scripting.ScriptRuntimeEngine;
+import net.sf.json.JSONObject;
 import org.oa4mp.server.loader.oauth2.OA2SE;
-import org.oa4mp.server.loader.oauth2.functor.FunctorRuntimeEngine;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
 import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
 import org.oa4mp.server.loader.oauth2.storage.tx.TXRecord;
@@ -10,16 +13,12 @@ import org.oa4mp.server.loader.qdl.scripting.OA2State;
 import org.oa4mp.server.loader.qdl.scripting.QDLRuntimeEngine;
 import org.qdl_lang.evaluate.MetaEvaluator;
 import org.qdl_lang.evaluate.OpEvaluator;
-import org.qdl_lang.functions.FStack;
 import org.qdl_lang.expressions.module.MIStack;
 import org.qdl_lang.expressions.module.MTStack;
+import org.qdl_lang.functions.FStack;
 import org.qdl_lang.state.State;
 import org.qdl_lang.state.StateUtils;
 import org.qdl_lang.variables.VStack;
-import edu.uiuc.ncsa.security.util.scripting.ScriptRunRequest;
-import edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse;
-import edu.uiuc.ncsa.security.util.scripting.ScriptRuntimeEngine;
-import net.sf.json.JSONObject;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -29,14 +28,12 @@ public class ScriptRuntimeEngineFactory {
     public static ScriptRuntimeEngine createRTE(OA2SE oa2SE, OA2ServiceTransaction transaction, TXRecord txRecord, JSONObject config) {
         // note: No QDL tag means no scripting for QDL even if there is an environment configured.
         // This is because there is nothing to execute so no reason to incur the overhead of creating it.
-        if (config.containsKey(OA2ClientFunctorScriptsUtil.CLAIMS_KEY)) {
+/*        if (config.containsKey(OA2ClientFunctorScriptsUtil.CLAIMS_KEY)) {
             return new FunctorRuntimeEngine(config);
-        }
+        }*/
 
         OA2Client oa2Client = (OA2Client) transaction.getClient();
-/*        if(!oa2Client.hasScript()){
-            return null; // Only create QDL runtime environment if there is a reason to do so.
-        }*/
+
 
         if (oa2SE.getQDLEnvironment() == null || !oa2SE.getQDLEnvironment().isEnabled()) {
             oa2SE.getMyLogger().warn("*********************************");

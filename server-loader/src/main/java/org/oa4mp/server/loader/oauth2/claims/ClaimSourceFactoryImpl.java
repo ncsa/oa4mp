@@ -1,18 +1,13 @@
 package org.oa4mp.server.loader.oauth2.claims;
 
-import org.oa4mp.server.loader.oauth2.OA2SE;
-import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
-import org.oa4mp.server.loader.oauth2.state.OA2ClientFunctorScriptsUtil;
-import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
+import net.sf.json.JSONObject;
 import org.oa4mp.delegation.server.server.claims.*;
 import org.oa4mp.delegation.server.server.config.LDAPConfiguration;
 import org.oa4mp.delegation.server.server.config.LDAPConfigurationUtil;
-import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-
-import java.util.LinkedList;
+import org.oa4mp.server.loader.oauth2.OA2SE;
+import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -38,58 +33,6 @@ public class ClaimSourceFactoryImpl extends ClaimSourceFactory {
         return h;
     }
 
-    /**
-     * This creates a uniform list of claim sources for both the access token servlet and the user info servlet.
-     * It will use a common handler if there is one and use the configured factory to create appropriate ones
-     * (and populate them with the right runtime environment otherwise.
-     *
-     * @param oa2SE
-     * @param transaction
-     * @return
-     */
-    public static LinkedList<ClaimSource> createClaimSources(OA2SE oa2SE, OA2ServiceTransaction transaction) {
-        DebugUtil.trace(ClaimSourceFactoryImpl.class, "Starting to create LDAPScopeHandlers per client");
-        LinkedList<ClaimSource> claimSources = new LinkedList<>();
-        JSONObject jsonConfig = ((OA2Client)transaction.getClient()).getConfig();
-        if (!OA2ClientFunctorScriptsUtil.hasClaimSourceConfigurations(jsonConfig)) {
-            DebugUtil.trace(ClaimSourceFactoryImpl.class, "using default scope handler=");
-            if (oa2SE.getClaimSource() instanceof BasicClaimsSourceImpl) {
-                BasicClaimsSourceImpl bb = (BasicClaimsSourceImpl) oa2SE.getClaimSource();
-                if (bb.getOa2SE() == null) {
-                    DebugUtil.trace(ClaimSourceFactoryImpl.class, "setting scope handler environment #1");
-                    bb.setOa2SE(oa2SE);
-                }
-            }
-            claimSources.add(oa2SE.getClaimSource());
-        } else {
-            JSONArray configs = OA2ClientFunctorScriptsUtil.getClaimSourceConfigurations(jsonConfig);
-
-            for (int i = 0; i < configs.size(); i++) {
-                JSONObject current = configs.getJSONObject(i);
-                ClaimSource c = null;
-                LDAPConfigurationUtil ldapConfigurationUtil = new LDAPConfigurationUtil();
-                ClaimSourceConfigurationUtil claimSourceConfigurationUtil = new ClaimSourceConfigurationUtil();
-                if (ldapConfigurationUtil.isInstanceOf(current)) {
-                    c = processLDAPConfig(ldapConfigurationUtil,
-                            current,
-                            oa2SE,
-                            transaction);
-
-                }
-                if (claimSourceConfigurationUtil.isInstanceOf(current)) {
-                    c = processDefaultConfig(claimSourceConfigurationUtil,
-                            current,
-                            oa2SE,
-                            transaction);
-                }
-                if (c != null) {
-                    claimSources.add(c);
-                }
-
-            }
-        }
-        return claimSources;
-    }
 
 
     protected static ClaimSource processDefaultConfig(ClaimSourceConfigurationUtil claimSourceConfigurationUtil,

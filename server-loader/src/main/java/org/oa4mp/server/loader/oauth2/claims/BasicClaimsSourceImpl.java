@@ -1,24 +1,21 @@
 package org.oa4mp.server.loader.oauth2.claims;
 
+import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
-import org.oa4mp.server.loader.oauth2.OA2SE;
-import org.oa4mp.server.loader.oauth2.flows.FlowStates2;
-import org.oa4mp.server.loader.oauth2.functor.FunctorRuntimeEngine;
-import org.oa4mp.server.loader.oauth2.functor.claims.OA2FunctorFactory;
-import org.oa4mp.server.loader.oauth2.servlet.GroupHandler;
-import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
-import org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet;
+import edu.uiuc.ncsa.security.util.functor.parser.FunctorScript;
+import net.sf.json.JSONObject;
+import org.oa4mp.delegation.server.ServiceTransaction;
 import org.oa4mp.delegation.server.UserInfo;
 import org.oa4mp.delegation.server.server.UnsupportedScopeException;
 import org.oa4mp.delegation.server.server.claims.ClaimSource;
 import org.oa4mp.delegation.server.server.claims.ClaimSourceConfiguration;
 import org.oa4mp.delegation.server.server.claims.OA2Claims;
 import org.oa4mp.delegation.server.server.config.JSONClaimSourceConfig;
-import org.oa4mp.delegation.server.ServiceTransaction;
+import org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet;
+import org.oa4mp.server.loader.oauth2.OA2SE;
+import org.oa4mp.server.loader.oauth2.servlet.GroupHandler;
+import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
 import org.qdl_lang.variables.QDLStem;
-import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
-import edu.uiuc.ncsa.security.util.functor.parser.FunctorScript;
-import net.sf.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
@@ -188,7 +185,7 @@ public class BasicClaimsSourceImpl implements ClaimSource {
         // configuration, so until nobody is using the old scripting, these must remain.
         debugger.trace(this, "Before preP claims:" + claims);
         debugger.trace(this, "Before preP has config:" + hasConfiguration());
-        if (hasConfiguration() && hasJSONPreProcessor()) {
+/*        if (hasConfiguration() && hasJSONPreProcessor()) {
             debugger.trace(this, "in preP cfg name=:" + getConfiguration().getName() + ", id=" + getConfiguration().getId());
 
             OA2FunctorFactory ff = new OA2FunctorFactory(claims, t.getScopes());
@@ -201,12 +198,12 @@ public class BasicClaimsSourceImpl implements ClaimSource {
             FlowStates2 f = t.getFlowStates();
             FunctorRuntimeEngine.updateFSValues(f, preProcessor.getFunctorMap());
             t.setFlowStates(f);
-        }
+        }*/
         debugger.trace(this, "starting real processing");
         realProcessing(claims, request, t); // actual work here
         debugger.trace(this, "done real processing, claims=" + claims);
 
-        if (hasConfiguration() && hasJSONPostProcessor()) {
+/*        if (hasConfiguration() && hasJSONPostProcessor()) {
             debugger.trace(this, "in postP cfg name=:" + getConfiguration().getName() + ", id=" + getConfiguration().getId());
 
             OA2FunctorFactory ff = new OA2FunctorFactory(claims, t.getScopes());
@@ -219,7 +216,7 @@ public class BasicClaimsSourceImpl implements ClaimSource {
             FunctorRuntimeEngine.updateFSValues(f, postProcessor.getFunctorMap());
             t.setFlowStates(f);
             t.setUserMetaData(claims);
-        }
+        }*/
         debugger.trace(this, "returned claims=:" + claims);
 
         return claims;
