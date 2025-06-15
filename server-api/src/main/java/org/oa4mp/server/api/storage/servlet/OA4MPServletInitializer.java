@@ -80,11 +80,11 @@ public class OA4MPServletInitializer implements Initialization {
     public void setupNotifiers() throws IOException {
         // do this once or you will have a message sent for each listener!
         if (notifiersSet) return;
-        MyProxyDelegationServlet mps = (MyProxyDelegationServlet) getServlet();
+        OA4MPServlet mps = (OA4MPServlet) getServlet();
         ServiceEnvironmentImpl env = (ServiceEnvironmentImpl) getEnvironment();
         MyLoggingFacade logger = env.getMyLogger();
         NewClientNotifier newClientNotifier = createNewClientNotifier(env.getMailUtil(), logger);
-        MyProxyDelegationServlet.addNotificationListener(newClientNotifier);
+        OA4MPServlet.addNotificationListener(newClientNotifier);
 
         String fName = mps.getServletContext().getInitParameter(EnvServlet.ERROR_NOTIFICATION_SUBJECT_KEY);
         if (fName == null) {
@@ -125,7 +125,7 @@ public class OA4MPServletInitializer implements Initialization {
         if (isInitRun) return;
         isInitRun = true;
 
-        MyProxyDelegationServlet mps = (MyProxyDelegationServlet) getServlet();
+        OA4MPServlet mps = (OA4MPServlet) getServlet();
         // Partial solution to CIL-355. This at least sets the host for the debug utilities
         // Full solution requires a good deal most tweaking of the logging including
         // determining if log4j is in use and configuring that.
@@ -151,16 +151,16 @@ public class OA4MPServletInitializer implements Initialization {
         logger.info("Cleaning up incomplete client registrations");
 
 
-        if (MyProxyDelegationServlet.transactionCleanup == null) {
+        if (OA4MPServlet.transactionCleanup == null) {
             LockingCleanup lc = new LockingCleanup<>(logger, "transaction cleanup");
             lc.setStopThread(false);
             lc.setStore(env.getTransactionStore());
             lc.addRetentionPolicy(new ValidTimestampPolicy());
-            MyProxyDelegationServlet.transactionCleanup = lc; // set it in the servlet
+            OA4MPServlet.transactionCleanup = lc; // set it in the servlet
 
         }
 
-        Cleanup<Identifier, CachedObject> myproxyConnectionCleanup = MyProxyDelegationServlet.myproxyConnectionCleanup;
+        Cleanup<Identifier, CachedObject> myproxyConnectionCleanup = OA4MPServlet.myproxyConnectionCleanup;
         int i = 0;
 
         if (myproxyConnectionCleanup == null) {
@@ -184,17 +184,17 @@ public class OA4MPServletInitializer implements Initialization {
                     return x;
                 }
             };
-            MyProxyDelegationServlet.myproxyConnectionCleanup = myproxyConnectionCleanup; // set it in the servlet
+            OA4MPServlet.myproxyConnectionCleanup = myproxyConnectionCleanup; // set it in the servlet
             // Set the cleanup interval much higher than the default (1 minute). We don't service
             // MyProxy requests much anymore, so it can be set a lot lower.
-            MyProxyDelegationServlet.myproxyConnectionCleanup.setCleanupInterval(6 * 3600 * 1000L);
+            OA4MPServlet.myproxyConnectionCleanup.setCleanupInterval(6 * 3600 * 1000L);
             DebugUtil.trace(this, "setting MyProxy connection cleanup interval to 6 hours.");
             myproxyConnectionCleanup.setStopThread(false);
-            Cache myproxyConnectionCache = MyProxyDelegationServlet.myproxyConnectionCache;
+            Cache myproxyConnectionCache = OA4MPServlet.myproxyConnectionCache;
 
             if (myproxyConnectionCache == null) {
                 myproxyConnectionCache = new Cache();
-                MyProxyDelegationServlet.myproxyConnectionCache = myproxyConnectionCache; // set it in the servlet
+                OA4MPServlet.myproxyConnectionCache = myproxyConnectionCache; // set it in the servlet
             }
 
             myproxyConnectionCleanup.setMap(myproxyConnectionCache);
@@ -204,13 +204,13 @@ public class OA4MPServletInitializer implements Initialization {
             logger.info("Starting myproxy connection cache cleanup thread");
         }
 
-        AbstractCLIApprover.ClientApprovalThread caThread = MyProxyDelegationServlet.caThread;
+        AbstractCLIApprover.ClientApprovalThread caThread = OA4MPServlet.caThread;
         if (caThread != null && !caThread.isAlive()) {
             caThread.setStopThread(false);
             caThread.start();
         }
 
-        KeyPairPopulationThread kpt = MyProxyDelegationServlet.kpt;
+        KeyPairPopulationThread kpt = OA4MPServlet.kpt;
         if (kpt != null && !kpt.isAlive()) {
             kpt.setStopThread(false);
             kpt.start();

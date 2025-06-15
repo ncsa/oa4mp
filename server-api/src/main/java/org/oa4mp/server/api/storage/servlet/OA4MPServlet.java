@@ -1,25 +1,6 @@
 package org.oa4mp.server.api.storage.servlet;
 
 import edu.uiuc.ncsa.myproxy.MyProxyConnectable;
-import edu.uiuc.ncsa.myproxy.MyProxyServiceFacade;
-import org.oa4mp.server.api.MyProxyServiceEnvironment;
-import org.oa4mp.server.api.ServiceEnvironment;
-import org.oa4mp.server.api.ServiceEnvironmentImpl;
-import org.oa4mp.server.api.util.AbstractCLIApprover;
-import org.oa4mp.server.api.util.ClientDebugUtil;
-import org.oa4mp.delegation.common.servlet.TransactionFilter;
-import org.oa4mp.delegation.common.servlet.TransactionState;
-import org.oa4mp.delegation.common.storage.TransactionStore;
-import org.oa4mp.delegation.common.storage.clients.BaseClient;
-import org.oa4mp.delegation.common.storage.clients.Client;
-import org.oa4mp.delegation.common.storage.transactions.BasicTransaction;
-import org.oa4mp.delegation.common.token.AuthorizationGrant;
-import org.oa4mp.delegation.server.ServiceTransaction;
-import org.oa4mp.delegation.server.UnapprovedClientException;
-import org.oa4mp.delegation.server.issuers.AGIssuer;
-import org.oa4mp.delegation.server.issuers.ATIssuer;
-import org.oa4mp.delegation.server.request.IssuerResponse;
-import org.oa4mp.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.cache.Cache;
 import edu.uiuc.ncsa.security.core.cache.CachedObject;
@@ -33,11 +14,27 @@ import edu.uiuc.ncsa.security.servlet.HeaderUtils;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.storage.events.LastAccessedThread;
 import edu.uiuc.ncsa.security.util.pkcs.KeyPairPopulationThread;
+import org.oa4mp.delegation.common.servlet.TransactionFilter;
+import org.oa4mp.delegation.common.servlet.TransactionState;
+import org.oa4mp.delegation.common.storage.TransactionStore;
+import org.oa4mp.delegation.common.storage.clients.BaseClient;
+import org.oa4mp.delegation.common.storage.clients.Client;
+import org.oa4mp.delegation.common.storage.transactions.BasicTransaction;
+import org.oa4mp.delegation.common.token.AuthorizationGrant;
+import org.oa4mp.delegation.server.ServiceTransaction;
+import org.oa4mp.delegation.server.UnapprovedClientException;
+import org.oa4mp.delegation.server.issuers.AGIssuer;
+import org.oa4mp.delegation.server.issuers.ATIssuer;
+import org.oa4mp.delegation.server.request.IssuerResponse;
+import org.oa4mp.delegation.server.storage.ClientApproval;
+import org.oa4mp.server.api.ServiceEnvironment;
+import org.oa4mp.server.api.ServiceEnvironmentImpl;
+import org.oa4mp.server.api.util.AbstractCLIApprover;
+import org.oa4mp.server.api.util.ClientDebugUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Map;
 
 import static org.oa4mp.server.api.ServiceConstantKeys.CONSUMER_KEY;
@@ -47,7 +44,7 @@ import static org.oa4mp.server.api.ServiceConstantKeys.CONSUMER_KEY;
  * <p>Created by Jeff Gaynor<br>
  * on May 17, 2011 at  3:46:53 PM
  */
-public abstract class MyProxyDelegationServlet extends EnvServlet implements TransactionFilter {
+public abstract class OA4MPServlet extends EnvServlet implements TransactionFilter {
     public static MetaDebugUtil createDebugger(BaseClient client) {
         if (client == null) return DebugUtil.getInstance();
         if (client.isDebugOn()) {
@@ -108,9 +105,6 @@ public abstract class MyProxyDelegationServlet extends EnvServlet implements Tra
         return (ServiceEnvironment) getEnvironment();
     }
 
-    public static List<MyProxyServiceFacade> getMyproxyServices() {
-        return ((MyProxyServiceEnvironment) getEnvironment()).getMyProxyServices();
-    }
 
     public void storeUpdates() throws IOException, SQLException {
         if (storeUpdatesDone) return; // run this once

@@ -29,6 +29,7 @@
         <module name="oa4mp-server-test" />
         <module name="client" />
         <module name="website" />
+        <module name="myproxy" />
         <module name="oa4mp-server-oauth2" />
         <module name="myproxy-logon" />
         <module name="server-loader" />

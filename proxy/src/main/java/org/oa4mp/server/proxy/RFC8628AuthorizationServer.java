@@ -10,9 +10,9 @@ import org.oa4mp.delegation.common.token.impl.AuthorizationGrantImpl;
 import org.oa4mp.delegation.common.token.impl.TokenFactory;
 import org.oa4mp.delegation.server.OA2ATException;
 import org.oa4mp.delegation.server.OA2GeneralError;
-import org.oa4mp.delegation.server.jwt.JWTRunner;
+import org.oa4mp.delegation.server.jwt.HandlerRunner;
 import org.oa4mp.server.api.storage.servlet.EnvServlet;
-import org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet;
+import org.oa4mp.server.api.storage.servlet.OA4MPServlet;
 import org.oa4mp.server.api.storage.servlet.PresentationState;
 import org.oa4mp.server.api.util.ClientDebugUtil;
 import org.oa4mp.server.loader.oauth2.OA2SE;
@@ -76,7 +76,7 @@ public class RFC8628AuthorizationServer extends EnvServlet {
     }
 
     protected OA2SE getServiceEnvironment() {
-        return (OA2SE) MyProxyDelegationServlet.getServiceEnvironment();
+        return (OA2SE) OA4MPServlet.getServiceEnvironment();
     }
 
     public void prepare(PresentableState state) throws Throwable {
@@ -161,14 +161,14 @@ public class RFC8628AuthorizationServer extends EnvServlet {
                             throw new IllegalStateException("the token for the device consent page is missing");
                         }
                         AuthorizationGrantImpl authorizationGrant = TokenFactory.createAG(ag);
-                        OA2SE oa2SE = (OA2SE) MyProxyDelegationServlet.getServiceEnvironment();
+                        OA2SE oa2SE = (OA2SE) OA4MPServlet.getServiceEnvironment();
 
                         OA2ServiceTransaction trans = (OA2ServiceTransaction) oa2SE.getTransactionStore().get(authorizationGrant);
                         trans.setConsentPageOK(true);
                         OA2Client resolvedClient = (OA2Client) trans.getClient(); // no ersatz possible at this point.
-                        JWTRunner jwtRunner = new JWTRunner(trans, ScriptRuntimeEngineFactory.createRTE(getServiceEnvironment(), trans, resolvedClient.getConfig()));
-                        OA2ClientUtils.setupHandlers(jwtRunner, getServiceEnvironment(), trans, resolvedClient, request);
-                        jwtRunner.doAuthClaims();
+                        HandlerRunner handlerRunner = new HandlerRunner(trans, ScriptRuntimeEngineFactory.createRTE(getServiceEnvironment(), trans, resolvedClient.getConfig()));
+                        OA2ClientUtils.setupHandlers(handlerRunner, getServiceEnvironment(), trans, resolvedClient, request);
+                        handlerRunner.doAuthClaims();
                         oa2SE.getTransactionStore().save(trans);
                         logOK(request); //CIL-1722
                         if (trans.hasLocalConsentUri()) {
@@ -278,7 +278,7 @@ public class RFC8628AuthorizationServer extends EnvServlet {
                             trace(this, "saving transaction");
                             getServiceEnvironment().getTransactionStore().save(trans);
                         }
-                        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(trans.getOA2Client());
+                        MetaDebugUtil debugger = OA4MPServlet.createDebugger(trans.getOA2Client());
                         printAllParameters(request, debugger);
                         // RFC 7636 support for device flow
 
@@ -457,7 +457,7 @@ public class RFC8628AuthorizationServer extends EnvServlet {
                     null,
                     trans.getClient());
         }
-        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(trans.getOA2Client());
+        MetaDebugUtil debugger = OA4MPServlet.createDebugger(trans.getOA2Client());
         if (debugger instanceof ClientDebugUtil) {
             ((ClientDebugUtil) debugger).setTransaction(trans);
         }

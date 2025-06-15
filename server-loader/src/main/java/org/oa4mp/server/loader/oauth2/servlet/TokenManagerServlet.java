@@ -6,7 +6,7 @@ import org.oa4mp.server.loader.oauth2.storage.RefreshTokenStore;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
 import org.oa4mp.server.loader.oauth2.storage.tx.TXRecord;
 import org.oa4mp.server.loader.oauth2.tokens.UITokenUtils;
-import org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet;
+import org.oa4mp.server.api.storage.servlet.OA4MPServlet;
 import org.oa4mp.delegation.server.server.RFC7523Constants;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
@@ -114,7 +114,7 @@ public abstract class TokenManagerServlet extends BearerTokenServlet implements 
 
     private State getState(HttpServletRequest req, State state, OA2SE oa2SE, OA2Client client) {
         OA2ServiceTransaction transaction;
-        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(client);
+        MetaDebugUtil debugger = OA4MPServlet.createDebugger(client);
 
         JSONWebKeys keys = OA2TokenUtils.getKeys(oa2SE, client);
         String token = req.getParameter(TOKEN);
@@ -236,7 +236,7 @@ public abstract class TokenManagerServlet extends BearerTokenServlet implements 
         // So we have the access token used as a bearer token
         transaction = findTransaction(atBearer, state);
         client = transaction.getOA2Client();
-        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(client);
+        MetaDebugUtil debugger = OA4MPServlet.createDebugger(client);
         debugger.trace(this, "checked client, verifying access token is bearer token");
         JSONWebKeys keys = OA2TokenUtils.getKeys(oa2SE, client);
 

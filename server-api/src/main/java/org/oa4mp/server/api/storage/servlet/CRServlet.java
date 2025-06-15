@@ -30,7 +30,7 @@ import java.util.LinkedList;
  * <p>Created by Jeff Gaynor<br>
  * on 2/6/14 at  11:30 AM
  */
-public abstract class CRServlet extends MyProxyDelegationServlet {
+public abstract class CRServlet extends OA4MPServlet {
 
     /**
      * Indirection call. If your extension to this class needs to do any
@@ -107,7 +107,7 @@ public abstract class CRServlet extends MyProxyDelegationServlet {
         trans.setUsername(userName); // Fixes OAUTH-102 username might not be set in some cases, so just reset it here.
 
         // Our response is a simple ok, since otherwise exceptions are thrown. No need to set this since that is the default.
-        trans.setVerifier(MyProxyDelegationServlet.getServiceEnvironment().getTokenForge().getVerifier());
+        trans.setVerifier(OA4MPServlet.getServiceEnvironment().getTokenForge().getVerifier());
         getServiceEnvironment().getTransactionStore().save(trans);
         if (hasMPConnection(trans.getIdentifier())) {
             // It can happen (especially in cases of manual testing when there is considerable time between calls)
@@ -163,7 +163,7 @@ public abstract class CRServlet extends MyProxyDelegationServlet {
                                                     String password,
                                                     long lifetime,
                                                     String loa) throws GeneralSecurityException {
-        MPConnectionProvider facades = new MPConnectionProvider(getMyLogger(), MyProxyDelegationServlet.getServiceEnvironment().getMyProxyServices());
+        MPConnectionProvider facades = new MPConnectionProvider(getMyLogger(), OA4MPServlet.getServiceEnvironment().getMyProxyServices());
         MyProxyConnectable mpc = facades.findConnection(identifier, userName, password, loa, lifetime);
         DebugUtil.trace(this,mpc.toString());
         getMyproxyConnectionCache().add( mpc);

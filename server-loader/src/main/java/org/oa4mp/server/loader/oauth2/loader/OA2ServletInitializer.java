@@ -11,7 +11,7 @@ import org.oa4mp.server.loader.oauth2.storage.RefreshTokenStore;
 import org.oa4mp.server.loader.qdl.scripting.OA2State;
 import org.oa4mp.server.api.admin.adminClient.AdminClientStoreProviders;
 import org.oa4mp.server.api.admin.things.SATFactory;
-import org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet;
+import org.oa4mp.server.api.storage.servlet.OA4MPServlet;
 import org.oa4mp.server.api.storage.servlet.OA4MPServletInitializer;
 import org.oa4mp.server.api.util.NewClientNotifier;
 import org.oa4mp.delegation.common.storage.clients.Client;
@@ -84,14 +84,14 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
         DebugUtil.setInstance(oa2SE.getDebugger()); // sets global debugger.
         DebugUtil.setPrintTS(oa2SE.isPrintTSInDebug());
         // Let the older myproxy connection clean up use alarms.
-        if (MyProxyDelegationServlet.myproxyConnectionCleanup != null) {
+        if (OA4MPServlet.myproxyConnectionCleanup != null) {
             if (oa2SE.hasCleanupAlarms()) {
-                MyProxyDelegationServlet.myproxyConnectionCleanup.setAlarms(oa2SE.getCleanupAlarms());
+                OA4MPServlet.myproxyConnectionCleanup.setAlarms(oa2SE.getCleanupAlarms());
             } else {
-                MyProxyDelegationServlet.myproxyConnectionCleanup.setCleanupInterval(oa2SE.getCleanupInterval());
+                OA4MPServlet.myproxyConnectionCleanup.setCleanupInterval(oa2SE.getCleanupInterval());
             }
         }
-        if (oa2SE.isMonitorEnabled() && MyProxyDelegationServlet.lastAccessedThread == null) {
+        if (oa2SE.isMonitorEnabled() && OA4MPServlet.lastAccessedThread == null) {
             // Note that the event listener cannot be in the same thread as the updater since they whole
             // system freezes for every item update. 
             LastAccessedEventListener lastAccessedEventListener = new LastAccessedEventListener();
@@ -139,24 +139,24 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
             uucThread.start();
         }*/
         if (oa2SE.isRefreshTokenEnabled()) {
-            MyProxyDelegationServlet.transactionCleanup.getRetentionPolicies().clear(); // We need a different set of policies than the original one.
+            OA4MPServlet.transactionCleanup.getRetentionPolicies().clear(); // We need a different set of policies than the original one.
             if (oa2SE.hasCleanupAlarms()) {
-                MyProxyDelegationServlet.transactionCleanup.setAlarms(oa2SE.getCleanupAlarms());
+                OA4MPServlet.transactionCleanup.setAlarms(oa2SE.getCleanupAlarms());
                 DebugUtil.trace(this, "setting transaction cleanup alarms " + oa2SE.getCleanupAlarms());
             } else {
-                MyProxyDelegationServlet.transactionCleanup.setCleanupInterval(oa2SE.getCleanupInterval());
+                OA4MPServlet.transactionCleanup.setCleanupInterval(oa2SE.getCleanupInterval());
                 DebugUtil.trace(this, "setting transaction cleanup interval to " + oa2SE.getCleanupInterval() + " ms.");
             }
-            MyProxyDelegationServlet.transactionCleanup.addRetentionPolicy(
+            OA4MPServlet.transactionCleanup.addRetentionPolicy(
                     new RefreshTokenRetentionPolicy(
                             (RefreshTokenStore) oa2SE.getTransactionStore(),
                             oa2SE.getTxStore(),
                             oa2SE.getServiceAddress().toString(),
                             oa2SE.isSafeGC()));
-            MyProxyDelegationServlet.transactionCleanup.setEnabledLocking(oa2SE.isCleanupLockingEnabled());
-            MyProxyDelegationServlet.transactionCleanup.setFailOnError(oa2SE.isCleanupFailOnErrors());
-            MyProxyDelegationServlet.transactionCleanup.setStopThread(false);
-            MyProxyDelegationServlet.transactionCleanup.start(); // start it here.
+            OA4MPServlet.transactionCleanup.setEnabledLocking(oa2SE.isCleanupLockingEnabled());
+            OA4MPServlet.transactionCleanup.setFailOnError(oa2SE.isCleanupFailOnErrors());
+            OA4MPServlet.transactionCleanup.setStopThread(false);
+            OA4MPServlet.transactionCleanup.start(); // start it here.
             oa2SE.getMyLogger().info("Started refresh token cleanup thread with interval " + oa2SE.getCleanupInterval() + " ms.");
         }
         if (!ClaimSourceFactory.isFactorySet()) {

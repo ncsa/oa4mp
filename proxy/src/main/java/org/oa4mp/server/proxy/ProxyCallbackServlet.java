@@ -12,11 +12,11 @@ import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.oa4mp.delegation.server.OA2Constants;
 import org.oa4mp.delegation.server.ServiceTransaction;
-import org.oa4mp.delegation.server.jwt.JWTRunner;
+import org.oa4mp.delegation.server.jwt.HandlerRunner;
 import org.oa4mp.delegation.server.request.IssuerResponse;
 import org.oa4mp.server.admin.myproxy.oauth2.tools.OA2CLCCommands;
 import org.oa4mp.server.admin.myproxy.oauth2.tools.OA2CommandLineClient;
-import org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet;
+import org.oa4mp.server.api.storage.servlet.OA4MPServlet;
 import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.servlet.OA2ClientUtils;
 import org.oa4mp.server.loader.oauth2.servlet.OA2ServletUtils;
@@ -70,12 +70,12 @@ public class ProxyCallbackServlet extends OA2AuthorizationServer {
         }
         // only use the first state parameter.
         Identifier proxyID = BasicIdentifier.newID(new String(Base64.getDecoder().decode(states[0])));
-        OA2SE oa2SE = (OA2SE) MyProxyDelegationServlet.getServiceEnvironment();
+        OA2SE oa2SE = (OA2SE) OA4MPServlet.getServiceEnvironment();
         OA2ServiceTransaction t = (OA2ServiceTransaction) oa2SE.getTransactionStore().getByProxyID(proxyID);
         if (t == null) {
             throw new IllegalStateException("No transaction for proxy ID \"" + proxyID + "\"");
         }
-        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(t.getOA2Client());
+        MetaDebugUtil debugger = OA4MPServlet.createDebugger(t.getOA2Client());
         debugger.trace(this, "request uri= " + request.getRequestURI());
         // Now we have determined that this is a pending transaction
         debugger.trace(this, "loading proxy client");
@@ -96,14 +96,14 @@ public class ProxyCallbackServlet extends OA2AuthorizationServer {
         setClaimsFromProxy(t, proxyClaims, debugger);
         OA2Client resolvedClient = OA2ClientUtils.resolvePrototypes(oa2SE, t.getOA2Client());
         // Do any scripting
-        JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2SE, t, resolvedClient.getConfig()));
-        OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, t, resolvedClient, request);
+        HandlerRunner handlerRunner = new HandlerRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2SE, t, resolvedClient.getConfig()));
+        OA2ClientUtils.setupHandlers(handlerRunner, oa2SE, t, resolvedClient, request);
         XMLMap backup = GenericStoreUtils.toXML(getTransactionStore(), t);
         Date now  = new Date();
         t.setAuthTime(now);
         t.getClient().setLastAccessed(now);
         try {
-            jwtRunner.doAuthClaims();
+            handlerRunner.doAuthClaims();
         } catch (Throwable throwable) {
             OA2ServletUtils.handleScriptEngineException(this, oa2SE, throwable, createDebugger(t.getClient()), t, backup);
         }

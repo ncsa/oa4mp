@@ -1,25 +1,6 @@
-package org.oa4mp.server.proxy;
+package org.oa4mp.myproxy.servlet;
 
 import edu.uiuc.ncsa.myproxy.MPSingleConnectionProvider;
-import org.oa4mp.server.loader.oauth2.OA2SE;
-import org.oa4mp.server.loader.oauth2.servlet.OA2HeaderUtils;
-import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
-import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
-import org.oa4mp.server.api.storage.servlet.ACS2;
-import org.oa4mp.server.api.storage.servlet.AbstractAuthorizationServlet.MyMyProxyLogon;
-import org.oa4mp.delegation.common.servlet.TransactionState;
-import org.oa4mp.delegation.common.storage.clients.Client;
-import org.oa4mp.delegation.common.token.AccessToken;
-import org.oa4mp.delegation.common.token.impl.AccessTokenImpl;
-import org.oa4mp.delegation.common.token.impl.TokenUtils;
-import org.oa4mp.delegation.server.OA2Constants;
-import org.oa4mp.delegation.server.OA2Errors;
-import org.oa4mp.delegation.server.OA2GeneralError;
-import org.oa4mp.delegation.server.OA2Scopes;
-import org.oa4mp.delegation.server.jwt.MyOtherJWTUtil2;
-import org.oa4mp.delegation.server.server.PAIResponse2;
-import org.oa4mp.delegation.server.ServiceTransaction;
-import org.oa4mp.delegation.server.request.IssuerResponse;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.InvalidTimestampException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
@@ -28,6 +9,20 @@ import edu.uiuc.ncsa.security.servlet.HeaderUtils;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.HttpStatus;
+import org.oa4mp.delegation.common.servlet.TransactionState;
+import org.oa4mp.delegation.common.storage.clients.Client;
+import org.oa4mp.delegation.common.token.AccessToken;
+import org.oa4mp.delegation.common.token.impl.AccessTokenImpl;
+import org.oa4mp.delegation.common.token.impl.TokenUtils;
+import org.oa4mp.delegation.server.*;
+import org.oa4mp.delegation.server.jwt.MyOtherJWTUtil2;
+import org.oa4mp.delegation.server.request.IssuerResponse;
+import org.oa4mp.delegation.server.server.PAIResponse2;
+import org.oa4mp.server.api.storage.servlet.AbstractAuthorizationServlet.MyMyProxyLogon;
+import org.oa4mp.server.loader.oauth2.OA2SE;
+import org.oa4mp.server.loader.oauth2.servlet.OA2HeaderUtils;
+import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
+import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -36,10 +31,10 @@ import java.net.URI;
 import java.security.GeneralSecurityException;
 import java.util.List;
 
-import static org.oa4mp.server.api.ServiceConstantKeys.CONSUMER_KEY;
+import static edu.uiuc.ncsa.security.core.util.DateUtils.checkTimestamp;
 import static org.oa4mp.delegation.server.OA2Constants.CLIENT_SECRET;
 import static org.oa4mp.delegation.server.server.claims.OA2Claims.JWT_ID;
-import static edu.uiuc.ncsa.security.core.util.DateUtils.checkTimestamp;
+import static org.oa4mp.server.api.ServiceConstantKeys.CONSUMER_KEY;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -111,43 +106,11 @@ public class OA2CertServlet extends ACS2 {
         String rawID = req.getParameter(CONST(CONSUMER_KEY));
         String rawSecret = getFirstParameterValue(req, CLIENT_SECRET);
         // According to the spec. this must be in a Basic Authz header if it is not sent as parameter
-/*
-        List<String> basicTokens = OA2HeaderUtils.getAuthHeader(req, "Basic");
-        if (2 < basicTokens.size()) {
-            // too many tokens to unscramble
-            throw new OA2GeneralError(OA2Errors.INVALID_TOKEN,
-                    "Error: Too many authorization tokens.",
-                    HttpStatus.SC_UNAUTHORIZED,
-                    null);
-            //throw new GeneralException("Too many authorization tokens");
-        }
-*/
+
         if (rawID == null) {
             // maybe it was sent as an authorization header
             // now we have to check for which of these is the identifier
 
-            /*for (String x : basicTokens) {
-                try {
-                    // Here is some detective work. We get up to TWO basic Authz headers with the id and secret.
-                    // Since ids are valid URIs the idea here is anything that is uri must be an id and the other
-                    // one is the secret. This also handles the case that one of these is sent as a parameter
-                    // in the call and the other is in the header.
-                    URI test = URI.create(x);
-                    // It is possible that the secret may be parseable as a valid URI (plain strings are
-                    // trivially uris). This checks that there a
-                    // scheme, which implies this is an id. The other token is assumed to
-                    // be the secret.
-                    if (test.getScheme() != null) {
-                        rawID = x;
-                    } else {
-                        rawSecret = x;
-                    }
-                } catch (Throwable t) {
-                    if (rawSecret == null) {
-                        rawSecret = x;
-                    }
-                }
-            }*/
             // https://github.com/rcauth-eu/OA4MP/commit/9227794f8c8589087c3460ae0918e4f7443f5bc8
             try {
                 String[] basicTokens = HeaderUtils.getCredentialsFromHeaders(req);
@@ -249,13 +212,6 @@ public class OA2CertServlet extends ACS2 {
     @Override
     protected void doRealCertRequest(ServiceTransaction trans, String statusString) throws Throwable {
         // CIL-243: binding the CR's DN to the user name. Uncomment if we ever decide to do this         \
-/*
-        if (trans.getCertReq().getCN()==null || (!trans.getUsername().equals(trans.getCertReq().getCN()))) { // CN can be null
-            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "The common name on the cert request is \"" +
-                    trans.getCertReq().getCN() +
-                    "\" which does not match the username \"" + trans.getUsername() + "\"", HttpStatus.SC_BAD_REQUEST);
-        }
-*/
         OA2ServiceTransaction st = (OA2ServiceTransaction) trans;
 
 
@@ -266,14 +222,7 @@ public class OA2CertServlet extends ACS2 {
                     st.getRequestState(), st.getClient());
         }
         OA2SE oa2SE = (OA2SE) getServiceEnvironment();
-/*        if(oa2SE.isUseProxyForCerts()){
-            if(st.getProxyState() == null){
-                throw new NFWException("No proxy configured.");
-            }   else{
-               st.setProtectedAsset(new MyX509Certificates(ProxyUtils.getCerts(oa2SE, st)));
-               return;
-            }
-        }*/
+
         if (!oa2SE.isTwoFactorSupportEnabled()) {
             checkMPConnection(st);
         } else {
@@ -311,4 +260,5 @@ public class OA2CertServlet extends ACS2 {
             getTransactionStore().save(t);
         }
     }
+
 }

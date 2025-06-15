@@ -31,18 +31,7 @@ if [ ! -d "$OA4MP_ROOT" ]
   then
      echo "$OA4MP_ROOT does not exist. No sources,  exiting.."
      exit 1
-  # else
-    # echo "$OA4MP_ROOT" exists
 fi
-
-#if [ ! -d "$OA4MP_CLIENT_DEPLOY" ]
-#  then
-#    mkdir "$OA4MP_CLIENT_DEPLOY"
-#  else
-#    echo "   client deploy directory exists, cleaning..."
-#    cd $OA4MP_CLIENT_DEPLOY
-#    rm -Rf *
-#fi
 
 
 if [ ! -d "$OA4MP_SERVER_DEPLOY" ]
@@ -64,12 +53,12 @@ fi
 OA2_TOOLS=$OA4MP_ROOT/server-admin
 
 cd $OA4MP_ROOT || exit
-echo  "╔══════════════╗"
-echo  "║Skipping tests║"
-echo  "╚══════════════╝"
-mvn clean install -DskipTests > maven.log
+# echo  "╔══════════════╗"
+# echo  "║Skipping tests║"
+# echo  "╚══════════════╝"
+# mvn clean install -DskipTests > maven.log
 
-# mvn clean install  > maven.log
+mvn clean install  > maven.log
 
 if [[ $? -ne 0 ]] ; then
     echo "OA4MP build failed, see $OA4MP_ROOT/maven.log"
@@ -78,7 +67,6 @@ fi
 echo "      ... done!"
 
 cp $OA4MP_ROOT/client-oauth2/target/client2.war $OA4MP_CLIENT_DEPLOY
-# cp $OA4MP_ROOT/client-oauth2/src/main/resources/*.sql $OA4MP_CLIENT_DEPLOY
 cp $OA4MP_ROOT/oa4mp-server-oauth2/target/oauth2.war  $OA4MP_SERVER_DEPLOY
 
 QDL_OA2_TOOLS=$OA4MP_ROOT/qdl
@@ -91,12 +79,6 @@ if [[ $? -ne 0 ]] ; then
     echo "could not build cli, see $OA2_TOOLS/cli.log"
     exit 1
 fi
-
-#mvn -P client package > client.log
-#if [[ $? -ne 0 ]] ; then
-#    echo "could not build client, see client.log"
-#    exit 1
-#fi
 
 mvn -P jwt package > jwt.log
 if [[ $? -ne 0 ]] ; then

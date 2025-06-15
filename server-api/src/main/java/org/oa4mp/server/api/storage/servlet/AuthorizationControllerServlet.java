@@ -12,7 +12,7 @@ import java.io.IOException;
  * <p>Created by Jeff Gaynor<br>
  * on 2/17/14 at  10:47 AM
  */
-public class AuthorizationControllerServlet extends MyProxyDelegationServlet {
+public class AuthorizationControllerServlet extends OA4MPServlet {
     public static AuthorizationHandler getAuthorizationHandler() {
         return authorizationHandler;
     }

@@ -17,7 +17,7 @@ import java.util.Map;
  * <p>Created by Jeff Gaynor<br>
  * on 9/24/13 at  3:56 PM
  */
-public abstract class AbstractInitServlet extends MyProxyDelegationServlet{
+public abstract class AbstractInitServlet extends OA4MPServlet {
 
     /**
         * Default is to just call {@link #doDelegation(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)}

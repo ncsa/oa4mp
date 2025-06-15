@@ -4,7 +4,7 @@ import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
 import org.oa4mp.server.loader.oauth2.storage.tx.TXRecord;
 import org.oa4mp.server.loader.oauth2.storage.vi.VirtualIssuer;
-import org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet;
+import org.oa4mp.server.api.storage.servlet.OA4MPServlet;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import org.oa4mp.delegation.common.token.impl.AccessTokenImpl;
 import org.oa4mp.delegation.server.JWTUtil;
@@ -26,7 +26,7 @@ import java.io.IOException;
  * <p>Created by Jeff Gaynor<br>
  * on 5/19/21 at  12:19 PM
  */
-public abstract class BearerTokenServlet extends MyProxyDelegationServlet {
+public abstract class BearerTokenServlet extends OA4MPServlet {
 
     /**
      * Find the transaction associated with the access token. Note that this will not return

@@ -4,7 +4,7 @@ import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
 import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
 import org.oa4mp.server.loader.oauth2.storage.tx.TXRecord;
-import org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet;
+import org.oa4mp.server.api.storage.servlet.OA4MPServlet;
 import org.oa4mp.delegation.server.OA2Scopes;
 import org.oa4mp.delegation.server.jwt.PayloadHandler;
 import org.oa4mp.delegation.server.jwt.PayloadHandlerConfig;
@@ -90,7 +90,7 @@ public abstract class AbstractPayloadHandler implements PayloadHandler, OA2Scope
     @Override
     public JSONObject execute(ClaimSource source, JSONObject claims) throws Throwable {
         // If this is disabled, return the claims unaltered -- do not execute.
-        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(transaction.getClient());
+        MetaDebugUtil debugger = OA4MPServlet.createDebugger(transaction.getClient());
 
         if (!source.isEnabled()) {
             debugger.trace(this, "source disabled");

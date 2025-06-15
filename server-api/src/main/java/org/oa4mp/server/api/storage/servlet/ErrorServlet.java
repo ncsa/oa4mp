@@ -21,7 +21,7 @@ import java.net.URLDecoder;
  * <p>Created by Jeff Gaynor<br>
  * on 9/4/12 at  6:03 PM
  */
-public class ErrorServlet extends MyProxyDelegationServlet {
+public class ErrorServlet extends OA4MPServlet {
     @Override
     public ServiceTransaction verifyAndGet(IssuerResponse iResponse) throws IOException {
         return null;

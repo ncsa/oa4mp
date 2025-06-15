@@ -5,7 +5,7 @@ import org.oa4mp.server.loader.oauth2.claims.AbstractPayloadConfig;
 import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
 import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
-import org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet;
+import org.oa4mp.server.api.storage.servlet.OA4MPServlet;
 import org.oa4mp.delegation.common.servlet.TransactionState;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.StringTokenizer;
 
-import static org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet.getServiceEnvironment;
+import static org.oa4mp.server.api.storage.servlet.OA4MPServlet.getServiceEnvironment;
 import static org.oa4mp.delegation.server.OA2Constants.SCOPE;
 
 /**
@@ -306,7 +306,7 @@ public class ClientUtils {
      */
     public static void verifyClientSecret(OA2Client client, String rawSecret, boolean isAT) {
         // Fix for CIL-332
-        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(client);
+        MetaDebugUtil debugger = OA4MPServlet.createDebugger(client);
         if (rawSecret == null) {
             debugger.trace(ClientUtils.class, "verifyClientSecret: no secret, throwing exception.");
             if (isAT) {
@@ -427,7 +427,7 @@ public class ClientUtils {
             // request access token scopes.
             return requestedScopes;
         }
-        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(st.getOA2Client());
+        MetaDebugUtil debugger = OA4MPServlet.createDebugger(st.getOA2Client());
         /*
         debugger.trace(ClientUtils.class, ".resolveScopes: stored client scopes =" + ((OA2Client) st.getClient()).getScopes());
         debugger.trace(ClientUtils.class, ".resolveScopes: passed in scopes =" + rawScopes);

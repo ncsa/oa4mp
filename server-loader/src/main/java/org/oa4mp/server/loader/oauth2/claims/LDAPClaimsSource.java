@@ -14,7 +14,7 @@ import org.oa4mp.delegation.server.server.UnsupportedScopeException;
 import org.oa4mp.delegation.server.server.claims.ClaimSourceConfiguration;
 import org.oa4mp.delegation.server.server.config.LDAPConfiguration;
 import org.oa4mp.delegation.server.server.config.LDAPConfigurationUtil;
-import org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet;
+import org.oa4mp.server.api.storage.servlet.OA4MPServlet;
 import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.servlet.GroupHandler;
 import org.oa4mp.server.loader.oauth2.servlet.NCSAGroupHandler;
@@ -222,7 +222,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
     @Override
     protected JSONObject realProcessing(JSONObject claims, HttpServletRequest request, ServiceTransaction transaction) throws UnsupportedScopeException {
         String name = "realProcessing(id=" + getLDAPCfg().getId() + "):";
-        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(transaction.getClient());
+        MetaDebugUtil debugger = OA4MPServlet.createDebugger(transaction.getClient());
 
         debugger.trace(this, name + " preparing to do processing, cfg=" + getLDAPCfg().toJSON().toString(2));
         debugger.trace(this, name + " initial claims = " + claims.toString(2));

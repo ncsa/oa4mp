@@ -29,7 +29,7 @@ import org.oa4mp.delegation.server.storage.ClientApproval;
 import org.oa4mp.server.api.admin.adminClient.AdminClient;
 import org.oa4mp.server.api.admin.permissions.Permission;
 import org.oa4mp.server.api.storage.servlet.EnvServlet;
-import org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet;
+import org.oa4mp.server.api.storage.servlet.OA4MPServlet;
 import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.cm.CM7591Config;
 import org.oa4mp.server.loader.oauth2.cm.CMConfig;
@@ -195,7 +195,7 @@ public class OIDCCMServlet extends EnvServlet {
 
                 }
                 JSONObject json = toJSONObject(oa2Client, version, true);
-                debugger = MyProxyDelegationServlet.createDebugger(oa2Client);
+                debugger = OA4MPServlet.createDebugger(oa2Client);
                 debugger.trace(this, "GET returns payload\n" + json.toString(2));
                 writeOK(httpServletResponse, json); //send it back with an ok.
                 return;
@@ -217,7 +217,7 @@ public class OIDCCMServlet extends EnvServlet {
             } else {
                 debugger = MyProxyDelegationServlet.createDebugger(adminClient);
             }*/
-            debugger = MyProxyDelegationServlet.createDebugger(adminClient);
+            debugger = OA4MPServlet.createDebugger(adminClient);
             debugger.trace(this, "Starting get");
             if (debugger.getDebugLevel() == MetaDebugUtil.DEBUG_LEVEL_TRACE) {
                 printAllParameters(httpServletRequest);
@@ -686,7 +686,7 @@ public class OIDCCMServlet extends EnvServlet {
             }
 
             AdminClient adminClient = getAndCheckAdminClient(req);
-            MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(adminClient);
+            MetaDebugUtil debugger = OA4MPServlet.createDebugger(adminClient);
             String rawID = req.getParameter(CLIENT_ID);
             debugger.trace(this, "Starting delete request for admin client " + adminClient.getIdentifierString() + "\n" +
                     "for client id =\"" + rawID + "\"");
@@ -793,7 +793,7 @@ public class OIDCCMServlet extends EnvServlet {
             }
 
             adminClient = getAndCheckAdminClient(req);
-            MetaDebugUtil adminDebugger = MyProxyDelegationServlet.createDebugger(adminClient);
+            MetaDebugUtil adminDebugger = OA4MPServlet.createDebugger(adminClient);
             if (adminDebugger.getDebugLevel() == MetaDebugUtil.DEBUG_LEVEL_TRACE) {
                 printAllParameters(req);
 
@@ -1041,7 +1041,7 @@ public class OIDCCMServlet extends EnvServlet {
             throw new UnknownClientException("the given id of \"" + acID + "\" is not recognized as an admin client.");
         }
         AdminClient adminClient = getOA2SE().getAdminClientStore().get(acID);
-        MetaDebugUtil adminDebugger = MyProxyDelegationServlet.createDebugger(adminClient);
+        MetaDebugUtil adminDebugger = OA4MPServlet.createDebugger(adminClient);
         String adminSecret = credentials[OA2HeaderUtils.SECRET_INDEX];
         if (adminSecret == null || adminSecret.isEmpty()) {
             throw new WrongPasswordException("missing secret.");
@@ -1067,7 +1067,7 @@ public class OIDCCMServlet extends EnvServlet {
             throw new GeneralException("the given id of \"" + clientID + "\" is not recognized as a  client.");
         }
         OA2Client oa2Client = (OA2Client) getOA2SE().getClientStore().get(clientID);
-        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(oa2Client);
+        MetaDebugUtil debugger = OA4MPServlet.createDebugger(oa2Client);
         String clientSecret = credentials[OA2HeaderUtils.SECRET_INDEX];
         if (clientSecret == null || clientSecret.isEmpty()) {
             throw new GeneralException("missing secret.");
@@ -1135,7 +1135,7 @@ public class OIDCCMServlet extends EnvServlet {
             throw new GeneralException("Bad admin client " + host + ":" + zzz.getMessage());
         }
 
-        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(adminClient);
+        MetaDebugUtil debugger = OA4MPServlet.createDebugger(adminClient);
         if (debugger.getDebugLevel() == MetaDebugUtil.DEBUG_LEVEL_TRACE) {
             printAllParameters(httpServletRequest);
         }

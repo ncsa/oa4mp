@@ -8,7 +8,7 @@ import org.oa4mp.server.loader.oauth2.tokens.AccessTokenConfig;
 import org.oa4mp.server.loader.oauth2.tokens.AuthorizationPath;
 import org.oa4mp.server.loader.oauth2.tokens.AuthorizationTemplate;
 import org.oa4mp.server.loader.oauth2.tokens.AuthorizationTemplates;
-import org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet;
+import org.oa4mp.server.api.storage.servlet.OA4MPServlet;
 import org.oa4mp.delegation.common.token.AccessToken;
 import org.oa4mp.delegation.common.token.impl.AccessTokenImpl;
 import org.oa4mp.delegation.common.token.impl.TokenFactory;
@@ -332,7 +332,7 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
         /*
           Make SURE the JTI gets set or token exchange, user info etc. will never work.
          */
-        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(client);
+        MetaDebugUtil debugger = OA4MPServlet.createDebugger(client);
         debugger.trace(this, "starting AT handler finish with transaction =" + transaction.summary());
         JSONObject atData = getPayload();
         if (getPhCfg().hasTXRecord()) {

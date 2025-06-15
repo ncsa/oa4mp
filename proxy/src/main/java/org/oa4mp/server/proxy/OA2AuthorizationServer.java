@@ -1,8 +1,6 @@
 package org.oa4mp.server.proxy;
 
 
-import edu.uiuc.ncsa.myproxy.MPSingleConnectionProvider;
-import edu.uiuc.ncsa.myproxy.MyProxyConnectable;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.servlet.HeaderUtils;
 import edu.uiuc.ncsa.security.servlet.PresentableState;
@@ -15,10 +13,10 @@ import org.oa4mp.delegation.server.OA2Constants;
 import org.oa4mp.delegation.server.OA2Errors;
 import org.oa4mp.delegation.server.OA2GeneralError;
 import org.oa4mp.delegation.server.ServiceTransaction;
-import org.oa4mp.delegation.server.jwt.JWTRunner;
+import org.oa4mp.delegation.server.jwt.HandlerRunner;
 import org.oa4mp.delegation.server.server.claims.OA2Claims;
 import org.oa4mp.server.api.storage.servlet.AbstractAuthorizationServlet;
-import org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet;
+import org.oa4mp.server.api.storage.servlet.OA4MPServlet;
 import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.servlet.OA2AuthorizedServletUtil;
 import org.oa4mp.server.loader.oauth2.servlet.OA2ClientUtils;
@@ -30,8 +28,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.security.GeneralSecurityException;
-import java.util.*;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Map;
 
 import static org.oa4mp.delegation.server.OA2Constants.AUTHORIZATION_CODE;
 import static org.oa4mp.delegation.server.OA2Constants.AUTHORIZATION_STATE;
@@ -47,9 +46,13 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
         throw new NotImplementedException("No access token is available");
     }
 
+    @Override
+    protected void createRedirectInit(ServiceTransaction trans, String userName, String password) {
+
+    }
+
     public String AUTHORIZATION_REFRESH_TOKEN_LIFETIME_KEY = "AuthRTL";
-    public String AUTHORIZED_ENDPOINT = "/authorized";
-    public String AUTHORIZATION_REFRESH_TOKEN_LIFETIME_VALUE = "rtLifetime";
+
 
     /**
      * Turn the scopes into a string. Since the user may send the same scope repetedly
@@ -107,7 +110,6 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
         // unscramble it.
         MyHttpServletResponseWrapper wrapper = new MyHttpServletResponseWrapper(response);
         OA2AuthorizedServletUtil init = getInitUtil();
-//              JSPUtil.fwd(request, wrapper, AUTHORIZED_ENDPOINT);
         init.doDelegation(request, wrapper);
         if (wrapper.isExceptionEncountered()) {
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, wrapper.toString(), wrapper.getStatus(),
@@ -150,7 +152,7 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
     @Override
     protected void createRedirect(HttpServletRequest request, HttpServletResponse response, ServiceTransaction trans) throws Throwable {
         String rawrtl = request.getParameter(AUTHORIZATION_REFRESH_TOKEN_LIFETIME_KEY);
-        OA2SE oa2SE = (OA2SE) MyProxyDelegationServlet.getServiceEnvironment();
+        OA2SE oa2SE = (OA2SE) OA4MPServlet.getServiceEnvironment();
 
         OA2ServiceTransaction st2 = (OA2ServiceTransaction) trans;
         OA2Client resolvedClient = OA2ClientUtils.resolvePrototypes(oa2SE, st2.getOA2Client());
@@ -164,9 +166,9 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
         super.createRedirect(request, response, trans);
         // At this point, all authentication has been done, everything is set up and the next stop in the flow is the
         // redirect back to the client.
-        JWTRunner jwtRunner = new JWTRunner(st2, ScriptRuntimeEngineFactory.createRTE(oa2SE, st2, resolvedClient.getConfig()));
-        OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, st2, resolvedClient, request);
-        jwtRunner.doAuthClaims();
+        HandlerRunner handlerRunner = new HandlerRunner(st2, ScriptRuntimeEngineFactory.createRTE(oa2SE, st2, resolvedClient.getConfig()));
+        OA2ClientUtils.setupHandlers(handlerRunner, oa2SE, st2, resolvedClient, request);
+        handlerRunner.doAuthClaims();
 
         getTransactionStore().save(st2);
     }
@@ -179,10 +181,6 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
         CIL-545: The checking for valid callbacks is done at registration time. No checking should be done
         any place else since we must support a much wider range of these (e.g. for mobile devices). 
          */
-     /*  This is the code that used to check that the protocol was https before creating the callback.
-      if (!cb.toLowerCase().startsWith("https:")) {
-            throw new GeneralException("Error: Unsupported callback protocol for \"" + cb + "\". Must be https");
-        }*/
 
         String idStr = st.getIdentifierString();
         // Fixes GitHub OA4MP issue 5, support multiple response modes.
@@ -222,27 +220,29 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
     }
 
 
-    @Override
+/*    @Override
     protected void setupMPConnection(ServiceTransaction trans, String username, String password) throws GeneralSecurityException {
-        if (((OA2SE) MyProxyDelegationServlet.getServiceEnvironment()).isTwoFactorSupportEnabled()) {
-            // Stash username and password in an bogus MyProxy logon instance.
+        if (((OA2SE) OA4MPServlet.getServiceEnvironment()).isTwoFactorSupportEnabled()) {
+            // Stash username and password in a bogus MyProxy logon instance.
             MyMyProxyLogon myProxyLogon = new MyMyProxyLogon();
             myProxyLogon.setUsername(username);
             myProxyLogon.setPassphrase(password);
             MyProxyConnectable mpc = new MPSingleConnectionProvider.MyProxyLogonConnection(myProxyLogon);
             mpc.setIdentifier(trans.getIdentifier());
-            MyProxyDelegationServlet.getMyproxyConnectionCache().add(mpc);
+            OA4MPServlet.getMyproxyConnectionCache().add(mpc);
         } else {
             createMPConnection(trans.getIdentifier(), username, password, trans.getLifetime());
             if (hasMPConnection(trans.getIdentifier())) {
                 getMPConnection(trans.getIdentifier()).close();
             }
         }
-    }
+    }*/
+
+
 
     @Override
     protected void doProxy(AuthorizedState state) throws Throwable {
-        ProxyUtils.doProxy((OA2SE) MyProxyDelegationServlet.getServiceEnvironment(), state);
+        ProxyUtils.doProxy((OA2SE) OA4MPServlet.getServiceEnvironment(), state);
     }
 }
 

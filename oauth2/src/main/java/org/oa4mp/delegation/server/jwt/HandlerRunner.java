@@ -25,14 +25,14 @@ import static edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse.RC_OK_NO_S
 import static edu.uiuc.ncsa.security.util.scripting.ScriptingConstants.*;
 
 /**
- * This will create a JWT. The contract is generally that it has (multiple) {@link PayloadHandler}s
+ * Runs the various configured handlers in the correct phases.
+ * The contract is generally that it has (multiple) {@link PayloadHandler}s
  * which process a given token. These are run at various times during execution based on the phase
- * and flow states. For various historical reasons, the JWT is referred to as "claims" and it would
- * take far too much tracking down in the code to change it.
+ * and flow states.
  * <p>Created by Jeff Gaynor<br>
  * on 2/15/20 at  7:38 AM
  */
-public class JWTRunner {
+public class HandlerRunner {
     OIDCServiceTransactionInterface transaction;
 
     public AccessTokenHandlerInterface getAccessTokenHandler() {
@@ -85,7 +85,7 @@ public class JWTRunner {
     }
 
 
-    public JWTRunner(OIDCServiceTransactionInterface transaction, ScriptRuntimeEngine scriptRuntimeEngine) {
+    public HandlerRunner(OIDCServiceTransactionInterface transaction, ScriptRuntimeEngine scriptRuntimeEngine) {
         this.transaction = transaction;
         this.scriptRuntimeEngine = scriptRuntimeEngine;
     }
@@ -222,11 +222,6 @@ public class JWTRunner {
                 for (int i = 0; i < h.getSources().size(); i++) {
                     ClaimSource claimSource = h.getSources().get(i);
                     boolean isRunAtAuthz = (h instanceof IDTokenHandlerInterface) && !(h instanceof AccessTokenHandlerInterface);
-              /*      if (checkAuthClaims) {
-                        isRunAtAuthz = claimSource.isRunOnlyAtAuthorization();
-                    } else {
-                        isRunAtAuthz = !claimSource.isRunOnlyAtAuthorization();
-                    }*/
                     if (isRunAtAuthz) {
                         // There may be mutliple ID Token handlers. Chain them, but don't just
                         // get claims for every handler since finish runs at the end of this call
@@ -240,14 +235,6 @@ public class JWTRunner {
                         } else {
                             claims = h.execute(claimSource, claims);
                         }
-/*
-                        if(!(execPhase.endsWith("_auth") && claimSource.isRunOnlyAtAuthorization())){
-                            claims = h.execute(claimSource, claims);
-                        }else{
-                            // what goes here? Probably nothing.
-                        }
-*/
-                        //claimSource.process(claims, request, transaction);
 
                         // keep this in case this was set earlier.
                         if (!flowStates.acceptRequests) {
@@ -262,13 +249,6 @@ public class JWTRunner {
                     trace(this, "user info for claim source #" + claimSource + " = " + claims.toString(1));
                 }
             }
-/*
-            if (claims != null) {
-                // make sure that chained claims get stashed if there are any.
-                // In functors it might not get set right, so do it here and be sure.
-                transaction.setUserMetaData(claims);
-            }
-*/
         }
         for (PayloadHandler h : handlers) {
             if (h instanceof IDTokenHandlerInterface) {
@@ -388,9 +368,7 @@ public class JWTRunner {
                 return;
             case ScriptRunResponse.RC_NOT_RUN:
                 return;
-
         }
-
         throw new NotImplementedException(" other script runtime reponses not implemented yet.");
     }
 

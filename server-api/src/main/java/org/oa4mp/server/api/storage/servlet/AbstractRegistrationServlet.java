@@ -22,7 +22,7 @@ import java.io.IOException;
  * <p>Created by Jeff Gaynor<br>
  * on 10/3/14 at  10:46 AM
  */
-public abstract class AbstractRegistrationServlet extends MyProxyDelegationServlet implements Presentable {
+public abstract class AbstractRegistrationServlet extends OA4MPServlet implements Presentable {
 
     @Override
     public ServiceTransaction verifyAndGet(IssuerResponse iResponse) throws IOException {

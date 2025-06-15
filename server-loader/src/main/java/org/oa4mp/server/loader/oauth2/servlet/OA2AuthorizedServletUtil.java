@@ -19,7 +19,7 @@ import org.oa4mp.delegation.common.servlet.TransactionState;
 import org.oa4mp.delegation.common.token.AuthorizationGrant;
 import org.oa4mp.delegation.common.token.impl.IDTokenImpl;
 import org.oa4mp.delegation.server.*;
-import org.oa4mp.delegation.server.jwt.JWTRunner;
+import org.oa4mp.delegation.server.jwt.HandlerRunner;
 import org.oa4mp.delegation.server.request.AGResponse;
 import org.oa4mp.delegation.server.request.IssuerResponse;
 import org.oa4mp.delegation.server.server.AGIResponse2;
@@ -28,7 +28,7 @@ import org.oa4mp.delegation.server.server.RFC7636Util;
 import org.oa4mp.delegation.server.server.RFC8693Constants;
 import org.oa4mp.delegation.server.server.claims.OA2Claims;
 import org.oa4mp.server.api.storage.servlet.IssuerTransactionState;
-import org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet;
+import org.oa4mp.server.api.storage.servlet.OA4MPServlet;
 import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.state.ScriptRuntimeEngineFactory;
 import org.oa4mp.server.loader.oauth2.storage.UsernameFindable;
@@ -47,8 +47,8 @@ import java.util.*;
 
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 import static org.oa4mp.delegation.server.OA2Constants.*;
-import static org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet.createDebugger;
-import static org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet.getServiceEnvironment;
+import static org.oa4mp.server.api.storage.servlet.OA4MPServlet.createDebugger;
+import static org.oa4mp.server.api.storage.servlet.OA4MPServlet.getServiceEnvironment;
 
 /**
  * This is set of calls to replace the old Authorized Servlet.
@@ -56,9 +56,9 @@ import static org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet.getS
  * on 5/14/18 at  12:14 PM
  */
 public class OA2AuthorizedServletUtil {
-    protected MyProxyDelegationServlet servlet = null;
+    protected OA4MPServlet servlet = null;
 
-    public OA2AuthorizedServletUtil(MyProxyDelegationServlet servlet) {
+    public OA2AuthorizedServletUtil(OA4MPServlet servlet) {
         this.servlet = servlet;
     }
 
@@ -195,18 +195,18 @@ public class OA2AuthorizedServletUtil {
             // In this case, there is an id token hint, so processing changes.
             return t;
         }
-        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(t.getOA2Client());
+        MetaDebugUtil debugger = OA4MPServlet.createDebugger(t.getOA2Client());
         debugger.trace(this, "Starting doDelegation");
         t = doDelegation(httpServletRequest, httpServletResponse);
         OA2SE oa2SE = (OA2SE) getServiceEnvironment();
         OA2Client resolvedClient = OA2ClientUtils.resolvePrototypes(oa2SE, t.getOA2Client());
         debugger.trace(this, "Starting done with doDelegation, creating claim util");
-        JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2SE, t, resolvedClient.getConfig()));
-        OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, t, resolvedClient, httpServletRequest);
+        HandlerRunner handlerRunner = new HandlerRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2SE, t, resolvedClient.getConfig()));
+        OA2ClientUtils.setupHandlers(handlerRunner, oa2SE, t, resolvedClient, httpServletRequest);
 
         DebugUtil.trace(this, "starting to process claims, creating basic claims:");
         try {
-            jwtRunner.doAuthClaims();
+            handlerRunner.doAuthClaims();
         } catch (IllegalAccessException iax) {
             oa2SE.getTransactionStore().save(t); // save it so we have this in the future, then bail
             throw new OA2RedirectableError(OA2Errors.ACCESS_DENIED,
@@ -427,7 +427,7 @@ public class OA2AuthorizedServletUtil {
         OA2Client resolvedClient = OA2ClientUtils.resolvePrototypes((OA2SE) getServiceEnvironment(), st.getOA2Client());
         OA2ClientUtils.check(resolvedClient, givenRedirect);
         // by this point it has been verified that the redirect uri is valid.
-        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(resolvedClient);
+        MetaDebugUtil debugger = OA4MPServlet.createDebugger(resolvedClient);
         String rawSecret = params.get(CLIENT_SECRET);
         if (rawSecret != null) {
             debugger.info(this, "Client is sending secret in initial request. Though not forbidden by the protocol this is discouraged.");
@@ -640,7 +640,7 @@ public class OA2AuthorizedServletUtil {
             try {
                 idTokenHint = JWTUtil.verifyAndReadJWT(map.get(ID_TOKEN_HINT), keys);
             } catch (Throwable t) {
-                MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(transaction.getOA2Client());
+                MetaDebugUtil debugger = OA4MPServlet.createDebugger(transaction.getOA2Client());
                 debugger.trace("Could not verify ID Token hint JWT token:" + t.getMessage(), t);
                 throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST,
                         "Invalid token hine for " + ID_TOKEN_HINT,

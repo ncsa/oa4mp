@@ -1,18 +1,19 @@
-package org.oa4mp.server.api.storage.servlet;
+package org.oa4mp.myproxy.servlet;
 
-import org.oa4mp.server.api.ServiceConstantKeys;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import org.oa4mp.delegation.server.ServiceTransaction;
-import org.oa4mp.delegation.server.issuers.PAIssuer;
-import org.oa4mp.delegation.server.request.PARequest;
-import org.oa4mp.delegation.server.request.PAResponse;
-import org.oa4mp.delegation.common.servlet.TransactionState;
-import org.oa4mp.delegation.common.token.AccessToken;
 import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.util.crypto.CertUtil;
 import edu.uiuc.ncsa.security.util.crypto.MyPKCS10CertRequest;
+import org.oa4mp.delegation.common.servlet.TransactionState;
+import org.oa4mp.delegation.common.token.AccessToken;
+import org.oa4mp.delegation.server.ServiceTransaction;
+import org.oa4mp.delegation.server.issuers.PAIssuer;
+import org.oa4mp.delegation.server.request.PARequest;
+import org.oa4mp.delegation.server.request.PAResponse;
+import org.oa4mp.server.api.ServiceConstantKeys;
+import org.oa4mp.server.api.storage.servlet.CRServlet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

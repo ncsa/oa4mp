@@ -2,7 +2,7 @@ package org.oa4mp.server.loader.oauth2.tokens;
 
 import org.oa4mp.server.loader.oauth2.claims.AbstractAccessTokenHandler;
 import org.oa4mp.server.loader.oauth2.claims.PayloadHandlerConfigImpl;
-import org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet;
+import org.oa4mp.server.api.storage.servlet.OA4MPServlet;
 import org.oa4mp.delegation.server.OA2ATException;
 import org.oa4mp.delegation.server.OA2Errors;
 import org.oa4mp.delegation.server.server.RFC9068Constants;
@@ -22,7 +22,7 @@ public class WLCGTokenHandler extends AbstractAccessTokenHandler implements WLCG
 
     public WLCGTokenHandler(PayloadHandlerConfigImpl cfg) {
         super(cfg);
-        MyProxyDelegationServlet.createDebugger(cfg.getTransaction().getClient()).trace(this, "Created WLCG handler with transaction " + cfg.getTransaction().summary());
+        OA4MPServlet.createDebugger(cfg.getTransaction().getClient()).trace(this, "Created WLCG handler with transaction " + cfg.getTransaction().summary());
     }
 
     @Override

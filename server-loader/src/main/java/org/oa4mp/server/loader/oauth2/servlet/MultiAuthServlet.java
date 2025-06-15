@@ -4,7 +4,7 @@ import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
 import org.oa4mp.server.api.admin.adminClient.AdminClient;
 import org.oa4mp.server.api.admin.adminClient.AdminClientStore;
-import org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet;
+import org.oa4mp.server.api.storage.servlet.OA4MPServlet;
 import org.oa4mp.delegation.common.storage.clients.Client;
 import org.oa4mp.delegation.server.OA2ATException;
 import org.oa4mp.delegation.server.OA2Errors;
@@ -36,10 +36,10 @@ import static org.oa4mp.delegation.server.OA2Constants.CLIENT_SECRET;
 /*
   This class has the
  */
-public abstract class MultiAuthServlet extends MyProxyDelegationServlet {
+public abstract class MultiAuthServlet extends OA4MPServlet {
 
     /**
-     * This should be in the {@link MyProxyDelegationServlet}, but that would have to be moved
+     * This should be in the {@link OA4MPServlet}, but that would have to be moved
      * and refactored. It stays here for now.
      */
   //  public static UUCThread uucThread = null;

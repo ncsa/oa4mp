@@ -18,7 +18,7 @@ import java.util.HashMap;
  * <p>Created by Jeff Gaynor<br>
  * on 9/25/13 at  3:36 PM
  */
-public abstract class AbstractCertServlet extends MyProxyDelegationServlet {
+public abstract class AbstractCertServlet extends OA4MPServlet {
     protected PAIssuer getPAI() throws IOException {
         return getServiceEnvironment().getPaIssuer();
     }

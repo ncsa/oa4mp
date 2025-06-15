@@ -31,7 +31,7 @@ import org.oa4mp.delegation.server.OA2GeneralError;
 import java.io.IOException;
 import java.net.URI;
 
-import static org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet.getServiceEnvironment;
+import static org.oa4mp.server.api.storage.servlet.OA4MPServlet.getServiceEnvironment;
 import static org.oa4mp.delegation.server.server.claims.OA2Claims.JWT_ID;
 
 /**

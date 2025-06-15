@@ -2,7 +2,7 @@ package org.oa4mp.server.loader.oauth2.servlet;
 
 import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
 import org.oa4mp.server.loader.oauth2.storage.tx.TXRecord;
-import org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet;
+import org.oa4mp.server.api.storage.servlet.OA4MPServlet;
 import org.oa4mp.delegation.common.token.AccessToken;
 import org.oa4mp.delegation.common.token.impl.TokenImpl;
 import org.oa4mp.delegation.server.OA2Constants;
@@ -51,7 +51,7 @@ public class RFC7662 extends TokenManagerServlet {
             return;
 
         }
-        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(state.transaction.getOA2Client());
+        MetaDebugUtil debugger = OA4MPServlet.createDebugger(state.transaction.getOA2Client());
         if (state.txRecord != null) {
             debugger.trace(this, "introspect, token in exchange record = \"" + state.txRecord.getIdentifier() + "\"");
             JSONObject jsonObject = new JSONObject();

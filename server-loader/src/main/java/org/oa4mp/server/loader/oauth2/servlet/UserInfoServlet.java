@@ -13,7 +13,7 @@ import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import org.oa4mp.delegation.server.ServiceTransaction;
 import org.oa4mp.delegation.server.request.IssuerResponse;
 import org.oa4mp.delegation.common.token.impl.AccessTokenImpl;
-import org.oa4mp.delegation.server.jwt.JWTRunner;
+import org.oa4mp.delegation.server.jwt.HandlerRunner;
 import org.oa4mp.delegation.server.jwt.ScriptRuntimeException;
 import org.oa4mp.delegation.server.server.UII2;
 import org.oa4mp.delegation.server.server.UIIRequest2;
@@ -104,10 +104,10 @@ public class UserInfoServlet extends BearerTokenServlet {
                 null));
         idTokenHandler.refreshAccountingInformation();
 
-        JWTRunner jwtRunner = new JWTRunner(transaction, ScriptRuntimeEngineFactory.createRTE(oa2SE, transaction, null, resolvedClient.getConfig()));
-        OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, transaction, resolvedClient, request);
+        HandlerRunner handlerRunner = new HandlerRunner(transaction, ScriptRuntimeEngineFactory.createRTE(oa2SE, transaction, null, resolvedClient.getConfig()));
+        OA2ClientUtils.setupHandlers(handlerRunner, oa2SE, transaction, resolvedClient, request);
         try {
-            jwtRunner.doUserInfo();
+            handlerRunner.doUserInfo();
         } catch (AssertionException assertionError) {
             debugger.trace(this, "assertion exception \"" + assertionError.getMessage() + "\"");
             throw new OA2ATException(OA2Errors.INVALID_REQUEST,
@@ -132,11 +132,11 @@ public class UserInfoServlet extends BearerTokenServlet {
         //setupTokens(client, rtiResponse, oa2SE, t, jwtRunner);
         debugger.trace(this, "finished processing claims.");
 
-        if (jwtRunner.hasATHandler()) {
-            transaction.setUserMetaData(jwtRunner.getAccessTokenHandler().getUserMetaData());
+        if (handlerRunner.hasATHandler()) {
+            transaction.setUserMetaData(handlerRunner.getAccessTokenHandler().getUserMetaData());
         } else {
-            if (jwtRunner.hasIDTokenHandler()) {
-                transaction.setUserMetaData(jwtRunner.getIdTokenHandlerInterface().getUserMetaData());
+            if (handlerRunner.hasIDTokenHandler()) {
+                transaction.setUserMetaData(handlerRunner.getIdTokenHandlerInterface().getUserMetaData());
             }
         }
 

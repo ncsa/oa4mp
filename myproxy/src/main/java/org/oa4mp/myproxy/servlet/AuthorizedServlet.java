@@ -1,18 +1,18 @@
-package org.oa4mp.server.api.storage.servlet;
+package org.oa4mp.myproxy.servlet;
 
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.DateUtils;
-import org.oa4mp.delegation.server.ServiceTransaction;
-import org.oa4mp.delegation.common.token.AuthorizationGrant;
 import org.apache.http.HttpStatus;
+import org.oa4mp.delegation.common.token.AuthorizationGrant;
+import org.oa4mp.delegation.server.ServiceTransaction;
+import org.oa4mp.server.api.storage.servlet.CRServlet;
+import org.oa4mp.server.api.storage.servlet.OA4MPServlet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Writer;
-
-import static edu.uiuc.ncsa.security.core.util.DateUtils.checkTimestamp;
 
 /**
  * For deployment in cases that there is a wholly external authorization webapp.
@@ -92,9 +92,9 @@ abstract    protected ProtocolParameters parseRequest(HttpServletRequest request
     protected ServiceTransaction getAndCheckTransaction(ProtocolParameters p) throws Throwable {
         String token = p.token;
         DateUtils.checkTimestamp(token);
-        AuthorizationGrant grant = getServiceEnvironment().getTokenForge().getAuthorizationGrant(token);
-        checkTimestamp(grant.getToken());
-        ServiceTransaction trans = getServiceEnvironment().getTransactionStore().get(grant);
+        AuthorizationGrant grant = OA4MPServlet.getServiceEnvironment().getTokenForge().getAuthorizationGrant(token);
+        DateUtils.checkTimestamp(grant.getToken());
+        ServiceTransaction trans = OA4MPServlet.getServiceEnvironment().getTransactionStore().get(grant);
         if (trans == null) {
             warn("Error: no delegation request found for " + token);
             throw new GeneralException("Error: no delegation request found.");

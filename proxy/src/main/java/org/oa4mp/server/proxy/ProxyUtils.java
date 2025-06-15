@@ -15,7 +15,7 @@ import org.oa4mp.server.admin.myproxy.oauth2.tools.OA2CLCCommands;
 import org.oa4mp.server.admin.myproxy.oauth2.tools.OA2CommandLineClient;
 import org.oa4mp.server.api.storage.servlet.AbstractAuthorizationServlet;
 import org.oa4mp.server.api.storage.servlet.AuthorizationServletConfig;
-import org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet;
+import org.oa4mp.server.api.storage.servlet.OA4MPServlet;
 import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.servlet.RFC8628Constants2;
 import org.oa4mp.server.loader.oauth2.servlet.RFC8628State;
@@ -71,7 +71,7 @@ public class ProxyUtils {
     protected static void startProxyAuthCodeFlow(OA2SE oa2SE, OA2ServiceTransaction t, HttpServletResponse response) throws Throwable {
 
         OA2CLCCommands clcCommands = createCLC(oa2SE, t);
-        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(t.getOA2Client());
+        MetaDebugUtil debugger = OA4MPServlet.createDebugger(t.getOA2Client());
         debugger.trace(ProxyUtils.class, "doProxyRedirect, response committed? " + response.isCommitted());
         AbstractAuthorizationServlet.MyHttpServletResponseWrapper wrapper = new AbstractAuthorizationServlet.MyHttpServletResponseWrapper(response);
         // set the specific scopes.
@@ -111,7 +111,7 @@ public class ProxyUtils {
      * @throws Exception
      */
     protected static String startProxyDeviceFlow(OA2SE oa2SE, OA2ServiceTransaction t, RFC8628State rfc8628State) throws Throwable {
-        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(t.getOA2Client());
+        MetaDebugUtil debugger = OA4MPServlet.createDebugger(t.getOA2Client());
         debugger.trace(ProxyUtils.class, "starting getProxyUserCode");
         OA2CLCCommands clcCommands = createCLC(oa2SE, t);
         Collection<String> requestScopes = getRequestScopes(t, clcCommands);
@@ -164,7 +164,7 @@ public class ProxyUtils {
      */
     protected static void userCodeToProxyRedirect(OA2SE oa2SE, OA2ServiceTransaction t, RFC8628AuthorizationServer.PendingState pendingState) throws Throwable {
         HttpServletResponse response = pendingState.getResponse();
-        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(t.getOA2Client());
+        MetaDebugUtil debugger = OA4MPServlet.createDebugger(t.getOA2Client());
 
         // Now we have determined that this is a pending transaction
         debugger.trace(ProxyUtils.class, "userCodeToProxyRedirect loading proxy client");
@@ -242,7 +242,7 @@ public class ProxyUtils {
      */
     protected static void getProxyAccessToken(OA2SE oa2SE, OA2ServiceTransaction t) throws Throwable {
         if(t.isProxyAccessTokenComplete()) return; // already done
-        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(t.getOA2Client());
+        MetaDebugUtil debugger = OA4MPServlet.createDebugger(t.getOA2Client());
 
         // Now we have determined that this is a pending transaction
         debugger.trace(ProxyUtils.class, "doRFC8628AT, loading proxy client");
@@ -360,7 +360,7 @@ public class ProxyUtils {
            //clcCommands.refresh(new InputLine("user_info "));
            clcCommands.refresh();
         }catch(Throwable throwable){
-            setClaimsFromProxy(t, clcCommands.getIdToken().getPayload(), MyProxyDelegationServlet.createDebugger(t.getOA2Client()));
+            setClaimsFromProxy(t, clcCommands.getIdToken().getPayload(), OA4MPServlet.createDebugger(t.getOA2Client()));
         }
         t.setProxyState(clcCommands.toJSON());
         oa2SE.getTransactionStore().save(t);

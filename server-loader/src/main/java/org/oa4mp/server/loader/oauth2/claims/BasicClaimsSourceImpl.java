@@ -11,7 +11,7 @@ import org.oa4mp.delegation.server.server.claims.ClaimSource;
 import org.oa4mp.delegation.server.server.claims.ClaimSourceConfiguration;
 import org.oa4mp.delegation.server.server.claims.OA2Claims;
 import org.oa4mp.delegation.server.server.config.JSONClaimSourceConfig;
-import org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet;
+import org.oa4mp.server.api.storage.servlet.OA4MPServlet;
 import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.servlet.GroupHandler;
 import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
@@ -177,7 +177,7 @@ public class BasicClaimsSourceImpl implements ClaimSource {
     @Override
     public JSONObject process(JSONObject claims, HttpServletRequest request, ServiceTransaction transaction) throws UnsupportedScopeException {
         OA2ServiceTransaction t = (OA2ServiceTransaction) transaction;
-        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(((OA2ServiceTransaction) transaction).getOA2Client());
+        MetaDebugUtil debugger = OA4MPServlet.createDebugger(((OA2ServiceTransaction) transaction).getOA2Client());
         // NOTE This runs functor pre and post processors if they are in the source configuration.
         // The older version of scripting that used functors (which is quite primitive) did not
         // actually have a way to save its state nor good control of its execution flow, hence

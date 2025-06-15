@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletResponse;
  * <p>Created by Jeff Gaynor<br>
  * on 9/25/13 at  1:37 PM
  */
-public abstract class AbstractAccessTokenServlet extends MyProxyDelegationServlet {
+public abstract class AbstractAccessTokenServlet extends OA4MPServlet {
     @Override
     protected void doIt(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable {
  //       printAllParameters(httpServletRequest);

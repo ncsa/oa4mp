@@ -99,6 +99,7 @@
         <module>client-installer</module>
         <module>installer</module>
         <module>rfc8414</module>
+        <module>myproxy</module>
     </modules>
     <dependencies>
         <dependency>

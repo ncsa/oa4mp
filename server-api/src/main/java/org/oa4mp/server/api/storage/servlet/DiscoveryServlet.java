@@ -16,7 +16,7 @@ import java.io.PrintWriter;
  * <p>Created by Jeff Gaynor<br>
  * on 12/12/16 at  1:04 PM
  */
-public class DiscoveryServlet extends MyProxyDelegationServlet implements OIDCDiscoveryTags {
+public class DiscoveryServlet extends OA4MPServlet implements OIDCDiscoveryTags {
 
    public static  final String DEFAULT_REGISTRATION_ENDPOINT = "oidc-cm";
     public static final String DISCOVERY_PATH = ".well-known";

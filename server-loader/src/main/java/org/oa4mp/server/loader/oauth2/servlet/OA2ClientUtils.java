@@ -18,7 +18,7 @@ import org.oa4mp.delegation.server.OA2ATException;
 import org.oa4mp.delegation.server.OA2Constants;
 import org.oa4mp.delegation.server.OA2Errors;
 import org.oa4mp.delegation.server.OA2GeneralError;
-import org.oa4mp.delegation.server.jwt.JWTRunner;
+import org.oa4mp.delegation.server.jwt.HandlerRunner;
 import org.oa4mp.delegation.server.server.RFC9068Constants;
 import org.oa4mp.delegation.server.storage.ClientStore;
 import org.oa4mp.server.api.admin.permissions.Permission;
@@ -301,16 +301,16 @@ public class OA2ClientUtils {
     }
 
 
-    public static void setupHandlers(JWTRunner jwtRunner,
+    public static void setupHandlers(HandlerRunner handlerRunner,
                                      OA2SE oa2SE,
                                      OA2ServiceTransaction transaction,
                                      OA2Client client,
                                      HttpServletRequest req) throws Throwable {
-        setupHandlers(jwtRunner, oa2SE, transaction, client, null, null, null, req);
+        setupHandlers(handlerRunner, oa2SE, transaction, client, null, null, null, req);
     }
 
 
-    public static void setupHandlers(JWTRunner jwtRunner,
+    public static void setupHandlers(HandlerRunner handlerRunner,
                                      OA2SE oa2SE,
                                      OA2ServiceTransaction transaction,
                                      OA2Client client,
@@ -330,7 +330,7 @@ public class OA2ClientUtils {
         if (!client.isSkipServerScripts() && oa2SE.getQDLEnvironment().hasServerScripts()) {
             ServerQDLScriptHandlerConfig qdlScriptHandlerConfig = new ServerQDLScriptHandlerConfig(oa2SE, transaction, atTX, req);
             ServerQDLScriptHandler qdlScriptHandler = new ServerQDLScriptHandler(qdlScriptHandlerConfig);
-            jwtRunner.addHandler(qdlScriptHandler);
+            handlerRunner.addHandler(qdlScriptHandler);
         }
         PayloadHandlerConfigImpl idthCfg = null;
         IDTokenHandler idTokenHandler = null;
@@ -366,7 +366,7 @@ public class OA2ClientUtils {
             idthCfg.setLegacyHandler(true);
         }
         idTokenHandler = new IDTokenHandler(idthCfg);
-        jwtRunner.setIdTokenHandlerInterface(idTokenHandler);
+        handlerRunner.setIdTokenHandlerInterface(idTokenHandler);
 
         if (client.hasAccessTokenConfig()) {
             debugger.trace(OA2ClientUtils.class, "has access token config, creating handler, type="
@@ -405,7 +405,7 @@ public class OA2ClientUtils {
                     throw new IllegalArgumentException("unknown access token handler type");
             }
             sth.setUserMetaData(idTokenHandler.getUserMetaData());
-            jwtRunner.setAccessTokenHandler(sth);
+            handlerRunner.setAccessTokenHandler(sth);
         }
         if (client.hasRefreshTokenConfig()) {
             debugger.trace(OA2ClientUtils.class, "has refresh token config, creating handler");
@@ -426,7 +426,7 @@ public class OA2ClientUtils {
                     throw new IllegalArgumentException("unknown refresh token handler type");
 
             }
-            jwtRunner.setRefreshTokenHandler(rth);
+            handlerRunner.setRefreshTokenHandler(rth);
         }
     }
 

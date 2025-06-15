@@ -368,8 +368,8 @@ public abstract class AbstractAuthorizationServlet extends CRServlet implements 
      */
     protected ServiceTransaction getAndCheckTransaction(String token) throws IOException {
         DateUtils.checkTimestamp(token);
-        AuthorizationGrant grant = MyProxyDelegationServlet.getServiceEnvironment().getTokenForge().getAuthorizationGrant(token);
-        ServiceTransaction trans = MyProxyDelegationServlet.getServiceEnvironment().getTransactionStore().get(grant);
+        AuthorizationGrant grant = OA4MPServlet.getServiceEnvironment().getTokenForge().getAuthorizationGrant(token);
+        ServiceTransaction trans = OA4MPServlet.getServiceEnvironment().getTransactionStore().get(grant);
         if (trans == null) {
             warn("Error: no delegation request found for " + token);
             throw new GeneralException("Error: no delegation request found.");
@@ -422,20 +422,33 @@ public abstract class AbstractAuthorizationServlet extends CRServlet implements 
         info("3.b. transaction has user name = " + userName);
         // The right place to invoke the pre-processor.
         preprocess(new TransactionState(request, response, null, trans, null));
+        trans.setVerifier(OA4MPServlet.getServiceEnvironment().getTokenForge().getVerifier());
+        OA4MPServlet.getServiceEnvironment().getTransactionStore().save(trans);
+        createRedirectInit(trans, userName, password);
+        String cb = createCallback(trans, getFirstParameters(request));
+
+        info("4.a. starting redirect to " + cb);
+        response.sendRedirect(cb);
+        info("4.b. Redirected to callback " + cb);
+    }
+
+    /**
+     * Additional setup for the callback. This is aimed at MyProxy aware services.
+     * @param trans
+     * @param userName
+     * @param password
+     */
+    protected abstract void createRedirectInit(ServiceTransaction trans,String userName, String password);
+
+    /*
+      Body of createRedirectInit:
         String statusString = " transaction =" + trans.getIdentifierString() + " and client=" + trans.getClient().getIdentifierString();
-        trans.setVerifier(MyProxyDelegationServlet.getServiceEnvironment().getTokenForge().getVerifier());
-        MyProxyDelegationServlet.getServiceEnvironment().getTransactionStore().save(trans);
         setupMPConnection(trans, userName, password);
         // Change is to close this connection after verifying it works.
         doRealCertRequest(trans, statusString); // Oauth 1 will get the cert, OAuth 2 will do nothing here, getting the cert later.
 
-        String cb = createCallback(trans, getFirstParameters(request));
 
-        info("4.a. starting redirect to " + cb + ", " + statusString);
-        response.sendRedirect(cb);
-        info("4.b. Redirect to callback " + cb + " ok, " + statusString);
-    }
-
+     */
     public void checkUser(String username, String password) throws GeneralSecurityException {
         // At this point in the basic servlet, there is no system for passwords.
         // This is because OA4MP has no native concept of managing users, it being
@@ -472,5 +485,5 @@ public abstract class AbstractAuthorizationServlet extends CRServlet implements 
         }
     }
 
-    abstract protected void setupMPConnection(ServiceTransaction trans, String username, String password) throws GeneralSecurityException;
+    //abstract protected void setupMPConnection(ServiceTransaction trans, String username, String password) throws GeneralSecurityException;
 }

@@ -3,7 +3,7 @@ package org.oa4mp.server.loader.oauth2.storage;
 import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
 import org.oa4mp.server.loader.oauth2.storage.tx.TXStore;
-import org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet;
+import org.oa4mp.server.api.storage.servlet.OA4MPServlet;
 import edu.uiuc.ncsa.security.core.exceptions.InvalidTimestampException;
 import edu.uiuc.ncsa.security.core.util.DateUtils;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
@@ -152,7 +152,7 @@ public class RefreshTokenRetentionPolicy extends SafeGCRetentionPolicy {
             // client gets deleted. Check if there is a client first or this will bomb with an NPE and
             // the transaction will never get garbage collected.
             if (st2.getClient()!=null && st2.getClient().isDebugOn()) {
-                MetaDebugUtil debugUtil = MyProxyDelegationServlet.createDebugger(st2.getOA2Client());
+                MetaDebugUtil debugUtil = OA4MPServlet.createDebugger(st2.getOA2Client());
                 String msg = (new Date(System.currentTimeMillis())) + ": ***Removing token " + token + " with time out " + timeout + " for client " + st2.getClient().getIdentifierString();
                 debugUtil.trace(this, msg);
             }

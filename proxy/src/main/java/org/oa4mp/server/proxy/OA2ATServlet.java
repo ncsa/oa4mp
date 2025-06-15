@@ -26,7 +26,7 @@ import org.oa4mp.delegation.common.token.AuthorizationGrant;
 import org.oa4mp.delegation.common.token.RefreshToken;
 import org.oa4mp.delegation.common.token.impl.*;
 import org.oa4mp.delegation.server.*;
-import org.oa4mp.delegation.server.jwt.JWTRunner;
+import org.oa4mp.delegation.server.jwt.HandlerRunner;
 import org.oa4mp.delegation.server.jwt.MyOtherJWTUtil2;
 import org.oa4mp.delegation.server.request.ATRequest;
 import org.oa4mp.delegation.server.request.IssuerResponse;
@@ -36,7 +36,7 @@ import org.oa4mp.server.api.admin.adminClient.AdminClient;
 import org.oa4mp.server.api.admin.permissions.Permission;
 import org.oa4mp.server.api.admin.permissions.PermissionsStore;
 import org.oa4mp.server.api.storage.servlet.IssuerTransactionState;
-import org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet;
+import org.oa4mp.server.api.storage.servlet.OA4MPServlet;
 import org.oa4mp.server.api.util.ClientDebugUtil;
 import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.claims.IDTokenHandler;
@@ -153,7 +153,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             return true;
         }
 
-        OA2SE oa2SE = (OA2SE) MyProxyDelegationServlet.getServiceEnvironment();
+        OA2SE oa2SE = (OA2SE) OA4MPServlet.getServiceEnvironment();
         if (grantType.equals(RFC7523Constants.GRANT_TYPE_JWT_BEARER)) {
             // If the client is doing an RFC 7523 grant, then it must authorize accordingly.
             OA2Client oa2Client = OA2HeaderUtils.getAndVerifyRFC7523Client(request, (OA2SE) getServiceEnvironment());
@@ -169,7 +169,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             warn("executeByGrant encountered a null client");
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, "no such client");
         }
-        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(client);
+        MetaDebugUtil debugger = OA4MPServlet.createDebugger(client);
         debugger.trace(this, "starting execute by grant, grant = \"" + grantType + "\"");
         OA2Client resolvedClient = OA2ClientUtils.resolvePrototypes(oa2SE, client);
         if (!resolvedClient.isPublicClient()) {
@@ -569,10 +569,10 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         IssuerTransactionState issuerTransactionState = new IssuerTransactionState(request, response, new HashMap<>(),
                 serviceTransaction, backup, atiResponse2);
         // Do the auth claims.
-        JWTRunner jwtRunner = new JWTRunner(serviceTransaction, ScriptRuntimeEngineFactory.createRTE(getOA2SE(), serviceTransaction, client.getConfig()));
-        OA2ClientUtils.setupHandlers(jwtRunner, getOA2SE(), serviceTransaction, client, null, null, null, request);
+        HandlerRunner handlerRunner = new HandlerRunner(serviceTransaction, ScriptRuntimeEngineFactory.createRTE(getOA2SE(), serviceTransaction, client.getConfig()));
+        OA2ClientUtils.setupHandlers(handlerRunner, getOA2SE(), serviceTransaction, client, null, null, null, request);
         try {
-            jwtRunner.doAuthClaims();
+            handlerRunner.doAuthClaims();
         } catch (Throwable throwable) {
             // NOTE at this point there is no "backup" possible if there is an error since this is starting the flow.
             // Sending a null cues in the handler not to rollback.
@@ -633,7 +633,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         Most of the machinery here is figuring out what type of token (JWT, default), looking up
         the transaction which may be in a TX record and finally verifying the token if sent.
          */
-        OA2SE oa2SE = (OA2SE) MyProxyDelegationServlet.getServiceEnvironment();
+        OA2SE oa2SE = (OA2SE) OA4MPServlet.getServiceEnvironment();
 
         AdminClient adminClient = null;
         OA2Client oa2Client = null;
@@ -841,7 +841,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
 
         RFC8693Thingie rfc8693Thingie = new RFC8693Thingie();
         String subjectToken = getFirstParameterValue(request, SUBJECT_TOKEN);
-        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(client);
+        MetaDebugUtil debugger = OA4MPServlet.createDebugger(client);
         debugger.trace(this, "Starting RFC 8693 token exchange");
         printAllParameters(request, debugger);
 /*
@@ -871,7 +871,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         AccessTokenImpl accessToken = null;
         RefreshTokenImpl refreshToken = null;
         OA2ServiceTransaction t = null;
-        OA2SE oa2se = (OA2SE) MyProxyDelegationServlet.getServiceEnvironment();
+        OA2SE oa2se = (OA2SE) OA4MPServlet.getServiceEnvironment();
         String subjectTokenType = getFirstParameterValue(request, SUBJECT_TOKEN_TYPE);
         if (subjectTokenType == null) {
             debugger.trace(this, "missing subject token type");
@@ -1085,7 +1085,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                     // reset it later.
                     t2.getUserMetaData().put(ISSUER, t.getUserMetaData().getString(ISSUER));
                 }
-                debugger = MyProxyDelegationServlet.createDebugger(client); // switch over to logging for the 𝕰𝖗s𝖆𝖙𝖟 client.
+                debugger = OA4MPServlet.createDebugger(client); // switch over to logging for the 𝕰𝖗s𝖆𝖙𝖟 client.
                 getTransactionStore().save(t2);
                 // rock on. A new transaction has been created for this and the flow from the original may now diverge.
                 t = t2;
@@ -1108,7 +1108,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                             client);
                 }
                 client = createErsatz(t.getProvisioningClientID(), client, p.getErsatzChain());
-                debugger = MyProxyDelegationServlet.createDebugger(client);
+                debugger = OA4MPServlet.createDebugger(client);
                 t.setClient(client);
             } catch (UnknownClientException ucx) {
                 debugger.trace(this, "No ersatz client found");
@@ -1252,7 +1252,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         newRTTX.setIssuedAt(System.currentTimeMillis());
 
         RTIRequest rtiRequest = new RTIRequest(request, t, t.getAccessToken(), oa2se.isOIDCEnabled());
-        RTI2 rtIssuer = new RTI2(getTF2(), MyProxyDelegationServlet.getServiceEnvironment().getServiceAddress());
+        RTI2 rtIssuer = new RTI2(getTF2(), OA4MPServlet.getServiceEnvironment().getServiceAddress());
         RTIResponse rtiResponse = (RTIResponse) rtIssuer.process(rtiRequest);
         debugger.trace(this, "rti response=" + rtiResponse);
         rtiResponse.setSignToken(client.isSignTokens());
@@ -1300,17 +1300,17 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         getOA2SE().getTxStore().save(newRTTX);
 
 
-        JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2se, t, activeTX, client.getConfig()));
+        HandlerRunner handlerRunner = new HandlerRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2se, t, activeTX, client.getConfig()));
         try {
-            OA2ClientUtils.setupHandlers(jwtRunner, oa2se, t, client, newIDTX, newATTX, newRTTX, request);
+            OA2ClientUtils.setupHandlers(handlerRunner, oa2se, t, client, newIDTX, newATTX, newRTTX, request);
             // NOTE WELL that the next two lines are where our identifiers are used to create JWTs (like SciTokens)
             // so if this is not done, the wrong token type will be returned.
-            jwtRunner.doTokenExchange();
+            handlerRunner.doTokenExchange();
         } catch (Throwable throwable) {
             OA2ServletUtils.handleScriptEngineException(this, oa2se, throwable, debugger, t, tBackup, activeTX);
         }
 
-        setupTokenResponseFromRunner(client, rtiResponse, oa2se, t, jwtRunner, true, debugger);
+        setupTokenResponseFromRunner(client, rtiResponse, oa2se, t, handlerRunner, true, debugger);
         debugger.trace(this, "rtiResponse after token setup:" + rtiResponse);
 
         if (!returnRTOnly) {
@@ -1501,7 +1501,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         }
 
         RTIRequest rtiRequest = new RTIRequest(request, t, t.getAccessToken(), oa2se.isOIDCEnabled());
-        RTI2 rtIssuer = new RTI2(getTF2(), MyProxyDelegationServlet.getServiceEnvironment().getServiceAddress());
+        RTI2 rtIssuer = new RTI2(getTF2(), OA4MPServlet.getServiceEnvironment().getServiceAddress());
         RTIResponse rtiResponse = (RTIResponse) rtIssuer.process(rtiRequest);
         debugger.trace(this, "rti response=" + rtiResponse);
         rtiResponse.setSignToken(client.isSignTokens());
@@ -1545,17 +1545,17 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                         t.getRequestState());
         }
 
-        JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2se, t, activeTX, client.getConfig()));
+        HandlerRunner handlerRunner = new HandlerRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2se, t, activeTX, client.getConfig()));
         try {
-            OA2ClientUtils.setupHandlers(jwtRunner, oa2se, t, client, newIDTX, newATTX, newRTTX, request);
+            OA2ClientUtils.setupHandlers(handlerRunner, oa2se, t, client, newIDTX, newATTX, newRTTX, request);
             // NOTE WELL that the next two lines are where our identifiers are used to create JWTs (like SciTokens)
             // so if this is not done, the wrong token type will be returned.
-            jwtRunner.doTokenExchange();
+            handlerRunner.doTokenExchange();
         } catch (Throwable throwable) {
             OA2ServletUtils.handleScriptEngineException(this, oa2se, throwable, debugger, t, tBackup, activeTX);
         }
 
-        setupTokenResponseFromRunner(client, rtiResponse, oa2se, t, jwtRunner, true, debugger);
+        setupTokenResponseFromRunner(client, rtiResponse, oa2se, t, handlerRunner, true, debugger);
         debugger.trace(this, "rtiResponse after token setup:" + rtiResponse);
         switch (requestedTokenType) {
             case ACCESS_TOKEN_TYPE:
@@ -1778,10 +1778,10 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                                      OA2Client client) {
         OA2ServiceTransaction t = (OA2ServiceTransaction) transaction;
         // Set these in the transaction then send it along.
-        t.setAccessTokenLifetime(ClientUtils.computeATLifetime(t, client, (OA2SE) MyProxyDelegationServlet.getServiceEnvironment()));
+        t.setAccessTokenLifetime(ClientUtils.computeATLifetime(t, client, (OA2SE) OA4MPServlet.getServiceEnvironment()));
         if (client.isRTLifetimeEnabled()) {
-            if (((OA2SE) MyProxyDelegationServlet.getServiceEnvironment()).isRefreshTokenEnabled()) {
-                long lifetime = ClientUtils.computeRefreshLifetime(t, client, (OA2SE) MyProxyDelegationServlet.getServiceEnvironment());
+            if (((OA2SE) OA4MPServlet.getServiceEnvironment()).isRefreshTokenEnabled()) {
+                long lifetime = ClientUtils.computeRefreshLifetime(t, client, (OA2SE) OA4MPServlet.getServiceEnvironment());
                 t.setRefreshTokenLifetime(lifetime);
                 t.setRefreshTokenExpiresAt(System.currentTimeMillis() + lifetime);
             }
@@ -1813,7 +1813,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
     }
 
     protected OA2SE getOA2SE() {
-        return (OA2SE) MyProxyDelegationServlet.getServiceEnvironment();
+        return (OA2SE) OA4MPServlet.getServiceEnvironment();
     }
 
     protected IssuerTransactionState doAT(HttpServletRequest request, HttpServletResponse response, OA2Client client) throws Throwable {
@@ -1834,21 +1834,21 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             String codeChallenge = RFC7636Util.createChallenge(verifier, serviceTransaction.getCodeChallengeMethod());
             if (StringUtils.isTrivial(codeChallenge)) {
                 // CIL-1307
-                MyProxyDelegationServlet.createDebugger(client).trace(this, "Missing verifier, PKCE (RFC 7636) failed");
+                OA4MPServlet.createDebugger(client).trace(this, "Missing verifier, PKCE (RFC 7636) failed");
                 throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
                         "bad or missing code challenge, access denied",
                         serviceTransaction.getRequestState());
             }
             if (!codeChallenge.equals(serviceTransaction.getCodeChallenge())) {
                 // CIL-1307
-                MyProxyDelegationServlet.createDebugger(client).trace(this, "missing code challenge, PKCE (RFC 7636) failed");
+                OA4MPServlet.createDebugger(client).trace(this, "missing code challenge, PKCE (RFC 7636) failed");
                 throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
                         "code challenge failed, access denied",
                         serviceTransaction.getRequestState());
             }
         } else {
             if (getOA2SE().isRfc7636Required() && client.isPublicClient()) {
-                MyProxyDelegationServlet.createDebugger(client).trace(this, "public client failed to send required code challenge, PKCE (RFC 7636) failed.");
+                OA4MPServlet.createDebugger(client).trace(this, "public client failed to send required code challenge, PKCE (RFC 7636) failed.");
                 throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
                         "code challenge failed, access denied",
                         serviceTransaction.getRequestState());
@@ -1862,10 +1862,10 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         ATIResponse2 atResponse = (ATIResponse2) state.getIssuerResponse();
 
         atResponse.setSignToken(client.isSignTokens());
-        OA2SE oa2SE = (OA2SE) MyProxyDelegationServlet.getServiceEnvironment();
+        OA2SE oa2SE = (OA2SE) OA4MPServlet.getServiceEnvironment();
 
         OA2ServiceTransaction st2 = (OA2ServiceTransaction) state.getTransaction();
-        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(st2.getClient());
+        MetaDebugUtil debugger = OA4MPServlet.createDebugger(st2.getClient());
         if (debugger instanceof ClientDebugUtil) {
             ((ClientDebugUtil) debugger).setTransaction(st2);
         }
@@ -1960,14 +1960,14 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             st2.setRefreshToken(null);
             st2.setRefreshTokenLifetime(0L);
         }
-        JWTRunner jwtRunner = new JWTRunner(st2, ScriptRuntimeEngineFactory.createRTE(oa2SE, st2, atTX, client.getConfig()));
-        OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, st2, client, null, atTX, rtTX, state.getRequest());
+        HandlerRunner handlerRunner = new HandlerRunner(st2, ScriptRuntimeEngineFactory.createRTE(oa2SE, st2, atTX, client.getConfig()));
+        OA2ClientUtils.setupHandlers(handlerRunner, oa2SE, st2, client, null, atTX, rtTX, state.getRequest());
         if (state.isRfc8628() || st2.getAuthorizationGrant().getVersion() == null || st2.getAuthorizationGrant().getVersion().equals(Identifiers.VERSION_1_0_TAG)) {
             // Handlers have not been initialized yet. Either because of old tokens or rfc 8628 (so no tokens).
-            jwtRunner.initializeHandlers();
+            handlerRunner.initializeHandlers();
         }
         try {
-            jwtRunner.doTokenClaims();
+            handlerRunner.doTokenClaims();
         } catch (Throwable throwable) {
             OA2ServletUtils.handleScriptEngineException(this, oa2SE, throwable, createDebugger(st2.getClient()), st2, tBackup);
         }
@@ -1977,7 +1977,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         } else {
             atResponse.setRefreshToken(null);
         }
-        setupTokenResponseFromRunner(client, atResponse, oa2SE, st2, jwtRunner, debugger);
+        setupTokenResponseFromRunner(client, atResponse, oa2SE, st2, handlerRunner, debugger);
         AccessTokenImpl tempAT = (AccessTokenImpl) atResponse.getAccessToken();
         if (tempAT.isJWT()) {
             st2.setATJWT(tempAT.getToken());
@@ -2037,14 +2037,14 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
      * @param tokenResponse
      * @param oa2SE
      * @param st2
-     * @param jwtRunner
+     * @param handlerRunner
      */
     private void setupTokenResponseFromRunner(OA2Client client,
                                               IDTokenResponse tokenResponse,
                                               OA2SE oa2SE,
                                               OA2ServiceTransaction st2,
-                                              JWTRunner jwtRunner, MetaDebugUtil debugger) {
-        setupTokenResponseFromRunner(client, tokenResponse, oa2SE, st2, jwtRunner, false, debugger);
+                                              HandlerRunner handlerRunner, MetaDebugUtil debugger) {
+        setupTokenResponseFromRunner(client, tokenResponse, oa2SE, st2, handlerRunner, false, debugger);
     }
 
     /**
@@ -2055,19 +2055,19 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
      * @param tokenResponse
      * @param oa2SE
      * @param st2
-     * @param jwtRunner
+     * @param handlerRunner
      * @param isTokenExchange
      */
     private void setupTokenResponseFromRunner(OA2Client client,
                                               IDTokenResponse tokenResponse,
                                               OA2SE oa2SE,
                                               OA2ServiceTransaction st2,
-                                              JWTRunner jwtRunner,
+                                              HandlerRunner handlerRunner,
                                               boolean isTokenExchange,
                                               MetaDebugUtil debugger
     ) {
         if (debugger == null) {
-            debugger = MyProxyDelegationServlet.createDebugger(client);
+            debugger = OA4MPServlet.createDebugger(client);
         }
         VirtualIssuer vo = oa2SE.getVI(client.getIdentifier());
         JSONWebKey key = null;
@@ -2076,19 +2076,19 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         } else {
             key = oa2SE.getJsonWebKeys().getDefault();
         }
-        if (jwtRunner.hasATHandler()) {
-            AccessTokenImpl newAT = (AccessTokenImpl) jwtRunner.getAccessTokenHandler().getSignedPayload(key);
+        if (handlerRunner.hasATHandler()) {
+            AccessTokenImpl newAT = (AccessTokenImpl) handlerRunner.getAccessTokenHandler().getSignedPayload(key);
             debugger.trace(this, "jwt has at handler: at=" + newAT + ", for claims " + st2.getATData().toString(2));
             tokenResponse.setAccessToken(newAT);
             debugger.trace(this, "Returned AT from handler:" + newAT + ", for claims " + st2.getATData().toString(2));
             // update the id token handler if this has been updated elsewhere.
-            jwtRunner.getIdTokenHandlerInterface().setUserMetaData(jwtRunner.getAccessTokenHandler().getUserMetaData());
+            handlerRunner.getIdTokenHandlerInterface().setUserMetaData(handlerRunner.getAccessTokenHandler().getUserMetaData());
         } else {
             debugger.trace(this, "NO ATHandler in jwtRunner");
         }
-        if (jwtRunner.hasIDTokenHandler()) {
-            tokenResponse.setUserMetadata(jwtRunner.getIdTokenHandlerInterface().getUserMetaData());
-            tokenResponse.setIdToken(((IDTokenHandler) jwtRunner.getIdTokenHandlerInterface()).getSignedPayload(key));
+        if (handlerRunner.hasIDTokenHandler()) {
+            tokenResponse.setUserMetadata(handlerRunner.getIdTokenHandlerInterface().getUserMetaData());
+            tokenResponse.setIdToken(((IDTokenHandler) handlerRunner.getIdTokenHandlerInterface()).getSignedPayload(key));
         }
 
         debugger.trace(this, "set token signing flag =" + tokenResponse.isSignToken());
@@ -2111,8 +2111,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 st2.setRefreshToken(rt);
                 st2.setRefreshTokenValid(true);
             }*/
-            if (jwtRunner.hasRTHandler()) {
-                RefreshTokenImpl newRT = (RefreshTokenImpl) jwtRunner.getRefreshTokenHandler().getSignedPayload(null); // unsigned, for now
+            if (handlerRunner.hasRTHandler()) {
+                RefreshTokenImpl newRT = (RefreshTokenImpl) handlerRunner.getRefreshTokenHandler().getSignedPayload(null); // unsigned, for now
                 tokenResponse.setRefreshToken(newRT);
                 debugger.trace(this, "Returned RT from handler:" + newRT + ", for claims " + st2.getRTData().toString(2));
             }
@@ -2133,7 +2133,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         }
         RefreshTokenStore rts = (RefreshTokenStore) getTransactionStore();
         try {
-            JSONObject jsonObject = MyOtherJWTUtil2.verifyAndReadJWT(refreshToken.getToken(), ((OA2SE) MyProxyDelegationServlet.getServiceEnvironment()).getJsonWebKeys());
+            JSONObject jsonObject = MyOtherJWTUtil2.verifyAndReadJWT(refreshToken.getToken(), ((OA2SE) OA4MPServlet.getServiceEnvironment()).getJsonWebKeys());
             if (jsonObject.containsKey(JWT_ID)) {
                 refreshToken = TokenFactory.createRT(jsonObject);
             } else {
@@ -2151,7 +2151,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
     }
 
     protected OA2TokenForge getTF2() {
-        return (OA2TokenForge) MyProxyDelegationServlet.getServiceEnvironment().getTokenForge();
+        return (OA2TokenForge) OA4MPServlet.getServiceEnvironment().getTokenForge();
     }
 
     protected TransactionState doRefresh(OA2Client client, HttpServletRequest request, HttpServletResponse response) throws Throwable {
@@ -2160,7 +2160,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
 
     protected TransactionState doNEWRefresh(OA2Client client, HttpServletRequest request, HttpServletResponse response) throws Throwable {
         // Grants are checked in the doIt method
-        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(client);
+        MetaDebugUtil debugger = OA4MPServlet.createDebugger(client);
         printAllParameters(request, debugger);
         String rawRefreshToken = request.getParameter(OA2Constants.REFRESH_TOKEN);
         if (StringUtils.isTrivial(rawRefreshToken)) {
@@ -2175,7 +2175,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
 
         debugger.trace(this, "starting token refresh at " + (new Date()));
         // Check if it's a token or JWT
-        OA2SE oa2SE = (OA2SE) MyProxyDelegationServlet.getServiceEnvironment();
+        OA2SE oa2SE = (OA2SE) OA4MPServlet.getServiceEnvironment();
         //CIL-974:
         JSONWebKeys keys = OA2TokenUtils.getKeys(oa2SE, client);
         RefreshTokenImpl oldRT;
@@ -2273,7 +2273,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         }
 
         RTIRequest rtiRequest = new RTIRequest(request, t, at, oa2SE.isOIDCEnabled() && client.isOIDCClient());
-        RTI2 rtIssuer = new RTI2(getTF2(), MyProxyDelegationServlet.getServiceEnvironment().getServiceAddress());
+        RTI2 rtIssuer = new RTI2(getTF2(), OA4MPServlet.getServiceEnvironment().getServiceAddress());
 
         RTIResponse rtiResponse = (RTIResponse) rtIssuer.process(rtiRequest);
         rtiResponse.setSignToken(client.isSignTokens());
@@ -2340,15 +2340,15 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
 
         debugger.trace(this, "set new access token = " + rtiResponse.getAccessToken().getToken());
         // remember that the client may have been resolved from prototypes, so use the one passed in, not in the transaction.
-        JWTRunner jwtRunner = new JWTRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2SE, t, txAT, client.getConfig()));
-        OA2ClientUtils.setupHandlers(jwtRunner, oa2SE, t, client, txIDT, txAT, txRT, request);
+        HandlerRunner handlerRunner = new HandlerRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2SE, t, txAT, client.getConfig()));
+        OA2ClientUtils.setupHandlers(handlerRunner, oa2SE, t, client, txIDT, txAT, txRT, request);
 
         try {
-            jwtRunner.doRefreshClaims();
+            handlerRunner.doRefreshClaims();
         } catch (Throwable throwable) {
             OA2ServletUtils.handleScriptEngineException(this, oa2SE, throwable, createDebugger(client), t, backup, txAT);
         }
-        setupTokenResponseFromRunner(client, rtiResponse, oa2SE, t, jwtRunner, debugger);
+        setupTokenResponseFromRunner(client, rtiResponse, oa2SE, t, handlerRunner, debugger);
 
         debugger.trace(this, "finished processing claims.");
 
@@ -2534,7 +2534,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
            supported scopes. Otherwise, return what scopes *are* supported.
          */
         ArrayList<String> targetScopes = new ArrayList<>();
-        OA2SE oa2SE = (OA2SE) MyProxyDelegationServlet.getServiceEnvironment();
+        OA2SE oa2SE = (OA2SE) OA4MPServlet.getServiceEnvironment();
 
         boolean returnScopes = false; // set true if something is requested we don't support
         for (String s : transaction.getScopes()) {
@@ -2566,8 +2566,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
     @Override
     protected ServiceTransaction getTransaction(AuthorizationGrant ag, HttpServletRequest req) throws ServletException {
 
-        OA2ServiceTransaction transaction = (OA2ServiceTransaction) MyProxyDelegationServlet.getServiceEnvironment().getTransactionStore().get(ag);
-        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(transaction.getOA2Client());
+        OA2ServiceTransaction transaction = (OA2ServiceTransaction) OA4MPServlet.getServiceEnvironment().getTransactionStore().get(ag);
+        MetaDebugUtil debugger = OA4MPServlet.createDebugger(transaction.getOA2Client());
         if (transaction == null) {
             if (ag instanceof AuthorizationGrantImpl) {
                 AuthorizationGrantImpl agi = (AuthorizationGrantImpl) ag;
@@ -2619,7 +2619,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
      * @throws Throwable
      */
     protected void doRFC8628(OA2Client client, HttpServletRequest request, HttpServletResponse response) throws Throwable {
-        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(client);
+        MetaDebugUtil debugger = OA4MPServlet.createDebugger(client);
         printAllParameters(request, debugger);
         debugger.trace(this, "starting RFC 8628 access token exchange.");
         //  printAllParameters(request);
@@ -2775,7 +2775,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             throw t;
         }
         debugger.trace(this, "returns from doAT");
-        OA2SE oa2se = (OA2SE) MyProxyDelegationServlet.getServiceEnvironment();
+        OA2SE oa2se = (OA2SE) OA4MPServlet.getServiceEnvironment();
         VirtualIssuer vo = oa2se.getVI(transaction.getClient().getIdentifier());
         if (vo == null) {
             debugger.trace(this, "no vi");

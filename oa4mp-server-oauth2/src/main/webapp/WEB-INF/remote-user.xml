@@ -53,15 +53,15 @@
     </servlet-mapping>
 
 
-    <servlet>
+<!--    <servlet>
         <servlet-name>getCert</servlet-name>
-        <servlet-class>org.oa4mp.server.proxy.OA2CertServlet</servlet-class>
+        <servlet-class>org.oa4mp.myproxy.servlet.OA2CertServlet</servlet-class>
 
     </servlet>
     <servlet-mapping>
         <servlet-name>getCert</servlet-name>
         <url-pattern>/getcert</url-pattern>
-    </servlet-mapping>
+    </servlet-mapping>-->
 
     <servlet>
         <servlet-name>error</servlet-name>

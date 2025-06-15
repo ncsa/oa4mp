@@ -4,7 +4,7 @@ import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.storage.RFC8628Store;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
 import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
-import org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet;
+import org.oa4mp.server.api.storage.servlet.OA4MPServlet;
 import org.oa4mp.server.api.util.ClientDebugUtil;
 import org.oa4mp.delegation.common.servlet.TransactionState;
 import org.oa4mp.delegation.common.token.impl.AuthorizationGrantImpl;
@@ -53,7 +53,7 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
     @Override
     protected void doIt(HttpServletRequest req, HttpServletResponse resp) throws Throwable {
         ServletDebugUtil.trace(this, "starting device flow");
-        OA2SE oa2SE = (OA2SE) MyProxyDelegationServlet.getServiceEnvironment();
+        OA2SE oa2SE = (OA2SE) OA4MPServlet.getServiceEnvironment();
        ServletDebugUtil.printAllParameters(getClass(), req, true);
         if (!oa2SE.isRfc8628Enabled()) {
             ServletDebugUtil.trace(this, "device flow not enabled onthis server");
@@ -101,7 +101,7 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
             }
 
         }
-        MetaDebugUtil debugger = MyProxyDelegationServlet.createDebugger(client);
+        MetaDebugUtil debugger = OA4MPServlet.createDebugger(client);
         debugger.trace(this, "is response committed?" + resp.isCommitted());
         debugger.trace(this, "checked client secret.");
 
@@ -232,7 +232,7 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
                 //               long at = Long.parseLong(rawATLifetime);
                 t.setRequestedATLifetime(at);
             } catch (Throwable throwable) {
-                MyProxyDelegationServlet.getServiceEnvironment().info("Could not set request access token lifetime to \"" + rawATLifetime
+                OA4MPServlet.getServiceEnvironment().info("Could not set request access token lifetime to \"" + rawATLifetime
                         + "\" for client " + client.getIdentifierString());
                 // do nothing.
             }
@@ -244,7 +244,7 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
                 //long rt = Long.parseLong(rawRefreshLifetime);
                 t.setRequestedRTLifetime(rt);
             } catch (Throwable throwable) {
-                MyProxyDelegationServlet.getServiceEnvironment().info("Could not set request refresh token lifetime to \"" + rawRefreshLifetime
+                OA4MPServlet.getServiceEnvironment().info("Could not set request refresh token lifetime to \"" + rawRefreshLifetime
                         + "\" for client " + client.getIdentifierString());
                 // do nothing.
             }
