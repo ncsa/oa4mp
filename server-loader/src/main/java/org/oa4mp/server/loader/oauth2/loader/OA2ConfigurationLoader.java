@@ -1,10 +1,5 @@
 package org.oa4mp.server.loader.oauth2.loader;
 
-import org.oa4mp.delegation.server.issuers.AGIssuer;
-import org.oa4mp.delegation.server.issuers.ATIssuer;
-import org.oa4mp.delegation.server.issuers.PAIssuer;
-import org.oa4mp.delegation.server.storage.ClientApprovalStore;
-import org.oa4mp.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.configuration.Configurations;
@@ -31,6 +26,9 @@ import org.oa4mp.delegation.server.OA2ConfigTags;
 import org.oa4mp.delegation.server.OA2ConfigurationLoaderUtils;
 import org.oa4mp.delegation.server.OA2Constants;
 import org.oa4mp.delegation.server.OA2TokenForge;
+import org.oa4mp.delegation.server.issuers.AGIssuer;
+import org.oa4mp.delegation.server.issuers.ATIssuer;
+import org.oa4mp.delegation.server.issuers.PAIssuer;
 import org.oa4mp.delegation.server.server.AGI2;
 import org.oa4mp.delegation.server.server.ATI2;
 import org.oa4mp.delegation.server.server.PAI2;
@@ -39,6 +37,8 @@ import org.oa4mp.delegation.server.server.claims.ClaimSource;
 import org.oa4mp.delegation.server.server.claims.ClaimSourceConfiguration;
 import org.oa4mp.delegation.server.server.config.LDAPConfiguration;
 import org.oa4mp.delegation.server.server.config.LDAPConfigurationUtil;
+import org.oa4mp.delegation.server.storage.ClientApprovalStore;
+import org.oa4mp.delegation.server.storage.ClientStore;
 import org.oa4mp.delegation.server.storage.uuc.*;
 import org.oa4mp.server.api.ClientApprovalProvider;
 import org.oa4mp.server.api.OA4MPConfigTags;
@@ -65,8 +65,6 @@ import org.oa4mp.server.loader.oauth2.cm.CM7591Config;
 import org.oa4mp.server.loader.oauth2.cm.CMConfig;
 import org.oa4mp.server.loader.oauth2.cm.CMConfigs;
 import org.oa4mp.server.loader.oauth2.cm.ClientManagementConstants;
-import org.oa4mp.server.loader.oauth2.cm.json.JSONStoreProviders;
-import org.oa4mp.server.loader.oauth2.cm.json.MultiJSONStoreProvider;
 import org.oa4mp.server.loader.oauth2.servlet.RFC8628ServletConfig;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2ClientConverter;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2ClientMemoryStore;
@@ -1084,27 +1082,6 @@ Boolean ccfEnabled = null;
     }
 
     CMConfigs cmConfigs;
-
-    public MultiJSONStoreProvider getMultiJSONStoreProvider() {
-        if (multiJSONStoreProvider == null) {
-
-            multiJSONStoreProvider = new MultiJSONStoreProvider(cn,
-                    isDefaultStoreDisabled(),
-                    getMyLogger(),
-                    null,
-                    null);
-            multiJSONStoreProvider.addListener(JSONStoreProviders.getJSMSP(cn));
-            multiJSONStoreProvider.addListener(JSONStoreProviders.getJSFSP(cn));
-            multiJSONStoreProvider.addListener(JSONStoreProviders.getMariaJS(cn, getMariaDBConnectionPoolProvider()));
-            multiJSONStoreProvider.addListener(JSONStoreProviders.getMySQLJS(cn, getMySQLConnectionPoolProvider()));
-            multiJSONStoreProvider.addListener(JSONStoreProviders.getPostgresJS(cn, getPgConnectionPoolProvider()));
-
-        }
-        return multiJSONStoreProvider;
-    }
-
-    protected MultiJSONStoreProvider multiJSONStoreProvider;
-
 
     protected MultiDSAdminClientStoreProvider macp;
 

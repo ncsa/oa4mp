@@ -1,31 +1,5 @@
 package org.oa4mp.server.loader.oauth2.cm.oidc_cm;
 
-import org.oa4mp.server.loader.oauth2.OA2SE;
-import org.oa4mp.server.loader.oauth2.cm.CM7591Config;
-import org.oa4mp.server.loader.oauth2.cm.CMConfig;
-import org.oa4mp.server.loader.oauth2.cm.util.permissions.AddClientRequest;
-import org.oa4mp.server.loader.oauth2.cm.util.permissions.PermissionServer;
-import org.oa4mp.server.loader.oauth2.cm.util.permissions.RemoveClientRequest;
-import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
-import org.oa4mp.server.loader.oauth2.servlet.OA2ExceptionHandlerThingie;
-import org.oa4mp.server.loader.oauth2.servlet.OA2HeaderUtils;
-import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
-import org.oa4mp.server.loader.oauth2.storage.clients.OA2ClientConverter;
-import org.oa4mp.server.loader.oauth2.storage.clients.OA2ClientKeys;
-import org.oa4mp.server.loader.oauth2.storage.vi.VirtualIssuer;
-import org.oa4mp.server.api.admin.adminClient.AdminClient;
-import org.oa4mp.server.api.admin.permissions.Permission;
-import org.oa4mp.server.api.storage.servlet.EnvServlet;
-import org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet;
-import org.oa4mp.delegation.common.OA4MPVersion;
-import org.oa4mp.delegation.common.storage.clients.Client;
-import org.oa4mp.delegation.server.OA2Constants;
-import org.oa4mp.delegation.server.OA2Errors;
-import org.oa4mp.delegation.server.OA2JSONException;
-import org.oa4mp.delegation.server.OA2Scopes;
-import org.oa4mp.delegation.server.UnapprovedClientException;
-import org.oa4mp.delegation.server.WrongPasswordException;
-import org.oa4mp.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
@@ -48,6 +22,27 @@ import net.sf.json.*;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.HttpStatus;
+import org.oa4mp.delegation.common.OA4MPVersion;
+import org.oa4mp.delegation.common.storage.clients.Client;
+import org.oa4mp.delegation.server.*;
+import org.oa4mp.delegation.server.storage.ClientApproval;
+import org.oa4mp.server.api.admin.adminClient.AdminClient;
+import org.oa4mp.server.api.admin.permissions.Permission;
+import org.oa4mp.server.api.storage.servlet.EnvServlet;
+import org.oa4mp.server.api.storage.servlet.MyProxyDelegationServlet;
+import org.oa4mp.server.loader.oauth2.OA2SE;
+import org.oa4mp.server.loader.oauth2.cm.CM7591Config;
+import org.oa4mp.server.loader.oauth2.cm.CMConfig;
+import org.oa4mp.server.loader.oauth2.cm.util.permissions.AddClientRequest;
+import org.oa4mp.server.loader.oauth2.cm.util.permissions.PermissionServer;
+import org.oa4mp.server.loader.oauth2.cm.util.permissions.RemoveClientRequest;
+import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
+import org.oa4mp.server.loader.oauth2.servlet.OA2ExceptionHandlerThingie;
+import org.oa4mp.server.loader.oauth2.servlet.OA2HeaderUtils;
+import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
+import org.oa4mp.server.loader.oauth2.storage.clients.OA2ClientConverter;
+import org.oa4mp.server.loader.oauth2.storage.clients.OA2ClientKeys;
+import org.oa4mp.server.loader.oauth2.storage.vi.VirtualIssuer;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -60,10 +55,10 @@ import java.security.SecureRandom;
 import java.sql.SQLException;
 import java.util.*;
 
-import static org.oa4mp.server.loader.oauth2.cm.oidc_cm.OIDCCMConstants.CLIENT_ID;
+import static edu.uiuc.ncsa.security.servlet.HeaderUtils.getFirstParameterValue;
 import static org.oa4mp.delegation.server.OA2Constants.*;
 import static org.oa4mp.delegation.server.server.RFC8693Constants.GRANT_TYPE_TOKEN_EXCHANGE;
-import static edu.uiuc.ncsa.security.servlet.HeaderUtils.getFirstParameterValue;
+import static org.oa4mp.server.loader.oauth2.cm.oidc_cm.OIDCCMConstants.CLIENT_ID;
 
 /**
  * Note that in all of these calls, the assumption is that an admin client has been requested and

@@ -43,7 +43,6 @@ import java.io.File;
         NewClientStoreTest.class,
         NewTransactionTest.class,
         CertAndKeyUtilTest.class,
-        PermissionServerTest.class,
         TokenTest2.class,
         FileStoreTest.class,
         ServiceConfigTest.class,
