@@ -16,6 +16,7 @@ CREATE TABLE oa4mp.transactions
     certlifetime              bigint,
     certreq                   clob,
     client_id                 clob,
+    consent_page_ok           boolean,
     description               clob,
     expires_in                bigint,
     id_token_identifier       clob,
@@ -183,54 +184,6 @@ CREATE TABLE oa4mp.virtual_organizations
    vo_id                  VARCHAR(255) PRIMARY KEY
 );
 create  INDEX discovery_path on oa4mp.virtual_organizations (discovery_path);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 /*

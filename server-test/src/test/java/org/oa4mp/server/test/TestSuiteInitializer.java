@@ -1,19 +1,16 @@
 package org.oa4mp.server.test;
 
-import org.oa4mp.server.test.AbstractTestSuiteInitializer;
-import org.oa4mp.server.test.TestStoreProviderInterface;
-import org.oa4mp.server.test.TestUtils;
-import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
-import org.oa4mp.server.api.ServiceEnvironment;
-import org.oa4mp.server.api.admin.adminClient.AdminClientStoreProviders;
-import org.oa4mp.server.api.admin.things.SATFactory;
-import org.oa4mp.server.api.storage.servlet.AbstractBootstrapper;
-import org.oa4mp.delegation.common.storage.clients.Client;
-import org.oa4mp.delegation.common.storage.clients.ClientConverter;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import edu.uiuc.ncsa.security.storage.sql.SQLStore;
 import edu.uiuc.ncsa.security.storage.sql.derby.DerbyConnectionPool;
+import org.oa4mp.delegation.common.storage.clients.Client;
+import org.oa4mp.delegation.common.storage.clients.ClientConverter;
+import org.oa4mp.server.api.ServiceEnvironment;
+import org.oa4mp.server.api.admin.adminClient.AdminClientStoreProviders;
+import org.oa4mp.server.api.admin.things.SATFactory;
+import org.oa4mp.server.api.storage.servlet.AbstractBootstrapper;
+import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
 
 import static org.oa4mp.server.test.TestUtils.findConfigNode;
 
@@ -54,6 +51,10 @@ public class TestSuiteInitializer extends AbstractTestSuiteInitializer {
     public String getFileStoreConfigName() {
         return "oa4mp.oa2.derby.filestore";
     }
+    // Note that if a test fails for the FS because of missing column, the derby
+    // script in /home/ncsa/dev/ncsa-git/oa4mp/server-admin/src/main/resources/oa4mp-derby.sql
+    // is missing the new column. Remove the test database in /tmp/test, fix the sql table
+    // create statements and retry.
 
     public String getOLDFileStoreConfigName() {
          return "oa4mp.oa2.fileStore";

@@ -19,6 +19,11 @@ import java.net.URI;
  * on 10/26/17 at  4:01 PM
  */
 public class NewTransactionTest extends TestBase {
+    // Note that if a test fails for the FS because of missing column, the derby
+    // script in /home/ncsa/dev/ncsa-git/oa4mp/server-admin/src/main/resources/oa4mp-derby.sql
+    // is missing the new column. Remove the test database in /tmp/test, fix the sql table
+    // create statements and retry.
+    // This is a regression test that ensures the SQL script for Derby is up to date!
     public void testFS() throws Exception {
         testServiceTransaction(TestUtils.getFsStoreProvider().getTransactionStore(),
                 TestUtils.getFsStoreProvider().getTokenForge(),

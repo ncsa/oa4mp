@@ -122,6 +122,7 @@ create table :oa4mpSchema.:oa4mpTransactionTable  (
    certreq              text,
    certlifetime         bigint,
    client_id            text,
+   consent_page_ok      boolean,
    verifier_token       text,
    access_token         text,
    access_token_valid   boolean,
