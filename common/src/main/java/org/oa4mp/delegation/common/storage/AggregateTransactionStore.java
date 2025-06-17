@@ -3,12 +3,11 @@ package org.oa4mp.delegation.common.storage;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
+import edu.uiuc.ncsa.security.storage.AggregateStore;
+import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import org.oa4mp.delegation.common.storage.transactions.BasicTransaction;
 import org.oa4mp.delegation.common.token.AccessToken;
 import org.oa4mp.delegation.common.token.AuthorizationGrant;
-import org.oa4mp.delegation.common.token.Verifier;
-import edu.uiuc.ncsa.security.storage.AggregateStore;
-import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 /**
  * An aggregate store for transactions.
@@ -47,16 +46,6 @@ public class AggregateTransactionStore<V extends TransactionStore> extends Aggre
         BasicTransaction t = null;
         for(TransactionStore s: stores){
            t = s.get(authorizationGrant);
-            if(t != null) return t;
-        }
-        return null;
-    }
-
-    @Override
-    public BasicTransaction get(Verifier verifier) {
-        BasicTransaction t = null;
-        for(TransactionStore s: stores){
-           t = s.get(verifier);
             if(t != null) return t;
         }
         return null;

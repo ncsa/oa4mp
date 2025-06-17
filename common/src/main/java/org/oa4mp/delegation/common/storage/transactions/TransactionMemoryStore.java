@@ -7,7 +7,6 @@ import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import org.oa4mp.delegation.common.storage.TransactionStore;
 import org.oa4mp.delegation.common.token.AccessToken;
 import org.oa4mp.delegation.common.token.AuthorizationGrant;
-import org.oa4mp.delegation.common.token.Verifier;
 import edu.uiuc.ncsa.security.storage.MemoryStore;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
@@ -93,10 +92,7 @@ public  class TransactionMemoryStore<V extends BasicTransaction> extends MemoryS
         return getProxyIDIndex().get(proxyID.toString());
     }
 
-    @Override
-    public V get(Verifier verifier) {
-        return getvIndex().get(verifier.getToken());
-    }
+
 
     /**
      * Override this as needed to update any and all indices.
@@ -111,9 +107,6 @@ public  class TransactionMemoryStore<V extends BasicTransaction> extends MemoryS
             getAgIndex().put(v.getAuthorizationGrant().getToken(), v);
         }
 
-        if (v.getVerifier() != null) {
-            getvIndex().put(v.getVerifier().getToken(), v);
-        }
     }
 
     @Override
@@ -153,7 +146,6 @@ public  class TransactionMemoryStore<V extends BasicTransaction> extends MemoryS
     protected void removeItem(V value) {
         getAgIndex().remove(value.getAuthorizationGrant());
         getAtIndex().remove(value.getAccessToken());
-        getvIndex().remove(value.getVerifier());
     }
 
 

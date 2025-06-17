@@ -19,8 +19,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 import static edu.uiuc.ncsa.security.core.configuration.Configurations.*;
-import static org.oa4mp.delegation.server.server.scripts.functor.ClientFunctorScriptsUtil.CLAIM_POST_PROCESSING_KEY;
-import static org.oa4mp.delegation.server.server.scripts.functor.ClientFunctorScriptsUtil.CLAIM_PRE_PROCESSING_KEY;
 
 /**
  * A utility that loads the configuration from a node and has the tags, etc. for it.
@@ -248,8 +246,6 @@ public class LDAPConfigurationUtil extends ClaimSourceConfigurationUtil {
         getJSONUtil().setJSONValue(ldap, LDAP_ADDRESS_TAG, configuration.getServer());
         getJSONUtil().setJSONValue(ldap, LDAP_PORT_TAG, configuration.getPort());
         getJSONUtil().setJSONValue(ldap, LDAP_AUTH_TYPE, configuration.getAuthType());
-        getJSONUtil().setJSONValue(ldap, CLAIM_PRE_PROCESSING_KEY, configuration.getJSONPreProcessing());
-        getJSONUtil().setJSONValue(ldap, CLAIM_POST_PROCESSING_KEY, configuration.getJSONPostProcessing());
 
         if (configuration.getAuthType() == LDAP_AUTH_NONE_KEY) {
             getJSONUtil().setJSONValue(ldap, LDAP_AUTH_TYPE, LDAP_AUTH_NONE);

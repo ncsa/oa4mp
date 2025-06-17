@@ -185,8 +185,6 @@ public class LDAPConfiguration extends JSONClaimSourceConfig {
         ldap2.setServer(getServer());
         ldap2.setSslConfiguration(getSslConfiguration());
         ldap2.setSearchBase(getSearchBase());
-        ldap2.setRawPostProcessor(getRawPostProcessor());
-        ldap2.setRawPreProcessor(getRawPreProcessor());
         ldap2.setSearchFilterAttribute(getSearchFilterAttribute());
         ldap2.setAdditionalFilter(getAdditionalFilter());
         return ldap2;

@@ -5,7 +5,6 @@ import edu.uiuc.ncsa.security.core.Store;
 import org.oa4mp.delegation.common.storage.transactions.BasicTransaction;
 import org.oa4mp.delegation.common.token.AccessToken;
 import org.oa4mp.delegation.common.token.AuthorizationGrant;
-import org.oa4mp.delegation.common.token.Verifier;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 /**
@@ -18,9 +17,6 @@ public interface TransactionStore<V extends BasicTransaction> extends Store<V> {
     V get(AuthorizationGrant authorizationGrant);
 
     V get(AccessToken accessToken);
-
-
-    V get(Verifier verifier);
 
     V getByProxyID(Identifier proxyID);
 

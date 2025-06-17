@@ -107,7 +107,6 @@ public abstract class CRServlet extends OA4MPServlet {
         trans.setUsername(userName); // Fixes OAUTH-102 username might not be set in some cases, so just reset it here.
 
         // Our response is a simple ok, since otherwise exceptions are thrown. No need to set this since that is the default.
-        trans.setVerifier(OA4MPServlet.getServiceEnvironment().getTokenForge().getVerifier());
         getServiceEnvironment().getTransactionStore().save(trans);
         if (hasMPConnection(trans.getIdentifier())) {
             // It can happen (especially in cases of manual testing when there is considerable time between calls)

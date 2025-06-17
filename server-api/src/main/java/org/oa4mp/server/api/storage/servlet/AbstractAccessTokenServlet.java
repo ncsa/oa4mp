@@ -8,7 +8,6 @@ import org.oa4mp.delegation.server.request.ATResponse;
 import org.oa4mp.delegation.common.servlet.TransactionState;
 import org.oa4mp.delegation.common.storage.clients.Client;
 import org.oa4mp.delegation.common.token.AuthorizationGrant;
-import org.oa4mp.delegation.common.token.Verifier;
 import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.XMLMap;
 
@@ -85,8 +84,6 @@ public abstract class AbstractAccessTokenServlet extends OA4MPServlet {
         MetaDebugUtil debugger = createDebugger(transaction.getClient());
         ATRequest atRequest = getATRequest(httpServletRequest, transaction);
 
-        Verifier v = getServiceEnvironment().getTokenForge().getVerifier(httpServletRequest);
-        atRequest.setVerifier(v); // can be null
         atRequest.setAuthorizationGrant(updatedAG);
         ATResponse atResp = (ATResponse) getATI().process(atRequest);
         if(!isRFC8628) {
@@ -97,7 +94,6 @@ public abstract class AbstractAccessTokenServlet extends OA4MPServlet {
 
         preprocess(new TransactionState(httpServletRequest, httpServletResponse, atResp.getParameters(), transaction, backup));
 
-        debugger.trace(this,"5.a. access token = " + atResp.getAccessToken() + (v!=null?(" for verifier = " + v):""));
         transaction.setAuthGrantValid(false);
         transaction.setAccessToken(atResp.getAccessToken());
         transaction.setAccessTokenValid(true);

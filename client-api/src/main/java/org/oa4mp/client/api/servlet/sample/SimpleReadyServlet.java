@@ -55,10 +55,10 @@ public class SimpleReadyServlet extends ClientServlet {
             String msg = "Error: no cookie found. Cannot save certificates";
             warn(msg);
             debug("No cookie found");
-            assetResponse = getOA4MPService().getCert(token, verifier);
+            assetResponse = getOA4MPService().getCert(token, null);
         } else {
             // The general case is to do the call with the identifier if you want the asset store managed.
-            assetResponse = getOA4MPService().getCert(token, verifier, BasicIdentifier.newID(identifier));
+            assetResponse = getOA4MPService().getCert(token,  BasicIdentifier.newID(identifier));
         }
         // The work in this call
 

@@ -1,10 +1,5 @@
 package org.oa4mp.delegation.common.storage.transactions;
 
-import org.oa4mp.delegation.common.storage.TransactionStore;
-import org.oa4mp.delegation.common.token.AccessToken;
-import org.oa4mp.delegation.common.token.AuthorizationGrant;
-import org.oa4mp.delegation.common.token.TokenForge;
-import org.oa4mp.delegation.common.token.Verifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.TransactionNotFoundException;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
@@ -13,6 +8,10 @@ import edu.uiuc.ncsa.security.storage.sql.ConnectionRecord;
 import edu.uiuc.ncsa.security.storage.sql.SQLStore;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
 import edu.uiuc.ncsa.security.storage.sql.internals.Table;
+import org.oa4mp.delegation.common.storage.TransactionStore;
+import org.oa4mp.delegation.common.token.AccessToken;
+import org.oa4mp.delegation.common.token.AuthorizationGrant;
+import org.oa4mp.delegation.common.token.TokenForge;
 
 import javax.inject.Provider;
 import java.sql.Connection;
@@ -100,14 +99,6 @@ abstract public class SQLBaseTransactionStore<V extends BasicTransaction> extend
         }
     }
 
-    public V get(Verifier verifier) {
-        try {
-            V t = getTransaction(verifier.getToken(), getTransactionTable().getByVerifierStatement());
-            return t;
-        } catch (TransactionNotFoundException x) {
-            return null;
-        }
-    }
 
     @Override
     public String getCreationTSField() {

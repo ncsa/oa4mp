@@ -372,19 +372,19 @@ public class OA2TokenForge implements TokenForge {
     }
 
     //TODO Resolve conflict between this and legacy classes (e.g. AbstractAuthorizationServlet)
-    @Override
+ /*   @Override
     public Verifier getVerifier(Map<String, String> parameters) {
         //throw new UnsupportedOperationException("Error: Verifiers are not used in OAuth2");
         return null;
-    }
+    }*/
 
-    @Override
+/*    @Override
     public Verifier getVerifier(HttpServletRequest request) {
         //throw new UnsupportedOperationException("Error: Verifiers are not used in OAuth2");
         return null;
-    }
+    }*/
 
-    @Override
+   /* @Override
     public Verifier getVerifier(String... tokens) {
         switch (tokens.length) {
             case 0:
@@ -394,5 +394,5 @@ public class OA2TokenForge implements TokenForge {
                 return new VerifierImpl(URI.create(tokens[0]));
         }
 
-    }
+    }*/
 }

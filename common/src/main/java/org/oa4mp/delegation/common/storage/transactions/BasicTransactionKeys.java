@@ -15,7 +15,6 @@ public class BasicTransactionKeys extends SerializationKeys {
 
     String accessToken = "access_token";
     String authGrant = "auth_grant"; // Changes require that temp_token be used solely as the id.
-    String verifier = "oauth_verifier";
     String tempCred = "temp_token";
 
     public String authGrant(String... x) {
@@ -34,18 +33,12 @@ public class BasicTransactionKeys extends SerializationKeys {
         return accessToken;
     }
 
-    public String verifier(String... x) {
-        if (0 < x.length) verifier = x[0];
-        return verifier;
-    }
-
     @Override
     public List<String> allKeys() {
         List<String> allKeys = super.allKeys();
         allKeys.add(tempCred());
         allKeys.add(authGrant());
         allKeys.add(accessToken());
-        allKeys.add(verifier());
         return allKeys;
     }
 }

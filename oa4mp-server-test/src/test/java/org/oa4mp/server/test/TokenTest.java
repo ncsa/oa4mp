@@ -1,11 +1,10 @@
 package org.oa4mp.server.test;
 
+import edu.uiuc.ncsa.security.util.TestBase;
+import org.junit.Test;
 import org.oa4mp.delegation.common.token.AccessToken;
 import org.oa4mp.delegation.common.token.AuthorizationGrant;
 import org.oa4mp.delegation.common.token.TokenForge;
-import org.oa4mp.delegation.common.token.Verifier;
-import edu.uiuc.ncsa.security.util.TestBase;
-import org.junit.Test;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -29,11 +28,6 @@ public class TokenTest extends TestBase {
         AccessToken at = tf.getAccessToken();
         assert 0 > at.getLifetime();
         assert 0 > at.getIssuedAt();
-        
-        Verifier v = tf.getVerifier();
-        assert 0 > v.getLifetime();
-        assert 0 > v.getIssuedAt();
-
     }
 
 

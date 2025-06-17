@@ -75,6 +75,8 @@ foo!
 
 ** Batch files
 
+[Deprecated. If you really need to do more than some rudimentary work, consider getting and running QDL.]
+
 The processor also has the ability to run batches of commands found in a single file. The syntax of the file
 is designed to be as minimal as possible:
 

@@ -29,8 +29,8 @@ public interface TokenForge {
     AccessToken getAccessToken(HttpServletRequest request);
     AccessToken getAccessToken(String... tokens);
 
-    Verifier getVerifier(Map<String, String> parameters);
-    Verifier getVerifier(HttpServletRequest request);
-    Verifier getVerifier(String... tokens);
+  //  Verifier getVerifier(Map<String, String> parameters);
+   // Verifier getVerifier(HttpServletRequest request);
+   // Verifier getVerifier(String... tokens);
 
 }

@@ -11,7 +11,7 @@ import java.util.List;
 public class OA2TransactionKeys extends DSTransactionKeys {
     public OA2TransactionKeys() {
         callbackUri("callback_uri");
-        verifier("verifier_token");
+        //verifier("verifier_token");
         clientKey("client_id");
     }
 

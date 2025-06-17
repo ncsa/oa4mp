@@ -19,7 +19,6 @@ import org.oa4mp.delegation.client.request.*;
 import org.oa4mp.delegation.common.storage.clients.Client;
 import org.oa4mp.delegation.common.token.AuthorizationGrant;
 import org.oa4mp.delegation.common.token.MyX509Certificates;
-import org.oa4mp.delegation.common.token.Verifier;
 import org.oa4mp.delegation.common.token.impl.*;
 import org.oa4mp.delegation.server.NonceHerder;
 import org.oa4mp.delegation.server.OA2Constants;
@@ -100,8 +99,8 @@ public class OA2MPService extends OA4MPService {
     }
 
     @Override
-    protected Map<String, Object> getATParameters(Asset asset, AuthorizationGrant ag, Verifier v) {
-        Map<String, Object> m = super.getATParameters(asset, ag, v);
+    protected Map<String, Object> getATParameters(Asset asset, AuthorizationGrant ag) {
+        Map<String, Object> m = super.getATParameters(asset, ag);
         OA2Asset a = (OA2Asset) asset;
         if (a == null) {
             throw new GeneralException("Asset not found. You may need to clear your browser cookies.");
@@ -205,7 +204,7 @@ public class OA2MPService extends OA4MPService {
         dar.setClient(getEnvironment().getClient());
         dar.setKeyID(getEnvironment().getKid());
         Map<String, Object> m1 = new HashMap<>();
-        m1.putAll(getATParameters(asset, ag, null));
+        m1.putAll(getATParameters(asset, ag));
         if (additionalParameters != null) {
             m1.putAll(additionalParameters);
         }
@@ -273,7 +272,7 @@ public class OA2MPService extends OA4MPService {
     }
 
     @Override
-    protected AssetResponse getCert(Asset a, AuthorizationGrant ag, Verifier v) {
+    protected AssetResponse getCert(Asset a, AuthorizationGrant ag) {
         OA2Asset asset = (OA2Asset) a;
         ATResponse2 atResp = getAccessToken(asset, ag);
         return getCert(asset, atResp);

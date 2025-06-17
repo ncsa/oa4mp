@@ -1,18 +1,16 @@
 package org.oa4mp.delegation.common.storage.transactions;
 
-import org.oa4mp.delegation.common.token.impl.TokenFactory;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.Identifier;
-import org.oa4mp.delegation.common.token.AccessToken;
-import org.oa4mp.delegation.common.token.AuthorizationGrant;
-import org.oa4mp.delegation.common.token.TokenForge;
-import org.oa4mp.delegation.common.token.Verifier;
-import org.oa4mp.delegation.common.token.impl.AccessTokenImpl;
-import org.oa4mp.delegation.common.token.impl.AuthorizationGrantImpl;
-import org.oa4mp.delegation.common.token.impl.VerifierImpl;
 import edu.uiuc.ncsa.security.storage.data.ConversionMap;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
+import org.oa4mp.delegation.common.token.AccessToken;
+import org.oa4mp.delegation.common.token.AuthorizationGrant;
+import org.oa4mp.delegation.common.token.TokenForge;
+import org.oa4mp.delegation.common.token.impl.AccessTokenImpl;
+import org.oa4mp.delegation.common.token.impl.AuthorizationGrantImpl;
+import org.oa4mp.delegation.common.token.impl.TokenFactory;
 
 import java.net.URI;
 
@@ -73,16 +71,6 @@ public class BasicTransactionConverter<V extends BasicTransaction> extends MapCo
         }
 
 
-
-        token = data.get(getBTKeys().verifier());
-        if (token != null) {
-            if (token instanceof Verifier) {
-                b.setVerifier((Verifier) token);
-            } else {
-                VerifierImpl verifier = new VerifierImpl(URI.create(token.toString()));
-                b.setVerifier(verifier);
-            }
-        }
         b.setIdentifier(id);  // Make sure it is right!
 
         return (V) b;
@@ -97,8 +85,6 @@ public class BasicTransactionConverter<V extends BasicTransaction> extends MapCo
         if (value.hasAccessToken()) {
             data.put(getBTKeys().accessToken(), value.getAccessToken().getJti().toString());
         }
-        if (value.hasVerifier()) {
-            data.put(getBTKeys().verifier(), value.getVerifier().getToken());
-        }
+
     }
 }

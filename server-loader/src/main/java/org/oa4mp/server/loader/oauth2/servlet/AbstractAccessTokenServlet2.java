@@ -111,8 +111,6 @@ public abstract class AbstractAccessTokenServlet2 extends MultiAuthServlet {
         MetaDebugUtil debugger = createDebugger(transaction.getClient());
         ATRequest atRequest = getATRequest(httpServletRequest, transaction, client);
 
-        Verifier v = getServiceEnvironment().getTokenForge().getVerifier(httpServletRequest);
-        atRequest.setVerifier(v); // can be null
         atRequest.setAuthorizationGrant(updatedAG);
         ATResponse atResp = (ATResponse) getATI().process(atRequest);
         if(!isRFC8628) {
@@ -123,7 +121,6 @@ public abstract class AbstractAccessTokenServlet2 extends MultiAuthServlet {
 
         preprocess(new TransactionState(httpServletRequest, httpServletResponse, atResp.getParameters(), transaction, backup));
 
-        debugger.trace(this,"5.a. access token = " + atResp.getAccessToken() + (v!=null?(" for verifier = " + v):""));
         transaction.setAuthGrantValid(false);
         transaction.setAccessToken(atResp.getAccessToken());
         transaction.setAccessTokenValid(true);

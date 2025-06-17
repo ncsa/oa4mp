@@ -7,8 +7,8 @@ import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import edu.uiuc.ncsa.security.core.util.LoggerProvider;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.cli.*;
+import edu.uiuc.ncsa.security.util.cli.batch.DDParser;
 import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
-import edu.uiuc.ncsa.security.util.functor.parser.event.ParserUtil;
 import org.apache.commons.lang.StringUtils;
 import org.oa4mp.delegation.common.OA4MPVersion;
 
@@ -278,7 +278,9 @@ public class JWKCLI extends ConfigurableCommandsImpl {
             throw new GeneralException("Error: Cannot read file \"" + fileName + "\". Please check your permissions.");
         }
         FileReader fis = new FileReader(file);
-        List<String> commands = ParserUtil.processInput(fis);
+        DDParser ddp = new DDParser();
+        List<String> commands = ddp.parse(fis);
+        //List<String> commands = ParserUtil.processInput(fis);
         JWKUtilCommands jwkCommands = getJWKCommands(cli);
         if (jwkCommands == null) {
             throw new NFWException("Error: No JWKUtilCommands configured, hence no logging.");

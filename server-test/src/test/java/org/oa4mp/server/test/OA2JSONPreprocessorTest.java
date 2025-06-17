@@ -89,10 +89,7 @@ public class OA2JSONPreprocessorTest extends JSONPreprocessorTest {
         LDAPConfiguration cfg = new LDAPConfiguration();
         cfg.setPort(636);
         cfg.setServer("https://foo.bar");
-        cfg.setRawPreProcessor(null);
-        ;
         JSONObject json = cfg.toJSON();
-
         System.out.println(json.toString(2));
     }
 

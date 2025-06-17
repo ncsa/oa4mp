@@ -1,0 +1,19 @@
+/*
+  The actual JSON for the client's configuration:
+
+{"tokens": {"identity": {
+  "qdl":  {
+           "load": "esnet/v1/id-token.qdl",
+           "xmd": {"exec_phase": ["post_auth"]}
+         },
+  "type": "identity"
+ }}}
+*/
+
+
+// Set list to whichever elements exist or set to null. Default is original sub claim
+q. ≔ [      ∃claims.'eppn' ⇒ claims.'eppn',
+      ∃claims.'subject-id' ⇒ claims.'subject-id',
+                             claims.'sub'];
+
+claims.'sub' ≔ (~q.≠ null⌆q.).0; // grab first one that is not null

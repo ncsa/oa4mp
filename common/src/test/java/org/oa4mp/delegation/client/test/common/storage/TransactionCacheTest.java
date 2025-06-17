@@ -7,13 +7,12 @@ import edu.uiuc.ncsa.security.core.cache.CachedObject;
 import edu.uiuc.ncsa.security.core.cache.Cleanup;
 import edu.uiuc.ncsa.security.core.cache.MaxCacheSizePolicy;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import org.junit.Test;
 import org.oa4mp.delegation.common.storage.TransactionStore;
 import org.oa4mp.delegation.common.storage.transactions.BasicTransaction;
 import org.oa4mp.delegation.common.storage.transactions.TransactionCache;
 import org.oa4mp.delegation.common.token.AccessToken;
 import org.oa4mp.delegation.common.token.AuthorizationGrant;
-import org.oa4mp.delegation.common.token.Verifier;
-import org.junit.Test;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -29,10 +28,7 @@ public class TransactionCacheTest extends BaseTransactionStoreTest {
         return new FileStoreTest.FakeAuthorizationGrant(id.toString());
     }
 
-    @Override
-    protected Verifier newVerifier(URI id) {
-        return new FileStoreTest.FakeVerifier(id.toString());
-    }
+
 
     @Override
     protected AccessToken newAT(URI id) {

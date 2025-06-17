@@ -32,7 +32,6 @@ abstract public class BasicTransactionTable extends Table {
         getColumnDescriptor().add(new ColumnDescriptorEntry(btk().tempCred(), LONGVARCHAR, false, true));
         getColumnDescriptor().add(new ColumnDescriptorEntry(btk().authGrant(), LONGVARCHAR, true, false));
         getColumnDescriptor().add(new ColumnDescriptorEntry(btk().accessToken(), LONGVARCHAR, true, false));
-        getColumnDescriptor().add(new ColumnDescriptorEntry(btk().verifier(), LONGVARCHAR, true, false));
 
     }
 
@@ -44,10 +43,6 @@ abstract public class BasicTransactionTable extends Table {
         return "SELECT * FROM " + getFQTablename() + " WHERE " + btk().accessToken() + "=?";
     }
 
-
-    public String getByVerifierStatement() {
-        return "SELECT * FROM " + getFQTablename() + " WHERE " + btk().verifier() + "=?";
-    }
 
     @Override
     public String toString() {

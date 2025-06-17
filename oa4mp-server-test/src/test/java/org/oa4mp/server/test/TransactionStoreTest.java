@@ -1,14 +1,13 @@
 package org.oa4mp.server.test;
 
 
-import org.oa4mp.server.api.OA4MPServiceTransaction;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import org.oa4mp.delegation.common.storage.clients.Client;
+import org.junit.Test;
 import org.oa4mp.delegation.common.storage.TransactionStore;
+import org.oa4mp.delegation.common.storage.clients.Client;
 import org.oa4mp.delegation.common.token.AccessToken;
 import org.oa4mp.delegation.common.token.AuthorizationGrant;
-import org.oa4mp.delegation.common.token.Verifier;
-import org.junit.Test;
+import org.oa4mp.server.api.OA4MPServiceTransaction;
 
 import java.net.URI;
 
@@ -36,9 +35,6 @@ public abstract class TransactionStoreTest extends StoreTest{
         return ag;
     }
 
-    protected Verifier newVerifier(String... x) {
-       return getTSProvider().getTokenForge().getVerifier(x);
-    }
 
     protected AccessToken newAT(String... x) {
         AccessToken  at = getTSProvider().getTokenForge().getAccessToken(x);
@@ -68,10 +64,6 @@ public abstract class TransactionStoreTest extends StoreTest{
         // First leg sets the verifier and user
 
         String r = getRandomString(12);
-        OA4MPServiceTransaction.setVerifier(newVerifier());
-        getStore().save(OA4MPServiceTransaction);
-
-        assert OA4MPServiceTransaction.equals(getStore().get(OA4MPServiceTransaction.getVerifier()));
         // next leg creates the access tokens and invalidates the temp credentials
         OA4MPServiceTransaction.setAccessToken(newAT());
         OA4MPServiceTransaction.setAuthGrantValid(false);

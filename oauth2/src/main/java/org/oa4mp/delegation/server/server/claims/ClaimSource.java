@@ -1,11 +1,10 @@
 package org.oa4mp.delegation.server.server.claims;
 
+import net.sf.json.JSONObject;
+import org.oa4mp.delegation.server.ServiceTransaction;
 import org.oa4mp.delegation.server.UserInfo;
 import org.oa4mp.delegation.server.server.UnsupportedScopeException;
-import org.oa4mp.delegation.server.ServiceTransaction;
 import org.qdl_lang.variables.QDLStem;
-import edu.uiuc.ncsa.security.util.functor.parser.FunctorScript;
-import net.sf.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
@@ -82,19 +81,6 @@ public interface ClaimSource  extends Serializable {
      * @return
      */
     public boolean isRunOnlyAtAuthorization();
-
-    /**
-     * This is the preprocessor <b>after</b> it has run. It is not available until execution time since it has to be
-     * constructed on the fly from the current state of the claims.
-     * @return
-     */
-   public FunctorScript getPreProcessor();
-
-    /**
-     * See comment in {@link #getPreProcessor()}.
-     * @return
-     */
-    public FunctorScript getPostProcessor();
 
     public void fromQDL(QDLStem stem);
 

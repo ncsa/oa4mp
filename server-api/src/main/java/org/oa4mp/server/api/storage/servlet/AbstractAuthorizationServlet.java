@@ -422,7 +422,6 @@ public abstract class AbstractAuthorizationServlet extends CRServlet implements 
         info("3.b. transaction has user name = " + userName);
         // The right place to invoke the pre-processor.
         preprocess(new TransactionState(request, response, null, trans, null));
-        trans.setVerifier(OA4MPServlet.getServiceEnvironment().getTokenForge().getVerifier());
         OA4MPServlet.getServiceEnvironment().getTransactionStore().save(trans);
         createRedirectInit(trans, userName, password);
         String cb = createCallback(trans, getFirstParameters(request));

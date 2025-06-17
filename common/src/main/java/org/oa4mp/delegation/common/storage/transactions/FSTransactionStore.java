@@ -2,13 +2,12 @@ package org.oa4mp.delegation.common.storage.transactions;
 
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.storage.FileStore;
+import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import org.oa4mp.delegation.common.storage.TransactionStore;
 import org.oa4mp.delegation.common.token.AccessToken;
 import org.oa4mp.delegation.common.token.AuthorizationGrant;
 import org.oa4mp.delegation.common.token.TokenForge;
-import org.oa4mp.delegation.common.token.Verifier;
-import edu.uiuc.ncsa.security.storage.FileStore;
-import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 import java.io.File;
 import java.io.IOException;
@@ -59,9 +58,7 @@ public abstract class FSTransactionStore<V extends BasicTransaction> extends Fil
             if (t.hasAccessToken()) {
                 createIndexEntry(t.getAccessToken().getToken(), t.getIdentifierString());
             }
-            if (t.hasVerifier()) {
-                createIndexEntry(t.getVerifier().getToken(), t.getIdentifierString());
-            }
+
         } catch (IOException e) {
             throw new GeneralException("Error serializing item " + t + "to file ");
         }
@@ -73,9 +70,7 @@ public abstract class FSTransactionStore<V extends BasicTransaction> extends Fil
         if (thingie.getAccessToken() != null) {
             removeIndexEntry(thingie.getAccessToken().getToken());
         }
-        if (thingie.getVerifier() != null) {
-            removeIndexEntry(thingie.getVerifier().getToken());
-        }
+
         return thingie;
     }
 
@@ -87,9 +82,6 @@ public abstract class FSTransactionStore<V extends BasicTransaction> extends Fil
         return getIndexEntry(accessToken.getToken());
     }
 
-    public V get(Verifier verifier) {
-        return getIndexEntry(verifier.getToken());
-    }
 
     @Override
     public MapConverter getMapConverter() {

@@ -7,7 +7,6 @@ import org.oa4mp.delegation.common.storage.TransactionStore;
 import org.oa4mp.delegation.common.storage.transactions.BasicTransaction;
 import org.oa4mp.delegation.common.token.AccessToken;
 import org.oa4mp.delegation.common.token.AuthorizationGrant;
-import org.oa4mp.delegation.common.token.Verifier;
 import edu.uiuc.ncsa.security.util.TestBase;
 import org.junit.Test;
 
@@ -25,11 +24,6 @@ public abstract class BaseTransactionStoreTest extends TestBase {
         return newAG(createToken("authorizationGrant"));
     }
 
-    abstract protected Verifier newVerifier(URI id);
-
-    protected Verifier newVerifier() {
-        return newVerifier(createToken("verifier"));
-    }
 
     abstract protected AccessToken newAT(URI id);
 
@@ -104,9 +98,7 @@ public abstract class BaseTransactionStoreTest extends TestBase {
         TransactionStore store = getInitializedStore();
 
         AccessToken at = newAT();
-        Verifier v = newVerifier();
         BasicTransaction t = createTransaction(store);
-        t.setVerifier(v);
         t.setAccessToken(at);
 
         AuthorizationGrant ag = t.getAuthorizationGrant(); // this is set in the call above.
@@ -116,16 +108,12 @@ public abstract class BaseTransactionStoreTest extends TestBase {
         assert t2 != null : "Could not save file for id=\"" + t.getIdentifierString() + "\"";
         assert t.equals(t2);
         assert t.equals(store.get(ag));
-        assert t.equals(store.get(v));
         assert t.equals(store.get(at));
 
         // now repeat it, clearing out the store each time.
         store = getStore();
 
         assert t.equals(store.get(ag));
-
-        store = getStore();
-        assert t.equals(store.get(v));
 
         store = getStore();
         assert t.equals(store.get(at));
@@ -166,10 +154,8 @@ public abstract class BaseTransactionStoreTest extends TestBase {
 
         ag = newAG();
         AccessToken at = newAT();
-        Verifier v = newVerifier();
 
         t.setAuthorizationGrant(ag);
-        t.setVerifier(v);
         t.setAccessToken(at);
 
 

@@ -12,7 +12,6 @@ import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import org.oa4mp.delegation.common.storage.TransactionStore;
 import org.oa4mp.delegation.common.token.AccessToken;
 import org.oa4mp.delegation.common.token.AuthorizationGrant;
-import org.oa4mp.delegation.common.token.Verifier;
 
 import java.net.URI;
 import java.util.*;
@@ -163,9 +162,6 @@ public class TransactionCache<V extends BasicTransaction> extends CachedMapFacad
             case ACCESS_TOKEN:
                 t = getTransactionIndices().get((AccessToken) key);
                 break;
-            case VERIFIER:
-                t = getTransactionIndices().get((Verifier) key);
-                break;
             case IDENTIFIER:
                 t = getTransactionIndices().get((Identifier) key);
                 break;
@@ -181,9 +177,7 @@ public class TransactionCache<V extends BasicTransaction> extends CachedMapFacad
                 case ACCESS_TOKEN:
                     t = getBackingStore().get((AccessToken) key);
                     break;
-                case VERIFIER:
-                    t = getBackingStore().get((Verifier) key);
-                    break;
+
                 case IDENTIFIER:
                     t = (BasicTransaction) getBackingStore().get(key);
                     break;
@@ -205,9 +199,6 @@ public class TransactionCache<V extends BasicTransaction> extends CachedMapFacad
         return getByKey(accessToken, ACCESS_TOKEN);
     }
 
-    public V get(Verifier verifier) {
-        return getByKey(verifier, VERIFIER);
-    }
 
 
     public int size() {
@@ -383,13 +374,6 @@ public class TransactionCache<V extends BasicTransaction> extends CachedMapFacad
             return get(getAccessTokenIndex().get(accessToken.getToken()));
         }
 
-        public V get(Verifier verifier) {
-            if (!getVerifierIndex().containsKey(verifier.getToken())) {
-                return null;
-            }
-            return get(getVerifierIndex().get(verifier.getToken()));
-        }
-
 
         HashMap<Identifier, V> transactions;
 
@@ -465,12 +449,6 @@ public class TransactionCache<V extends BasicTransaction> extends CachedMapFacad
         }
 
 
-        protected HashMap<String, Identifier> getVerifierIndex() {
-            if (verifierIndex == null) {
-                verifierIndex = new HashMap<String, Identifier>();
-            }
-            return verifierIndex;
-        }
 
         protected HashMap<String, Identifier> getAccessTokenIndex() {
             if (accessTokenIndex == null) {
@@ -488,9 +466,7 @@ public class TransactionCache<V extends BasicTransaction> extends CachedMapFacad
             if (t.hasAuthorizationGrant()) {
                 getAuthorizationGrantIndex().put(t.getAuthorizationGrant().getToken(), t.getIdentifier());
             }
-            if (t.hasVerifier()) {
-                getVerifierIndex().put(t.getVerifier().getToken(), t.getIdentifier());
-            }
+
         }
 
 
@@ -501,9 +477,7 @@ public class TransactionCache<V extends BasicTransaction> extends CachedMapFacad
             if (t.hasAuthorizationGrant()) {
                 getAuthorizationGrantIndex().remove(t.getAuthorizationGrant().getToken());
             }
-            if (t.hasVerifier()) {
-                getVerifierIndex().remove(t.getVerifier().getToken());
-            }
+
         }
     }
 

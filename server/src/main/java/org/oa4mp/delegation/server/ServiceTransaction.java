@@ -176,7 +176,6 @@ public class ServiceTransaction extends BasicTransaction {
     transient MyPKCS10CertRequest certReq;
     protected String formatToString(){
         String out = "id=" + getIdentifierString() + ", authGrant=" + getAuthorizationGrant() + "(" + (isAuthGrantValid() ? "" : "in") + "valid)";
-        out = out + ", verifier=" + (!hasVerifier() ? "(none)" : getVerifier());
         out = out + ", access token=" + getAccessToken() + "(" + (isAccessTokenValid() ? "" : "in") + "valid)";
         out = out + ", lifetime=" + getLifetime();
               return out;

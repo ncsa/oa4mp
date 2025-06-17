@@ -2,7 +2,6 @@ package org.oa4mp.server.loader.oauth2.claims;
 
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
-import edu.uiuc.ncsa.security.util.functor.parser.FunctorScript;
 import net.sf.json.JSONObject;
 import org.oa4mp.delegation.server.ServiceTransaction;
 import org.oa4mp.delegation.server.UserInfo;
@@ -10,7 +9,6 @@ import org.oa4mp.delegation.server.server.UnsupportedScopeException;
 import org.oa4mp.delegation.server.server.claims.ClaimSource;
 import org.oa4mp.delegation.server.server.claims.ClaimSourceConfiguration;
 import org.oa4mp.delegation.server.server.claims.OA2Claims;
-import org.oa4mp.delegation.server.server.config.JSONClaimSourceConfig;
 import org.oa4mp.server.api.storage.servlet.OA4MPServlet;
 import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.servlet.GroupHandler;
@@ -91,22 +89,6 @@ public class BasicClaimsSourceImpl implements ClaimSource {
         return configuration != null;
     }
 
-    public boolean hasJSONPreProcessor() {
-        if (getConfiguration() instanceof JSONClaimSourceConfig) {
-            return ((JSONClaimSourceConfig) getConfiguration()).getJSONPreProcessing() != null;
-
-        }
-        return false;
-    }
-
-    public boolean hasJSONPostProcessor() {
-        if (getConfiguration() instanceof JSONClaimSourceConfig) {
-            return ((JSONClaimSourceConfig) getConfiguration()).getJSONPostProcessing() != null;
-
-        }
-        return false;
-    }
-
     public BasicClaimsSourceImpl(OA2SE oa2SE) {
         this.oa2SE = oa2SE;
     }
@@ -185,38 +167,10 @@ public class BasicClaimsSourceImpl implements ClaimSource {
         // configuration, so until nobody is using the old scripting, these must remain.
         debugger.trace(this, "Before preP claims:" + claims);
         debugger.trace(this, "Before preP has config:" + hasConfiguration());
-/*        if (hasConfiguration() && hasJSONPreProcessor()) {
-            debugger.trace(this, "in preP cfg name=:" + getConfiguration().getName() + ", id=" + getConfiguration().getId());
-
-            OA2FunctorFactory ff = new OA2FunctorFactory(claims, t.getScopes());
-            preProcessor = new FunctorScript(ff, getConfiguration().getJSONPreProcessing());
-            debugger.trace(this, "PreP before X=:" + preProcessor);
-            preProcessor.execute();
-            debugger.trace(this, "PreP after X=:" + preProcessor);
-
-            // since the flow state maps to  part of a JSON object, we have to get the object, then reset it.
-            FlowStates2 f = t.getFlowStates();
-            FunctorRuntimeEngine.updateFSValues(f, preProcessor.getFunctorMap());
-            t.setFlowStates(f);
-        }*/
         debugger.trace(this, "starting real processing");
         realProcessing(claims, request, t); // actual work here
         debugger.trace(this, "done real processing, claims=" + claims);
 
-/*        if (hasConfiguration() && hasJSONPostProcessor()) {
-            debugger.trace(this, "in postP cfg name=:" + getConfiguration().getName() + ", id=" + getConfiguration().getId());
-
-            OA2FunctorFactory ff = new OA2FunctorFactory(claims, t.getScopes());
-            postProcessor = new FunctorScript(ff, getConfiguration().getJSONPostProcessing());
-            debugger.trace(this, "postP before X=:" + postProcessor);
-
-            postProcessor.execute();
-            debugger.trace(this, "postP after X=:" + postProcessor);
-            FlowStates2 f = t.getFlowStates();
-            FunctorRuntimeEngine.updateFSValues(f, postProcessor.getFunctorMap());
-            t.setFlowStates(f);
-            t.setUserMetaData(claims);
-        }*/
         debugger.trace(this, "returned claims=:" + claims);
 
         return claims;
@@ -288,18 +242,7 @@ public class BasicClaimsSourceImpl implements ClaimSource {
         return false;
     }
 
-    FunctorScript preProcessor = null;
-    FunctorScript postProcessor = null;
 
-    @Override
-    public FunctorScript getPostProcessor() {
-        return postProcessor;
-    }
-
-    @Override
-    public FunctorScript getPreProcessor() {
-        return preProcessor;
-    }
 
     @Override
     public void fromQDL(QDLStem stem) {

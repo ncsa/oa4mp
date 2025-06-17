@@ -1,16 +1,15 @@
 package org.oa4mp.server.test;
 
-import org.oa4mp.server.api.OA4MPServiceTransaction;
-import org.oa4mp.delegation.common.storage.clients.Client;
+import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.util.TestBase;
 import org.oa4mp.delegation.common.storage.TransactionStore;
+import org.oa4mp.delegation.common.storage.clients.Client;
 import org.oa4mp.delegation.common.token.AccessToken;
 import org.oa4mp.delegation.common.token.AuthorizationGrant;
 import org.oa4mp.delegation.common.token.TokenForge;
-import org.oa4mp.delegation.common.token.Verifier;
 import org.oa4mp.delegation.server.OA2TokenForge;
 import org.oa4mp.delegation.server.storage.ClientStore;
-import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import edu.uiuc.ncsa.security.util.TestBase;
+import org.oa4mp.server.api.OA4MPServiceTransaction;
 
 import java.net.URI;
 
@@ -25,31 +24,31 @@ public class NewTransactionTest extends TestBase {
     // create statements and retry.
     // This is a regression test that ensures the SQL script for Derby is up to date!
     public void testFS() throws Exception {
-        testServiceTransaction(TestUtils.getFsStoreProvider().getTransactionStore(),
+        serviceTransactionTest(TestUtils.getFsStoreProvider().getTransactionStore(),
                 TestUtils.getFsStoreProvider().getTokenForge(),
                 TestUtils.getFsStoreProvider().getClientStore());
     }
 
     public void testMYSQL() throws Exception {
-        testServiceTransaction(TestUtils.getMySQLStoreProvider().getTransactionStore(),
+        serviceTransactionTest(TestUtils.getMySQLStoreProvider().getTransactionStore(),
                 TestUtils.getMySQLStoreProvider().getTokenForge(),
                 TestUtils.getMySQLStoreProvider().getClientStore());
     }
 
     public void testMemStore() throws Exception {
-        testServiceTransaction(TestUtils.getMemoryStoreProvider().getTransactionStore(),
+        serviceTransactionTest(TestUtils.getMemoryStoreProvider().getTransactionStore(),
                 TestUtils.getMemoryStoreProvider().getTokenForge(),
                 TestUtils.getMemoryStoreProvider().getClientStore());
     }
 
     public void testPG() throws Exception {
-        testServiceTransaction(TestUtils.getPgStoreProvider().getTransactionStore(),
+        serviceTransactionTest(TestUtils.getPgStoreProvider().getTransactionStore(),
                 TestUtils.getPgStoreProvider().getTokenForge(),
                 TestUtils.getPgStoreProvider().getClientStore());
     }
 
     public void testDerby() throws Exception {
-        testServiceTransaction(TestUtils.getDerbyStoreProvider().getTransactionStore(),
+        serviceTransactionTest(TestUtils.getDerbyStoreProvider().getTransactionStore(),
                 TestUtils.getDerbyStoreProvider().getTokenForge(),
                 TestUtils.getDerbyStoreProvider().getClientStore());
     }
@@ -62,17 +61,13 @@ public class NewTransactionTest extends TestBase {
         return ag;
     }
 
-    protected Verifier newVerifier(TokenForge tokenForge, String... x) {
-        return tokenForge.getVerifier(x);
-    }
-
-    protected AccessToken newAT(TokenForge tokenForge, String... x) {
+     protected AccessToken newAT(TokenForge tokenForge, String... x) {
         AccessToken at = tokenForge.getAccessToken(x);
         //     at.setSharedSecret(null);
         return at;
     }
 
-    public void testServiceTransaction(TransactionStore transactionStore, TokenForge tokenForge, ClientStore clientStore) throws Exception {
+    public void serviceTransactionTest(TransactionStore transactionStore, TokenForge tokenForge, ClientStore clientStore) throws Exception {
         String randomString =  getRandomString();
         OA4MPServiceTransaction serviceTransaction = (OA4MPServiceTransaction) transactionStore.create();
         serviceTransaction.setCallback(URI.create("http://callback"));
@@ -100,10 +95,8 @@ public class NewTransactionTest extends TestBase {
         // now emulate doing oauth type transactions with it.
         // First leg sets the verifier and user
 
-        serviceTransaction.setVerifier(newVerifier(tokenForge));
         transactionStore.save(serviceTransaction);
 
-        assert serviceTransaction.equals(transactionStore.get(serviceTransaction.getVerifier()));
         // next leg creates the access tokens and invalidates the temp credentials
         serviceTransaction.setAccessToken(newAT(tokenForge));
         serviceTransaction.setAuthGrantValid(false);

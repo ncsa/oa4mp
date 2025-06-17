@@ -34,10 +34,6 @@ public class BasicTransaction extends IdentifiableImpl implements Cacheable {
         return protectedAsset != null;
     }
 
-    public boolean hasVerifier() {
-        return verifier != null;
-    }
-
     public AccessToken getAccessToken() {
         return accessToken;
     }
@@ -58,18 +54,8 @@ public class BasicTransaction extends IdentifiableImpl implements Cacheable {
         }
     }
 
-
-    public Verifier getVerifier() {
-        return verifier;
-    }
-
-    public void setVerifier(Verifier verifier) {
-        this.verifier = verifier;
-    }
-
    protected AuthorizationGrant authorizationGrant;
     AccessToken accessToken = null;
-    Verifier verifier = null;
     ProtectedAsset protectedAsset;
 
 
@@ -97,7 +83,6 @@ public class BasicTransaction extends IdentifiableImpl implements Cacheable {
 
         if(!checkTokenEquals(getAuthorizationGrant(), t.getAuthorizationGrant())) return false;
         if(!checkTokenEquals(getAccessToken(), t.getAccessToken())) return false;
-        if(!checkTokenEquals(getVerifier(), t.getVerifier())) return false;
         return true;
     }
 
@@ -105,7 +90,6 @@ public class BasicTransaction extends IdentifiableImpl implements Cacheable {
     public String toString() {
         String out = "Transaction[";
         out = out + "id=" + getIdentifierString() + ", auth grant=" + (hasAuthorizationGrant() ? getAuthorizationGrant() : "(none)");
-        out = out + ", verifier=" + (!hasVerifier() ? "(none)" : getVerifier());
         out = out + ", access token=" + (hasAccessToken() ? getAccessToken() : "(none)");
         return out + "]";
     }

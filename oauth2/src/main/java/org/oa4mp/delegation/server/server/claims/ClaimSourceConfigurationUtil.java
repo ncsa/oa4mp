@@ -8,8 +8,6 @@ import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import static edu.uiuc.ncsa.security.core.configuration.Configurations.getFirstAttribute;
 import static edu.uiuc.ncsa.security.core.configuration.Configurations.getNodeValue;
-import static org.oa4mp.delegation.server.server.scripts.functor.ClientFunctorScriptsUtil.CLAIM_POST_PROCESSING_KEY;
-import static org.oa4mp.delegation.server.server.scripts.functor.ClientFunctorScriptsUtil.CLAIM_PRE_PROCESSING_KEY;
 
 /**
  * This is a utility that will take a claim source and make a configuration for it.
@@ -120,8 +118,6 @@ public class ClaimSourceConfigurationUtil {
         jsonUtil.setJSONValue(jsonConfig, ENABLED_TAG, config.isEnabled());
         jsonUtil.setJSONValue(jsonConfig, FAIL_ON_ERROR_TAG, config.isFailOnError());
         jsonUtil.setJSONValue(jsonConfig, NOTIFY_ON_FAIL_TAG, config.isNotifyOnFail());
-        jsonUtil.setJSONValue(jsonConfig, CLAIM_PRE_PROCESSING_KEY, config.getRawPreProcessor());
-        jsonUtil.setJSONValue(jsonConfig, CLAIM_POST_PROCESSING_KEY, config.getRawPostProcessor());
         if (config.getOmitList() != null && !config.getOmitList().isEmpty()) {
             JSONArray omitList = null;
             if (config.getOmitList() instanceof JSONArray) {
@@ -172,8 +168,6 @@ public class ClaimSourceConfigurationUtil {
             }
             config.setOmitList(array);
         }
-        config.setRawPreProcessor(jsonUtil.getJSONValueString(json, CLAIM_PRE_PROCESSING_KEY));
-        config.setRawPostProcessor(jsonUtil.getJSONValueString(json, CLAIM_POST_PROCESSING_KEY));
         config.setProperties(json.getJSONObject(getComponentName()));
         return config;
     }

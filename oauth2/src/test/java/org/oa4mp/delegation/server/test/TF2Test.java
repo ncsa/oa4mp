@@ -38,11 +38,7 @@ public class TF2Test extends TestBase {
         System.out.println(at);
         RefreshTokenImpl rt = tf2.createToken(new RTIRequest(fakeST, true));
         System.out.println(rt);
-        try {
-            tf2.getVerifier();
-        } catch (UnsupportedOperationException gx) {
-            assert true;
-        }
+
         System.out.println(tf2.getRefreshToken());
     }
 

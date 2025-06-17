@@ -1,12 +1,11 @@
 package org.oa4mp.server.loader.oauth2.flows;
 
-import edu.uiuc.ncsa.security.util.functor.FunctorType;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 3/23/18 at  11:36 AM
  */
-public enum FlowType implements FunctorType {
+public enum FlowType  {
     /**
      * Allows for issuing access tokens
      */
@@ -37,7 +36,6 @@ public enum FlowType implements FunctorType {
 
     String value;
 
-    @Override
     public String getValue() {
         return value;
     }

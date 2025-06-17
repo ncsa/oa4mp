@@ -9,7 +9,6 @@ import org.oa4mp.delegation.client.request.DelegationRequest;
 import org.oa4mp.delegation.client.request.DelegationResponse;
 import org.oa4mp.delegation.common.token.AuthorizationGrant;
 import org.oa4mp.delegation.common.token.MyX509Certificates;
-import org.oa4mp.delegation.common.token.Verifier;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
@@ -202,25 +201,23 @@ public abstract class AbstractOA4MPService {
      * user authorization.
      *
      * @param tempToken
-     * @param verifier
      * @return
      */
-    public AssetResponse getCert(String tempToken, String verifier) {
-        return getCert(tempToken, verifier, null);
-    }
+  /*  public abstract AssetResponse getCert(String tempToken);/* {
+        return getCert(tempToken, null);
+    }*/
 
 
     /**
-     * Performs the {@link #getCert(String, String)} call then updates the asset associated with
+     * Performs the {@link #getCert(String)} call then updates the asset associated with
      * the given identifier. This throws an exception is there is no asset or if the asset store
      * is not enabled.
      *
      * @param tempToken
-     * @param verifier
      * @param identifier
      * @return
      */
-    public AssetResponse getCert(String tempToken, String verifier, Identifier identifier) {
+    public AssetResponse getCert(String tempToken,  Identifier identifier) {
         Asset asset = null;
         Identifier realId = null;
 
@@ -243,11 +240,7 @@ public abstract class AbstractOA4MPService {
                     "You might need to clear your cookies and retry the entire request.");
         }
         AuthorizationGrant ag = getEnvironment().getTokenForge().getAuthorizationGrant(tempToken);
-        Verifier v = null;
-        if (verifier != null) {
-            v = getEnvironment().getTokenForge().getVerifier(verifier);
-        }
-        return getCert(asset, ag, v);
+        return getCert(asset, ag);
     }
 
     /**
@@ -256,10 +249,9 @@ public abstract class AbstractOA4MPService {
      *
      * @param asset
      * @param ag
-     * @param v
      * @return
      */
-    protected Map<String, Object> getATParameters(Asset asset, AuthorizationGrant ag, Verifier v) {
+    protected Map<String, Object> getATParameters(Asset asset, AuthorizationGrant ag) {
         Map m = new HashMap();
         m.put(getEnvironment().getConstants().get(ClientEnvironment.CALLBACK_URI_KEY), getEnvironment().getCallback().toString());
         return m;
@@ -283,16 +275,14 @@ public abstract class AbstractOA4MPService {
      *
      * @param asset
      * @param ag
-     * @param v
      * @return
      */
-    protected AssetResponse getCert(Asset asset, AuthorizationGrant ag, Verifier v) {
+    protected AssetResponse getCert(Asset asset, AuthorizationGrant ag) {
         DelegatedAssetRequest dar = new DelegatedAssetRequest();
         dar.setAuthorizationGrant(ag);
         dar.setClient(getEnvironment().getClient());
         dar.setKeyID(getEnvironment().getKid());
-        dar.setVerifier(v);
-        dar.setParameters(getATParameters(asset, ag, v));
+        dar.setParameters(getATParameters(asset, ag));
 
         Map<String, String> m1 = getAssetParameters(asset);
         preGetCert(asset, m1);

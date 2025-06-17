@@ -1,12 +1,11 @@
 package org.oa4mp.delegation.server.jwt;
 
-import edu.uiuc.ncsa.security.util.functor.FunctorType;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 2/15/20 at  8:27 AM
  */
-public enum FlowType implements FunctorType {
+public enum FlowType  {
     /**
      * Allows for issuing access tokens
      */
@@ -33,7 +32,7 @@ public enum FlowType implements FunctorType {
 
     String value;
 
-    @Override
+
     public String getValue() {
         return value;
     }

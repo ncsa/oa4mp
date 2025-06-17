@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.core.util.IdentifiableProviderImpl;
 import edu.uiuc.ncsa.security.core.util.IdentifierProvider;
+import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import org.oa4mp.delegation.common.storage.TransactionStore;
 import org.oa4mp.delegation.common.storage.transactions.BasicTransaction;
 import org.oa4mp.delegation.common.storage.transactions.BasicTransactionConverter;
@@ -14,8 +15,6 @@ import org.oa4mp.delegation.common.storage.transactions.FSTransactionStore;
 import org.oa4mp.delegation.common.token.AccessToken;
 import org.oa4mp.delegation.common.token.AuthorizationGrant;
 import org.oa4mp.delegation.common.token.TokenForge;
-import org.oa4mp.delegation.common.token.Verifier;
-import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
@@ -68,23 +67,7 @@ public class FileStoreTest extends BaseTransactionStoreTest {
 
         }
 
-        @Override
-        public Verifier getVerifier(Map<String, String> parameters) {
-            return null;
-        }
 
-        @Override
-        public Verifier getVerifier(HttpServletRequest request) {
-            return null;
-        }
-
-        @Override
-        public Verifier getVerifier(String... tokens) {
-            if(tokens.length == 0 ) {
-                return new FakeVerifier((String) null);
-            }
-            return new FakeVerifier(tokens[0]);
-        }
     }
 
     @Override
@@ -92,10 +75,6 @@ public class FileStoreTest extends BaseTransactionStoreTest {
         return new FakeAuthorizationGrant(id.toString());
     }
 
-    @Override
-    protected Verifier newVerifier(URI id) {
-        return new FakeVerifier(id.toString());
-    }
 
     @Override
     protected AccessToken newAT(URI id) {
@@ -163,20 +142,7 @@ public class FileStoreTest extends BaseTransactionStoreTest {
     }
 }
 
-    /**
-     * <p>Created by Jeff Gaynor<br>
-     * on May 6, 2011 at  3:19:07 PM
-     */
-    public static class FakeVerifier extends FakeTokenImpl implements Verifier {
-        public FakeVerifier(String token) {
-            super(token);
-        }
 
-        public FakeVerifier(URI token) {
-            super(token);
-        }
-
-    }
 
     /**
      * <p>Created by Jeff Gaynor<br>

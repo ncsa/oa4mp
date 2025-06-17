@@ -6,7 +6,6 @@ import org.oa4mp.server.loader.oauth2.storage.transactions.OA2TransactionKeys;
 import org.oa4mp.delegation.common.token.MyX509Certificates;
 import org.oa4mp.delegation.server.storage.ClientStore;
 import org.oa4mp.delegation.common.token.impl.TokenFactory;
-import org.oa4mp.delegation.common.token.impl.VerifierImpl;
 import org.qdl_lang.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
@@ -102,7 +101,6 @@ public class TransactionStemMC<V extends OA2ServiceTransaction> extends StemConv
         if (stem.containsKey(kk().accessToken())) {v.setAccessToken(TokenFactory.createAT(stem.getString(kk().accessToken())));}
         //if (stem.containsKey(kk().authGrant())) {v.setAuthorizationGrant(new AuthorizationGrantImpl(URI.create(stem.getString(kk().authGrant()))));}
         if (stem.containsKey(kk().authGrant())) {v.setAuthorizationGrant(TokenFactory.createAG(stem.getString(kk().authGrant())));}
-        if(stem.containsKey(kk().verifier())){v.setVerifier(new VerifierImpl(URI.create(stem.getString(kk().verifier()))));}
         // 3 (4th unused)
         // ======
         /*
@@ -199,7 +197,6 @@ public class TransactionStemMC<V extends OA2ServiceTransaction> extends StemConv
         stem = super.toMap(v, stem);
         if(v.getAccessToken() != null){put(stem,kk().accessToken(), v.getAccessToken().getToken());}
         if(v.getAuthorizationGrant()!=null) {put(stem,kk().authGrant(), v.getAuthorizationGrant().getToken());}
-        if(v.getVerifier()!=null) {put(stem,kk().verifier(), v.getVerifier().getToken());}
         // 3 attribute
         put(stem,kk().accessTokenValid(), v.isAccessTokenValid());
         put(stem,kk().lifetime(), v.getLifetime());
