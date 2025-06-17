@@ -58,7 +58,7 @@ public class OA2ReadyServlet extends ClientServlet {
         // (so it is the server that actually is invoking this method after the authorization
         // step.) The token and verifier are peeled off and used
         // to complete the request.
-        info("2.a.0 Getting token and verifier.");
+        info("2.a.0 Getting token.");
         String token = request.getParameter(CONST(ClientEnvironment.TOKEN));
         if(TokenUtil.isBase32(token)){
             token = TokenUtil.b32DecodeToken(token);
@@ -66,7 +66,7 @@ public class OA2ReadyServlet extends ClientServlet {
         String state = request.getParameter(OA2Constants.STATE);
         if (token == null) {
             warn("2.a.1 The token is " + (token == null ? "null" : token) + ".");
-            GeneralException ge = new GeneralException(" This servlet requires parameters for the token and possibly verifier.");
+            GeneralException ge = new GeneralException(" This servlet requires parameters for the token.");
             request.setAttribute("exception", ge);
             JSPUtil.fwd(request, response, getCE().getErrorPagePath());
             return;

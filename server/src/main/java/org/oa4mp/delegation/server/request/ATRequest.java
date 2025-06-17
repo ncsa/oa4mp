@@ -1,12 +1,11 @@
 package org.oa4mp.delegation.server.request;
 
-import org.oa4mp.delegation.server.ServiceTransaction;
-import org.oa4mp.delegation.server.issuers.ATIssuer;
 import org.oa4mp.delegation.common.services.Response;
 import org.oa4mp.delegation.common.services.Server;
-import org.oa4mp.delegation.common.token.AuthorizationGrant;
-import org.oa4mp.delegation.common.token.Verifier;
 import org.oa4mp.delegation.common.token.AccessToken;
+import org.oa4mp.delegation.common.token.AuthorizationGrant;
+import org.oa4mp.delegation.server.ServiceTransaction;
+import org.oa4mp.delegation.server.issuers.ATIssuer;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -43,15 +42,6 @@ public class ATRequest extends IssuerRequest {
         return super.process(server);
     }
 
-      public Verifier getVerifier() {
-        return verifier;
-    }
-
-    public void setVerifier(Verifier verifier) {
-        this.verifier = verifier;
-    }
-
-    Verifier verifier;
 
     public boolean isOidc() {
         return oidc;

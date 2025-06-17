@@ -4,7 +4,6 @@ import org.oa4mp.delegation.client.DelegationService;
 import org.oa4mp.delegation.common.services.Response;
 import org.oa4mp.delegation.common.services.Server;
 import org.oa4mp.delegation.common.token.AuthorizationGrant;
-import org.oa4mp.delegation.common.token.Verifier;
 
 import java.util.Map;
 
@@ -32,16 +31,6 @@ public class DelegatedAssetRequest extends BasicRequest {
 
     AuthorizationGrant authorizationGrant;
 
-
-    public Verifier getVerifier() {
-        return verifier;
-    }
-
-    public void setVerifier(Verifier verifier) {
-        this.verifier = verifier;
-    }
-
-    Verifier verifier;
 
     /**
      * These are passed to the resource server in the protected asset request. The {@link #getParameters()} are passed

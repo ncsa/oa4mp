@@ -4,7 +4,6 @@ import org.oa4mp.delegation.client.server.CBServer;
 import org.oa4mp.delegation.common.services.Response;
 import org.oa4mp.delegation.common.services.Server;
 import org.oa4mp.delegation.common.token.AuthorizationGrant;
-import org.oa4mp.delegation.common.token.Verifier;
 
 import javax.servlet.ServletRequest;
 
@@ -29,7 +28,6 @@ public class CallbackRequest extends BasicRequest {
     }
 
     AuthorizationGrant authorizationGrant;
-    Verifier verifier;
 
     public AuthorizationGrant getAuthorizationGrant() {
         return authorizationGrant;
@@ -39,13 +37,6 @@ public class CallbackRequest extends BasicRequest {
         this.authorizationGrant = authorizationGrant;
     }
 
-    public Verifier getVerifier() {
-        return verifier;
-    }
-
-    public void setVerifier(Verifier verifier) {
-        this.verifier = verifier;
-    }
 
     @Override
     public Response process(Server server) {
@@ -59,7 +50,6 @@ public class CallbackRequest extends BasicRequest {
     public String toString() {
         String out = getClass().getSimpleName() + "[";
         out = out + "grant=" + (authorizationGrant == null?"(null)":authorizationGrant);
-        out = out + ", verifier=" + (verifier==null?"(null)":verifier);
         out = out + "]";
         return out;
     }

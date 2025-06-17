@@ -4,7 +4,6 @@ import org.oa4mp.delegation.client.server.ATServer;
 import org.oa4mp.delegation.common.services.Response;
 import org.oa4mp.delegation.common.services.Server;
 import org.oa4mp.delegation.common.token.AuthorizationGrant;
-import org.oa4mp.delegation.common.token.Verifier;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -20,28 +19,12 @@ public class ATRequest extends BasicRequest {
      * @param dar
      */
     public ATRequest(DelegatedAssetRequest dar) {
-        setVerifier(dar.getVerifier());
         setRfc8628(dar.isRfc8628());
         setAuthorizationGrant(dar.getAuthorizationGrant());
         setClient(dar.getClient());
         setParameters(dar.getParameters());
         setKeyID(dar.getKeyID());
     }
-
-    /**
-     * Optional if supported. This should be set to null if it is not supported.
-     *
-     * @return
-     */
-    public Verifier getVerifier() {
-        return verifier;
-    }
-
-    public void setVerifier(Verifier verifier) {
-        this.verifier = verifier;
-    }
-
-    Verifier verifier;
 
     public Response process(Server server) {
         if (server instanceof ATServer) {

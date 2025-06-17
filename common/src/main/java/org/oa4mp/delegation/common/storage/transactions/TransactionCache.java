@@ -379,7 +379,6 @@ public class TransactionCache<V extends BasicTransaction> extends CachedMapFacad
 
         public void clear() {
             transactions = null;
-            verifierIndex = null;
             accessTokenIndex = null;
             AuthorizationGrantIndex = null;
             createdTransactions = null;
@@ -439,7 +438,6 @@ public class TransactionCache<V extends BasicTransaction> extends CachedMapFacad
 
 
         HashMap<String, Identifier> AuthorizationGrantIndex;
-        HashMap<String, Identifier> verifierIndex;
 
         protected HashMap<String, Identifier> getAuthorizationGrantIndex() {
             if (AuthorizationGrantIndex == null) {

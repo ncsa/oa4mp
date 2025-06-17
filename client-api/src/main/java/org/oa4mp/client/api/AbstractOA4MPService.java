@@ -197,19 +197,7 @@ public abstract class AbstractOA4MPService {
 
 
     /**
-     * Retrieve the certificate chain from the server. This is done after the {@link #requestCert()} and
-     * user authorization.
-     *
-     * @param tempToken
-     * @return
-     */
-  /*  public abstract AssetResponse getCert(String tempToken);/* {
-        return getCert(tempToken, null);
-    }*/
-
-
-    /**
-     * Performs the {@link #getCert(String)} call then updates the asset associated with
+     * Performs the {@link #getCert(Asset, AuthorizationGrant)} and updates the asset associated with
      * the given identifier. This throws an exception is there is no asset or if the asset store
      * is not enabled.
      *

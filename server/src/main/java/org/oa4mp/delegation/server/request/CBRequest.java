@@ -1,11 +1,10 @@
 package org.oa4mp.delegation.server.request;
 
-import org.oa4mp.delegation.server.ServiceTransaction;
-import org.oa4mp.delegation.server.issuers.CBIssuer;
 import org.oa4mp.delegation.common.services.Response;
 import org.oa4mp.delegation.common.services.Server;
 import org.oa4mp.delegation.common.token.AuthorizationGrant;
-import org.oa4mp.delegation.common.token.Verifier;
+import org.oa4mp.delegation.server.ServiceTransaction;
+import org.oa4mp.delegation.server.issuers.CBIssuer;
 
 import java.net.URI;
 
@@ -63,15 +62,6 @@ public class CBRequest extends IssuerRequest {
         this.callbackUri = callbackUri;
     }
 
-    public Verifier getVerifier() {
-        return verifier;
-    }
-
-    public void setVerifier(Verifier verifier) {
-        this.verifier = verifier;
-    }
-
-    Verifier verifier;
     URI callbackUri;
 
     public CBRequest(ServiceTransaction transaction) {
@@ -81,6 +71,6 @@ public class CBRequest extends IssuerRequest {
 
     @Override
     public String toString() {
-        return "CBRequest[grant=" + authorizationGrant + ", uri=" + callbackUri + ", verifier=" + verifier + "]";
+        return "CBRequest[grant=" + authorizationGrant + ", uri=" + callbackUri + "]";
     }
 }

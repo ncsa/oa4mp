@@ -3,7 +3,6 @@ package org.oa4mp.delegation.server;
 import org.oa4mp.delegation.common.token.AccessToken;
 import org.oa4mp.delegation.common.token.AuthorizationGrant;
 import org.oa4mp.delegation.common.token.TokenForge;
-import org.oa4mp.delegation.common.token.Verifier;
 import org.oa4mp.delegation.server.server.AGRequest2;
 import org.oa4mp.delegation.server.server.OIDCServiceTransactionInterface;
 import org.oa4mp.delegation.server.server.RTIRequest;
@@ -108,10 +107,6 @@ public class OA2TokenForge implements TokenForge {
         return userInfo;
     }
 
-    protected String verifierToken(String... x) {
-        if (1 == x.length) verifierToken = x[0];
-        return verifierToken;
-    }
 
     protected String idToken(String... x) {
         if (1 == x.length) idToken = x[0];
@@ -135,7 +130,6 @@ public class OA2TokenForge implements TokenForge {
     public String authzGrant = "authzGrant";
     public String accessToken = "accessToken";
     public String refreshToken = "refreshToken";
-    public String verifierToken = "verifierToken";
     public String idToken = "idToken";
     public String asset = "asset";
     public String userInfo = "userInfo";
@@ -166,11 +160,12 @@ public class OA2TokenForge implements TokenForge {
     /**
      * Takes a token (as a string) and returns a human-readable type of token.
      * This is intended to be used in, e.g., logging applications.
+     *
      * @param x
      * @return
      */
     public String getStringType(String x) {
-        switch (getType(x)){
+        switch (getType(x)) {
             case TYPE_ACCESS_TOKEN:
                 return "access token";
             case TYPE_REFRESH_TOKEN:
@@ -184,6 +179,7 @@ public class OA2TokenForge implements TokenForge {
                 return "unknown token";
         }
     }
+
     public int getType(String x) {
         String s = getServer();
         if (!s.endsWith("/")) {
@@ -234,10 +230,10 @@ public class OA2TokenForge implements TokenForge {
                 return new AuthorizationGrantImpl(getAgIdProvider().get().getUri());
 
             default:
-                if(tokens[0] == null){
+                if (tokens[0] == null) {
                     return new AuthorizationGrantImpl(null);
                 }
-                if(isBase32(tokens[0])){
+                if (isBase32(tokens[0])) {
                     return new AuthorizationGrantImpl(tokens[0] == null ? null : URI.create(b32DecodeToken(tokens[0])));
                 } else {
                     return new AuthorizationGrantImpl(URI.create(tokens[0]));
@@ -316,29 +312,13 @@ public class OA2TokenForge implements TokenForge {
     }
 
 
-    public IP2<Identifier> getVerifierTokenProvider() {
-        if (verifierTokenProvider == null) {
-            //verifierTokenProvider = new IdentifierProvider<Identifier>(URI.create(getServer()), verifierToken(), true) {
-            verifierTokenProvider = new IP2(URI.create(getServer()), verifierToken(), true) {
-            };
-        }
-        return verifierTokenProvider;
-    }
-
-/*
-    public void setVerifierTokenProvider(IdentifierProvider<Identifier> verifierTokenProvider) {
-        this.verifierTokenProvider = verifierTokenProvider;
-    }
-*/
-
     /*
-       Note that our specification dictates that grants, verifiers  and access tokens conform to the
+       Note that our specification dictates that grants  and access tokens conform to the
        semantics of identifiers. We have to provide these.
         */
     IP2<Identifier> atIdProvider;
     IP2<Identifier> agIdProvider;
     IP2<Identifier> refreshTokenProvider;
-    IP2<Identifier> verifierTokenProvider;
     IP2<Identifier> idTokenprovider = null;
 
     protected URI getURI(String token) {
@@ -370,29 +350,6 @@ public class OA2TokenForge implements TokenForge {
                 return new AccessTokenImpl(URI.create(tokens[0]));
         }
     }
-
-    //TODO Resolve conflict between this and legacy classes (e.g. AbstractAuthorizationServlet)
- /*   @Override
-    public Verifier getVerifier(Map<String, String> parameters) {
-        //throw new UnsupportedOperationException("Error: Verifiers are not used in OAuth2");
-        return null;
-    }*/
-
-/*    @Override
-    public Verifier getVerifier(HttpServletRequest request) {
-        //throw new UnsupportedOperationException("Error: Verifiers are not used in OAuth2");
-        return null;
-    }*/
-
-   /* @Override
-    public Verifier getVerifier(String... tokens) {
-        switch (tokens.length) {
-            case 0:
-                return new VerifierImpl(getVerifierTokenProvider().get().getUri());
-
-            default:
-                return new VerifierImpl(URI.create(tokens[0]));
-        }
-
-    }*/
 }
+
+

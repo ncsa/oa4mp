@@ -27,14 +27,13 @@ public class SimpleReadyServlet extends ClientServlet {
     protected void doIt(HttpServletRequest request, HttpServletResponse response) throws Throwable {
         // Get the cert itself. The server itself does a redirect using the callback to this servlet
         // (so it is the portal that actually is invoking this method after the authorization
-        // step.) The token and verifier are peeled off and used
+        // step.) The token is peeled off and used
         // to complete the request.
-        info("2.a. Getting token and verifier.");
+        info("2.a. Getting token.");
         String token = request.getParameter(CONST(ClientEnvironment.TOKEN));
-        String verifier = request.getParameter(CONST(ClientEnvironment.VERIFIER));
-        if (token == null && verifier == null) {
-            warn("2.a. The token is " + (token == null ? "null" : token) + " and the verifier is " + (verifier == null ? "null" : verifier));
-            GeneralException ge = new GeneralException("Error: This servlet requires parameters for the token and possibly verifier.");
+        if (token == null ) {
+            warn("2.a. The token is " + (token == null ? "null" : token) );
+            GeneralException ge = new GeneralException("Error: This servlet requires parameters for the token.");
             request.setAttribute("exception", ge);
             JSPUtil.fwd(request, response, getCE().getErrorPagePath());
             return;

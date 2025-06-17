@@ -1,7 +1,6 @@
 package org.oa4mp.delegation.server.server;
 
 import org.oa4mp.delegation.server.request.ATResponse;
-import org.oa4mp.delegation.common.token.Verifier;
 import org.oa4mp.delegation.common.token.impl.AccessTokenImpl;
 import org.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
 
@@ -16,27 +15,6 @@ public class ATIResponse2 extends IDTokenResponse implements ATResponse {
                         boolean isOIDC) {
         super(accessToken,refreshToken,isOIDC);
     }
-    Verifier verifier;
 
-    /**
-     * Getter for verifier
-     * This shouldn't be called in OIDC, but it's here temporarily
-     *
-     * @return verifier (should be null)
-     */
-    public Verifier getVerifier() {
-        return verifier;
-    }
-
-
-    /**
-     * Setter for verifier
-     * This needs to go away since OIDC doesn't use verifiers
-     *
-     * @param verifier Verifier object (probably null)
-     */
-    public void setVerifier(Verifier verifier) {
-        this.verifier = verifier;
-    }
 
 }

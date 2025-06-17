@@ -51,6 +51,10 @@ public class CopyCommands extends CommonCommands {
         sayi("to ensure they match. Warning:This can be slow, depending on the store involved.");
         sayi("If you need more functionality (such as the ability to use this with multiple configuration files)");
         sayi("then you should use the dedicated command line tool for this.");
+        sayi("If you are using an SQL store, just use the built in database tools for that.");
+        sayi("then you should also use the SQL store tool for that.");
+        sayi("This is intended for moving e.g. one file store to another, or dumping an in-memory store to disk");
+        sayi("i.e. moving between stores that do not have such tools.");
 
     }
 

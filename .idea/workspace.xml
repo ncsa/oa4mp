@@ -12,64 +12,33 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="Before removing functors">
-      <change afterPath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/esnet/v1/id-token.qdl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client-api/src/main/java/org/oa4mp/client/api/AbstractOA4MPService.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-api/src/main/java/org/oa4mp/client/api/AbstractOA4MPService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client-api/src/main/java/org/oa4mp/client/api/ClientEnvironment.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-api/src/main/java/org/oa4mp/client/api/ClientEnvironment.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client-api/src/main/java/org/oa4mp/client/api/servlet/sample/SimpleReadyServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-api/src/main/java/org/oa4mp/client/api/servlet/sample/SimpleReadyServlet.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/client-installer/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-loader/src/main/java/org/oa4mp/client/loader/OA2MPService.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-loader/src/main/java/org/oa4mp/client/loader/OA2MPService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/src/main/java/org/oa4mp/delegation/common/storage/AggregateTransactionStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/org/oa4mp/delegation/common/storage/AggregateTransactionStore.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/src/main/java/org/oa4mp/delegation/common/storage/TransactionStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/org/oa4mp/delegation/common/storage/TransactionStore.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/src/main/java/org/oa4mp/delegation/common/storage/transactions/BasicTransaction.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/org/oa4mp/delegation/common/storage/transactions/BasicTransaction.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/src/main/java/org/oa4mp/delegation/common/storage/transactions/BasicTransactionConverter.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/org/oa4mp/delegation/common/storage/transactions/BasicTransactionConverter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/src/main/java/org/oa4mp/delegation/common/storage/transactions/FSTransactionStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/org/oa4mp/delegation/common/storage/transactions/FSTransactionStore.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/src/main/java/org/oa4mp/delegation/common/storage/transactions/SQLBaseTransactionStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/org/oa4mp/delegation/common/storage/transactions/SQLBaseTransactionStore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client-loader/src/main/java/org/oa4mp/client/loader/servlet/OA2ReadyServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-loader/src/main/java/org/oa4mp/client/loader/servlet/OA2ReadyServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/main/java/org/oa4mp/delegation/client/request/ATRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/org/oa4mp/delegation/client/request/ATRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/main/java/org/oa4mp/delegation/client/request/CallbackRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/org/oa4mp/delegation/client/request/CallbackRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/main/java/org/oa4mp/delegation/client/request/CallbackResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/org/oa4mp/delegation/client/request/CallbackResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/main/java/org/oa4mp/delegation/client/request/DelegatedAssetRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/org/oa4mp/delegation/client/request/DelegatedAssetRequest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/src/main/java/org/oa4mp/delegation/common/storage/transactions/TransactionCache.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/org/oa4mp/delegation/common/storage/transactions/TransactionCache.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/src/main/java/org/oa4mp/delegation/common/storage/transactions/TransactionMemoryStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/org/oa4mp/delegation/common/storage/transactions/TransactionMemoryStore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/main/java/org/oa4mp/delegation/common/token/OA1TokenImpl.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/common/src/main/java/org/oa4mp/delegation/common/token/TokenForge.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/org/oa4mp/delegation/common/token/TokenForge.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/src/test/java/org/oa4mp/delegation/client/test/common/storage/BaseTransactionStoreTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/test/java/org/oa4mp/delegation/client/test/common/storage/BaseTransactionStoreTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/src/test/java/org/oa4mp/delegation/client/test/common/storage/FileStoreTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/test/java/org/oa4mp/delegation/client/test/common/storage/FileStoreTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/src/test/java/org/oa4mp/delegation/client/test/common/storage/TransactionCacheTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/test/java/org/oa4mp/delegation/client/test/common/storage/TransactionCacheTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/main/java/org/oa4mp/delegation/common/token/Verifier.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/main/java/org/oa4mp/delegation/common/token/impl/OA1Token.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/src/main/java/org/oa4mp/delegation/common/token/impl/VerifierImpl.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-test/src/test/java/org/oa4mp/server/test/NewTransactionTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test/src/test/java/org/oa4mp/server/test/NewTransactionTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-test/src/test/java/org/oa4mp/server/test/ServiceTestSuite.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test/src/test/java/org/oa4mp/server/test/ServiceTestSuite.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-test/src/test/java/org/oa4mp/server/test/TokenTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test/src/test/java/org/oa4mp/server/test/TokenTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oauth2/src/main/java/org/oa4mp/delegation/server/OA2TokenForge.java" beforeDir="false" afterPath="$PROJECT_DIR$/oauth2/src/main/java/org/oa4mp/delegation/server/OA2TokenForge.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oauth2/src/main/java/org/oa4mp/delegation/server/jwt/FlowType.java" beforeDir="false" afterPath="$PROJECT_DIR$/oauth2/src/main/java/org/oa4mp/delegation/server/jwt/FlowType.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oauth2/src/main/java/org/oa4mp/delegation/server/server/claims/ClaimSource.java" beforeDir="false" afterPath="$PROJECT_DIR$/oauth2/src/main/java/org/oa4mp/delegation/server/server/claims/ClaimSource.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oauth2/src/main/java/org/oa4mp/delegation/server/server/claims/ClaimSourceConfiguration.java" beforeDir="false" afterPath="$PROJECT_DIR$/oauth2/src/main/java/org/oa4mp/delegation/server/server/claims/ClaimSourceConfiguration.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oauth2/src/main/java/org/oa4mp/delegation/server/server/claims/ClaimSourceConfigurationUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/oauth2/src/main/java/org/oa4mp/delegation/server/server/claims/ClaimSourceConfigurationUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oauth2/src/main/java/org/oa4mp/delegation/server/server/config/LDAPConfiguration.java" beforeDir="false" afterPath="$PROJECT_DIR$/oauth2/src/main/java/org/oa4mp/delegation/server/server/config/LDAPConfiguration.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oauth2/src/main/java/org/oa4mp/delegation/server/server/config/LDAPConfigurationUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/oauth2/src/main/java/org/oa4mp/delegation/server/server/config/LDAPConfigurationUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oauth2/src/main/java/org/oa4mp/delegation/server/server/scripts/functor/ClientFunctorScripts.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oauth2/src/main/java/org/oa4mp/delegation/server/server/scripts/functor/ClientFunctorScriptsFactory.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oauth2/src/main/java/org/oa4mp/delegation/server/server/scripts/functor/ClientFunctorScriptsUtil.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oauth2/src/main/java/org/oa4mp/delegation/server/server/scripts/functor/FunctorState.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oauth2/src/test/java/org/oa4mp/delegation/server/test/TF2Test.java" beforeDir="false" afterPath="$PROJECT_DIR$/oauth2/src/test/java/org/oa4mp/delegation/server/test/TF2Test.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oauth2/src/main/java/org/oa4mp/delegation/server/server/ATIResponse2.java" beforeDir="false" afterPath="$PROJECT_DIR$/oauth2/src/main/java/org/oa4mp/delegation/server/server/ATIResponse2.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/storage/TransactionStemMC.java" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/storage/TransactionStemMC.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rfc8414/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/rfc8414/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/JWKCLI.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/JWKCLI.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/scripts/jwt-scripts/readme.txt" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/scripts/jwt-scripts/readme.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/servlet/AbstractAccessTokenServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/servlet/AbstractAccessTokenServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/servlet/AbstractAuthorizationServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/servlet/AbstractAuthorizationServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/servlet/CRServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/servlet/CRServlet.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-installer/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/claims/BasicClaimsSourceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/claims/BasicClaimsSourceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/flows/FlowFunctor.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/flows/FlowType.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/flows/FlowType.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/flows/jATDoTemplates.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/flows/jAcceptRequests.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/flows/jAccessToken.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/flows/jGetCert.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/flows/jGetClaims.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/flows/jIDToken.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/flows/jRefreshToken.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/flows/jSetClaimSource.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/flows/jUserInfo.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/servlet/AbstractAccessTokenServlet2.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/servlet/AbstractAccessTokenServlet2.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-test/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-test/src/test/java/org/oa4mp/server/test/OA2JSONPreprocessorTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/test/java/org/oa4mp/server/test/OA2JSONPreprocessorTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/org/oa4mp/delegation/server/ServiceTransaction.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/org/oa4mp/delegation/server/ServiceTransaction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/org/oa4mp/delegation/server/request/ATRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/org/oa4mp/delegation/server/request/ATRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/org/oa4mp/delegation/server/request/ATResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/org/oa4mp/delegation/server/request/ATResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/org/oa4mp/delegation/server/request/CBRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/org/oa4mp/delegation/server/request/CBRequest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -93,6 +62,9 @@
         <option value="HTML File" />
       </list>
     </option>
+  </component>
+  <component name="Git.Merge.Settings">
+    <option name="BRANCH" value="remove_functors" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
@@ -180,7 +152,7 @@
     "Tomcat Server.DEV OA4MP.executor": "Run",
     "Tomcat Server.OA4MP server.executor": "Run",
     "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "remove__functors",
+    "git-widget-placeholder": "master",
     "jdk.selected.JAVA_MODULE": "11 (2)",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-oauth2/src/main/webapp",

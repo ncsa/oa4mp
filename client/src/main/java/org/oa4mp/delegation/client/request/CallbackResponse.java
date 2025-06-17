@@ -2,7 +2,6 @@ package org.oa4mp.delegation.client.request;
 
 
 import org.oa4mp.delegation.common.token.AuthorizationGrant;
-import org.oa4mp.delegation.common.token.Verifier;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -10,7 +9,6 @@ import org.oa4mp.delegation.common.token.Verifier;
  */
 public class CallbackResponse extends BasicResponse {
     AuthorizationGrant authorizationGrant;
-    Verifier verifier;
 
     public AuthorizationGrant getAuthorizationGrant() {
         return authorizationGrant;
@@ -20,11 +18,4 @@ public class CallbackResponse extends BasicResponse {
         this.authorizationGrant = authorizationGrant;
     }
 
-    public Verifier getVerifier() {
-        return verifier;
-    }
-
-    public void setVerifier(Verifier verifier) {
-        this.verifier = verifier;
-    }
 }
