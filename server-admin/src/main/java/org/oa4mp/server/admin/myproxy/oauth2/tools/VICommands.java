@@ -303,8 +303,13 @@ public class VICommands extends OA4MPStoreCommands {
     }
 
     @Override
-    public void bootstrap() throws Throwable {
-        super.bootstrap();
+    public void bootstrap(InputLine inputLine) throws Throwable {
+        super.bootstrap(inputLine);
+    }
+
+    @Override
+    protected void initHelp() throws Throwable {
+        super.initHelp();
         getHelpUtil().load("/help/vi_help.xml");
     }
 

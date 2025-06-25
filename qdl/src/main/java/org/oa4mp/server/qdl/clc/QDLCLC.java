@@ -54,15 +54,7 @@ public class QDLCLC extends OA2CommandLineClient {
             e.printStackTrace();
         }
     }
-    /*
-           try {
-            OA2CommandLineClient oa2CommandLineClient = new OA2CommandLineClient(null);
-      //      oa2CommandLineClient.start(args);
-            oa2CommandLineClient.runnit(args, getInstance());
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
-     */
+
     protected void banner(){
           bannerTimes();
     }

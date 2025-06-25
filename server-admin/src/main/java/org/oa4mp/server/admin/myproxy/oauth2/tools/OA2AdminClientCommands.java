@@ -3,6 +3,7 @@ package org.oa4mp.server.admin.myproxy.oauth2.tools;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
+import edu.uiuc.ncsa.security.core.exceptions.ObjectNotFoundException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
@@ -18,15 +19,15 @@ import org.oa4mp.server.admin.myproxy.oauth2.base.ClientApprovalStoreCommands;
 import org.oa4mp.server.api.admin.adminClient.AdminClient;
 import org.oa4mp.server.api.admin.adminClient.AdminClientKeys;
 import org.oa4mp.server.api.admin.permissions.Permission;
+import org.oa4mp.server.api.admin.permissions.PermissionKeys;
 import org.oa4mp.server.api.admin.permissions.PermissionList;
 import org.oa4mp.server.api.admin.permissions.PermissionsStore;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
+import org.oa4mp.server.loader.oauth2.storage.clients.OA2ClientKeys;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -196,14 +197,14 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
             showListAdminsHelp();
             return;
         }
-        if(inputLine.getArgCount() == 0){
+        if (inputLine.getArgCount() == 0) {
             say("no clients identifier found");
             return;
         }
         Identifier clientID = BasicIdentifier.newID(inputLine.getLastArg());
-        FoundIdentifiables foundClients = findItem(getEnvironment().getClientStore(), inputLine,true);
+        FoundIdentifiables foundClients = findItem(getEnvironment().getClientStore(), inputLine, true);
         //BaseClient baseClient = (BaseClient) getEnvironment().getClientStore().get(clientID);
-        if(foundClients == null) {
+        if (foundClients == null) {
             say("client not found.");
             return;
         }
@@ -221,7 +222,7 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
                     say(format(adminClient, (ClientApproval) getClientApprovalStore().get(adminClient.getIdentifier())));
                 }
             }
-            if(1 < foundClients.size()){
+            if (1 < foundClients.size()) {
                 say(StringUtils.hLine("-", 40));
             }
         }
@@ -420,27 +421,64 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
 
     public void list_provisioners(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
-            say("list_provisioners ersatz_id index = list all of the clients that are provisioners for this ersatz client.");
+            say("list_provisioners [" + RESULT_SET_KEY + " rs_name] ersatz_id  = list all of the clients that are provisioners for this ersatz client.");
+            say("If you specify a result set, the result will be a set of clients. to view it, sue the clients component, e.g.");
+            say("// clients rs show rs_name");
             printIndexHelp(true);
             return;
         }
-        AdminClient adminClient = (AdminClient) findSingleton(inputLine, "admi admin client not found");
         if (inputLine.getArgCount() == 0) {
             say("you must supply the ersatz client id");
             return;
         }
-        Identifier ersatzID = BasicIdentifier.newID(inputLine.getArg(1));
+        boolean useResultSet = inputLine.hasArg(RESULT_SET_KEY);
+        String rsName = null;
+        RSRecord rsRecord = null;
+        List<Identifiable> provisionerList = null;
+        if (useResultSet) {
+            rsName = inputLine.getNextArgFor(RESULT_SET_KEY);
+            inputLine.removeSwitchAndValue(RESULT_SET_KEY);
+            provisionerList = new ArrayList<>();
+        }
+        PermissionKeys permissionKeys = new PermissionKeys();
+        Identifier ersatzID = BasicIdentifier.newID(inputLine.getLastArg());
 
-        PermissionList provisioners = permissionsStore.getProvisioners(adminClient.getIdentifier(), ersatzID);
+        // Use java escaping because the ersatz id is a JSON blob. THis might timeout for really huge lists of
+        // ersatz id's....
+        List<Permission> provisioners = getEnvironment().getPermissionStore().search(permissionKeys.ersatzID(), ".*\\Q" + ersatzID + "\\E.*", true);
 
         if (provisioners == null || provisioners.isEmpty()) {
             say("(none)");
             return;
         }
+
+        if (useResultSet) {
+            provisionerList = new ArrayList<>(provisioners.size());
+        }
+
         int count = 0;
         for (Permission p : provisioners) {
-            count++;
-            say(p.getClientID().toString());
+            if (p.getErsatzChain().contains(ersatzID)) {
+                // since we have to muck about with JSON internally, make sure this is not a false positive
+            //    AdminClient x = (AdminClient) getStore().get(p.getAdminID());
+                OA2Client pClient = (OA2Client) getEnvironment().getClientStore().get(p.getClientID());
+                if (pClient != null) { // possible this is stale reference. Don't add it
+                    count++;
+                    say(pClient.getIdentifierString());
+                    if (useResultSet) {
+                        provisionerList.add(pClient);
+                    }
+                }
+            }
+
+        }
+        if (count == 0) {
+            say("no clients found");
+            return;
+        }
+        if (useResultSet) {
+            rsRecord = new RSRecord(provisionerList, (new OA2ClientKeys()).allKeys());
+            getResultSets().put(rsName, rsRecord);
         }
         say(count + " total provisioners for " + ersatzID);
 
@@ -448,13 +486,105 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
 
     public void list_ersatz(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
-            say("list_ersatz client_id admin_id = list all of the clients granted substitute privilege.");
+            say("list_ersatz [client_id] [" + RESULT_SET_KEY + " rs_name] + admin_id = list all of the clients granted substitute privilege.");
+            say("No client id lists all of the ersatz clients known to the admin");
+            say("Result sets without a client id will contain every such client. To view the result set, use the clients component:");
+            say("// clients rs show rs_name");
             printIndexHelp(true);
             return;
         }
-        AdminClient adminClient = (AdminClient) findSingleton(inputLine, "admin client not found");
+        boolean hasRS = inputLine.hasArg(RESULT_SET_KEY);
+        String rsName = null;
+        RSRecord rsRecord = null;
+        HashSet<Identifier> rsErsatzIDs = null;
+        List<Identifiable> allErsatz = new LinkedList<>();
+        if (hasRS) {
+            rsName = inputLine.getNextArgFor(RESULT_SET_KEY);
+            inputLine.removeSwitchAndValue(RESULT_SET_KEY);
+            rsRecord = new RSRecord();
+            rsErsatzIDs = new HashSet<>();
+            allErsatz = new LinkedList<>();
+        }
+        AdminClient adminClient;
+        try {
+             adminClient = (AdminClient) findSingleton(inputLine, "admin client not found");
+        }catch( ObjectNotFoundException e){
+            say(e.getMessage());
+            return;
+        }
         if (inputLine.getArgCount() == 0) {
-            say("you must supply the client id");
+            PermissionKeys permissionKeys = new PermissionKeys();
+            List<Permission> provisioners = getEnvironment().getPermissionStore().search(permissionKeys.adminID(), adminClient.getIdentifierString(), false);
+            HashSet<Identifier> ersatzIds = null;
+            HashMap<Identifier, HashSet<Identifier>> idsByProvisioner = new HashMap<>();
+            for (Permission p : provisioners) {
+                if (p.getErsatzChain() != null && !p.getErsatzChain().isEmpty()) {
+                    if (idsByProvisioner.containsKey(p.getClientID())) {
+                        ersatzIds = idsByProvisioner.get(p.getClientID());
+                    } else {
+                        ersatzIds = new HashSet<>();
+                        idsByProvisioner.put(p.getClientID(), ersatzIds);
+                    }
+                    ersatzIds.addAll(p.getErsatzChain());
+
+                }
+            }
+            if (idsByProvisioner.size() == 0) {
+                say("no ersatz clients found");
+                return;
+            }
+            // so now we have every one of these by provisioner id. Start printing...
+            int width = 0;
+            for (Identifier id : idsByProvisioner.keySet()) {
+                width = Math.max(width, id.toString().length());
+            }
+            width = width + 2;
+            int count = 0;
+            boolean printHeader = true;
+            String hLine = StringUtils.repeatString("-" , width) + " + " + StringUtils.repeatString("-", width);
+
+            for (Identifier id : idsByProvisioner.keySet()) {
+                ersatzIds = idsByProvisioner.get(id);
+                boolean firstPass = true;
+                if (!ersatzIds.isEmpty()) {
+                    for (Identifier eID : ersatzIds) {
+                        Identifiable x = (Identifiable) getEnvironment().getClientStore().get(eID);
+                        if(x != null){
+                            count++;
+                            if(hasRS){
+                                if(!rsErsatzIDs.contains(eID)){
+                                    rsErsatzIDs.add(eID);
+                                    allErsatz.add(x);
+                                }
+                            }
+                            if (firstPass) {
+                                if(printHeader) {
+                                    say(StringUtils.center("client id", width) + " | " + StringUtils.center("ersatz client id", width));
+                                    printHeader = false;
+                                }
+                                say(hLine);
+                                say(StringUtils.RJustify(id.toString(), width) + " | " + eID);
+                                firstPass = false;
+                            } else {
+                                say(StringUtils.getBlanks(width) + " | " + eID);
+                            }
+
+                        }
+                    }
+                }
+            }
+            if(count == 0){
+                say("no ersatz clients found");
+                return;
+            }
+            if(hasRS){
+                if(!rsErsatzIDs.isEmpty()){
+                    OA2ClientKeys keys = new OA2ClientKeys();
+                    rsRecord = new RSRecord(allErsatz, keys.allKeys());
+                    getResultSets().put(rsName, rsRecord);
+                }
+            }
+            say(count + " total ersatz clients");
             return;
         }
         Identifier clientID = BasicIdentifier.newID(inputLine.getArg(1));
@@ -508,13 +638,19 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
      */
 
     @Override
-    public void bootstrap() throws Throwable {
-        super.bootstrap();
+    public void bootstrap(InputLine inputLine) throws Throwable {
+        super.bootstrap(inputLine);
+    }
+
+    @Override
+    protected void initHelp() throws Throwable {
+        super.initHelp();
         getHelpUtil().load("/help/admin_help.xml");
     }
+
     public static final String APPROVAL_QDL_ENABLE = "-qdl";
 
-    public static class AdminApprovalModsConfig extends ApprovalModsConfig{
+    public static class AdminApprovalModsConfig extends ApprovalModsConfig {
         public AdminApprovalModsConfig(BaseClient client, boolean doPrompt, boolean enableQDL) {
             super(client, doPrompt);
             this.enableQDL = enableQDL;
@@ -522,10 +658,11 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
 
         boolean enableQDL = false;
     }
+
     @Override
     protected ApprovalModsConfig createApprovalModsConfig(InputLine inputLine, BaseClient client, boolean doPrompt) {
         boolean enableQDL = false;
-        if(inputLine.hasArg(APPROVAL_QDL_ENABLE)) {
+        if (inputLine.hasArg(APPROVAL_QDL_ENABLE)) {
             enableQDL = true;
             inputLine.removeSwitch(APPROVAL_QDL_ENABLE);
         }
@@ -536,10 +673,10 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
     protected BaseClient doApprovalMods(ApprovalModsConfig approvalModsConfig) throws IOException {
         // Fix https://github.com/ncsa/oa4mp/issues/109
         AdminClient adminClient = (AdminClient) approvalModsConfig.client;
-        if(approvalModsConfig.doPrompt) {
+        if (approvalModsConfig.doPrompt) {
             adminClient.setAllowQDL("y".equals(getInput("Allow QDL in scripts?(y/n)", adminClient.isAllowQDL() ? "y" : "n")));
-        }else{
-            adminClient.setAllowQDL(((AdminApprovalModsConfig)approvalModsConfig).enableQDL);
+        } else {
+            adminClient.setAllowQDL(((AdminApprovalModsConfig) approvalModsConfig).enableQDL);
         }
         return adminClient;
     }

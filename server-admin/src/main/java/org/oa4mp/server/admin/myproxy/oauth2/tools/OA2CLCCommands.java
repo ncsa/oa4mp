@@ -90,8 +90,8 @@ public class OA2CLCCommands extends CommonCommands {
     protected OA2ClientEnvironment ce;
 
     @Override
-    public void bootstrap() throws Throwable {
-        // no op
+    public void bootstrap(InputLine inputLine) throws Throwable {
+        super.bootstrap(inputLine);
     }
 
     @Override

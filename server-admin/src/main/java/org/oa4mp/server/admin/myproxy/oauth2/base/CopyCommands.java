@@ -32,8 +32,8 @@ public class CopyCommands extends CommonCommands {
     }
 
     @Override
-    public void bootstrap() throws Throwable {
-
+    public void bootstrap(InputLine inputLine) throws Throwable {
+super.bootstrap(inputLine);
     }
 
     @Override

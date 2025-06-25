@@ -41,7 +41,7 @@ public class OA2PermissionCommands extends OA4MPStoreCommands {
     @Override
     protected String format(Identifiable identifiable) {
         Permission p = (Permission) identifiable;
-        String output = "Permission: admin=" + p.getAdminID() + ", client=" + p.getClientID() + ", id=" + p.getIdentifierString();
+        String output = "admin=" + p.getAdminID() + ", client=" + p.getClientID() + ", ersatz id=" + p.getErsatzChain() + ", id=" + p.getIdentifierString();
         return output;
     }
 
@@ -104,8 +104,13 @@ public class OA2PermissionCommands extends OA4MPStoreCommands {
     }
 
     @Override
-    public void bootstrap() throws Throwable {
-        super.bootstrap();
+    public void bootstrap(InputLine inputLine) throws Throwable {
+        super.bootstrap(inputLine);
+    }
+
+    @Override
+    protected void initHelp() throws Throwable {
+        super.initHelp();
         getHelpUtil().load("/help/permission_help.xml");
     }
 

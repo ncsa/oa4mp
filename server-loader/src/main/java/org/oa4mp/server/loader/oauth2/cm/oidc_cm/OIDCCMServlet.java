@@ -201,22 +201,7 @@ public class OIDCCMServlet extends EnvServlet {
                 return;
             }
 
-/*            if (isAnonymous) {
-                // Here's the logic: If we allow anonymous access, then a client can get itself.
-                // If the client is administered, then the request must come with an admin client
-                // Do not allow an un-administered client to query anything.
-                try {
-                    oa2Client = getAndCheckOA2Client(httpServletRequest);
-                } catch (IllegalArgumentException iax) {
-                    throw new IllegalArgumentException("Anonymous queries are not supported");
-                }
-                if (!getOA2SE().getPermissionStore().getAdmins(oa2Client.getIdentifier()).isEmpty()) {
-                    throw new IllegalArgumentException("administered clients cannot query their properties, only their administrator can.");
-                }
-                debugger = MyProxyDelegationServlet.createDebugger(oa2Client);
-            } else {
-                debugger = MyProxyDelegationServlet.createDebugger(adminClient);
-            }*/
+
             debugger = OA4MPServlet.createDebugger(adminClient);
             debugger.trace(this, "Starting get");
             if (debugger.getDebugLevel() == MetaDebugUtil.DEBUG_LEVEL_TRACE) {
@@ -268,6 +253,25 @@ public class OIDCCMServlet extends EnvServlet {
             // One major difference is that we have an email that we store and this has to be
             // converted to a contacts array or we run the risk of inadvertantly losing this.
             JSONObject json = toJSONObject(oa2Client, version, true);
+            if (oa2Client.isErsatzClient()) {
+                // Fix https://github.com/ncsa/oa4mp/issues/252
+                List<Permission> permissions = getOA2SE().getPermissionStore().getByErsatzID(oa2Client.getIdentifier());
+                JSONArray provisioners = new JSONArray();
+                for (Permission p : permissions) {
+                    if (p.getErsatzChain().contains(oa2Client.getIdentifier())) {
+                        if (p.getAdminID().equals(adminClient.getIdentifier())) {
+                            provisioners.add(p.getClientID().toString());
+                        }
+                    }
+                }
+                if(!provisioners.isEmpty()) {
+                    if(provisioners.size() == 1){
+                        json.put(ERSATZ_CLIENT_PROVISIONERS, provisioners.get(0));
+                    }else{
+                        json.put(ERSATZ_CLIENT_PROVISIONERS, provisioners);
+                    }
+                }
+            }
             // This next block would turn on messages every time a get is issued. Since
             // COManage has a groovy GUI that lets people surf clients, the output
             // was getting intolerable. Maybe someday re-enable this? Maybe.
@@ -1657,14 +1661,18 @@ public class OIDCCMServlet extends EnvServlet {
             }
             if (client.isErsatzClient() && jsonRequest.containsKey(ERSATZ_CLIENT_PROVISIONERS)) {
                 // Fix https://github.com/ncsa/oa4mp/issues/221
-                JSONArray array;
+                List<Identifier> ersatzChain;
                 try {
-                    array = jsonRequest.getJSONArray(ERSATZ_CLIENT_PROVISIONERS);
+                    JSONArray array = jsonRequest.getJSONArray(ERSATZ_CLIENT_PROVISIONERS);
+                    ersatzChain = new ArrayList<>(array.size());
+                    for(Object obj : array) {
+                        ersatzChain.add(BasicIdentifier.newID(obj.toString()));
+                    }
                 } catch (Throwable t) {
-                    array = new JSONArray();
-                    array.add(jsonRequest.getString(ERSATZ_CLIENT_PROVISIONERS));
+                    ersatzChain = new ArrayList<>(1);
+                    ersatzChain.add(BasicIdentifier.newID( jsonRequest.getString(ERSATZ_CLIENT_PROVISIONERS)));
                 }
-                Identifier provisionerID = BasicIdentifier.newID(array.getString(0));
+                Identifier provisionerID = ersatzChain.get(0);
                 Permission permission = getOA2SE().getPermissionStore().getErsatzChain(
                         adminClient.getIdentifier(),
                         provisionerID,
@@ -1675,10 +1683,10 @@ public class OIDCCMServlet extends EnvServlet {
                     permission.setSubstitute(true);
                     permission.setAdminID(adminClient.getIdentifier());
                     permission.setClientID(provisionerID);
-                    permission.setErsatzChain(array);
+                    permission.setErsatzChain(ersatzChain);
                 } else {
                     // check that this has the right information, so treat this as an update
-                    permission.setErsatzChain(array);
+                    permission.setErsatzChain(ersatzChain);
                 }
                 getOA2SE().getPermissionStore().save(permission);
             }

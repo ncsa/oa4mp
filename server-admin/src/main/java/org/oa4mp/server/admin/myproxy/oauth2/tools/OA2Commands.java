@@ -9,13 +9,10 @@ import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.util.cli.CLIDriver;
-import edu.uiuc.ncsa.security.util.cli.CommonCommands;
-import edu.uiuc.ncsa.security.util.cli.HelpUtil;
-import edu.uiuc.ncsa.security.util.cli.InputLine;
+import edu.uiuc.ncsa.security.util.cli.*;
 import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
+import edu.uiuc.ncsa.security.util.terminal.ISO6429IO;
 import org.apache.commons.configuration.tree.ConfigurationNode;
-import org.apache.commons.lang.StringUtils;
 import org.oa4mp.delegation.common.OA4MPVersion;
 import org.oa4mp.server.admin.myproxy.oauth2.Banners;
 import org.oa4mp.server.admin.myproxy.oauth2.base.BaseCommands;
@@ -26,6 +23,10 @@ import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+
+import static edu.uiuc.ncsa.security.core.util.StringUtils.pad2;
+import static edu.uiuc.ncsa.security.core.util.StringUtils.repeatString;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -37,16 +38,38 @@ public class OA2Commands extends BaseCommands {
     public static final String PERMISSIONS = "permissions";
     public static final String ADMINS = "admins";
     public static final String TOKENS = "tokens";
-    public static final String KEYS = "keys";
     public static final String VIRTUAL_ISSUER = "vi";
 
+    /**
+     * This snoops through all components and gloms every call together. This does not
+     * result in context-sensitive help, but at least is something.
+     * @return
+     */
+    protected ArrayList<String> getCommandCompletions(){
+        HashSet<String> commandCompletions = new HashSet<>();
+        String[] cc = CLIReflectionUtil.getCommandsNameList(new Commands[] {this});
+        for(String x : cc){
+            commandCompletions.add(x);
+        }
+        for(String name : drivers.keySet()){
+            CLIDriver cli = drivers.get(name);
+            for(Commands commands : cli.getCLICommands()){
+                cc = CLIReflectionUtil.getCommandsNameList(new Commands[] {commands});
+                for(String x : cc){
+                    commandCompletions.add(x);
+                }
+            }
+        }
+        ArrayList<String> result = new ArrayList<>(commandCompletions.size());
+        result.addAll(commandCompletions);
+        return result;
+    }
 
     @Override
     protected void init() {
         super.init();
         try {
             if (!drivers.containsKey(ADMINS)) {
-
                 drivers.put(ADMINS, createCLIDriver(getAdminClientCommands()));
                 drivers.put(PERMISSIONS, createCLIDriver(getPermissionCommands()));
                 drivers.put(TOKENS, createCLIDriver(getTokenCommands()));
@@ -59,12 +82,12 @@ public class OA2Commands extends BaseCommands {
             }
             throw new GeneralException("Unable to initialize CLI components", t);
         }
+        if(getIOInterface() instanceof ISO6429IO){
+            // can't do this until here.
+            ISO6429IO iso6429IO = (ISO6429IO) getIOInterface();
+            iso6429IO.setCommandCompletion(getCommandCompletions());
 
-/*        components.add(PERMISSIONS);
-        components.add(ADMINS);
-        components.add(TOKENS);
-        components.add(KEYS);
-        components.add(VIRTUAL_ISSUER);*/
+        }
     }
 
     public OA2Commands(MyLoggingFacade logger) {
@@ -103,24 +126,64 @@ public class OA2Commands extends BaseCommands {
     }
 
     public static void main(String[] args) {
-        try {
-            ArrayList<String> aaa = new ArrayList<>();
-            aaa.add(OA2Commands.class.getSimpleName()); // dummy first argument
-            aaa.addAll(Arrays.asList(args));
-            InputLine inputLine = new InputLine(aaa);
-            if (inputLine.hasArg("-sas")) {
-                setupSAS(inputLine);
-                return;
-            }
-            OA2Commands oa2Commands = new OA2Commands(null);
-            oa2Commands.startup(args); // read the command line options and such to set the state
-            CLIDriver cli = new CLIDriver(oa2Commands); // actually run the driver that parses commands and passes them along
-            cli.start();
-        } catch (Throwable t) {
-            t.printStackTrace();
+      //oldMain(args);
+      newMain(args);
+    }
+    // Uses new cli.bootstrap.
+protected static void newMain(String[] args) {
+    try {
+        ArrayList<String> aaa = new ArrayList<>();
+        aaa.add(OA2Commands.class.getSimpleName()); // dummy first argument
+        aaa.addAll(Arrays.asList(args));
+        InputLine inputLine = new InputLine(aaa);
+        if (inputLine.hasArg("-sas")) {
+            setupSAS(inputLine);
+            return;
+        }
+        OA2Commands oa2Commands = new OA2Commands(null);
+        CLIDriver cli = new CLIDriver(oa2Commands); // actually run the driver that parses commands and passes them along
+        inputLine = cli.bootstrap(inputLine);
+        oa2Commands.bootstrap(inputLine); // read the command line options and such to set the state
+        cli.start();
+    } catch (Throwable t) {
+        t.printStackTrace();
+    }
+}
+/*protected static void oldMain(String[] args) {
+    try {
+        ArrayList<String> aaa = new ArrayList<>();
+        aaa.add(OA2Commands.class.getSimpleName()); // dummy first argument
+        aaa.addAll(Arrays.asList(args));
+        InputLine inputLine = new InputLine(aaa);
+        if (inputLine.hasArg("-sas")) {
+            setupSAS(inputLine);
+            return;
+        }
+        OA2Commands oa2Commands = new OA2Commands(null);
+        oa2Commands.startup(args); // read the command line options and such to set the state
+        CLIDriver cli = new CLIDriver(oa2Commands); // actually run the driver that parses commands and passes them along
+        cli.start();
+    } catch (Throwable t) {
+        t.printStackTrace();
+    }
+}*/
+    @Override
+    public void setIOInterface(IOInterface io) {
+        super.setIOInterface(io);
+        for(String component : drivers.keySet()){
+            drivers.get(component).setIOInterface(io);
         }
     }
 
+    @Override
+    public boolean isBatchMode() {
+        return false;
+    }
+
+    @Override
+    public void setBatchMode(boolean batchMode) {
+
+    }
 
     protected static void setupSAS(InputLine inputLine) throws Throwable {
         Client sasClient = Client.newInstance(inputLine);
@@ -166,17 +229,17 @@ public class OA2Commands extends BaseCommands {
             showBanner = false;
         }
 
-        String stars = StringUtils.rightPad("", width + 1, "*");
+        String stars = repeatString("*", width + 1);
         if (showBanner) {
             say(banner);
         }
         if (showHeader) {
             say(stars);
-            say(padLineWithBlanks("* OA4MP CLI (Command Line Interpreter)", width) + "*");
-            say(padLineWithBlanks("* Version " + OA4MPVersion.VERSION_NUMBER, width) + "*");
-            say(padLineWithBlanks("* By Jeff Gaynor  NCSA", width) + "*");
-            say(padLineWithBlanks("* type 'help' for a list of commands", width) + "*");
-            say(padLineWithBlanks("*      'exit', 'quit' or '/q' to end this session.", width) + "*");
+            say(pad2("* OA4MP CLI (Command Line Interpreter)", width) + "*");
+            say(pad2("* Version " + OA4MPVersion.VERSION_NUMBER, width) + "*");
+            say(pad2("* By Jeff Gaynor  NCSA", width) + "*");
+            say(pad2("* type 'help' for a list of commands", width) + "*");
+            say(pad2("*      'exit', 'quit' or '/q' to end this session.", width) + "*");
             say(stars);
         }
     }
@@ -293,10 +356,7 @@ public class OA2Commands extends BaseCommands {
         return false;
     }
 
-    @Override
-    public void bootstrap() throws Throwable {
 
-    }
 
     HelpUtil helpUtil = new HelpUtil();
 

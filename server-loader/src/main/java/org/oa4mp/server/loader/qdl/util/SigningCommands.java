@@ -32,7 +32,7 @@ import java.util.List;
  */
 public class SigningCommands extends CommonCommands {
     @Override
-    public void bootstrap() throws Throwable {
+    public void bootstrap(InputLine inputLine) throws Throwable {
         // no-op at this point
     }
 

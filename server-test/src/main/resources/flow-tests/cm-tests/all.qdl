@@ -15,6 +15,7 @@
 path := 'test#/cm-tests/';
 script_path(path ~ script_path());
 test.:= path + [
+                'cm-ersatz.qdl',
                 'cm-roundtrip.qdl',
                 'cm-minimal-v5_5.qdl',
                 'cm-minimal-v5_4.qdl',

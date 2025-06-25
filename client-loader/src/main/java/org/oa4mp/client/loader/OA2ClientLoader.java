@@ -134,6 +134,9 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
                     getDebugger()
             );
         } catch (Throwable e) {
+            if(e instanceof RuntimeException) {
+                throw (RuntimeException) e;
+            }
             throw new GeneralException("Unable to create client environment", e);
         }
     }

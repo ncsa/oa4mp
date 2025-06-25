@@ -854,8 +854,13 @@ if(1 < foundIdentifiables.size()){
     }
 
     @Override
-    public void bootstrap() throws Throwable {
-        super.bootstrap();
+    public void bootstrap(InputLine inputLine) throws Throwable {
+        super.bootstrap(inputLine);
+    }
+
+    @Override
+    protected void initHelp() throws Throwable {
+        super.initHelp();
         getHelpUtil().load("/help/transaction_help.xml");
     }
 

@@ -28,9 +28,6 @@ target=${1:-$DEFAULT_TARGET}
 adminCfg=${2:-$DEFAULT_CONFIG}
 env=${3:-$DEFAULT_ENV}
 
-overrides=( "$@" )
-defaults=("-cfg"  "$CFG_FILE" "-name" "default" "-home_dir" "$QDL_HOME" )
-qqq=( "${overrides[@]}" "${defaults[@]}" )
 java -jar $cliJar   -cfg $adminCfg -name $target -log $logFile -set_env $env -v
 
 if [ $? != 0 ]; then

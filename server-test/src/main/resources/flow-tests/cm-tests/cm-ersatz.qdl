@@ -1,0 +1,37 @@
+#! /usr/bin/env -S qdl-run  
+
+/*
+   Script that creates a provisioner and then an ersatz client. It then gets the ersatz client
+   and checks that the round trip works.
+
+   Test for https://github.com/ncsa/oa4mp/issues/252
+*/
+script_load('test#/cm-tests/init.qdl', args(0));
+payload. := from_json(file_read(ini.'payloads' + 'create.json'));
+provisioner_id := custom_id();
+payload.'client_id' := provisioner_id;
+
+debugger(1,'creating provisioner ' + provisioner_id);
+provisioner_resp. := http#post(payload.);
+⊨ provisioner_resp.'status'.'code' == ini.'status' : 'incorrect provisioner status: expected '+ ini.'status' +' but got ' + provisioner_resp.'status'.'code';
+
+// now create an ersatz client.
+ersatz_id := custom_id();
+payload.'client_id' := ersatz_id;
+payload.'ersatz_client' := true;
+payload.'org.oa4mp:/ersatz/provisioners' := provisioner_id;
+debugger(1,'creating ersatz client ' + ersatz_id);
+ersatz_resp. := http#post(payload.);
+⊨ ersatz_resp.'status'.'code' == ini.'status' : 'incorrect ersatz status: expected '+ ini.'status' +' but got ' + ersatz_resp.'status'.'code';
+
+r. := http#get({'client_id':ersatz_id});
+say('ersatz client response:' + print(r.'content'));
+⊨ ∃r.'content'.'ersatz_client' : 'missing ersatz_client assertion';
+⊨ r.'content'.'ersatz_client' : 'wrong ersatz_client assertion';
+⊨ ∃r.'content'.'org.oa4mp:/ersatz/provisioners' : 'missing provisioners assertion';
+⊨ r.'content'.'org.oa4mp:/ersatz/provisioners' ≡ provisioner_id : 'wrong provisioners id';
+
+r. := http#delete({'client_id':provisioner_id});
+r. := http#delete({'client_id':ersatz_id});
+say('ok: Admin ersatz client test');
+

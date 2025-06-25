@@ -4,22 +4,48 @@ import edu.uiuc.ncsa.security.core.exceptions.ConnectionException;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.util.cli.CLIDriver;
-import edu.uiuc.ncsa.security.util.cli.FormatUtil;
-import edu.uiuc.ncsa.security.util.cli.HelpUtil;
-import edu.uiuc.ncsa.security.util.cli.InputLine;
-import org.apache.commons.lang.StringUtils;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
+import edu.uiuc.ncsa.security.util.cli.*;
+import org.oa4mp.client.api.ClientXMLTags;
 import org.oa4mp.delegation.common.OA4MPVersion;
-import org.oa4mp.server.admin.myproxy.oauth2.base.CommandLineClient;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 5/11/16 at  2:51 PM
  */
-public class OA2CommandLineClient extends CommandLineClient {
+public class OA2CommandLineClient extends ConfigurableCommandsImpl {
     @Override
-    public void bootstrap() throws Throwable {
+    public String getComponentName() {
+        return ClientXMLTags.COMPONENT;
+    }
 
+
+    @Override
+    public void useHelp() {
+
+    }
+
+    @Override
+    public String getPrompt() {
+        return "clc>";
+    }
+
+    @Override
+    public boolean isBatchMode() {
+        return false;
+    }
+
+    @Override
+    public void setBatchMode(boolean batchMode) {
+
+    }
+
+    @Override
+    public void bootstrap(InputLine inputLine) throws Throwable {
+super.bootstrap(inputLine);
     }
 
     @Override
@@ -63,14 +89,37 @@ public class OA2CommandLineClient extends CommandLineClient {
 
     public static void main(String[] args) {
         try {
-            OA2CommandLineClient oa2CommandLineClient = new OA2CommandLineClient(null);
-      //      oa2CommandLineClient.start(args);
-            oa2CommandLineClient.runnit(args, getInstance());
-        } catch (Throwable e) {
+            OA2CommandLineClient clc = new OA2CommandLineClient(null);
+            setInstance(clc);
+            clc.runnit(args, clc );
+/*
+            CLIDriver cli = new CLIDriver(clc); // actually run the driver that parses commands and passes them along
+            inputLine = cli.bootstrap(inputLine);
+            clc.bootstrap(inputLine);
+            OA2CLCCommands usc = new OA2CLCCommands(cli.getLogger(), clc);
+            usc.setConfigFile(clc.getConfigFile());
+            FormatUtil.setIoInterface(cli.getIOInterface());
+            cli.addCommands(usc);
+            usc.bootMessage();
+            cli.start();
+*/
+     } catch (Throwable e) {
             e.printStackTrace();
         }
     }
 
+    /*
+
+        if (inputLine.hasArg("-sas")) {
+            setupSAS(inputLine);
+            return;
+        }
+        OA2Commands oa2Commands = new OA2Commands(null);
+        CLIDriver cli = new CLIDriver(oa2Commands); // actually run the driver that parses commands and passes them along
+        inputLine = cli.bootstrap(inputLine);
+        oa2Commands.startup(inputLine); // read the command line options and such to set the state
+        cli.start();
+     */
     /**
      * Does all the actual work of running this once it gets the right command line client
      * instance.
@@ -79,6 +128,45 @@ public class OA2CommandLineClient extends CommandLineClient {
      * @throws Throwable
      */
     protected  void runnit(String[] args, OA2CommandLineClient clc) throws Throwable {
+        ArrayList<String> aaa = new ArrayList<>();
+        aaa.add(OA2Commands.class.getSimpleName()); // dummy first argument
+        aaa.addAll(Arrays.asList(args));
+        InputLine inputLine = new InputLine(aaa);
+        CLIDriver cli = new CLIDriver(clc);
+        try {// actually run the driver that parses commands and passes them along
+            clc.bootstrap(inputLine);
+        }catch(ConnectionException ce){
+            say("could not connect to server");
+        }catch(Throwable e) {
+            if(cli.isVerbose()){
+                e.printStackTrace();
+            }
+            say("erro reading configuration file: " + e.getMessage());
+
+        }
+        OA2CLCCommands usc = new OA2CLCCommands(cli.getLogger(), clc);
+        usc.setConfigFile(clc.getConfigFile());
+        FormatUtil.setIoInterface(cli.getIOInterface());
+        cli.addCommands(usc);
+        usc.bootMessage();
+        cli.start();
+
+        /* Proposed NEW
+
+            OA2CommandLineClient clc = new OA2CommandLineClient(null);
+            CLIDriver cli = new CLIDriver(clc); // actually run the driver that parses commands and passes them along
+            clc.bootstrap(inputLine);
+            OA2CLCCommands usc = new OA2CLCCommands(cli.getLogger(), clc);
+            usc.setConfigFile(clc.getConfigFile());
+            FormatUtil.setIoInterface(cli.getIOInterface());
+            cli.addCommands(usc);
+            usc.bootMessage();
+            cli.start();
+
+         */
+/* OLD
+        CLIDriver cli = new CLIDriver();
+        cli.bootstrap(inputLine);
         clc.start(args);
         OA2CLCCommands usc = new OA2CLCCommands(clc.getMyLogger(), clc);
         usc.setConfigFile(clc.getConfigFile());
@@ -89,6 +177,7 @@ public class OA2CommandLineClient extends CommandLineClient {
         cli.setIOInterface(clc.getIOInterface());
         usc.bootMessage();
         cli.start();
+*/
 
     }
 
@@ -97,10 +186,6 @@ public class OA2CommandLineClient extends CommandLineClient {
     }
 
     public void start(String[] args) throws Exception {
-        if (!getOptions(args)) {
-            say("Warning: no configuration file specified. type in 'load --help' to see how to load one.");
-            return;
-        }
         try {
             initialize();
             about();
@@ -154,15 +239,15 @@ Y8,    "88,,8P  88         8P  88              Y8,            88         Y8,
     public void about() {
         int width = 60;
         banner();
-        String stars = StringUtils.rightPad("", width + 1, "*");
+        String stars = StringUtils.repeatString("*", width + 1);
         say(stars);
-        say(padLineWithBlanks("* OA4MP CLC (command line client)", width) + "*");
-        say(padLineWithBlanks("* Version " + OA4MPVersion.VERSION_NUMBER, width) + "*");
-        say(padLineWithBlanks("* By Jeff Gaynor  NCSA", width) + "*");
-        say(padLineWithBlanks("*  (National Center for Supercomputing Applications)", width) + "*");
-        say(padLineWithBlanks("*", width) + "*");
-        say(padLineWithBlanks("* type 'help' for a list of commands", width) + "*");
-        say(padLineWithBlanks("*      'exit' or 'quit' to end this session.", width) + "*");
+        say(StringUtils.pad2("* OA4MP CLC (command line client)", width) + "*");
+        say(StringUtils.pad2("* Version " + OA4MPVersion.VERSION_NUMBER, width) + "*");
+        say(StringUtils.pad2("* By Jeff Gaynor  NCSA", width) + "*");
+        say(StringUtils.pad2("*  (National Center for Supercomputing Applications)", width) + "*");
+        say(StringUtils.pad2("*", width) + "*");
+        say(StringUtils.pad2("* type 'help' for a list of commands", width) + "*");
+        say(StringUtils.pad2("*      'exit' or 'quit' to end this session.", width) + "*");
         say(stars);
     }
 

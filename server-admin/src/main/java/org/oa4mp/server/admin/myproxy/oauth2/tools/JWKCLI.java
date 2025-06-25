@@ -2,14 +2,10 @@ package org.oa4mp.server.admin.myproxy.oauth2.tools;
 
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
-import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
-import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
-import edu.uiuc.ncsa.security.core.util.LoggerProvider;
-import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.core.util.*;
 import edu.uiuc.ncsa.security.util.cli.*;
 import edu.uiuc.ncsa.security.util.cli.batch.DDParser;
 import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
-import org.apache.commons.lang.StringUtils;
 import org.oa4mp.delegation.common.OA4MPVersion;
 
 import java.io.File;
@@ -29,10 +25,24 @@ import static edu.uiuc.ncsa.security.util.cli.CommonCommands.BATCH_MODE_FLAG;
  * on 5/6/19 at  2:37 PM
  */
 public class JWKCLI extends ConfigurableCommandsImpl {
+    @Override
+    public void setIOInterface(IOInterface io) {
+
+    }
 
     @Override
-    public void bootstrap() throws Throwable {
+    public boolean isBatchMode() {
+        return false;
+    }
 
+    @Override
+    public void setBatchMode(boolean batchMode) {
+
+    }
+
+    @Override
+    public void bootstrap(InputLine inputLine) throws Throwable {
+super.bootstrap(inputLine);
     }
 
     @Override
@@ -44,24 +54,18 @@ public class JWKCLI extends ConfigurableCommandsImpl {
         super(logger);
     }
 
-/*
-    @Override
-    public Set<String> listComponents() {
-        return null;
-    }
-*/
 
     public void about() {
         int width = 60;
-        String stars = StringUtils.rightPad("", width + 1, "*");
+        String stars = StringUtils.repeatString("*", width + 1);
         say(stars);
-        say(padLineWithBlanks("* JSON Web Token CLI (Command Line Interpreter)", width) + "*");
-        say(padLineWithBlanks("* Version " + OA4MPVersion.VERSION_NUMBER, width) + "*");
-        say(padLineWithBlanks("* By Jeff Gaynor  NCSA", width) + "*");
-        say(padLineWithBlanks("*  (National Center for Supercomputing Applications)", width) + "*");
-        say(padLineWithBlanks("*", width) + "*");
-        say(padLineWithBlanks("* type 'help' for a list of commands", width) + "*");
-        say(padLineWithBlanks("*      'exit' or 'quit' to end this session.", width) + "*");
+        say(StringUtils.pad2("* JSON Web Token CLI (Command Line Interpreter)", width) + "*");
+        say(StringUtils.pad2("* Version " + OA4MPVersion.VERSION_NUMBER, width) + "*");
+        say(StringUtils.pad2("* By Jeff Gaynor  NCSA", width) + "*");
+        say(StringUtils.pad2("*  (National Center for Supercomputing Applications)", width) + "*");
+        say(StringUtils.pad2("*", width) + "*");
+        say(StringUtils.pad2("* type 'help' for a list of commands", width) + "*");
+        say(StringUtils.pad2("*      'exit' or 'quit' to end this session.", width) + "*");
         say(stars);
     }
 
@@ -160,9 +164,9 @@ public class JWKCLI extends ConfigurableCommandsImpl {
         boolean isVerbose = argLine.hasArg(SHORT_VERBOSE_FLAG) || argLine.hasArg(LONG_VERBOSE_FLAG);
         // again, a batch file means every line in the file is a separate comamand, aside from comments
         boolean hasBatchFile = argLine.hasArg(BATCH_FILE_MODE_FLAG);
-        // Batch mode means that the command line is interpreted as a single command. This executes one command, batch mode does many.
+        // Batch mode means that the rest of command line after flag is interpreted as a single command.
+        // This executes one command, batch mode does many.
         boolean isBatchMode = argLine.hasArg(BATCH_MODE_FLAG);
-        boolean isNoOuput = (argLine.hasArg(SHORT_NO_OUTPUT_FLAG) || argLine.hasArg(LONG_NO_OUTPUT_FLAG));
 
         MyLoggingFacade myLoggingFacade = null;
         if (argLine.hasArg("-log")) {
@@ -233,6 +237,13 @@ public class JWKCLI extends ConfigurableCommandsImpl {
         return null;
     }
 
+    /**
+     * Reads command line for batch flag or batch file, sets the flag for batch processing, then invokes the
+     * main event loop.
+     * @param cli
+     * @param arg
+     * @throws Exception
+     */
     protected void processBatchModeCommand(CLIDriver cli, InputLine arg) throws Exception {
         JWKUtilCommands jwkCommands = getJWKCommands(cli);
         if (jwkCommands == null) {
@@ -256,9 +267,14 @@ public class JWKCLI extends ConfigurableCommandsImpl {
         say("You may have commands across multiple lines with all the whitespace you want, but");
         say("at processing each line will be concatenated with a space, so don't break tokens over ");
         say("lines. See the readme.txt for more and look at any .cmd file in this distro for examples.");
-        say("And do remember that environment variables are not available inside these scripts.");
     }
 
+    /**
+     * Parses the file for commands and runs them.
+     * @param fileName
+     * @param cli
+     * @throws Throwable
+     */
     protected void processBatchFile(String fileName, CLIDriver cli) throws Throwable {
         if (fileName.toLowerCase().equals("--help")) {
             batchFileHelp();
@@ -318,10 +334,10 @@ public class JWKCLI extends ConfigurableCommandsImpl {
 
     protected void start(String[] args) throws Exception {
         about();
-        if (!getOptions(args)) {
+/*        if (!getOptions(args)) {
             say("Warning: no configuration file specified. type in 'load --help' to see how to load one.");
             return;
-        }
+        }*/
     }
 
     @Override

@@ -22,30 +22,27 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
     public String TRANSACTION_COMMAND = "transactions";
     protected Map<String, CLIDriver> drivers = new HashMap<>();
 
-    protected List<String> components = new ArrayList<>();
+    //protected List<String> components = new ArrayList<>();
 
     protected boolean showHeader = true;
     protected boolean showLogo = true;
 
-    protected void init()  {
+    protected void init() {
         try {
             if (drivers.isEmpty()) {
                 drivers.put(CLIENTS, createCLIDriver(getClientCommands()));
                 drivers.put(CLIENT_APPROVALS, createCLIDriver(getClientApprovalCommands()));
                 drivers.put(TRANSACTION_COMMAND, createCLIDriver(getTransactionCommands()));
             }
-        }catch(Throwable t) {
-            if( t instanceof RuntimeException ){
-                throw (RuntimeException)t;
+        } catch (Throwable t) {
+            if (t instanceof RuntimeException) {
+                throw (RuntimeException) t;
             }
-            throw new  GeneralException("Unable to initialize CLI components", t);
+            throw new GeneralException("Unable to initialize CLI components", t);
         }
     }
 
-    @Override
-/*    public List<String> listComponents() {
-        return components;
-    }*/
+
     public Set<String> listComponents() {
         return drivers.keySet();
     }
@@ -61,7 +58,7 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
 
     protected BaseCommands(MyLoggingFacade logger) {
         super(logger);
-     //   init();
+        //   init();
     }
 
     @Override
@@ -88,39 +85,42 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
      * @param args
      * @throws Exception
      */
-    protected void startup(String[] args) throws Exception {
-        InputLine inputLine = new InputLine(args);
-        showLogo = !inputLine.hasArg("-noLogo");
-        showHeader = !inputLine.hasArg("-noHeader");
-        if (inputLine.hasArg("-silent")) {
-            showHeader = false;
-            showLogo = false;
-        }
-        boolean printStartup = inputLine.hasArg("-v");
-        if (inputLine.hasArg("-logo")) {
-            logoName = inputLine.getNextArgFor("-logo").toLowerCase();
-        }
+    protected void startup(String[] args) throws Throwable {
+        bootstrap(new InputLine(args));
 
-        about();
-        if (!getOptions(args)) {
-            say("Warning: no configuration file specified. type in 'load --help' to see how to load one.");
-            return;
-        }
-        if (printStartup) {
-            initialize(); // No logging so a there might be a bunch of stuff that gets spit out.
-            return;
-        }
-        // pipe startup messages to dev null:
-        if(getIOInterface() instanceof BasicIO) {
-            ((BasicIO) getIOInterface()).getPrintStream();
-            PrintStream out = System.out;
-            PrintStream err = System.err;
+    }
+
+    @Override
+    public void bootstrap(InputLine args) throws Throwable {
+        IOInterface ioInterface = null;
+        PrintStream out = System.out;
+        PrintStream err = System.err;
+        if (!getDriver().isVerbose()) {
+            ioInterface = getIOInterface();
+            BasicIO basicIO = new BasicIO();
+            setIOInterface(basicIO);
             System.setOut(new PrintStream(OutputStream.nullOutputStream()));
             System.setErr(new PrintStream(OutputStream.nullOutputStream()));
+        }
+        super.bootstrap(args);
+        if (ioInterface != null) {
             initialize();
             System.setOut(out);
             System.setErr(err);
+            setIOInterface(ioInterface);
         }
+        showLogo = !args.hasArg("-noLogo");
+        showHeader = !args.hasArg("-noHeader");
+        if (args.hasArg("-silent")) {
+            showHeader = false;
+            showLogo = false;
+        }
+        if (args.hasArg("-logo")) {
+            logoName = args.getNextArgFor("-logo").toLowerCase();
+        }
+
+        about();
+
         init();
     }
 
@@ -160,51 +160,41 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
         return false;
     }
 
-    /**
-     * Either switch to another component or (if there are arguments) simply run the
-     * single command and return. Note that each component has stored state, so
-     * these will be run with whatever is in that state.
-     *
-     * @param inputLine
-     * @param commands
-     * @return
-     */
-    protected boolean switchOrRun(InputLine inputLine, CommonCommands commands) {
-        boolean switchComponent = 1 < inputLine.getArgCount();
 
+    /*    protected boolean switchOrRun(InputLine inputLine, CommonCommands commands) {
+            boolean switchComponent = 1 < inputLine.getArgCount();
+
+            CLIDriver cli = new CLIDriver();
+            cli.setIOInterface(commands.getIOInterface());
+            cli.addCommands(commands);
+            cli.setEnv(getGlobalEnv());
+            cli.setComponentManager(this);
+            if (switchComponent) {
+                inputLine.removeArgAt(0); // removes original arg ("use")
+                cli.execute(inputLine.removeArgAt(0)); // removes components before executing
+            } else {
+                cli.start();
+            }
+            return true;
+        }*/
+    protected CLIDriver createCLIDriver(CommonCommands commands) {
         CLIDriver cli = new CLIDriver();
         cli.setIOInterface(commands.getIOInterface());
         cli.addCommands(commands);
         cli.setEnv(getGlobalEnv());
         cli.setComponentManager(this);
-        if (switchComponent) {
-            inputLine.removeArgAt(0); // removes original arg ("use")
-            cli.execute(inputLine.removeArgAt(0)); // removes components before executing
-        } else {
-            cli.start();
-        }
-        return true;
+        return cli;
     }
-protected CLIDriver createCLIDriver(CommonCommands commands){
-    CLIDriver cli = new CLIDriver();
-    cli.setIOInterface(commands.getIOInterface());
-    cli.addCommands(commands);
-    cli.setEnv(getGlobalEnv());
-    cli.setComponentManager(this);
-    return cli;
-}
 
     protected boolean hasComponent(String componentName) {
         return componentName.equals(CLIENTS) ||
                 componentName.equals(CLIENT_APPROVALS) ||
-                componentName.equals(COPY) ;
+                componentName.equals(COPY);
     }
 
     protected void runComponent(String componentName) throws Throwable {
         CommonCommands commonCommands = null;
-    /*    if (componentName.equals(PARSER_COMMAND)) {
-            commonCommands = getNewParserCommands();
-        }*/
+
         if (componentName.equals(CLIENTS)) {
             commonCommands = getClientCommands();
         }
@@ -223,7 +213,7 @@ protected CLIDriver createCLIDriver(CommonCommands commands){
 
 //    public abstract ParserCommands getNewParserCommands() throws Throwable;
 
-    protected boolean executeComponent() throws Throwable {
+/*    protected boolean executeComponent() throws Throwable {
         if (hasOption(USE_COMPONENT_OPTION, USE_COMPONENT_LONG_OPTION)) {
             String component = getCommandLine().getOptionValue(USE_COMPONENT_OPTION);
             if (component != null && 0 < component.length()) {
@@ -238,7 +228,7 @@ protected CLIDriver createCLIDriver(CommonCommands commands){
             }
         }
         return false;
-    }
+    }*/
 
     public void useHelp() {
         say("Choose the component you wish to use.");
