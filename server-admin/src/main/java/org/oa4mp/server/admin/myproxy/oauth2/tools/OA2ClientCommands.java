@@ -939,7 +939,11 @@ public class OA2ClientCommands extends ClientStoreCommands {
             PermissionList pList = getPermissionsStore().get(adminID, id);
             OA2Client e = (OA2Client) getEnvironment().getClientStore().get(id);
             if (e != null) {
-                e.setErsatzClient(true);
+                if(!e.isErsatzClient()) {
+                    // just in case they created it without setting this.
+                    e.setErsatzClient(true);
+                   getStore().save(e);
+                }
             }
             // no permissions means create new ones.
             if (pList.isEmpty()) {

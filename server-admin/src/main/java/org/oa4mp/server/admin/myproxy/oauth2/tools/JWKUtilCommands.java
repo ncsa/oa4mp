@@ -1,16 +1,11 @@
 package org.oa4mp.server.admin.myproxy.oauth2.tools;
 
 import com.nimbusds.jose.util.Base64URL;
-import org.oa4mp.server.loader.oauth2.OA2SE;
-import org.oa4mp.server.loader.qdl.util.SigningCommands;
-import org.oa4mp.delegation.server.JWTUtil;
-import org.oa4mp.delegation.server.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.FileUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
 import edu.uiuc.ncsa.security.util.cli.CommonCommands;
-import edu.uiuc.ncsa.security.util.cli.HelpUtil;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.crypto.KeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
@@ -20,6 +15,10 @@ import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
+import org.oa4mp.delegation.server.JWTUtil;
+import org.oa4mp.delegation.server.server.claims.OA2Claims;
+import org.oa4mp.server.loader.oauth2.OA2SE;
+import org.oa4mp.server.loader.qdl.util.SigningCommands;
 
 import java.io.*;
 import java.math.BigInteger;
@@ -64,20 +63,13 @@ public class JWKUtilCommands extends CommonCommands {
 
     @Override
     public String getPrompt() {
-        return getName()+">";
+        return getName() + ">";
     }
 
     @Override
     public void bootstrap(InputLine inputLine) throws Throwable {
-super.bootstrap(inputLine);
+        super.bootstrap(inputLine);
     }
-
-    @Override
-    public HelpUtil getHelpUtil() {
-        return null;
-    }
-
-    public static String JWK_EXTENSION = "jwk";
 
     protected void createKeysHelps() {
         say("create_keys [" + CL_INPUT_FILE_FLAG + " set_of_keys " + CL_IS_PUBLIC_FLAG + "] | [" + CL_IS_PRIVATE_FLAG + "] " + FORCE_TO_STD_OUT_FLAG + "] " + CL_OUTPUT_FILE_FLAG + " file");
@@ -211,13 +203,13 @@ super.bootstrap(inputLine);
                         algs.addAll(Arrays.asList(JWKUtil2.ALL_EC_ALGORITHMS));
                         say("Supported curves");
                         say("----------------");
-                        for(String x: curves){
+                        for (String x : curves) {
                             say(x);
                         }
                         say("The default is " + JWKUtil2.EC_CURVE_P_256);
                         say("\nSupported algorithms");
                         say("--------------------");
-                        for(String x : algs){
+                        for (String x : algs) {
                             say(x);
                         }
                         say("The default is " + JWKUtil2.ES_256);
@@ -226,7 +218,7 @@ super.bootstrap(inputLine);
                         say("Supported algorithms");
                         say("--------------------");
                         algs.addAll(Arrays.asList(JWKUtil2.ALL_RSA_ALGORITHMS));
-                        for(String x : algs){
+                        for (String x : algs) {
                             say(x);
                         }
                         say("The default is " + JWKUtil2.RS_256);
@@ -242,15 +234,14 @@ super.bootstrap(inputLine);
         }
         // Fingers and toes cases
         // #1 no arguments, create the keys and dump to std out
-        if (!inputLine.hasArgs() || (inputLine.getArgCount()==1 && inputLine.hasArg(CREATE_SINGLE_KEY_FLAG))) {
+        if (!inputLine.hasArgs() || (inputLine.getArgCount() == 1 && inputLine.hasArg(CREATE_SINGLE_KEY_FLAG))) {
             SigningCommands sg = createSG(null);
-            sg.setBatchMode(isBatchMode());
             sg.create(inputLine);
             return;
         }
         boolean hasDefaultID = inputLine.hasArg(SET_DEFAULT_ID);
         String defaultID = null;
-        if(hasDefaultID){
+        if (hasDefaultID) {
             defaultID = inputLine.getNextArgFor(SET_DEFAULT_ID);
             inputLine.removeSwitchAndValue(SET_DEFAULT_ID);
         }
@@ -293,10 +284,6 @@ super.bootstrap(inputLine);
         }
         // #2 Error case that public keys are wanted, but no input file is specified.
         if (inputLine.hasArg(CL_IS_PUBLIC_FLAG) && !inputLine.hasArg(CL_INPUT_FILE_FLAG)) {
-            if (isBatch()) {
-                sayv("Error! Request for public keys but no set odf keys supplied.");
-                System.exit(1);
-            }
             say("Error! Request for public keys but no set odf keys supplied.");
             return;
         }
@@ -306,10 +293,6 @@ super.bootstrap(inputLine);
         inputLine.removeSwitch(CL_IS_PRIVATE_FLAG);
         if (isPrivate && isPublic) {
             String err = " cannot specify both private and public keys at the same time";
-            if (isBatch()) {
-                sayv(err);
-                System.exit(1);
-            }
             say(err);
             return;
         }
@@ -338,9 +321,9 @@ super.bootstrap(inputLine);
                     keys.put(createRSAJWK(keySize, algorithm)); // make one
                 }
             } else {
-                if(isCreateElliptic){
+                if (isCreateElliptic) {
                     keys = sg.createECJsonWebKeys(ellipticCurve, defaultID); // make full set
-                }else{
+                } else {
                     keys = sg.createRSAJsonWebKeys(keySize, defaultID); // make full set
                 }
 
@@ -398,8 +381,6 @@ super.bootstrap(inputLine);
             // do nothing
         }
         // make sure these get propagated
-        signingCommands.setBatchMode(true);
-        signingCommands.setBatchFile(true);
         InputLine inputLine1 = new InputLine("x " + signingCommands.SYMMETRIC_KEY_ARG + " " + defaultLength + " " + signingCommands.SYMMETRIC_KEY_COUNT_ARG + " 1");
         signingCommands.create_symmetric_keys(inputLine1);
     }
@@ -408,8 +389,6 @@ super.bootstrap(inputLine);
     public void create_symmetric_keys(InputLine inputLine) throws Exception {
         SigningCommands signingCommands = createSG(null);
         // make sure these get propagated
-        signingCommands.setBatchMode(isBatchMode());
-        signingCommands.setBatchFile(isBatchFile());
 
         if (showHelp(inputLine)) {
             showSymmetricKeyHelp(signingCommands);
@@ -997,25 +976,25 @@ super.bootstrap(inputLine);
 
         }
         if (localKeys == null) {
-            if (isBatchMode()) {
+   /*         if (isBatchMode()) {
                 // Error in this case -- there cannot be a set of keys defined, so exit
                 sayv(" no keys specified");
                 return;
-            } else {
-                if (keys == null || keys.isEmpty()) {
-                    if (getBooleanInput("No keys set. Would you like to specify keys for signing?")) {
-                        String x = getInput("Enter fully qualified path and file name");
-                        if (isEmpty(x)) {
-                            say("no file entered, exiting...");
-                            return;
-                        }
-                        localKeys = readKeys(new File(x));
+            } else {*/
+            if (keys == null || keys.isEmpty()) {
+                if (getBooleanInput("No keys set. Would you like to specify keys for signing?")) {
+                    String x = getInput("Enter fully qualified path and file name");
+                    if (isEmpty(x)) {
+                        say("no file entered, exiting...");
+                        return;
                     }
-
-                } else {
-                    localKeys = keys;
+                    localKeys = readKeys(new File(x));
                 }
+
+            } else {
+                localKeys = keys;
             }
+            //   }
         }
         String localDefaultID = null;
         if (inputLine.hasArg(CL_KEY_ID_FLAG)) {
@@ -1305,16 +1284,18 @@ super.bootstrap(inputLine);
             s = new Base64URL(new String(x[2]));
         }
         if (JWTUtil.verify(h, p, s, keys.get(fullHeader.getString("kid")))) {
-            if (isBatch()) {
+        /*    if (isBatch()) {
                 sayv("token valid!");
                 return;
-            }
+            }*/
             say("token valid!");
         } else {
+/*
             if (isBatch()) {
                 sayv("could not validate token");
                 System.exit(1);
             }
+*/
             say("could not validate token");
         }
     }

@@ -14,7 +14,7 @@ import java.util.Map;
  * on 9/4/15 at  11:00 AM
  */
 public class MyProxyServiceEnvironment extends AbstractEnvironment {
-    public MyProxyServiceEnvironment() {
+/*    public MyProxyServiceEnvironment() {
     }
 
     public MyProxyServiceEnvironment(MyLoggingFacade myLogger,
@@ -22,14 +22,13 @@ public class MyProxyServiceEnvironment extends AbstractEnvironment {
                                      ) {
         super(myLogger);
         this.mfps = mfp;
-    }
+    }*/
 
     public MyProxyServiceEnvironment(MyLoggingFacade myLogger,
                                      List<MyProxyFacadeProvider> mfp,
                                      Map<String, String> constants) {
         super(myLogger, constants);
         this.mfps = mfp;
-
     }
 
     List<MyProxyFacadeProvider> mfps;

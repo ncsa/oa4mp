@@ -3,7 +3,6 @@ package org.oa4mp.server.admin.myproxy.oauth2.tools;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.ConnectionException;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
-import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
@@ -137,27 +136,29 @@ public class OA2CLCCommands extends CommonCommands {
         super(logger);
         try {
             if (oa2CommandLineClient.getLoader() == null) {
+/*
                 if (isBatch()) {
                     throw new MyConfigurationException("No loader found");
                 } else {
+*/
                     // probably should not issue this on startup since they may start without
                     // a configuration then load one.
                     //   say("warning: no loader found");
-                }
+//                }
             } else {
                 setCe((OA2ClientEnvironment) oa2CommandLineClient.getEnvironment());
             }
         } catch (Throwable t) {
             if (t instanceof ConnectionException) {
                 // Fix https://github.com/ncsa/oa4mp/issues/201
-                if (isBatch()) {
+/*                if (isBatch()) {
                     if (logger != null) {
                         logger.error("could not load configuration", t);
                         throw t; // If batch mode and configuration cannot load, bomb here and now.
                     }
-                } else {
+                } else {*/
                     say("unable to connect to OA4MP server. Cannot load configuration.");
-                }
+                //}
             } else {
                 // Most likely is that there is some connection issue, but if not,
                 // fall through here

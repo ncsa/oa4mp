@@ -34,16 +34,6 @@ public class OA2CommandLineClient extends ConfigurableCommandsImpl {
     }
 
     @Override
-    public boolean isBatchMode() {
-        return false;
-    }
-
-    @Override
-    public void setBatchMode(boolean batchMode) {
-
-    }
-
-    @Override
     public void bootstrap(InputLine inputLine) throws Throwable {
 super.bootstrap(inputLine);
     }

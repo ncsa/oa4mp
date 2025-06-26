@@ -672,7 +672,7 @@ if(1 < foundIdentifiables.size()){
             outFile = inputLine.getNextArgFor(GC_FILE_FLAG);
             inputLine.removeSwitchAndValue(GC_FILE_FLAG);
         }
-        if (!testMode && !isBatchMode()) {
+        if (!testMode) {
             if (!readline("Are you SURE? (Yes/no)").equals("Yes")) {
                 say("aborting...");
                 return;

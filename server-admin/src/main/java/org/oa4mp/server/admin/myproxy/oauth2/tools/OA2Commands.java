@@ -22,7 +22,6 @@ import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 
 import static edu.uiuc.ncsa.security.core.util.StringUtils.pad2;
@@ -132,10 +131,7 @@ public class OA2Commands extends BaseCommands {
     // Uses new cli.bootstrap.
 protected static void newMain(String[] args) {
     try {
-        ArrayList<String> aaa = new ArrayList<>();
-        aaa.add(OA2Commands.class.getSimpleName()); // dummy first argument
-        aaa.addAll(Arrays.asList(args));
-        InputLine inputLine = new InputLine(aaa);
+        InputLine inputLine = new InputLine(OA2Commands.class.getSimpleName(), args);
         if (inputLine.hasArg("-sas")) {
             setupSAS(inputLine);
             return;
@@ -149,40 +145,12 @@ protected static void newMain(String[] args) {
         t.printStackTrace();
     }
 }
-/*protected static void oldMain(String[] args) {
-    try {
-        ArrayList<String> aaa = new ArrayList<>();
-        aaa.add(OA2Commands.class.getSimpleName()); // dummy first argument
-        aaa.addAll(Arrays.asList(args));
-        InputLine inputLine = new InputLine(aaa);
-        if (inputLine.hasArg("-sas")) {
-            setupSAS(inputLine);
-            return;
-        }
-        OA2Commands oa2Commands = new OA2Commands(null);
-        oa2Commands.startup(args); // read the command line options and such to set the state
-        CLIDriver cli = new CLIDriver(oa2Commands); // actually run the driver that parses commands and passes them along
-        cli.start();
-    } catch (Throwable t) {
-        t.printStackTrace();
-    }
-}*/
     @Override
     public void setIOInterface(IOInterface io) {
         super.setIOInterface(io);
         for(String component : drivers.keySet()){
             drivers.get(component).setIOInterface(io);
         }
-    }
-
-    @Override
-    public boolean isBatchMode() {
-        return false;
-    }
-
-    @Override
-    public void setBatchMode(boolean batchMode) {
-
     }
 
     protected static void setupSAS(InputLine inputLine) throws Throwable {

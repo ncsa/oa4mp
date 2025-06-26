@@ -7,7 +7,7 @@ Now, generate server key file: ${OA4MP_HOME}etc/keys.jwk
 
 by running:
 
-${OA4MP_HOME}bin/jwt -batchFile ${OA4MP_HOME}etc/create_keys.cmd
+${OA4MP_HOME}bin/jwt -in ${OA4MP_HOME}etc/create_keys.cmd
 
 When done, the keys and a default will be set in your configuration file.
 If you want a different default key, select one of the printed key ids ('kid')

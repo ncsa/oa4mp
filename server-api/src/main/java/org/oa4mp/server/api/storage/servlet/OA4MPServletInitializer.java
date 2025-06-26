@@ -163,7 +163,7 @@ public class OA4MPServletInitializer implements Initialization {
         Cleanup<Identifier, CachedObject> myproxyConnectionCleanup = OA4MPServlet.myproxyConnectionCleanup;
         int i = 0;
 
-        if (myproxyConnectionCleanup == null) {
+        if (!((ServiceEnvironmentImpl) getEnvironment()).getMyProxyServices().isEmpty() &&  myproxyConnectionCleanup == null) {
             myproxyConnectionCleanup = new Cleanup<Identifier, CachedObject>(logger, "myproxy connection cleanup") {
                 @Override
                 public List<CachedObject> age() {

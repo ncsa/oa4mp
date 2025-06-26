@@ -42,12 +42,7 @@ public abstract class MyProxyConfigurationLoader<T extends AbstractEnvironment> 
                      String currentDN  = getFirstAttribute(currentNode, MYPROXY_SERVER_DN);
                      mfp.add(new MyProxyFacadeProvider(((ConfigurationNode) kids.get(i)), (currentDN==null?defaultDN:currentDN)));
                  }
-
-             } else {
-                 // set up with defaults
-                 mfp.add(new MyProxyFacadeProvider());
              }
-
          }
          return mfp;
      }

@@ -1,22 +1,10 @@
 package org.oa4mp.server.admin.myproxy.oauth2.tools;
 
-import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
-import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.*;
 import edu.uiuc.ncsa.security.util.cli.*;
-import edu.uiuc.ncsa.security.util.cli.batch.DDParser;
-import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
 import org.oa4mp.delegation.common.OA4MPVersion;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.util.List;
-import java.util.Vector;
 import java.util.logging.Level;
-
-import static edu.uiuc.ncsa.security.util.cli.CommonCommands.BATCH_FILE_MODE_FLAG;
-import static edu.uiuc.ncsa.security.util.cli.CommonCommands.BATCH_MODE_FLAG;
 
 /**
  * Top-level class for the JWT and JWK command line utilities. This lets you create keys, create id tokens
@@ -30,15 +18,7 @@ public class JWKCLI extends ConfigurableCommandsImpl {
 
     }
 
-    @Override
-    public boolean isBatchMode() {
-        return false;
-    }
 
-    @Override
-    public void setBatchMode(boolean batchMode) {
-
-    }
 
     @Override
     public void bootstrap(InputLine inputLine) throws Throwable {
@@ -98,9 +78,6 @@ super.bootstrap(inputLine);
     @Override
     public void useHelp() {
         say("You may use this in both interactive mode and as a command line utility.");
-        say("To use in batch mode, supply the " + BATCH_MODE_FLAG + " flag.");
-        say("This will suppress all output and will not prompt for missing arguments to functions.");
-        say("If you omit this flag, then missing arguments will still cause you to be prompted.");
         say("Here is a list of commands: An asterisk (X) means it is for interactive mode only");
         say("Key commands");
         say("------------");
@@ -135,12 +112,9 @@ super.bootstrap(inputLine);
         say("   You can set this in a batch file by invoking set_verbose true|false");
         say(SHORT_NO_OUTPUT_FLAG + ", " + LONG_NO_OUTPUT_FLAG + " = turn off all output");
         say("   You can set this in a batch file by invoking set_no_ouput true|false");
-        say(BATCH_MODE_FLAG + "= interpret everything else on the command line as a command, aside from flags. Note this means you can execute a single command.");
-        say(BATCH_FILE_MODE_FLAG + "= this is the fully qualified path to a file of commands which will be interpreted one after the other.");
     }
 
 
-    protected static String DUMMY_FUNCTION = "dummy0"; // used to create initial command line
 
     public static String SHORT_HELP_FLAG = "-help";
     public static String LONG_HELP_FLAG = "--help";
@@ -151,22 +125,38 @@ super.bootstrap(inputLine);
 
 
     public static void main(String[] args) throws Throwable{
-        Vector<String> vector = new Vector<>();
-        vector.add(DUMMY_FUNCTION); // Dummy zero-th arg.
-        for (String arg : args) {
-            vector.add(arg);
+        try {
+            InputLine inputLine = new InputLine(JWKCLI.class.getSimpleName(), args); // now we have a bunch of utilities for this
+            // Do any help first
+            if (inputLine.hasArg(SHORT_HELP_FLAG) || inputLine.hasArg(LONG_HELP_FLAG)) {
+                JWKCLI jwkcli = new JWKCLI(null);
+                jwkcli.useHelp();
+                return;
+            }
+
+            JWKUtilCommands jwkUtilCommands = new JWKUtilCommands(null);
+
+            CLIDriver cli = new CLIDriver(jwkUtilCommands); // actually run the driver that parses commands and passes them along
+            inputLine = cli.bootstrap(inputLine);
+            jwkUtilCommands.bootstrap(inputLine); // read the command line options and such to set the state
+            if (args == null || args.length == 0) {
+                JWKCLI jwkcli = new JWKCLI(null);
+                jwkcli.useHelp();
+            }
+            cli.start();
+        } catch (Throwable t) {
+            t.printStackTrace();
         }
-        InputLine argLine = new InputLine(vector); // now we have a bunch of utilities for this
+    }
+    public static void OLDmain(String[] args) throws Throwable{
+
+        InputLine argLine = new InputLine(JWKCLI.class.getSimpleName(), args); // now we have a bunch of utilities for this
 
         // In order of importance for command line flags.
 
 
         boolean isVerbose = argLine.hasArg(SHORT_VERBOSE_FLAG) || argLine.hasArg(LONG_VERBOSE_FLAG);
         // again, a batch file means every line in the file is a separate comamand, aside from comments
-        boolean hasBatchFile = argLine.hasArg(BATCH_FILE_MODE_FLAG);
-        // Batch mode means that the rest of command line after flag is interpreted as a single command.
-        // This executes one command, batch mode does many.
-        boolean isBatchMode = argLine.hasArg(BATCH_MODE_FLAG);
 
         MyLoggingFacade myLoggingFacade = null;
         if (argLine.hasArg("-log")) {
@@ -179,10 +169,7 @@ super.bootstrap(inputLine);
         }
 
         JWKCLI jwkcli = new JWKCLI(myLoggingFacade);
-        if (!(isBatchMode || hasBatchFile)) {
-            // if not batch mode, print startup banner && help.
             jwkcli.useHelp();
-        }
         JWKUtilCommands jwkUtilCommands = new JWKUtilCommands(myLoggingFacade);
         jwkUtilCommands.setVerbose(isVerbose);
         jwkUtilCommands.setPrintOuput(true);
@@ -194,15 +181,6 @@ super.bootstrap(inputLine);
                 cli.start();
                 return;
             }
-            jwkUtilCommands.setBatchMode(false);
-            if (hasBatchFile) {
-                jwkcli.processBatchFile(argLine.getNextArgFor(BATCH_FILE_MODE_FLAG), cli);
-                return;
-            }
-            if (isBatchMode) {
-                jwkcli.processBatchModeCommand(cli, argLine);
-                return;
-            }
             // alternately, parse the arguments
             // check for help first
             if (argLine.hasArg(SHORT_HELP_FLAG) || argLine.hasArg(LONG_HELP_FLAG)) {
@@ -212,12 +190,7 @@ super.bootstrap(inputLine);
 
             String cmdLine = args[0];
             for (int i = 1; i < args.length; i++) {
-                if (args[i].equals(BATCH_MODE_FLAG)) {
-                    jwkUtilCommands.setBatchMode(true);
-                } else {
-                    // don't keep the batch flag in the final arguments.
                     cmdLine = cmdLine + " " + args[i];
-                }
             }
             cli.execute(cmdLine);
 
@@ -244,7 +217,7 @@ super.bootstrap(inputLine);
      * @param arg
      * @throws Exception
      */
-    protected void processBatchModeCommand(CLIDriver cli, InputLine arg) throws Exception {
+/*    protected void processBatchModeCommand(CLIDriver cli, InputLine arg) throws Exception {
         JWKUtilCommands jwkCommands = getJWKCommands(cli);
         if (jwkCommands == null) {
             throw new NFWException("Error: No JWKUtilCommands configured, hence no logging.");
@@ -257,8 +230,9 @@ super.bootstrap(inputLine);
         arg.removeSwitch(BATCH_FILE_MODE_FLAG);
         arg.removeSwitch(DUMMY_FUNCTION);
         cli.execute(arg);
-    }
+    }*/
 
+/*
     protected void batchFileHelp() {
         say("Running batch files.");
         say("You can run scripts from the command line by passing in a file,");
@@ -268,13 +242,13 @@ super.bootstrap(inputLine);
         say("at processing each line will be concatenated with a space, so don't break tokens over ");
         say("lines. See the readme.txt for more and look at any .cmd file in this distro for examples.");
     }
+*/
 
     /**
      * Parses the file for commands and runs them.
-     * @param fileName
-     * @param cli
      * @throws Throwable
      */
+/*
     protected void processBatchFile(String fileName, CLIDriver cli) throws Throwable {
         if (fileName.toLowerCase().equals("--help")) {
             batchFileHelp();
@@ -331,6 +305,7 @@ super.bootstrap(inputLine);
         }
 
     }
+*/
 
     protected void start(String[] args) throws Exception {
         about();

@@ -116,7 +116,7 @@ public class SigningCommands extends CommonCommands {
                 publicKeyFile = new File(inputLine.getArg(1));
             }
         }
-        if (publicKeyFile == null && isBatchMode()) {
+        if (publicKeyFile == null ) {
             throw new GeneralException("No full path to the file given.");
         }
 
@@ -132,23 +132,25 @@ public class SigningCommands extends CommonCommands {
 
             if (publicKeyFile.exists()) {
                 if (!publicKeyFile.isFile()) {
+/*
                     sayi("Sorry, but you must supply the name of the file as well (or type 'exit' to exit");
                 } else {
                     if (!isBatchMode()) {
+*/
                         retry = !isOk(readline("The file you gave exists, do you want to over write it? [y/n]"));
-                    }
+//                    }
                 }
             } else {
                 retry = false;
             }
         }
-        if (!isBatchMode()) {
+  //      if (!isBatchMode()) {
             if (!isOk(readline("create a new set of JSON web keys to \"" + publicKeyFile.getAbsolutePath() + "\"?[y/n]"))) {
                 say("create cancelled.");
                 return;
             }
 
-        }
+    //    }
 
         JSONWebKeys keys = createJsonWebKeys();
         FileWriter writer = new FileWriter(publicKeyFile);
@@ -157,10 +159,10 @@ public class SigningCommands extends CommonCommands {
         writer.flush();
         writer.close();
 
-        if (!isBatchMode()) {
+      //  if (!isBatchMode()) {
             sayi("JSONweb keys written");
             sayi("Done!");
-        }
+        //}
 
     }
 
@@ -285,7 +287,7 @@ public class SigningCommands extends CommonCommands {
         }
 
         byte[] array = null;
-        if (!isBatchMode() && targetFile == null) {
+        if (targetFile == null) {
             say(count + " base 64 encoded key" + (count == 1 ? "" : "s") + " with length of " + length + " bytes:\n");
         }
         List<String> keys = new ArrayList<>();
