@@ -57,11 +57,7 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.oa4mp</groupId>
-            <artifactId>myproxy-logon</artifactId>
-            <version>6.x-SNAPSHOT</version>
-        </dependency>
+
 
 <!--        <dependency>
             <groupId>mysql</groupId>
@@ -99,8 +95,6 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
-            <!--    <version>2.5</version>
-                <scope>provided</scope>-->
         </dependency>
     </dependencies>
 

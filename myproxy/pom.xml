@@ -8,7 +8,22 @@
     </parent>
     <artifactId>myproxy</artifactId>
     <name>OA4MP MyProxy support</name>
+    <packaging>war</packaging>
+
     <dependencies>
+
+        <dependency>
+            <groupId>org.oa4mp</groupId>
+            <artifactId>oa4mp-server-oauth2</artifactId>
+            <version>6.x-SNAPSHOT</version>
+            <type>war</type>
+        </dependency>
+<!--        <dependency>
+            <groupId>org.oa4mp</groupId>
+            <artifactId>oa4mp-server-oauth2</artifactId>
+            <version>6.x-SNAPSHOT</version>
+            <type>pom</type>
+        </dependency>-->
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>server-api</artifactId>
@@ -22,6 +37,32 @@
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>server-api</artifactId>
+            <version>6.x-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.oa4mp</groupId>
+            <artifactId>myproxy-logon</artifactId>
+            <version>6.x-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.oa4mp</groupId>
+            <artifactId>proxy</artifactId>
+            <version>6.x-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.oa4mp</groupId>
+            <artifactId>oauth2</artifactId>
+            <version>6.x-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>edu.uiuc.ncsa.security</groupId>
+            <artifactId>core</artifactId>
             <version>6.x-SNAPSHOT</version>
         </dependency>
     </dependencies>
