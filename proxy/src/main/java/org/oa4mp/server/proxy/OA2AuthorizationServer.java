@@ -1,13 +1,11 @@
 package org.oa4mp.server.proxy;
 
 
-import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.servlet.HeaderUtils;
 import edu.uiuc.ncsa.security.servlet.PresentableState;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.http.HttpStatus;
-import org.oa4mp.delegation.common.token.AccessToken;
 import org.oa4mp.delegation.common.token.impl.TokenUtils;
 import org.oa4mp.delegation.server.OA2Constants;
 import org.oa4mp.delegation.server.OA2Errors;
@@ -41,10 +39,6 @@ import static org.oa4mp.delegation.server.OA2Constants.AUTHORIZATION_STATE;
  * on 2/7/14 at  11:44 AM
  */
 public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
-    @Override
-    protected AccessToken getAccessToken(HttpServletRequest request) {
-        throw new NotImplementedException("No access token is available");
-    }
 
     @Override
     protected void createRedirectInit(ServiceTransaction trans, String userName, String password) {
@@ -207,17 +201,6 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
         return cb;
     }
 
-    /**
-     * Spec says we do the cert request in the authorization servlet.
-     *
-     * @param trans
-     * @param statusString
-     * @throws Throwable
-     */
-    @Override
-    protected void doRealCertRequest(ServiceTransaction trans, String statusString) throws Throwable {
-        // do nix here in this protocol.
-    }
 
 
 /*    @Override

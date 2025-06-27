@@ -125,7 +125,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Object.html?is-external=true" title="class or interface in java.lang" class="externalLink">java.lang.Object</a></li>
 <li>
 <ul class="inheritance">
-<li>org.oa4mp.server.admin.myproxy.oauth2.tools.migrate.FSMigrater</li>
+<li>org.oa4mp.server.admin.migrate.tools.oauth2.FSMigrater</li>
 </ul>
 </li>
 </ul>
@@ -156,7 +156,7 @@ implements <a href="MigrationConstants.html" title="interface in org.oa4mp.serve
 </a>
 <h3>Field Summary</h3>
 <ul class="blockList">
-<li class="blockList"><a id="fields.inherited.from.class.org.oa4mp.server.admin.myproxy.oauth2.tools.migrate.MigrationConstants">
+<li class="blockList"><a id="fields.inherited.from.class.org.oa4mp.server.admin.migrate.tools.oauth2.MigrationConstants">
 <!--   -->
 </a>
 <h3>Fields inherited from interface&nbsp;org.oa4mp.server.admin.myproxy.oauth2.tools.migrate.<a href="MigrationConstants.html" title="interface in org.oa4mp.server.admin.myproxy.oauth2.tools.migrate">MigrationConstants</a></h3>
@@ -179,7 +179,7 @@ implements <a href="MigrationConstants.html" title="interface in org.oa4mp.serve
 <th class="colLast" scope="col">Description</th>
 </tr>
 <tr class="altColor">
-<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(org.oa4mp.server.admin.myproxy.oauth2.tools.migrate.MigrateStore,java.io.Writer)">FSMigrater</a></span>&#8203;(<a href="MigrateStore.html" title="class in org.oa4mp.server.admin.myproxy.oauth2.tools.migrate">MigrateStore</a>&nbsp;migrateStore,
+<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(org.oa4mp.server.admin.migrate.tools.oauth2.MigrateStore,java.io.Writer)">FSMigrater</a></span>&#8203;(<a href="MigrateStore.html" title="class in org.oa4mp.server.admin.myproxy.oauth2.tools.migrate">MigrateStore</a>&nbsp;migrateStore,
           <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/io/Writer.html?is-external=true" title="class or interface in java.io" class="externalLink">Writer</a>&nbsp;echoWriter)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -221,7 +221,7 @@ implements <a href="MigrationConstants.html" title="interface in org.oa4mp.serve
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code>protected boolean</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#doUpkeep(edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConfiguration,org.oa4mp.server.admin.myproxy.oauth2.tools.migrate.MigrationEntry,edu.uiuc.ncsa.security.storage.monitored.Monitored)">doUpkeep</a></span>&#8203;(edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConfiguration&nbsp;upkeepConfiguration,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#doUpkeep(edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConfiguration,org.oa4mp.server.admin.migrate.tools.oauth2.MigrationEntry,edu.uiuc.ncsa.security.storage.monitored.Monitored)">doUpkeep</a></span>&#8203;(edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConfiguration&nbsp;upkeepConfiguration,
         <a href="MigrationEntry.html" title="class in org.oa4mp.server.admin.myproxy.oauth2.tools.migrate">MigrationEntry</a>&nbsp;me,
         edu.uiuc.ncsa.security.storage.monitored.Monitored&nbsp;monitored)</code></th>
 <td class="colLast">
@@ -328,20 +328,20 @@ implements <a href="MigrationConstants.html" title="interface in org.oa4mp.serve
 </tr>
 <tr id="i18" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setImportMessage(org.oa4mp.server.admin.myproxy.oauth2.tools.migrate.MigrationEntry,int)">setImportMessage</a></span>&#8203;(<a href="MigrationEntry.html" title="class in org.oa4mp.server.admin.myproxy.oauth2.tools.migrate">MigrationEntry</a>&nbsp;me,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setImportMessage(org.oa4mp.server.admin.migrate.tools.oauth2.MigrationEntry,int)">setImportMessage</a></span>&#8203;(<a href="MigrationEntry.html" title="class in org.oa4mp.server.admin.myproxy.oauth2.tools.migrate">MigrationEntry</a>&nbsp;me,
                 int&nbsp;code)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i19" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setImportMessage(org.oa4mp.server.admin.myproxy.oauth2.tools.migrate.MigrationEntry,int,java.lang.Throwable)">setImportMessage</a></span>&#8203;(<a href="MigrationEntry.html" title="class in org.oa4mp.server.admin.myproxy.oauth2.tools.migrate">MigrationEntry</a>&nbsp;me,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setImportMessage(org.oa4mp.server.admin.migrate.tools.oauth2.MigrationEntry,int,java.lang.Throwable)">setImportMessage</a></span>&#8203;(<a href="MigrationEntry.html" title="class in org.oa4mp.server.admin.myproxy.oauth2.tools.migrate">MigrationEntry</a>&nbsp;me,
                 int&nbsp;code,
                 <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Throwable.html?is-external=true" title="class or interface in java.lang" class="externalLink">Throwable</a>&nbsp;t)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i20" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setImportMessage(org.oa4mp.server.admin.myproxy.oauth2.tools.migrate.MigrationEntry,java.lang.Throwable)">setImportMessage</a></span>&#8203;(<a href="MigrationEntry.html" title="class in org.oa4mp.server.admin.myproxy.oauth2.tools.migrate">MigrationEntry</a>&nbsp;me,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setImportMessage(org.oa4mp.server.admin.migrate.tools.oauth2.MigrationEntry,java.lang.Throwable)">setImportMessage</a></span>&#8203;(<a href="MigrationEntry.html" title="class in org.oa4mp.server.admin.myproxy.oauth2.tools.migrate">MigrationEntry</a>&nbsp;me,
                 <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Throwable.html?is-external=true" title="class or interface in java.lang" class="externalLink">Throwable</a>&nbsp;t)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -369,7 +369,7 @@ implements <a href="MigrationConstants.html" title="interface in org.oa4mp.serve
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a id="&lt;init&gt;(org.oa4mp.server.admin.myproxy.oauth2.tools.migrate.MigrateStore,java.io.Writer)">
+<a id="&lt;init&gt;(org.oa4mp.server.admin.migrate.tools.oauth2.MigrateStore,java.io.Writer)">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -389,7 +389,7 @@ implements <a href="MigrationConstants.html" title="interface in org.oa4mp.serve
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a id="setImportMessage(org.oa4mp.server.admin.myproxy.oauth2.tools.migrate.MigrationEntry,int,java.lang.Throwable)">
+<a id="setImportMessage(org.oa4mp.server.admin.migrate.tools.oauth2.MigrationEntry,int,java.lang.Throwable)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -400,7 +400,7 @@ implements <a href="MigrationConstants.html" title="interface in org.oa4mp.serve
                              <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Throwable.html?is-external=true" title="class or interface in java.lang" class="externalLink">Throwable</a>&nbsp;t)</pre>
 </li>
 </ul>
-<a id="setImportMessage(org.oa4mp.server.admin.myproxy.oauth2.tools.migrate.MigrationEntry,int)">
+<a id="setImportMessage(org.oa4mp.server.admin.migrate.tools.oauth2.MigrationEntry,int)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -410,7 +410,7 @@ implements <a href="MigrationConstants.html" title="interface in org.oa4mp.serve
                              int&nbsp;code)</pre>
 </li>
 </ul>
-<a id="setImportMessage(org.oa4mp.server.admin.myproxy.oauth2.tools.migrate.MigrationEntry,java.lang.Throwable)">
+<a id="setImportMessage(org.oa4mp.server.admin.migrate.tools.oauth2.MigrationEntry,java.lang.Throwable)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -639,7 +639,7 @@ implements <a href="MigrationConstants.html" title="interface in org.oa4mp.serve
 <pre class="methodSignature">protected&nbsp;boolean&nbsp;approvalCheck&#8203;(<a href="../../../../../../delegation/server/storage/ClientApproval.html" title="class in org.oa4mp.delegation.server.storage">ClientApproval</a>&nbsp;clientApproval)</pre>
 </li>
 </ul>
-<a id="doUpkeep(edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConfiguration,org.oa4mp.server.admin.myproxy.oauth2.tools.migrate.MigrationEntry,edu.uiuc.ncsa.security.storage.monitored.Monitored)">
+<a id="doUpkeep(edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConfiguration,org.oa4mp.server.admin.migrate.tools.oauth2.MigrationEntry,edu.uiuc.ncsa.security.storage.monitored.Monitored)">
 <!--   -->
 </a>
 <ul class="blockList">

@@ -1,8 +1,8 @@
 package org.oa4mp.server.qdl.storage;
 
 import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
-import org.oa4mp.server.admin.myproxy.oauth2.base.StoreArchiver;
-import org.oa4mp.server.admin.myproxy.oauth2.base.OA4MPStoreCommands;
+import org.oa4mp.server.admin.oauth2.base.StoreArchiver;
+import org.oa4mp.server.admin.oauth2.base.OA4MPStoreCommands;
 import org.qdl_lang.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;

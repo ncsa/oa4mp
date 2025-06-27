@@ -11,7 +11,7 @@ import java.util.Map;
 import static org.oa4mp.client.api.ClientEnvironment.CALLBACK_URI_KEY;
 
 /**
- * The OAuth for MyProxy service. Note that the {@link ClientEnvironment} is queried for its properties
+ * The OA4MP service. Note that the {@link ClientEnvironment} is queried for its properties
  * for each call, so that changes on a per request basis will be performed.
  * <p>Created by Jeff Gaynor<br>
  * on May 16, 2011 at  3:27:16 PM

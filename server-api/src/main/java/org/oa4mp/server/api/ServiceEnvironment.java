@@ -1,26 +1,25 @@
 package org.oa4mp.server.api;
 
-import edu.uiuc.ncsa.myproxy.MyProxyServiceFacade;
+import edu.uiuc.ncsa.security.core.Logable;
+import edu.uiuc.ncsa.security.core.Store;
+import edu.uiuc.ncsa.security.servlet.UsernameTransformer;
+import edu.uiuc.ncsa.security.util.mail.MailUtil;
+import org.oa4mp.delegation.common.storage.TransactionStore;
+import org.oa4mp.delegation.common.storage.clients.Client;
+import org.oa4mp.delegation.common.token.TokenForge;
+import org.oa4mp.delegation.server.ServiceTransaction;
+import org.oa4mp.delegation.server.issuers.AGIssuer;
+import org.oa4mp.delegation.server.issuers.ATIssuer;
 import org.oa4mp.delegation.server.issuers.AbstractIssuer;
+import org.oa4mp.delegation.server.issuers.PAIssuer;
+import org.oa4mp.delegation.server.storage.ClientApproval;
+import org.oa4mp.delegation.server.storage.ClientApprovalStore;
+import org.oa4mp.delegation.server.storage.ClientStore;
 import org.oa4mp.server.api.admin.adminClient.AdminClient;
 import org.oa4mp.server.api.admin.adminClient.AdminClientStore;
 import org.oa4mp.server.api.admin.permissions.Permission;
 import org.oa4mp.server.api.admin.permissions.PermissionsStore;
 import org.oa4mp.server.api.storage.servlet.AuthorizationServletConfig;
-import org.oa4mp.delegation.common.storage.clients.Client;
-import org.oa4mp.delegation.common.storage.TransactionStore;
-import org.oa4mp.delegation.common.token.TokenForge;
-import org.oa4mp.delegation.server.ServiceTransaction;
-import org.oa4mp.delegation.server.issuers.AGIssuer;
-import org.oa4mp.delegation.server.issuers.ATIssuer;
-import org.oa4mp.delegation.server.issuers.PAIssuer;
-import org.oa4mp.delegation.server.storage.ClientApproval;
-import org.oa4mp.delegation.server.storage.ClientApprovalStore;
-import org.oa4mp.delegation.server.storage.ClientStore;
-import edu.uiuc.ncsa.security.core.Logable;
-import edu.uiuc.ncsa.security.core.Store;
-import edu.uiuc.ncsa.security.servlet.UsernameTransformer;
-import edu.uiuc.ncsa.security.util.mail.MailUtil;
 
 import java.net.URI;
 import java.security.KeyPair;
@@ -68,7 +67,7 @@ public interface ServiceEnvironment extends Logable {
      * @return
      */
 
-    List<MyProxyServiceFacade> getMyProxyServices();
+ //   List<MyProxyServiceFacade> getMyProxyServices();
 
     /**
      * The address for this server. Since hosts can have any of several aliases, automatic determination from
@@ -88,14 +87,14 @@ public interface ServiceEnvironment extends Logable {
     TokenForge getTokenForge();
 
     /**
-     * The {@link AbstractIssuer} that creates {@link edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant}s.
+     * The {@link AbstractIssuer} that creates {@link org.oa4mp.delegation.common.token.AuthorizationGrant}s.
      *
      * @return
      */
     AGIssuer getAgIssuer();
 
     /**
-     * The {@link AbstractIssuer} that creates {@link edu.uiuc.ncsa.security.delegation.token.AccessToken}s.
+     * The {@link AbstractIssuer} that creates {@link org.oa4mp.delegation.common.token.AccessToken}s.
      *
      * @return
      */
@@ -103,7 +102,7 @@ public interface ServiceEnvironment extends Logable {
     ATIssuer getAtIssuer();
 
     /**
-     * The {@link AbstractIssuer} that creates the {@link edu.uiuc.ncsa.security.delegation.token.ProtectedAsset}s.
+     * The {@link AbstractIssuer} that creates the {@link org.oa4mp.delegation.common.token.ProtectedAsset}s.
      *
      * @return
      */

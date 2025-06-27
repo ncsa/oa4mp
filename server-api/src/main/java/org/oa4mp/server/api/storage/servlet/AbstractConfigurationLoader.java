@@ -1,19 +1,5 @@
 package org.oa4mp.server.api.storage.servlet;
 
-import edu.uiuc.ncsa.myproxy.MyProxyServiceFacade;
-import org.oa4mp.server.api.ClientApprovalProvider;
-import org.oa4mp.server.api.OA4MPConfigTags;
-import org.oa4mp.server.api.OA4MPServiceTransaction;
-import org.oa4mp.server.api.ServiceEnvironmentImpl;
-import org.oa4mp.server.api.admin.permissions.MultiDSPermissionStoreProvider;
-import org.oa4mp.server.api.admin.permissions.PermissionStoreProviders;
-import org.oa4mp.server.api.storage.MultiDSClientApprovalStoreProvider;
-import org.oa4mp.server.api.storage.MultiDSClientStoreProvider;
-import org.oa4mp.server.api.storage.filestore.DSFSClientApprovalStoreProvider;
-import org.oa4mp.server.api.storage.sql.provider.DSSQLClientApprovalStoreProvider;
-import org.oa4mp.server.api.util.AbstractCLIApprover;
-import org.oa4mp.server.api.util.ClientApprovalMemoryStore;
-import org.oa4mp.server.api.util.ClientApproverConverter;
 import edu.uiuc.ncsa.security.core.configuration.Configurations;
 import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
 import edu.uiuc.ncsa.security.core.configuration.provider.TypedProvider;
@@ -21,33 +7,47 @@ import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.IdentifierProvider;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
-import org.oa4mp.delegation.server.storage.ClientApprovalStore;
-import org.oa4mp.delegation.server.storage.ClientStore;
-import org.oa4mp.delegation.common.storage.clients.Client;
-import org.oa4mp.delegation.common.storage.TransactionStore;
-import org.oa4mp.delegation.common.storage.transactions.TransactionMemoryStore;
 import edu.uiuc.ncsa.security.servlet.TrivialUsernameTransformer;
 import edu.uiuc.ncsa.security.servlet.UsernameTransformer;
 import edu.uiuc.ncsa.security.servlet.mail.ServletMailUtilProvider;
 import edu.uiuc.ncsa.security.util.mail.MailUtilProvider;
 import org.apache.commons.configuration.tree.ConfigurationNode;
+import org.oa4mp.delegation.common.servlet.DBConfigLoader;
+import org.oa4mp.delegation.common.storage.TransactionStore;
+import org.oa4mp.delegation.common.storage.clients.Client;
+import org.oa4mp.delegation.common.storage.transactions.TransactionMemoryStore;
+import org.oa4mp.delegation.server.storage.ClientApprovalStore;
+import org.oa4mp.delegation.server.storage.ClientStore;
+import org.oa4mp.server.api.ClientApprovalProvider;
+import org.oa4mp.server.api.OA4MPConfigTags;
+import org.oa4mp.server.api.OA4MPServiceTransaction;
+import org.oa4mp.server.api.ServiceEnvironmentImpl;
+import org.oa4mp.server.api.admin.permissions.MultiDSPermissionStoreProvider;
+import org.oa4mp.server.api.admin.permissions.PermissionStoreProviders;
 import org.oa4mp.server.api.admin.transactions.*;
+import org.oa4mp.server.api.storage.MultiDSClientApprovalStoreProvider;
+import org.oa4mp.server.api.storage.MultiDSClientStoreProvider;
+import org.oa4mp.server.api.storage.filestore.DSFSClientApprovalStoreProvider;
+import org.oa4mp.server.api.storage.sql.provider.DSSQLClientApprovalStoreProvider;
+import org.oa4mp.server.api.util.AbstractCLIApprover;
+import org.oa4mp.server.api.util.ClientApprovalMemoryStore;
+import org.oa4mp.server.api.util.ClientApproverConverter;
 
 import javax.inject.Provider;
 import java.io.File;
 import java.net.URI;
 import java.util.List;
 
+import static edu.uiuc.ncsa.security.core.configuration.Configurations.getFirstAttribute;
 import static org.oa4mp.server.api.util.AbstractCLIApprover.POLLING_DIRECTORY;
 import static org.oa4mp.server.api.util.AbstractCLIApprover.POLLING_INTERVAL;
-import static edu.uiuc.ncsa.security.core.configuration.Configurations.getFirstAttribute;
 
 /**
  * All servers configuration loaders should extend this.
  * <p>Created by Jeff Gaynor<br>
  * on 4/26/12 at  1:18 PM
  */
-public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentImpl> extends MyProxyConfigurationLoader<T> implements ConfigurationLoaderInterface {
+public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentImpl> extends DBConfigLoader<T> implements ConfigurationLoaderInterface {
 
     protected MultiDSClientStoreProvider csp;
     protected MultiDSClientApprovalStoreProvider casp;
@@ -366,7 +366,7 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
     public T createInstance() {
         initialize();
         return (T) new ServiceEnvironmentImpl(loggerProvider.get(),
-                getMyProxyFacadeProvider(),
+              //  getMyProxyFacadeProvider(),
                 getTransactionStoreProvider(),
                 getClientStoreProvider(),
                 getMaxAllowedNewClientRequests(),
@@ -466,12 +466,7 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
             se2.setClientApprovalThread(cat);
         }
 
-        if (se2.isDebugOn()) {
-            info("Debug mode enabled.");
-            for (MyProxyServiceFacade x : se2.getMyProxyServices()) {
-                debug("loaded myproxy configuration for " + x.getFacadeConfiguration().getHostname() + ":" + x.getFacadeConfiguration().getPort());
-            }
-        }
+
 
         return (T) se2;
     }

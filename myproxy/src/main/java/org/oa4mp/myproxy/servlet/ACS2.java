@@ -13,7 +13,6 @@ import org.oa4mp.delegation.server.issuers.PAIssuer;
 import org.oa4mp.delegation.server.request.PARequest;
 import org.oa4mp.delegation.server.request.PAResponse;
 import org.oa4mp.server.api.ServiceConstantKeys;
-import org.oa4mp.server.api.storage.servlet.CRServlet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -26,7 +25,7 @@ import java.util.Map;
  * <p>Created by Jeff Gaynor<br>
  * on 2/7/14 at  1:22 PM
  */
-public abstract class ACS2 extends CRServlet {
+public abstract class ACS2 extends MyProxyServlet {
     protected PAIssuer getPAI() throws IOException {
         return getServiceEnvironment().getPaIssuer();
     }

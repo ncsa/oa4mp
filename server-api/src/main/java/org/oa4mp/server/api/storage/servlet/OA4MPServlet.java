@@ -3,7 +3,6 @@ package org.oa4mp.server.api.storage.servlet;
 import edu.uiuc.ncsa.myproxy.MyProxyConnectable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.cache.Cache;
-import edu.uiuc.ncsa.security.core.cache.CachedObject;
 import edu.uiuc.ncsa.security.core.cache.Cleanup;
 import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
@@ -44,6 +43,7 @@ import static org.oa4mp.server.api.ServiceConstantKeys.CONSUMER_KEY;
  * <p>Created by Jeff Gaynor<br>
  * on May 17, 2011 at  3:46:53 PM
  */
+// Formerly known as MyProxydelegationServlet Super class for all servlets in OA4MP.
 public abstract class OA4MPServlet extends EnvServlet implements TransactionFilter {
     public static MetaDebugUtil createDebugger(BaseClient client) {
         if (client == null) return DebugUtil.getInstance();
@@ -77,17 +77,9 @@ public abstract class OA4MPServlet extends EnvServlet implements TransactionFilt
 
     public static Cleanup<String, BasicTransaction> transactionCleanup;
 
-    public static Cleanup<Identifier, CachedObject> myproxyConnectionCleanup = null;
     public static LastAccessedThread lastAccessedThread = null;
 
-    public static Cache getMyproxyConnectionCache() {
-        if (myproxyConnectionCache == null) {
-            myproxyConnectionCache = new Cache();
-        }
-        return myproxyConnectionCache;
-    }
 
-    public static Cache myproxyConnectionCache;
 
     public static KeyPairPopulationThread kpt;
 
@@ -142,7 +134,6 @@ public abstract class OA4MPServlet extends EnvServlet implements TransactionFilt
     public void destroy() {
         super.destroy();
         shutdownCleanup(transactionCleanup);
-        shutdownCleanup(myproxyConnectionCleanup);
         if (caThread != null) {
             caThread.setStopThread(true);
         }
@@ -285,22 +276,6 @@ public abstract class OA4MPServlet extends EnvServlet implements TransactionFilt
         state.getResponse().setHeader("Cache-Control", "no-store");
     }
 
-
-    protected boolean hasMPConnection(Identifier identifier) {
-        return getMyproxyConnectionCache().containsKey(identifier);
-    }
-
-    protected boolean hasMPConnection(ServiceTransaction transaction) {
-        return hasMPConnection(transaction.getIdentifier());
-    }
-
-    protected MyProxyConnectable getMPConnection(ServiceTransaction transaction) {
-        return getMPConnection(transaction.getIdentifier());
-    }
-
-    protected MyProxyConnectable getMPConnection(Identifier identifier) {
-        return (MyProxyConnectable) getMyproxyConnectionCache().get(identifier).getValue();
-    }
 
     /**
      * Utility to extract all of the parameters from a request. Since the parameters are all

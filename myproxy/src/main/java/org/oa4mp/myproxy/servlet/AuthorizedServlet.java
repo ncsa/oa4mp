@@ -5,7 +5,6 @@ import edu.uiuc.ncsa.security.core.util.DateUtils;
 import org.apache.http.HttpStatus;
 import org.oa4mp.delegation.common.token.AuthorizationGrant;
 import org.oa4mp.delegation.server.ServiceTransaction;
-import org.oa4mp.server.api.storage.servlet.CRServlet;
 import org.oa4mp.server.api.storage.servlet.OA4MPServlet;
 
 import javax.servlet.ServletException;
@@ -22,7 +21,7 @@ import java.io.Writer;
  * <p>Created by Jeff Gaynor<blifetr>
  * on 2/13/14 at  3:24 PM
  */
-public abstract class AuthorizedServlet extends CRServlet {
+public abstract class AuthorizedServlet extends MyProxyServlet {
     public static final String STATUS_KEY = "status";
     public static final String STATUS_OK = "ok";
     public static final String REDIRECT_URL_KEY = "redirect_url";

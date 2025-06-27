@@ -37,6 +37,6 @@ public class OA4MPResponse implements Response {
 
     @Override
     public String toString() {
-        return "MyProxyDSResponse[redirect=" + getRedirect() + ", privateKey " + (getPrivateKey() == null ? "=" : "!") + "= null]";
+        return "OA4MPResponse[redirect=" + getRedirect() + ", privateKey " + (getPrivateKey() == null ? "=" : "!") + "= null]";
     }
 }

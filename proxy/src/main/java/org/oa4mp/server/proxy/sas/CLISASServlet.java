@@ -8,7 +8,7 @@ import edu.uiuc.ncsa.sas.cli.SASCLIDriver;
 import edu.uiuc.ncsa.sas.loader.SASConfigurationLoader;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import org.apache.commons.configuration.tree.ConfigurationNode;
-import org.oa4mp.server.admin.myproxy.oauth2.tools.OA2Commands;
+import org.oa4mp.server.admin.oauth2.tools.OA2Commands;
 import org.oa4mp.server.api.storage.servlet.OA4MPServlet;
 import org.oa4mp.server.loader.oauth2.OA2SE;
 

@@ -119,13 +119,10 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     public static final String UUC_ENABLED = "enabled";
     public static final String UUC_GRACE_PERIOD = "gracePeriod";
     public static final String UUC_INTERVAL = "interval";
-    public static final String UUC_LAST_ACCESSED_BEFORE = "lastAccessedBefore";
-    public static final String UUC_LAST_ACCESSED_AFTER = "lastAccessedAfter";
     public static final String UUC_LAST_ACCESSED_NEVER = "lastAccessedNever";
     public static final String UUC_LIST_ITEM = "clientID";
     public static final String UUC_LIST_REGEX = "regex";
     public static final String UUC_CREATED_AFTER = "createdAfter";
-    public static final String UUC_CREATED_BEFORE = "createdBefore";
     public static final String UUC_ACTION_TAG = "action";
     public static final String UUC_TAG = "unusedClientCleanup";
     public static final String UUC_TEST_MODE_ON = "testModeOn";
@@ -140,7 +137,6 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     public static final String UUC_RULE_UNUSED_GRACE_PERIOD = "gracePeriod";
     public static final String UUC_RULE_UNUSED_TAG = "unused";
     public static final String UUC_RULE_ABANDONED_TAG = "abandoned";
-    public static final String UUC_RULE_ABANDONED_GRACE_PERIOD = "gracePeriod";
 
 
     public static final String RFC7636_REQUIRED_TAG = "rfc7636Required";
@@ -180,7 +176,6 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
     public static boolean CLEANUP_LOCKING_ENABLED_DEFAULT = false; // Don't lock tables by default
     public static boolean CLEANUP_FAIL_ON_ERRORS_DEFAULT = true; // fail on errors
     public static boolean MONITOR_ENABLED_DEFAULT = false; // Don't enabled monitoring by default
-    public static boolean UUC_ENABLED_DEFAULT = false; // Don't just clean up clients
     public static long UUC_INTERVAL_DEFAULT = 6 * 60 * 60 * 1000L; // 6 hours minutes
     public static long UUC_GRACE_PERIOD_DEFAULT = 6 * 60 * 60 * 1000L; // 6 hours minutes
     public static long MONITOR_INTERVAL_DEFAULT = 120 * 60 * 1000L; // 2 hours minutes
@@ -213,7 +208,7 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     getRTLifetime(),
                     getMaxRTLifetime(),
                     getClientApprovalStoreProvider(),
-                    getMyProxyFacadeProvider(),
+                 //   getMyProxyFacadeProvider(),
                     getMailUtilProvider(),
                     getMP(),
                     getAGIProvider(),

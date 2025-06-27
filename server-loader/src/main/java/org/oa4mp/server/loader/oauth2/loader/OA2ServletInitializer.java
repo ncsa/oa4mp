@@ -84,13 +84,13 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
         DebugUtil.setInstance(oa2SE.getDebugger()); // sets global debugger.
         DebugUtil.setPrintTS(oa2SE.isPrintTSInDebug());
         // Let the older myproxy connection clean up use alarms.
-        if (OA4MPServlet.myproxyConnectionCleanup != null) {
+   /*     if (OA4MPServlet.myproxyConnectionCleanup != null) {
             if (oa2SE.hasCleanupAlarms()) {
                 OA4MPServlet.myproxyConnectionCleanup.setAlarms(oa2SE.getCleanupAlarms());
             } else {
                 OA4MPServlet.myproxyConnectionCleanup.setCleanupInterval(oa2SE.getCleanupInterval());
             }
-        }
+        }*/
         if (oa2SE.isMonitorEnabled() && OA4MPServlet.lastAccessedThread == null) {
             // Note that the event listener cannot be in the same thread as the updater since they whole
             // system freezes for every item update. 
@@ -127,17 +127,7 @@ public class OA2ServletInitializer extends OA4MPServletInitializer {
             }
             MultiAuthServlet.upkeepThreadList = upkeepThreads;
         }
-/*        if(oa2SE.getUucConfiguration().enabled && MultiAuthServlet.uucThread == null){
-            UUCThread uucThread = new UUCThread("Unused client cleanup thread",
-                    oa2SE.getMyLogger(),
-                    oa2SE.getClientStore(),
-                    oa2SE.getUucConfiguration());
-             uucThread.setCleanupInterval(oa2SE.getUucConfiguration().interval);
-             uucThread.setAlarms(oa2SE.getUucConfiguration().alarms);
-             uucThread.setStopThread(false);
-            MultiAuthServlet.uucThread = uucThread;
-            uucThread.start();
-        }*/
+
         if (oa2SE.isRefreshTokenEnabled()) {
             OA4MPServlet.transactionCleanup.getRetentionPolicies().clear(); // We need a different set of policies than the original one.
             if (oa2SE.hasCleanupAlarms()) {

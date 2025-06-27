@@ -1,13 +1,8 @@
 package org.oa4mp.server.api.storage.servlet;
 
-import edu.uiuc.ncsa.myproxy.MyProxyConnectable;
-import org.oa4mp.server.api.ServiceEnvironmentImpl;
-import org.oa4mp.server.api.util.AbstractCLIApprover;
-import org.oa4mp.server.api.util.ConnectionCacheRetentionPolicy;
-import org.oa4mp.server.api.util.NewClientNotifier;
-import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
-import edu.uiuc.ncsa.security.core.cache.*;
+import edu.uiuc.ncsa.security.core.cache.LockingCleanup;
+import edu.uiuc.ncsa.security.core.cache.ValidTimestampPolicy;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
@@ -18,13 +13,15 @@ import edu.uiuc.ncsa.security.servlet.Initialization;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.util.mail.MailUtil;
 import edu.uiuc.ncsa.security.util.pkcs.KeyPairPopulationThread;
+import org.oa4mp.server.api.ServiceEnvironmentImpl;
+import org.oa4mp.server.api.util.AbstractCLIApprover;
+import org.oa4mp.server.api.util.NewClientNotifier;
 
 import javax.servlet.ServletException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
-import java.util.List;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -116,9 +113,7 @@ public class OA4MPServletInitializer implements Initialization {
         notifiersSet = true;
     }
 
-    protected void realInit() throws ServletException {
 
-    }
 
     @Override
     public void init() throws ServletException {
@@ -160,49 +155,6 @@ public class OA4MPServletInitializer implements Initialization {
 
         }
 
-        Cleanup<Identifier, CachedObject> myproxyConnectionCleanup = OA4MPServlet.myproxyConnectionCleanup;
-        int i = 0;
-
-        if (!((ServiceEnvironmentImpl) getEnvironment()).getMyProxyServices().isEmpty() &&  myproxyConnectionCleanup == null) {
-            myproxyConnectionCleanup = new Cleanup<Identifier, CachedObject>(logger, "myproxy connection cleanup") {
-                @Override
-                public List<CachedObject> age() {
-                    List<CachedObject> x = super.age();
-                    // by this point is has been removed from the cache. Rest of this
-                    // is just trying to clean up afterwards.
-                    for (CachedObject co : x) {
-                        Object mp = co.getValue();
-                        if (mp instanceof MyProxyConnectable) {
-                            try {
-                                ((MyProxyConnectable) mp).close();
-                            } catch (Throwable t) {
-                                // don't care if it fails, get rid of it.
-                            }
-                        }
-
-                    }
-                    return x;
-                }
-            };
-            OA4MPServlet.myproxyConnectionCleanup = myproxyConnectionCleanup; // set it in the servlet
-            // Set the cleanup interval much higher than the default (1 minute). We don't service
-            // MyProxy requests much anymore, so it can be set a lot lower.
-            OA4MPServlet.myproxyConnectionCleanup.setCleanupInterval(6 * 3600 * 1000L);
-            DebugUtil.trace(this, "setting MyProxy connection cleanup interval to 6 hours.");
-            myproxyConnectionCleanup.setStopThread(false);
-            Cache myproxyConnectionCache = OA4MPServlet.myproxyConnectionCache;
-
-            if (myproxyConnectionCache == null) {
-                myproxyConnectionCache = new Cache();
-                OA4MPServlet.myproxyConnectionCache = myproxyConnectionCache; // set it in the servlet
-            }
-
-            myproxyConnectionCleanup.setMap(myproxyConnectionCache);
-            myproxyConnectionCleanup.addRetentionPolicy(new ConnectionCacheRetentionPolicy(myproxyConnectionCache, env.getTransactionStore()));
-            myproxyConnectionCleanup.start();
-
-            logger.info("Starting myproxy connection cache cleanup thread");
-        }
 
         AbstractCLIApprover.ClientApprovalThread caThread = OA4MPServlet.caThread;
         if (caThread != null && !caThread.isAlive()) {

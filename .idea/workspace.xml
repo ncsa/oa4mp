@@ -11,29 +11,180 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="https://github.com/ncsa/oa4mp/issues/251&#10;https://github.com/ncsa/oa4mp/issues/252">
+    <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="Before moving MyProxy stuff">
+      <change afterPath="$PROJECT_DIR$/myproxy/src/main/java/org/oa4mp/myproxy/servlet/MyProxyServletInitializer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client-api/src/main/java/org/oa4mp/client/api/OA4MPResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-api/src/main/java/org/oa4mp/client/api/OA4MPResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client-api/src/main/java/org/oa4mp/client/api/OA4MPService.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-api/src/main/java/org/oa4mp/client/api/OA4MPService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/client-installer/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client-oauth2/src/main/test/java/edu/uiuc/ncsa/oa4mp/oauth2/client/Client2AssetStoreTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client-oauth2/src/main/test/java/edu/uiuc/ncsa/oa4mp/oauth2/client/Client2TestSuite.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/constant-values.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/constant-values.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/OA2SE.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/myproxy/oa4mp/oauth2/OA2SE.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/myproxy/oa4mp/server/MyProxyFacadeProvider.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/myproxy/oa4mp/server/MyProxyFacadeProvider.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/myproxy/oa4mp/server/MyProxyServiceEnvironment.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/myproxy/oa4mp/server/MyProxyServiceEnvironment.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/myproxy/oa4mp/server/ServiceEnvironmentImpl.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/myproxy/oa4mp/server/ServiceEnvironmentImpl.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/myproxy/oa4mp/server/class-use/MyProxyFacadeProvider.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/myproxy/oa4mp/server/class-use/MyProxyFacadeProvider.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/myproxy/oa4mp/server/class-use/MyProxyServiceEnvironment.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/myproxy/oa4mp/server/class-use/MyProxyServiceEnvironment.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/index-all.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/index-all.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/delegation/common/storage/clients/class-use/BaseClient.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/delegation/common/storage/clients/class-use/BaseClient.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/delegation/server/storage/class-use/ClientStore.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/delegation/server/storage/class-use/ClientStore.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/Banners.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/Banners.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/BaseClientStoreCommands.ApprovalModsConfig.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/BaseClientStoreCommands.ApprovalModsConfig.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/BaseClientStoreCommands.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/BaseClientStoreCommands.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/BaseCommands.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/BaseCommands.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/CLIApprover.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/CLIApprover.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/ClientApprovalStoreCommands.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/ClientApprovalStoreCommands.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/ClientSorter.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/ClientSorter.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/ClientStoreCommands.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/ClientStoreCommands.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/CommandLineClient.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/CommandLineClient.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/CopyCommands.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/CopyCommands.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/CopyExtension.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/CopyExtension.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/CopyTool.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/CopyTool.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/CopyToolVerifier.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/CopyToolVerifier.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/Monitor.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/Monitor.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/OA4MPStoreCommands.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/OA4MPStoreCommands.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/StoreArchiver.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/StoreArchiver.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/class-use/BaseClientStoreCommands.ApprovalModsConfig.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/class-use/BaseClientStoreCommands.ApprovalModsConfig.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/class-use/BaseClientStoreCommands.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/class-use/BaseClientStoreCommands.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/class-use/BaseCommands.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/class-use/BaseCommands.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/class-use/CLIApprover.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/class-use/CLIApprover.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/class-use/ClientApprovalStoreCommands.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/class-use/ClientApprovalStoreCommands.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/class-use/ClientSorter.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/class-use/ClientSorter.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/class-use/ClientStoreCommands.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/class-use/ClientStoreCommands.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/class-use/CommandLineClient.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/class-use/CommandLineClient.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/class-use/CopyCommands.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/class-use/CopyCommands.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/class-use/CopyExtension.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/class-use/CopyExtension.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/class-use/CopyTool.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/class-use/CopyTool.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/class-use/CopyToolVerifier.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/class-use/CopyToolVerifier.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/class-use/Monitor.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/class-use/Monitor.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/class-use/OA4MPStoreCommands.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/class-use/OA4MPStoreCommands.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/class-use/StoreArchiver.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/base/class-use/StoreArchiver.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/class-use/Banners.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/class-use/Banners.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/ConfigLoaderTool.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/ConfigLoaderTool.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/JWKCLI.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/JWKCLI.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/JWKUtilCommands.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/JWKUtilCommands.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2AdminClientCommands.AdminApprovalModsConfig.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2AdminClientCommands.AdminApprovalModsConfig.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2AdminClientCommands.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2AdminClientCommands.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2CLCCommands.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2CLCCommands.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2ClientCommands.OA2ClientApprovalMods.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2ClientCommands.OA2ClientApprovalMods.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2ClientCommands.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2ClientCommands.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2CommandLineClient.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2CommandLineClient.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2Commands.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2Commands.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2CopyTool.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2CopyTool.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2CopyToolVerifier.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2CopyToolVerifier.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2Monitor.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2Monitor.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2PermissionCommands.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2PermissionCommands.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/TokenStoreCommands.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/TokenStoreCommands.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/TransactionStoreCommands.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/TransactionStoreCommands.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/VICommands.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/VICommands.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/ConfigLoaderTool.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/ConfigLoaderTool.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/JWKCLI.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/JWKCLI.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/JWKUtilCommands.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/JWKUtilCommands.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/OA2AdminClientCommands.AdminApprovalModsConfig.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/OA2AdminClientCommands.AdminApprovalModsConfig.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/OA2AdminClientCommands.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/OA2AdminClientCommands.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/OA2CLCCommands.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/OA2CLCCommands.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/OA2ClientCommands.OA2ClientApprovalMods.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/OA2ClientCommands.OA2ClientApprovalMods.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/OA2ClientCommands.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/OA2ClientCommands.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/OA2CommandLineClient.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/OA2CommandLineClient.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/OA2Commands.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/OA2Commands.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/OA2CopyTool.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/OA2CopyTool.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/OA2CopyToolVerifier.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/OA2CopyToolVerifier.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/OA2Monitor.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/OA2Monitor.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/OA2PermissionCommands.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/OA2PermissionCommands.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/TokenStoreCommands.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/TokenStoreCommands.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/TransactionStoreCommands.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/TransactionStoreCommands.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/VICommands.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/class-use/VICommands.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/FSMigrater.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/FSMigrater.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/FSMigrationTool.HelpEntry.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/FSMigrationTool.HelpEntry.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/FSMigrationTool.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/FSMigrationTool.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/MEProvider.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/MEProvider.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/MigrateKeys.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/MigrateKeys.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/MigrateStore.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/MigrateStore.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/MigrateTable.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/MigrateTable.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/MigrationConstants.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/MigrationConstants.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/MigrationEntry.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/MigrationEntry.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/MigrationEntryConverter.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/MigrationEntryConverter.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/class-use/FSMigrater.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/class-use/FSMigrater.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/class-use/FSMigrationTool.HelpEntry.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/class-use/FSMigrationTool.HelpEntry.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/class-use/FSMigrationTool.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/class-use/FSMigrationTool.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/class-use/MEProvider.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/class-use/MEProvider.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/class-use/MigrateKeys.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/class-use/MigrateKeys.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/class-use/MigrateStore.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/class-use/MigrateStore.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/class-use/MigrateTable.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/class-use/MigrateTable.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/class-use/MigrationConstants.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/class-use/MigrationConstants.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/class-use/MigrationEntry.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/class-use/MigrationEntry.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/class-use/MigrationEntryConverter.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/class-use/MigrationEntryConverter.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/serialized-form.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/serialized-form.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/myproxy/src/main/java/org/oa4mp/myproxy/servlet/ACS2.java" beforeDir="false" afterPath="$PROJECT_DIR$/myproxy/src/main/java/org/oa4mp/myproxy/servlet/ACS2.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/myproxy/src/main/java/org/oa4mp/myproxy/servlet/AuthorizedServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/myproxy/src/main/java/org/oa4mp/myproxy/servlet/AuthorizedServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/myproxy/src/main/java/org/oa4mp/myproxy/servlet/OA2CertServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/myproxy/src/main/java/org/oa4mp/myproxy/servlet/OA2CertServlet.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/OA2AuthorizationServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/OA2AuthorizationServer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/ProxyCallbackServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/ProxyCallbackServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/ProxyUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/ProxyUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/sas/CLISASServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/sas/CLISASServlet.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/CLC.java" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/CLC.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/clc/QDLCLC.java" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/clc/QDLCLC.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/storage/QDLStoreAccessor.java" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/storage/QDLStoreAccessor.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rfc8414/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/rfc8414/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/JWKCLI.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/JWKCLI.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/JWKUtilCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/JWKUtilCommands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2CLCCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2CLCCommands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2ClientCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2ClientCommands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2CommandLineClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2CommandLineClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2Commands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2Commands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/TransactionStoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/TransactionStoreCommands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/MyProxyServiceEnvironment.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/MyProxyServiceEnvironment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/OA4MPConfigTags.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/OA4MPConfigTags.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/servlet/MyProxyConfigurationLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/servlet/MyProxyConfigurationLoader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/Banners.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/Banners.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/base/BaseClientStoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/BaseClientStoreCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/base/BaseCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/BaseCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/base/CLIApprover.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/CLIApprover.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/base/ClientApprovalStoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/ClientApprovalStoreCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/base/ClientSorter.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/ClientSorter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/base/ClientStoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/ClientStoreCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/base/CommandLineClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/CommandLineClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/base/CopyCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/CopyCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/base/CopyExtension.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/CopyExtension.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/base/CopyTool.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/CopyTool.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/base/CopyToolVerifier.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/CopyToolVerifier.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/base/Monitor.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/Monitor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/base/OA4MPStoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/OA4MPStoreCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/base/StoreArchiver.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/StoreArchiver.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/ConfigLoaderTool.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/ConfigLoaderTool.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/JWKCLI.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/JWKCLI.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/JWKUtilCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/JWKUtilCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2AdminClientCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2AdminClientCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2CLCCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2CLCCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2ClientCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2ClientCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2CommandLineClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2CommandLineClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2Commands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2Commands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2CopyTool.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2CopyTool.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2CopyToolVerifier.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2CopyToolVerifier.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2Monitor.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2Monitor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2PermissionCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2PermissionCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/TokenStoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/TokenStoreCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/TransactionStoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/TransactionStoreCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/VICommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/VICommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/FSMigrater.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/migrate/FSMigrater.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/FSMigrationTool.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/migrate/FSMigrationTool.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/MEProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/migrate/MEProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/MigrateKeys.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/migrate/MigrateKeys.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/MigrateStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/migrate/MigrateStore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/MigrateTable.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/migrate/MigrateTable.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/MigrationConstants.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/migrate/MigrationConstants.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/MigrationEntry.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/migrate/MigrationEntry.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/MigrationEntryConverter.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/migrate/MigrationEntryConverter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/MyProxyFacadeProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/myproxy/src/main/java/org/oa4mp/myproxy/servlet/MyProxyFacadeProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/MyProxyServiceEnvironment.java" beforeDir="false" afterPath="$PROJECT_DIR$/myproxy/src/main/java/org/oa4mp/myproxy/servlet/MyProxyServiceEnvironment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/ServiceEnvironment.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/ServiceEnvironment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/ServiceEnvironmentImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/ServiceEnvironmentImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/servlet/AbstractAuthorizationServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/servlet/AbstractAuthorizationServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/servlet/AbstractConfigurationLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/servlet/AbstractConfigurationLoader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/servlet/AbstractVerifierServlet.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/servlet/CRServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/myproxy/src/main/java/org/oa4mp/myproxy/servlet/MyProxyServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/servlet/MyProxyConfigurationLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/myproxy/src/main/java/org/oa4mp/myproxy/servlet/MyProxyConfigurationLoader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/servlet/OA4MPServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/servlet/OA4MPServlet.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/servlet/OA4MPServletInitializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/servlet/OA4MPServletInitializer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-installer/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-installer/src/main/resources/installer/cfg.xml" beforeDir="false" afterPath="$PROJECT_DIR$/server-installer/src/main/resources/installer/cfg.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-installer/src/main/resources/oa4mp/success.txt" beforeDir="false" afterPath="$PROJECT_DIR$/server-installer/src/main/resources/oa4mp/success.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/util/SigningCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/util/SigningCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/OA2SE.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/OA2SE.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/loader/OA2ConfigurationLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/loader/OA2ConfigurationLoader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/loader/OA2ServletInitializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/loader/OA2ServletInitializer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-test/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/local/derby.log" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/local/derby.log" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,8 +204,8 @@
       <list>
         <option value="Interface" />
         <option value="package-info" />
-        <option value="Class" />
         <option value="HTML File" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -1138,15 +1289,7 @@
       <workItem from="1747997700408" duration="12968000" />
       <workItem from="1748786031746" duration="4184000" />
       <workItem from="1748896211549" duration="136633000" />
-      <workItem from="1750287152582" duration="99406000" />
-    </task>
-    <task id="LOCAL-00043" summary="https://github.com/ncsa/oa4mp/issues/205">
-      <option name="closed" value="true" />
-      <created>1726164149400</created>
-      <option name="number" value="00043" />
-      <option name="presentableId" value="LOCAL-00043" />
-      <option name="project" value="LOCAL" />
-      <updated>1726164149401</updated>
+      <workItem from="1750287152582" duration="105265000" />
     </task>
     <task id="LOCAL-00044" summary="Updated package names for website">
       <option name="closed" value="true" />
@@ -1532,7 +1675,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750859773870</updated>
     </task>
-    <option name="localTasksCounter" value="92" />
+    <task id="LOCAL-00092" summary="Before moving MyProxy stuff">
+      <option name="closed" value="true" />
+      <created>1750970119855</created>
+      <option name="number" value="00092" />
+      <option name="presentableId" value="LOCAL-00092" />
+      <option name="project" value="LOCAL" />
+      <updated>1750970119855</updated>
+    </task>
+    <option name="localTasksCounter" value="93" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1554,7 +1705,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
-    <MESSAGE value="Playing catchup to 6.0.2" />
     <MESSAGE value="Missing file" />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/228 Improve error messages from QDL modules so scripts give more detailed messages." />
     <MESSAGE value="Rebuild of website, fixed a few issues with PDFs, added index.html for https://jira.ncsa.illinois.edu/browse/CIL-2143 and https://github.com/ncsa/oa4mp/issues/229" />
@@ -1579,7 +1729,8 @@
     <MESSAGE value="Before removing functors" />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/250 Last vestiges of the Verifier including the tests" />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/251&#10;https://github.com/ncsa/oa4mp/issues/252" />
-    <option name="LAST_COMMIT_MESSAGE" value="https://github.com/ncsa/oa4mp/issues/251&#10;https://github.com/ncsa/oa4mp/issues/252" />
+    <MESSAGE value="Before moving MyProxy stuff" />
+    <option name="LAST_COMMIT_MESSAGE" value="Before moving MyProxy stuff" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="GROUP_MULTIFILE_MERGE_BY_DIRECTORY" value="true" />
   </component>
@@ -1627,7 +1778,7 @@
           <option name="timeStamp" value="125" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2ClientCommands.java</url>
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2ClientCommands.java</url>
           <line>1025</line>
           <option name="timeStamp" value="132" />
         </line-breakpoint>
@@ -1707,7 +1858,7 @@
           <option name="timeStamp" value="344" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/migrate/MigrationEntryConverter.java</url>
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/migrate/MigrationEntryConverter.java</url>
           <line>39</line>
           <option name="timeStamp" value="402" />
         </line-breakpoint>
@@ -1742,7 +1893,7 @@
           <option name="timeStamp" value="463" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/JWKUtilCommands.java</url>
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/JWKUtilCommands.java</url>
           <line>247</line>
           <option name="timeStamp" value="539" />
         </line-breakpoint>
@@ -1817,7 +1968,7 @@
           <option name="timeStamp" value="573" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/JWKUtilCommands.java</url>
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/JWKUtilCommands.java</url>
           <line>289</line>
           <option name="timeStamp" value="581" />
         </line-breakpoint>
@@ -1932,7 +2083,7 @@
           <option name="timeStamp" value="777" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2CLCCommands.java</url>
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2CLCCommands.java</url>
           <line>1169</line>
           <option name="timeStamp" value="801" />
         </line-breakpoint>
@@ -1962,7 +2113,7 @@
           <option name="timeStamp" value="855" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2Commands.java</url>
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2Commands.java</url>
           <line>110</line>
           <option name="timeStamp" value="875" />
         </line-breakpoint>
@@ -1997,22 +2148,22 @@
           <option name="timeStamp" value="963" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2ClientCommands.java</url>
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2ClientCommands.java</url>
           <line>595</line>
           <option name="timeStamp" value="965" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2ClientCommands.java</url>
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2ClientCommands.java</url>
           <line>596</line>
           <option name="timeStamp" value="966" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2ClientCommands.java</url>
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2ClientCommands.java</url>
           <line>1064</line>
           <option name="timeStamp" value="967" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2ClientCommands.java</url>
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2ClientCommands.java</url>
           <line>1069</line>
           <option name="timeStamp" value="970" />
         </line-breakpoint>
@@ -2022,17 +2173,17 @@
           <option name="timeStamp" value="974" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2AdminClientCommands.java</url>
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2AdminClientCommands.java</url>
           <line>251</line>
           <option name="timeStamp" value="981" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2AdminClientCommands.java</url>
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2AdminClientCommands.java</url>
           <line>362</line>
           <option name="timeStamp" value="983" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/base/BaseClientStoreCommands.java</url>
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/BaseClientStoreCommands.java</url>
           <line>606</line>
           <option name="timeStamp" value="987" />
         </line-breakpoint>
@@ -2062,17 +2213,17 @@
           <option name="timeStamp" value="1005" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/VICommands.java</url>
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/VICommands.java</url>
           <line>353</line>
           <option name="timeStamp" value="1007" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/VICommands.java</url>
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/VICommands.java</url>
           <line>327</line>
           <option name="timeStamp" value="1008" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/VICommands.java</url>
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/VICommands.java</url>
           <line>322</line>
           <option name="timeStamp" value="1009" />
         </line-breakpoint>
@@ -2082,22 +2233,22 @@
           <option name="timeStamp" value="1010" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2ClientCommands.java</url>
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2ClientCommands.java</url>
           <line>113</line>
           <option name="timeStamp" value="1021" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/base/OA4MPStoreCommands.java</url>
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/OA4MPStoreCommands.java</url>
           <line>193</line>
           <option name="timeStamp" value="1023" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2ClientCommands.java</url>
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2ClientCommands.java</url>
           <line>623</line>
           <option name="timeStamp" value="1029" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2ClientCommands.java</url>
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2ClientCommands.java</url>
           <line>640</line>
           <option name="timeStamp" value="1032" />
         </line-breakpoint>
@@ -2107,7 +2258,7 @@
           <option name="timeStamp" value="1049" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/base/OA4MPStoreCommands.java</url>
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/OA4MPStoreCommands.java</url>
           <line>184</line>
           <option name="timeStamp" value="1056" />
         </line-breakpoint>
@@ -2120,7 +2271,7 @@
           <option name="timeStamp" value="1068" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2AdminClientCommands.java</url>
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2AdminClientCommands.java</url>
           <line>203</line>
           <option name="timeStamp" value="1076" />
         </line-breakpoint>
@@ -2160,7 +2311,7 @@
           <option name="timeStamp" value="1151" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2CLCCommands.java</url>
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2CLCCommands.java</url>
           <line>2263</line>
           <option name="timeStamp" value="1157" />
         </line-breakpoint>
@@ -2211,12 +2362,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/servlet/AbstractAuthorizationServlet.java</url>
-          <line>213</line>
+          <line>212</line>
           <option name="timeStamp" value="1205" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/OA2AuthorizationServer.java</url>
-          <line>93</line>
+          <line>87</line>
           <option name="timeStamp" value="1209" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2250,17 +2401,17 @@
           <option name="timeStamp" value="1235" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/JWKCLI.java</url>
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/JWKCLI.java</url>
           <line>178</line>
           <option name="timeStamp" value="1236" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2Commands.java</url>
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2Commands.java</url>
           <line>47</line>
           <option name="timeStamp" value="1242" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2Commands.java</url>
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2Commands.java</url>
           <line>63</line>
           <option name="timeStamp" value="1243" />
         </line-breakpoint>
@@ -2300,27 +2451,27 @@
           <option name="timeStamp" value="1269" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2CommandLineClient.java</url>
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2CommandLineClient.java</url>
           <line>126</line>
           <option name="timeStamp" value="1271" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2CommandLineClient.java</url>
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2CommandLineClient.java</url>
           <line>130</line>
           <option name="timeStamp" value="1272" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2AdminClientCommands.java</url>
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2AdminClientCommands.java</url>
           <line>447</line>
           <option name="timeStamp" value="1278" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2AdminClientCommands.java</url>
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2AdminClientCommands.java</url>
           <line>434</line>
           <option name="timeStamp" value="1281" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/myproxy/oauth2/tools/OA2AdminClientCommands.java</url>
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2AdminClientCommands.java</url>
           <line>495</line>
           <option name="timeStamp" value="1282" />
         </line-breakpoint>
@@ -2355,24 +2506,14 @@
           <option name="timeStamp" value="1290" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/servlet/MyProxyConfigurationLoader.java</url>
+          <url>file://$PROJECT_DIR$/myproxy/src/main/java/org/oa4mp/myproxy/servlet/MyProxyConfigurationLoader.java</url>
           <line>31</line>
           <option name="timeStamp" value="1291" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/MyProxyServiceEnvironment.java</url>
-          <line>38</line>
-          <option name="timeStamp" value="1292" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/servlet/OA4MPServletInitializer.java</url>
-          <line>186</line>
-          <option name="timeStamp" value="1293" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/servlet/OA4MPServletInitializer.java</url>
-          <line>165</line>
-          <option name="timeStamp" value="1294" />
+          <url>file://$PROJECT_DIR$/myproxy/src/main/java/org/oa4mp/myproxy/servlet/MyProxyFacadeProvider.java</url>
+          <line>25</line>
+          <option name="timeStamp" value="1295" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-method">
           <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/storage/transactions/OA2MTStore.java</url>

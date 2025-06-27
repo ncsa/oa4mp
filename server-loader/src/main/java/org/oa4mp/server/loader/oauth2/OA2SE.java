@@ -1,29 +1,5 @@
 package org.oa4mp.server.loader.oauth2;
 
-import org.oa4mp.server.loader.oauth2.claims.BasicClaimsSourceImpl;
-import org.oa4mp.server.loader.oauth2.cm.CMConfigs;
-import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
-import org.oa4mp.server.loader.oauth2.servlet.RFC8628ServletConfig;
-import org.oa4mp.server.loader.oauth2.storage.tx.TXStore;
-import org.oa4mp.server.loader.oauth2.storage.vi.VIStore;
-import org.oa4mp.server.loader.oauth2.storage.vi.VirtualIssuer;
-import org.oa4mp.server.loader.qdl.scripting.OA2QDLEnvironment;
-import org.oa4mp.server.api.MyProxyFacadeProvider;
-import org.oa4mp.server.api.ServiceEnvironmentImpl;
-import org.oa4mp.server.api.admin.adminClient.AdminClient;
-import org.oa4mp.server.api.admin.adminClient.AdminClientStore;
-import org.oa4mp.server.api.admin.permissions.PermissionsStore;
-import org.oa4mp.server.api.storage.servlet.AuthorizationServletConfig;
-import org.oa4mp.delegation.common.storage.TransactionStore;
-import org.oa4mp.delegation.common.token.TokenForge;
-import org.oa4mp.delegation.server.OA2Scopes;
-import org.oa4mp.delegation.server.server.claims.ClaimSource;
-import org.oa4mp.delegation.server.server.config.LDAPConfiguration;
-import org.oa4mp.delegation.server.issuers.AGIssuer;
-import org.oa4mp.delegation.server.issuers.ATIssuer;
-import org.oa4mp.delegation.server.issuers.PAIssuer;
-import org.oa4mp.delegation.server.storage.ClientApprovalStore;
-import org.oa4mp.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
@@ -37,6 +13,29 @@ import edu.uiuc.ncsa.security.util.json.JSONEntry;
 import edu.uiuc.ncsa.security.util.json.JSONStore;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import edu.uiuc.ncsa.security.util.mail.MailUtilProvider;
+import org.oa4mp.delegation.common.storage.TransactionStore;
+import org.oa4mp.delegation.common.token.TokenForge;
+import org.oa4mp.delegation.server.OA2Scopes;
+import org.oa4mp.delegation.server.issuers.AGIssuer;
+import org.oa4mp.delegation.server.issuers.ATIssuer;
+import org.oa4mp.delegation.server.issuers.PAIssuer;
+import org.oa4mp.delegation.server.server.claims.ClaimSource;
+import org.oa4mp.delegation.server.server.config.LDAPConfiguration;
+import org.oa4mp.delegation.server.storage.ClientApprovalStore;
+import org.oa4mp.delegation.server.storage.ClientStore;
+import org.oa4mp.server.api.ServiceEnvironmentImpl;
+import org.oa4mp.server.api.admin.adminClient.AdminClient;
+import org.oa4mp.server.api.admin.adminClient.AdminClientStore;
+import org.oa4mp.server.api.admin.permissions.PermissionsStore;
+import org.oa4mp.server.api.storage.servlet.AuthorizationServletConfig;
+import org.oa4mp.server.loader.oauth2.claims.BasicClaimsSourceImpl;
+import org.oa4mp.server.loader.oauth2.cm.CMConfigs;
+import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
+import org.oa4mp.server.loader.oauth2.servlet.RFC8628ServletConfig;
+import org.oa4mp.server.loader.oauth2.storage.tx.TXStore;
+import org.oa4mp.server.loader.oauth2.storage.vi.VIStore;
+import org.oa4mp.server.loader.oauth2.storage.vi.VirtualIssuer;
+import org.oa4mp.server.loader.qdl.scripting.OA2QDLEnvironment;
 
 import javax.inject.Provider;
 import java.time.LocalTime;
@@ -67,7 +66,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  long rtLifetime,
                  long maxRTLifetime,
                  Provider<ClientApprovalStore> casp,
-                 List<MyProxyFacadeProvider> mfp,
+          //       List<MyProxyFacadeProvider> mfp,
                  MailUtilProvider mup,
                  MessagesProvider messagesProvider,
                  Provider<AGIssuer> agip,
@@ -115,7 +114,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  boolean allowPromptNone) {
 
         super(logger,
-                mfp,
+           //     mfp,
                 tsp,
                 csp,
                 maxAllowedNewClientRequests,
@@ -192,7 +191,6 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.monitorInterval = monitorInterval;
         this.monitorAlarms = monitorAlarms;
         this.monitorEnabled = isMonitorEnabled;
-//        this.uucConfiguration = uucConfiguration;
         this.cleanupFailOnErrors = cleanupFailOnErrors;
     }
 
@@ -201,14 +199,6 @@ public class OA2SE extends ServiceEnvironmentImpl {
     }
 
     boolean cleanupFailOnErrors;
-
-/*
-    public UUCConfiguration getUucConfiguration() {
-        return uucConfiguration;
-    }
-
-    UUCConfiguration uucConfiguration;
-*/
 
     public boolean isMonitorEnabled() {
         return monitorEnabled;

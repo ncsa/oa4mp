@@ -18,7 +18,6 @@ import org.oa4mp.delegation.server.*;
 import org.oa4mp.delegation.server.jwt.MyOtherJWTUtil2;
 import org.oa4mp.delegation.server.request.IssuerResponse;
 import org.oa4mp.delegation.server.server.PAIResponse2;
-import org.oa4mp.server.api.storage.servlet.AbstractAuthorizationServlet.MyMyProxyLogon;
 import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.servlet.OA2HeaderUtils;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;

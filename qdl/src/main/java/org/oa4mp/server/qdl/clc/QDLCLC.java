@@ -1,7 +1,7 @@
 package org.oa4mp.server.qdl.clc;
 
-import org.oa4mp.server.admin.myproxy.oauth2.tools.ConfigLoaderTool;
-import org.oa4mp.server.admin.myproxy.oauth2.tools.OA2CommandLineClient;
+import org.oa4mp.server.admin.oauth2.tools.ConfigLoaderTool;
+import org.oa4mp.server.admin.oauth2.tools.OA2CommandLineClient;
 import org.oa4mp.client.loader.OA2ClientEnvironment;
 import org.oa4mp.server.qdl.CLC;
 import org.qdl_lang.parsing.IniParserDriver;

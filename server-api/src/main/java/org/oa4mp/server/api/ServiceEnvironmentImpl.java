@@ -1,5 +1,6 @@
 package org.oa4mp.server.api;
 
+import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import org.oa4mp.server.api.admin.adminClient.AdminClient;
 import org.oa4mp.server.api.admin.adminClient.AdminClientStore;
 import org.oa4mp.server.api.admin.permissions.Permission;
@@ -46,7 +47,7 @@ import static org.oa4mp.server.api.storage.servlet.AbstractAuthorizationServlet.
  * <p>Created by Jeff Gaynor<br>
  * on 1/9/12 at  4:08 PM
  */
-public class ServiceEnvironmentImpl extends MyProxyServiceEnvironment implements ServiceEnvironment {
+public class ServiceEnvironmentImpl extends AbstractEnvironment implements ServiceEnvironment {
 
     public KeyPairQueue getKeyPairQueue() {
         return kpq;
@@ -142,7 +143,7 @@ public class ServiceEnvironmentImpl extends MyProxyServiceEnvironment implements
 
 
     public ServiceEnvironmentImpl(MyLoggingFacade logger,
-                                  List<MyProxyFacadeProvider> mfp,
+                              //    List<MyProxyFacadeProvider> mfp,
                                   Provider<TransactionStore> tsp,
                                   Provider<ClientStore> csp,
                                   int maxAllowedNewClientRequests,
@@ -158,7 +159,8 @@ public class ServiceEnvironmentImpl extends MyProxyServiceEnvironment implements
                                   UsernameTransformer usernameTransformer,
                                   boolean isPingable,
                                   Provider<PermissionsStore> psp) {
-        super(logger, mfp, constants);
+        //super(logger, mfp, constants);
+        super(logger, constants);
         this.casp = casp;
         this.csp = csp;
         this.tsp = tsp;

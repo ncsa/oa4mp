@@ -1,6 +1,5 @@
 package org.oa4mp.server.api.storage.servlet;
 
-import edu.uiuc.ncsa.myproxy.MyProxyLogon;
 import edu.uiuc.ncsa.myproxy.NoUsableMyProxyServerFoundException;
 import edu.uiuc.ncsa.security.core.exceptions.ConnectionException;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
@@ -35,7 +34,7 @@ import static org.oa4mp.server.api.ServiceConstantKeys.TOKEN_KEY;
  * <p>Created by Jeff Gaynor<br>
  * on 1/14/14 at  11:50 AM
  */
-public abstract class AbstractAuthorizationServlet extends CRServlet implements Presentable {
+public abstract class AbstractAuthorizationServlet extends OA4MPServlet implements Presentable {
 
     /**
      * This class is needed to pass information between servlets, where one servlet
@@ -472,17 +471,5 @@ public abstract class AbstractAuthorizationServlet extends CRServlet implements 
         }
     }
 
-    public static class MyMyProxyLogon extends MyProxyLogon {
 
-        public String getPassphrase() {
-            return passphrase;
-        }
-
-        @Override
-        public String toString() {
-            return getClass().getSimpleName() + "[host=" + getHost() + ", port=" + getPort() + ", for username=" + getUsername() + "]";
-        }
-    }
-
-    //abstract protected void setupMPConnection(ServiceTransaction trans, String username, String password) throws GeneralSecurityException;
 }
