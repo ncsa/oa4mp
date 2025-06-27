@@ -82,9 +82,9 @@
         <module>client-loader</module>
         <module>client-oauth2</module>
         <module>server-admin</module>
-        <module>client-webapp</module>
+    <!--    <module>client-webapp</module> -->
         <module>client-test</module>
-        <module>oa4mp-webapp</module>
+    <!--    <module>oa4mp-webapp</module> -->
         <module>proxy</module>
         <module>website</module>
         <module>server-test</module>

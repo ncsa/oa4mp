@@ -18,7 +18,7 @@ import java.io.File;
  * <p>Created by Jeff Gaynor<br>
  * on 6/5/13 at  2:40 PM
  */
-public class OA2ClientBootstrapper extends Bootstrapper /*AbstractClientBootstrapper*/{
+public class OA2ClientBootstrapper extends Bootstrapper {
     public static final String OA2_CLIENT_CONFIG_FILE_KEY= "oa4mp:oauth2.client.config.file";
     public static final String OA2_CLIENT_CONFIG_NAME_KEY= "oa4mp:oauth2.client.config.name";
     public static final String DEFAULT_CONFIG_FILE_NAME = "client.xml";

@@ -22,7 +22,7 @@ import java.sql.SQLException;
  * <p>Created by Jeff Gaynor<br>
  * on 4/15/14 at  12:31 PM
  */
-public class OA2ClientServletInitializer implements Initialization/*extends ClientServletInitializer*/ {
+public class OA2ClientServletInitializer implements Initialization{
     protected ExceptionHandler exceptionHandler;
 
 
