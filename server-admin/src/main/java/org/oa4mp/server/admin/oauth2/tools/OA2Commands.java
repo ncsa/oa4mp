@@ -139,7 +139,14 @@ protected static void newMain(String[] args) {
         OA2Commands oa2Commands = new OA2Commands(null);
         CLIDriver cli = new CLIDriver(oa2Commands); // actually run the driver that parses commands and passes them along
         inputLine = cli.bootstrap(inputLine);
-        oa2Commands.bootstrap(inputLine); // read the command line options and such to set the state
+        try {
+            oa2Commands.bootstrap(inputLine); // read the command line options and such to set the state
+        }catch(Throwable t){
+            if(cli.isVerbose()){
+                t.printStackTrace();
+            }
+            oa2Commands.say("Warning: could not load configuration:" + t.getMessage());
+        }
         cli.start();
     } catch (Throwable t) {
         t.printStackTrace();

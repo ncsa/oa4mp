@@ -38,6 +38,7 @@ block[ // set of basic verifications to run repeatedly.
   checks#lifetime(server_defaults.'id_token_lifetime', claims.);
   checks#claims(idt_expected.,claims.);
 ];
+
 at_expected.:={'iss':server_defaults.'at_issuer',
                'sub':params.'sub',
                'scopes':['read:/home/pilbeam', 'execute', 'write:/public/pilbeam'],
@@ -49,15 +50,20 @@ at_asserted.:= tokens.'access_token'.'jwt';
 
 rt_asserted.:= tokens.'refresh_token';
     claims. := clc#claims();
+
 verify();
+
 // Refresh
 tokens. := clc#refresh();
+
 at_asserted.:= tokens.'access_token'.'jwt';
 rt_asserted.:= tokens.'refresh_token';
 // note that the request attempted to upscope, so nothing should be returned
+
 remove(at_expected.'scopes');
 claims. := clc#claims();
 verify();
+
 // time to get the refresh and exchange tokens, downscoping.
 at_expected.'scopes':=['read:/home/pilbeam/woof', 'execute', 'write:/public/pilbeam/blarf/fnord'];
 at_asserted. := clc#exchange('-at','-subject','rt').'access_token'.'jwt';

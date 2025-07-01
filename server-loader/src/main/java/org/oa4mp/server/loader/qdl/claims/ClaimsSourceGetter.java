@@ -234,7 +234,7 @@ public class ClaimsSourceGetter implements QDLFunction, CSConstants {
                     }
                     QDLStem st1 = new QDLStem();
                     st1.setQDLList(sl);
-                    put(out,key + STEM_INDEX_MARKER, st1);
+                    put(out,key, st1);
                 } else {
                     put(out,key, obj.toString());
                 }

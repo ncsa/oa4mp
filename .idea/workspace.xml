@@ -2,27 +2,37 @@
 <project version="4">
   <component name="ArtifactsWorkspaceSettings">
     <artifacts-to-build>
-      <artifact name="myproxy:war" />
+      <artifact name="client-oauth2:war" />
+      <artifact name="oa4mp-server-oauth2:war" />
+      <artifact name="rfc8414:war" />
     </artifacts-to-build>
   </component>
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="Getting webapp to actually deploy witht he right dependencies, part 2 of &#10;https://jira.ncsa.illinois.edu/browse/CIL-2249&#10;https://github.com/ncsa/oa4mp/issues/254">
+    <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="Removing unused webapp modules, part 3 of &#10;https://jira.ncsa.illinois.edu/browse/CIL-2249&#10;https://github.com/ncsa/oa4mp/issues/254">
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-api/src/main/java/org/oa4mp/client/api/loader/AbstractClientBootstrapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-api/src/main/java/org/oa4mp/client/api/loader/ClientServletInitializer.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/client-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/client-installer/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-loader/src/main/java/org/oa4mp/client/loader/OA2ClientBootstrapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-loader/src/main/java/org/oa4mp/client/loader/OA2ClientBootstrapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-loader/src/main/java/org/oa4mp/client/loader/OA2ClientServletInitializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-loader/src/main/java/org/oa4mp/client/loader/OA2ClientServletInitializer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-test/src/test/java/org/oa4mp/client/test/ClientParameterTest.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/storage/AdminClientStemMC.java" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/storage/AdminClientStemMC.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rfc8414/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/rfc8414/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2CommandLineClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2CommandLineClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2Commands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2Commands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/fnal/new/at.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/fnal/new/at.qdl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/fnal/new/get_user.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/fnal/new/get_user.qdl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/scripts/clc" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/scripts/clc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/scripts/cli" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/scripts/cli" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/scripts/installer/clc" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/scripts/installer/clc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/scripts/installer/cli" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/scripts/installer/cli" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-installer/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/OA2SE.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/OA2SE.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/claims/ClaimsSourceGetter.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/claims/ClaimsSourceGetter.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-test/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/auto/tests/oidc-scitokens-template.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/auto/tests/oidc-scitokens-template.qdl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -113,12 +123,12 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Application.CLC.executor": "Run",
-    "Application.CLI.executor": "Debug",
+    "Application.CLI.executor": "Run",
     "Application.JWKCLI.executor": "Run",
     "Application.OA4MPClientInstaller.executor": "Run",
     "Application.OA4MPServerInstaller.executor": "Run",
     "Application.QDL CLC.executor": "Debug",
-    "Application.QDL.executor": "Run",
+    "Application.QDL.executor": "Debug",
     "Application.QDLConfigLoader.executor": "Debug",
     "Application.SAS CLI.executor": "Debug",
     "Application.org.oa4mp.server.installer.OA4MPServerInstaller.executor": "Run",
@@ -136,7 +146,7 @@
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "Tomcat Server.DEV OA4MP.executor": "Run",
     "Tomcat Server.MyProxy.executor": "Run",
-    "Tomcat Server.OA4MP server.executor": "Debug",
+    "Tomcat Server.OA4MP server.executor": "Run",
     "WebServerToolWindowFactoryState": "false",
     "git-widget-placeholder": "master",
     "jdk.selected.JAVA_MODULE": "11 (2)",
@@ -187,7 +197,7 @@
       <recent name="edu.uiuc.ncsa.oa4mp.delegation.server.storage.upkeep" />
     </key>
   </component>
-  <component name="RunManager" selected="Tomcat Server.MyProxy">
+  <component name="RunManager" selected="Application.CLI">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="WIDTH" value="400" />
       <option name="HEIGHT" value="300" />
@@ -271,7 +281,7 @@
     <configuration name="CLI" type="Application" factoryName="Application">
       <option name="ALTERNATIVE_JRE_PATH" value="11 (2)" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
-      <option name="MAIN_CLASS_NAME" value="org.oa4mp.server.admin.myproxy.oauth2.tools.OA2Commands" />
+      <option name="MAIN_CLASS_NAME" value="org.oa4mp.server.admin.oauth2.tools.OA2Commands" />
       <module name="server-admin" />
       <option name="PROGRAM_PARAMETERS" value="-cfg $PROJECT_DIR$/../../csd/config/servers.xml -name localhost:oa4mp.oa2.mariadb " />
       <method v="2">
@@ -1217,15 +1227,7 @@
       <workItem from="1747997700408" duration="12968000" />
       <workItem from="1748786031746" duration="4184000" />
       <workItem from="1748896211549" duration="136633000" />
-      <workItem from="1750287152582" duration="114861000" />
-    </task>
-    <task id="LOCAL-00046" summary="Small tweaks (documentation) and fix https://github.com/ncsa/oa4mp/issues/207">
-      <option name="closed" value="true" />
-      <created>1726922097470</created>
-      <option name="number" value="00046" />
-      <option name="presentableId" value="LOCAL-00046" />
-      <option name="project" value="LOCAL" />
-      <updated>1726922097470</updated>
+      <workItem from="1750287152582" duration="148286000" />
     </task>
     <task id="LOCAL-00047" summary="Javadoc after package rename.">
       <option name="closed" value="true" />
@@ -1611,7 +1613,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751030952105</updated>
     </task>
-    <option name="localTasksCounter" value="95" />
+    <task id="LOCAL-00095" summary="Removing unused webapp modules, part 3 of &#10;https://jira.ncsa.illinois.edu/browse/CIL-2249&#10;https://github.com/ncsa/oa4mp/issues/254">
+      <option name="closed" value="true" />
+      <created>1751050119628</created>
+      <option name="number" value="00095" />
+      <option name="presentableId" value="LOCAL-00095" />
+      <option name="project" value="LOCAL" />
+      <updated>1751050119628</updated>
+    </task>
+    <option name="localTasksCounter" value="96" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1633,7 +1643,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
-    <MESSAGE value="Rebuild of website, fixed a few issues with PDFs, added index.html for https://jira.ncsa.illinois.edu/browse/CIL-2143 and https://github.com/ncsa/oa4mp/issues/229" />
     <MESSAGE value="Official support for RFC 8707: https://www.rfc-editor.org/rfc/rfc8707&#10;&#10;We accept this at all points of the flow already. What the RFC outlines is, in effect, that the server should implement policies based on the resources server. Since OA4MP is not tied to any resource server, this is normally done on a per client basis as part of the policy for that client." />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/234&#10;https://github.com/ncsa/oa4mp/issues/236&#10;(https://github.com/ncsa/oa4mp/pull/237)&#10;https://github.com/ncsa/oa4mp/issues/238" />
     <MESSAGE value=" https://github.com/ncsa/oa4mp/issues/243&#10; side effect of https://github.com/ncsa/security-lib/issues/45" />
@@ -1658,7 +1667,8 @@
     <MESSAGE value="Before moving MyProxy stuff" />
     <MESSAGE value="https://jira.ncsa.illinois.edu/browse/CIL-2249&#10;https://github.com/ncsa/oa4mp/issues/254&#10; Isolate old MyProxy code into its own Maven module. In the future, OA4MP instances that need MyProxy can just use that module." />
     <MESSAGE value="Getting webapp to actually deploy witht he right dependencies, part 2 of &#10;https://jira.ncsa.illinois.edu/browse/CIL-2249&#10;https://github.com/ncsa/oa4mp/issues/254" />
-    <option name="LAST_COMMIT_MESSAGE" value="Getting webapp to actually deploy witht he right dependencies, part 2 of &#10;https://jira.ncsa.illinois.edu/browse/CIL-2249&#10;https://github.com/ncsa/oa4mp/issues/254" />
+    <MESSAGE value="Removing unused webapp modules, part 3 of &#10;https://jira.ncsa.illinois.edu/browse/CIL-2249&#10;https://github.com/ncsa/oa4mp/issues/254" />
+    <option name="LAST_COMMIT_MESSAGE" value="Removing unused webapp modules, part 3 of &#10;https://jira.ncsa.illinois.edu/browse/CIL-2249&#10;https://github.com/ncsa/oa4mp/issues/254" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="GROUP_MULTIFILE_MERGE_BY_DIRECTORY" value="true" />
   </component>
@@ -2314,19 +2324,9 @@
           <option name="timeStamp" value="1220" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/RFC8628AuthorizationServer.java</url>
-          <line>143</line>
-          <option name="timeStamp" value="1223" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/common/src/main/java/org/oa4mp/delegation/common/token/impl/TokenFactory.java</url>
           <line>176</line>
           <option name="timeStamp" value="1224" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/OA2ATServlet.java</url>
-          <line>2681</line>
-          <option name="timeStamp" value="1235" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/JWKCLI.java</url>
@@ -2442,6 +2442,16 @@
           <url>file://$PROJECT_DIR$/myproxy/src/main/java/org/oa4mp/myproxy/servlet/MyProxyFacadeProvider.java</url>
           <line>25</line>
           <option name="timeStamp" value="1295" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/tokens/WLCGTokenHandler.java</url>
+          <line>77</line>
+          <option name="timeStamp" value="1296" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/claims/ClaimsSourceGetter.java</url>
+          <line>193</line>
+          <option name="timeStamp" value="1298" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-method">
           <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/storage/transactions/OA2MTStore.java</url>

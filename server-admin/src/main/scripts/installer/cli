@@ -11,25 +11,29 @@ DEFAULT_CONFIG=$OA4MP_ROOT/etc/cfg.xml
 DEFAULT_TARGET=default
 DEFAULT_ENV=$OA4MP_ROOT/etc/cli.properties
 cliJar=$OA4MP_ROOT/lib/cli.jar
-logFile=$OA4MP_ROOT/var/log/cli.log
+logFile=$OA4MP_ROOT/log/cli.log
 
 # End of user serviceable parts.
 
-if [[  "$1" = "--help" || $# -gt 2 ]];then
-  echo "cli [configName configFile environment"]
+if [[  "$1" = "help" || $# -gt 2 ]];then
+  echo "cli [-name configName -cfg configFile -env environment -tty ansi|ascii"]
   echo "Start the OAuth 2 forMyProxy command line admin tool with the"
   echo "given configuration name in the given configuration file (full path)."
   echo "No arguments means to use the config named '$DEFAULT_TARGET' in the file  '$DEFAULT_CONFIG'"
   echo "and the default properties file at '$DEFAULT_ENV'"
   echo "One argument is assumed to be the configuration name in the default config file."
+  echo "The default terminal type is ascii (plain old java) but you can specify ansi mode too."
+  echo "ansi mode allows for command completion and eiditing the current line."
+  echo ""
+  echo "For more detailed help, invoke with --help"
   exit 1
 fi
 
-target=${1:-$DEFAULT_TARGET}
-adminCfg=${2:-$DEFAULT_CONFIG}
-env=${3:-$DEFAULT_ENV}
+overrides=( "$@" )
+defaults=("-cfg"  "$DEFAULT_CONFIG" "-name" "$DEFAULT_TARGET"  "-set_env" "$DEFAULT_ENV" "-log" "$logFile" )
+qqq=( "${overrides[@]}" "${defaults[@]}" )
 
-java -jar $cliJar   -cfg $adminCfg -name $target -log $logFile -set_env $env -v
+java -cp $cliJar  "${qqq[@]}"
 
 if [ $? != 0 ]; then
   exit 1

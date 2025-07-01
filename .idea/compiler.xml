@@ -22,10 +22,8 @@
         <module name="server-api" />
         <module name="skin" />
         <module name="oauth2" />
-        <module name="oa4mp-webapp" />
         <module name="common" />
         <module name="server-test" />
-        <module name="client-webapp" />
         <module name="oa4mp-server-test" />
         <module name="client" />
         <module name="website" />
@@ -44,9 +42,13 @@
         <module name="client-oauth2" />
         <module name="client-installer" />
         <module name="client-api" />
-        <module name="myproxy-website" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="client-webapp" target="11" />
+      <module name="myproxy-website" target="1.8" />
+      <module name="oa4mp-webapp" target="11" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">

@@ -9,9 +9,6 @@ import edu.uiuc.ncsa.security.util.cli.*;
 import org.oa4mp.client.api.ClientXMLTags;
 import org.oa4mp.delegation.common.OA4MPVersion;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 5/11/16 at  2:51 PM
@@ -118,20 +115,17 @@ super.bootstrap(inputLine);
      * @throws Throwable
      */
     protected  void runnit(String[] args, OA2CommandLineClient clc) throws Throwable {
-        ArrayList<String> aaa = new ArrayList<>();
-        aaa.add(OA2Commands.class.getSimpleName()); // dummy first argument
-        aaa.addAll(Arrays.asList(args));
-        InputLine inputLine = new InputLine(aaa);
+        InputLine inputLine = new InputLine(getClass().getSimpleName(), args);
         CLIDriver cli = new CLIDriver(clc);
         try {// actually run the driver that parses commands and passes them along
-            clc.bootstrap(inputLine);
+           inputLine = cli.bootstrap(inputLine);
         }catch(ConnectionException ce){
             say("could not connect to server");
         }catch(Throwable e) {
             if(cli.isVerbose()){
                 e.printStackTrace();
             }
-            say("erro reading configuration file: " + e.getMessage());
+            say("error reading configuration file: " + e.getMessage());
 
         }
         OA2CLCCommands usc = new OA2CLCCommands(cli.getLogger(), clc);

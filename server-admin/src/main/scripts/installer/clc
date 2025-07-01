@@ -9,24 +9,29 @@
 OA4MP_ROOT=${OA4MP_HOME}
 DEFAULT_CONFIG="$OA4MP_ROOT"etc/cfg.xml
 DEFAULT_TARGET=default
+DEFAULT_ENV=$OA4MP_ROOTetc/cli.properties
 clientJar=""$OA4MP_ROOT"lib/clc.jar
-logFile="$OA4MP_ROOT"var/log/clc.log
+logFile="$OA4MP_ROOT"log/clc.log
 
 # End of user serviceable parts.
 
-if [[  "$1" = "--help" || $# -gt 2 ]];then
-  echo "clc [configName configFile"]
+if [[  "$1" = "help" || $# -gt 2 ]];then
+  echo "clc [-name configName -cfg configFile -tty ansi|ascii ]"
   echo "Start the OAuth 2 forMyProxy command line client with the"
-  echo "given configuration name in the given configuration file (full path)."
+  echo "given configuration name in the given configuration file (needs full path)."
   echo "No arguments means to use the config named '$DEFAULT_TARGET' in the file  '$DEFAULT_CONFIG'"
-  echo "One argument is assumed to be the configuration name in the default config file."
+  echo ""
+  echo "For more detailed help , invoke with --help"
   exit 1
 fi
 
-target=${1:-$DEFAULT_TARGET}
-adminCfg=${2:-$DEFAULT_CONFIG}
 
-java  -jar $clientJar   -cfg $adminCfg -name $target -log $logFile -v
+overrides=( "$@" )
+defaults=("-cfg"  "$DEFAULT_CONFIG" "-name" "$DEFAULT_TARGET"  "-set_env" "$DEFAULT_ENV" "-log" "$logFile" )
+qqq=( "${overrides[@]}" "${defaults[@]}" )
+
+java -jar $clientJar  "${qqq[@]}"
+
 
 if [ $? != 0 ]; then
   exit 1

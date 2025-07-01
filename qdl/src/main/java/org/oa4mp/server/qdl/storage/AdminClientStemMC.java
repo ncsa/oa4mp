@@ -123,12 +123,16 @@ public class AdminClientStemMC<V extends AdminClient> extends StemConverter<V> {
         }
         put(stem, kk().listUsers(), v.isListUsers());
         put(stem, kk().listUsersInOtherClients(), v.isListUsersInOtherClients());
-        setNonNullStemValue(stem, kk().config(), v.getConfig().toString());
+        if(v.getConfig() != null){
+            setNonNullStemValue(stem, kk().config(), v.getConfig().toString());
+        }
         setNonNullStemValue(stem, kk().issuer(), v.getIssuer());
         put(stem,kk().maxClients(), Long.valueOf(v.getMaxClients()));
         setNonNullStemValue(stem, kk().allowQDLCodeBlocks(), v.allowQDLCodeBlocks());
 
-        setNonNullStemValue(stem, kk().voURI(), v.getVirtualIssuer().toString());
+        if(v.getVirtualIssuer() != null){
+            setNonNullStemValue(stem, kk().voURI(), v.getVirtualIssuer().toString());
+        }
         setNonNullStemValue(stem, kk().vo(), v.getExternalVIName());
         return stem;
     }

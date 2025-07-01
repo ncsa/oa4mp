@@ -27,31 +27,3 @@ block[
       return(claims#get_claims(claims#create_source(fnal_cfg.), args().0));
     ];
 
-
-/*
-block[
-            ldap_name := (size(args()) == 2)?args().1: 'prod';
-                         //   ini. := file_read('vfs#/scripts/fnal/ldap.ini',2).'prod';
-            ini. := file_read('/home/ncsa/dev/csd/config/ini/fnal-ldap.ini',2).'prod';
-           // say('ldap name = ' + ldap_name + ':\n' + print(ini.));
-          //  say(print(ini.));
-
-                       fnal_cfg. := claims#new_template('ldap');
-              fnal_cfg.auth_type := 'simple';
-                fnal_cfg.address := ini.'server';
-                   fnal_cfg.port := 636;
-          fnal_cfg.fail_on_error := true;
-             fnal_cfg.claim_name := 'uid';
-            fnal_cfg.search_base := ini.'user_search_base';
-                   fnal_cfg.type := 'ldap';
-              fnal_cfg.ldap_name := 'voPersonExternalID';
-     fnal_cfg.search_attributes. := [EPPN,EPE,IS_MEMBER_OF];
-                 fnal_cfg.lists. := [EPE,IS_MEMBER_OF];
-               fnal_cfg.username := ini.'name';
-               fnal_cfg.password := ini.'pwd';
-                               x := args().0;
-      out. := claims#get_claims(claims#create_source(fnal_cfg.), x);
-
-      return(out.);
-];
-*/

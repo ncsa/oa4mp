@@ -4,17 +4,20 @@
 #
 # The next 5 entries completely determine how this operates. Change these to whatever you want if
 # different from the standard install.
+#
+# Note that the script the installer uses is in installer/cli
+
 
 OA4MP_ROOT=/opt/oa4mp
 DEFAULT_CONFIG=$OA4MP_ROOT/etc/admin-cfg.xml
 DEFAULT_TARGET=default
 DEFAULT_ENV=$OA4MP_ROOT/etc/cli.properties
 cliJar=$OA4MP_ROOT/lib/cli.jar
-logFile=$OA4MP_ROOT/var/log/cli.log
+logFile=$OA4MP_ROOT/log/cli.log
 
 # End of user serviceable parts.
 
-if [[  "$1" = "--help" || $# -gt 2 ]];then
+if [[  "$1" = "help" || $# -gt 2 ]];then
   echo "cli [configName configFile environment"]
   echo "Start the OAuth 2 forMyProxy command line admin tool with the"
   echo "given configuration name in the given configuration file (full path)."
@@ -24,14 +27,13 @@ if [[  "$1" = "--help" || $# -gt 2 ]];then
   exit 1
 fi
 
-target=${1:-$DEFAULT_TARGET}
-adminCfg=${2:-$DEFAULT_CONFIG}
-env=${3:-$DEFAULT_ENV}
-
 overrides=( "$@" )
-defaults=("-cfg"  "$CFG_FILE" "-name" "default" "-home_dir" "$QDL_HOME" )
+defaults=("-cfg"  "$DEFAULT_CONFIG" "-name" "$DEFAULT_TARGET"  "-set_env" "$DEFAULT_ENV" "-log" "$logFile" )
 qqq=( "${overrides[@]}" "${defaults[@]}" )
-java -jar $cliJar   -cfg $adminCfg -name $target -log $logFile -set_env $env -v
+
+echo "${qqq[@]}"
+
+java -jar $cliJar  "${qqq[@]}"
 
 if [ $? != 0 ]; then
   exit 1

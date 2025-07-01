@@ -47,6 +47,13 @@
         <option value="$PROJECT_DIR$/myproxy-website/pom.xml" />
       </list>
     </option>
+    <option name="ignoredFiles">
+      <set>
+        <option value="$PROJECT_DIR$/client-webapp/pom.xml" />
+        <option value="$PROJECT_DIR$/myproxy-website/pom.xml" />
+        <option value="$PROJECT_DIR$/oa4mp-webapp/pom.xml" />
+      </set>
+    </option>
   </component>
   <component name="ModuleEditorState">
     <option name="LAST_EDITED_MODULE_NAME" />

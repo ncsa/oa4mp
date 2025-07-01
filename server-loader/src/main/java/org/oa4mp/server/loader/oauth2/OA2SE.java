@@ -621,16 +621,15 @@ public class OA2SE extends ServiceEnvironmentImpl {
                     return null; // no VO set. Most common case.
                 }
                 DebugUtil.trace(this, "got admin client " + ac.getIdentifierString());
-                VirtualIssuer vo = (VirtualIssuer) getVIStore().get(ac.getVirtualIssuer());
-                DebugUtil.trace(this, "got vi  " + (vo == null ? "(none)" : vo.getIdentifierString()));
-                if (!vo.isValid()) {
-                    throw new GeneralException("invalid virtual issuer \"" + vo.getIdentifierString() + "\"");
-                }
-                if (vo != null) {
-                    return vo;
-                } else {
+                VirtualIssuer vi = (VirtualIssuer) getVIStore().get(ac.getVirtualIssuer());
+                DebugUtil.trace(this, "got vi  " + (vi == null ? "(none)" : vi.getIdentifierString()));
+                if (vi == null) {
                     return null;
                 }
+                if (!vi.isValid()) {
+                    throw new GeneralException("invalid virtual issuer \"" + vi.getIdentifierString() + "\"");
+                }
+                return vi;
             case 2:
                 throw new NFWException("too many admins for this client.");
         }

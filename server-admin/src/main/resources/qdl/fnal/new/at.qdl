@@ -21,7 +21,7 @@ size(user_record.) == 0 ? raise_error('no user record found for ' + claims.eppn)
 //user_record. := script_load('fnal/new/get_user.qdl', claims.eppn);
 
 
-debugger(2,'*** FNAL user_record.\n' + print(user_record., 72));
+debugger(2,'*** FNAL user_record:\n' + print(user_record., 120));
 
   if[exec_phase == 'post_token'] // so first pass only
 then[
@@ -34,9 +34,10 @@ then[
          claims.'sub' := user_record.EPPN;
        ]; // end if
     ]; // end if
-
-  if[∄user_record.EPE.]
+say(print(user_record.EPE));
+  if[∄user_record.EPE]
 then[
+     debugger(1, '*** FNAL no ' + EPE + ' returned!');
      access_token.'scope' := ''; // return empty scopes.
      return(); // nothing to do. No capabilities ==>  no scopes.
     ]; //end if
@@ -52,6 +53,8 @@ then[
            access_token.wlcg_groups := wlcg_groups.;
            remove(user_record.'isMemberOf');
         ]; //end if
+    ]else[
+        debugger(1, ' *** FNAL NO isMemberOf claim');
     ]; //end if
 
   if[exec_phase == 'post_token' || size(tx_scopes.) == 0]
