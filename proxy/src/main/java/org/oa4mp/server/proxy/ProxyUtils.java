@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.servlet.ServiceClientHTTPException;
+import edu.uiuc.ncsa.security.util.cli.CLIDriver;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import net.sf.json.JSONObject;
 import org.oa4mp.delegation.server.OA2ATException;
@@ -193,7 +194,9 @@ public class ProxyUtils {
      * @throws Exception
      */
     protected static OA2CLCCommands getCLC(OA2SE oa2SE, OA2ServiceTransaction t) throws Throwable {
-        OA2CLCCommands clcCommands = new OA2CLCCommands(oa2SE.getMyLogger(), new OA2CommandLineClient(oa2SE.getMyLogger()));
+        //OA2CLCCommands clcCommands = new OA2CLCCommands(oa2SE.getMyLogger(), new OA2CommandLineClient(oa2SE.getMyLogger()));
+        CLIDriver driver = new CLIDriver();
+        OA2CLCCommands clcCommands = new OA2CLCCommands(driver, new OA2CommandLineClient(driver));
         JSONObject proxyState = t.getProxyState();
         if (proxyState.isEmpty()) {
             throw new TransactionNotFoundException("No pending proxy transaction was found");
@@ -217,13 +220,14 @@ public class ProxyUtils {
         }
 
         // next line is where the CLC is first created in the flow, so can't call getCLC
-        OA2CLCCommands clcCommands = new OA2CLCCommands(true, oa2SE.getMyLogger(), new OA2CommandLineClient(oa2SE.getMyLogger()));
+        CLIDriver driver = new CLIDriver();
+        OA2CLCCommands clcCommands = new OA2CLCCommands(true, driver, new OA2CommandLineClient(driver));
+        //OA2CLCCommands clcCommands = new OA2CLCCommands(true, oa2SE.getMyLogger(), new OA2CommandLineClient(oa2SE.getMyLogger()));
         clcCommands.setUseClipboard(false); // Don't put stuff in the clipboard.
         if (t.getOA2Client().isDebugOn()) {
             // Turn it all on if the client is in debug mode.
-            clcCommands.setVerbose(true);
-            clcCommands.setDebugOn(true);
-            clcCommands.setPrintOuput(true);
+            driver.setOutputOn(true);
+            driver.setVerbose(true);
         }
         clcCommands.load(new InputLine("dummy ", asc.getCfgName(), asc.getCfgFile()));
         //   This was to fix CIL-1419 but the actual issue was not that the client should dictate the proxy's

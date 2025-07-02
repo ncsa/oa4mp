@@ -1,22 +1,36 @@
 package org.oa4mp.server.admin.oauth2.base;
 
-import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.util.cli.CommonCommands;
-import edu.uiuc.ncsa.security.util.cli.HelpUtil;
+import edu.uiuc.ncsa.security.util.cli.CLIDriver;
+import edu.uiuc.ncsa.security.util.cli.CommonCommands2;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 11/14/13 at  2:38 PM
  */
-public class CopyCommands extends CommonCommands {
+public class CopyCommands extends CommonCommands2 {
     String configFile;
 
-    public CopyCommands(MyLoggingFacade logger, CopyTool copyTool, CopyToolVerifier verifier, String configFile) throws Throwable{
-        super(logger);
+    public CopyCommands(CLIDriver driver, CopyTool copyTool, CopyToolVerifier verifier, String configFile) throws Throwable{
+        super(driver);
         this.configFile = configFile;
         this.copyTool = copyTool;
         this.verifier = verifier;
+    }
+
+    @Override
+    public void about(boolean showBanner, boolean showHeader) {
+
+    }
+
+    @Override
+    public void initialize() throws Throwable {
+
+    }
+
+    @Override
+    public void load(InputLine inputLine) throws Throwable {
+
     }
 
     @Override
@@ -31,15 +45,7 @@ public class CopyCommands extends CommonCommands {
         return getName()+">";
     }
 
-    @Override
-    public void bootstrap(InputLine inputLine) throws Throwable {
-super.bootstrap(inputLine);
-    }
 
-    @Override
-    public HelpUtil getHelpUtil() {
-        return null;
-    }
 
     protected void showCpHelp() {
         sayi("This command copies one store to another. At the end of this operation the");

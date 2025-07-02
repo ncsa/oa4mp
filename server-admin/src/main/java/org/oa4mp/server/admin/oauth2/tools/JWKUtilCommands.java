@@ -66,11 +66,6 @@ public class JWKUtilCommands extends CommonCommands {
         return getName() + ">";
     }
 
-    @Override
-    public void bootstrap(InputLine inputLine) throws Throwable {
-        super.bootstrap(inputLine);
-    }
-
     protected void createKeysHelps() {
         say("create_keys [" + CL_INPUT_FILE_FLAG + " set_of_keys " + CL_IS_PUBLIC_FLAG + "] | [" + CL_IS_PRIVATE_FLAG + "] " + FORCE_TO_STD_OUT_FLAG + "] " + CL_OUTPUT_FILE_FLAG + " file");
         sayi(CL_INPUT_FILE_FLAG + " - and input file of keys. Implies " + CL_IS_PUBLIC_FLAG + " and will extract the public keys.");
@@ -118,7 +113,7 @@ public class JWKUtilCommands extends CommonCommands {
     protected SigningCommands createSG(OA2SE oa2SE) throws Exception {
         SigningCommands sg;
         try {
-            sg = new SigningCommands(oa2SE);
+            sg = new SigningCommands(getDriver(), oa2SE);
             return sg;
         } catch (Throwable t) {
             if (t instanceof Exception) {

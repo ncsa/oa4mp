@@ -4,9 +4,9 @@ import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.cli.FoundIdentifiables;
+import edu.uiuc.ncsa.security.util.cli.CLIDriver;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
@@ -40,16 +40,16 @@ public class VICommands extends OA4MPStoreCommands {
     public static final String RSA_SIZE_FLAG = "-size";
     public static final String EC_CURVE_FLAG = "-curve";
 
-    public VICommands(MyLoggingFacade logger, String defaultIndent, Store store) throws Throwable {
-        super(logger, defaultIndent, store);
+    public VICommands(CLIDriver driver, String defaultIndent, Store store) throws Throwable {
+        super(driver, defaultIndent, store);
     }
 
     protected VIStore getVIS() {
         return (VIStore) getStore();
     }
 
-    public VICommands(MyLoggingFacade logger, Store store) throws Throwable {
-        super(logger, store);
+    public VICommands(CLIDriver driver, Store store) throws Throwable {
+        super(driver, store);
     }
 
     @Override
@@ -302,10 +302,6 @@ public class VICommands extends OA4MPStoreCommands {
         return vo.getIdentifierString() + " (" + vo.getTitle() + ") created on " + vo.getCreationTS();
     }
 
-    @Override
-    public void bootstrap(InputLine inputLine) throws Throwable {
-        super.bootstrap(inputLine);
-    }
 
     @Override
     protected void initHelp() throws Throwable {

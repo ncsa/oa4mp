@@ -1,20 +1,20 @@
 package org.oa4mp.server.admin.oauth2.base;
 
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
-import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.cli.*;
+import org.oa4mp.server.admin.oauth2.tools.TransactionStoreCommands;
 import org.oa4mp.server.api.OA4MPConfigTags;
 import org.oa4mp.server.api.ServiceEnvironment;
 
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 3/27/15 at  1:49 PM
  */
-public abstract class BaseCommands extends ConfigurableCommandsImpl implements ComponentManager {
+public abstract class BaseCommands2 extends ConfigurableCommandsImpl2 implements ComponentManager {
 
     public static final String CLIENTS = "clients";
     public static final String CLIENT_APPROVALS = "approvals";
@@ -27,7 +27,8 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
     protected boolean showHeader = true;
     protected boolean showLogo = true;
 
-    protected void init() {
+    @Override
+    public void initialize() {
         try {
             if (drivers.isEmpty()) {
                 drivers.put(CLIENTS, createCLIDriver(getClientCommands()));
@@ -53,12 +54,10 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
 
     public abstract CopyCommands getCopyCommands() throws Throwable;
 
-    protected abstract CommonCommands getTransactionCommands() throws Throwable;
+    protected abstract TransactionStoreCommands getTransactionCommands() throws Throwable;
 
-
-    protected BaseCommands(MyLoggingFacade logger) {
-        super(logger);
-        //   init();
+    public BaseCommands2(CLIDriver driver) {
+        super(driver);
     }
 
     @Override
@@ -90,7 +89,7 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
 
     }
 
-    @Override
+/*    @Override
     public void bootstrap(InputLine args) throws Throwable {
         IOInterface ioInterface = null;
         PrintStream out = System.out;
@@ -122,7 +121,7 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
         about();
 
         init();
-    }
+    }*/
 
 
     public ServiceEnvironment getServiceEnvironment() throws Exception {
@@ -131,12 +130,12 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
 
 
     public ClientApprovalStoreCommands getClientApprovalCommands() throws Throwable {
-        return new ClientApprovalStoreCommands(getMyLogger(), "  ", getServiceEnvironment().getClientApprovalStore());
+        return new ClientApprovalStoreCommands(getDriver(), "  ", getServiceEnvironment().getClientApprovalStore());
     }
 
     @Override
     public boolean use(InputLine inputLine) throws Throwable {
-        CommonCommands commands = null;
+        CommonCommands2 commands = null;
 
         if (inputLine.hasArg(CLIENTS)) {
             commands = getClientCommands();
@@ -161,27 +160,12 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
     }
 
 
-    /*    protected boolean switchOrRun(InputLine inputLine, CommonCommands commands) {
-            boolean switchComponent = 1 < inputLine.getArgCount();
-
-            CLIDriver cli = new CLIDriver();
-            cli.setIOInterface(commands.getIOInterface());
-            cli.addCommands(commands);
-            cli.setEnv(getGlobalEnv());
-            cli.setComponentManager(this);
-            if (switchComponent) {
-                inputLine.removeArgAt(0); // removes original arg ("use")
-                cli.execute(inputLine.removeArgAt(0)); // removes components before executing
-            } else {
-                cli.start();
-            }
-            return true;
-        }*/
-    protected CLIDriver createCLIDriver(CommonCommands commands) {
+    protected CLIDriver createCLIDriver(CommonCommands2 commands) {
         CLIDriver cli = new CLIDriver();
-        cli.setIOInterface(commands.getIOInterface());
+
+        cli.setIOInterface(getDriver().getIOInterface());
         cli.addCommands(commands);
-        cli.setEnv(getGlobalEnv());
+        cli.setEnv(getDriver().getEnv());
         cli.setComponentManager(this);
         return cli;
     }
@@ -193,7 +177,7 @@ public abstract class BaseCommands extends ConfigurableCommandsImpl implements C
     }
 
     protected void runComponent(String componentName) throws Throwable {
-        CommonCommands commonCommands = null;
+        CommonCommands2 commonCommands = null;
 
         if (componentName.equals(CLIENTS)) {
             commonCommands = getClientCommands();

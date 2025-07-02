@@ -8,14 +8,13 @@ import edu.uiuc.ncsa.sas.webclient.ResponseDeserializer;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
-import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.cli.*;
 import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
 import edu.uiuc.ncsa.security.util.terminal.ISO6429IO;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 import org.oa4mp.delegation.common.OA4MPVersion;
 import org.oa4mp.server.admin.oauth2.Banners;
-import org.oa4mp.server.admin.oauth2.base.BaseCommands;
+import org.oa4mp.server.admin.oauth2.base.BaseCommands2;
 import org.oa4mp.server.admin.oauth2.base.ClientStoreCommands;
 import org.oa4mp.server.admin.oauth2.base.CopyCommands;
 import org.oa4mp.server.loader.oauth2.OA2SE;
@@ -31,7 +30,7 @@ import static edu.uiuc.ncsa.security.core.util.StringUtils.repeatString;
  * <p>Created by Jeff Gaynor<br>
  * on 4/3/14 at  1:23 PM
  */
-public class OA2Commands extends BaseCommands {
+public class OA2Commands extends BaseCommands2 {
 
 
     public static final String PERMISSIONS = "permissions";
@@ -65,8 +64,8 @@ public class OA2Commands extends BaseCommands {
     }
 
     @Override
-    protected void init() {
-        super.init();
+    public void initialize() {
+        super.initialize();
         try {
             if (!drivers.containsKey(ADMINS)) {
                 drivers.put(ADMINS, createCLIDriver(getAdminClientCommands()));
@@ -85,12 +84,11 @@ public class OA2Commands extends BaseCommands {
             // can't do this until here.
             ISO6429IO iso6429IO = (ISO6429IO) getIOInterface();
             iso6429IO.setCommandCompletion(getCommandCompletions());
-
         }
     }
 
-    public OA2Commands(MyLoggingFacade logger) {
-        super(logger);
+    public OA2Commands(CLIDriver driver) {
+        super(driver);
     }
 
     @Override
@@ -110,15 +108,12 @@ public class OA2Commands extends BaseCommands {
         if (loader == null) {
             ConfigurationNode node =
                     XMLConfigUtil.findConfiguration(getConfigFile(), getConfigName(), getComponentName());
-            loader = new OA2ConfigurationLoader<>(node, getMyLogger());
+            loader = new OA2ConfigurationLoader<>(node, getDriver().getLogger());
         }
         return loader;
     }
 
-    @Override
-    public void print_help() throws Exception {
-        say("Need to write help");
-    }
+
 
     OA2SE getOA2SE() throws Exception {
         return (OA2SE) getServiceEnvironment();
@@ -136,10 +131,12 @@ protected static void newMain(String[] args) {
             setupSAS(inputLine);
             return;
         }
-        OA2Commands oa2Commands = new OA2Commands(null);
-        CLIDriver cli = new CLIDriver(oa2Commands); // actually run the driver that parses commands and passes them along
-        inputLine = cli.bootstrap(inputLine);
+        CLIDriver cli = new CLIDriver();
+        // actually run the driver that parses commands and passes them along
+        OA2Commands oa2Commands = new OA2Commands(cli);
+        //inputLine = cli.bootstrap(inputLine);
         try {
+            cli.addCommands(oa2Commands);
             oa2Commands.bootstrap(inputLine); // read the command line options and such to set the state
         }catch(Throwable t){
             if(cli.isVerbose()){
@@ -152,13 +149,7 @@ protected static void newMain(String[] args) {
         t.printStackTrace();
     }
 }
-    @Override
-    public void setIOInterface(IOInterface io) {
-        super.setIOInterface(io);
-        for(String component : drivers.keySet()){
-            drivers.get(component).setIOInterface(io);
-        }
-    }
+
 
     protected static void setupSAS(InputLine inputLine) throws Throwable {
         Client sasClient = Client.newInstance(inputLine);
@@ -224,7 +215,7 @@ protected static void newMain(String[] args) {
     @Override
     public ClientStoreCommands getClientCommands() throws Throwable {
         if (oa2ClientCommands == null) {
-            oa2ClientCommands = new OA2ClientCommands(getMyLogger(),
+            oa2ClientCommands = new OA2ClientCommands(getDriver(),
                     "  ",
                     getServiceEnvironment().getClientStore(),
                     getClientApprovalCommands(),
@@ -234,21 +225,21 @@ protected static void newMain(String[] args) {
             oa2ClientCommands.setSupportedScopes(getOA2SE().getScopes());
             //       oa2ClientCommands.setUucConfiguration(getOA2SE().getUucConfiguration());
             oa2ClientCommands.setEnvironment(getOA2SE());
-            oa2ClientCommands.setIOInterface(getIOInterface());
+         //   oa2ClientCommands.setIOInterface(getIOInterface());
         }
         return oa2ClientCommands;
     }
 
     @Override
     public CopyCommands getCopyCommands() throws Throwable {
-        return new CopyCommands(getMyLogger(), new OA2CopyTool(), new OA2CopyToolVerifier(), getConfigFile());
+        return new CopyCommands(getDriver(), new OA2CopyTool(), new OA2CopyToolVerifier(), getConfigFile());
     }
 
     TokenStoreCommands tokenStoreCommands = null;
 
-    protected CommonCommands getTokenCommands() throws Throwable {
+    protected TokenStoreCommands getTokenCommands() throws Throwable {
         if (tokenStoreCommands == null) {
-            tokenStoreCommands = new TokenStoreCommands(getMyLogger(), "  ", getOA2SE().getTxStore());
+            tokenStoreCommands = new TokenStoreCommands(getDriver(), "  ", getOA2SE().getTxStore());
             tokenStoreCommands.setEnvironment(getOA2SE());
         }
 
@@ -259,7 +250,7 @@ protected static void newMain(String[] args) {
 
     protected VICommands getVICommands() throws Throwable {
         if (VICommands == null) {
-            VICommands = new VICommands(getMyLogger(), "  ", getOA2SE().getVIStore());
+            VICommands = new VICommands(getDriver(), "  ", getOA2SE().getVIStore());
             VICommands.setEnvironment(getOA2SE());
         }
         return VICommands;
@@ -268,12 +259,13 @@ protected static void newMain(String[] args) {
     TransactionStoreCommands transactionStoreCommands = null;
 
     @Override
-    protected CommonCommands getTransactionCommands() throws Throwable {
+    protected TransactionStoreCommands getTransactionCommands() throws Throwable {
         if (transactionStoreCommands == null) {
-            transactionStoreCommands = new TransactionStoreCommands(getMyLogger(),
+            transactionStoreCommands = new TransactionStoreCommands(getDriver(),
                     "  ",
                     getOA2SE());
             transactionStoreCommands.setEnvironment(getOA2SE());
+            transactionStoreCommands.initHelp();
         }
         return transactionStoreCommands;
     }
@@ -283,7 +275,7 @@ protected static void newMain(String[] args) {
 
     public OA2AdminClientCommands getAdminClientCommands() throws Throwable {
         if (oa2AdminClientCommands == null) {
-            oa2AdminClientCommands = new OA2AdminClientCommands(getMyLogger(),
+            oa2AdminClientCommands = new OA2AdminClientCommands(getDriver(),
                     "  ",
                     getOA2SE().getAdminClientStore(),
                     getClientApprovalCommands(),
@@ -298,7 +290,7 @@ protected static void newMain(String[] args) {
 
     public OA2PermissionCommands getPermissionCommands() throws Throwable {
         if (oa2PermissionCommands == null) {
-            oa2PermissionCommands = new OA2PermissionCommands(getMyLogger(), "  ", getOA2SE().getPermissionStore());
+            oa2PermissionCommands = new OA2PermissionCommands(getDriver(), "  ", getOA2SE().getPermissionStore());
             oa2PermissionCommands.setEnvironment(getOA2SE());
         }
         return oa2PermissionCommands;
@@ -306,7 +298,7 @@ protected static void newMain(String[] args) {
 
     @Override
     public boolean use(InputLine inputLine) throws Throwable {
-        CommonCommands commands = null;
+        CommonCommands2 commands = null;
         if (inputLine.hasArg(ADMINS)) {
             commands = getAdminClientCommands();
         }
@@ -331,14 +323,6 @@ protected static void newMain(String[] args) {
         return false;
     }
 
-
-
-    HelpUtil helpUtil = new HelpUtil();
-
-    @Override
-    public HelpUtil getHelpUtil() {
-        return helpUtil;
-    }
 
     @Override
     public void setLoader(ConfigurationLoader<? extends AbstractEnvironment> loader) {

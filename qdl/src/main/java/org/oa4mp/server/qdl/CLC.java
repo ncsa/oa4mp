@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.security.core.util.DebugConstants;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
+import edu.uiuc.ncsa.security.util.cli.CLIDriver;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -96,7 +97,8 @@ public class CLC implements QDLMetaModule {
                     OA2CommandLineClient.setInstance(qdlclc);
                 }
                 DebugUtil.setEnabled(true);
-                clcCommands = new OA2CLCCommands(true, state.getLogger(), new QDLCLC(state.getLogger()));
+                CLIDriver driver = new CLIDriver();
+                clcCommands = new OA2CLCCommands(true, driver, new QDLCLC(driver));
                 // note that the order of the arguments swaps.
                 InputLine inputLine = new InputLine(DUMMY_ARG + " " + objects[1].toString() + "  " + objects[0].toString());
                 clcCommands.load(inputLine);
@@ -906,7 +908,8 @@ public class CLC implements QDLMetaModule {
             // Assume that the clc has been initialized first since otherwise it is impossible to load
             // the file (e.g. assetStore is missing, debugger is missing etc.)
             if(clcCommands == null){
-                clcCommands = new OA2CLCCommands(true, state.getLogger(), new QDLCLC(state.getLogger()));
+                CLIDriver driver = new CLIDriver();
+                clcCommands = new OA2CLCCommands(true, driver, new QDLCLC(driver));
             }
             /*
                Improvement is to read the JSON file in objects[0] and suck out

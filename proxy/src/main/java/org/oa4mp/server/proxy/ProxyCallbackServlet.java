@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.servlet.JSPUtil;
 import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.XMLMap;
+import edu.uiuc.ncsa.security.util.cli.CLIDriver;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -79,7 +80,9 @@ public class ProxyCallbackServlet extends OA2AuthorizationServer {
         debugger.trace(this, "request uri= " + request.getRequestURI());
         // Now we have determined that this is a pending transaction
         debugger.trace(this, "loading proxy client");
-        OA2CLCCommands clcCommands = new OA2CLCCommands(getMyLogger(), new OA2CommandLineClient(getMyLogger()));
+        //OA2CLCCommands clcCommands = new OA2CLCCommands(getMyLogger(), new OA2CommandLineClient(getMyLogger()));
+        CLIDriver driver = new CLIDriver();
+        OA2CLCCommands clcCommands = new OA2CLCCommands(driver, new OA2CommandLineClient(driver));
         JSONObject proxyState = t.getProxyState();
         if (proxyState.isEmpty()) {
             throw new TransactionNotFoundException("No pending proxy transaction was found");

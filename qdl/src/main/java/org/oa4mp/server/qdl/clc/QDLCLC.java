@@ -1,14 +1,14 @@
 package org.oa4mp.server.qdl.clc;
 
+import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
+import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
+import edu.uiuc.ncsa.security.util.cli.CLIDriver;
+import org.oa4mp.client.loader.OA2ClientEnvironment;
 import org.oa4mp.server.admin.oauth2.tools.ConfigLoaderTool;
 import org.oa4mp.server.admin.oauth2.tools.OA2CommandLineClient;
-import org.oa4mp.client.loader.OA2ClientEnvironment;
 import org.oa4mp.server.qdl.CLC;
 import org.qdl_lang.parsing.IniParserDriver;
 import org.qdl_lang.variables.QDLStem;
-import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
-import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
-import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 
 import java.io.File;
 import java.io.FileReader;
@@ -20,8 +20,8 @@ import java.io.FileReader;
  * on 12/19/23 at  3:32 PM
  */
 public class QDLCLC extends OA2CommandLineClient {
-    public QDLCLC(MyLoggingFacade logger) {
-        super(logger);
+    public QDLCLC(CLIDriver driver) {
+        super(driver);
     }
 
     @Override

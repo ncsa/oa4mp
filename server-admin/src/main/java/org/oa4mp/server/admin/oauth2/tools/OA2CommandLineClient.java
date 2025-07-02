@@ -3,9 +3,11 @@ package org.oa4mp.server.admin.oauth2.tools;
 import edu.uiuc.ncsa.security.core.exceptions.ConnectionException;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
-import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
-import edu.uiuc.ncsa.security.util.cli.*;
+import edu.uiuc.ncsa.security.util.cli.CLIDriver;
+import edu.uiuc.ncsa.security.util.cli.ConfigurableCommandsImpl2;
+import edu.uiuc.ncsa.security.util.cli.FormatUtil;
+import edu.uiuc.ncsa.security.util.cli.InputLine;
 import org.oa4mp.client.api.ClientXMLTags;
 import org.oa4mp.delegation.common.OA4MPVersion;
 
@@ -13,7 +15,7 @@ import org.oa4mp.delegation.common.OA4MPVersion;
  * <p>Created by Jeff Gaynor<br>
  * on 5/11/16 at  2:51 PM
  */
-public class OA2CommandLineClient extends ConfigurableCommandsImpl {
+public class OA2CommandLineClient extends ConfigurableCommandsImpl2 {
     @Override
     public String getComponentName() {
         return ClientXMLTags.COMPONENT;
@@ -27,26 +29,19 @@ public class OA2CommandLineClient extends ConfigurableCommandsImpl {
 
     @Override
     public String getPrompt() {
-        return "clc>";
+        return getName() + ">";
     }
 
-    @Override
-    public void bootstrap(InputLine inputLine) throws Throwable {
-super.bootstrap(inputLine);
-    }
+
 
     @Override
     public String getName() {
-        return "oa4mp";
+        return "clc";
     }
 
-    @Override
-    public HelpUtil getHelpUtil() {
-        return null;
-    }
 
-    public OA2CommandLineClient(MyLoggingFacade logger) {
-        super(logger);
+    public OA2CommandLineClient(CLIDriver driver) {
+        super(driver);
     }
 
     public void setLoader(ConfigurationLoader<? extends AbstractEnvironment> loader) {
@@ -117,7 +112,7 @@ super.bootstrap(inputLine);
     protected  void runnit(String[] args, OA2CommandLineClient clc) throws Throwable {
         InputLine inputLine = new InputLine(getClass().getSimpleName(), args);
         CLIDriver cli = new CLIDriver(clc);
-        try {// actually run the driver that parses commands and passes them along
+/*        try {// actually run the driver that parses commands and passes them along
            inputLine = cli.bootstrap(inputLine);
         }catch(ConnectionException ce){
             say("could not connect to server");
@@ -127,12 +122,12 @@ super.bootstrap(inputLine);
             }
             say("error reading configuration file: " + e.getMessage());
 
-        }
-        OA2CLCCommands usc = new OA2CLCCommands(cli.getLogger(), clc);
+        }*/
+        OA2CLCCommands usc = new OA2CLCCommands(cli, clc);
         usc.setConfigFile(clc.getConfigFile());
         FormatUtil.setIoInterface(cli.getIOInterface());
         cli.addCommands(usc);
-        usc.bootMessage();
+        usc.bootstrap(inputLine);
         cli.start();
 
         /* Proposed NEW
@@ -163,10 +158,6 @@ super.bootstrap(inputLine);
         cli.start();
 */
 
-    }
-
-    @Override
-    public void print_help() throws Exception {
     }
 
     public void start(String[] args) throws Exception {
@@ -239,5 +230,10 @@ Y8,    "88,,8P  88         8P  88              Y8,            88         Y8,
     public boolean use(InputLine inputLine) throws Exception {
         // No components so this is a stub.
         return false;
+    }
+
+    @Override
+    public void about(boolean showBanner, boolean showHeader) {
+
     }
 }

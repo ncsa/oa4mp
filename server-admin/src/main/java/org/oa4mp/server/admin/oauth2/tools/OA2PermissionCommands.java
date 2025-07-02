@@ -1,6 +1,7 @@
 package org.oa4mp.server.admin.oauth2.tools;
 
 import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.util.cli.CLIDriver;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import org.oa4mp.server.api.admin.permissions.Permission;
 import org.oa4mp.server.api.admin.permissions.PermissionKeys;
@@ -21,12 +22,12 @@ import java.util.HashMap;
  * on 4/7/17 at  3:11 PM
  */
 public class OA2PermissionCommands extends OA4MPStoreCommands {
-    public OA2PermissionCommands(MyLoggingFacade logger, String defaultIndent, Store store) throws Throwable {
-        super(logger, defaultIndent, store);
+    public OA2PermissionCommands(CLIDriver driver, String defaultIndent, Store store) throws Throwable {
+        super(driver, defaultIndent, store);
     }
 
-    public OA2PermissionCommands(MyLoggingFacade logger, Store store) throws Throwable {
-        super(logger, store);
+    public OA2PermissionCommands(CLIDriver driver, Store store) throws Throwable {
+        super(driver, store);
     }
 
     protected PermissionsStore getPStore() {
@@ -101,11 +102,6 @@ public class OA2PermissionCommands extends OA4MPStoreCommands {
         Permission p = (Permission) mc.fromMap(map, identifiable);
         getPStore().save(p);
 
-    }
-
-    @Override
-    public void bootstrap(InputLine inputLine) throws Throwable {
-        super.bootstrap(inputLine);
     }
 
     @Override

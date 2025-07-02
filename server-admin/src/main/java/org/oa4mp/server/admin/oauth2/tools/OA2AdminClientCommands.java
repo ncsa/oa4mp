@@ -9,6 +9,7 @@ import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.cli.FoundIdentifiables;
+import edu.uiuc.ncsa.security.util.cli.CLIDriver;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import net.sf.json.JSONObject;
 import org.oa4mp.delegation.common.storage.clients.BaseClient;
@@ -34,17 +35,20 @@ import java.util.*;
  * on 12/8/16 at  12:34 PM
  */
 public class OA2AdminClientCommands extends BaseClientStoreCommands {
-    public OA2AdminClientCommands(MyLoggingFacade logger,
+    public OA2AdminClientCommands(CLIDriver driver,
                                   String defaultIndent,
                                   Store adminClientStore,
                                   ClientApprovalStoreCommands clientApprovalStoreCommands,
                                   PermissionsStore permissionsStore,
                                   ClientStore clientStore) throws Throwable {
-        super(logger, defaultIndent, adminClientStore, clientApprovalStoreCommands);
+        super(driver, defaultIndent, adminClientStore, clientApprovalStoreCommands);
         this.clientStore = clientStore;
         this.permissionsStore = permissionsStore;
     }
+@Override
+        public void initialize() throws Throwable{
 
+}
     ClientStore clientStore;
 
     @Override
@@ -636,11 +640,6 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
     client_id = localhost:command.line2
     ersatz_id = client:/my_ersatz
      */
-
-    @Override
-    public void bootstrap(InputLine inputLine) throws Throwable {
-        super.bootstrap(inputLine);
-    }
 
     @Override
     protected void initHelp() throws Throwable {

@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.sas.StringIO;
 import edu.uiuc.ncsa.sas.cli.SASCLIDriver;
 import edu.uiuc.ncsa.sas.loader.SASConfigurationLoader;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.util.cli.InputLine;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 import org.oa4mp.server.admin.oauth2.tools.OA2Commands;
 import org.oa4mp.server.api.storage.servlet.OA4MPServlet;
@@ -23,20 +24,21 @@ public class CLISASServlet extends SASServlet {
     public Executable createExecutable(String executableName) {
 
         OA2SE oa2SE = (OA2SE) OA4MPServlet.getServiceEnvironment();
-        OA2Commands oa2Commands = new OA2Commands(oa2SE.getMyLogger());
-        oa2Commands.setEnvironment(oa2SE); // gives it the same runtime as the server.
         StringIO stringIO = new StringIO("");
-        oa2Commands.setIOInterface(stringIO);
         SASCLIDriver sascliDriver = null;
         try {
             sascliDriver = new SASCLIDriver(stringIO);
-        } catch (Exception e) {
+            OA2Commands oa2Commands = new OA2Commands(sascliDriver);
+            oa2Commands.setEnvironment(oa2SE); // gives it the same runtime as the server.
+            sascliDriver.addCommands(oa2Commands);
+            oa2Commands.bootstrap(new InputLine());
+        } catch (Throwable e) {
             if(e instanceof RuntimeException){
                 throw (RuntimeException) e;
             }
             throw new GeneralException(e);
         }
-        sascliDriver.addCommands(oa2Commands);
+
         return sascliDriver;
     }
 

@@ -4,9 +4,9 @@ import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
-import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.cli.FoundIdentifiables;
+import edu.uiuc.ncsa.security.util.cli.CLIDriver;
 import edu.uiuc.ncsa.security.util.cli.ExitException;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.cli.Sortable;
@@ -44,15 +44,15 @@ import static org.oa4mp.delegation.server.storage.ClientApproval.Status.*;
  */
 public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
 
-    public BaseClientStoreCommands(MyLoggingFacade logger, String defaultIndent, Store clientStore,
+    public BaseClientStoreCommands(CLIDriver driver, String defaultIndent, Store clientStore,
                                    ClientApprovalStoreCommands clientApprovalStoreCommands) throws Throwable {
-        super(logger, defaultIndent, clientStore);
+        super(driver, defaultIndent, clientStore);
         this.clientApprovalStoreCommands = clientApprovalStoreCommands;
         setSortable(new ClientSorter());
     }
 
-    public BaseClientStoreCommands(MyLoggingFacade logger, Store store) throws Throwable {
-        super(logger, store);
+    public BaseClientStoreCommands(CLIDriver driver, Store store) throws Throwable {
+        super(driver, store);
     }
 
     // used internally to approve records.

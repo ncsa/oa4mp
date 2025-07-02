@@ -1,10 +1,9 @@
 package org.oa4mp.server.loader.qdl.util;
 
-import org.oa4mp.server.loader.oauth2.OA2SE;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
-import edu.uiuc.ncsa.security.util.cli.CommonCommands;
-import edu.uiuc.ncsa.security.util.cli.HelpUtil;
+import edu.uiuc.ncsa.security.util.cli.CLIDriver;
+import edu.uiuc.ncsa.security.util.cli.CommonCommands2;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
@@ -12,6 +11,7 @@ import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import edu.uiuc.ncsa.security.util.jwk.JWKUtil2;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.oa4mp.server.loader.oauth2.OA2SE;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -30,23 +30,29 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 1/6/17 at  9:27 AM
  */
-public class SigningCommands extends CommonCommands {
+public class SigningCommands extends CommonCommands2 {
+
     @Override
-    public void bootstrap(InputLine inputLine) throws Throwable {
-        // no-op at this point
+    public void about(boolean showBanner, boolean showHeader) {
+
     }
 
     @Override
-    public HelpUtil getHelpUtil() {
-        return null;
+    public void initialize() throws Throwable {
+
+    }
+
+    @Override
+    public void load(InputLine inputLine) throws Throwable {
+
     }
 
     public static final String RS_256 = "RS256";
     public static final String RS_384 = "RS384";
     public static final String RS_512 = "RS512";
 
-    public SigningCommands(OA2SE oa2se) throws Throwable {
-        super(oa2se == null ? null : oa2se.getMyLogger());
+    public SigningCommands(CLIDriver driver, OA2SE oa2se) throws Throwable {
+        super(driver);
         this.oa2SE = oa2se;
     }
 

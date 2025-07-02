@@ -3,9 +3,9 @@ package org.oa4mp.server.admin.oauth2.base;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
-import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.cli.FoundIdentifiables;
+import edu.uiuc.ncsa.security.util.cli.CLIDriver;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import org.oa4mp.delegation.common.storage.clients.ClientApprovalKeys;
 import org.oa4mp.delegation.server.storage.ClientApproval;
@@ -24,12 +24,12 @@ public class ClientApprovalStoreCommands extends OA4MPStoreCommands {
     public static final String SHOW_UNAPPROVED_FLAG = "-n";
 
 
-    public ClientApprovalStoreCommands(MyLoggingFacade logger, String defaultIndent, Store store) throws Throwable {
-        super(logger, defaultIndent, store);
+    public ClientApprovalStoreCommands(CLIDriver driver, String defaultIndent, Store store) throws Throwable {
+        super(driver, defaultIndent, store);
     }
 
-    public ClientApprovalStoreCommands(MyLoggingFacade logger, Store store) throws Throwable {
-        super(logger, store);
+    public ClientApprovalStoreCommands(CLIDriver driver, Store store) throws Throwable {
+        super(driver, store);
     }
 
 
@@ -340,10 +340,6 @@ public class ClientApprovalStoreCommands extends OA4MPStoreCommands {
         show(showApproved, regex);
     }
 
-    @Override
-    public void bootstrap(InputLine inputLine) throws Throwable {
-        super.bootstrap(inputLine);
-    }
 
     @Override
     protected void initHelp() throws Throwable {

@@ -4,10 +4,10 @@ import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.storage.cli.FoundIdentifiables;
+import edu.uiuc.ncsa.security.util.cli.CLIDriver;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
@@ -36,12 +36,12 @@ import static org.oa4mp.server.loader.oauth2.storage.clients.OA2Client.USE_SERVE
  * on 4/3/14 at  3:24 PM
  */
 public class OA2ClientCommands extends ClientStoreCommands {
-    public OA2ClientCommands(MyLoggingFacade logger,
+    public OA2ClientCommands(CLIDriver driver,
                              String defaultIndent,
                              Store clientStore,
                              ClientApprovalStoreCommands clientApprovalStoreCommands,
                              PermissionsStore permissionsStore) throws Throwable {
-        super(logger, defaultIndent, clientStore, clientApprovalStoreCommands);
+        super(driver, defaultIndent, clientStore, clientApprovalStoreCommands);
         setPermissionsStore(permissionsStore);
     }
 
@@ -483,8 +483,8 @@ public class OA2ClientCommands extends ClientStoreCommands {
         say("If you need to create a hash of a secret, invoke the create_hash method on the secret");
     }
 
-    public OA2ClientCommands(MyLoggingFacade logger, Store store) throws Throwable {
-        super(logger, store);
+    public OA2ClientCommands(CLIDriver driver, Store store) throws Throwable {
+        super(driver, store);
     }
 
     @Override
@@ -670,23 +670,12 @@ public class OA2ClientCommands extends ClientStoreCommands {
             say(identifiables.size() + " clients ea_support " + action);
     }
 
-    @Override
-    public void bootstrap(InputLine inputLine) throws Throwable {
-        super.bootstrap(inputLine);
-
-    }
 
     @Override
     protected void initHelp() throws Throwable {
         super.initHelp();
         getHelpUtil().load("/help/client_help.xml");
     }
-
-    public static String UUC_FLAG_TEST = "-test";
-    public static String UUC_FLAG_CFG = "-cfg";
-    public static String UUC_FLAG_FOUND = "-found";
-    public static String UUC_FLAG_ENABLE = "-enable";
-
 
     protected ApprovalModsConfig createApprovalModsConfig(InputLine inputLine, BaseClient client, boolean doPrompt) {
         boolean useStrictScopes = !inputLine.hasArg(USE_NONSTRICT_SCOPES);

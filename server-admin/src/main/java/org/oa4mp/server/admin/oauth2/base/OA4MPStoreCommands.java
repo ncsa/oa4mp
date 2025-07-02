@@ -4,11 +4,10 @@ import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.ObjectNotFoundException;
-import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.storage.cli.StoreCommands;
+import edu.uiuc.ncsa.security.storage.cli.StoreCommands2;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
-import edu.uiuc.ncsa.security.util.cli.CommandLineTokenizer;
+import edu.uiuc.ncsa.security.util.cli.CLIDriver;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import org.oa4mp.delegation.common.token.impl.TokenUtils;
 import org.oa4mp.server.loader.oauth2.OA2SE;
@@ -20,7 +19,6 @@ import org.qdl_lang.variables.QDLStem;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Vector;
 
 import static edu.uiuc.ncsa.security.util.cli.CLIDriver.LIST_ALL_METHODS_COMMAND;
 import static org.qdl_lang.variables.values.QDLValue.asQDLValue;
@@ -31,16 +29,19 @@ import static org.qdl_lang.variables.values.QDLValue.asQDLValue;
  * <p>Created by Jeff Gaynor<br>
  * on 7/2/18 at  10:06 AM
  */
-public abstract class OA4MPStoreCommands extends StoreCommands {
+public abstract class OA4MPStoreCommands extends StoreCommands2 {
 
-    public OA4MPStoreCommands(MyLoggingFacade logger, String defaultIndent, Store store) throws Throwable {
-        super(logger, defaultIndent, store);
+    public OA4MPStoreCommands(CLIDriver driver, String defaultIndent, Store store) throws Throwable {
+        super(driver, defaultIndent, store);
     }
 
-    public OA4MPStoreCommands(MyLoggingFacade logger, Store store) throws Throwable {
-        super(logger, store);
+    public OA4MPStoreCommands(CLIDriver driver, Store store) throws Throwable {
+        super(driver, store);
     }
+    @Override
+    public void initialize() throws Throwable{}
 
+    public void load(InputLine inputLine){}
 
     @Override
     public OA2SE getEnvironment() {
@@ -110,16 +111,6 @@ public abstract class OA4MPStoreCommands extends StoreCommands {
         } else {
             say(TokenUtils.b64DecodeToken(arg));
         }
-    }
-
-
-    public static void main(String[] args) {
-        CommandLineTokenizer CLT = new CommandLineTokenizer();
-        String raw = "update -add -json '{\"fnord\":[\"blarf0\",\"blarf1\"]}' /foo:bar";
-
-        Vector v = CLT.tokenize(raw);
-        System.out.println(v);
-        InputLine inputLine = new InputLine(v);
     }
 
     @Override
@@ -250,4 +241,9 @@ say("and for QDL lists, see");
     }
 
     State state = null;
+
+    @Override
+    public void about(boolean showBanner, boolean showHeader) {
+       // No-op since logo is not displayed by components
+    }
 }

@@ -3,7 +3,7 @@ package org.oa4mp.server.admin.oauth2.tools;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
-import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.util.cli.CLIDriver;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import org.oa4mp.server.admin.oauth2.base.OA4MPStoreCommands;
 import org.oa4mp.server.loader.oauth2.storage.tx.TXRecord;
@@ -18,12 +18,12 @@ import java.util.List;
  * on 12/14/20 at  2:38 PM
  */
 public class TokenStoreCommands extends OA4MPStoreCommands {
-    public TokenStoreCommands(MyLoggingFacade logger, String defaultIndent, Store store) throws Throwable {
-        super(logger, defaultIndent, store);
+    public TokenStoreCommands(CLIDriver driver, String defaultIndent, Store store) throws Throwable {
+        super(driver, defaultIndent, store);
     }
 
-    public TokenStoreCommands(MyLoggingFacade logger, Store store) throws Throwable {
-        super(logger, store);
+    public TokenStoreCommands(CLIDriver driver, Store store) throws Throwable {
+        super(driver, store);
     }
 
     @Override
@@ -68,10 +68,6 @@ public class TokenStoreCommands extends OA4MPStoreCommands {
         say(i + " exchange records found");
     }
 
-    @Override
-    public void bootstrap(InputLine inputLine) throws Throwable {
-        super.bootstrap(inputLine);
-    }
 
     @Override
     protected void initHelp() throws Throwable {

@@ -4,14 +4,10 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.ConnectionException;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
-import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
 import edu.uiuc.ncsa.security.servlet.ServiceClientHTTPException;
-import edu.uiuc.ncsa.security.util.cli.CommonCommands;
-import edu.uiuc.ncsa.security.util.cli.ConfigurableCommandsImpl;
-import edu.uiuc.ncsa.security.util.cli.HelpUtil;
-import edu.uiuc.ncsa.security.util.cli.InputLine;
+import edu.uiuc.ncsa.security.util.cli.*;
 import edu.uiuc.ncsa.security.util.crypto.CertUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import net.sf.json.JSONArray;
@@ -68,9 +64,19 @@ import static org.oa4mp.delegation.server.server.RFC8628Constants.*;
  * <p>Created by Jeff Gaynor<br>
  * on 5/11/16 at  2:57 PM
  */
-public class OA2CLCCommands extends CommonCommands {
+public class OA2CLCCommands extends CommonCommands2 {
     public String getPrompt() {
         return getName() + ">";
+    }
+
+    @Override
+    public void about(boolean showBanner, boolean showHeader) {
+        say(hasClipboard() ? "clipboard is supported." : "no clipboard support available.");
+    }
+
+    @Override
+    public void initialize() throws Throwable {
+
     }
 
     @Override
@@ -88,24 +94,17 @@ public class OA2CLCCommands extends CommonCommands {
 
     protected OA2ClientEnvironment ce;
 
-    @Override
-    public void bootstrap(InputLine inputLine) throws Throwable {
-        super.bootstrap(inputLine);
-    }
-
-    @Override
-    public HelpUtil getHelpUtil() {
-        return null;
-    }
 
     public static final String IS_RFC_8628_KEY = "is_rfc8628";
 
-    public OA2CLCCommands(boolean silentMode, MyLoggingFacade logger,
+    public OA2CLCCommands(boolean silentMode, CLIDriver driver,
                           OA2CommandLineClient oa2CommandLineClient) throws Throwable {
-        this(logger, oa2CommandLineClient);
-        setPrintOuput(!silentMode);
-        setVerbose(!silentMode);
-        oa2CommandLineClient.setVerbose(!silentMode);
+        this(driver, oa2CommandLineClient);
+        driver.setVerbose(!silentMode);
+        driver.setOutputOn(!silentMode);
+        //setPrintOuput(!silentMode);
+        //setVerbose(!silentMode);
+        //oa2CommandLineClient.setVerbose(!silentMode);
     }
 
     MetaDebugUtil debugUtil = null;
@@ -131,20 +130,12 @@ public class OA2CLCCommands extends CommonCommands {
         debugUtil = metaDebugUtil;
     }
 
-    public OA2CLCCommands(MyLoggingFacade logger,
+    public OA2CLCCommands(CLIDriver driver,
                           OA2CommandLineClient oa2CommandLineClient) throws Throwable {
-        super(logger);
+        super(driver);
         try {
             if (oa2CommandLineClient.getLoader() == null) {
-/*
-                if (isBatch()) {
-                    throw new MyConfigurationException("No loader found");
-                } else {
-*/
-                    // probably should not issue this on startup since they may start without
-                    // a configuration then load one.
-                    //   say("warning: no loader found");
-//                }
+
             } else {
                 setCe((OA2ClientEnvironment) oa2CommandLineClient.getEnvironment());
             }
@@ -162,22 +153,15 @@ public class OA2CLCCommands extends CommonCommands {
             } else {
                 // Most likely is that there is some connection issue, but if not,
                 // fall through here
-                if (logger != null) {
-                    logger.error("could not load configuration", t);
-                } else {
+                    error("could not load configuration", t);
                     if (getDebugger().isEnabled()) {
                         t.printStackTrace();
                     }
                 }
-
             }
-        }
         this.oa2CommandLineClient = oa2CommandLineClient;
     }
 
-    public void bootMessage() {
-        say(hasClipboard() ? "clipboard is supported." : "no clipboard support available.");
-    }
 
     protected OA2MPService service;
 
@@ -1011,7 +995,7 @@ public class OA2CLCCommands extends CommonCommands {
                 printToken(getIdToken(), inputLine.hasArg(NO_VERIFY_JWT), true);
             }
         }
-        if (isPrintOuput()) {
+        if (isPrintOutput()) {
             printTokens(inputLine.hasArg(NO_VERIFY_JWT), true);
         }
     }
@@ -1022,7 +1006,9 @@ public class OA2CLCCommands extends CommonCommands {
 
     ATResponse2 currentATResponse;
 
-
+protected boolean isPrintOutput(){
+    return getDriver().isOutputOn();
+}
     protected void getCertHelp() {
         say("get_cert");
         sayi("Usage: This will get the requested cert chain from the server.");
@@ -1270,7 +1256,7 @@ public class OA2CLCCommands extends CommonCommands {
                 say(getIdToken().getPayload().toString(2));
             }
         }
-        if (isPrintOuput()) {
+        if (isPrintOutput()) {
             printTokens(inputLine.hasArg(NO_VERIFY_JWT), false);
         }
 
@@ -1548,10 +1534,10 @@ public class OA2CLCCommands extends CommonCommands {
             }
         }
         if (json.containsKey(PRINT_OUTPUT_ON_KEY)) {
-            setPrintOuput(json.getBoolean(PRINT_OUTPUT_ON_KEY));
+            getDriver().setOutputOn(json.getBoolean(PRINT_OUTPUT_ON_KEY));
         }
         if (json.containsKey(VERBOSE_ON_KEY)) {
-            setVerbose(json.getBoolean(VERBOSE_ON_KEY));
+            getDriver().setVerbose(json.getBoolean(VERBOSE_ON_KEY));
         }
 
         if (json.containsKey(USER_MESSAGE_KEY)) {
@@ -1738,7 +1724,7 @@ public class OA2CLCCommands extends CommonCommands {
                 jsonObject.put("debugger", getDebugger().toJSON());
             }
         } catch (Exception e) {
-            if (isPrintOuput()) {
+            if (isPrintOutput()) {
                 say("warn -- could not serialize debugger:" + e.getMessage());
             }
             if (isVerbose()) {
@@ -1750,7 +1736,7 @@ public class OA2CLCCommands extends CommonCommands {
         if (grant != null) {
             jsonObject.put(AUTHZ_GRANT_KEY, grant.toJSON());
         }
-        jsonObject.put(PRINT_OUTPUT_ON_KEY, isPrintOuput());
+        jsonObject.put(PRINT_OUTPUT_ON_KEY, isPrintOutput());
         jsonObject.put(VERBOSE_ON_KEY, isVerbose());
         if (currentURI != null) {
             jsonObject.put(CURRENT_URI_KEY, currentURI.toString());
@@ -2222,7 +2208,7 @@ public class OA2CLCCommands extends CommonCommands {
             parameters.put(x, getRequestParameters().get(x));
         }
         rfc7523(parameters);
-        if (isPrintOuput()) {
+        if (isPrintOutput()) {
             printTokens(inputLine.hasArg(NO_VERIFY_JWT), true);
         }
 

@@ -13,22 +13,6 @@ import java.util.logging.Level;
  * on 5/6/19 at  2:37 PM
  */
 public class JWKCLI extends ConfigurableCommandsImpl {
-    @Override
-    public void setIOInterface(IOInterface io) {
-
-    }
-
-
-
-    @Override
-    public void bootstrap(InputLine inputLine) throws Throwable {
-super.bootstrap(inputLine);
-    }
-
-    @Override
-    public HelpUtil getHelpUtil() {
-        return null;
-    }
 
     public JWKCLI(MyLoggingFacade logger) {
         super(logger);
@@ -47,11 +31,6 @@ super.bootstrap(inputLine);
         say(StringUtils.pad2("* type 'help' for a list of commands", width) + "*");
         say(StringUtils.pad2("*      'exit' or 'quit' to end this session.", width) + "*");
         say(stars);
-    }
-
-    @Override
-    public void print_help() throws Exception{
-    say("Need to write help.");
     }
 
     ConfigurationLoader<? extends AbstractEnvironment> loader = null;

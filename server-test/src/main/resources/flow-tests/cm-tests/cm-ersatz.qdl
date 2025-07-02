@@ -25,7 +25,6 @@ ersatz_resp. := http#post(payload.);
 ⊨ ersatz_resp.'status'.'code' == ini.'status' : 'incorrect ersatz status: expected '+ ini.'status' +' but got ' + ersatz_resp.'status'.'code';
 
 r. := http#get({'client_id':ersatz_id});
-say('ersatz client response:' + print(r.'content'));
 ⊨ ∃r.'content'.'ersatz_client' : 'missing ersatz_client assertion';
 ⊨ r.'content'.'ersatz_client' : 'wrong ersatz_client assertion';
 ⊨ ∃r.'content'.'org.oa4mp:/ersatz/provisioners' : 'missing provisioners assertion';

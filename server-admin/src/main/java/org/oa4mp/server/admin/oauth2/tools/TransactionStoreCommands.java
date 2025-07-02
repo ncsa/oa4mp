@@ -8,6 +8,7 @@ import edu.uiuc.ncsa.security.core.cache.LockingCleanup;
 import edu.uiuc.ncsa.security.core.exceptions.TransactionNotFoundException;
 import edu.uiuc.ncsa.security.core.util.*;
 import edu.uiuc.ncsa.security.storage.cli.FoundIdentifiables;
+import edu.uiuc.ncsa.security.util.cli.CLIDriver;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
@@ -41,8 +42,8 @@ import static edu.uiuc.ncsa.security.core.util.StringUtils.*;
  * on 11/16/20 at  3:16 PM
  */
 public class TransactionStoreCommands extends OA4MPStoreCommands {
-    public TransactionStoreCommands(MyLoggingFacade logger, String defaultIndent, OA2SE oa2se) throws Throwable {
-        super(logger, defaultIndent, oa2se.getTransactionStore());
+    public TransactionStoreCommands(CLIDriver driver, String defaultIndent, OA2SE oa2se) throws Throwable {
+        super(driver, defaultIndent, oa2se.getTransactionStore());
         this.oa2se = oa2se;
         this.txStore = oa2se.getTxStore();
     }
@@ -55,8 +56,8 @@ public class TransactionStoreCommands extends OA4MPStoreCommands {
 
     TXStore<? extends TXRecord> txStore;
 
-    public TransactionStoreCommands(MyLoggingFacade logger, Store store) throws Throwable {
-        super(logger, store);
+    public TransactionStoreCommands(CLIDriver driver, Store store) throws Throwable {
+        super(driver, store);
     }
 
     @Override
@@ -553,7 +554,7 @@ if(1 < foundIdentifiables.size()){
                 say("saved QDL state to '" + f + "'");
             } catch (Throwable e) {
                 say("saving to '" + f + " failed:" + e.getMessage());
-                if (isVerbose() && isPrintOuput()) {
+                if (isVerbose() && getDriver().isOutputOn()) {
                     e.printStackTrace();
                 }
             }
@@ -853,10 +854,6 @@ if(1 < foundIdentifiables.size()){
         return;
     }
 
-    @Override
-    public void bootstrap(InputLine inputLine) throws Throwable {
-        super.bootstrap(inputLine);
-    }
 
     @Override
     protected void initHelp() throws Throwable {

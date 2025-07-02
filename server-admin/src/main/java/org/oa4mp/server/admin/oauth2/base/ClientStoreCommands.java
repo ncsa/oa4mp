@@ -4,7 +4,7 @@ import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.util.cli.CLIDriver;
 import org.oa4mp.delegation.common.storage.clients.Client;
 import org.oa4mp.delegation.common.storage.clients.ClientKeys;
 import org.oa4mp.delegation.server.storage.ClientApproval;
@@ -16,16 +16,16 @@ import java.io.IOException;
  * on 5/21/13 at  4:21 PM
  */
 public abstract class ClientStoreCommands extends BaseClientStoreCommands {
-    public ClientStoreCommands(MyLoggingFacade logger,
+    public ClientStoreCommands(CLIDriver driver,
                                String defaultIndent,
                                Store clientStore,
                                ClientApprovalStoreCommands clientApprovalStoreCommands) throws Throwable {
-        super(logger, defaultIndent, clientStore, clientApprovalStoreCommands);
+        super(driver, defaultIndent, clientStore, clientApprovalStoreCommands);
     }
 
 
-    public ClientStoreCommands(MyLoggingFacade logger, Store store) throws Throwable {
-        super(logger, store);
+    public ClientStoreCommands(CLIDriver driver, Store store) throws Throwable {
+        super(driver, store);
         setSortable(new ClientSorter());
     }
 

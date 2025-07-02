@@ -1,6 +1,7 @@
 package org.oa4mp.server.loader.qdl.util;
 
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.util.cli.CLIDriver;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import edu.uiuc.ncsa.security.util.jwk.JWKUtil2;
@@ -90,7 +91,9 @@ public class JWTCommands  {
 
     public SigningCommands getSigningCommands() throws Throwable {
         if (signingCommands == null) {
-            signingCommands = new SigningCommands(null);
+            CLIDriver cli = new CLIDriver();
+            cli.setVerbose(false);
+            signingCommands = new SigningCommands(cli, null);
 
         }
         return signingCommands;
