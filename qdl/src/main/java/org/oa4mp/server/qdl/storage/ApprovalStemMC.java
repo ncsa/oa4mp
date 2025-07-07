@@ -58,7 +58,9 @@ public class ApprovalStemMC<V extends ClientApproval> extends StemConverter<V> {
         } else {
             put(stem,kk().status(), v.getStatus().getStatus());
         }
-        put(stem,kk().approvalTS(), v.getApprovalTimestamp().getTime());
+        if(v.getApprovalTimestamp() != null) {
+            put(stem, kk().approvalTS(), v.getApprovalTimestamp().getTime());
+        }
         if (!StringUtils.isTrivial(v.getApprover())) {
             put(stem,kk().approver(), v.getApprover());
         }

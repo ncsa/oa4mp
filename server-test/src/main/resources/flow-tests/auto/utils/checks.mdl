@@ -122,12 +122,13 @@ body[
             === lifetime = the lifetime of this token (this is to check OA4MP works)
             // Checks required claims as per §2.2
             m. ≔  missing_claims(['exp','iat','aud','sub','iss','jti','client_id'], asserted.);
-            ⊨ size(m.)≡0 : 'missing claims:' + to_string(m.);
+            ⊨ size(m.)≡0 : 'access token missing claims:' + to_string(m.);
             //⊨ access_token.'lifetime' == 300000 : 'wrong access token lifetime, got ' + (access_token.'lifetime');
            // If a resource was sent in the initial request, then that should be asserted as the audience,
            // otherwise, use whatever the server has set.
             ⊨ asserted.'aud' == (∃expected.'resource'?expected.'resource':expected.'aud') : 'wrong audience';  // Audience is a little different than usual.
-            ⊨ asserted.'client_id' == expected.'client_id';  // wrong client_id.
+            ⊨ ∃asserted.'client_id' : 'missing client_id in access token';  // missing client_id.
+            ⊨ asserted.'client_id' == expected.'client_id' : 'wrong client_id in access token, got ' + (asserted.'client_id');  // wrong client_id.
             ⊨ date_ms() < (asserted.'exp')*1000  : 'incorrect expiration time.';  // §4 validation
             ⊨ asserted.'iss'  == expected.'iss' : 'incorrect issuer value';  // §4 validation
           ];// end RFC9068

@@ -3,9 +3,9 @@ package org.oa4mp.server.admin.oauth2.tools;
 import com.nimbusds.jose.util.Base64URL;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.FileUtil;
-import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
-import edu.uiuc.ncsa.security.util.cli.CommonCommands;
+import edu.uiuc.ncsa.security.util.cli.CLIDriver;
+import edu.uiuc.ncsa.security.util.cli.CommonCommands2;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.crypto.KeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
@@ -38,7 +38,7 @@ import static org.oa4mp.server.loader.qdl.util.SigningCommands.createRSAJWK;
  * <p>Created by Jeff Gaynor<br>
  * on 5/6/19 at  2:39 PM
  */
-public class JWKUtilCommands extends CommonCommands {
+public class JWKUtilCommands extends CommonCommands2 {
     public JWKUtil2 getJwkUtil() {
         if (jwkUtil == null) {
             jwkUtil = new JWKUtil2();
@@ -52,8 +52,23 @@ public class JWKUtilCommands extends CommonCommands {
 
     JWKUtil2 jwkUtil;
 
-    public JWKUtilCommands(MyLoggingFacade logger) throws Throwable {
-        super(logger);
+    public JWKUtilCommands(CLIDriver driver) throws Throwable {
+        super(driver);
+    }
+
+    @Override
+    public void about(boolean showBanner, boolean showHeader) {
+
+    }
+
+    @Override
+    public void initialize() throws Throwable {
+
+    }
+
+    @Override
+    public void load(InputLine inputLine) throws Throwable {
+
     }
 
     @Override
@@ -83,15 +98,12 @@ public class JWKUtilCommands extends CommonCommands {
         sayi("Create a set of RSA JSON Web keys and store them in the given file");
         sayi("There are several modes of operation. If you do not specify an output file, then the keys are written ");
         sayi("to the command line.");
-        sayi("Interactive mode:");
         sayi("   E.g.");
         sayi("   create_keys " + CL_OUTPUT_FILE_FLAG + " keys.jwk");
         sayi("       This will create a set of key pairs with random ids and store the result in the file kwys.jwk");
         sayi("   create_keys");
         sayi("        with no arguments, a full set of keys will be created and printed to the command line.");
-        sayi("   ");
-        sayi("Batch mode:");
-        sayi("   You can also take a set of keys and extract the set of public keys. Various JWT toolkits require this.");
+        sayi("\nE.g.   ");
         sayi("   create_keys " + CL_IS_PUBLIC_FLAG + " " + CL_INPUT_FILE_FLAG + " keys.jwk " + CL_OUTPUT_FILE_FLAG + "  pub_keys.jwk");
         sayi("        This will take the full set of keys in keys.jwk extract the public keys and place the result in pub_keys.jwk");
         sayi("        Note: including the -public flag implies the -in argument is given and an error will result if it is not found");
@@ -149,7 +161,16 @@ public class JWKUtilCommands extends CommonCommands {
         }
         JSONWebKeys sourceKeys = this.keys;
         if (hasInputFile) {
-            String contents = readFile(inputLine.getNextArgFor(CL_INPUT_FILE_FLAG));
+            String contents = null;
+            try {
+                contents = FileUtil.readFileAsString(inputLine.getNextArgFor(CL_INPUT_FILE_FLAG));
+            } catch (Throwable e) {
+                if(getDriver().isTraceOn()){
+                    e.printStackTrace();
+                }
+                say("error reading input file: " + e.getMessage());
+                return;
+            }
             sourceKeys = getJwkUtil().fromJSON(contents);
         }
         SigningCommands sg = createSG(null);
@@ -323,6 +344,7 @@ public class JWKUtilCommands extends CommonCommands {
                 }
 
             }
+            this.keys = keys;
             JSONObject jwks = getJwkUtil().toJSON(keys);
             if (hasOutputFile) {
                 writeFile(outFilename, jwks.toString(2));
@@ -333,7 +355,16 @@ public class JWKUtilCommands extends CommonCommands {
             return;
         }
         // final case, generate the public keys.
-        String contents = readFile(inFilename);
+        String contents = null;
+        try {
+            contents = FileUtil.readFileAsString(inFilename);
+        } catch (Throwable e) {
+            if(getDriver().isTraceOn()){
+                e.printStackTrace();
+            }
+            say("error reading " + inFilename);
+            return;
+        }
 
         JSONWebKeys keys = getJwkUtil().fromJSON(contents);
         JSONWebKeys targetKeys = getJwkUtil().makePublic(keys);
@@ -866,7 +897,16 @@ public class JWKUtilCommands extends CommonCommands {
                 return;
             }
         }
-        String rawJSON = readFile(filename);
+        String rawJSON = null;
+        try {
+            rawJSON = FileUtil.readFileAsString(filename);
+        } catch (Throwable e) {
+            if(getDriver().isTraceOn()){
+                e.printStackTrace();
+            }
+            say("could not read file: " + filename);
+            return;
+        }
         if (rawJSON == null) {
             say("Could not read the file \"" + filename + "\"");
             return;
@@ -920,10 +960,6 @@ public class JWKUtilCommands extends CommonCommands {
         sayi("   If you have already set the key and keyid these will be used.");
         sayi("   If the output file is given, the token will be written there instead.");
         sayi("");
-        sayi("Batch mode:");
-        sayi("   Creates a token from a set of claims, then signs it using the key with the given id.            ");
-        sayi("   Writes the output to either the target file or prints it at the command line if no output       ");
-        sayi("   file is specified.                                                                              ");
         sayi("   E.g.                                                                                            ");
         sayi("   create_token " + CL_KEY_FILE_FLAG + " keys.jwk " + CL_KEY_ID_FLAG + " ABC123 " + CL_INPUT_FILE_FLAG +
                 " my_claims.txt " + CL_OUTPUT_FILE_FLAG + " my_token.jwt");
@@ -1007,14 +1043,29 @@ public class JWKUtilCommands extends CommonCommands {
         }
         JSONObject claims = null;
         if (inputLine.hasArg(CL_INPUT_FILE_FLAG)) {
-            claims = JSONObject.fromObject(readFile(getArgValue(inputLine, CL_INPUT_FILE_FLAG)));
+            try {
+                claims = JSONObject.fromObject(FileUtil.readFileAsString(getArgValue(inputLine, CL_INPUT_FILE_FLAG)));
+            } catch (Throwable e) {
+                if(getDriver().isTraceOn()){
+                    e.printStackTrace();
+                }
+                say("error reading input file: " + e.getMessage());
+                return;
+            }
         } else {
             String x = getInput("Enter the name of the file containing the JSON object to use:");
             if (isEmpty(x)) {
                 say("No argument, exiting...");
                 return;
             }
-            claims = JSONObject.fromObject(readFile(x));
+            try {
+                claims = JSONObject.fromObject(FileUtil.readFileAsString(x));
+            } catch (Throwable e) {
+                if(getDriver().isTraceOn()){
+                    e.printStackTrace();
+                }
+                say("error reading claims file \"" + x + "\":" + e.getMessage());
+            }
 
         }
         String signedToken = JWTUtil.createJWT(claims, localKeys.get(localDefaultID));
@@ -1087,8 +1138,17 @@ public class JWKUtilCommands extends CommonCommands {
             lifetime = Long.parseLong(inputLine.getNextArgFor(LIFETIME_FLAG));
         }
         long issuedAt = new Date().getTime(); // in milliseconds. Eventually this turns into seconds.
-
-        JSONObject claims = readJSON(inputLine.getNextArgFor(CL_INPUT_FILE_FLAG));
+String x = inputLine.getNextArgFor(CL_INPUT_FILE_FLAG);
+        JSONObject claims = null;
+        try {
+            claims = readJSON(x);
+        } catch (Throwable e) {
+            if(getDriver().isTraceOn()){
+                e.printStackTrace();
+            }
+            say("error reading file \"" + x + "\": " + e.getMessage());
+            return;
+        }
         // now we set the claims.
 
         claims.put(OA2Claims.ISSUED_AT, issuedAt / 1000);
@@ -1121,11 +1181,9 @@ public class JWKUtilCommands extends CommonCommands {
 
     protected void printTokenHelp() {
         say("print_token: [" + CL_INPUT_FILE_FLAG + " file | token] Print the given token's header and payload, doing no verification.");
-        sayi("Interactive mode:");
-        sayi("    If you omit the argument, it will print the last token generated by the create_token call.");
-        sayi("    If there is no last token, that will be shown too. ");
-        sayi("Batch mode:");
-        sayi("    Print the token specified by the file or given at the command line.");
+        sayi("If you omit the argument, it will print the last token generated by the create_token call.");
+        sayi("If there is no last token, that will be shown too. ");
+
         say("Related: create_token");
     }
 
@@ -1144,7 +1202,16 @@ public class JWKUtilCommands extends CommonCommands {
         }
         String rawToken = null;
         if (inputLine.hasArg(CL_INPUT_FILE_FLAG)) {
-            rawToken = readFile(inputLine.getNextArgFor(CL_INPUT_FILE_FLAG));
+            String x = inputLine.getNextArgFor(CL_INPUT_FILE_FLAG);
+            try {
+                rawToken = FileUtil.readFileAsString(x);
+            } catch (Throwable e) {
+                if(getDriver().isTraceOn()){
+                    e.printStackTrace();
+                }
+                say("error reading file \"" + x + "\"");
+                return;
+            }
         } else {
             rawToken = inputLine.getLastArg();
         }
@@ -1200,28 +1267,23 @@ public class JWKUtilCommands extends CommonCommands {
 
     protected void printValidateTokenHelp() {
         say("validate_token [" + CL_WELL_KNOWN_FLAG + " url | " + CL_KEY_FILE_FLAG + " file " + CL_INPUT_FILE_FLAG + " filename  | token]");
-        sayi("Interactive mode:                                                                                                            ");
-        sayi("    This will take a token and check the signature. It will also print out the payload");
-        sayi("    and header information.");
-        sayi("    The validation is against the current set of keys or against a URL specified with the");
-        sayi("    -wellKnown flag. You can also point to a key file (file with JSON web keys in it) with");
-        sayi("    the -keyFile flag.");
-        sayi("    You may supply either the token itself or specify with the -file flag that this is in a file.");
-        sayi(" Batch mode:");
-        sayi("    This will verify a given jwt given either a set of keys or a well-known url (from which the key will            ");
-        sayi("    be extracted. You may either specify the token in a file or as the final argument.                              ");
-        sayi("    This will result in a return code of 1 if the token is valid or 0 if not.                                       ");
-        sayi("    E.g.s                                                                                                          ");
-        sayi("    validate_token " + CL_WELL_KNOWN_FLAG + " https://foo.bar/.well-known " + CL_INPUT_FILE_FLAG + " my_token.jwt                                         ");
-        sayi("       This will read the keys in the well-known file and read the token in the file                                ");
-        sayi("                                                                                                                 ");
-        sayi("    validate_token " + CL_WELL_KNOWN_FLAG + " https://foo.bar/.well-known -v " + CL_INPUT_FILE_FLAG + " my_token.jwt                                      ");
-        sayi("       Identical behavior to the first example but note the -v flag: This causes any information about              ");
-        sayi("       the token to be printed. Normally this is not used except for trying to debug issues.                        ");
-        sayi("                                        ");
-        sayi("    validate_token " + CL_KEY_FILE_FLAG + "  keys.jwk eyJ...........                                                                    ");
-        sayi("       This will read in the keys from the give file and the assumption is that the last argument is the token itself");
-        sayi("       Note that in this example the token is truncated so it fits here.                                     ");
+        sayi("This will take a token and check the signature. It will also print out the payload");
+        sayi("and header information.");
+        sayi("The validation is against the current set of keys or against a URL specified with the");
+        sayi("-wellKnown flag. You can also point to a key file (file with JSON web keys in it) with");
+        sayi("the -keyFile flag.");
+        sayi("You may supply either the token itself or specify with the -file flag that this is in a file.");
+        sayi("E.g.s                                                                                                          ");
+        sayi("validate_token " + CL_WELL_KNOWN_FLAG + " https://foo.bar/.well-known " + CL_INPUT_FILE_FLAG + " my_token.jwt                                         ");
+        sayi("   This will read the keys in the well-known file and read the token in the file                                ");
+        sayi("                                                                                                             ");
+        sayi("validate_token " + CL_WELL_KNOWN_FLAG + " https://foo.bar/.well-known -v " + CL_INPUT_FILE_FLAG + " my_token.jwt                                      ");
+        sayi("   Identical behavior to the first example but note the -v flag: This causes any information about              ");
+        sayi("   the token to be printed. Normally this is not used except for trying to debug issues.                        ");
+        sayi("                                    ");
+        sayi("validate_token " + CL_KEY_FILE_FLAG + "  keys.jwk eyJ...........                                                                    ");
+        sayi("   This will read in the keys from the give file and the assumption is that the last argument is the token itself");
+        sayi("   Note that in this example the token is truncated so it fits here.                                     ");
         say("See also: create_token");
     }
 
@@ -1295,11 +1357,6 @@ public class JWKUtilCommands extends CommonCommands {
         }
     }
 
-    public void error(Throwable t, String message) {
-        if (logger != null) {
-            logger.error(message, t);
-        }
-    }
 
     public static void main(String[] args) {
         try {
@@ -1348,8 +1405,16 @@ public class JWKUtilCommands extends CommonCommands {
         gracefulExit(isDecode && isEncode, "Sorry, you cannot specify both encoding and decoding at the same time");
 
         String input = "";
+        String x = inputLine.getNextArgFor(CL_INPUT_FILE_FLAG);
         if (hasInfile) {
-            input = readFile(inputLine.getNextArgFor(CL_INPUT_FILE_FLAG));
+            try {
+                input = FileUtil.readFileAsString(x);
+            } catch (Throwable e) {
+                if(getDriver().isTraceOn()){
+                    e.printStackTrace();
+                }
+                say("error reading input file \"" + x + "\":" + e.getMessage());
+            }
         } else {
             input = inputLine.getLastArg();
         }
@@ -1361,7 +1426,6 @@ public class JWKUtilCommands extends CommonCommands {
             } else {
                 say(output);
             }
-            return;
         } else {
             // decoding to bytes
             byte[] bytes = Base64.decodeBase64(input);
@@ -1378,7 +1442,6 @@ public class JWKUtilCommands extends CommonCommands {
                 fos.close();
             } else {
                 writeFile(inputLine.getNextArgFor(CL_OUTPUT_FILE_FLAG), new String(bytes));
-                return;
             }
         }
     }

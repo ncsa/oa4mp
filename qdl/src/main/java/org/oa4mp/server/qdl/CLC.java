@@ -1441,7 +1441,8 @@ public class CLC implements QDLMetaModule {
                                 array.addAll(QDLValue.castToJavaValues((List<QDLValue>) qdlStem.getQDLList()));
                                 parameters.put(key.getValue(), array);
                             } else {
-                                throw new IllegalArgumentException("General stems are not supported as values, just lists");
+                                parameters.put(key.getValue(), qdlStem.toJSON());
+//                                throw new IllegalArgumentException("General stems are not supported as values, just lists");
                             }
                         } else {
                             parameters.put(key.getValue(), value.getValue());

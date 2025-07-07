@@ -129,35 +129,6 @@ public class OA2CommandLineClient extends ConfigurableCommandsImpl2 {
         cli.addCommands(usc);
         usc.bootstrap(inputLine);
         cli.start();
-
-        /* Proposed NEW
-
-            OA2CommandLineClient clc = new OA2CommandLineClient(null);
-            CLIDriver cli = new CLIDriver(clc); // actually run the driver that parses commands and passes them along
-            clc.bootstrap(inputLine);
-            OA2CLCCommands usc = new OA2CLCCommands(cli.getLogger(), clc);
-            usc.setConfigFile(clc.getConfigFile());
-            FormatUtil.setIoInterface(cli.getIOInterface());
-            cli.addCommands(usc);
-            usc.bootMessage();
-            cli.start();
-
-         */
-/* OLD
-        CLIDriver cli = new CLIDriver();
-        cli.bootstrap(inputLine);
-        clc.start(args);
-        OA2CLCCommands usc = new OA2CLCCommands(clc.getMyLogger(), clc);
-        usc.setConfigFile(clc.getConfigFile());
-        FormatUtil.setIoInterface(clc.getIOInterface());
-        CLIDriver cli = new CLIDriver(clc.getIOInterface());
-        cli.addCommands(usc);
-        cli.setLineCommentStart(COMMENT_START);
-        cli.setIOInterface(clc.getIOInterface());
-        usc.bootMessage();
-        cli.start();
-*/
-
     }
 
     public void start(String[] args) throws Exception {

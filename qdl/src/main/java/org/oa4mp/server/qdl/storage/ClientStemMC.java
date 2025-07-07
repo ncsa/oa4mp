@@ -16,6 +16,7 @@ import org.qdl_lang.variables.QDLList;
 import org.qdl_lang.variables.QDLStem;
 import org.qdl_lang.variables.values.StringValue;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -90,6 +91,10 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
         }
         if(stem.containsKey(kk().rfc7523ClientUsers())){
            v.setServiceClientUsers(toList(stem, kk().rfc7523ClientUsers()));
+        }
+
+        if (stem.containsKey(kk().jwksURI())) {
+            v.setJwksURI(URI.create(stem.getString( kk().proxyClaimsList())));
         }
         if(stem.containsKey(kk().jwks())){
             try {
@@ -257,6 +262,10 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
         setNonNullStemValue(stem, kk().email(), v.getEmail());
         setNonNullStemValue(stem, kk().name(), v.getName());
         setNonNullStemValue(stem, kk().creationTS(), v.getCreationTS().getTime());
+        if(v.getJwksURI() != null) {
+            setNonNullStemValue(stem, kk().jwksURI(), v.getJwksURI().toString());
+        }
+
         if(v.hasJWKS()) {
             QDLStem ss = new QDLStem();
             ss.fromJSON(JSONWebKeyUtil.toJSON(v.getJWKS()));

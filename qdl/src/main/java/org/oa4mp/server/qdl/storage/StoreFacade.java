@@ -44,12 +44,12 @@ public class StoreFacade /*implements QDLMetaModule*/ {
     public QDLStem getStoreTypes() {
         if (types == null) {
             types = new QDLStem();
-            put(types,"client", STORE_TYPE_CLIENT);
-            put(types,"approval", STORE_TYPE_APPROVALS);
-            put(types,"admin", STORE_TYPE_ADMIN_CLIENT_STORE);
-            put(types,"permission", STORE_TYPE_PERMISSION_STORE);
-            put(types,"transaction", STORE_TYPE_TRANSACTION);
-            put(types,"tx", STORE_TYPE_TX_STORE);
+            put(types, "client", STORE_TYPE_CLIENT);
+            put(types, "approval", STORE_TYPE_APPROVALS);
+            put(types, "admin", STORE_TYPE_ADMIN_CLIENT_STORE);
+            put(types, "permission", STORE_TYPE_PERMISSION_STORE);
+            put(types, "transaction", STORE_TYPE_TRANSACTION);
+            put(types, "tx", STORE_TYPE_TX_STORE);
         }
         return types;
     }
@@ -302,6 +302,10 @@ public class StoreFacade /*implements QDLMetaModule*/ {
                 storeAccessor.setMapConverter(new TXRStemMC(getEnvironment().getTxStore().getMapConverter(),
                         getEnvironment().getTxStore(),
                         getEnvironment().getClientStore()));
+                break;
+            case STORE_TYPE_PERMISSION_STORE:
+                storeAccessor = new QDLPermissionStoreAccessor(storeType, getEnvironment().getPermissionStore(), getEnvironment().getMyLogger());
+                storeAccessor.setMapConverter(new PermissionStemMC(getEnvironment().getPermissionStore().getMapConverter()));
                 break;
             default:
                 throw new IllegalArgumentException("unsupported store '" + storeType + "'");
@@ -1158,6 +1162,43 @@ public class StoreFacade /*implements QDLMetaModule*/ {
             doxx.add("");
             doxx.add("");
             return doxx;
+        }
+    }
+
+    public static String SHUTDOWN = "shutdown";
+
+    public class Shutdown implements QDLFunction {
+        @Override
+        public String getName() {
+            return SHUTDOWN;
+        }
+
+        @Override
+        public int[] getArgCount() {
+            return new int[]{0};
+        }
+
+        @Override
+        public QDLValue evaluate(QDLValue[] qdlValues, State state) throws Throwable {
+            checkInit();
+            QDLValue out = QDLValue.asQDLValue(getStoreAccessor().shutdown());
+            initCalled = false; // since connections should be released;
+            return out;
+        }
+
+        List<String> docs = null;
+
+        @Override
+        public List<String> getDocumentation(int argCount) {
+            if (docs == null) {
+                docs = new ArrayList<>();
+                docs.add(getName() + "() - shutdown the store. ");
+                docs.add("For most stores this does nothing, but Derby (file) stores can be rendered ");
+                docs.add("unusable in case of an issue. One important use is catching errors and issuing this");
+                docs.add("as a final call to cleanup connections");
+
+            }
+            return docs;
         }
     }
 }

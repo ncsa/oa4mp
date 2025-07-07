@@ -30,7 +30,7 @@ Using Keys (RFC 7523)
 If you want to use public and private keys for authorization, then **before registering**,
 run:
 
-${OA4MP_HOME}bin/jwt -batchFile ${OA4MP_HOME}etc/create_keys.cmd
+${OA4MP_HOME}bin/jwt -in ${OA4MP_HOME}etc/create_keys.cmd
 
 The defaults for using keys are already in the generated cfg.xml file.
 This command creates a full set

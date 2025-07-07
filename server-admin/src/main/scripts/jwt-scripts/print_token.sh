@@ -9,7 +9,7 @@ if [ -z "$JWT_JAR" ]; then
   JWT_JAR=jwt.jar
 fi
 
-java -jar $JWT_JAR print_token -log $JWT_LOG -batch  $1
+java -jar $JWT_JAR print_token -log $JWT_LOG -run  $1
 
 if [ $? != 0 ]; then
   exit 1

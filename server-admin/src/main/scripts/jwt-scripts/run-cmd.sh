@@ -1,5 +1,5 @@
 #!/bin/bash
-# Run a command in batch mode. Note that this just passes along the arguments so any command can be run.
+# Run a command. Note that this just passes along the arguments so any command can be run.
 
 source ./set-env.sh
 
@@ -12,7 +12,7 @@ if [ -z "$JWT_JAR" ]; then
   JWT_JAR=jwt.jar
 fi
 
-java -jar $JWT_JAR  -log $JWT_LOG -batchFile  "$@"
+java -jar $JWT_JAR  -log $JWT_LOG -run  "$@"
 
 if [ $? != 0 ]; then
   exit 1

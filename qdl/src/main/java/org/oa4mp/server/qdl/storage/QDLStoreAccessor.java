@@ -1,9 +1,5 @@
 package org.oa4mp.server.qdl.storage;
 
-import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
-import org.oa4mp.server.admin.oauth2.base.StoreArchiver;
-import org.oa4mp.server.admin.oauth2.base.OA4MPStoreCommands;
-import org.qdl_lang.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
@@ -12,11 +8,16 @@ import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
-import org.oa4mp.delegation.common.token.impl.AuthorizationGrantImpl;
 import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
+import edu.uiuc.ncsa.security.storage.sql.SQLStore;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
+import org.oa4mp.delegation.common.token.impl.AuthorizationGrantImpl;
+import org.oa4mp.server.admin.oauth2.base.OA4MPStoreCommands;
+import org.oa4mp.server.admin.oauth2.base.StoreArchiver;
+import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
+import org.qdl_lang.variables.QDLStem;
 import org.qdl_lang.variables.values.QDLKey;
 
 import java.io.ByteArrayInputStream;
@@ -28,7 +29,7 @@ import java.util.List;
 
 /**
  * This gives QDL the ability to look into stores such as clients, approvals, etc.
- * programatically. It is designed to be similar to the CLI for OA4MP, hence
+ * programmatically. It is designed to be similar to the CLI for OA4MP, hence
  * more or less a take off of {@link OA4MPStoreCommands}.
  * This class is used by others for accessing a store, so it assumes that the inputs
  * have been checked (e.g. that a method is called with the right value). As such
@@ -171,6 +172,23 @@ public class QDLStoreAccessor {
     }
 
     /**
+     * shutsdown the store. This really only affect Derby stores which can be unusable if they
+     * are not shutdown correctly.
+     *
+     * @return
+     */
+    public boolean shutdown() {
+
+        if (getStore() instanceof SQLStore) {
+            SQLStore sqlStore = (SQLStore) getStore();
+            if(sqlStore.getConnectionPool() != null) {
+                sqlStore.getConnectionPool().shutdown();
+            }
+        }
+        return true;
+    }
+
+    /**
      * Either
      *
      * @param id
@@ -216,7 +234,7 @@ public class QDLStoreAccessor {
 
     protected QDLStem toStem(Identifiable identifiable) {
         QDLStem stem = new QDLStem();
-        if(identifiable != null) {
+        if (identifiable != null) {
             getConverter().toMap(identifiable, stem);
         }
         return stem;
@@ -252,16 +270,18 @@ public class QDLStoreAccessor {
         List<Identifiable> result = getStore().search(key, condition, isregex);
         List<QDLStem> stems = new ArrayList<>();
         for (Identifiable identifiable : result) {
-            if(!isVersionID(identifiable.getIdentifier())) {
+            if (!isVersionID(identifiable.getIdentifier())) {
                 stems.add(toStem(identifiable));
             }
         }
         output.addList(stems);
         return output;
     }
-    protected boolean isVersionID(Identifier id){
-        return id.getUri().getFragment()==null?false:id.getUri().getFragment().contains(StoreArchiver.ARCHIVE_VERSION_TAG + StoreArchiver.ARCHIVE_VERSION_SEPARATOR_TAG);
+
+    protected boolean isVersionID(Identifier id) {
+        return id.getUri().getFragment() == null ? false : id.getUri().getFragment().contains(StoreArchiver.ARCHIVE_VERSION_TAG + StoreArchiver.ARCHIVE_VERSION_SEPARATOR_TAG);
     }
+
     //  store#init('/home/ncsa/dev/csd/config/server-oa2.xml', 'localhost:oa4mp.oa2.mariadb', 'transaction')
     //  t. :=  store#search('temp_token', '.*23.*')
     public QDLStem listKeys() {
@@ -303,7 +323,6 @@ public class QDLStoreAccessor {
     /**
      * Archive the elements (all ids) in the stem list.  Returns stem of version numberss created.
      *
-     *
      * @param arg
      */
     public QDLStem archive(QDLStem arg) {
@@ -326,7 +345,6 @@ public class QDLStoreAccessor {
      * <pre>
      *     ['uri', integer]
      * </pre>
-     *
      */
 /*    public QDLStem remove(QDLStem ids){
         QDLStem output= new QDLStem();
@@ -350,8 +368,8 @@ public class QDLStoreAccessor {
         }
         return output;
     }*/
-       public QDLStem getVersion(Identifier id, Long version) throws IOException {
-          return toStem( getStoreArchiver().getVersion(id, version));
+    public QDLStem getVersion(Identifier id, Long version) throws IOException {
+        return toStem(getStoreArchiver().getVersion(id, version));
 
-       }
+    }
 }

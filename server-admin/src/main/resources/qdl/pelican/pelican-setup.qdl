@@ -1,0 +1,69 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   Invoke with the ini file, E.g. from the current directory
+
+   pelican-setup.qdl pelican-cfg.ini
+*/
+⊨size(args()) ≡ 1 : 'Missing  argument, Please specify the configuration file';
+ini. ≔ file_read(args().0,2);
+cfg. ≔ ini.'cfg';
+setup. := ini.'clients';
+say('Setting up Pelican admin and service clients');
+// generate admin key
+jwt ≔ j_load('oa4mp.util.jwt');
+aa. ≔ jwt#create_keys({'type':'RSA', 'size':4096}).'keys';
+admin_key. ≔ (~pick((k,v.)→v.'alg'≡'RS256',aa.)).0;
+say('writing admin key to admin_key.jwk');
+file_write('admin_key.jwk', to_json(admin_key.));
+
+// generate client key
+aa. ≔ jwt#create_keys({'type':'RSA', 'size':4096}).'keys';
+client_key. ≔ (~pick((k,v.)→v.'alg'≡'RS256',aa.)).0;
+say('writing client key to client_key.jwk');
+file_write('client_key.jwk',to_json(client_key.));
+
+approvals ≔ j_load('oa4mp.client.store');
+approvals#init(cfg., $$STORE_TYPE.'approval');
+
+admins ≔ j_load('oa4mp.client.store');
+admins#init(cfg., $$STORE_TYPE.'admin');
+             a. ≔ admins#create(setup.'admin_id');
+  a.'allow_qdl' ≔ true; // in case the pelican:client needs it.
+   a.'debug_on' ≔ false;
+       a.'jwks' ≔ admin_key.;
+a.'description' ≔ 'Pelican administrative client';
+admins#save(a.);
+
+          admin_approval. ≔ approvals#create(setup.'admin_id');
+admin_approval.'approved' ≔ true;
+  admin_approval.'status' ≔ 'approved';
+admin_approval.'approver' ≔ setup.'approver';
+approvals#save(admin_approval.);
+
+
+clients ≔ j_load('oa4mp.client.store');
+clients#init(cfg., $$STORE_TYPE.'client');
+                c. ≔ clients#create(setup.'client_id');
+c.'rfc7523_client' ≔ true;
+          c.'jwks' ≔ client_key.;
+   c.'description' ≔ 'Pelican client';
+clients#save(c.);
+
+          client_approval. ≔ approvals#create(setup.'client_id');
+client_approval.'approved' ≔ true;
+  client_approval.'status' ≔ 'approved';
+client_approval.'approver' ≔ setup.'admin_id';
+approvals#save(client_approval.);
+
+// now need to set client as managed by the admin.
+permissions ≔ j_load('oa4mp.client.p_store');
+permissions#init(cfg., $$STORE_TYPE.'permission');
+           p. := permissions#create(setup.'permission_id');
+ p.'admin_id' :=setup.'admin_id';
+p.'client_id' := setup.'client_id';
+permissions#save(p.);
+
+permissions#shutdown();
+
+say('Done! Your clients are now ready for use.');

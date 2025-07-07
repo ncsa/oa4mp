@@ -36,7 +36,7 @@
              See https://oa4mp.org/server/configuration/signing.html
              You should create a key by issuing.
 
-              ${OA4MP_HOME}bin/jwt -batchFile ${OA4MP_HOME}etc/create_keys.cmd
+              ${OA4MP_HOME}bin/jwt -in ${OA4MP_HOME}etc/create_keys.cmd
 
               this calls the very useful key utility included with OA4MP. It will
               list keys at various strength. Choose one of the id's as the default

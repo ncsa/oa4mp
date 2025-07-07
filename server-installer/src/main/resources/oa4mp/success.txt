@@ -54,3 +54,13 @@ Assuming that Tomcat is installed in $CATALINA_HOME, you should
 
 (3) Test that it is up and running at the oauth2 endpoint.  You should be able to go
     to either the registration page or the .well-known/openid-configuration page.
+
+Consider installing QDL
+‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+QDL is used heavily internally in OA4MP. It is installable as qdl-installer.jar from
+
+https://github.com/ncsa/oa4mp/releases/latest
+
+This version has a bunch of specific extensions to OA4MP. After install, the QDL docs directory
+has pretty much everything in PDF format for both QDL and OA4MP, which is also available
+on the web.

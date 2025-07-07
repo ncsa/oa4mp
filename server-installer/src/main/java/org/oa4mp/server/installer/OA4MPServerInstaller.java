@@ -95,6 +95,14 @@ public class OA4MPServerInstaller extends AbstractInstaller {
         say("java -jar installer.jar  " + UPGRADE_OPTION + " " + DIR_ARG + " $OA4MP_HOME");
         say("This upgrades all components, but does not touch any .xml (config) files or scripts.");
         say("Note that " + UPDATE_OPTION + " is a synonym");
+        say("\n\nExample of preparing an extension file for preprocessing. ");
+        say("This is used if you want to apply scripts to the server right after boot, for instance.");
+        say("Your file should use the template of ${OA4MP_HOME} every place it needs to refer to the");
+        say("(new) installation. So the example might be a QDL ini file that needs the path to the current");
+        say("server configuration to do some setup before starting the server:");
+        say("[cfg]");
+        say("file := '${OA4MP_HOME}etc/cfg.xml';");
+        say("name := 'default';");
     }
 
     public static void main(String[] args) {

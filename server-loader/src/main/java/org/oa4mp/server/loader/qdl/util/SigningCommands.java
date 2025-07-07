@@ -25,6 +25,7 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -181,14 +182,28 @@ public class SigningCommands extends CommonCommands2 {
      */
     public static JSONWebKeys createRSAJsonWebKeys(int size, String defaultKeyID) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
         JSONWebKey defaultKey = createRSAJWK(size, RS_256);
-        if(defaultKeyID != null){
-            defaultKey.id = defaultKeyID;
-        }
+        // Fix https://github.com/ncsa/oa4mp/issues/256
+        defaultKey = resetDefaultID(defaultKeyID, defaultKey);
         JSONWebKeys keys = new JSONWebKeys(defaultKey.id);
         keys.put(defaultKey);
         keys.put(createRSAJWK(size, RS_384));
         keys.put(createRSAJWK(size, RS_512));
         return keys;
+    }
+
+    // Fixes https://github.com/ncsa/oa4mp/issues/256
+    private static JSONWebKey resetDefaultID(String defaultKeyID, JSONWebKey defaultKey) {
+        if(defaultKeyID != null){
+            // Internally the JOSE key stores the kid and later only digests that. Cannot set the
+            // kid directly, but have to marshall then unmarshall it.
+            Map<String, Object> rawKey = defaultKey.getJOSEJWK().toJSONObject();
+            rawKey.put("kid", defaultKeyID);
+            JSONObject rawjson = new JSONObject();
+            rawjson.putAll(rawKey);
+            defaultKey = getJwkUtil2().getJsonWebKey(rawjson);
+            defaultKey.id = defaultKeyID;
+        }
+        return defaultKey;
     }
 
     /**
@@ -226,9 +241,8 @@ public class SigningCommands extends CommonCommands2 {
             return createECJsonWebKeys(defaultKeyID);
         }
         JSONWebKey defaultKey = createECJWK(curve, JWKUtil2.ES_256);
-        if(defaultKeyID != null){
-            defaultKey.id = defaultKeyID;
-        }
+        defaultKey = resetDefaultID(defaultKeyID, defaultKey);
+
         JSONWebKeys keys = new JSONWebKeys(defaultKey.id);
         keys.put(defaultKey);
         keys.put(createECJWK(curve, JWKUtil2.ES_384));

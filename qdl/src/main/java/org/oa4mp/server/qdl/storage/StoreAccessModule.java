@@ -79,7 +79,9 @@ public class StoreAccessModule extends JavaModule {
 
     protected List<QDLFunction> createFList(StoreFacade sf) {
         List<QDLFunction> functions = new ArrayList<>();
+        functions.add(sf.new Count());
         functions.add(sf.new Create());
+        functions.add(sf.new CreateVersion());
         functions.add(sf.new FromXML());
         functions.add(sf.new InitMethod());
         functions.add(sf.new Keys());
@@ -87,10 +89,9 @@ public class StoreAccessModule extends JavaModule {
         functions.add(sf.new Remove());
         functions.add(sf.new SaveObject());
         functions.add(sf.new Search());
-        functions.add(sf.new Count());
+        functions.add(sf.new Shutdown());
         functions.add(sf.new ToXML());
         functions.add(sf.new UpdateObject());
-        functions.add(sf.new CreateVersion());
         functions.add(sf.new VGetVersions());
         functions.add(sf.new VRestore());
         return functions;

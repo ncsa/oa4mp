@@ -33,7 +33,7 @@ overrides=( "$@" )
 defaults=("-cfg"  "$DEFAULT_CONFIG" "-name" "$DEFAULT_TARGET"  "-set_env" "$DEFAULT_ENV" "-log" "$logFile" )
 qqq=( "${overrides[@]}" "${defaults[@]}" )
 
-java -cp $cliJar  "${qqq[@]}"
+java -jar $cliJar  "${qqq[@]}"
 
 if [ $? != 0 ]; then
   exit 1

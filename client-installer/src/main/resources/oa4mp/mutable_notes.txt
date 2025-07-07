@@ -1,8 +1,8 @@
 _____________________________________________
-Release notes for OA4MP version 5.4-SNAPSHOT
-‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+Release notes for the OA4MP mutable version
+‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 This is not a release but will install the most recent
-snapshot (ongoing development) for OA4MP. Generally
+development branch, termed mutable, for OA4MP. Generally
 this is only of interest to, for instance, developers
 who are testing specific features. It should not
 be installed for production purposes as there is not

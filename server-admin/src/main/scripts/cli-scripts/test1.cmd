@@ -12,4 +12,4 @@ rs size A ;
 /q;
 /q;
 
-#  -batchFile /home/ncsa/dev/ncsa-git/oa4mp/server-admin/src/main/scripts/cli-scripts/test1.cmd
+#  -in /home/ncsa/dev/ncsa-git/oa4mp/server-admin/src/main/scripts/cli-scripts/test1.cmd

@@ -17,7 +17,6 @@ import org.qdl_lang.extensions.QDLFunction;
 import org.qdl_lang.extensions.QDLVariable;
 import org.qdl_lang.state.State;
 import org.qdl_lang.util.QDLFileUtil;
-import org.qdl_lang.variables.Constant;
 import org.qdl_lang.variables.QDLStem;
 import org.qdl_lang.variables.values.BooleanValue;
 import org.qdl_lang.variables.values.QDLNullValue;
@@ -156,7 +155,7 @@ public class JWTCommands  {
                         QDLStem args = objects[0].asStem();
                         argTypeOk = true;
                         if (args.containsKey(ARG_KEY_TYPE)) {
-                            if (!Constant.isString(args.get(ARG_KEY_TYPE))) {
+                            if (!args.get(ARG_KEY_TYPE).isString()) {
                                 throw new BadArgException(getName() + " requires a string as the " + ARG_KEY_TYPE + " of the key.",0);
                             }
                             keyType = args.getString(ARG_KEY_TYPE);

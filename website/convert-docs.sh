@@ -22,6 +22,7 @@ lowriter --headless --convert-to pdf ${args[0]}/server-admin/src/main/docs/rfc75
 lowriter --headless --convert-to pdf ${args[0]}/server-admin/src/main/docs/rfc6749_4_4.odt              > /dev/null
 lowriter --headless --convert-to pdf ${args[0]}/server-admin/src/main/docs/jwt-util.odt                  > /dev/null
 lowriter --headless --convert-to pdf ${args[0]}/server-admin/src/main/docs/forking_a_flow_quickstart.odt > /dev/null
+lowriter --headless --convert-to pdf ${args[0]}/server-admin/src/main/docs/oa4mp_as_dedicated_issuer.odt > /dev/null
 lowriter --headless --convert-to pdf ${args[0]}/website/src/main/doc/oa2-client.odt                      > /dev/null
 lowriter --headless --convert-to pdf ${args[0]}/website/src/main/doc/scopes.odt                          > /dev/null
 lowriter --headless --convert-to pdf ${args[0]}/website/src/main/doc/policies.odt                        > /dev/null

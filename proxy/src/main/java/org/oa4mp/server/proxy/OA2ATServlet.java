@@ -396,9 +396,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         if (!client.getIdentifierString().equals(jsonRequest.getString(OA2Claims.ISSUER))) {
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, "invalid issuer");
         }
-        if (!jsonRequest.containsKey(OA2Claims.SUBJECT)) {
-            throw new OA2ATException(OA2Errors.INVALID_REQUEST, "missing subject");
-        }
+
         if (jsonRequest.getLong(OA2Claims.EXPIRATION) * 1000L < System.currentTimeMillis()) {
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, "expired assertion token");
         }
@@ -442,9 +440,10 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         Date now = new Date();
         serviceTransaction.setAuthTime(now); // auth time is now.
         client.setLastAccessed(now);
-        String user = jsonRequest.getString(OA2Claims.SUBJECT);
+       // String user = jsonRequest.getString(OA2Claims.SUBJECT);
 
 
+/*
         if (client.getServiceClientUsers().contains("*")) {
             serviceTransaction.setUsername(user);
         } else {
@@ -454,10 +453,33 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 throw new OA2ATException(OA2Errors.INVALID_REQUEST, "user \"" + user + "\" does not have permission");
             }
         }
+*/
         OA2ServletUtils.processXAs(jsonRequest, serviceTransaction, client);
 
+        // Do claims
         JSONObject claims = new JSONObject();
-        claims.put(OA2Claims.SUBJECT, serviceTransaction.getUsername());
+        if (jsonRequest.containsKey(OA2Constants.ID_TOKEN)) {
+            JSONObject idToken = jsonRequest.getJSONObject(OA2Constants.ID_TOKEN);
+            claims.putAll(idToken);
+            if (jsonRequest.containsKey(OA2Claims.SUBJECT)) {
+                String user = jsonRequest.getString(OA2Claims.SUBJECT);
+                claims.put(OA2Claims.SUBJECT, user);
+                setUsername(serviceTransaction, client, user);
+
+            }else{
+                if(!idToken.containsKey(OA2Claims.SUBJECT)){
+                    throw new OA2ATException(OA2Errors.INVALID_REQUEST, "missing subject");
+                }
+                setUsername(serviceTransaction, client, idToken.getString(OA2Claims.SUBJECT));
+            }
+        }else{
+            if (!jsonRequest.containsKey(OA2Claims.SUBJECT)) {
+                throw new OA2ATException(OA2Errors.INVALID_REQUEST, "missing subject");
+            }
+           String  user = jsonRequest.getString(OA2Claims.SUBJECT);
+            setUsername(serviceTransaction, client, user);
+            claims.put(OA2Claims.SUBJECT, user);
+        }
         serviceTransaction.setUserMetaData(claims); // set this so it exists for later.
         try {
             serviceTransaction.setScopes(ClientUtils.resolveScopes(request,
@@ -526,6 +548,25 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         processServiceClientRequest(request, response, client, serviceTransaction, false);
     }
 
+    /**
+     * Checks if the user name is allowed for this client and if so sets it, if not an exception
+     * is raised.
+     * @param serviceTransaction
+     * @param client
+     * @param user
+     */
+    protected void setUsername(OA2ServiceTransaction serviceTransaction, OA2Client client, String user) {
+        if (client.getServiceClientUsers().contains("*")) {
+            serviceTransaction.setUsername(user);
+        } else {
+            if (client.getServiceClientUsers().contains(user)) {
+                serviceTransaction.setUsername(user);
+            } else {
+                throw new OA2ATException(OA2Errors.INVALID_REQUEST, "user \"" + user + "\" does not have permission");
+            }
+        }
+
+    }
     /**
      * Both RFC7523 and credential flow clients operate the same once the parameters have
      * been processed. This is code common to both for that.
