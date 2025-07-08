@@ -102,9 +102,6 @@ public class OA2CLCCommands extends CommonCommands2 {
         this(driver, oa2CommandLineClient);
         driver.setVerbose(!silentMode);
         driver.setOutputOn(!silentMode);
-        //setPrintOuput(!silentMode);
-        //setVerbose(!silentMode);
-        //oa2CommandLineClient.setVerbose(!silentMode);
     }
 
     MetaDebugUtil debugUtil = null;

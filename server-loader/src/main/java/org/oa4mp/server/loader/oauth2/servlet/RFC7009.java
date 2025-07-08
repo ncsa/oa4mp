@@ -43,6 +43,7 @@ public class RFC7009 extends TokenManagerServlet {
                 }
             }
             if (state == null) {
+                // not found means effectively revoked
                 resp.setStatus(HttpStatus.SC_OK);
                 logOK(req); // CIL-1722
                 return;
@@ -68,6 +69,7 @@ public class RFC7009 extends TokenManagerServlet {
         }
 
 
+        checkAdminClientStatus(state.transaction.getOA2Client().getIdentifier());
         // By this point the state object has the original transaction and request information in it,
         // plus it has the TX record if there is one.
         // Now we have enough to do what we need to.

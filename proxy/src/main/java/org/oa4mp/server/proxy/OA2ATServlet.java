@@ -160,6 +160,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             if (!oa2Client.isServiceClient()) {
                 throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT, "client not authorized to do RFC7523 requests");
             }
+            checkAdminClientStatus(oa2Client.getIdentifier());
             doRFC7523(request, response, oa2Client);
             return true;
         }
@@ -169,6 +170,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             warn("executeByGrant encountered a null client");
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, "no such client");
         }
+        checkAdminClientStatus(client.getIdentifier());
+
         MetaDebugUtil debugger = OA4MPServlet.createDebugger(client);
         debugger.trace(this, "starting execute by grant, grant = \"" + grantType + "\"");
         OA2Client resolvedClient = OA2ClientUtils.resolvePrototypes(oa2SE, client);
@@ -1930,8 +1933,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                     "wrong client, access denied",
                     HttpStatus.SC_UNAUTHORIZED, null);
         }
-        st2.setAccessToken(atResponse.getAccessToken()); // needed if there are handlers later.
 
+        st2.setAccessToken(atResponse.getAccessToken()); // needed if there are handlers later.
 
         /* *************** */
         // CIL-1536 -- use tx record for forwarding any parameters to the runtime engine.
@@ -2213,7 +2216,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         if (client == null) {
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, "Could not find the client associated with refresh token \"" + rawRefreshToken + "\"");
         }
-
         debugger.trace(this, "starting token refresh at " + (new Date()));
         // Check if it's a token or JWT
         OA2SE oa2SE = (OA2SE) OA4MPServlet.getServiceEnvironment();
@@ -2853,5 +2855,4 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             }
         }
     }
-
 }

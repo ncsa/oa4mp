@@ -606,16 +606,16 @@ public class OA2MPService extends OA4MPService {
             request.setRefreshToken(dummyAsset.getRefreshToken());
         }
         DS2 ds2 = (DS2) getEnvironment().getDelegationService();
-        try {
+     //   try {
             ds2.rfc7009(request);
             return true;
-        } catch (Throwable t) {
+/*        } catch (Throwable t) {
             DebugUtil.trace(this, "revoke encountered a "
                     + t.getClass().getSimpleName()
                     + ": \""
                     + t.getMessage() + "\" ");
         }
-        return false;
+        return false;*/
     }
 
     public JSONObject introspect(OA2Asset asset, boolean doRT) {

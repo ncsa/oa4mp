@@ -51,6 +51,7 @@ public class RFC7662 extends TokenManagerServlet {
             return;
 
         }
+        checkAdminClientStatus(state.transaction.getClient().getIdentifier());
         MetaDebugUtil debugger = OA4MPServlet.createDebugger(state.transaction.getOA2Client());
         if (state.txRecord != null) {
             debugger.trace(this, "introspect, token in exchange record = \"" + state.txRecord.getIdentifier() + "\"");

@@ -9,7 +9,10 @@ It will create an admin client and regular client. The regular client uses RFC 7
 with keys and this allows Pelican to use OA4MP as a dedicated issuer while it handles authorization.
 
 This requires an ini file that contains the path to the system configuration and the name there.
-It also requires the names of the admin and service client.
+It also requires the names of the admin and service client. You install OA4MP with the
+-preprocess flag to point to the pelican ini file which then has all of the placeholders
+for the new OA4MP install updated. At the end of running server-installer.jar, the
+Pelican script can be just run without any actual intervention.
 
 
 
@@ -23,19 +26,22 @@ Requirements
 
 Use
 ---
-Copy this directory someplace. This has templates that should be resolved by the installer,
+Copy the Pelican directory someplace. This has templates that should be resolved by the installer,
 so during OA4MP install, specify the -preprocess flag and point it to pelican-cfg.ini,
 
 E.g.
 
-java -jar server-installer.jar install -dir /opt/oa4mp-server -preprocess /path/to/pelican-cfg.ini
+Set your $OA4MP_SERVER directory then run the installer. ($> is the bash prompt)
+
+$> export OA4MP_SERVER=/opt/oa4mp-server
+$> java -jar server-installer.jar install -dir $OA4MP_SERVER -preprocess /path/to/pelican-cfg.ini
 
 (Make sure you use the correct -version argument as well, if needed.)
 
 Before starting the server for the first time, cd to the directory that has pelican-setup.qdl,
-make *sure* the correct ini file is loaded (see note there), then issue
+then issue
 
-./pelican-setup.qdl
+./pelican-setup.qdl pelican-cfg.ini
 
 When this finishes successfully:
 * The admin client and the service client have been created

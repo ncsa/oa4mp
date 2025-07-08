@@ -101,5 +101,11 @@ if [ -z ${OA4MP_HOME+x} ];  then
     cp cli.jar $OA4MP_HOME/lib
     cp clc.jar $OA4MP_HOME/lib
 fi
+
+echo "Building Pelican tar"
+cd $OA4MP_ROOT/server-admin/src/main/resources/qdl
+tar -czf pelican.gz pelican/
+mv pelican.gz $OA4MP_SERVER_DEPLOY/pelican.gz
+
 echo "     ... done!"
 

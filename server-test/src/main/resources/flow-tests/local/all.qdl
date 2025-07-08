@@ -5,6 +5,7 @@
 */
 path:='test#/';
 test.:=(path + 'local/') + [
+                             'ac-revoke.qdl',
                              'test_acl.qdl',
                              'test_qdl.qdl',
                              'cil1550.qdl',

@@ -1,0 +1,98 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   Tests revocation of the admin client (AC). This starts a flow, then revokes the
+   AC. It then shows that it cannot start any other flows, and verifies
+   that exchange, refresh, user info and introspection all just fail.
+
+   It finally re-approves the AC and finishes the flow.
+
+   This has a dedicated AC and client so that if something goes wrong (e.g. the test fails)
+   it does not impact other tests.
+*/
+admin_id := 'admin:/revoke/test';
+client_id :='localhost:test/revoke';
+cfg.'file' := '/home/ncsa/dev/csd/config/server-oa2.xml';
+cfg.'name' := 'localhost:oa4mp.oa2.mariadb';
+
+approvals ≔ j_load('oa4mp.client.store');
+approvals#init(cfg., $$STORE_TYPE.'approval');
+
+ac_approval. := approvals#read(admin_id);
+if[!ac_approval.'approved']
+  [say('Had to reset admin client...');
+  ac_approval.'status' := 'appropved';
+   ac_approval.'approved' := true;
+   approvals#save(ac_approval.);
+];
+
+cfg.'id'  := 'localhost:test/revoke';
+cfg.'idp'  := 'ANY';
+cfg.'file' := $$OA4MP_CLC_XML_INI;
+cfg.'description' :=  'Admin revocation test.';
+cfg.'flow_type' := 'df'; // Use device flow since it fails fast.
+params.'a' := {'org.oa4mp:/tokens/access/lifetime':1000000,'org.oa4mp:/roles':'admin,all-user'};
+rc := script_load('driver.qdl', cfg., params.);
+if[rc!='ok'][return(rc);];
+tokens. := clc#access();
+
+// now revoke it.
+ac_approval.'status' := 'revoked';
+ac_approval.'approved' := false;
+approvals#save(ac_approval.);
+
+try[
+  tokens. := clc#refresh();
+  say('revocation failure, could do refresh token after revocation.');
+ ]catch[
+ ];
+
+ try[
+    tokens. :=clc#exchange();
+    say('revocation failure, could do exchange token after revocation.');
+  ]catch[
+  ];
+
+  try[
+      tokens. :=clc#user_info();
+      say('revocation failure, could do user_info after revocation.');
+    ]catch[
+    ];
+
+try[
+    tokens. :=clc#introspection();
+    say('revocation failure, could do token introspection after revocation.');
+  ]catch[
+  ];
+
+try[
+    tokens. :=clc#revoke();
+    say('revocation failure, could do token revocation after revocation.');
+
+  ]catch[
+  ];
+ // now try to restart the flows
+
+   try[
+     say('auto testing flow restart -- should fail on its own');
+     rc := script_load('driver.qdl', cfg., params.);
+     say('revocation failure, could start device code flow after revocation.');
+   ]catch[];
+
+/* Can't restart flow this way since the driver won't figure out the flow is dead. This is
+   an issue with the driver.qdl script.
+
+cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
+      try[
+       say('testing flow restart -- will fail in browser');
+        rc := script_load('driver.qdl', cfg., params.);
+        say('revocation failure, could start device code flow after revocation.');
+      ]catch[
+      say('ok');];*/
+
+// cleanup
+
+ac_approval.'status' := 'approved';
+ac_approval.'approved' := true;
+approvals#save(ac_approval.);
+say('Admin client revocation test: ok!');

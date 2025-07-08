@@ -1,12 +1,23 @@
 package org.oa4mp.server.api.admin.adminClient;
 
-import org.oa4mp.delegation.server.storage.BaseClientSQLStore;
+import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
+import edu.uiuc.ncsa.security.storage.sql.ConnectionRecord;
+import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
 import edu.uiuc.ncsa.security.storage.sql.internals.Table;
+import org.oa4mp.delegation.server.storage.BaseClientSQLStore;
 
 import javax.inject.Provider;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -37,4 +48,5 @@ public class AdminClientSQLStore<V extends AdminClient> extends BaseClientSQLSto
         v.setDebugOn(true); //default for AC's
         return v;
     }
+
 }

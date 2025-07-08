@@ -1,45 +1,53 @@
 /*
+Current policy is at https://github.com/cilogon/drac-policies/blob/main/DRAC_Policy_Specification.md
 
-* OIDC client ID on PROD is currently
-    * None
-* OIDC client ID on TEST is currently
-    * [cilogon:/client_id/316405f349a68520afb75500017b0417](https://registry-test.cilogon.org/registry/oa4mp_client/oa4mp_client_co_oidc_clients/edit/197)
-    * [cilogon:/client_id/5112efedc855c95588ac9371deaf7e49](https://registry-test.cilogon.org/registry/oa4mp_client/oa4mp_client_co_oidc_clients/edit/198)
-* Policy:
-    * Use OIDC tokens.
-    * Refresh token is not required.
-    * Membership in the group CO:COU:UVic Staff:members:active is required in order for the flow to continue.
-      Users that are not in the group should be redirected to
-      [https://alliancecan.ca/en](https://alliancecan.ca/en).
-*/
-/*
 Note that this runs in the post_auth phase only since
 the only place that there is a browser to redirect from
 is during the auth phase.
-Configuration for the client is
+Configurations for the client are either
 
 {"tokens": {
   "identity": {
     "qdl":  {
-     "load": "drac/cloudconnect/v1/id-token.qdl",
+     "load": "drac/v1/id-token.qdl",
      "xmd": {"exec_phase": ["post_auth"]}
     },
   "type": "identity"
   }
 }}
-    // Note. No refresh tokens!
+
+which checks if the user is in the base gorup
+      CO:COU:UVic Staff:members:active.
+
+Or the following,
+which may have another argument for an additional group(s)
+or list of them that this person must be
+a member of, in addition to the base group.
+
+{"tokens": {
+  "identity": {
+    "qdl":  {
+     "load": "drac/v1/id-token.qdl",
+     "args":['CO:COU:CADC:members:active'],
+     "xmd": {"exec_phase": ["post_auth"]}
+    },
+  "type": "identity"
+  }
+}}
+
+N.B. No refresh tokens!
 */
 script_load('drac/acl.qdl');
 script_load('utils/init.qdl'); // set up stuff
-
 debugger(1);
-drac_cc := 'DRAC Cloud Connect'; // moniker for debugging
-user := claims.sub;
-error_uri := 'https://alliancecan.ca/en';
-trace(drac_cc,'starting id-token for user =' + user);
 
+   drac_cc := 'DRAC'; // moniker for debugging
+   groups. := ['CO:COU:UVic Staff:members:active']; // Everyone is in here
+ error_uri := 'https://object-arbutus.cloud.computecanada.ca/cilogon/error.html';
+  results. := script_load('drac/v1/get-user.qdl', claims.'sub'); // user == claims.sub
 
-results. := script_load('drac/cloudconnect/v1/get_user.qdl', user); // user == claims.sub
 trace(drac_cc,'result of user query =' + to_string(results.));
-∄results.'isMemberOf' ⇒ err_uri('no groups for user found',error_uri);
-'CO:COU:UVic Staff:members:active'∉ results.'isMemberOf' ⇒ err_uri(error_uri);
+
+                         size(args()) ≡ 1 ⇒ groups. := groups.~args().0;
+                  (∄results.'isMemberOf') ⇒ err_uri('no groups for user found',error_uri);
+(true ∉ (groups. ∈ results.'isMemberOf')) ⇒ err_uri('user not in group', error_uri);

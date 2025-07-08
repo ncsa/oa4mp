@@ -101,10 +101,10 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
             }
 
         }
+        checkAdminClientStatus(client.getIdentifier());
         MetaDebugUtil debugger = OA4MPServlet.createDebugger(client);
         debugger.trace(this, "is response committed?" + resp.isCommitted());
         debugger.trace(this, "checked client secret.");
-
 
         long lifetime = 0 < client.getDfLifetime() ? client.getDfLifetime() : rfc8628ServletConfig.lifetime;
         lifetime = 0 < lifetime ? lifetime : oa2SE.getAuthorizationGrantLifetime(); // if nothing is set, default to AG lifetime.

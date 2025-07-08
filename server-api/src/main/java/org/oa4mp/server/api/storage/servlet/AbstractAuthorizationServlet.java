@@ -373,6 +373,7 @@ public abstract class AbstractAuthorizationServlet extends OA4MPServlet implemen
             warn("Error: no delegation request found for " + token);
             throw new GeneralException("Error: no delegation request found.");
         }
+        checkAdminClientStatus(trans.getClient().getIdentifier());
         checkClientApproval(trans.getClient());
         return trans;
     }

@@ -85,6 +85,7 @@ public class UserInfoServlet extends BearerTokenServlet {
                     transaction.getRequestState(),
                     transaction.getCallback());
         }
+        checkAdminClientStatus(transaction.getClient().getIdentifier());
         // if we get to here, then the access token checked out, so we can just get it and use it.
 
         // Need to look this up by its jti if its not a basic access token.

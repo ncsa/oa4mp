@@ -2,11 +2,11 @@ package org.oa4mp.server.api.admin.adminClient;
 
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.Identifier;
-import org.oa4mp.delegation.server.storage.ClientApprovalStore;
-import org.oa4mp.delegation.server.storage.impl.GenericClientStoreUtils;
 import edu.uiuc.ncsa.security.storage.FileStore;
 import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
+import org.oa4mp.delegation.server.storage.ClientApprovalStore;
+import org.oa4mp.delegation.server.storage.impl.GenericClientStoreUtils;
 
 import java.io.File;
 import java.util.Date;
@@ -62,8 +62,4 @@ public class AdminClientFS<V extends AdminClient> extends FileStore<V> implement
         return GenericStoreUtils.getMostRecent(this, n, attributes);
     }
 
- /*   @Override
-    public UUCResponse unusedClientCleanup(UUCConfiguration uucConfiguration) {
-        throw new NotImplementedException();
-    }*/
 }

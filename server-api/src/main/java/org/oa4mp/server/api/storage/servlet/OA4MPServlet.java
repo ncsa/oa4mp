@@ -1,8 +1,6 @@
 package org.oa4mp.server.api.storage.servlet;
 
-import edu.uiuc.ncsa.myproxy.MyProxyConnectable;
 import edu.uiuc.ncsa.security.core.Identifier;
-import edu.uiuc.ncsa.security.core.cache.Cache;
 import edu.uiuc.ncsa.security.core.cache.Cleanup;
 import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
@@ -13,6 +11,7 @@ import edu.uiuc.ncsa.security.servlet.HeaderUtils;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.storage.events.LastAccessedThread;
 import edu.uiuc.ncsa.security.util.pkcs.KeyPairPopulationThread;
+import org.apache.http.HttpStatus;
 import org.oa4mp.delegation.common.servlet.TransactionFilter;
 import org.oa4mp.delegation.common.servlet.TransactionState;
 import org.oa4mp.delegation.common.storage.TransactionStore;
@@ -20,6 +19,8 @@ import org.oa4mp.delegation.common.storage.clients.BaseClient;
 import org.oa4mp.delegation.common.storage.clients.Client;
 import org.oa4mp.delegation.common.storage.transactions.BasicTransaction;
 import org.oa4mp.delegation.common.token.AuthorizationGrant;
+import org.oa4mp.delegation.server.OA2Errors;
+import org.oa4mp.delegation.server.OA2GeneralError;
 import org.oa4mp.delegation.server.ServiceTransaction;
 import org.oa4mp.delegation.server.UnapprovedClientException;
 import org.oa4mp.delegation.server.issuers.AGIssuer;
@@ -34,6 +35,7 @@ import org.oa4mp.server.api.util.ClientDebugUtil;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 
 import static org.oa4mp.server.api.ServiceConstantKeys.CONSUMER_KEY;
@@ -307,4 +309,26 @@ public abstract class OA4MPServlet extends EnvServlet implements TransactionFilt
         System.out.println(getClass().getSimpleName() + ": " + x);
     }
 
+    /**
+     * Given a client id, check if there is an associated admin client and if so, check
+     * the status of said admin client. This way if an admin client has been revoked, e.g.,
+     * all clients are immediately invalidated. This returns no value, it simply throws
+     * an exception if the admin client is invalid.
+     * @param clientID
+     */
+    // Fix https://jira.ncsa.illinois.edu/browse/CIL-2278 by centralizing it and making sure *every* access
+    // point is checked.
+    public void checkAdminClientStatus(Identifier clientID) {
+        List<Identifier> adminIDs = getServiceEnvironment().getPermissionStore().getAdmins(clientID);
+        if (adminIDs == null || adminIDs.size() == 0) {
+            return; // nix to do
+        }
+        for (Identifier adminID : adminIDs) {
+            if (!getServiceEnvironment().getClientApprovalStore().isApproved(adminID)) {
+                throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT,
+                        "Admin client is not approved , access denied",
+                        HttpStatus.SC_UNAUTHORIZED, null);
+            }
+        }
+    }
 }
