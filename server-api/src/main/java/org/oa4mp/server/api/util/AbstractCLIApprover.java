@@ -1,24 +1,23 @@
 package org.oa4mp.server.api.util;
 
-import org.oa4mp.server.api.ServiceEnvironment;
-import org.oa4mp.server.api.ServiceEnvironmentImpl;
-import org.oa4mp.delegation.common.storage.clients.Client;
-import org.oa4mp.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.util.cli.CLITool;
+import edu.uiuc.ncsa.security.util.cli.CLITool2;
 import net.sf.json.JSONObject;
-import org.apache.commons.cli.Options;
+import org.oa4mp.delegation.common.storage.clients.Client;
+import org.oa4mp.delegation.server.storage.ClientApproval;
+import org.oa4mp.server.api.ServiceEnvironment;
+import org.oa4mp.server.api.ServiceEnvironmentImpl;
 
 import java.io.*;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.Set;
 
-import static org.oa4mp.server.api.OA4MPConfigTags.COMPONENT;
 import static java.nio.file.Files.readAllBytes;
+import static org.oa4mp.server.api.OA4MPConfigTags.COMPONENT;
 
 /**
  * A command line approver. This has a couple of modes of operation.
@@ -45,7 +44,7 @@ import static java.nio.file.Files.readAllBytes;
  * <p>Created by Jeff Gaynor<br>
  * on 2/24/12 at  2:40 PM
  */
-public abstract class AbstractCLIApprover extends CLITool {
+public abstract class AbstractCLIApprover extends CLITool2 {
     public static final String ANONYMOUS = "anonymous";
 
     public static class ClientApprovalThread extends Thread {
@@ -263,13 +262,13 @@ public abstract class AbstractCLIApprover extends CLITool {
 
     File pollingDir = null;
 
-
+/*
     @Override
     protected Options getOptions() {
         Options options = super.getOptions();
         options.addOption(CONFIG_NAME_OPTION, CONFIG_NAME_LONG_OPTION, true, "the name of the configuration. Omitting this means there is exactly one and to use that.");
         return options;
-    }
+    }*/
 
     @Override
     public void help() {

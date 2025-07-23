@@ -396,7 +396,7 @@ public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
         for (Identifiable identifiable : identifiables) {
             BaseClient client = (BaseClient) identifiable;
             approvalModsConfig.client = client;
-            client =  doApprovalMods(approvalModsConfig);
+            client = doApprovalMods(approvalModsConfig);
             ClientApprovalStoreCommands.setupApprovalRecord(getClientApprovalStore(), client.getIdentifier(), doApproval, approver);
             getStore().update(client);
         }
@@ -407,9 +407,9 @@ public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
 
     protected void old_approve(InputLine inputLine, Identifiable identifiable) throws Throwable {
         // But everyone expects it to behave in the kludgy way for single approvals.
-            BaseClient client = (BaseClient) identifiable;
-            client = doApprovalMods(new ApprovalModsConfig(client, true));
-            approve(client);
+        BaseClient client = (BaseClient) identifiable;
+        client = doApprovalMods(new ApprovalModsConfig(client, true));
+        approve(client);
     }
 
     protected void approve(BaseClient client) throws IOException {
@@ -439,7 +439,7 @@ public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
         return approvalModsConfig.client;
     }
 
-    public static class ApprovalModsConfig{
+    public static class ApprovalModsConfig {
         public ApprovalModsConfig(BaseClient client, boolean doPrompt) {
             this.client = client;
             this.doPrompt = doPrompt;
@@ -448,6 +448,7 @@ public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
         public BaseClient client;
         public boolean doPrompt = true;
     }
+
     @Override
     protected void rmCleanup(FoundIdentifiables x) {
         getClientApprovalStore().remove(x);// batch remove
@@ -457,7 +458,7 @@ public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
 
     public void approver_search(InputLine inputLine) {
         if (showHelp(inputLine)) {
-            sayi("approver_search [ "  + SEARCH_SHORT_REGEX_FLAG +"] approver [" + SEARCH_RESULT_SET_NAME + " rs_name]  - search for all " +
+            sayi("approver_search [ " + SEARCH_SHORT_REGEX_FLAG + "] approver [" + SEARCH_RESULT_SET_NAME + " rs_name]  - search for all " +
                     "approvals by a given approver.");
             sayi(SEARCH_RESULT_SET_NAME + " rs_name - save the result set under then name rs_name");
             sayi(SEARCH_SHORT_REGEX_FLAG + " - if present, treat the approver as a regex in the search.");
@@ -478,7 +479,7 @@ public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
         boolean isRegex = inputLine.hasArg(SEARCH_REGEX_FLAG) || inputLine.hasArg(SEARCH_SHORT_REGEX_FLAG);
         inputLine.removeSwitch(SEARCH_REGEX_FLAG);
         inputLine.removeSwitch(SEARCH_SHORT_REGEX_FLAG);
-        if(0 == inputLine.getArgCount()){
+        if (0 == inputLine.getArgCount()) {
             say("missing approver. exiting...");
             return;
         }
@@ -552,7 +553,7 @@ public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
         BaseClientStore clientStore = (BaseClientStore) getStore();
         List<Identifier> ids = clientStore.getByStatus(rawStatus, getClientApprovalStore());
 
-        if(sizeOnly){
+        if (sizeOnly) {
             say("there are " + ids.size() + " clients with the status " + rawStatus);
             return;
         }
@@ -565,8 +566,8 @@ public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
             // a huge amount of information from the database. So we just get the ids and
             // create a placeholder. We can do this since we control this.
             acs.add((Identifiable) getStore().get(id));
-            if(!saveRS){
-                say(StringUtils.RJustify((i++)+".", numberWidth) + " " + id.toString());
+            if (!saveRS) {
+                say(StringUtils.RJustify((i++) + ".", numberWidth) + " " + id.toString());
             }
         }
 
@@ -731,10 +732,10 @@ public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
 
         FoundIdentifiables identifiables = findItem(inputLine);
         if (identifiables == null) {
-            say("no client specified.");
+            say("no client found.");
         }
-        if (identifiables.isSingleton()) {
-            say("only a single object not supported for this operation");
+        if (!identifiables.isSingleton()) {
+            say("only a single object is supported for this operation");
             return;
         }
         String secret = null;
@@ -742,41 +743,33 @@ public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
         if (hasPassword) {
             secret = inputLine.getNextArgFor(RESET_SECRET_NEW_FLAG);
             inputLine.removeSwitchAndValue(RESET_SECRET_NEW_FLAG);
-            if (identifiables.size() != 1) {
-                say("Cannot reset the password for " + identifiables.size() + " clients");
-                return;
-            }
         }
 
-        for (Identifiable identifiable : identifiables) {
-            BaseClient client = (BaseClient) identifiable;
+        BaseClient client = (BaseClient) identifiables.get(0);
 
-            if (!hasPassword) {
-                byte[] y = new byte[size];
-                SecureRandom secureRandom = new SecureRandom();
-                secureRandom.nextBytes(y);
-                secret = Base64.encodeBase64URLSafeString(y);
-            }
-
-
-            if (StringUtils.isTrivial(secret)) {
-                say("sorry but could not determine a secret for client '" + client.getIdentifier() + "'");  // test just in case.
-                continue;
-            }
-            String hash = DigestUtils.sha1Hex(secret);
-            client.setSecret(hash);
-            getStore().save(client);
-            if (-1 < secret.indexOf(" ")) {
-                // If there are blanks, put quotes around it.
-                secret = "\"" + secret + "\"";
-            }
-            say("client_id : " + client.getIdentifierString());
-            say("   secret : " + secret);
-            say("     hash : " + hash);
-            if (identifiables.size() != 1) {
-                say(""); // add a blank line
-            }
+        if (!hasPassword) {
+            byte[] y = new byte[size];
+            SecureRandom secureRandom = new SecureRandom();
+            secureRandom.nextBytes(y);
+            secret = Base64.encodeBase64URLSafeString(y);
         }
+
+
+        if (StringUtils.isTrivial(secret)) {
+            say("sorry but could not determine a secret for client '" + client.getIdentifier() + "'");  // test just in case.
+            return;
+        }
+        String hash = DigestUtils.sha1Hex(secret);
+        client.setSecret(hash);
+        getStore().save(client);
+        if (-1 < secret.indexOf(" ")) {
+            // If there are blanks, put quotes around it.
+            secret = "\"" + secret + "\"";
+        }
+        say("client_id : " + client.getIdentifierString());
+        say("   secret : " + secret);
+        say("     hash : " + hash);
+
     }
 
     @Override

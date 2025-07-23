@@ -81,7 +81,6 @@ import javax.inject.Provider;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
-import java.text.ParseException;
 import java.time.LocalTime;
 import java.util.*;
 
@@ -605,129 +604,6 @@ Boolean allowPromptNone = null;
             filter.add(when, type, value); // let the method figure it out.
         }
         return filter;
-    }
-
-
-    public UUCConfiguration OLDgetUucConfiguration() {
-        if (uucConfiguration == null) {
-            uucConfiguration = new UUCConfiguration();
-
-            ConfigurationNode node = getFirstNode(cn, UUC_TAG);
-            if (node == null) {
-                uucConfiguration.enabled = false;
-                return uucConfiguration;
-            }
-            uucConfiguration.enabled = getFirstBooleanValue(node, UUC_ENABLED, false);
-            // If this is disabled, allow it to be loaded anyway. That way it may also be run
-            // from the CLI.
-            String raw = getFirstAttribute(node, UUC_GRACE_PERIOD);
-            if (StringUtils.isTrivial(raw)) {
-                uucConfiguration.gracePeriod = UUC_GRACE_PERIOD_DEFAULT;
-            } else {
-                uucConfiguration.gracePeriod = XMLConfigUtil.getValueSecsOrMillis(raw, true);
-            }
-            raw = getFirstAttribute(node, UUC_CREATED_AFTER);
-            if (!StringUtils.isTrivial(raw)) {
-                try {
-                    uucConfiguration.setCreatedAfter(Iso8601.string2Date(raw).getTime());
-                } catch (ParseException e) {
-                    warn("unable to parse " + UUC_CREATED_AFTER + " date. To prevent catastrophic loss, UUC disabled");
-                    uucConfiguration.enabled = false;
-                    return uucConfiguration;
-                }
-            }
-  /*          raw = getFirstAttribute(node, UUC_CREATED_BEFORE);
-            if (!StringUtils.isTrivial(raw)) {
-                try {
-                    uucConfiguration.setCreatedBefore(Iso8601.string2Date(raw).getTime());
-                } catch (ParseException e) {
-                    warn("unable to parse " + UUC_CREATED_BEFORE + " date. To prevent catastrophic loss, UUC disabled");
-                    uucConfiguration.enabled = false;
-                    return uucConfiguration;
-                }
-            }*/
-            raw = getFirstAttribute(node, UUC_DEBUG_ON);
-            if (StringUtils.isTrivial(raw)) {
-                try {
-                    Boolean b = Boolean.parseBoolean(raw);
-                    uucConfiguration.setDebugOn(b);
-                } catch (Throwable t) {
-                    warn("unable to interpret debug value of \"" + raw + "\". Debug disabled");
-                }
-            } else {
-                uucConfiguration.setDebugOn(false); // do NOT enable this casually.
-            }
-
-            raw = getFirstAttribute(node, UUC_INTERVAL);
-            if (StringUtils.isTrivial(raw)) {
-                uucConfiguration.interval = UUC_INTERVAL_DEFAULT;
-            } else {
-                uucConfiguration.interval = XMLConfigUtil.getValueSecsOrMillis(raw, true);
-            }
-
-            uucConfiguration.deleteVersions = Configurations.getFirstBooleanValue(node, UUC_DELETE_VERSION_FLAG, false);
-            uucConfiguration.testMode = Configurations.getFirstBooleanValue(node, UUC_TEST_MODE_ON, false);
-            uucConfiguration.alarms = getAlarms(node, UUC_ALARMS);
-            String x = Configurations.getFirstAttribute(node, UUC_LAST_ACCESSED_NEVER);
-            if (!StringUtils.isTrivial(x)) {
-                try {
-                    Boolean b = Boolean.parseBoolean(x);
-                    uucConfiguration.setLastAccessedNever(b);
-                } catch (Throwable t) {
-                    warn("unable to interpret boolean value \"" + x + "\" for " + UUC_LAST_ACCESSED_NEVER + " attribute. default is false.");
-                    uucConfiguration.setLastAccessedNever(false);
-                }
-            }
-/*
-            x = Configurations.getFirstAttribute(node, UUC_LAST_ACCESSED_BEFORE);
-            if (!StringUtils.isTrivial(x)) {
-                try {
-                    uucConfiguration.lastAccessedBefore = Iso8601.string2Date(x).getTimeInMillis();
-                    if (uucConfiguration.lastAccessedBefore < 0L) {
-                        throw new IllegalArgumentException("error processing last access date for unused client cleanup. Illegal date '" + x + "'");
-                    }
-                } catch (ParseException e) {
-                    warn("unable to interpret date " + x + " for " + UUC_LAST_ACCESSED_BEFORE + " in unused client cleanup. Cleanup disabled!!.\n" +
-                            "parsing failed at position " + e.getErrorOffset() + ": '" + e.getMessage() + "'");
-                    uucConfiguration.enabled = false;
-                    if (DebugUtil.isEnabled()) {
-                        e.printStackTrace();
-                    }
-                    return uucConfiguration;
-                }
-            }
-            x = Configurations.getFirstAttribute(node, UUC_LAST_ACCESSED_AFTER);
-            if (!StringUtils.isTrivial(x)) {
-                // only do something if you need to. No default for this attribute
-                try {
-                    uucConfiguration.lastAccessedAfter = Iso8601.string2Date(x).getTimeInMillis();
-                } catch (ParseException e) {
-                    warn("unable to interpret date " + x + " for " + UUC_LAST_ACCESSED_AFTER + " in unused client cleanup. Cleanup disabled!!.\n" +
-                            "parsing failed at position " + e.getErrorOffset() + ": '" + e.getMessage() + "'");
-                    ;
-                    uucConfiguration.enabled = false;
-                    if (DebugUtil.isEnabled()) {
-                        e.printStackTrace();
-                    }
-                    return uucConfiguration;
-                }
-            }
-*/
-    /*        ConfigurationNode whiteListNode = getFirstNode(node, UUC_WHITELIST);
-            // Fix https://github.com/ncsa/oa4mp/issues/139
-            if (whiteListNode != null) {
-                List[] outList = processUUCList(whiteListNode);
-                uucConfiguration.whiteList = outList[0];
-                uucConfiguration.whitelistRegex = outList[1];
-            }*/
-     /*       ConfigurationNode blackListNode = getFirstNode(node, UUC_BLACKLIST);
-            if (blackListNode != null) {
-                List[] outList = processUUCList(blackListNode);
-                uucConfiguration.blacklist = outList[0];
-                uucConfiguration.blacklistRegex = outList[1];
-            }*/
-        }
-        return uucConfiguration;
     }
 
     protected List[] processUUCList(ConfigurationNode node) {

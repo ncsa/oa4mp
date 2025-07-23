@@ -1,23 +1,22 @@
 package org.oa4mp.server.admin.oauth2.base;
 
-import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
-import org.oa4mp.server.api.OA4MPConfigTags;
-import org.oa4mp.server.api.ServiceEnvironmentImpl;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
-import edu.uiuc.ncsa.security.util.cli.CLITool;
+import edu.uiuc.ncsa.security.util.cli.CLITool2;
 import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
-import org.apache.commons.cli.Options;
 import org.apache.commons.configuration.tree.ConfigurationNode;
+import org.oa4mp.server.api.OA4MPConfigTags;
+import org.oa4mp.server.api.ServiceEnvironmentImpl;
+import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 11/14/13 at  3:15 PM
  */
-public  class CopyTool extends CLITool {
+public  class CopyTool extends CLITool2 {
 
     @Override
         public ConfigurationLoader<? extends AbstractEnvironment> getLoader() throws Exception {
@@ -79,18 +78,18 @@ public  class CopyTool extends CLITool {
     }
 
     protected ServiceEnvironmentImpl getEnv(String cfgFileOption, String cfgNameOption) {
-        if (getCommandLine().getOptionValue(SOURCE_CONFIG_NAME_OPTION).equals(getCommandLine().getOptionValue(TARGET_CONFIG_NAME_OPTION))) {
+        if (getInputLine().getNextArgFor(SOURCE_CONFIG_NAME_OPTION).equals(getInputLine().getNextArgFor(TARGET_CONFIG_NAME_OPTION))) {
             throw new MyConfigurationException("Error! You have specified that source and target as the same.");
         }
-        String fileName = getCommandLine().getOptionValue(cfgFileOption);
+        String fileName = getInputLine().getNextArgFor(cfgFileOption);
         if (fileName == null) {
-            fileName = getCommandLine().getOptionValue(SOURCE_CONFIG_FILE_OPTION);
+            fileName = getInputLine().getNextArgFor(SOURCE_CONFIG_FILE_OPTION);
         }
 
-        String configName = getCommandLine().getOptionValue(cfgNameOption);
+        String configName = getInputLine().getNextArgFor(cfgNameOption);
         sayv("loading configuration \"" + (configName == null ? "(none)" : configName) + "\" from file " + fileName);
         ConfigurationNode node = XMLConfigUtil.findConfiguration(fileName,
-                getCommandLine().getOptionValue(cfgNameOption),
+                getInputLine().getNextArgFor(cfgNameOption),
                 OA4MPConfigTags.COMPONENT);
         // override the logging in the configuration file, since that might be remote.
         ConfigurationLoader loader = null;
@@ -149,7 +148,7 @@ public  class CopyTool extends CLITool {
         return OA4MPConfigTags.COMPONENT;
     }
 
-
+/*
 
     @Override
     protected Options getOptions() {
@@ -159,7 +158,7 @@ public  class CopyTool extends CLITool {
         options.addOption(TARGET_CONFIG_FILE_OPTION, TARGET_CONFIG_FILE_LONG_OPTION, true, "The full path to the target configuration file.");
         options.addOption(TARGET_CONFIG_NAME_OPTION, TARGET_CONFIG_FILE_LONG_OPTION, true, "The target server for the operation.");
         return options;
-    }
+    }*/
 
     @Override
     public void help() {

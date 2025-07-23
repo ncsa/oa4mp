@@ -282,6 +282,9 @@ public class TXRecord extends IdentifiableImpl implements Identifiable, Cloneabl
 
     public void fromXML(XMLEventReader xer) throws XMLStreamException {
         XMLEvent xe = xer.nextEvent();
+        while(!xe.isStartElement()){
+            xe = xer.nextEvent();
+        }
         // process all the attributes
         String versionNumber = doXMLAttributes(xe);
 

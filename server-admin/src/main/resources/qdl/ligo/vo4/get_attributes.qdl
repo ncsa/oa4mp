@@ -9,23 +9,27 @@
 
  ldapsearch -LLL -H ldaps://ldap.cilogon.org  -x  -b 'ou=people,o=KAGRA-LIGO,o=CO,dc=gwastronomy-data,dc=cgca,dc=uwm,dc=edu'  '(eduPersonPrincipalName=duncan.meacher@shibbi.pki.itc.u-tokyo.ac.jp)'
  */
-
-     ini. := file_read('/home/ncsa/dev/csd/config/ini/ligo-ldap.ini',2).'ligo_prod';
+trace(x)->say(x);
+     ini. := file_read('/home/ncsa/dev/csd/config/ini/ligo-ldap.ini',2).'igwn';
+     kagra. := file_read('/home/ncsa/dev/csd/config/ini/ligo-ldap.ini',2).'kagra';
+     //ini. := file_read('/home/ncsa/dev/csd/config/ini/ligo-ldap.ini',2).'ligo_prod';
      //ini. := file_read('vfs#/scripts/ligo/ldap.ini',2).'ligo';
      user := script_args(0); // This is actually the EPPN for the user.
         uid := head(user, '@');
 trace('*** LIGO get_attributes, user=' + user);
-           kagra_cfg.'address' := 'ldap.cilogon.org,ldap.cilogon.org';
+           kagra_cfg.'address' := kagra.'address';
               kagra_cfg.'port' := 636;
         kagra_cfg.'claim_name' := 'uid';
               kagra_cfg.'type' := 'ldap';
-       kagra_cfg.'search_base' := 'ou=people,o=KAGRA-LIGO,o=CO,dc=gwastronomy-data,dc=cgca,dc=uwm,dc=edu';
+       kagra_cfg.'search_base' := kagra.'search_base';
          kagra_cfg.'ldap_name' := 'eduPersonPrincipalName';
-             kagra_cfg.groups. := ['isMemberOf'];
-  kagra_cfg.search_attributes. := ['isMemberOf','uid'];
-         kagra_cfg.'auth_type' := 'none';
+          kagra_cfg.'username' := kagra.'username';
+          kagra_cfg.'password' := kagra.'password';
+             kagra_cfg.'groups' := ['isMemberOf'];
+  kagra_cfg.'search_attributes' := ['isMemberOf','uid'];
      kagra_cfg.'fail_on_error' := true;
-               kagra_response. := get_claims(create_source(kagra_cfg.), user);
+         kagra_cfg.'auth_type' := 'none';
+               kagra_response. := claims#get_claims(claims#create_source(kagra_cfg.), user);
              trace('get_attr kagra_response.==' + to_string(kagra_response., true));
             groups. :=  is_defined(kagra_response.'isMemberOf')?kagra_response.'isMemberOf':[];
 
@@ -33,7 +37,8 @@ trace('*** LIGO get_attributes, user=' + user);
                ligo_cfg.'port' := 636;
          ligo_cfg.'claim_name' := 'uid';
                ligo_cfg.'type' := 'ldap';
-        ligo_cfg.'search_base' := 'ou=people,dc=ligo,dc=org';
+        //ligo_cfg.'search_base' := 'ou=people,dc=ligo,dc=org';
+        ligo_cfg.'search_base' := 'ou=people,dc=igwn,dc=org';
           ligo_cfg.'ldap_name' := 'uid';
               ligo_cfg.groups. := ['isMemberOf'];
    ligo_cfg.search_attributes. := ['isMemberOf', 'uin'];
@@ -41,7 +46,7 @@ trace('*** LIGO get_attributes, user=' + user);
            ligo_cfg.'username' := ini.'username';
            ligo_cfg.'password' := ini.'password';
       ligo_cfg.'fail_on_error' := true;
-                ligo_response. := get_claims(create_source(ligo_cfg.), uid);
+                ligo_response. := claims#get_claims(claims#create_source(ligo_cfg.), uid);
 
                    trace('get_attr ligo_response.==' + to_string(ligo_response., true));
 

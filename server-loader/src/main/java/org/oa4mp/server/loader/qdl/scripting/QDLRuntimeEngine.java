@@ -3,11 +3,11 @@ package org.oa4mp.server.loader.qdl.scripting;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.core.util.FileUtil;
 import edu.uiuc.ncsa.security.util.scripting.*;
 import net.sf.json.JSON;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
 import org.oa4mp.delegation.server.OA2Errors;
 import org.oa4mp.delegation.server.jwt.ScriptRuntimeException;
@@ -250,8 +250,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             byte[] bytes = Base64.decodeBase64(rawState);
             ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
             GZIPInputStream gzipInputStream = new GZIPInputStream(bais, 65536);
-            Reader r = new InputStreamReader(gzipInputStream);
-            String rawJSON = IOUtils.toString(r);
+            String rawJSON = FileUtil.readFileAsString(gzipInputStream);
 
             SerializationState serializationState = new SerializationState();
             serializationState.setVersion(SerializationConstants.VERSION_2_1_TAG);

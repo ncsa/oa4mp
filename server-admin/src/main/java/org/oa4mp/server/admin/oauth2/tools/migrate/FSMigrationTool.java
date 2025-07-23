@@ -1,7 +1,5 @@
 package org.oa4mp.server.admin.oauth2.tools.migrate;
 
-import org.oa4mp.server.loader.oauth2.OA2SE;
-import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import edu.uiuc.ncsa.security.core.util.FileUtil;
@@ -9,18 +7,20 @@ import edu.uiuc.ncsa.security.storage.FileStore;
 import edu.uiuc.ncsa.security.storage.sql.SQLStore;
 import edu.uiuc.ncsa.security.storage.sql.derby.DerbyConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.derby.DerbyConnectionPoolProvider;
-import edu.uiuc.ncsa.security.util.cli.CLITool;
+import edu.uiuc.ncsa.security.util.cli.CLITool2;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
 import org.apache.commons.configuration.tree.ConfigurationNode;
+import org.oa4mp.server.loader.oauth2.OA2SE;
+import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
 
 import java.io.*;
 import java.lang.reflect.Field;
 import java.util.*;
 
-import static org.oa4mp.server.api.OA4MPConfigTags.COMPONENT;
 import static edu.uiuc.ncsa.security.core.configuration.StorageConfigurationTags.DERBY_STORE_TYPE_FILE;
 import static edu.uiuc.ncsa.security.core.util.StringUtils.*;
+import static org.oa4mp.server.api.OA4MPConfigTags.COMPONENT;
 
 /**
  * Migration tool for old style file stores to (at this point) a Derby store.
@@ -42,7 +42,7 @@ import static edu.uiuc.ncsa.security.core.util.StringUtils.*;
    crash in OA4MP, Administrators therefore need a special tool to do the import
    that takes this into account.
  */
-public class FSMigrationTool extends CLITool {
+public class FSMigrationTool extends CLITool2 {
     public static final int DEFAULT_BATCH_SIZE = 15000;
 
     @Override

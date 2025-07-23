@@ -5,13 +5,13 @@ package org.oa4mp.server.test;
  * on 3/13/12 at  3:10 PM
  */
 
-import edu.uiuc.ncsa.security.core.configuration.ConfigInheritanceTest;
-import edu.uiuc.ncsa.security.core.configuration.MultipleInheritanceTest;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.storage.sql.SQLStore;
 import edu.uiuc.ncsa.security.storage.sql.derby.DerbyConnectionParameters;
 import edu.uiuc.ncsa.security.storage.sql.derby.DerbyConnectionPool;
-import edu.uiuc.ncsa.security.util.*;
+import edu.uiuc.ncsa.security.util.EditorTest;
+import edu.uiuc.ncsa.security.util.JSONPreprocessorTest;
+import edu.uiuc.ncsa.security.util.TemplateTest;
 import edu.uiuc.ncsa.security.util.cache.CacheTest;
 import junit.framework.TestSuite;
 import org.junit.BeforeClass;
@@ -33,8 +33,6 @@ import java.io.File;
 
 @Suite.SuiteClasses({
         QDLTests.class,
-        MultipleInheritanceTest.class,
-        ConfigInheritanceTest.class,
         TemplateTest.class,
         CacheTest.class,
         EditorTest.class,

@@ -95,4 +95,5 @@ cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token 
 ac_approval.'status' := 'approved';
 ac_approval.'approved' := true;
 approvals#save(ac_approval.);
+
 say('Admin client revocation test: ok!');
