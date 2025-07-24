@@ -48,7 +48,7 @@
     
         
                     <div class="xleft">
-            Last Published: 2025-05-15
+            Last Published: 2025-07-24
                                 </div>
                 <div class="xright">            
     
@@ -216,6 +216,22 @@
     
 <tr class="a">
         
+<td>localDFConsent</td>
+        
+<td>N</td>
+        
+<td>false</td>
+        
+<td>As per the OIDC specification, showing a consent screen is optional. When proxying,
+            this will request that the proxy send the user back to the local service to use the consent
+            screen there. Otherwise, the assumption is that the consent the user gave on the proxy
+            is sufficient. Also, note that the request parameters used are OA4MP only, so if
+            you are using another system for proxying, the request will be ignored by that proxy.
+        </td>
+    </tr>
+    
+<tr class="b">
+        
 <td>useHeader</td>
         
 <td>N</td>
@@ -228,7 +244,7 @@
     </tr>
 
     
-<tr class="b">
+<tr class="a">
         
 <td>requireHeader</td>
         
@@ -241,7 +257,7 @@
         </td>
     </tr>
     
-<tr class="a">
+<tr class="b">
         
 <td>headerFieldName</td>
         
@@ -254,7 +270,7 @@
         </td>
     </tr>
     
-<tr class="b">
+<tr class="a">
         
 <td>returnDNAsUsername</td>
         
@@ -268,7 +284,7 @@
         </td>
     </tr>
     
-<tr class="a">
+<tr class="b">
         
 <td>convertDNToGlobusID</td>
         

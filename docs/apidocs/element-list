@@ -20,7 +20,6 @@ org.oa4mp.delegation.server.server
 org.oa4mp.delegation.server.server.claims
 org.oa4mp.delegation.server.server.config
 org.oa4mp.delegation.server.server.scripts
-org.oa4mp.delegation.server.server.scripts.functor
 org.oa4mp.delegation.server.server.scripts.qdl
 org.oa4mp.delegation.server.storage
 org.oa4mp.delegation.server.storage.impl
@@ -28,9 +27,10 @@ org.oa4mp.delegation.server.storage.support
 org.oa4mp.delegation.server.storage.upkeep
 org.oa4mp.delegation.server.storage.uuc
 org.oa4mp.installer
+org.oa4mp.myproxy.servlet
 org.oa4mp.server.admin.install
-org.oa4mp.server.admin.myproxy.oauth2
-org.oa4mp.server.admin.myproxy.oauth2.base
-org.oa4mp.server.admin.myproxy.oauth2.tools
-org.oa4mp.server.admin.myproxy.oauth2.tools.migrate
+org.oa4mp.server.admin.oauth2
+org.oa4mp.server.admin.oauth2.base
+org.oa4mp.server.admin.oauth2.tools
+org.oa4mp.server.admin.oauth2.tools.migrate
 org.oa4mp.server.installer
