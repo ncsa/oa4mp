@@ -11,30 +11,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="https://jira.ncsa.illinois.edu/browse/CIL-2278 Added regression tests to check that a revoked admin client stops all flows and access dead.">
+    <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="https://github.com/ncsa/oa4mp/issues/260 removing old TX record tests. They are failing now thanks to a library change, but they are testing a serialization format we abandoned long ago, so reviving them is really just not worth it.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/client-installer/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/myproxy-logon/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/myproxy-logon/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oauth2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oauth2/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rfc8414/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/rfc8414/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/BaseClientStoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/BaseClientStoreCommands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/CopyTool.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/CopyTool.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/Monitor.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2Monitor.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/migrate/FSMigrationTool.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/migrate/FSMigrationTool.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/ligo/vo4/get_attributes.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/ligo/vo4/get_attributes.qdl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/util/AbstractCLIApprover.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/util/AbstractCLIApprover.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-installer/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/loader/OA2ConfigurationLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/loader/OA2ConfigurationLoader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/storage/tx/TXRecord.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/storage/tx/TXRecord.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/scripting/QDLRuntimeEngine.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/scripting/QDLRuntimeEngine.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-test/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/local/ac-revoke.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/local/ac-revoke.qdl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-test/src/test/java/org/oa4mp/server/test/QDLTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/test/java/org/oa4mp/server/test/QDLTests.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-test/src/test/java/org/oa4mp/server/test/ServiceTestSuite2.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/test/java/org/oa4mp/server/test/ServiceTestSuite2.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -1224,15 +1208,7 @@
       <workItem from="1748786031746" duration="4184000" />
       <workItem from="1748896211549" duration="136633000" />
       <workItem from="1750287152582" duration="292163000" />
-      <workItem from="1752785633628" duration="14660000" />
-    </task>
-    <task id="LOCAL-00051" summary="https://github.com/ncsa/oa4mp/issues/212. Added lots of tests for the new client credentials flow using RFC 7523 and lots of tweaks to tests.">
-      <option name="closed" value="true" />
-      <created>1729343653210</created>
-      <option name="number" value="00051" />
-      <option name="presentableId" value="LOCAL-00051" />
-      <option name="project" value="LOCAL" />
-      <updated>1729343653210</updated>
+      <workItem from="1752785633628" duration="22061000" />
     </task>
     <task id="LOCAL-00052" summary="https://github.com/ncsa/oa4mp/issues/213. Documentation">
       <option name="closed" value="true" />
@@ -1618,7 +1594,15 @@
       <option name="project" value="LOCAL" />
       <updated>1752011665491</updated>
     </task>
-    <option name="localTasksCounter" value="100" />
+    <task id="LOCAL-00100" summary="https://github.com/ncsa/oa4mp/issues/260 removing old TX record tests. They are failing now thanks to a library change, but they are testing a serialization format we abandoned long ago, so reviving them is really just not worth it.">
+      <option name="closed" value="true" />
+      <created>1753303638168</created>
+      <option name="number" value="00100" />
+      <option name="presentableId" value="LOCAL-00100" />
+      <option name="project" value="LOCAL" />
+      <updated>1753303638168</updated>
+    </task>
+    <option name="localTasksCounter" value="101" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1640,7 +1624,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
-    <MESSAGE value="https://github.com/ncsa/security-lib/issues/46 fallout for https://github.com/ncsa/oa4mp/issues/232" />
     <MESSAGE value="website update" />
     <MESSAGE value="Mostly formatting updates in the CLI to support result set printing." />
     <MESSAGE value="While chasing down formatting errors, got tired of doing the same 4 queries repeatedly to test, and created https://github.com/ncsa/oa4mp/issues/245 which wonderfully streamlines it." />
@@ -1665,7 +1648,8 @@
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/255" />
     <MESSAGE value="More fallout from improving bootstrap sequence in command line utilities. Found some issues in the QDL storage module. Wrote basic Pelican startup scripts." />
     <MESSAGE value="https://jira.ncsa.illinois.edu/browse/CIL-2278 Added regression tests to check that a revoked admin client stops all flows and access dead." />
-    <option name="LAST_COMMIT_MESSAGE" value="https://jira.ncsa.illinois.edu/browse/CIL-2278 Added regression tests to check that a revoked admin client stops all flows and access dead." />
+    <MESSAGE value="https://github.com/ncsa/oa4mp/issues/260 removing old TX record tests. They are failing now thanks to a library change, but they are testing a serialization format we abandoned long ago, so reviving them is really just not worth it." />
+    <option name="LAST_COMMIT_MESSAGE" value="https://github.com/ncsa/oa4mp/issues/260 removing old TX record tests. They are failing now thanks to a library change, but they are testing a serialization format we abandoned long ago, so reviving them is really just not worth it." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="GROUP_MULTIFILE_MERGE_BY_DIRECTORY" value="true" />
   </component>
@@ -2457,7 +2441,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/org/qdl_lang/language/1.6-QDL-SNAPSHOT/language-1.6-QDL-SNAPSHOT-sources.jar!/org/qdl_lang/xml/XMLUtils.java</url>
-          <line>245</line>
+          <line>248</line>
           <option name="timeStamp" value="1372" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-method">
