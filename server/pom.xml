@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.oa4mp</groupId>
         <artifactId>oa4mp-parent</artifactId>
-        <version>6.x-SNAPSHOT</version>
+        <version>6.2.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -21,7 +21,7 @@
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>common</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.0</version>
         </dependency>
 
         <dependency>
@@ -33,7 +33,7 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>storage</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.0</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

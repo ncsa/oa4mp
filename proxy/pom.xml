@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.oa4mp</groupId>
         <artifactId>oa4mp-parent</artifactId>
-        <version>6.x-SNAPSHOT</version>
+        <version>6.2.0</version>
     </parent>
 
     <artifactId>proxy</artifactId>
@@ -26,36 +26,36 @@
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>server-admin</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.0</version>
         </dependency>
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>server-loader</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.0</version>
         </dependency>
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>oauth2</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.0</version>
         </dependency>
 
 
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>util</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.0</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>servlet</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.0</version>
         </dependency>
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>myproxy-logon</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.0</version>
         </dependency>
 
 <!--        <dependency>
