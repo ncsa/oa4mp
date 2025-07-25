@@ -114,11 +114,15 @@ public class ProxyCallbackServlet extends OA2AuthorizationServer {
         // create the correct callback and return it.
         Map<String, String> cbParams = new HashMap<>();
         cbParams.put(OA2Constants.STATE, t.getRequestState()); // Make sure that the original state that was sent is returned to the client callback
-        createCallback(t, cbParams);
+        String cb = createCallback(t, cbParams);
         oa2SE.getTransactionStore().save(t);
      //   response.sendRedirect(cb);
-        setClientConsentAttributes(request, t);
-        JSPUtil.fwd(request, response, "/proxy-consent.jsp");
+        if(oa2SE.getAuthorizationServletConfig().isLocalDFConsent()) {
+            setClientConsentAttributes(request, t);
+            JSPUtil.fwd(request, response, "/proxy-consent.jsp");
+        }else {
+            response.sendRedirect(cb);
+        }
     }
     protected void setClientConsentAttributes(HttpServletRequest request, OA2ServiceTransaction t) {
         request.setAttribute(AUTHORIZATION_ACTION_KEY, AUTHORIZATION_ACTION_KEY);
