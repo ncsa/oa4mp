@@ -201,28 +201,6 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
         return cb;
     }
 
-
-
-/*    @Override
-    protected void setupMPConnection(ServiceTransaction trans, String username, String password) throws GeneralSecurityException {
-        if (((OA2SE) OA4MPServlet.getServiceEnvironment()).isTwoFactorSupportEnabled()) {
-            // Stash username and password in a bogus MyProxy logon instance.
-            MyMyProxyLogon myProxyLogon = new MyMyProxyLogon();
-            myProxyLogon.setUsername(username);
-            myProxyLogon.setPassphrase(password);
-            MyProxyConnectable mpc = new MPSingleConnectionProvider.MyProxyLogonConnection(myProxyLogon);
-            mpc.setIdentifier(trans.getIdentifier());
-            OA4MPServlet.getMyproxyConnectionCache().add(mpc);
-        } else {
-            createMPConnection(trans.getIdentifier(), username, password, trans.getLifetime());
-            if (hasMPConnection(trans.getIdentifier())) {
-                getMPConnection(trans.getIdentifier()).close();
-            }
-        }
-    }*/
-
-
-
     @Override
     protected void doProxy(AuthorizedState state) throws Throwable {
         ProxyUtils.doProxy((OA2SE) OA4MPServlet.getServiceEnvironment(), state);

@@ -58,6 +58,7 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
     /**
      * Get the value from the configuration node as a boolean. This returns the default value if
      * no such configuration value. or if it does not parse to something reasonable.
+     *
      * @param sn
      * @param tagName
      * @param defaultValue
@@ -67,8 +68,12 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
         String x = getFirstAttribute(sn, tagName);
         if (x == null || x.length() == 0) return defaultValue;
         x = x.trim().toLowerCase();
-        if("true".equals(x) || "on".equals(x)) {return true;}
-        if("false".equals(x.trim()) || "off".equals(x)) {return false;}
+        if ("true".equals(x) || "on".equals(x)) {
+            return true;
+        }
+        if ("false".equals(x.trim()) || "off".equals(x)) {
+            return false;
+        }
         return defaultValue;
     }
 
@@ -87,24 +92,24 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
             if (!kids.isEmpty()) {
                 ConfigurationNode sn = (ConfigurationNode) kids.get(0);
                 try {
-                    boolean useProxy =getCfgBoolean(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_USE_PROXY, useHeader);
+                    boolean useProxy = getCfgBoolean(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_USE_PROXY, useHeader);
                     // implicitly uses the fact that null (so missing parameter) parses to false.
                     // If the useHeader tag is missing, then this is effectively false.
                     useHeader = getCfgBoolean(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_HEADER_USE, useHeader);
-                    if(useProxy){
+                    if (useProxy) {
                         String cfgFile = getFirstAttribute(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_PROXY_CONFIG_FILE);
-                        if(StringUtils.isTrivial(cfgFile)){
+                        if (StringUtils.isTrivial(cfgFile)) {
                             throw new IllegalArgumentException("Missing config file for the authorization proxy.");
                         }
                         File f = new File(cfgFile);
                         // check that this works before we load the configuration
-                        if(!f.exists()){
-                             throw new IllegalArgumentException("The file \"" + cfgFile + "\" does not exist. Check your path.");
+                        if (!f.exists()) {
+                            throw new IllegalArgumentException("The file \"" + cfgFile + "\" does not exist. Check your path.");
                         }
-                        if(!f.isFile()){
+                        if (!f.isFile()) {
                             throw new IllegalArgumentException("\"" + cfgFile + "\" is not a file.");
                         }
-                        if(!f.canRead()){
+                        if (!f.canRead()) {
                             throw new IllegalArgumentException("The file \"" + cfgFile + "\" cannot be read. Check your permissions");
                         }
                         String cfgName = getFirstAttribute(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_PROXY_CONFIG_NAME);
@@ -114,14 +119,14 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
 
                         // A missing config file is bad. However, if there is exactly one configuration in the file
                         // it does not need to be named, so the cfgName can be omitted.
-                      authorizationServletConfig = new AuthorizationServletConfig(cfgFile, cfgName==null?"":cfgName, localDFConsent);
-                      // Grab any authz URI or the discovery page does not get set right!
+                        authorizationServletConfig = new AuthorizationServletConfig(cfgFile, cfgName == null ? "" : cfgName, localDFConsent);
+                        // Grab any authz URI or the discovery page does not get set right!
                         authorizationURI = getFirstAttribute(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_URI);
-                        if(authorizationURI != null){
+                        if (authorizationURI != null) {
                             authorizationServletConfig.authorizationURI = authorizationURI;
                         }
 
-                    }else {
+                    } else {
                         authorizationURI = getFirstAttribute(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_URI);
                         if (useHeader) {
                             requiredHeader = getCfgBoolean(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_HEADER_REQUIRE, requiredHeader);
@@ -131,6 +136,7 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
                             verifyUsername = getCfgBoolean(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_VERIFY_USERNAME, verifyUsername);
                             convertDNToGlobusID = getCfgBoolean(sn, OA4MPConfigTags.CONVERT_DN_TO_GLOBUS_ID, convertDNToGlobusID);
                         }
+
                         // Fall through. If  useHeader is true, then all the above values will be set.
                         // Otherwise, the previous defaults will be used.
                         authorizationServletConfig = new AuthorizationServletConfig(
@@ -142,14 +148,25 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
                                 showLogon,
                                 verifyUsername,
                                 convertDNToGlobusID);
+                        authorizationServletConfig.setUseProxy(useProxy); // It's false here
+                        Boolean localDFConsent;
+                        String rawDFC = getFirstAttribute(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_PROXY_DF_LOCAL_CONSENT_REQUIRED );
+                        if(rawDFC == null) {
+                            // don't require local consent if replacing entire authorization machinery
+                            // with an external one. External system should handle it all.
+                            localDFConsent = !authorizationServletConfig.useExternalAuthorization();
+                        }else{
+                            localDFConsent = Boolean.parseBoolean(rawDFC); // use whatever they explicitly set, however
+                        }
+                        authorizationServletConfig.setLocalDFConsent(localDFConsent);
                     }
                 } catch (Throwable t) {
                     info("Error loading authorization configuration. Disabling use of headers");
                 }
             }
-
-
         }
+        DebugUtil.trace(this, "setting local consent to " + authorizationServletConfig.isLocalDFConsent());
+
         return authorizationServletConfig;
     }
 
@@ -366,7 +383,7 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
     public T createInstance() {
         initialize();
         return (T) new ServiceEnvironmentImpl(loggerProvider.get(),
-              //  getMyProxyFacadeProvider(),
+                //  getMyProxyFacadeProvider(),
                 getTransactionStoreProvider(),
                 getClientStoreProvider(),
                 getMaxAllowedNewClientRequests(),
@@ -459,13 +476,12 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
         Object[] polling = loadPolling();
 
 
-        if (polling != null && 0<(long)polling[1]) {
+        if (polling != null && 0 < (long) polling[1]) {
             // only start polling if the polling interval is positive.
             info("Loading polling for " + polling[0]);
             AbstractCLIApprover.ClientApprovalThread cat = new AbstractCLIApprover.ClientApprovalThread(myLogger, se2, (File) polling[0], (Long) polling[1]);
             se2.setClientApprovalThread(cat);
         }
-
 
 
         return (T) se2;
