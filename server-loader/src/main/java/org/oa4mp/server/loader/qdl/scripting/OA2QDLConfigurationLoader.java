@@ -1,7 +1,7 @@
 package org.oa4mp.server.loader.qdl.scripting;
 
 import org.qdl_lang.config.QDLConfigurationLoader;
-import org.qdl_lang.scripting.AnotherJSONUtil;
+import org.qdl_lang.scripting.AnaphorUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.scripting.ScriptSet;
 import net.sf.json.JSON;
@@ -122,6 +122,6 @@ public class OA2QDLConfigurationLoader<T extends OA2QDLEnvironment> extends QDLC
                 }
             }
         }
-        return AnotherJSONUtil.createScripts(allScripts);
+        return AnaphorUtil.createScripts(allScripts);
     }
 }

@@ -157,6 +157,7 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
                         }else{
                             localDFConsent = Boolean.parseBoolean(rawDFC); // use whatever they explicitly set, however
                         }
+                        DebugUtil.trace(this, "setting local consent to " + localDFConsent);
                         authorizationServletConfig.setLocalDFConsent(localDFConsent);
                     }
                 } catch (Throwable t) {
@@ -166,7 +167,6 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
 
 
         }
-        DebugUtil.trace(this, "setting local consent to " + authorizationServletConfig.isLocalDFConsent());
 
         return authorizationServletConfig;
     }

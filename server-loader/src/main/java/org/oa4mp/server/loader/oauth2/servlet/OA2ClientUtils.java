@@ -30,7 +30,7 @@ import org.oa4mp.server.loader.oauth2.storage.clients.OA2ClientKeys;
 import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
 import org.oa4mp.server.loader.oauth2.storage.tx.TXRecord;
 import org.oa4mp.server.loader.oauth2.tokens.*;
-import org.qdl_lang.scripting.AnotherJSONUtil;
+import org.qdl_lang.scripting.AnaphorUtil;
 import org.qdl_lang.scripting.QDLScript;
 
 import javax.servlet.http.HttpServletRequest;
@@ -552,9 +552,9 @@ public class OA2ClientUtils {
         ScriptSet<? extends QDLScript> scriptSet;
         // Options are it is a single QDL load command or an array of them.
         if (cfg.get(CONFIG_TAG) instanceof JSONArray) {
-            scriptSet = AnotherJSONUtil.createScripts(cfg.getJSONArray(CONFIG_TAG));
+            scriptSet = AnaphorUtil.createScripts(cfg.getJSONArray(CONFIG_TAG));
         } else {
-            scriptSet = AnotherJSONUtil.createScripts(cfg.getJSONObject(CONFIG_TAG));
+            scriptSet = AnaphorUtil.createScripts(cfg.getJSONObject(CONFIG_TAG));
         }
         Iterator<? extends QDLScript> iterator = scriptSet.iterator();
         while (iterator.hasNext()) {

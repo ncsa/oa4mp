@@ -2,7 +2,7 @@ package org.oa4mp.server.loader.oauth2.claims;
 
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
 import org.oa4mp.server.loader.qdl.scripting.QDLRuntimeEngine;
-import org.qdl_lang.scripting.AnotherJSONUtil;
+import org.qdl_lang.scripting.AnaphorUtil;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
@@ -84,7 +84,7 @@ public abstract class AbstractPayloadConfig implements Serializable {
             if (rawScripts == null) {
                 throw new IllegalArgumentException("error: no recognizable scripts found for \"" + jsonObject.getString(QDLRuntimeEngine.CONFIG_TAG) + "\"");
             }
-            setScriptSet(AnotherJSONUtil.createScripts(rawScripts));
+            setScriptSet(AnaphorUtil.createScripts(rawScripts));
         }
         if (jsonObject.containsKey(TYPE_KEY)) {
             type = jsonObject.getString(TYPE_KEY);

@@ -1,13 +1,14 @@
 package org.oa4mp.server.loader.oauth2.claims;
 
-import org.oa4mp.server.loader.oauth2.OA2SE;
-import org.oa4mp.delegation.server.server.claims.OA2Claims;
-import org.oa4mp.delegation.server.server.config.LDAPConfiguration;
-import org.oa4mp.delegation.server.server.config.LDAPConfigurationUtil;
-import org.qdl_lang.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import net.sf.json.JSONObject;
+import org.oa4mp.delegation.server.server.claims.ClaimSourceConfiguration;
+import org.oa4mp.delegation.server.server.claims.OA2Claims;
+import org.oa4mp.delegation.server.server.config.LDAPConfiguration;
+import org.oa4mp.delegation.server.server.config.LDAPConfigurationUtil;
+import org.oa4mp.server.loader.oauth2.OA2SE;
+import org.qdl_lang.variables.QDLStem;
 
 /**
  * An {@link LDAPClaimsSource} for the NCSA. This has the more common  defaults.
@@ -21,16 +22,13 @@ public class NCSALDAPClaimSource extends LDAPClaimsSource {
      * No arg constructor is needed for invocation by reflection. 
      */
     public NCSALDAPClaimSource() {
-        init();
     }
     public NCSALDAPClaimSource(QDLStem stem) {
         super(stem);
-        init();
     }
 
     public NCSALDAPClaimSource(QDLStem stem, OA2SE oa2SE) {
          super(stem, oa2SE);
-         init();
      }
     /**
      * NOTE that his uses the search filter attribute == the name of the claim to look up and
@@ -42,7 +40,6 @@ public class NCSALDAPClaimSource extends LDAPClaimsSource {
     public NCSALDAPClaimSource(String claimName) {
         super();
         ServletDebugUtil.trace(this, "In constructor.");
-        init();
         if (claimName != null && !claimName.isEmpty()) {
             getLDAPCfg().setSearchFilterAttribute(claimName);
         } else {
@@ -53,17 +50,15 @@ public class NCSALDAPClaimSource extends LDAPClaimsSource {
 
     public NCSALDAPClaimSource(LDAPConfiguration ldapConfiguration, MyLoggingFacade myLogger) {
         super(ldapConfiguration, myLogger);
-        init();
     }
 
 
 
     public NCSALDAPClaimSource(OA2SE oa2SE) {
         super(oa2SE);
-        init();
     }
     // This is to test that this works.
-    String rawConfig = " {\n" +
+    String rawDefaultConfig = " {\n" +
             "        \"ldap\": {\n" +
             "          \"id\": \"ncsa-default\",\n" +
             "          \"name\": \"ncsa-default\",\n" +
@@ -115,14 +110,23 @@ public class NCSALDAPClaimSource extends LDAPClaimsSource {
             "        }\n" +
             "      }";
 
-    protected void init() {
-        LDAPConfigurationUtil util = new LDAPConfigurationUtil();
-        JSONObject cfg = JSONObject.fromObject(rawConfig);
-        LDAPConfiguration x = util.fromJSON(cfg);
-        ServletDebugUtil.trace(this, "In init(). Setting configuration");
-        setConfiguration(x);
+    protected void createDefaultConfig() {
+        if(!hasConfiguration()) {
+            LDAPConfigurationUtil util = new LDAPConfigurationUtil();
+            JSONObject cfg = JSONObject.fromObject(rawDefaultConfig);
+            LDAPConfiguration x = util.fromJSON(cfg);
+            ServletDebugUtil.trace(this, "In init(). Setting default configuration");
+            setConfiguration(x);
+        }
     }
 
+    @Override
+    public ClaimSourceConfiguration getConfiguration() {
+        if (configuration == null) {
+            createDefaultConfig();
+        }
+        return configuration;
+    }
     @Override
     public String toString() {
         return "NCSALDAPClaimSource{" +

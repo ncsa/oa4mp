@@ -114,10 +114,14 @@ public class CreateSourceConfig implements QDLFunction, CSConstants {
         put(searchAtt,2L, "uidNumber");
         put(searchAtt,3L, "cn");
         put(searchAtt,4L, "memberOf");
-        put(output,"search_attributes.", searchAtt);
+        // Fix for https://github.com/cilogon/cilogon-java/issues/58 here and for next entry for goups.
+        put(output,CS_LDAP_SEARCH_ATTRIBUTES, searchAtt);
         QDLStem groups = new QDLStem();
         put(groups,0L, "memberOf");
-        put(output,"groups.", groups);
+        put(output,CS_LDAP_GROUP_NAMES, groups);
+        QDLStem renames = new QDLStem();
+        put(renames, "memberOf", "isMemberOf");
+        put(output, CS_LDAP_RENAME,renames);
         return output.union(arg);
     }
 

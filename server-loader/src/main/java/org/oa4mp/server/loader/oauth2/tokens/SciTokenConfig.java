@@ -16,7 +16,7 @@ public class SciTokenConfig extends AccessTokenConfig {
         if (jsonObject.containsKey(USERNAME_CLAIM_KEY)) {
             usernameClaimKey = jsonObject.getString(USERNAME_CLAIM_KEY);
         }
-        //setScriptSet(AnotherJSONUtil.createScripts(jsonObject));
+        //setScriptSet(AnaphorUtil.createScripts(jsonObject));
 
     }
 

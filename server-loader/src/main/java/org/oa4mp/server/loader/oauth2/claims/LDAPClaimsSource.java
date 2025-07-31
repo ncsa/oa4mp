@@ -88,7 +88,8 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
      * @return
      */
     public String getSearchName(JSONObject claims, HttpServletRequest request, ServiceTransaction transaction) {
-        String dbgname = ".getSearchName(id=" + getLDAPCfg().getId() + "):";
+        String dbgname = ".getSearchName(id=" + getLDAPCfg().getId() + ", search name key=" + getLDAPCfg().getSearchNameKey() + ")";
+
         DebugUtil.trace(this, dbgname);
         LDAPConfigurationUtil ldapConfigurationUtil = new LDAPConfigurationUtil();
         JSONObject xxx = ldapConfigurationUtil.toJSON(getLDAPCfg());
@@ -116,6 +117,8 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
             // return nothing) and inexplicably have no result.
             throw new LDAPException("No search name found for LDAP query.");
         }
+        DebugUtil.trace(this, ".getSearchName(id=" + getLDAPCfg().getId() + ", returning " + searchName );
+
         return searchName;
     }
 
@@ -161,16 +164,17 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
      ServiceUnavailableException
  */
     public void handleException(Throwable throwable, MetaDebugUtil debugger) {
-
+debugger.trace(this, "LDAP error (" + throwable.getClass().getSimpleName() + "):" + throwable.getMessage());
+throwable.printStackTrace();
         if (throwable instanceof NamingException) {
             // Fix for https://jira.ncsa.illinois.edu/browse/CIL-1943
-            String msg =  throwable.getClass().getSimpleName() + " talking to LDAP:" + throwable.getMessage();
+            String msg = throwable.getClass().getSimpleName() + " talking to LDAP:" + throwable.getMessage();
             debugger.warn(this, msg);
             // Fix https://github.com/ncsa/oa4mp/issues/246
-            if(getConfiguration().isNotifyOnFail()){
+            if (getConfiguration().isNotifyOnFail()) {
                 warn(msg);
             }
-            if(getConfiguration().isFailOnError()) {
+            if (getConfiguration().isFailOnError()) {
                 throw new LDAPException(msg, throwable);
             }
             return;
@@ -224,8 +228,8 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
         String name = "realProcessing(id=" + getLDAPCfg().getId() + "):";
         MetaDebugUtil debugger = OA4MPServlet.createDebugger(transaction.getClient());
 
-        debugger.trace(this, name + " preparing to do processing, cfg=" + getLDAPCfg().toJSON().toString(2));
-        debugger.trace(this, name + " initial claims = " + claims.toString(2));
+        debugger.trace(this, name + " preparing to do processing, cfg:\n" + getLDAPCfg().toJSON().toString(1));
+        debugger.trace(this, name + " initial claims:\n" + claims.toString(1));
 
         if (!isEnabled()) {
             debugger.trace(this, name + " Claims source not enabled.");
@@ -234,11 +238,14 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
 
         if (!isLoggedOn()) {
             logon(debugger);
-            debugger.trace(this, name + " logon attempted. failed?" + isLoggedOn());
+            if(!isLoggedOn() && !getLDAPCfg().isFailOnError()){
+                debugger.trace(this, name + " logon FAILED!");
+                return claims;
+            }
         }
         try {
             String searchName = getSearchName(claims, request, transaction);
-            debugger.trace(this, name + " search name=" + searchName);
+            debugger.trace(this, name + " search name=\"" + searchName+"\"");
 
             if (searchName != null) {
                 Map tempMap = simpleSearch(context, searchName, getLDAPCfg().getSearchAttributes(), debugger);
@@ -247,7 +254,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
                 info("No search name encountered for LDAP query. No search performed.");
             }
             context.close();
-        }        catch (Throwable throwable) {
+        } catch (Throwable throwable) {
             debugger.trace(this, name + " Error getting search name \"" + throwable.getMessage() + "\"", throwable);
             handleException(throwable, debugger);
         } finally {
@@ -337,7 +344,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
         // Fix https://github.com/ncsa/oa4mp/issues/113
         int retryCount = Math.max(1, getLDAPCfg().getRetryCount()); // make sure it trips once
         Throwable lastException = null;
-        for(int i = 0; i < retryCount; i++){
+        for (int i = 0; i < retryCount; i++) {
             while (stringTokenizer.hasMoreTokens()) {
                 try {
                     currentServerAddress = stringTokenizer.nextToken().trim(); // chop out extra blanks!
@@ -351,19 +358,21 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
                     lastException = e;
                 }
             }
-           if(0 < getLDAPCfg().getMaxWait()){
-               try {
-                   Thread.currentThread().sleep(getLDAPCfg().getMaxWait());
-               } catch (InterruptedException e) {
-                   if(DebugUtil.isEnabled()) {
-                       e.printStackTrace();
-                   }
-                   info("sleep in " + getClass().getSimpleName() + " + interrupted:" + e.getMessage());
-               }
-           }
+            if (0 < getLDAPCfg().getMaxWait()) {
+                try {
+                    Thread.currentThread().sleep(getLDAPCfg().getMaxWait());
+                } catch (InterruptedException e) {
+                    if (DebugUtil.isEnabled()) {
+                        e.printStackTrace();
+                    }
+                    info("sleep in " + getClass().getSimpleName() + " + interrupted:" + e.getMessage());
+                }
+            }
         }
         // Fix https://github.com/ncsa/oa4mp/issues/246 let handleException do the work so it's centralized
         handleException(lastException, debugger); // failed the max number of times, so handle the error.
+        // Note that the previous line will rnd up throwing the correct exception, so the next
+        // line never should execute. It must be here though or Java won't compile.
         return null;
     }
 
@@ -466,7 +475,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
      * @throws NamingException
      */
     protected JSONObject toJSON(Map<String,
-            LDAPConfigurationUtil.AttributeEntry> attributes,
+                                        LDAPConfigurationUtil.AttributeEntry> attributes,
                                 NamingEnumeration e,
                                 String userName) throws NamingException {
         JSONObject json = new JSONObject();
@@ -715,6 +724,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
 
     @Override
     public void fromQDL(QDLStem arg) {
+        System.out.println("LDAPClaimsSource::fromQDL:\n"+arg.toString(1));
         LDAPConfiguration ldapCfg = new LDAPConfiguration();
         setConfiguration(ldapCfg);
         super.fromQDL(arg);
@@ -828,15 +838,15 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
         QDLStem stem = super.toQDL();
         LDAPConfigurationUtil cUtil = new LDAPConfigurationUtil();
         LDAPConfiguration cfg2 = (LDAPConfiguration) getConfiguration();
-        addToStem(stem,CS_DEFAULT_TYPE, CS_TYPE_LDAP);
-        addToStem(stem,CS_LDAP_SEARCH_NAME, cfg2.getSearchNameKey());
-        addToStem(stem,CS_LDAP_SERVER_ADDRESS, cfg2.getServer());
-        addToStem(stem,CS_LDAP_SEARCH_BASE, cfg2.getSearchBase()); // Fixes CIL-1328
-        addToStem(stem,CS_LDAP_CONTEXT_NAME, cfg2.getContextName());
-        addToStem(stem,CS_LDAP_ADDITIONAL_FILTER, cfg2.getAdditionalFilter());
-        addToStem(stem,CS_LDAP_PORT, new Long(cfg2.getPort()));
-        addToStem(stem,CS_LDAP_AUTHZ_TYPE, cUtil.getAuthName(cfg2.getAuthType()));
-        addToStem(stem,CS_LDAP_SEARCH_FILTER_ATTRIBUTE, cfg2.getSearchFilterAttribute());
+        addToStem(stem, CS_DEFAULT_TYPE, CS_TYPE_LDAP);
+        addToStem(stem, CS_LDAP_SEARCH_NAME, cfg2.getSearchNameKey());
+        addToStem(stem, CS_LDAP_SERVER_ADDRESS, cfg2.getServer());
+        addToStem(stem, CS_LDAP_SEARCH_BASE, cfg2.getSearchBase()); // Fixes CIL-1328
+        addToStem(stem, CS_LDAP_CONTEXT_NAME, cfg2.getContextName());
+        addToStem(stem, CS_LDAP_ADDITIONAL_FILTER, cfg2.getAdditionalFilter());
+        addToStem(stem, CS_LDAP_PORT, new Long(cfg2.getPort()));
+        addToStem(stem, CS_LDAP_AUTHZ_TYPE, cUtil.getAuthName(cfg2.getAuthType()));
+        addToStem(stem, CS_LDAP_SEARCH_FILTER_ATTRIBUTE, cfg2.getSearchFilterAttribute());
         if (cfg2.hasSearchScope()) {
             put(stem, CS_LDAP_SEARCH_SCOPE, cfg2.getSearchScope());
         }
@@ -855,7 +865,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
                 LDAPConfigurationUtil.AttributeEntry attributeEntry = cfg2.getSearchAttributes().get(key);
                 names.add(attributeEntry.sourceName);
                 if (attributeEntry.targetName != null && !attributeEntry.targetName.equals(attributeEntry.sourceName)) {
-                    put(renames,attributeEntry.sourceName, attributeEntry.targetName);
+                    put(renames, attributeEntry.sourceName, attributeEntry.targetName);
                 }
                 if (attributeEntry.isGroup) {
                     groups.add(attributeEntry.sourceName);
@@ -865,20 +875,20 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
                 }
                 QDLStem nameStem = new QDLStem();
                 nameStem.addList(names);
-                put(stem,CS_LDAP_SEARCH_ATTRIBUTES, nameStem);
+                put(stem, CS_LDAP_SEARCH_ATTRIBUTES, nameStem);
 
                 if (groups.size() != 0) {
                     QDLStem groupStem = new QDLStem();
                     groupStem.addList(groups);
-                    put(stem,CS_LDAP_GROUP_NAMES, groupStem);
+                    put(stem, CS_LDAP_GROUP_NAMES, groupStem);
                 }
                 if (isList.size() != 0) {
                     QDLStem listStem = new QDLStem();
                     listStem.addList(isList);
-                    put(stem,CS_LDAP_LISTS, listStem);
+                    put(stem, CS_LDAP_LISTS, listStem);
                 }
                 if (renames.size() != 0) {
-                    put(stem,CS_LDAP_RENAME, renames);
+                    put(stem, CS_LDAP_RENAME, renames);
                 }
             }
 
@@ -888,6 +898,7 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
 
     /**
      * Lazy initialization since it is assumed that this is needed to populate this from JSON or QDL.
+     *
      * @return
      */
     @Override
@@ -897,4 +908,5 @@ public class LDAPClaimsSource extends BasicClaimsSourceImpl implements Logable {
         }
         return configuration;
     }
+
 }
