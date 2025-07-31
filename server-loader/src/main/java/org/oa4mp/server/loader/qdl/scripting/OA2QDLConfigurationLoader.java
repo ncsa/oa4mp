@@ -122,6 +122,6 @@ public class OA2QDLConfigurationLoader<T extends OA2QDLEnvironment> extends QDLC
                 }
             }
         }
-        return AnotherJSONUtil.createScripts(allScripts);
+        return AnaphorUtil.createScripts(allScripts);
     }
 }

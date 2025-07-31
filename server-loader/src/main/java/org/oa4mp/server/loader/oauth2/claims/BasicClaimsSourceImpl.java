@@ -1,6 +1,5 @@
 package org.oa4mp.server.loader.oauth2.claims;
 
-import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import net.sf.json.JSONObject;
 import org.oa4mp.delegation.server.ServiceTransaction;
@@ -9,7 +8,6 @@ import org.oa4mp.delegation.server.server.UnsupportedScopeException;
 import org.oa4mp.delegation.server.server.claims.ClaimSource;
 import org.oa4mp.delegation.server.server.claims.ClaimSourceConfiguration;
 import org.oa4mp.delegation.server.server.claims.OA2Claims;
-import org.oa4mp.server.api.storage.servlet.OA4MPServlet;
 import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.servlet.GroupHandler;
 import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
@@ -159,20 +157,11 @@ public class BasicClaimsSourceImpl implements ClaimSource {
     @Override
     public JSONObject process(JSONObject claims, HttpServletRequest request, ServiceTransaction transaction) throws UnsupportedScopeException {
         OA2ServiceTransaction t = (OA2ServiceTransaction) transaction;
-        MetaDebugUtil debugger = OA4MPServlet.createDebugger(((OA2ServiceTransaction) transaction).getOA2Client());
-        // NOTE This runs functor pre and post processors if they are in the source configuration.
-        // The older version of scripting that used functors (which is quite primitive) did not
-        // actually have a way to save its state nor good control of its execution flow, hence
-        // pre and post processors were needed. If you remove these, you will probably break every older
-        // configuration, so until nobody is using the old scripting, these must remain.
-        debugger.trace(this, "Before preP claims:" + claims);
-        debugger.trace(this, "Before preP has config:" + hasConfiguration());
-        debugger.trace(this, "starting real processing");
+   //     MetaDebugUtil debugger = OA4MPServlet.createDebugger(((OA2ServiceTransaction) transaction).getOA2Client());
+     //   debugger.trace(this, "starting real processing");
         realProcessing(claims, request, t); // actual work here
-        debugger.trace(this, "done real processing, claims=" + claims);
-
-        debugger.trace(this, "returned claims=:" + claims);
-
+       // debugger.trace(this, "done real processing, claims=" + claims);
+//        debugger.trace(this, "returned claims=:" + claims);
         return claims;
     }
 
@@ -246,7 +235,6 @@ public class BasicClaimsSourceImpl implements ClaimSource {
 
     @Override
     public void fromQDL(QDLStem stem) {
-
         if (stem.containsKey(CS_DEFAULT_ID)) getConfiguration().setId(stem.getString(CS_DEFAULT_ID));
         if (stem.containsKey(CS_DEFAULT_FAIL_ON_ERROR)) getConfiguration().setFailOnError(stem.getBoolean(CS_DEFAULT_FAIL_ON_ERROR));
         if (stem.containsKey(CS_DEFAULT_NOTIFY_ON_FAIL)) getConfiguration().setNotifyOnFail(stem.getBoolean(CS_DEFAULT_NOTIFY_ON_FAIL));

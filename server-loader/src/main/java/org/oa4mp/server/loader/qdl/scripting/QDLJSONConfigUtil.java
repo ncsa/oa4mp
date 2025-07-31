@@ -30,7 +30,7 @@ import static org.qdl_lang.scripting.Scripts.*;
  */
 /*
   NOTE This is older. The new way to do this is documented in qdl_server_scripts.odt
-  and the utility edu.uiuc.ncsa.qdl.scripting.AnotherJSONUtil
+  and the utility is AnaphorUtil
   This will be deprecated and removed at some point!
  */
 public class QDLJSONConfigUtil implements ScriptingConstants {

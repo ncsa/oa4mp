@@ -1,0 +1,18 @@
+____________________________________
+Release notes for OA4MP Client version 6.2
+‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+Welcome to OA4MP Client 6.2! This has several fixes, listed on the release
+page on GitHub https://github.com/ncsa/oa4mp/releases/tag/v6.2.0.
+
+This will install both the command line client (CLC) and download the current
+war file for a Tomcat deploy. These are independent, but both read the same
+configuration file for a client.
+
+At the end of the installation, you will have a minimal but serviceable configuration
+that you may use. It is a starting point and should be reviewed.
+
+If you are installing both client and server on the same machine, they do
+use different directories, we suggest E.g.
+
+/opt/oa4mp/client and /opt/oa4mp/server
+

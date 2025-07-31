@@ -1913,7 +1913,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         if (debugger instanceof ClientDebugUtil) {
             ((ClientDebugUtil) debugger).setTransaction(st2);
         }
-        if(getOA2SE().getAuthorizationServletConfig().isLocalDFConsent() &&  !st2.isConsentPageOK()){
+        if(getOA2SE().getAuthorizationServletConfig().isLocalDFConsent() && !st2.isConsentPageOK()){
             throw new OA2ATException(OA2Errors.CONSENT_REQUIRED,
                     "consent required",
                     HttpStatus.SC_BAD_REQUEST,

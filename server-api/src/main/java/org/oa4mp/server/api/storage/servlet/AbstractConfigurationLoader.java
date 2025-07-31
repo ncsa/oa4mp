@@ -58,7 +58,6 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
     /**
      * Get the value from the configuration node as a boolean. This returns the default value if
      * no such configuration value. or if it does not parse to something reasonable.
-     *
      * @param sn
      * @param tagName
      * @param defaultValue
@@ -158,14 +157,16 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
                         }else{
                             localDFConsent = Boolean.parseBoolean(rawDFC); // use whatever they explicitly set, however
                         }
+                        DebugUtil.trace(this, "setting local consent to " + localDFConsent);
                         authorizationServletConfig.setLocalDFConsent(localDFConsent);
                     }
                 } catch (Throwable t) {
                     info("Error loading authorization configuration. Disabling use of headers");
                 }
             }
+
+
         }
-        DebugUtil.trace(this, "setting local consent to " + authorizationServletConfig.isLocalDFConsent());
 
         return authorizationServletConfig;
     }
@@ -383,7 +384,7 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
     public T createInstance() {
         initialize();
         return (T) new ServiceEnvironmentImpl(loggerProvider.get(),
-                //  getMyProxyFacadeProvider(),
+              //  getMyProxyFacadeProvider(),
                 getTransactionStoreProvider(),
                 getClientStoreProvider(),
                 getMaxAllowedNewClientRequests(),
@@ -476,12 +477,13 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
         Object[] polling = loadPolling();
 
 
-        if (polling != null && 0 < (long) polling[1]) {
+        if (polling != null && 0<(long)polling[1]) {
             // only start polling if the polling interval is positive.
             info("Loading polling for " + polling[0]);
             AbstractCLIApprover.ClientApprovalThread cat = new AbstractCLIApprover.ClientApprovalThread(myLogger, se2, (File) polling[0], (Long) polling[1]);
             se2.setClientApprovalThread(cat);
         }
+
 
 
         return (T) se2;

@@ -19,11 +19,6 @@ public class NCSAGroupHandler extends GroupHandler {
     LDAPClaimsSource claimsSource;
 
     String userName;
-/*
-    public NCSAGroupHandler(LdapContext ctx) {
-        this.ctx = ctx;
-    }*/
-
     /**
      * The form of an LDAP record is cn=group,buncha stuff.
      *

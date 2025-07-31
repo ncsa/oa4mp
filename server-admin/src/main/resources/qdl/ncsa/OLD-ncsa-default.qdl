@@ -1,0 +1,54 @@
+
+DEBUG := false;
+//debug(0, 'first debug message');
+
+if[DEBUG][
+say('In debug = ON');
+// Debug stuff --  uncomment if running on my dev box. Should not be in store.
+  claims.idp := 'https://idp.ncsa.illinois.edu/idp/shibboleth';
+  claims.eppn := 'jgaynor@illinois.edu';
+  claims.debug := 'debugging mode on.';
+]; //end debugging hack
+
+//say('at top');
+//say('script arg count =' + script_args());
+
+script_load('utils/init.qdl');
+
+if[!is_defined(claims.idp)][return();];
+
+if[claims.idp != idp.ncsa][return();]; // never process anything unless IDP is right.
+
+if[
+     exec_phase == 'pre_auth'
+]then[
+     cfg. := claims#new_template('ncsa');
+     claims.uid := head(claims.eppn, '@'); // set search key
+     claim_sources. := claim_sources. ~ [claims#create_source(cfg.)]; // add it to any claims
+//     claims.cilogon_uid := to_uri(claims.sub).path - '/server' - '/users/';
+]; //end if
+
+if[
+   // CIL-1327 fix
+   exec_phase == 'post_token' || exec_phase=='post_user_info' || exec_phase =='post_refresh'
+]then[
+     // default is false -- return whole list
+    convert := false;
+    if[
+        0 < script_args()
+      ][
+        convert := to_boolean(script_args(0));
+       ];
+
+    if[!convert][return();];
+
+   // then take the isMemberOf claims and return them as a flat list, not as a JSON structure.
+    s. := null; // initialize it
+     n := size(claims.isMemberOf.);
+    while[
+       for_next(j,n)
+    ][
+       s.j := claims.isMemberOf.j.name;
+    ]; // end while
+    claims.isMemberOf. := s.;
+];
