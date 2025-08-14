@@ -51,7 +51,8 @@ import static org.oa4mp.server.api.storage.servlet.OA4MPServlet.createDebugger;
 import static org.oa4mp.server.api.storage.servlet.OA4MPServlet.getServiceEnvironment;
 
 /**
- * This is set of calls to replace the old Authorized Servlet.
+ * This is set of calls to replace the old Authorized Servlet. It still has utilities for
+ * starting the auth code flow.
  * <p>Created by Jeff Gaynor<br>
  * on 5/14/18 at  12:14 PM
  */
@@ -189,6 +190,8 @@ public class OA2AuthorizedServletUtil {
      */
     protected OA2ServiceTransaction doIt(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable {
         String rawcb = basicChecks(httpServletRequest);
+        // The user sends the ID Token in the parameter id_token_hint. This uses that to find the jti
+        // of said token, then look up the transactions.
         OA2ServiceTransaction t = CheckIdTokenHint(httpServletRequest, httpServletResponse, rawcb);
         t.setResponseTypes(getAndCheckResponseTypes(httpServletRequest));
         if (t != null) {

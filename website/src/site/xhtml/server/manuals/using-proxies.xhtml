@@ -14,7 +14,8 @@
 <h2>Introduction</h2>
 <p>
    The authorization module for OA4MP can be replaced by various means, such as using Tomcat's built in
-    management. However, this means that you will need to have separate logins that you manage for each
+    management, or even a complete standalone replacement.
+    However, this means that you will need to have separate logins that you manage for each
     user. Another option is using a <i>proxy</i> service. This is an OIDC service that allows for logins.
     Your OA4MP can simply forward all requested scopes to that service (including the device flow) and use the
     service, allowing your users to effectively log in there. In short, it allows some other service to
@@ -40,7 +41,7 @@
 <pre>https://host:port/oauth2/ready</pre>
 <p>in a standard install. Key points are that https should be available, and that your server
     should be at host:port. The proxy must be able to contact your callback endpoint securely,
-    so self-signed certs hould be avoided unless you have a specific agreement with the proxy.</p>
+    so self-signed certs should be avoided unless you have a specific agreement with the proxy.</p>
 
 <h4>The server configuration proper</h4>
 <p>

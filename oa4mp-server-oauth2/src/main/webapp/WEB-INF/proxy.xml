@@ -57,16 +57,6 @@
         <url-pattern>/oidc-cm/*</url-pattern>
     </servlet-mapping>
 
-
-<!--    <servlet>
-        <servlet-name>getCert</servlet-name>
-        <servlet-class>org.oa4mp.myproxy.servlet.OA2CertServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>getCert</servlet-name>
-        <url-pattern>/getcert</url-pattern>
-    </servlet-mapping>-->
-
     <servlet>
         <servlet-name>error</servlet-name>
         <servlet-class>org.oa4mp.server.api.storage.servlet.ErrorServlet</servlet-class>
@@ -132,16 +122,6 @@
         <servlet-name>sas</servlet-name>
         <url-pattern>/sas/*</url-pattern>
     </servlet-mapping>
-
-    <!--    <servlet>
-            <servlet-name>client</servlet-name>
-            <servlet-class>org.oa4mp.server.loader.oauth2.servlet.ClientServlet</servlet-class>
-            <load-on-startup>1</load-on-startup>
-        </servlet>
-        <servlet-mapping>
-            <servlet-name>client</servlet-name>
-            <url-pattern>/clients</url-pattern>
-        </servlet-mapping>-->
 
     <servlet>
         <servlet-name>userInfo</servlet-name>

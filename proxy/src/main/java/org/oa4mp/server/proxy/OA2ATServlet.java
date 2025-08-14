@@ -22,6 +22,7 @@ import net.sf.json.JSONObject;
 import org.apache.http.HttpStatus;
 import org.oa4mp.delegation.common.servlet.TransactionState;
 import org.oa4mp.delegation.common.storage.TransactionStore;
+import org.oa4mp.delegation.common.storage.clients.BaseClient;
 import org.oa4mp.delegation.common.token.AuthorizationGrant;
 import org.oa4mp.delegation.common.token.RefreshToken;
 import org.oa4mp.delegation.common.token.impl.*;
@@ -155,13 +156,20 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
 
         OA2SE oa2SE = (OA2SE) OA4MPServlet.getServiceEnvironment();
         if (grantType.equals(RFC7523Constants.GRANT_TYPE_JWT_BEARER)) {
-            // If the client is doing an RFC 7523 grant, then it must authorize accordingly.
-            OA2Client oa2Client = OA2HeaderUtils.getAndVerifyRFC7523Client(request, (OA2SE) getServiceEnvironment());
-            if (!oa2Client.isServiceClient()) {
-                throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT, "client not authorized to do RFC7523 requests");
+            // If the client is doing an RFC 7523 grant, then it must authorize accordingly
+            // .
+            BaseClient client = OA2HeaderUtils.getAndVerifyRFC7523Client(request, (OA2SE) getServiceEnvironment());
+            if (client instanceof OA2Client) {
+                OA2Client oa2Client = (OA2Client) client;
+                // check client before continuing. Fail early, fail often!
+                if (!oa2Client.isServiceClient()) {
+                    throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT, "client not authorized to do RFC7523 requests");
+                }
+                checkAdminClientStatus(oa2Client.getIdentifier());
+                doRFC7523(request, response, oa2Client);
+            } else {
+                doRFC7523InitiateFlow(request, response, client);
             }
-            checkAdminClientStatus(oa2Client.getIdentifier());
-            doRFC7523(request, response, oa2Client);
             return true;
         }
         OA2Client client = getClient(request);
@@ -257,6 +265,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         serviceTransaction.setRequestState(state);
         serviceTransaction.setNonce(nonce);
         serviceTransaction.setClient(client);
+        serviceTransaction.setConsentPageOK(true);
         Date now = new Date();
         serviceTransaction.setAuthTime(now); // auth time is now.
         client.setLastAccessed(now);
@@ -360,6 +369,203 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
 
     }
 
+    protected OA2Client getRFC7523Client(BaseClient baseClient, JSONObject jsonRequest) {
+        if (baseClient instanceof OA2Client) {
+            return (OA2Client) baseClient;
+        }
+        AdminClient adminClient = (AdminClient) baseClient;
+        if (!adminClient.canInitializeFlows()) {
+            throw new OA2ATException(OA2Errors.INVALID_REQUEST, "admin client not authorized to initiate flows."); // client does not exist.
+        }
+        Identifier clientID = BasicIdentifier.newID(jsonRequest.getString(OA2Claims.ISSUER));
+        OA2Client client = (OA2Client) getOA2SE().getClientStore().get(clientID);
+        if (client == null) {
+            throw new OA2ATException(OA2Errors.INVALID_REQUEST, "no such client: " + clientID); // client does not exist.
+        }
+        // have to check admin owns client
+        List<Identifier> adminIDs = getOA2SE().getPermissionStore().getAdmins(clientID);
+        if (adminIDs.isEmpty() || !adminIDs.contains(adminClient.getIdentifier())) {
+            throw new OA2ATException(OA2Errors.INVALID_REQUEST, "no such client: " + clientID); // client does not exist.
+        }
+
+        return client;
+    }
+
+    /**
+     * Processes a request from a service client. This allows for getting tokens from a trusted
+     * client directly from the token endpoint by sending in the authorization grant request
+     * directly.
+     *
+     * @param request
+     * @param response
+     * @param adminBaseClient
+     * @throws Throwable
+     */
+    protected void doRFC7523InitiateFlow(HttpServletRequest request, HttpServletResponse response, BaseClient adminBaseClient) throws Throwable {
+        JSONObject tokenRequest = null;
+        JSONObject authNAssertion = null;
+        ServletDebugUtil.printAllParameters(getClass(), request, true);
+        AdminClient adminClient = getOA2SE().getAdminClientStore().get(adminBaseClient.getIdentifier()); // get the full one
+        if (adminClient == null) {
+            throw new OA2ATException(OA2Errors.INVALID_REQUEST, "no such admin client");
+        }
+        if (!adminClient.canInitializeFlows()) {
+            throw new OA2ATException(OA2Errors.INVALID_REQUEST, "admin client not authorized to initiate flows.");
+        }
+        try {
+            String tokenRequestRaw = request.getParameter(RFC7523Constants.ASSERTION);
+            if (StringUtils.isTrivial(tokenRequestRaw)) {
+                throw new OA2ATException(OA2Errors.INVALID_REQUEST, "missing json assertion");
+            }
+            // In our min-spec., this is unsigned since the admin does not necessarily have the client key(s)
+            tokenRequest = MyOtherJWTUtil2.verifyAndReadJWT(tokenRequestRaw);
+
+
+        } catch (IllegalArgumentException iax) {
+            throw new OA2ATException(OA2Errors.INVALID_REQUEST, "invalid JWT:" + iax.getMessage()); // Not a JWT
+
+        } catch (Throwable t) {
+            throw new OA2ATException(OA2Errors.INVALID_REQUEST, "invalid json assertion:" + t.getMessage()); // Something is wrong with the JWT --
+        }
+        if (!tokenRequest.containsKey(OA2Claims.ISSUER)) {
+            throw new OA2ATException(OA2Errors.INVALID_REQUEST, "missing issuer");
+        }
+        OA2Client client = getRFC7523Client(adminClient, tokenRequest);
+        if (!getOA2SE().getPermissionStore().getAdmins(client.getIdentifier()).contains(adminClient.getIdentifier())) {
+            debug("admin client \"" + adminClient.getIdentifierString() + "\" not authorized to use client \"" + client.getIdentifierString() + "\"");
+            throw new OA2ATException(OA2Errors.INVALID_REQUEST, "admin client not authorized to use this client ");
+        }
+        if (!client.getIdentifierString().equals(tokenRequest.getString(OA2Claims.ISSUER))) {
+            throw new OA2ATException(OA2Errors.INVALID_REQUEST, "invalid issuer");
+        }
+
+        if (tokenRequest.getLong(OA2Claims.EXPIRATION) * 1000L < System.currentTimeMillis()) {
+            throw new OA2ATException(OA2Errors.INVALID_REQUEST, "expired assertion token");
+        }
+        Collection<String> scopes;
+        if (tokenRequest.containsKey(OA2Constants.SCOPE)) {
+            Object ss = tokenRequest.get(OA2Constants.SCOPE);
+            if (ss instanceof JSONArray) {
+                scopes = (JSONArray) ss;
+            } else {
+                scopes = new ArrayList<>();
+                StringTokenizer stringTokenizer = new StringTokenizer(ss.toString(), " ");
+                while (stringTokenizer.hasMoreTokens()) {
+                    scopes.add(stringTokenizer.nextToken());
+                }
+            }
+        } else {
+            scopes = new ArrayList<>();
+        }
+        String state = tokenRequest.containsKey(STATE) ? tokenRequest.getString(STATE) : null;
+        String nonce = tokenRequest.containsKey(NONCE) ? tokenRequest.getString(NONCE) : null;
+
+        OA2ServiceTransaction serviceTransaction = (OA2ServiceTransaction) getOA2SE().getTransactionStore().create();
+
+        URI newURI = Identifiers.uniqueIdentifier("oa4mp:/rfc7523", "transaction", Identifiers.VERSION_2_0_TAG, serviceTransaction.getAuthzGrantLifetime());
+        // FIXME This should really come from the token forge, but that means making a few Issuer/response classes
+        String sURI = newURI.toString();
+        String[] ss = sURI.split("\\?");
+        ss[0] = ss[0] + "/" + (new Date()).getTime();
+        newURI = URI.create(ss[0]);
+        serviceTransaction.setIdentifier(BasicIdentifier.newID(newURI));
+        serviceTransaction.setAuthorizationGrant(new AuthorizationGrantImpl(newURI));
+        serviceTransaction.setRequestState(state);
+        serviceTransaction.setNonce(nonce);
+        serviceTransaction.setClient(client);
+        Date now = new Date();
+        serviceTransaction.setAuthTime(now); // auth time is now.
+        client.setLastAccessed(now);
+
+        OA2ServletUtils.processXAs(tokenRequest, serviceTransaction, client);
+
+        // Do claims
+        JSONObject claims = new JSONObject();
+        if (tokenRequest.containsKey(OA2Constants.ID_TOKEN)) {
+            JSONObject idToken = tokenRequest.getJSONObject(OA2Constants.ID_TOKEN);
+            claims.putAll(idToken);
+            if (tokenRequest.containsKey(OA2Claims.SUBJECT)) {
+                String user = tokenRequest.getString(OA2Claims.SUBJECT);
+                claims.put(OA2Claims.SUBJECT, user);
+                setUsername(serviceTransaction, client, user);
+
+            } else {
+                if (!idToken.containsKey(OA2Claims.SUBJECT)) {
+                    throw new OA2ATException(OA2Errors.INVALID_REQUEST, "missing subject");
+                }
+                setUsername(serviceTransaction, client, idToken.getString(OA2Claims.SUBJECT));
+            }
+        } else {
+            if (!tokenRequest.containsKey(OA2Claims.SUBJECT)) {
+                throw new OA2ATException(OA2Errors.INVALID_REQUEST, "missing subject");
+            }
+            String user = tokenRequest.getString(OA2Claims.SUBJECT);
+            setUsername(serviceTransaction, client, user);
+            claims.put(OA2Claims.SUBJECT, user);
+        }
+        serviceTransaction.setUserMetaData(claims); // set this so it exists for later.
+        try {
+            serviceTransaction.setScopes(ClientUtils.resolveScopes(request,
+                    serviceTransaction,
+                    client,
+                    scopes,
+                    true, false, false));
+        } catch (OA2RedirectableError redirectableError) {
+            throw new OA2ATException(OA2Errors.INVALID_SCOPE,
+                    "unable to determine scopes",
+                    HttpStatus.SC_BAD_REQUEST,
+                    state, client);
+        }
+        if (tokenRequest.containsKey(OA2Constants.ACCESS_TOKEN_LIFETIME)) {
+            String rawATLifetime = tokenRequest.getString(OA2Constants.ACCESS_TOKEN_LIFETIME);
+            try {
+                long at = XMLConfigUtil.getValueSecsOrMillis(rawATLifetime);
+                //               long at = Long.parseLong(rawATLifetime);
+                serviceTransaction.setRequestedATLifetime(at);
+            } catch (Throwable t) {
+                getServiceEnvironment().info("Could not set requested access token lifetime to \"" + rawATLifetime
+                        + "\" for client " + client.getIdentifierString());
+                // do nothing.
+            }
+        }
+
+        //       serviceTransaction.setAccessTokenLifetime(ClientUtils.computeATLifetime(serviceTransaction, client, getOA2SE()));
+        if (tokenRequest.containsKey(OA2Constants.REFRESH_LIFETIME)) {
+            String rawRTLifetime = tokenRequest.getString(OA2Constants.REFRESH_LIFETIME);
+            try {
+                long at = XMLConfigUtil.getValueSecsOrMillis(rawRTLifetime);
+                serviceTransaction.setRequestedRTLifetime(at);
+            } catch (Throwable t) {
+                getServiceEnvironment().info("Could not set requested refresh token lifetime to \"" + rawRTLifetime
+                        + "\" for client " + client.getIdentifierString());
+                // do nothing.
+            }
+
+        }
+
+        if (tokenRequest.containsKey(OA2Constants.ID_TOKEN_LIFETIME)) {
+            String rawLifetime = tokenRequest.getString(OA2Constants.ID_TOKEN_LIFETIME);
+            try {
+                long at = XMLConfigUtil.getValueSecsOrMillis(rawLifetime);
+                serviceTransaction.setRequestedIDTLifetime(at);
+            } catch (Throwable t) {
+                getServiceEnvironment().info("Could not set requested ID token lifetime to \"" + rawLifetime
+                        + "\" for client " + client.getIdentifierString());
+                // do nothing.
+            }
+        }
+        //   serviceTransaction.setIDTokenLifetime(ClientUtils.computeIDTLifetime(serviceTransaction, client, getOA2SE()));
+        try {
+            String[] rawResource = extractArray(tokenRequest, RESOURCE);
+            String[] rawAudience = extractArray(tokenRequest, AUDIENCE);
+            OA2AuthorizedServletUtil.figureOutAudienceAndResource(serviceTransaction, rawResource, rawAudience);
+        } catch (OA2GeneralError ge) {
+            throw new OA2ATException(ge.getError(), ge.getDescription(), ge.getHttpStatus(), state, client);
+        }
+        serviceTransaction.setConsentPageOK(true);
+        processServiceClientRequest(request, response, client, serviceTransaction, false);
+    }
+
     /**
      * Processes a request from a service client. This allows for getting tokens from a trusted
      * client directly from the token endpoint by sending in the authorization grant request
@@ -433,8 +639,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         // FIXME This should really come from the token forge, but that means making a few Issuer/response classes
         String sURI = newURI.toString();
         String[] ss = sURI.split("\\?");
-        ss[0] = ss[0]+"/" + (new Date()).getTime();
-        newURI = URI.create(ss[0] );
+        ss[0] = ss[0] + "/" + (new Date()).getTime();
+        newURI = URI.create(ss[0]);
         serviceTransaction.setIdentifier(BasicIdentifier.newID(newURI));
         serviceTransaction.setAuthorizationGrant(new AuthorizationGrantImpl(newURI));
         serviceTransaction.setRequestState(state);
@@ -443,7 +649,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         Date now = new Date();
         serviceTransaction.setAuthTime(now); // auth time is now.
         client.setLastAccessed(now);
-       // String user = jsonRequest.getString(OA2Claims.SUBJECT);
+        // String user = jsonRequest.getString(OA2Claims.SUBJECT);
 
 
 /*
@@ -469,17 +675,17 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 claims.put(OA2Claims.SUBJECT, user);
                 setUsername(serviceTransaction, client, user);
 
-            }else{
-                if(!idToken.containsKey(OA2Claims.SUBJECT)){
+            } else {
+                if (!idToken.containsKey(OA2Claims.SUBJECT)) {
                     throw new OA2ATException(OA2Errors.INVALID_REQUEST, "missing subject");
                 }
                 setUsername(serviceTransaction, client, idToken.getString(OA2Claims.SUBJECT));
             }
-        }else{
+        } else {
             if (!jsonRequest.containsKey(OA2Claims.SUBJECT)) {
                 throw new OA2ATException(OA2Errors.INVALID_REQUEST, "missing subject");
             }
-           String  user = jsonRequest.getString(OA2Claims.SUBJECT);
+            String user = jsonRequest.getString(OA2Claims.SUBJECT);
             setUsername(serviceTransaction, client, user);
             claims.put(OA2Claims.SUBJECT, user);
         }
@@ -548,12 +754,14 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         } catch (OA2GeneralError ge) {
             throw new OA2ATException(ge.getError(), ge.getDescription(), ge.getHttpStatus(), state, client);
         }
+        serviceTransaction.setConsentPageOK(true);
         processServiceClientRequest(request, response, client, serviceTransaction, false);
     }
 
     /**
      * Checks if the user name is allowed for this client and if so sets it, if not an exception
      * is raised.
+     *
      * @param serviceTransaction
      * @param client
      * @param user
@@ -570,6 +778,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         }
 
     }
+
     /**
      * Both RFC7523 and credential flow clients operate the same once the parameters have
      * been processed. This is code common to both for that.
@@ -1913,7 +2122,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         if (debugger instanceof ClientDebugUtil) {
             ((ClientDebugUtil) debugger).setTransaction(st2);
         }
-        if(getOA2SE().getAuthorizationServletConfig().isLocalDFConsent() && !st2.isConsentPageOK()){
+        if (getOA2SE().getAuthorizationServletConfig().isLocalDFConsent() && !st2.isConsentPageOK()) {
             throw new OA2ATException(OA2Errors.CONSENT_REQUIRED,
                     "consent required",
                     HttpStatus.SC_BAD_REQUEST,
@@ -2722,7 +2931,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                     HttpStatus.SC_BAD_REQUEST,
                     null);
         }
-        if(getOA2SE().getAuthorizationServletConfig().isLocalDFConsent() && !transaction.isConsentPageOK()){
+        if (getOA2SE().getAuthorizationServletConfig().isLocalDFConsent() && !transaction.isConsentPageOK()) {
             throw new OA2ATException(OA2Errors.CONSENT_REQUIRED,
                     "consent required",
                     HttpStatus.SC_BAD_REQUEST,

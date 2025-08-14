@@ -44,6 +44,9 @@ public class AdminClientStemMC<V extends AdminClient> extends StemConverter<V> {
         if (stem.containsKey(kk().creationTS())) {
             v.setCreationTS(toDate(stem, kk().creationTS()));
         }
+        if (stem.containsKey(kk().initializeFlows())) {
+            v.setInitializeFlows(stem.getBoolean(kk().initializeFlows()));
+        }
         if (isStringKeyOK(stem, kk().email())) {
             v.setEmail(stem.getString(kk().email()));
         }
@@ -58,6 +61,12 @@ public class AdminClientStemMC<V extends AdminClient> extends StemConverter<V> {
         }
         if (isStringKeyOK(stem, kk().secret())) {
             v.setSecret(stem.getString(kk().secret()));
+        }
+        if(stem.containsKey(kk().rfc7523Client())){
+            v.setServiceClient(stem.getBoolean(kk().rfc7523Client()));
+        }
+        if(stem.containsKey(kk().rfc7523ClientUsers())){
+            v.setServiceClientUsers(toList(stem, kk().rfc7523ClientUsers()));
         }
         if (stem.containsKey(kk().jwksURI())) {
             v.setJwksURI(URI.create(stem.getString(kk().jwksURI())));
@@ -137,6 +146,7 @@ public class AdminClientStemMC<V extends AdminClient> extends StemConverter<V> {
         setNonNullStemValue(stem, kk().secret(), v.getSecret());
 
         put(stem, kk().allowQDL(), v.isAllowQDL());
+        put(stem, kk().initializeFlows(), v.canInitializeFlows());
         put(stem, kk().generateIDs(), v.isGenerateIDs());
         put(stem, kk().useTimestampsInIds(), v.isUseTimestampInIDs());
         put(stem, kk().allowCustomIDs(), v.isAllowCustomIDs());
@@ -163,6 +173,8 @@ public class AdminClientStemMC<V extends AdminClient> extends StemConverter<V> {
             ss.fromJSON(JSONWebKeyUtil.toJSON(v.getJWKS()));
             setNonNullStemValue(stem, kk().jwks(), ss);
         }
+        setNonNullStemValue(stem, kk().rfc7523Client(), v.isServiceClient());
+        fromList(v.getServiceClientUsers(), stem, kk().rfc7523ClientUsers());
         setNonNullStemValue(stem, kk().vo(), v.getExternalVIName());
         return stem;
     }

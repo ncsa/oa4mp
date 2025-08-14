@@ -285,4 +285,15 @@ public class AdminClient extends BaseClient {
     }
 
     boolean useTimestampInIDs = true;
+
+    public boolean canInitializeFlows() {
+        return initializeFlows;
+    }
+
+    public void setInitializeFlows(boolean initializeFlows) {
+        this.initializeFlows = initializeFlows;
+    }
+
+    boolean initializeFlows = false;
+
 }

@@ -23,7 +23,7 @@ debugger(1);
 
 script_load('utils/init.qdl');
 
-claims.'idp' ≠ idp.'ncsa' ⇒ return(); // never process anything unless IDP is right.
+(∄claims.'idp' ∨ claims.'idp' ≠ idp.'ncsa') ⇒ return(); // never process anything unless IDP is right.
 
 if[
      exec_phase ≡ 'pre_auth'

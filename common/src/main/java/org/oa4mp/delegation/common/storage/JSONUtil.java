@@ -27,9 +27,21 @@ public class JSONUtil {
 
 This method sets or gets one of the components from the JSON object
  */
+
+    /**
+     * Gets a raw object.
+     * @param json
+     * @param key
+     * @return
+     */
     public Object getJSONValue(JSONObject json, String key) {
         if (!hasKey(json, key)) return null;
         return json.getJSONObject(getComponentName()).get(key);
+    }
+
+    public JSONObject getJSONObject(JSONObject json, String key) {
+        if (!hasKey(json, key)) return null;
+        return json.getJSONObject(getComponentName()).getJSONObject(key);
     }
 
     public JSONArray getJSONArray(JSONObject json, String key) {

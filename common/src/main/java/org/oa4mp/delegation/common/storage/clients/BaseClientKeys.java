@@ -15,6 +15,8 @@ public class BaseClientKeys extends MonitoredKeys {
     String secret = "oauth_client_pubkey";
     String jwks = "jwks";
     String jwksURI = "jwks_uri";
+    String rfc7523Client = "rfc7523_client";
+    String rfc7523ClientUsers = "rfc7523_client_users";
 
     public String name(String... x) {
         if (0 < x.length) name = x[0];
@@ -46,6 +48,16 @@ public class BaseClientKeys extends MonitoredKeys {
         return secret;
     }
 
+    public String rfc7523Client(String... x) {
+        if (0 < x.length) rfc7523Client = x[0];
+        return rfc7523Client;
+    }
+
+    public String rfc7523ClientUsers(String... x) {
+        if (0 < x.length) rfc7523ClientUsers = x[0];
+        return rfc7523ClientUsers;
+    }
+
     @Override
     public List<String> allKeys() {
         List<String> allKeys = super.allKeys();
@@ -55,6 +67,8 @@ public class BaseClientKeys extends MonitoredKeys {
         allKeys.add(debugOn());
         allKeys.add(jwks());
         allKeys.add(jwksURI());
+        allKeys.add(rfc7523Client());
+        allKeys.add(rfc7523ClientUsers());
         return allKeys;
     }
 }

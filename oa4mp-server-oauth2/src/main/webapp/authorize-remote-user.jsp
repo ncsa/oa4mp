@@ -19,7 +19,7 @@
 <%@ page session="false" %>
 <html>
 <head>
-    <title>MyProxy Delegation Portal Authorization Page</title>
+    <title>OA4MP Client Authorization Page</title>
     <link rel="stylesheet"
           type="text/css"
           media="all"

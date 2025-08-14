@@ -182,10 +182,18 @@ public class OA2ClientEnvironment extends ClientEnvironment {
         return scopes;
     }
 
-    public String scopesToString() {
+    public boolean hasScopes(){
+        return scopes != null && !scopes.isEmpty();
+    }
+    /**
+     * Convert any (Java) collection of strings to a scope.
+     * @param scopes
+     * @return
+     */
+    public String scopesToString(Collection<String> scopes) {
         String out = null;
         boolean isFirst = true;
-        for (String s : getScopes()) {
+        for (String s : scopes) {
             if (isFirst) {
                 out = s;
                 isFirst = false;
@@ -195,6 +203,15 @@ public class OA2ClientEnvironment extends ClientEnvironment {
 
         }
         return out;
+    }
+
+    /**
+     * Convert the client's configured scopes to a string. If there are additional scopes, you will
+     * have to add those or just send all your scopes to {@link #scopesToString(Collection)}.
+     * @return
+     */
+    public String scopesToString() {
+        return scopesToString(getScopes());
     }
 
     String secret;

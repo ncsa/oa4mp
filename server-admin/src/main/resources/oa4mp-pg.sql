@@ -85,9 +85,12 @@ create table :oa4mpSchema.:oa4mpAdminClientTable  (
                  secret      text,
                  vo          text,
     list_users_other_clients boolean,
+                 initialize_flows            boolean,
                   list_users boolean,
                   vo_uri     text,
-                  issuer     text,
+                 rfc7523_client              boolean,
+                 rfc7523_client_users        text,
+                 issuer     text,
                   max_clients integer,
     creation_ts TIMESTAMP);
 

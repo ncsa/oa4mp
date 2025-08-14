@@ -116,7 +116,7 @@ public class QDLACL implements QDLMetaModule {
                                      boolean accept // accept or reject refers to which method invoked this: add or blacklist
     ) {
         if (!(state instanceof OA2State)) {
-            throw new IllegalArgumentException("Error: This requires an OA2State object.");
+            throw new IllegalArgumentException("Error: ACLs not supported in this environment.");
         }
         OA2State oa2State = (OA2State) state;
         if (qdlValues.length == 0) {

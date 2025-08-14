@@ -7,7 +7,10 @@ import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
 import edu.uiuc.ncsa.security.servlet.ServiceClientHTTPException;
-import edu.uiuc.ncsa.security.util.cli.*;
+import edu.uiuc.ncsa.security.util.cli.CLIDriver;
+import edu.uiuc.ncsa.security.util.cli.CommonCommands2;
+import edu.uiuc.ncsa.security.util.cli.ConfigurableCommandsImpl;
+import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.crypto.CertUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import net.sf.json.JSONArray;
@@ -32,6 +35,12 @@ import org.oa4mp.delegation.server.jwt.MyOtherJWTUtil2;
 import org.oa4mp.delegation.server.server.claims.OA2Claims;
 import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
 import org.oa4mp.server.loader.oauth2.servlet.RFC8628Constants2;
+import org.qdl_lang.variables.Constant;
+import org.qdl_lang.variables.Constants;
+import org.qdl_lang.variables.QDLSet;
+import org.qdl_lang.variables.QDLStem;
+import org.qdl_lang.variables.values.QDLKey;
+import org.qdl_lang.variables.values.QDLValue;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
@@ -71,7 +80,11 @@ public class OA2CLCCommands extends CommonCommands2 {
 
     @Override
     public void about(boolean showBanner, boolean showHeader) {
-        say(hasClipboard() ? "clipboard is supported." : "no clipboard support available.");
+        try {
+            say(hasClipboard() ? "clipboard is supported." : "no clipboard support available.");
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -145,17 +158,17 @@ public class OA2CLCCommands extends CommonCommands2 {
                         throw t; // If batch mode and configuration cannot load, bomb here and now.
                     }
                 } else {*/
-                    say("unable to connect to OA4MP server. Cannot load configuration.");
+                say("unable to connect to OA4MP server. Cannot load configuration.");
                 //}
             } else {
                 // Most likely is that there is some connection issue, but if not,
                 // fall through here
-                    error("could not load configuration", t);
-                    if (getDebugger().isEnabled()) {
-                        t.printStackTrace();
-                    }
+                error("could not load configuration", t);
+                if (getDebugger().isEnabled()) {
+                    t.printStackTrace();
                 }
             }
+        }
         this.oa2CommandLineClient = oa2CommandLineClient;
     }
 
@@ -220,6 +233,9 @@ public class OA2CLCCommands extends CommonCommands2 {
             // we will clear the state no matter what the user requested.
             return;
         } catch (Exception myConfigurationException) {
+            if (isThrowExceptions()) {
+                throw myConfigurationException;
+            }
             // https://github.com/ncsa/oa4mp/issues/199
             if (isDebugOn()) {
                 myConfigurationException.printStackTrace();
@@ -261,6 +277,9 @@ public class OA2CLCCommands extends CommonCommands2 {
                 copyToClipboard(uriComplete, "verification uri copied to clipboard");
             }
         } catch (Exception e) {
+            if (isThrowExceptions()) {
+                throw e;
+            }
             say(e.getMessage());
         }
     }
@@ -423,7 +442,10 @@ public class OA2CLCCommands extends CommonCommands2 {
         }*/
         clear(inputLine, false); //clear out everything except any set parameters
         Identifier id = AssetStoreUtil.createID();
-        OA4MPResponse resp = getService().requestCert(id, requestParameters);
+        HashMap<String, Object> copyOfParams = new HashMap<>();
+        copyOfParams.putAll(getRefreshParameters());
+        createScopes(copyOfParams, true);
+        OA4MPResponse resp = getService().requestCert(id, copyOfParams);
         getDebugger().trace(this, "client id = " + getCe().getClientId());
         currentURI = resp.getRedirect();
 
@@ -457,6 +479,9 @@ public class OA2CLCCommands extends CommonCommands2 {
                 }
             }
         } catch (Throwable t) {
+            if (isThrowExceptions()) {
+                throw t;
+            }
             // there was a problem with the clipboard. Skip it.
         }
     }
@@ -484,13 +509,15 @@ public class OA2CLCCommands extends CommonCommands2 {
         say("echo response mode set to " + (ServiceClient.ECHO_RESPONSE ? "on" : "off"));
     }
 
-    protected String getFromClipboard(boolean silentMode) {
+    protected String getFromClipboard(boolean silentMode) throws Throwable {
         // TODO Places where the clipboard is read have a lot of cases of prompting the user for the information. Refactor that to use this method?
         try {
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
             return (String) clipboard.getData(DataFlavor.stringFlavor);
         } catch (Throwable t) {
-
+            if (isThrowExceptions()) {
+                throw t;
+            }
         }
         return null;
     }
@@ -502,7 +529,7 @@ public class OA2CLCCommands extends CommonCommands2 {
      *
      * @return
      */
-    protected boolean hasClipboard() {
+    protected boolean hasClipboard() throws Throwable {
         if (!isUseClipboard()) {
             return false;
         }
@@ -523,6 +550,9 @@ public class OA2CLCCommands extends CommonCommands2 {
             System.setErr(errStream);
             return true;
         } catch (Throwable t) {
+            if (isThrowExceptions()) {
+                throw t;
+            }
             info("Probably benign message from checking clipboard:" + new String(byteArrayOutputStream.toByteArray()));
         }
         System.setErr(errStream);
@@ -607,6 +637,9 @@ public class OA2CLCCommands extends CommonCommands2 {
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                 x = (String) clipboard.getData(DataFlavor.stringFlavor);
             } catch (Throwable t) {
+                if (isThrowExceptions()) {
+                    throw t;
+                }
                 say("No clipboard.");
                 x = getInput("Enter the callback", "");
                 if (isTrivial(x)) {
@@ -945,13 +978,22 @@ public class OA2CLCCommands extends CommonCommands2 {
         lastException = null;
         if (isDeviceFlow) {
             HashMap copyOfParams = new HashMap<>();
-            copyOfParams.putAll(tokenParameters);
-            OA2ClientEnvironment oa2ce = (OA2ClientEnvironment) getCe();
+            if (!getRequestParameters().isEmpty()) {
+                copyOfParams.putAll(getRequestParameters());
+            } else {
+                copyOfParams.putAll(getTokenParameters());
+            }
+            createScopes(copyOfParams, true);
 
             // if the parameters are set then pass along everything including the
             // default scopes. 
-            String scopes = oa2ce.scopesToString();
+      /*      String scopes = oa2ce.scopesToString();
             if (copyOfParams.containsKey(SCOPE)) {
+                copyOfParams.put(SCOPE, scopes);
+                createScopes(copyOfParams);
+
+                ((Collection)copyOfParams.get(SCOPE)).addAll(oa2ce.getScopes());
+                copyOfParams.put(SCOPE, );
                 String ss = copyOfParams.get(SCOPE).toString(); // poor man's cast to string.
                 if (-1 == ss.indexOf(scopes)) {
                     ss = scopes + " " + ss;
@@ -960,6 +1002,7 @@ public class OA2CLCCommands extends CommonCommands2 {
             } else {
                 copyOfParams.put(SCOPE, scopes);
             }
+      */
             try {
                 currentATResponse = getService().rfc8628Request(dummyAsset, deviceCode, copyOfParams);
                 processATResponse(inputLine);
@@ -1003,9 +1046,10 @@ public class OA2CLCCommands extends CommonCommands2 {
 
     ATResponse2 currentATResponse;
 
-protected boolean isPrintOutput(){
-    return getDriver().isOutputOn();
-}
+    protected boolean isPrintOutput() {
+        return getDriver().isOutputOn();
+    }
+
     protected void getCertHelp() {
         say("get_cert");
         sayi("Usage: This will get the requested cert chain from the server.");
@@ -1133,6 +1177,9 @@ protected boolean isPrintOutput(){
             }
 
         } catch (ServiceClientHTTPException t) {
+            if (isThrowExceptions()) {
+                throw t;
+            }
             if (t.getMessage().contains("requires HTTP authentication")) {
                 say("Request ok, but this requires authentication to continue");
                 return;
@@ -1243,6 +1290,9 @@ protected boolean isPrintOutput(){
         try {
             refresh();
         } catch (Throwable t) {
+            if (isThrowExceptions()) {
+                throw t;
+            }
             say(t.getMessage());
             return;
         }
@@ -1269,7 +1319,10 @@ protected boolean isPrintOutput(){
             if (!dummyAsset.hasRefreshToken()) {
                 throw new IllegalStateException("no refresh token");
             }
-            RTResponse rtResponse = getService().refresh(dummyAsset.getIdentifier().toString(), refreshParameters);
+            Map copyOfParameters = new HashMap();
+            copyOfParameters.putAll(getRefreshParameters());
+            createScopes(copyOfParameters, false);
+            RTResponse rtResponse = getService().refresh(dummyAsset.getIdentifier().toString(), copyOfParameters);
             OA2Asset z = (OA2Asset) getCe().getAssetStore().get(dummyAsset.getIdentifier().toString());
             if (z != null && dummyAsset.getIssuedAt().getTime() < z.getIssuedAt().getTime()) {
                 dummyAsset = z;
@@ -1347,7 +1400,7 @@ protected boolean isPrintOutput(){
             say("Oops! No configuration has been loaded.");
             return;
         }
-        if(getDummyAsset() == null){
+        if (getDummyAsset() == null) {
             throw new IllegalStateException("No dummy asset has been loaded.");
         }
         lastException = null;
@@ -1436,10 +1489,12 @@ protected boolean isPrintOutput(){
             // NOTE ATServer2 class is slightly broken in that it sets the JTI to be the token
             // This fixes it, but this code should be moved there, along with the resolveFromToken method
             // Since it only really affects the CLC, it has a low priority though.
-
+            Map copyOfParameters = new HashMap();
+            copyOfParameters.putAll(getExchangeParameters());
+            createScopes(copyOfParameters, false);
             exchangeResponse = getService().exchangeRefreshToken(getDummyAsset(),
                     subjectToken,
-                    exchangeParameters,
+                    copyOfParameters,
                     requestedTokenType,
                     subjectTokenType, isErsatz());
             // Note that the call updates the asset, so we don't need to look at the response,
@@ -1705,7 +1760,7 @@ protected boolean isPrintOutput(){
     String lastUserMessage = null;
     File saveFile = null;
 
-    public JSONObject toJSON() {
+    public JSONObject toJSON() throws Exception {
         /*
         NOTE that other programs are now starting to use this client for Proxies, hence are expecting the
         state (in particular the claims) to be findable. If you change how the claims are stashed,
@@ -1721,6 +1776,9 @@ protected boolean isPrintOutput(){
                 jsonObject.put("debugger", getDebugger().toJSON());
             }
         } catch (Exception e) {
+            if (isThrowExceptions()) {
+                throw e;
+            }
             if (isPrintOutput()) {
                 say("warn -- could not serialize debugger:" + e.getMessage());
             }
@@ -2152,14 +2210,13 @@ protected boolean isPrintOutput(){
     public String USERNAME_FLAG = "-user";
     public String ALT_USERNAME_FLAG = "-sub";
 
-    public JSONObject rfc7523(Map parameters) throws Exception {
+    public JSONObject rfc7523(Map p) throws Exception {
         clear(new InputLine(), false); // start by clearing everything but current parameters,
         dummyAsset = (OA2Asset) getCe().getAssetStore().create();
-        JSONArray array = new JSONArray();
-        array.addAll(getCe().getScopes());
-        if (!parameters.containsKey(SCOPE)) {
-            parameters.put(SCOPE, array);
-        }
+        Map parameters = new HashMap();
+        parameters.putAll(p); // make a copy
+        parameters.putAll(getRequestParameters());
+        createScopes(parameters, true);
         if (!parameters.containsKey(REDIRECT_URI)) {
             if (getCe().getCallback() != null) {
                 parameters.put(REDIRECT_URI, getCe().getCallback().toString());
@@ -2174,6 +2231,82 @@ protected boolean isPrintOutput(){
         JSONObject jsonObject = getService().rfc7523(getDummyAsset(), parameters);
         return jsonObject;
     }
+
+    /**
+     * If the parameter map contains the scope parameter (it <i>may</i> be set as a stem or set)
+     * then replace it with the string representation of the scopes, so it may be passed along
+     * to the delegation service.
+     * <p>
+     * <b>Note:</b> This converts the scopes to a blank delimited string. This is normally called right before
+     * making a request.
+     * </p>
+     *
+     * @param parameters
+     * @param addClientScopes add the scopes form the client configuratation
+     */
+    private void createScopes(Map parameters, boolean addClientScopes) {
+        Set<String> scopes;
+        if (parameters != null ) {
+            if( parameters.containsKey(SCOPE)){
+                scopes = scopesToSet(parameters.get(SCOPE));
+                if (getCe().hasScopes() && addClientScopes) {
+                    scopes.addAll(getCe().getScopes());
+                }
+                parameters.put(SCOPE, getCe().scopesToString(scopes));
+            }else{
+                if (getCe().hasScopes() && addClientScopes) {
+                    parameters.put(SCOPE, getCe().scopesToString());
+                }
+            }
+        }
+        // else do nothing
+    }
+// script_load('/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests/auto/tests/initialize-flow.qdl')
+    /**
+     * Takes an object of scopes (string, stem, set) and returns a {@link Set} of strings.
+     * This lets you normalize the scopes when creating requests.
+     *
+     * @param ss
+     * @return
+     */
+    private Set<String> scopesToSet(Object ss) {
+        // If no scopes explicitly sent, snoop around and construct them.
+        // The map may contain stems or strings.
+        Set<String> scopes = new HashSet<>();
+        List addScopes = new ArrayList();
+        switch (Constant.getType(ss)) {
+            case Constant.STRING_TYPE:
+                // Blank delimited list of scopes
+                StringTokenizer st = new StringTokenizer((String) ss, " ");
+                addScopes = new ArrayList();
+                while (st.hasMoreTokens()) {
+                    addScopes.add(st.nextToken());
+                }
+                break;
+            case Constants.STEM_TYPE:
+                QDLStem qdlstem = (QDLStem) ss;
+                for (QDLKey key : qdlstem.keySet()) {
+                    addScopes.add(qdlstem.get(key).toString());
+                }
+                break;
+            case Constant.SET_TYPE:
+                QDLSet<QDLValue> qdlset = (QDLSet) ss;
+                for (QDLValue v : qdlset) {
+                    addScopes.add(v.toString());
+                }
+                break;
+            case Constant.UNKNOWN_TYPE:
+                if (ss instanceof List) {
+                    addScopes.addAll((List) ss);
+                } else {
+                    throw new IllegalArgumentException("Unknown type for scopes" + ss);
+                }
+        }
+        scopes.addAll(addScopes);
+        return scopes;
+        // parameters.put(SCOPE, scopes);
+    }
+
 
     public void rfc7523(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {

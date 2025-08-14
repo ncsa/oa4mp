@@ -55,7 +55,7 @@ public abstract class MultiAuthServlet extends OA4MPServlet {
      */
     @Override
     public Client getClient(HttpServletRequest request) {
-        String assertionType = request.getParameter(RFC7523Constants.CILENT_ASSERTION_TYPE);
+        String assertionType = request.getParameter(RFC7523Constants.CLIENT_ASSERTION_TYPE);
         if (!StringUtils.isTrivial(assertionType) && assertionType.equals(RFC7523Constants.ASSERTION_JWT_BEARER)) {
             try {
                 return OA2HeaderUtils.getRFC7523Client(request, (OA2SE) getServiceEnvironment());
@@ -106,7 +106,7 @@ public abstract class MultiAuthServlet extends OA4MPServlet {
     }
 
     public void verifyClient(OA2Client client, HttpServletRequest request, boolean isAT) {
-        String grantType = request.getParameter(RFC7523Constants.CILENT_ASSERTION_TYPE);
+        String grantType = request.getParameter(RFC7523Constants.CLIENT_ASSERTION_TYPE);
         if (grantType != null && grantType.equals(RFC7523Constants.ASSERTION_JWT_BEARER)) {
             try {
                 OA2HeaderUtils.verifyRFC7523Client(client, request, (OA2SE) getServiceEnvironment());

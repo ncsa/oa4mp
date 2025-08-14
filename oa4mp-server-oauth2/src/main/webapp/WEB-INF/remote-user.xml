@@ -52,17 +52,6 @@
         <url-pattern>/oidc-cm/*</url-pattern>
     </servlet-mapping>
 
-
-<!--    <servlet>
-        <servlet-name>getCert</servlet-name>
-        <servlet-class>org.oa4mp.myproxy.servlet.OA2CertServlet</servlet-class>
-
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>getCert</servlet-name>
-        <url-pattern>/getcert</url-pattern>
-    </servlet-mapping>-->
-
     <servlet>
         <servlet-name>error</servlet-name>
         <servlet-class>org.oa4mp.server.api.storage.servlet.ErrorServlet</servlet-class>

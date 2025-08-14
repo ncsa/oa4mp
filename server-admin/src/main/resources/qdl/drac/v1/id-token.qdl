@@ -28,7 +28,7 @@ a member of, in addition to the base group.
   "identity": {
     "qdl":  {
      "load": "drac/v1/id-token.qdl",
-     "args":['CO:COU:CADC:members:active'],
+     "args":["CO:COU:CADC:members:active"],
      "xmd": {"exec_phase": ["post_auth"]}
     },
   "type": "identity"

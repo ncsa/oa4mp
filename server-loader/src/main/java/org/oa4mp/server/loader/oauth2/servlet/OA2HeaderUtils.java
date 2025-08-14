@@ -1,13 +1,5 @@
 package org.oa4mp.server.loader.oauth2.servlet;
 
-import org.oa4mp.server.loader.oauth2.OA2SE;
-import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
-import org.oa4mp.delegation.server.OA2Constants;
-import org.oa4mp.delegation.server.OA2Errors;
-import org.oa4mp.delegation.server.OA2GeneralError;
-import org.oa4mp.delegation.server.jwt.MyOtherJWTUtil2;
-import org.oa4mp.delegation.server.server.RFC7523Constants;
-import org.oa4mp.delegation.server.server.RFC8628Constants;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
@@ -16,13 +8,22 @@ import edu.uiuc.ncsa.security.servlet.AbstractServlet;
 import edu.uiuc.ncsa.security.servlet.HeaderUtils;
 import net.sf.json.JSONObject;
 import org.apache.http.HttpStatus;
+import org.oa4mp.delegation.common.storage.clients.BaseClient;
+import org.oa4mp.delegation.server.OA2Constants;
+import org.oa4mp.delegation.server.OA2Errors;
+import org.oa4mp.delegation.server.OA2GeneralError;
+import org.oa4mp.delegation.server.jwt.MyOtherJWTUtil2;
+import org.oa4mp.delegation.server.server.RFC7523Constants;
+import org.oa4mp.delegation.server.server.RFC8628Constants;
+import org.oa4mp.server.loader.oauth2.OA2SE;
+import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 
-import static org.oa4mp.server.api.ServiceConstantKeys.CONSUMER_KEY;
 import static org.oa4mp.delegation.server.server.claims.OA2Claims.*;
+import static org.oa4mp.server.api.ServiceConstantKeys.CONSUMER_KEY;
 
 
 /**
@@ -54,50 +55,88 @@ public class OA2HeaderUtils extends HeaderUtils {
     }
 
     /**
-     * Assumption is that the request has the correct {@link RFC7523Constants#CILENT_ASSERTION_TYPE} of
-     * {@link RFC7523Constants#ASSERTION_JWT_BEARER}, so we are decoding that.
-     *
+     * Finds the client from the  §2.1 JSON {@link RFC7523Constants#CLIENT_ASSERTION}-- admin or regular -- and verifies that it is valid, has been approved etc.
      * @param request
+     * @param oa2SE
+     * @return
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeySpecException
      */
-    public static OA2Client getAndVerifyRFC7523Client(HttpServletRequest request, OA2SE oa2SE) throws NoSuchAlgorithmException, InvalidKeySpecException {
-        return getAndVerifyRFC7523Client(request, oa2SE, false); // default is to use token endpoint
-    }
-
-    public static OA2Client getAndVerifyRFC7523Client(HttpServletRequest request, OA2SE oa2SE, boolean isDeviceFlow) throws NoSuchAlgorithmException, InvalidKeySpecException {
-
-        String raw = request.getParameter(RFC7523Constants.CILENT_ASSERTION);
-        if (StringUtils.isTrivial(raw)) {
-            // throw an exception
-            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
-                    "missing " + RFC7523Constants.CILENT_ASSERTION,
-                    HttpStatus.SC_BAD_REQUEST, null);
-
-        }
-        JSONObject[] hp;
-        try {
-            hp = MyOtherJWTUtil2.readJWT(raw);
-        } catch (IllegalArgumentException iax) {
-            // means this is sent as a JWT, but is not one
-            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, RFC7523Constants.CILENT_ASSERTION + " is not a JWT", HttpStatus.SC_BAD_REQUEST, null);
-        } catch (Throwable t) {
-            // In this case, it is something like an unsupported algorithm
-            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "could not decode JWT:" + t.getMessage(), HttpStatus.SC_BAD_REQUEST, null);
-        }
-        // In order to decode this, we need to get the client ID (required in the sub claim) and grab the key.
-        JSONObject json = hp[1];
+    public static BaseClient findRFC7523Client(HttpServletRequest request, OA2SE oa2SE, JSONObject json) throws NoSuchAlgorithmException, InvalidKeySpecException {
         String state = json.containsKey(OA2Constants.STATE) ? json.getString(OA2Constants.STATE) : null;
         if (!json.containsKey(SUBJECT)) {
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "missing " + SUBJECT + " claim, i.e., no client ID", HttpStatus.SC_BAD_REQUEST, state);
         }
         Identifier clientID = BasicIdentifier.newID(json.getString(SUBJECT));
-        OA2Client client = (OA2Client) oa2SE.getClientStore().get(clientID);
+        BaseClient client;
+        if (oa2SE.getClientStore().containsKey(clientID)) {
+            client = (OA2Client) oa2SE.getClientStore().get(clientID);
+        } else {
+            if (oa2SE.getAdminClientStore().containsKey(clientID)) {
+                client = oa2SE.getAdminClientStore().get(clientID);
+            } else {
+                throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, RFC7523Constants.CLIENT_ASSERTION + " is not a valid client", HttpStatus.SC_BAD_REQUEST, null);
+            }
+        }
         if (!oa2SE.getClientApprovalStore().isApproved(clientID)) {
             throw new OA2GeneralError(OA2Errors.UNAUTHORIZED_CLIENT, "client not approved", HttpStatus.SC_BAD_REQUEST, state);
         }
         if (!client.hasJWKS()) {
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "client does not support RFC 7523", HttpStatus.SC_BAD_REQUEST, state);
         }
-// Finally. We can verify the JWT
+
+        return client;
+    }
+
+    /**
+     * Assumption is that the request has the correct {@link RFC7523Constants#CLIENT_ASSERTION_TYPE} of
+     * {@link RFC7523Constants#ASSERTION_JWT_BEARER}, so we are decoding that.
+     *
+     * @param request
+     */
+    public static BaseClient getAndVerifyRFC7523Client(HttpServletRequest request, OA2SE oa2SE) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        return getAndVerifyRFC7523Client(request, oa2SE, false); // default is to use token endpoint
+    }
+
+    /**
+     * Just carries out verifying RFC 7523 §2.1. It returns the authorizing client
+     * @param request
+     * @param oa2SE
+     * @param isDeviceFlow
+     * @return
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeySpecException
+     */
+    public static BaseClient getAndVerifyRFC7523Client(HttpServletRequest request, OA2SE oa2SE, boolean isDeviceFlow) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        String assertionType= request.getParameter(RFC7523Constants.CLIENT_ASSERTION_TYPE);
+        if(!assertionType.equals(RFC7523Constants.ASSERTION_JWT_BEARER)){
+            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                    "unsupported " + RFC7523Constants.CLIENT_ASSERTION_TYPE,
+                    HttpStatus.SC_BAD_REQUEST, null);
+
+        }
+        String raw = request.getParameter(RFC7523Constants.CLIENT_ASSERTION);
+        if (StringUtils.isTrivial(raw)) {
+            // throw an exception
+            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                    "missing " + RFC7523Constants.CLIENT_ASSERTION,
+                    HttpStatus.SC_BAD_REQUEST, null);
+        }
+        JSONObject[] hp;
+        try {
+            hp = MyOtherJWTUtil2.readJWT(raw);
+        } catch (IllegalArgumentException iax) {
+            // means this is sent as a JWT, but is not one
+            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, RFC7523Constants.CLIENT_ASSERTION + " is not a JWT", HttpStatus.SC_BAD_REQUEST, null);
+        } catch (Throwable t) {
+            // In this case, it is something like an unsupported algorithm
+            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "could not decode JWT:" + t.getMessage(), HttpStatus.SC_BAD_REQUEST, null);
+        }
+        // In order to decode this, we need to get the client ID (required in the sub claim) and grab the key.
+        JSONObject json = hp[1];
+        BaseClient client = findRFC7523Client(request, oa2SE, json);
+        String state = json.containsKey(OA2Constants.STATE) ? json.getString(OA2Constants.STATE) : null;
+
         try {
             MyOtherJWTUtil2.verifyAndReadJWT(raw, client.getJWKS());
         } catch (Throwable t) {
@@ -147,11 +186,11 @@ public class OA2HeaderUtils extends HeaderUtils {
     }
 
     public static OA2Client getRFC7523Client(HttpServletRequest request, OA2SE oa2SE) throws NoSuchAlgorithmException, InvalidKeySpecException {
-        String raw = request.getParameter(RFC7523Constants.CILENT_ASSERTION);
+        String raw = request.getParameter(RFC7523Constants.CLIENT_ASSERTION);
         if (StringUtils.isTrivial(raw)) {
             // throw an exception
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
-                    "missing " + RFC7523Constants.CILENT_ASSERTION,
+                    "missing " + RFC7523Constants.CLIENT_ASSERTION,
                     HttpStatus.SC_BAD_REQUEST, null);
 
         }
@@ -160,7 +199,7 @@ public class OA2HeaderUtils extends HeaderUtils {
             hp = MyOtherJWTUtil2.readJWT(raw);
         } catch (IllegalArgumentException iax) {
             // means this is sent as a JWT, but is not one
-            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, RFC7523Constants.CILENT_ASSERTION + " is not a JWT", HttpStatus.SC_BAD_REQUEST, null);
+            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, RFC7523Constants.CLIENT_ASSERTION + " is not a JWT", HttpStatus.SC_BAD_REQUEST, null);
         } catch (Throwable t) {
             // In this case, it is something like an unsupported algorithm
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "could not decode JWT:" + t.getMessage(), HttpStatus.SC_BAD_REQUEST, null);
@@ -180,11 +219,11 @@ public class OA2HeaderUtils extends HeaderUtils {
     }
 
     public static void verifyRFC7523Client(OA2Client client, HttpServletRequest request, OA2SE oa2SE) throws NoSuchAlgorithmException, InvalidKeySpecException {
-        String raw = request.getParameter(RFC7523Constants.CILENT_ASSERTION);
+        String raw = request.getParameter(RFC7523Constants.CLIENT_ASSERTION);
         if (StringUtils.isTrivial(raw)) {
             // throw an exception
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
-                    "missing " + RFC7523Constants.CILENT_ASSERTION,
+                    "missing " + RFC7523Constants.CLIENT_ASSERTION,
                     HttpStatus.SC_BAD_REQUEST, null);
 
         }
@@ -193,7 +232,7 @@ public class OA2HeaderUtils extends HeaderUtils {
             hp = MyOtherJWTUtil2.readJWT(raw);
         } catch (IllegalArgumentException iax) {
             // means this is sent as a JWT, but is not one
-            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, RFC7523Constants.CILENT_ASSERTION + " is not a JWT", HttpStatus.SC_BAD_REQUEST, null);
+            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, RFC7523Constants.CLIENT_ASSERTION + " is not a JWT", HttpStatus.SC_BAD_REQUEST, null);
         } catch (Throwable t) {
             // In this case, it is something like an unsupported algorithm
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "could not decode JWT:" + t.getMessage(), HttpStatus.SC_BAD_REQUEST, null);

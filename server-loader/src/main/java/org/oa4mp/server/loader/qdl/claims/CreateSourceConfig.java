@@ -121,6 +121,7 @@ public class CreateSourceConfig implements QDLFunction, CSConstants {
         put(output,CS_LDAP_GROUP_NAMES, groups);
         QDLStem renames = new QDLStem();
         put(renames, "memberOf", "isMemberOf");
+        put(renames, "mail", "email");
         put(output, CS_LDAP_RENAME,renames);
         return output.union(arg);
     }

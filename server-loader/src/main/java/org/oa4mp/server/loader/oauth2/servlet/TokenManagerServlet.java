@@ -97,9 +97,9 @@ public abstract class TokenManagerServlet extends BearerTokenServlet implements 
     }
 
     protected boolean isRFC7523Client(HttpServletRequest req) {
-        System.out.println(getClass().getSimpleName() + ": " + req.getParameter(RFC7523Constants.CILENT_ASSERTION_TYPE));
-        if (req.getParameter(RFC7523Constants.CILENT_ASSERTION_TYPE) != null &&
-                req.getParameter(RFC7523Constants.CILENT_ASSERTION_TYPE).equals(RFC7523Constants.ASSERTION_JWT_BEARER)) {
+        System.out.println(getClass().getSimpleName() + ": " + req.getParameter(RFC7523Constants.CLIENT_ASSERTION_TYPE));
+        if (req.getParameter(RFC7523Constants.CLIENT_ASSERTION_TYPE) != null &&
+                req.getParameter(RFC7523Constants.CLIENT_ASSERTION_TYPE).equals(RFC7523Constants.ASSERTION_JWT_BEARER)) {
             return true;
         }
         return false;
@@ -108,7 +108,8 @@ public abstract class TokenManagerServlet extends BearerTokenServlet implements 
     protected State check7523(HttpServletRequest req) throws Throwable {
         State state = new State();
         OA2SE oa2SE = (OA2SE) getServiceEnvironment();
-        OA2Client oa2Client = OA2HeaderUtils.getAndVerifyRFC7523Client(req, (OA2SE) getServiceEnvironment());
+        // Only OA2Client allowed here.
+        OA2Client oa2Client = (OA2Client) OA2HeaderUtils.getAndVerifyRFC7523Client(req, (OA2SE) getServiceEnvironment());
         return getState(req, state, oa2SE, oa2Client);
     }
 

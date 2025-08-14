@@ -39,6 +39,7 @@ public class AdminClientConverter<V extends AdminClient> extends BaseClientConve
         v.setVirtualIssuer(BasicIdentifier.newID(getJsonUtil().getJSONValueString(json, getACK().voURI())));
         v.setMaxClients(getJsonUtil().getJSONValueInt(json, getACK().maxClients()));
         v.setAllowQDL(getJsonUtil().getJSONValueBoolean(json, getACK().allowQDL()));
+        v.setInitializeFlows(getJsonUtil().getJSONValueBoolean(json, getACK().initializeFlows()));
         v.setGenerateIDs(getJsonUtil().getJSONValueBoolean(json, getACK().generateIDs()));
         v.setUseTimestampInIDs(getJsonUtil().getJSONValueBoolean(json, getACK().useTimestampsInIds()));
         v.setAllowCustomIDs(getJsonUtil().getJSONValueBoolean(json, getACK().allowCustomIDs()));
@@ -70,6 +71,9 @@ public class AdminClientConverter<V extends AdminClient> extends BaseClientConve
         if (map.containsKey(getACK().generateIDs())) {
             // older clients won't have this, so don't force the issue.
             value.setGenerateIDs(map.getBoolean(getACK().generateIDs()));
+        }
+        if (map.containsKey(getACK().initializeFlows())) {
+            value.setInitializeFlows(map.getBoolean(getACK().initializeFlows()));
         }
         if (map.containsKey(getACK().useTimestampsInIds())) {
              // older clients won't have this, so don't force the issue.
@@ -125,6 +129,7 @@ public class AdminClientConverter<V extends AdminClient> extends BaseClientConve
         }
         getJsonUtil().setJSONValue(json, getACK().allowCustomIDs(), client.isAllowCustomIDs());
         getJsonUtil().setJSONValue(json, getACK().generateIDs(), client.isGenerateIDs());
+        getJsonUtil().setJSONValue(json, getACK().initializeFlows(), client.canInitializeFlows());
         getJsonUtil().setJSONValue(json, getACK().useTimestampsInIds(), client.isUseTimestampInIDs());
         if(client.getIdHead()!=null){
             getJsonUtil().setJSONValue(json, getACK().idHead(), client.getIdHead().toString());
@@ -150,6 +155,7 @@ public class AdminClientConverter<V extends AdminClient> extends BaseClientConve
         map.put(getACK().allowQDLCodeBlocks(), client.allowQDLCodeBlocks());
         map.put(getACK().generateIDs(), client.isGenerateIDs());
         map.put(getACK().allowCustomIDs(), client.isAllowCustomIDs());
+        map.put(getACK().initializeFlows(), client.canInitializeFlows());
         map.put(getACK().useTimestampsInIds(), client.isUseTimestampInIDs());
         if(client.getIdHead()!=null){
             map.put(getACK().idHead(), client.getIdHead().toString());

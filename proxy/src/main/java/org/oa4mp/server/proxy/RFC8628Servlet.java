@@ -74,11 +74,11 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
         // lastAttemptTS = System.currentTimeMillis();
         // Next two lines also verify that it is a client, has been approved and has the right secret.
         OA2Client client = null;
-        String type = req.getParameter(RFC7523Constants.CILENT_ASSERTION_TYPE );
+        String type = req.getParameter(RFC7523Constants.CLIENT_ASSERTION_TYPE);
   //      printAllParameters(req);
         if (type != null && type.equals(RFC7523Constants.ASSERTION_JWT_BEARER)) {
             // If the client is doing an RFC 7523 grant, then it must authorize accordingly.
-            client = OA2HeaderUtils.getAndVerifyRFC7523Client(req, (OA2SE) getServiceEnvironment(), true);
+            client = (OA2Client) OA2HeaderUtils.getAndVerifyRFC7523Client(req, (OA2SE) getServiceEnvironment(), true);
         }else{
             try {
                 client = (OA2Client) getClient(req);
@@ -155,7 +155,10 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
         if (oa2SE.getAuthorizationServletConfig().isUseProxy()) {
             userCode = ProxyUtils.startProxyDeviceFlow(oa2SE, t, rfc8628State);
             lifetime = rfc8628State.lifetime; // This is set from the proxy and must be propagated to the user.
-
+            // if use local DF consent is false,  can't get callback from DF, hence there can be
+            // no local consent page displayed to the user. If we don't set it here, the user will not
+            // be able to do any flows.
+            t.setConsentPageOK(!oa2SE.getAuthorizationServletConfig().isLocalDFConsent());
         } else {
             userCode = getUserCode(rfc8628ServletConfig);
             // Make sure it is not in use, since the configuration might make collisions possible.

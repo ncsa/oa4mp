@@ -1,12 +1,5 @@
 package org.oa4mp.server.loader.oauth2.servlet;
 
-import org.oa4mp.server.loader.oauth2.claims.LDAPException;
-import org.oa4mp.server.api.storage.servlet.AbstractAuthorizationServlet;
-import org.oa4mp.delegation.common.storage.clients.BaseClient;
-import org.oa4mp.delegation.server.ExceptionWrapper;
-import org.oa4mp.delegation.server.UnapprovedClientException;
-import org.oa4mp.delegation.server.*;
-import org.qdl_lang.exceptions.QDLExceptionWithTrace;
 import edu.uiuc.ncsa.security.core.exceptions.MissingContentException;
 import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
@@ -15,6 +8,12 @@ import edu.uiuc.ncsa.security.servlet.AbstractServlet;
 import edu.uiuc.ncsa.security.servlet.ExceptionHandler;
 import edu.uiuc.ncsa.security.servlet.ExceptionHandlerThingie;
 import org.apache.http.HttpStatus;
+import org.oa4mp.delegation.common.storage.clients.BaseClient;
+import org.oa4mp.delegation.server.*;
+import org.oa4mp.server.api.storage.servlet.AbstractAuthorizationServlet;
+import org.oa4mp.server.loader.oauth2.claims.LDAPException;
+import org.qdl_lang.exceptions.QDLException;
+import org.qdl_lang.exceptions.QDLExceptionWithTrace;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -83,12 +82,20 @@ public class OA2ExceptionHandler implements ExceptionHandler {
                 baseClient = ((OA2ExceptionHandlerThingie) xh).client;
             }
         }
-        //     ServletDebugUtil.trace(this, "Error", t);
-        if (t instanceof QDLExceptionWithTrace) {
-            if (t.getCause() != null) {
-                t = t.getCause();
+        // Do QDL. If there is a script, print out the stack trace
+        if (t instanceof QDLException) {
+            QDLException qx = (QDLException) t;
+            if (qx.getCause() != null) {
+                t = qx.getCause();
             }
-
+                if(qx instanceof QDLExceptionWithTrace){
+                    QDLExceptionWithTrace qxTrace = (QDLExceptionWithTrace) qx;
+                    if(qxTrace.isScript()){
+                        forensicMessage = "QDL script stack trace:\n" + qxTrace.stackTrace();
+                    }else{
+                        forensicMessage = "No QDL script"; // So it was a code block
+                    }
+                }
         }
         String message = "";
         if (baseClient != null) {

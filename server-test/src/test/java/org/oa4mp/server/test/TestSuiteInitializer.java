@@ -92,7 +92,7 @@ public class TestSuiteInitializer extends AbstractTestSuiteInitializer {
                      DerbyConnectionPool dcp = (DerbyConnectionPool) ((SQLStore) tspi.getClientStore()).getConnectionPool();
                      if (dcp.isMemoryStore() || dcp.isFileStore()) {
                          // have to create it.
-                         System.out.println("TEST, starting Derby store create");
+                         System.out.println("TEST, starting Derby store create for " + dcp.getConnectionParameters().getRootDirectory());
                          dcp.createStore();
                      }
                  }

@@ -76,7 +76,7 @@ public class WLCGTokenHandler extends AbstractAccessTokenHandler implements WLCG
         super.finish(doTemplates, isQuery);
         if (!atData.containsKey(SCOPE) || StringUtils.isTrivial(atData.getString(SCOPE))) {
             throw new OA2ATException(OA2Errors.ACCESS_DENIED,
-                    "No scopes found.",
+                    "No WLCG scopes found.",
                     transaction.getRequestState(),
                     transaction.getClient());
         }

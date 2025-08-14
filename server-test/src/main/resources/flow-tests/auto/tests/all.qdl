@@ -12,6 +12,7 @@ test.:= [
           [(path + 'auto/tests/' +'ccf-oauth-basic.qdl'), 'ccf.oauth.basic', initialization, false],
           [(path + 'auto/tests/' +'ccf-oidc-basic.qdl'),'ccf.oidc.basic', initialization, false],
           [(path + 'auto/tests/' +'ccf-oauth-qdl.qdl'), 'ccf.oauth.qdl', initialization, false],
+          [path + 'auto/tests/' +'initialize-flow.qdl', initialization],
           [path + 'auto/tests/' +'server-script.qdl', initialization],
           [path + 'auto/tests/' +'oauth-with-refresh.qdl', initialization],
           [path + 'auto/tests/' +'oauth-basic-no-refresh.qdl',initialization],

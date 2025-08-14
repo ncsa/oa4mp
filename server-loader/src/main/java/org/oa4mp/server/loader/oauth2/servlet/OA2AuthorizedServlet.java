@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
+ * Formerly used in OAuth 1 for the /init endpoint.
  * <p>Created by Jeff Gaynor<br>
  * on 10/3/13 at  2:01 PM
  */

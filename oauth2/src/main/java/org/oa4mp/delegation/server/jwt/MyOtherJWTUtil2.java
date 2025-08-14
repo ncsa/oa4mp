@@ -99,7 +99,7 @@ public class MyOtherJWTUtil2 {
         header.put(ALGORITHM, jsonWebKey.algorithm);
 
         if (jsonWebKey.algorithm.equals(NONE_JWT)) {
-            token = concat(header, payload) +"."; // as per spec. Ends with a period if not signed.
+            token = concat(header, payload) + "."; // as per spec. Ends with a period if not signed.
 
         } else {
             token = sign(header, payload, jsonWebKey);
@@ -337,6 +337,18 @@ val jwt: String = signedJWT.serialize()     */
     }
 
     /**
+     * Read and return an unsigned JWT/ This will blow up if it is signed because
+     * there is no key
+     *
+     * @param jwt
+     * @throws IllegalArgumentException    if this is not a JWT, the JWT is signed.
+     * @return
+     */
+    public static JSONObject verifyAndReadJWT(String jwt) {
+        return verifyAndReadJWT(jwt, (JSONWebKeys) null);
+    }
+
+    /**
      * Verify and read a JWT. Note that this returns any of several exceptions which you should
      * check for as needed. An {@link IllegalArgumentException} means that this is not in fact
      * a JWT, all other exceptions relate to whether the internal structure passes muster.
@@ -344,7 +356,7 @@ val jwt: String = signedJWT.serialize()     */
      * @param jwt
      * @param webKeys
      * @return
-     * @throws IllegalArgumentException    if this is not a JWT or the argument is null
+     * @throws IllegalArgumentException    if this is not a JWT, missing web keys, or the argument is null
      * @throws InvalidAlgorithmException   if there is no algorithm or the algorith is not supported
      * @throws InvalidSignatureException   if the signature fails to verify
      * @throws UnsupportedJWTTypeException if the internal type of the token is not supported
@@ -374,7 +386,9 @@ val jwt: String = signedJWT.serialize()     */
             throw new UnsupportedJWTTypeException("Unsupported token type.");
         Object keyID = h.get(KEY_ID);
         //  DebugUtil.trace(JWTUtil.class, "key_id=" + keyID);
-
+        if (webKeys == null) {
+            throw new IllegalStateException("Missing web keys");
+        }
         if (keyID == null || !(keyID instanceof String)) {
             throw new InvalidAlgorithmException("Unknown algorithm");
         }

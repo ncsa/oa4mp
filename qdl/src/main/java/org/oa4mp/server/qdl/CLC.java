@@ -12,6 +12,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.oa4mp.client.loader.OA2ClientEnvironment;
 import org.oa4mp.delegation.common.token.impl.*;
+import org.oa4mp.delegation.server.server.RFC7523Constants;
 import org.oa4mp.delegation.server.server.claims.OA2Claims;
 import org.oa4mp.server.admin.oauth2.tools.OA2CLCCommands;
 import org.oa4mp.server.admin.oauth2.tools.OA2CommandLineClient;
@@ -99,6 +100,7 @@ public class CLC implements QDLMetaModule {
                 DebugUtil.setEnabled(true);
                 CLIDriver driver = new CLIDriver();
                 clcCommands = new OA2CLCCommands(true, driver, new QDLCLC(driver));
+                clcCommands.setThrowExceptions(true); // so we get exception, not output to the console.
                 // note that the order of the arguments swaps.
                 InputLine inputLine = new InputLine(DUMMY_ARG + " " + objects[1].toString() + "  " + objects[0].toString());
                 clcCommands.load(inputLine);
@@ -1413,10 +1415,24 @@ public class CLC implements QDLMetaModule {
                     dd.add(getName() + "('igwn-robot@bigstate.edu')");
                     dd.add("Sends request with the user name (as the subject of the request token). This is used on the");
                     dd.add("service as if the user logged in with the given name, so all e.g. QDL scripts will run against that name.");
-                    dd.add("\nE.g.");
+                    dd.add("\nE.g. with configuration stem");
                     dd.add(getName() + "({'sub':'bob@bigstate.edu','lifetime':1000000})");
                     dd.add("sends the request with the given user name and the parameter (in this case, requesting a certificate lifetime).");
                     dd.add("\nTo send headers, include a stem that has the key " + ServiceClient.HEADER_KEY);
+                    dd.add("E.g. using an admin client to initiate the flow");
+                    dd.add("This sets some custom scopes, then starts the flow");
+                    dd.add("(load the client whose flow you initiate, get the admin_client. and the kid for the key first)");
+                    dd.add("param.'a' := {'scope':'read: write: x.y'};");
+                    dd.add("clc#set_param(param.);");
+                    dd.add("tokens. := clc#rfc7523({'sub':'jeff','admin_client':admin_client., 'admin_kid':admin_kid});");
+
+                    dd.add("The result is the tokens that you pass back to a client. ");
+                    dd.add("In this case, you supply the admin client (as a stem) and the admin's key you want to use");
+                    dd.add("for signing. This starts a flow for the current client. Mostly this is to test");
+                    dd.add("how this works.");
+                    dd.add("In addition to any client-specific parameters (such as the sub, scopes) you need to pass");
+                    dd.add(RFC7523Constants.ADMIN_CLIENT + " - the entire admin client as a stem");
+                    dd.add(RFC7523Constants.ADMIN_KID + "the key id to use");
                     break;
             }
 
@@ -1424,6 +1440,13 @@ public class CLC implements QDLMetaModule {
         }
     }
 
+    /**
+     * Converts the argument list of POJOs to a map. Note that stems are converted to
+     * JSON, so you can send those along too.
+     * @param objects
+     * @param name
+     * @return
+     */
     private static Map argToMap(QDLValue[] objects, String name) {
         Map parameters = new HashMap();
         if (objects.length == 1) {
@@ -1614,7 +1637,11 @@ public class CLC implements QDLMetaModule {
             // table.
             return new JSONObject();
         }
-        return clcCommands.toJSON();
+        try {
+            return clcCommands.toJSON();
+        } catch (Exception e) {
+            throw new GeneralException(e);
+        }
     }
 
     @Override

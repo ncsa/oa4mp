@@ -3,6 +3,7 @@ package org.oa4mp.server.proxy;
 
 import edu.uiuc.ncsa.security.servlet.HeaderUtils;
 import edu.uiuc.ncsa.security.servlet.PresentableState;
+import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.http.HttpStatus;
@@ -35,6 +36,7 @@ import static org.oa4mp.delegation.server.OA2Constants.AUTHORIZATION_STATE;
 
 
 /**
+ * This is deployed as the /authorize endpoint.
  * <p>Created by Jeff Gaynor<br>
  * on 2/7/14 at  11:44 AM
  */
@@ -84,15 +86,14 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
 
     @Override
     protected void doIt(HttpServletRequest request, HttpServletResponse response) throws Throwable {
-
+        ServletDebugUtil.printAllParameters(getClass(), request,true);
         Map<String, String> map = getFirstParameters(request);
         if(map.containsKey("action") && map.get("action").equals("ok")){
+            // If authZ in progress, send to consent page here.
             super.doIt(request, response);
             logOK(request); //CIL-1722
             return;
         }
-
-
         if (!map.containsKey(OA2Constants.RESPONSE_TYPE)) {
             // As per both OIDC and OAuth 2 spec., this is required. OIDC compliance requires state is returned.
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
@@ -104,7 +105,7 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
         // unscramble it.
         MyHttpServletResponseWrapper wrapper = new MyHttpServletResponseWrapper(response);
         OA2AuthorizedServletUtil init = getInitUtil();
-        init.doDelegation(request, wrapper);
+        init.doDelegation(request, wrapper); // creates transaction, writes it to wrapper
         if (wrapper.isExceptionEncountered()) {
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, wrapper.toString(), wrapper.getStatus(),
                     HeaderUtils.getFirstParameterValue(request, OA2Constants.STATE));

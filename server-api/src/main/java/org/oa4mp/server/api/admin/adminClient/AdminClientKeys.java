@@ -23,12 +23,19 @@ public class AdminClientKeys extends BaseClientKeys {
     String useTimestampsInIDs = "use_timestamps_in_ids";
     String idStart = "id_start";
     String issuer = "issuer";
+    String initializeFlows = "initialize_flows";
     String maxClients = "max_clients";
     String notifyOnNewClientCreate="new_client_notify";
     String vo="vo";
     String voURI="vo_uri";
     String listUsers = "list_users";
     String listUsersInOtherClients = "list_users_other_clients";
+
+
+    public String initializeFlows(String... x) {
+        if (0 < x.length) initializeFlows= x[0];
+        return initializeFlows;
+    }
 
     public String listUsers(String... x) {
         if (0 < x.length) listUsers= x[0];
@@ -99,20 +106,21 @@ public class AdminClientKeys extends BaseClientKeys {
     @Override
     public List<String> allKeys() {
         List<String> allKeys =  super.allKeys();
-        allKeys.add(config());
-        allKeys.add(issuer());
-        allKeys.add(maxClients());
-        allKeys.add(vo());
-        allKeys.add(voURI());
+        allKeys.add(allowCustomIDs());
         allKeys.add(allowQDL());
         allKeys.add(allowQDLCodeBlocks());
-        allKeys.add(notifyOnNewClientCreate());
+        allKeys.add(config());
+        allKeys.add(generateIDs());
+        allKeys.add(idHead());
+        allKeys.add(initializeFlows());
+        allKeys.add(issuer());
         allKeys.add(listUsers());
         allKeys.add(listUsersInOtherClients());
-        allKeys.add(idHead());
-        allKeys.add(allowCustomIDs());
-        allKeys.add(generateIDs());
+        allKeys.add(maxClients());
+        allKeys.add(notifyOnNewClientCreate());
         allKeys.add(useTimestampsInIds());
+        allKeys.add(vo());
+        allKeys.add(voURI());
         return allKeys;
     }
 }

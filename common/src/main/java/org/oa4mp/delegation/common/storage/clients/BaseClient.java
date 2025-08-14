@@ -6,6 +6,8 @@ import edu.uiuc.ncsa.security.storage.monitored.Monitored;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 
 import static edu.uiuc.ncsa.security.core.util.BeanUtils.checkEquals;
@@ -148,4 +150,43 @@ public class BaseClient extends Monitored {
     }
 
     boolean debugOn = false;
+
+    /**
+     * A service client is one that is permitted to use the flow outlined in RFC 7523, viz.,
+     * it may request authorization grants directly from the token endpoint without any
+     * authorization. This is typically used by a service and has a dedicated single
+     * "user."
+     * @return
+     */
+    public boolean isServiceClient() {
+        return serviceClient;
+    }
+
+    public void setServiceClient(boolean serviceClient) {
+        this.serviceClient = serviceClient;
+    }
+
+    boolean serviceClient = false;
+
+    public Collection<String> getServiceClientUsers() {
+        if(serviceClientUsers == null){
+            serviceClientUsers = new ArrayList<>();
+            serviceClientUsers.add("*"); // default is to accept everyone.
+        }
+        return serviceClientUsers;
+    }
+
+    public void setServiceClientUsers(Collection<String> serviceClientUsers) {
+        this.serviceClientUsers = serviceClientUsers;
+    }
+
+    Collection<String> serviceClientUsers = null;
+
+    /**
+     * Mostly this is for use by converters so we know when we are setting this to a default.
+     * @return
+     */
+    public boolean hasServiceClientUsers(){
+        return serviceClientUsers!=null;
+    }
 }

@@ -1,0 +1,88 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+  A test to test initializing a flow with an administrative client and RFC 7523. The admin client
+  starts the flow, then the resulting tokens can be handed off to the client to continue. This
+  allows one way to replace the entire authorization mechanism of OA4MP, so is a critical test.
+*/
+//params.'authz' :=  {'scope': 'read: write: x.y'};
+params.'authz' :=  {'scope': ['read:', 'write:', 'x.y']};
+params.'token' := {
+  'code_verifier' : 'qBdfP8Wmpomgkq6aJwcvZQMHx553RK4P7LAYxmzMAkmo8cM7MlE8ViJSOx38nlHr',
+          'scope' : 'read: write: x.y'
+   };
+params.'exchange':={'scope':'read:/home/jeff write:/data/jeff/cluster x.y:/abc/def/ghi'};
+
+/*
+   Note that this is a pretty low level test in the sense that it has to have access to the
+   local OA4MP install. It reads the given admin client from OA4MP's store. In practice, a
+   service would have its admin client with keys locally. The aim here is that if the server
+   changes the configurations, these are picked up by the test so it does not break.
+*/
+$$ROOT_CONFIG_DIR := '/home/ncsa/dev/csd/config/';
+
+ cfg.'name' ≔ 'localhost:oa4mp.oa2.mariadb';
+ cfg.'file' ≔ $$ROOT_CONFIG_DIR + 'server-oa2.xml';
+   admin_id ≔ 'admin:test/vo_1';
+  admin_kid ≔ '563054FD9C2E418A';
+     admins ≔ j_load('oa4mp.client.store');
+        clc ≔ j_load('oa4mp.client.clc');
+  client_id ≔ 'localhost:test/initialize_flow';
+     issuer ≔ 'http://localhost:9443/custom/issuer';
+
+admins#init(cfg., $$STORE_TYPE.'admin');
+admin_client. ≔ admins#read(admin_id);
+clc#init($$ROOT_CONFIG_DIR + 'client-oa2.xml', client_id);
+// WLCG request, so have to send specific scopes.
+clc#set_param(params.);
+tokens. := clc#rfc7523({'sub':'jeff','admin_client':admin_client., 'admin_kid':admin_kid});
+
+/*
+   This ends the actual work talking to the server. The tokens would be returned to the client
+   at this point and used by them as part of replacing the authN endpoint and using OA4MP as a
+   dedicated token issuer.
+*/
+
+⊨ is_defined(tokens.) : 'uh-oh, access endpoint failed:' + to_string(tokens., true);
+
+at. := tokens.'access_token'.'jwt';
+rt. := tokens.'access_token'.'jwt';
+
+claims. :=clc#claims();
+
+user := claims.'sub';
+expected_scopes. :=['read:/home/'+user,'write:/data/'+user+'/cluster', 'x.y:/abc/def'];
+
+define[test_lifetime(at., rt.)][
+   // Not the same at and rt as in the test(). These are the complete token response with their states.
+   ⊨ at.'lifetime' == 900000 : 'wrong lifetime, expected 900000, got ' + (at.'lifetime');
+   ⊨ rt.'lifetime' == 3600000 : 'wrong rt lifetime, expected 3600000, got ' + (rt.'lifetime');
+];
+
+define[test(at., rt., user, expected_scopes., issuer)][
+   ss. := tokenize(at.'scope', ' ');
+   //⊨ at.'iss' == 'http://localhost:9443/custom/issuer' : 'wrong issuer';
+   ⊨ at.'iss' == issuer : 'wrong issuer';
+   ⊨ is_defined(at.'wlcg.ver')  : 'not an WLCG token';
+   ⊨ at.'wlcg.ver' == '1.0' : 'wrong WLCG version';
+   ⊨ user == at.'sub' : 'subject in id and access token do not match';
+   ⊨ reduce(@&&, ss.∈ expected_scopes.) :  'incorrect access scopes';
+   ⊨ rt.'aud' == 'https://localhost/test' : 'wrong rt audience';
+];
+
+tokens. :=clc#refresh();
+at. := tokens.'access_token';
+rt. := tokens.'refresh_token';
+expected_scopes. :=['read:/home/'+user,'write:/data/'+user+'/cluster', 'x.y:/abc/def/ghi'];
+test_lifetime(at., rt.);
+test(at.'jwt', rt.'jwt', user, expected_scopes., issuer);
+
+tokens. :=clc#exchange();
+at. := tokens.'access_token';
+
+tokens. :=clc#exchange('-rt');
+rt. := tokens.'refresh_token';
+
+test_lifetime(at., rt.);
+test(at.'jwt', rt.'jwt', user, expected_scopes., issuer);
+say('ok: Admin client is able to intialize a flow for one of its clients.');

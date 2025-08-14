@@ -26,7 +26,7 @@
 */
 // Note in test mode, the server mode flag is set to false so we can look at
 // the output.
-say('*** QDL test script');
+say('*** QDL test script: test.qdl');
 say('auth_headers:\n' + print(auth_headers.));
 z.'sub' := 'foo';
 z.'baz' := 'bar';

@@ -20,21 +20,22 @@ public class AdminClientTable extends BaseClientTable {
     public void createColumnDescriptors() {
 
         super.createColumnDescriptors();
-        getColumnDescriptor().add(new ColumnDescriptorEntry(ak().name(), Types.LONGVARCHAR));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(ak().allowCustomIDs(), Types.BOOLEAN));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(ak().allowQDL(), Types.BOOLEAN));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(ak().config(), Types.LONGVARCHAR));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(ak().creationTS(), Types.TIMESTAMP));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(ak().email(), Types.LONGVARCHAR));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(ak().generateIDs(), Types.BOOLEAN));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(ak().idHead(), Types.LONGVARCHAR));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(ak().initializeFlows(), Types.BOOLEAN));
         getColumnDescriptor().add(new ColumnDescriptorEntry(ak().issuer(), Types.LONGVARCHAR));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(ak().listUsers(), Types.BOOLEAN));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(ak().listUsersInOtherClients(), Types.BOOLEAN));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(ak().maxClients(), Types.BIGINT));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(ak().name(), Types.LONGVARCHAR));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(ak().notifyOnNewClientCreate(), Types.BOOLEAN));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(ak().useTimestampsInIds(), Types.BOOLEAN));
         getColumnDescriptor().add(new ColumnDescriptorEntry(ak().vo(), Types.LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(ak().voURI(), Types.LONGVARCHAR));
-        getColumnDescriptor().add(new ColumnDescriptorEntry(ak().email(), Types.LONGVARCHAR));
-        getColumnDescriptor().add(new ColumnDescriptorEntry(ak().config(), Types.LONGVARCHAR));
-        getColumnDescriptor().add(new ColumnDescriptorEntry(ak().maxClients(), Types.BIGINT));
-        getColumnDescriptor().add(new ColumnDescriptorEntry(ak().allowQDL(), Types.BOOLEAN));
-        getColumnDescriptor().add(new ColumnDescriptorEntry(ak().notifyOnNewClientCreate(), Types.BOOLEAN));
-        getColumnDescriptor().add(new ColumnDescriptorEntry(ak().listUsers(), Types.BOOLEAN));
-        getColumnDescriptor().add(new ColumnDescriptorEntry(ak().generateIDs(), Types.BOOLEAN));
-        getColumnDescriptor().add(new ColumnDescriptorEntry(ak().allowCustomIDs(), Types.BOOLEAN));
-        getColumnDescriptor().add(new ColumnDescriptorEntry(ak().useTimestampsInIds(), Types.BOOLEAN));
-        getColumnDescriptor().add(new ColumnDescriptorEntry(ak().idHead(), Types.LONGVARCHAR));
-        getColumnDescriptor().add(new ColumnDescriptorEntry(ak().listUsersInOtherClients(), Types.BOOLEAN));
-        getColumnDescriptor().add(new ColumnDescriptorEntry(ak().creationTS(), Types.TIMESTAMP));
     }
 }
