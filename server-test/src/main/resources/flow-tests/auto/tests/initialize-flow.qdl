@@ -6,12 +6,9 @@
   allows one way to replace the entire authorization mechanism of OA4MP, so is a critical test.
 */
 //params.'authz' :=  {'scope': 'read: write: x.y'};
-params.'authz' :=  {'scope': ['read:', 'write:', 'x.y']};
-params.'token' := {
-  'code_verifier' : 'qBdfP8Wmpomgkq6aJwcvZQMHx553RK4P7LAYxmzMAkmo8cM7MlE8ViJSOx38nlHr',
-          'scope' : 'read: write: x.y'
-   };
-params.'exchange':={'scope':'read:/home/jeff write:/data/jeff/cluster x.y:/abc/def/ghi'};
+params.'authz' :=  {'scope': ['read:', 'write:', 'x.y']}; // scope as list
+params.'token' := {'scope' : {'read:', 'write:', 'x.y'}}; // scopes as set
+params.'exchange':={'scope':'read:/home/jeff write:/data/jeff/cluster x.y:/abc/def/ghi'}; // scopes as string
 
 /*
    Note that this is a pretty low level test in the sense that it has to have access to the
@@ -34,6 +31,7 @@ admins#init(cfg., $$STORE_TYPE.'admin');
 admin_client. ≔ admins#read(admin_id);
 clc#init($$ROOT_CONFIG_DIR + 'client-oa2.xml', client_id);
 // WLCG request, so have to send specific scopes.
+clc#echo_http_request(true);
 clc#set_param(params.);
 tokens. := clc#rfc7523({'sub':'jeff','admin_client':admin_client., 'admin_kid':admin_kid});
 

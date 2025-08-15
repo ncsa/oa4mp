@@ -33,7 +33,8 @@ import java.util.Map;
  */
 public interface ServiceEnvironment extends Logable {
 
-    public AuthorizationServletConfig getAuthorizationServletConfig();
+    AuthorizationServletConfig getAuthorizationServletConfig();
+    boolean hasAuthorizationServletConfig();
 
     /**
      * Return a key pair for cert request generation, e.g. in limited proxy requests.

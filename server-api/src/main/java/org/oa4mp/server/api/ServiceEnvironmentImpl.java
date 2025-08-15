@@ -65,6 +65,11 @@ public class ServiceEnvironmentImpl extends AbstractEnvironment implements Servi
         return authorizationServletConfig;
     }
 
+    @Override
+    public boolean hasAuthorizationServletConfig() {
+        return authorizationServletConfig != null;
+    }
+
     AGIssuer agIssuer;
     URI serviceAddress;
 

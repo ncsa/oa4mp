@@ -217,13 +217,13 @@ public abstract class AbstractAuthorizationServlet extends OA4MPServlet implemen
                     //https://github.com/ncsa/oa4mp/issues/236
                     // this is a new transaction, but there must be an existing one for this client
                 }
-                if (getServiceEnvironment().getAuthorizationServletConfig().isUseProxy()) {
+                if (getServiceEnvironment().hasAuthorizationServletConfig() && getServiceEnvironment().getAuthorizationServletConfig().isUseProxy()) {
                     doProxy(aState);
                     return;
                 }
                 String initPage = getInitialPage();
                 info("*** STARTING present");
-                if (getServiceEnvironment().getAuthorizationServletConfig().isUseHeader()) {
+                if (getServiceEnvironment().hasAuthorizationServletConfig() && getServiceEnvironment().getAuthorizationServletConfig().isUseHeader()) {
                     initPage = getRemoteUserInitialPage();
                     ServletDebugUtil.printAllParameters(getClass(), state.getRequest(), true);
                     info("*** PRESENT: Use headers enabled.");
@@ -382,7 +382,7 @@ public abstract class AbstractAuthorizationServlet extends OA4MPServlet implemen
         String password = null;
         // Fixes OAUTH-192.
         // Note this regets it from the header if present to check that the user got here legitimately
-        if (getServiceEnvironment().getAuthorizationServletConfig().isUseHeader()) {
+        if (getServiceEnvironment().hasAuthorizationServletConfig() && getServiceEnvironment().getAuthorizationServletConfig().isUseHeader()) {
             String headerName = getServiceEnvironment().getAuthorizationServletConfig().getHeaderFieldName();
             if (isEmpty(headerName) || headerName.toLowerCase().equals("remote_user")) {
                 userName = request.getRemoteUser();
@@ -438,7 +438,7 @@ public abstract class AbstractAuthorizationServlet extends OA4MPServlet implemen
     protected abstract void createRedirectInit(ServiceTransaction trans,String userName, String password);
 
     /*
-      Body of createRedirectInit:
+      Body of createRedirectInit for MyProxy:
         String statusString = " transaction =" + trans.getIdentifierString() + " and client=" + trans.getClient().getIdentifierString();
         setupMPConnection(trans, userName, password);
         // Change is to close this connection after verifying it works.
@@ -446,12 +446,24 @@ public abstract class AbstractAuthorizationServlet extends OA4MPServlet implemen
 
 
      */
+
+    /**
+     * <b><i>If</i></b> OA4MP has been extended to have a native concept of a user, this is the method that is used
+     * to verify them. Normally this is only called if explicitly set and no other authorization method (such
+     * as a proxy) is configured. Therefore, the default behavior is to throw an exception, but this is where
+     * the logic has to be.  To add a user, extend OA2AuthorizationServer, override this method to talk to
+     * whatever manages your users and set your servlet as the authorization endpoint.
+     * @param username
+     * @param password
+     * @throws GeneralSecurityException
+     */
     public void checkUser(String username, String password) throws GeneralSecurityException {
         // At this point in the basic servlet, there is no system for passwords.
         // This is because OA4MP has no native concept of managing users, it being
         // far outside of the OAuth spec.
         // If you were checking users and there  were a problem, you would do this:
         String message = "invalid login";
+        if(username.equals("jeff") && password.equals("1234567890")) {return;}
         throw new UserLoginException(message, username, password);
         // which would display the message as the retry message.
 

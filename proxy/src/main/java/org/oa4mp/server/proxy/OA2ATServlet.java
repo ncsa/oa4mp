@@ -403,7 +403,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
      */
     protected void doRFC7523InitiateFlow(HttpServletRequest request, HttpServletResponse response, BaseClient adminBaseClient) throws Throwable {
         JSONObject tokenRequest = null;
-        JSONObject authNAssertion = null;
         ServletDebugUtil.printAllParameters(getClass(), request, true);
         AdminClient adminClient = getOA2SE().getAdminClientStore().get(adminBaseClient.getIdentifier()); // get the full one
         if (adminClient == null) {
@@ -427,13 +426,19 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         } catch (Throwable t) {
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, "invalid json assertion:" + t.getMessage()); // Something is wrong with the JWT --
         }
-        if (!tokenRequest.containsKey(OA2Claims.ISSUER)) {
-            throw new OA2ATException(OA2Errors.INVALID_REQUEST, "missing issuer");
-        }
+
         OA2Client client = getRFC7523Client(adminClient, tokenRequest);
         if (!getOA2SE().getPermissionStore().getAdmins(client.getIdentifier()).contains(adminClient.getIdentifier())) {
             debug("admin client \"" + adminClient.getIdentifierString() + "\" not authorized to use client \"" + client.getIdentifierString() + "\"");
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, "admin client not authorized to use this client ");
+        }
+
+        processRFC7523(request, response, tokenRequest, client);
+    } // end RFC7523InitiateFlow
+
+    private void processRFC7523(HttpServletRequest request, HttpServletResponse response, JSONObject tokenRequest, OA2Client client) throws Throwable {
+        if (!tokenRequest.containsKey(OA2Claims.ISSUER)) {
+            throw new OA2ATException(OA2Errors.INVALID_REQUEST, "missing issuer");
         }
         if (!client.getIdentifierString().equals(tokenRequest.getString(OA2Claims.ISSUER))) {
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, "invalid issuer");
@@ -554,7 +559,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 // do nothing.
             }
         }
-        //   serviceTransaction.setIDTokenLifetime(ClientUtils.computeIDTLifetime(serviceTransaction, client, getOA2SE()));
         try {
             String[] rawResource = extractArray(tokenRequest, RESOURCE);
             String[] rawAudience = extractArray(tokenRequest, AUDIENCE);
@@ -577,18 +581,17 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
      * @throws Throwable
      */
     protected void doRFC7523(HttpServletRequest request, HttpServletResponse response, OA2Client client) throws Throwable {
-        JSONObject jsonRequest = null;
-        ServletDebugUtil.printAllParameters(getClass(), request, true);
+        JSONObject tokenRequestRaw = null;
         try {
             String raw = request.getParameter(RFC7523Constants.ASSERTION);
             if (StringUtils.isTrivial(raw)) {
                 throw new OA2ATException(OA2Errors.INVALID_REQUEST, "missing json assertion");
             }
             if (client.hasJWKS()) {
-                jsonRequest = MyOtherJWTUtil2.verifyAndReadJWT(raw, client.getJWKS());
+                tokenRequestRaw = MyOtherJWTUtil2.verifyAndReadJWT(raw, client.getJWKS());
             } else {
                 if (client.hasJWKSURI()) {
-                    jsonRequest = MyOtherJWTUtil2.verifyAndReadJWT(raw, client.getJwksURI());
+                    tokenRequestRaw = MyOtherJWTUtil2.verifyAndReadJWT(raw, client.getJwksURI());
                 } else {
                     throw new OA2ATException(OA2Errors.INVALID_REQUEST, "missing JSON web key. Cannot verify signature."); // Not a JWT
                 }
@@ -599,164 +602,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         } catch (Throwable t) {
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, "invalid json assertion:" + t.getMessage()); // Something is wrong with the JWT --
         }
-        if (!jsonRequest.containsKey(OA2Claims.ISSUER)) {
-            throw new OA2ATException(OA2Errors.INVALID_REQUEST, "missing issuer");
-        }
-        if (!client.getIdentifierString().equals(jsonRequest.getString(OA2Claims.ISSUER))) {
-            throw new OA2ATException(OA2Errors.INVALID_REQUEST, "invalid issuer");
-        }
-
-        if (jsonRequest.getLong(OA2Claims.EXPIRATION) * 1000L < System.currentTimeMillis()) {
-            throw new OA2ATException(OA2Errors.INVALID_REQUEST, "expired assertion token");
-        }
-        Collection<String> scopes;
-        if (jsonRequest.containsKey(OA2Constants.SCOPE)) {
-            Object ss = jsonRequest.get(OA2Constants.SCOPE);
-            if (ss instanceof JSONArray) {
-                scopes = (JSONArray) ss;
-            } else {
-                scopes = new ArrayList<>();
-                StringTokenizer stringTokenizer = new StringTokenizer(ss.toString(), " ");
-                while (stringTokenizer.hasMoreTokens()) {
-                    scopes.add(stringTokenizer.nextToken());
-                }
-            }
-        } else {
-            scopes = new ArrayList<>();
-        }
-        String state = jsonRequest.containsKey(STATE) ? jsonRequest.getString(STATE) : null;
-        String nonce = jsonRequest.containsKey(NONCE) ? jsonRequest.getString(NONCE) : null;
-
-        OA2ServiceTransaction serviceTransaction = (OA2ServiceTransaction) getOA2SE().getTransactionStore().create();
-/*
-        String uri = serviceTransaction.getIdentifier().getUri().toString();
-        if (-1 == uri.indexOf("/rfc7523")) {
-            uri = uri.substring(0, uri.indexOf("/")) + "/rfc7523" + uri.substring(uri.indexOf("/"));
-            serviceTransaction.setIdentifier(BasicIdentifier.newID(uri));
-        }
-*/
-        URI newURI = Identifiers.uniqueIdentifier("oa4mp:/rfc7523", "transaction", Identifiers.VERSION_2_0_TAG, serviceTransaction.getAuthzGrantLifetime());
-        // FIXME This should really come from the token forge, but that means making a few Issuer/response classes
-        String sURI = newURI.toString();
-        String[] ss = sURI.split("\\?");
-        ss[0] = ss[0] + "/" + (new Date()).getTime();
-        newURI = URI.create(ss[0]);
-        serviceTransaction.setIdentifier(BasicIdentifier.newID(newURI));
-        serviceTransaction.setAuthorizationGrant(new AuthorizationGrantImpl(newURI));
-        serviceTransaction.setRequestState(state);
-        serviceTransaction.setNonce(nonce);
-        serviceTransaction.setClient(client);
-        Date now = new Date();
-        serviceTransaction.setAuthTime(now); // auth time is now.
-        client.setLastAccessed(now);
-        // String user = jsonRequest.getString(OA2Claims.SUBJECT);
-
-
-/*
-        if (client.getServiceClientUsers().contains("*")) {
-            serviceTransaction.setUsername(user);
-        } else {
-            if (client.getServiceClientUsers().contains(user)) {
-                serviceTransaction.setUsername(user);
-            } else {
-                throw new OA2ATException(OA2Errors.INVALID_REQUEST, "user \"" + user + "\" does not have permission");
-            }
-        }
-*/
-        OA2ServletUtils.processXAs(jsonRequest, serviceTransaction, client);
-
-        // Do claims
-        JSONObject claims = new JSONObject();
-        if (jsonRequest.containsKey(OA2Constants.ID_TOKEN)) {
-            JSONObject idToken = jsonRequest.getJSONObject(OA2Constants.ID_TOKEN);
-            claims.putAll(idToken);
-            if (jsonRequest.containsKey(OA2Claims.SUBJECT)) {
-                String user = jsonRequest.getString(OA2Claims.SUBJECT);
-                claims.put(OA2Claims.SUBJECT, user);
-                setUsername(serviceTransaction, client, user);
-
-            } else {
-                if (!idToken.containsKey(OA2Claims.SUBJECT)) {
-                    throw new OA2ATException(OA2Errors.INVALID_REQUEST, "missing subject");
-                }
-                setUsername(serviceTransaction, client, idToken.getString(OA2Claims.SUBJECT));
-            }
-        } else {
-            if (!jsonRequest.containsKey(OA2Claims.SUBJECT)) {
-                throw new OA2ATException(OA2Errors.INVALID_REQUEST, "missing subject");
-            }
-            String user = jsonRequest.getString(OA2Claims.SUBJECT);
-            setUsername(serviceTransaction, client, user);
-            claims.put(OA2Claims.SUBJECT, user);
-        }
-        serviceTransaction.setUserMetaData(claims); // set this so it exists for later.
-        try {
-            serviceTransaction.setScopes(ClientUtils.resolveScopes(request,
-                    serviceTransaction,
-                    client,
-                    scopes,
-                    true, false, false));
-        } catch (OA2RedirectableError redirectableError) {
-            throw new OA2ATException(OA2Errors.INVALID_SCOPE,
-                    "unable to determine scopes",
-                    HttpStatus.SC_BAD_REQUEST,
-                    state, client);
-        }
-        if (jsonRequest.containsKey(OA2Constants.ACCESS_TOKEN_LIFETIME)) {
-            String rawATLifetime = jsonRequest.getString(OA2Constants.ACCESS_TOKEN_LIFETIME);
-            try {
-                long at = XMLConfigUtil.getValueSecsOrMillis(rawATLifetime);
-                //               long at = Long.parseLong(rawATLifetime);
-                serviceTransaction.setRequestedATLifetime(at);
-            } catch (Throwable t) {
-                getServiceEnvironment().info("Could not set requested access token lifetime to \"" + rawATLifetime
-                        + "\" for client " + client.getIdentifierString());
-                // do nothing.
-            }
-        }
-
-        //       serviceTransaction.setAccessTokenLifetime(ClientUtils.computeATLifetime(serviceTransaction, client, getOA2SE()));
-        if (jsonRequest.containsKey(OA2Constants.REFRESH_LIFETIME)) {
-            String rawRTLifetime = jsonRequest.getString(OA2Constants.REFRESH_LIFETIME);
-            try {
-                long at = XMLConfigUtil.getValueSecsOrMillis(rawRTLifetime);
-                serviceTransaction.setRequestedRTLifetime(at);
-            } catch (Throwable t) {
-                getServiceEnvironment().info("Could not set requested refresh token lifetime to \"" + rawRTLifetime
-                        + "\" for client " + client.getIdentifierString());
-                // do nothing.
-            }
-
-        }
-    /*    if (client.isRTLifetimeEnabled()) {
-            long lifetime = ClientUtils.computeRefreshLifetime(serviceTransaction, client, getOA2SE());
-            serviceTransaction.setRefreshTokenLifetime(ClientUtils.computeRefreshLifetime(serviceTransaction, client, getOA2SE()));
-            serviceTransaction.setRefreshTokenExpiresAt(System.currentTimeMillis() + lifetime);
-        } else {
-            serviceTransaction.setRefreshTokenLifetime(0L);
-        }*/
-        if (jsonRequest.containsKey(OA2Constants.ID_TOKEN_LIFETIME)) {
-            String rawLifetime = jsonRequest.getString(OA2Constants.ID_TOKEN_LIFETIME);
-            try {
-                long at = XMLConfigUtil.getValueSecsOrMillis(rawLifetime);
-                serviceTransaction.setRequestedIDTLifetime(at);
-            } catch (Throwable t) {
-                getServiceEnvironment().info("Could not set requested ID token lifetime to \"" + rawLifetime
-                        + "\" for client " + client.getIdentifierString());
-                // do nothing.
-            }
-        }
-        //   serviceTransaction.setIDTokenLifetime(ClientUtils.computeIDTLifetime(serviceTransaction, client, getOA2SE()));
-        try {
-            String[] rawResource = extractArray(jsonRequest, RESOURCE);
-            String[] rawAudience = extractArray(jsonRequest, AUDIENCE);
-            OA2AuthorizedServletUtil.figureOutAudienceAndResource(serviceTransaction, rawResource, rawAudience);
-        } catch (OA2GeneralError ge) {
-            throw new OA2ATException(ge.getError(), ge.getDescription(), ge.getHttpStatus(), state, client);
-        }
-        serviceTransaction.setConsentPageOK(true);
-        processServiceClientRequest(request, response, client, serviceTransaction, false);
-    }
+        processRFC7523(request, response, tokenRequestRaw, client);
+    } // end RFC7525
 
     /**
      * Checks if the user name is allowed for this client and if so sets it, if not an exception
@@ -2122,7 +1969,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         if (debugger instanceof ClientDebugUtil) {
             ((ClientDebugUtil) debugger).setTransaction(st2);
         }
-        if (getOA2SE().getAuthorizationServletConfig().isLocalDFConsent() && !st2.isConsentPageOK()) {
+        if (getOA2SE().hasAuthorizationServletConfig() && getOA2SE().getAuthorizationServletConfig().isLocalDFConsent() && !st2.isConsentPageOK()) {
             throw new OA2ATException(OA2Errors.CONSENT_REQUIRED,
                     "consent required",
                     HttpStatus.SC_BAD_REQUEST,
