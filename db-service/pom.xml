@@ -13,19 +13,25 @@
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>server-api</artifactId>
-            <version>6.2.0</version>
+            <version>6.x-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>server-loader</artifactId>
-            <version>6.2.0</version>
+            <version>6.x-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>proxy</artifactId>
-            <version>6.2.0</version>
+            <version>6.x-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.oa4mp</groupId>
+            <artifactId>server</artifactId>
+            <version>6.x-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

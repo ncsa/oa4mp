@@ -65,6 +65,7 @@ import org.oa4mp.server.loader.oauth2.cm.CM7591Config;
 import org.oa4mp.server.loader.oauth2.cm.CMConfig;
 import org.oa4mp.server.loader.oauth2.cm.CMConfigs;
 import org.oa4mp.server.loader.oauth2.cm.ClientManagementConstants;
+import org.oa4mp.server.loader.oauth2.servlet.DBServiceConfig;
 import org.oa4mp.server.loader.oauth2.servlet.RFC8628ServletConfig;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2ClientConverter;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2ClientMemoryStore;
@@ -253,7 +254,8 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
                     getMonitorAlarms(),
                     isCCFEnabled(),
                     getDebugger(),
-                    isAllowPromptNone()
+                    isAllowPromptNone(),
+                    getDBSerivceConfig()
             );
 
             if (getClaimSource() instanceof BasicClaimsSourceImpl) {
@@ -1803,4 +1805,54 @@ Boolean ccfEnabled = null;
         return "OA4MP, version " + OA4MPVersion.VERSION_NUMBER;
     }
 
+    DBServiceConfig dbServiceConfig = null;
+/*
+  element is
+
+  <dbService enabled="true|false">
+     <users>
+       <user username="name" hash="hash"/>
+       ...
+     </users>
+  </dbService>
+
+  should become
+
+  <dbService enabled="true|false">  <!-- throws exception on any call if false -->
+     <rfc7523 enabled="true|false"
+              required="true|false/> <!-- allows admin clients with dbService true to access -->
+     <users enabled="true|false">  <!-- direct user support on/off -->
+       <user username="name" hash="hash"/> <!-- individual users, store password hash only -->
+       ...
+     </users>
+  </dbService>
+
+ */
+    protected DBServiceConfig getDBSerivceConfig() {
+        if (dbServiceConfig == null) {
+            List<ConfigurationNode> kids = cn.getChildren(DBServiceConfig.DB_SERVICE_CONFIG_TAG);
+            dbServiceConfig = new DBServiceConfig();
+            dbServiceConfig.setEnabled(false); //default
+            if (kids.isEmpty()) {
+                return dbServiceConfig;
+            }
+            ConfigurationNode topNode = kids.get(0);
+            String rawEnabled = getFirstAttribute(topNode, DBServiceConfig.DB_SERVICE_ENABLED_ATTRIBUTE);
+            if (!StringUtils.isTrivial(rawEnabled)) {
+                try {
+                    dbServiceConfig.setEnabled(Boolean.parseBoolean(rawEnabled));
+                } catch (Throwable t) {
+                    info("Could not determine if db service is enabled: got \"" + rawEnabled + "\" in tag");
+                }
+            }
+            ConfigurationNode usersNode = getFirstNode(topNode, DBServiceConfig.DB_SERVICE_USERS_TAG);
+            List<ConfigurationNode> userNodes = usersNode.getChildren(DBServiceConfig.DB_SERVICE_USER_TAG);
+            for (ConfigurationNode tempNode : userNodes) {
+                String rawUser = getFirstAttribute(tempNode, DBServiceConfig.DB_SERVICE_NAME_ATTRIBUTE);
+                String rawHash = getFirstAttribute(tempNode, DBServiceConfig.DB_SERVICE_HASH_ATTRIBUTE);
+                dbServiceConfig.addUser(rawUser, rawHash);
+            }
+        }
+        return dbServiceConfig;
+    }
 }

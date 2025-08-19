@@ -62,6 +62,34 @@
     </servlet-mapping>
 
     <servlet>
+        <servlet-name>dbService</servlet-name>
+        <servlet-class>org.oa4mp.dbservice.DBService</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>dbService</servlet-name>
+        <url-pattern>/dbService</url-pattern>
+    </servlet-mapping>
+    <filter>
+        <filter-name>Remote Address Filter</filter-name>
+        <filter-class>org.apache.catalina.filters.RemoteAddrFilter</filter-class>
+        <init-param>
+            <param-name>allow</param-name>
+            <param-value>128\.0\.0\.1|192\.168\.1\.22</param-value>
+        </init-param>
+        <!-- Or, to deny specific IPs and allow others by default: -->
+        <!--
+        <init-param>
+            <param-name>deny</param-name>
+            <param-value>192\.168\.1\.101|172\.16\.0\.0/16</param-value>
+        </init-param>
+        -->
+    </filter>
+
+    <filter-mapping>
+        <filter-name>Remote Address Filter</filter-name>
+        <url-pattern>/oauth2/dbService</url-pattern>
+    </filter-mapping>
+    <servlet>
         <servlet-name>authorize</servlet-name>
         <servlet-class>org.oa4mp.server.proxy.OA2AuthorizationServer</servlet-class>
     </servlet>

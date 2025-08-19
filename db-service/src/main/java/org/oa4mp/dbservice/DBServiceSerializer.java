@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
+import net.sf.json.JSONObject;
 import org.oa4mp.delegation.common.storage.clients.ClientApprovalKeys;
 import org.oa4mp.delegation.common.storage.clients.ClientKeys;
 import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
@@ -212,8 +213,22 @@ public class DBServiceSerializer {
     public void serialize(PrintWriter w, OA2ServiceTransaction oa2ServiceTransaction, Err errResponse) throws IOException {
         writeMessage(w, errResponse);
     }
-
     public void writeMessage(PrintWriter w, Err errResponse) throws IOException {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(STATUS_KEY, errResponse.code);
+        jsonObject.put("error", errResponse.error);
+        jsonObject.put("description", errResponse.description);
+        // CIL-1187 support.
+        // CIL-1388,  CIL-1342
+        if(errResponse.customErrorURI != null) {
+            jsonObject.put("custom_error_uri", errResponse.customErrorURI.toString());
+        }
+        if(errResponse.errorURI != null) {
+            jsonObject.put("error_uri", errResponse.errorURI.toString());
+        }
+        w.println(jsonObject);
+    }
+   /* public void writeMessage(PrintWriter w, Err errResponse) throws IOException {
         writeMessage(w, errResponse.code);
         print(w, "error", errResponse.error);
         print(w, "error_description", errResponse.description);
@@ -225,5 +240,5 @@ public class DBServiceSerializer {
         if(errResponse.errorURI != null) {
             print(w, "error_uri", errResponse.errorURI.toString());
         }
-    }
+    }*/
   }

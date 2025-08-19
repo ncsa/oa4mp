@@ -31,6 +31,7 @@ import org.oa4mp.server.api.storage.servlet.AuthorizationServletConfig;
 import org.oa4mp.server.loader.oauth2.claims.BasicClaimsSourceImpl;
 import org.oa4mp.server.loader.oauth2.cm.CMConfigs;
 import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
+import org.oa4mp.server.loader.oauth2.servlet.DBServiceConfig;
 import org.oa4mp.server.loader.oauth2.servlet.RFC8628ServletConfig;
 import org.oa4mp.server.loader.oauth2.storage.tx.TXStore;
 import org.oa4mp.server.loader.oauth2.storage.vi.VIStore;
@@ -111,7 +112,8 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  Collection<LocalTime> monitorAlarms,
                  boolean clientCredentialFlowEnabled,
                  MetaDebugUtil debugger,
-                 boolean allowPromptNone) {
+                 boolean allowPromptNone,
+                 DBServiceConfig dbServiceConfig) {
 
         super(logger,
            //     mfp,
@@ -192,6 +194,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.monitorAlarms = monitorAlarms;
         this.monitorEnabled = isMonitorEnabled;
         this.cleanupFailOnErrors = cleanupFailOnErrors;
+        this.dbServiceConfig = dbServiceConfig;
     }
 
     public boolean isCleanupFailOnErrors() {
@@ -714,4 +717,10 @@ public class OA2SE extends ServiceEnvironmentImpl {
     }
 
     boolean allowPromptNone = false;
+
+    public DBServiceConfig getDBServiceConfig() {
+        return dbServiceConfig;
+    }
+
+    DBServiceConfig dbServiceConfig = null;
 }

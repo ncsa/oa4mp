@@ -9,6 +9,7 @@ import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.servlet.ExceptionHandlerThingie;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
+import net.sf.json.JSONObject;
 import org.oa4mp.delegation.common.storage.clients.ClientApprovalKeys;
 import org.oa4mp.delegation.common.token.impl.AuthorizationGrantImpl;
 import org.oa4mp.delegation.common.token.impl.TokenUtils;
@@ -22,10 +23,7 @@ import org.oa4mp.delegation.server.request.IssuerResponse;
 import org.oa4mp.server.api.storage.servlet.OA4MPServlet;
 import org.oa4mp.server.api.util.ClientDebugUtil;
 import org.oa4mp.server.loader.oauth2.OA2SE;
-import org.oa4mp.server.loader.oauth2.servlet.OA2AuthorizedServletUtil;
-import org.oa4mp.server.loader.oauth2.servlet.OA2ClientUtils;
-import org.oa4mp.server.loader.oauth2.servlet.RFC8628ServletConfig;
-import org.oa4mp.server.loader.oauth2.servlet.RFC8628State;
+import org.oa4mp.server.loader.oauth2.servlet.*;
 import org.oa4mp.server.loader.oauth2.state.ScriptRuntimeEngineFactory;
 import org.oa4mp.server.loader.oauth2.storage.RFC8628Store;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
@@ -40,19 +38,23 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
+import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 import static org.apache.http.HttpStatus.SC_OK;
+import static org.oa4mp.dbservice.StatusCodes.*;
 import static org.oa4mp.server.api.ServiceConstantKeys.FORM_ENCODING_KEY;
+import static org.oa4mp.server.loader.oauth2.servlet.OA2AuthorizedServletUtil.createCallback;
 
 public class DBService extends OA4MPServlet {
-    public static final String SET_TRANSACTION_STATE = "setTransactionState";
-    public static final int SET_TRANSACTION_STATE_CASE = 720;
+    public static final String FINISH_AUTH_CODE_FLOW = "finishAuthCodeFlow";
 
-    public static final String CREATE_TRANSACTION_STATE = "createTransaction";
-    public static final int CREATE_TRANSACTION_STATE_CASE = 730;
+    public static final String START_AUTH_CODE_FLOW = "startAuthCodeFlow";
     public static final int STATUS_TRANSACTION_NOT_FOUND = 0x10001; //65537
     public static final int STATUS_EXPIRED_TOKEN = 0x10003; //65539
     public static final int STATUS_CREATE_TRANSACTION_FAILED = 0x10005; // 65541
@@ -66,32 +68,108 @@ public class DBService extends OA4MPServlet {
     public static final int STATUS_QDL_RUNTIME_ERROR = 0x100009; // 1048585
 
     public static final String STATUS_KEY = "status";
+    public static final String ACTION_PARAMETER = "action";
 
     protected DBServiceSerializer serializer;
 
     public static final String CHECK_USER_CODE = "checkUserCode";
-    public static final int CHECK_USER_CODE_CASE = 740;
-    public static final String CHECK_CODE_APPROVED = "userCodeApproved";
-    public static final int CHECK_CODE_APPROVED_CASE = 741;
+    public static final String APPROVE_USER_CODE = "approveUserCode";
     public static final String USER_CODE_PARAMETER = "user_code";
     public static final String USER_NAME_PARAMETER = "user_name";
     public static final String MYPROXY_USERNAME_PARAMETER = "myproxy_username";
     public static final String USER_CODE_APPROVED_PARAMETER = "approved";
 
-    @Override
-    public ServiceTransaction verifyAndGet(IssuerResponse iResponse) throws IOException {
-        return null;
-    }
+
 
     @Override
-    protected void doIt(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable {
+    protected void doIt(HttpServletRequest request, HttpServletResponse response) throws Throwable {
+        ServletDebugUtil.printAllParameters(getClass(), request, true);
+        if (getOA2SE().getDBServiceConfig().isEnabled()) {
+            String username = request.getParameter("username");
+            String password = request.getParameter("password");
+            if (isTrivial(username) || isTrivial(password)) {
+                throw new DBServiceConfig.UnknownDBSericeUserException();
+            }
+            getOA2SE().getDBServiceConfig().checkPassword(username, password);
+        }else{
+            throw new ServletException("DB service is not enabled");
+        }
+        if (doPing(request, response)) {
+            return;
+        }
+        String action = getParam(request, ACTION_PARAMETER);
 
+        doAction(request, response, action);
     }
 
+
+    protected void doAction(HttpServletRequest request, HttpServletResponse response, String action) throws IOException, ServletException {
+        //   printAllParameters(request);
+        if(StringUtils.isTrivial(action)) {
+            throw new DBServiceException(STATUS_ACTION_NOT_FOUND);
+        }
+
+        ServletDebugUtil.trace(this, "action = " + action);
+        switch (action) {
+            case FINISH_AUTH_CODE_FLOW:
+                finishAuthCodeFlow(request, response);
+                return;
+            case START_AUTH_CODE_FLOW:
+                ServletDebugUtil.trace(this, "creating transaction");
+                startAuthCodeFlow(request, response);
+                return;
+            case CHECK_USER_CODE:
+                checkUserCode(request, response);
+                return;
+            case APPROVE_USER_CODE:
+                approveUserCode(request, response);
+                return;
+            default:
+                info("Action \"" + action + "\" not found");
+                throw new DBServiceException(STATUS_ACTION_NOT_FOUND);
+        }
+    }
+
+    /**
+     * Gets a single parameter, throwing the appropriate exception if there are multiples or none
+     *
+     * @param key
+     * @return
+     */
+    protected String getParam(HttpServletRequest request, String key) throws UnsupportedEncodingException {
+        return getParam(request, key, false);
+    }
+    /**
+     * Gets the parameter for the given key, decoding it as needed.
+     *
+     * @param request
+     * @param key
+     * @param nullOK
+     * @return
+     * @throws java.io.UnsupportedEncodingException
+     */
+    protected String getParam(HttpServletRequest request, String key, boolean nullOK) throws UnsupportedEncodingException {
+        request.setCharacterEncoding("UTF-8");
+        String[] params = request.getParameterValues(key);
+        if (null == params || params.length == 0) {
+            if (nullOK) {
+                return null;
+            }
+            info("Error: missing parameter for key \"" + key + "\"");
+            throw new DBServiceException(STATUS_MISSING_ARGUMENT);
+        }
+        if (1 < params.length) {
+            info("Error: duplicate parameter for key \"" + key + "\"");
+            throw new DBServiceException(STATUS_DUPLICATE_ARGUMENT);
+        }
+        return params[0];
+
+    }
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
         serializer = new DBServiceSerializer(new OA2ClientKeys(), new ClientApprovalKeys());
+        setExceptionHandler(new DBServiceExceptionHandler(this, getMyLogger()));
     }
 
     /**
@@ -132,12 +210,12 @@ public class DBService extends OA4MPServlet {
 
         if (!request.getParameterMap().containsKey(USER_CODE_PARAMETER)) {
             // missing parameter
-            doError("No user code parameter was found.", StatusCodes.STATUS_MISSING_ARGUMENT, response);
+            doError("No user code parameter was found.", STATUS_MISSING_ARGUMENT, response);
             return;
         }
         String userCode = request.getParameter(USER_CODE_PARAMETER);
         if (StringUtils.isTrivial(userCode)) {
-            doError("No user code parameter was found.", StatusCodes.STATUS_MISSING_ARGUMENT, response);
+            doError("No user code parameter was found.", STATUS_MISSING_ARGUMENT, response);
         }
         RFC8628ServletConfig rfc8628ServletConfig = ((OA2SE) OA4MPServlet.getServiceEnvironment()).getRfc8628ServletConfig();
 
@@ -178,18 +256,26 @@ public class DBService extends OA4MPServlet {
 
         startWrite(response);
         PrintWriter printWriter = response.getWriter();
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(STATUS_KEY, StatusCodes.STATUS_OK);
+        jsonObject.put(OA2Constants.CLIENT_ID ,transaction.getClient().getIdentifierString());
+        debugger.trace(this, "writing response for grant = " + ag.getToken());
+        jsonObject.put("grant" ,TokenUtils.b32EncodeToken(ag.getToken()));
+        jsonObject.put("scope",  transaction.getRFC8628State().originalScopes);
+        jsonObject.put("user_code" , userCode);
+
+        printWriter.println(jsonObject.toString(1));
+/*
         printWriter.println(STATUS_KEY + "=" + StatusCodes.STATUS_OK);
         printWriter.println(OA2Constants.CLIENT_ID + "=" + transaction.getClient().getIdentifierString());
         debugger.trace(this, "writing response for grant = " + ag.getToken());
         printWriter.println("grant=" + TokenUtils.b32EncodeToken(ag.getToken()));
         printWriter.println("scope=" + transaction.getRFC8628State().originalScopes);
         printWriter.println("user_code=" + userCode);
+*/
         printWriter.flush();
         printWriter.close();
         stopWrite(response);
-        return;
-
-
     }
 
     /**
@@ -215,14 +301,14 @@ public class DBService extends OA4MPServlet {
      * 1048569 = missing parameter
      * 65537 = transaction not found
      */
-    protected void userCodeApproved(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void approveUserCode(HttpServletRequest request, HttpServletResponse response) throws IOException {
         if (!request.getParameterMap().containsKey(USER_CODE_PARAMETER)) {
             // missing parameter
-            doError("No user code parameter was found.", StatusCodes.STATUS_MISSING_ARGUMENT, response);
+            doError("No user code parameter was found.", STATUS_MISSING_ARGUMENT, response);
             return;
         }
         if (StringUtils.isTrivial(request.getParameter(USER_CODE_PARAMETER))) {
-            doError("No user code parameter was found.", StatusCodes.STATUS_MISSING_ARGUMENT, response);
+            doError("No user code parameter was found.", STATUS_MISSING_ARGUMENT, response);
             return;
         }
         int approved = 1; // default
@@ -241,7 +327,7 @@ public class DBService extends OA4MPServlet {
                 doError("unknown value for " +
                                 USER_CODE_APPROVED_PARAMETER + " parameter \"" +
                                 request.getParameter(USER_CODE_APPROVED_PARAMETER) + "\"",
-                        StatusCodes.STATUS_MISSING_ARGUMENT, response);
+                        STATUS_MISSING_ARGUMENT, response);
             }
         }
         if (approved != 0 && approved != 1) {
@@ -251,7 +337,7 @@ public class DBService extends OA4MPServlet {
 
         String userCode = request.getParameter(USER_CODE_PARAMETER);
         if (StringUtils.isTrivial(userCode)) {
-            doError("No user code parameter was found.", StatusCodes.STATUS_MISSING_ARGUMENT, response);
+            doError("No user code parameter was found.", STATUS_MISSING_ARGUMENT, response);
             return;
         }
         RFC8628ServletConfig rfc8628ServletConfig = ((OA2SE) OA4MPServlet.getServiceEnvironment()).getRfc8628ServletConfig();
@@ -296,7 +382,11 @@ public class DBService extends OA4MPServlet {
             // the requested action was done.
             startWrite(response);
             PrintWriter printWriter = response.getWriter();
-            printWriter.println(STATUS_KEY + "=" + StatusCodes.STATUS_OK);
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put(STATUS_KEY, StatusCodes.STATUS_OK);
+
+            printWriter.println(jsonObject);
+    //        printWriter.println(STATUS_KEY + "=" + StatusCodes.STATUS_OK);
             printWriter.flush();
             printWriter.close();
             stopWrite(response);
@@ -304,28 +394,59 @@ public class DBService extends OA4MPServlet {
         }
 
         transaction.setRFC8628State(rfc8628State);
+        setNameAndTime(request, debugger, transaction);
         getTransactionStore().save(transaction);
+
         // The JSON library copies everything no matter what, so no guarantee what's in the transaction is the same object.
         // Just replace it with the good copy.
         startWrite(response);
-        PrintWriter printWriter = response.getWriter();
+        PrintWriter printWriter = response.getWriter();        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(STATUS_KEY, StatusCodes.STATUS_OK);
+        jsonObject.put(OA2Constants.CLIENT_ID ,transaction.getClient().getIdentifierString());
+        debugger.trace(this, "encoding grant for " + userCode + " = " + ag.getToken());
+        jsonObject.put("grant",TokenUtils.b32EncodeToken(ag.getToken()));
+        jsonObject.put("user_code" , userCode);
+        printWriter.println(jsonObject);
+
+/*
         printWriter.println(STATUS_KEY + "=" + StatusCodes.STATUS_OK);
         printWriter.println(OA2Constants.CLIENT_ID + "=" + transaction.getClient().getIdentifierString());
         debugger.trace(this, "encoding grant for " + userCode + " = " + ag.getToken());
         printWriter.println("grant=" + TokenUtils.b32EncodeToken(ag.getToken()));
         printWriter.println("user_code=" + userCode);
+*/
         printWriter.flush();
         printWriter.close();
         stopWrite(response);
-        return;
+    }
 
+    private void setNameAndTime(HttpServletRequest request, MetaDebugUtil debugger, OA2ServiceTransaction transaction) {
+        String username = request.getParameter(USER_NAME_PARAMETER);
+        if(StringUtils.isTrivial(username)) {
+            debugger.warn("missing " + USER_NAME_PARAMETER + " parameter");
+        }else{
+            transaction.setUsername(username);
+        }
+        long authTime = 0L;
+        try {
+            if (request.getParameter(OA2Constants.AUTHORIZATION_TIME) == null) {
+                authTime = new Date().getTime();
+            } else {
+                authTime = Long.parseLong(request.getParameter(OA2Constants.AUTHORIZATION_TIME));
+            }
+        } catch (Throwable t) {
+            info("Got " + OA2Constants.AUTHORIZATION_TIME + "=" + request.getParameter(OA2Constants.AUTHORIZATION_TIME) + ", error=\"" + t.getMessage() + "\"");
+        }
+        transaction.setAuthTime(new Date(authTime*1000));
     }
 
     /**
      * This accepts the following parameters
      * <pre>
      * client_id
-     * scopes
+     * response_type
+     * redirect_uri
+     * scope
      * state
      * code_challenge          (RFC 7636)
      * code_challenge_method      "   "
@@ -336,7 +457,7 @@ public class DBService extends OA4MPServlet {
      * @param resp
      * @throws IOException
      */
-    protected void createTransaction(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    protected void startAuthCodeFlow(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         ServletDebugUtil.trace(this, "createTransaction: ******** NEW CALL ******** ");
         ServletDebugUtil.trace(this, "createTransaction: printing request ");
         // Fixed https://github.com/cilogon/cilogon-java/issues/38 removed print statement
@@ -349,7 +470,7 @@ public class DBService extends OA4MPServlet {
          */
         if (!req.getParameterMap().containsKey(OA2Constants.CLIENT_ID)) {
             // missing parameter
-            doError("No client id parameter was found.", StatusCodes.STATUS_MISSING_ARGUMENT, resp);
+            doError("No client id parameter was found.", STATUS_MISSING_ARGUMENT, resp);
             return;
         }
         String clientID = req.getParameter(OA2Constants.CLIENT_ID);
@@ -436,13 +557,13 @@ public class DBService extends OA4MPServlet {
     }
 
     // Fixes CIL-101
-    protected void setTransactionState(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    protected void finishAuthCodeFlow(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String ag = req.getParameter(OA2Constants.AUTHORIZATION_CODE);
 
         if (ag == null || ag.trim().length() == 0) {
             String description = "Warning. No auth code. Cannot complete call.";
             getMyLogger().error(description);
-            writeMessage(resp, new Err(StatusCodes.STATUS_MISSING_ARGUMENT, "missing_argument", description));
+            writeMessage(resp, new Err(STATUS_MISSING_ARGUMENT, "missing_argument", description));
             return;
         }
         if (TokenUtils.isBase32(ag)) {
@@ -468,16 +589,6 @@ public class DBService extends OA4MPServlet {
             return;
         }
 
-        long authTime = 0L;
-        try {
-            if (req.getParameter(OA2Constants.AUTHORIZATION_TIME) == null) {
-                authTime = new Date().getTime();
-            } else {
-                authTime = Long.parseLong(req.getParameter(OA2Constants.AUTHORIZATION_TIME));
-            }
-        } catch (Throwable t) {
-            info("Got " + OA2Constants.AUTHORIZATION_TIME + "=" + req.getParameter(OA2Constants.AUTHORIZATION_TIME) + ", error=\"" + t.getMessage() + "\"");
-        }
         String myproxyUsername = req.getParameter(MYPROXY_USERNAME_PARAMETER);
         OA2ServiceTransaction t = null;
         // Make sure that if there is some internal issue getting a transaction that a random runtime exception
@@ -504,15 +615,7 @@ public class DBService extends OA4MPServlet {
         if (myproxyUsername != null) {
             t.setMyproxyUsername(URLDecoder.decode(myproxyUsername, "UTF-8"));
         }
-
-        t.setAuthTime(new Date(authTime * 1000));
         t.setAuthGrantValid(true);
-        String username = req.getParameter(USER_NAME_PARAMETER);
-        if(StringUtils.isTrivial(username)) {
-            debugger.warn("missing " + USER_NAME_PARAMETER + " parameter");
-        }else{
-            t.setUsername(username);
-        }
         // Next block is critical since it puts the user claims from authorization in the transaction.
         // If there are server-wide claims to be processed, they are done here as well. This takes the
         // place of the similar call in the OA4MP authorization leg, which this service replaces.
@@ -556,10 +659,20 @@ public class DBService extends OA4MPServlet {
             debugger.trace(this, "Exception running QDL, throwing GeneralException", throwable);
             throw new GeneralException(throwable);
         }
-        debugger.trace(this, "done setting transaction state for user " + (username==null?"(no name)":username));
+        setNameAndTime(req,debugger,t);
+        Map<String, String> cbParams = new HashMap<>();
+        cbParams.put(OA2Constants.STATE, t.getRequestState()); // Make sure that the original state that was sent is returned to the client callback
+        String cb = createCallback(t, cbParams);
         getTransactionStore().save(t);
-
-        writeTransaction(t, StatusCodes.STATUS_OK, resp); // just returns an ok if state written.
+        startWrite(resp);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(STATUS_KEY, StatusCodes.STATUS_OK);
+        jsonObject.put(OA2Constants.REDIRECT_URI, cb);
+        PrintWriter printWriter = resp.getWriter();
+        printWriter.println(jsonObject);
+        printWriter.flush();
+        printWriter.close();
+        stopWrite(resp);
     }
 
 
@@ -640,5 +753,10 @@ public class DBService extends OA4MPServlet {
      */
     protected OA2SE getOA2SE() {
         return (OA2SE) OA4MPServlet.getServiceEnvironment();
+    }
+
+    @Override
+    public ServiceTransaction verifyAndGet(IssuerResponse iResponse) throws IOException {
+        return null;
     }
 }

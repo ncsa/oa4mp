@@ -7,13 +7,11 @@ import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.http.HttpStatus;
-import org.oa4mp.delegation.common.token.impl.TokenUtils;
 import org.oa4mp.delegation.server.OA2Constants;
 import org.oa4mp.delegation.server.OA2Errors;
 import org.oa4mp.delegation.server.OA2GeneralError;
 import org.oa4mp.delegation.server.ServiceTransaction;
 import org.oa4mp.delegation.server.jwt.HandlerRunner;
-import org.oa4mp.delegation.server.server.claims.OA2Claims;
 import org.oa4mp.server.api.storage.servlet.AbstractAuthorizationServlet;
 import org.oa4mp.server.api.storage.servlet.OA4MPServlet;
 import org.oa4mp.server.loader.oauth2.OA2SE;
@@ -25,8 +23,6 @@ import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
@@ -170,12 +166,13 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
 
     @Override
     public String createCallback(ServiceTransaction trans, Map<String, String> params) {
-        String cb = trans.getCallback().toString();
+        return OA2AuthorizedServletUtil.createCallback(trans, params);
+       /* String cb = trans.getCallback().toString();
         OA2ServiceTransaction st = (OA2ServiceTransaction) trans;
-        /*
+        *//*
         CIL-545: The checking for valid callbacks is done at registration time. No checking should be done
         any place else since we must support a much wider range of these (e.g. for mobile devices). 
-         */
+         *//*
 
         String idStr = st.getIdentifierString();
         // Fixes GitHub OA4MP issue 5, support multiple response modes.
@@ -199,7 +196,7 @@ public class OA2AuthorizationServer extends AbstractAuthorizationServlet {
             e.printStackTrace(); // now way this can happen, but if it does, we want to know about it.
         }
         ((OA2ServiceTransaction) trans).setCreatedCallback(cb);
-        return cb;
+        return cb;*/
     }
 
     @Override

@@ -18,6 +18,7 @@ import org.apache.http.HttpStatus;
 import org.oa4mp.delegation.common.servlet.TransactionState;
 import org.oa4mp.delegation.common.token.AuthorizationGrant;
 import org.oa4mp.delegation.common.token.impl.IDTokenImpl;
+import org.oa4mp.delegation.common.token.impl.TokenUtils;
 import org.oa4mp.delegation.server.*;
 import org.oa4mp.delegation.server.jwt.HandlerRunner;
 import org.oa4mp.delegation.server.request.AGResponse;
@@ -43,6 +44,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.util.*;
 
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
@@ -856,5 +858,38 @@ public class OA2AuthorizedServletUtil {
         t.setValidatedScopes(scopes);
         t.setRequestedIDTLifetime(ClientUtils.computeIDTLifetime(t, client, (OA2SE) getServiceEnvironment()));
         transactionState.getResponse().setHeader("X-Frame-Options", "DENY");
+    }
+
+    public static String createCallback(ServiceTransaction trans, Map<String, String> params) {
+        String cb = trans.getCallback().toString();
+        OA2ServiceTransaction st = (OA2ServiceTransaction) trans;
+        /*
+        CIL-545: The checking for valid callbacks is done at registration time. No checking should be done
+        any place else since we must support a much wider range of these (e.g. for mobile devices).
+         */
+
+        String idStr = st.getIdentifierString();
+        // Fixes GitHub OA4MP issue 5, support multiple response modes.
+        String responseDelimiter = "?"; // default
+        if (st.hasResponseMode()) {
+            if (st.getResponseMode().equals(OA2Constants.RESPONSE_MODE_FRAGMENT)) {
+                responseDelimiter = "#";
+            }
+        }
+        try {
+            cb = cb + (cb.indexOf(responseDelimiter) == -1 ? responseDelimiter : "&") + AUTHORIZATION_CODE + "=" + TokenUtils.b32EncodeToken(idStr);
+            if (params.containsKey(OA2Constants.STATE)) {
+                cb = cb + "&" + OA2Constants.STATE + "=" + URLEncoder.encode(params.get(OA2Constants.STATE), "UTF-8");
+            }
+            // Fix https://github.com/ncsa/oa4mp/issues/214 RFC 9207 support
+            if(((OA2ServiceTransaction) trans).getUserMetaData().containsKey(OA2Claims.ISSUER)){
+                cb = cb + (cb.indexOf(responseDelimiter) == -1 ? responseDelimiter : "&")  + OA2Claims.ISSUER + "=" + st.getUserMetaData().get(OA2Claims.ISSUER);
+            }
+
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace(); // now way this can happen, but if it does, we want to know about it.
+        }
+        ((OA2ServiceTransaction) trans).setCreatedCallback(cb);
+        return cb;
     }
 }

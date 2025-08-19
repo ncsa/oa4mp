@@ -1,0 +1,5 @@
+<Context>
+    <!-- Restricts access to localhost only for the entire web app.-->
+    <Valve className="org.apache.catalina.valves.RemoteAddrValve"
+           allow="128\.0\.0\.1" />
+</Context>
