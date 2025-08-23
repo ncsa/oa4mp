@@ -1,0 +1,27 @@
+#! /usr/bin/env -S qdl-run
+
+/*
+   QDL script to approve a user_code. Make sure that the address is set right for your local
+   DB Service instance and make sure that it is running.
+*/
+ ⊨ 0 < size(args()): 'you must supply a user code and user name';
+
+block[
+   debugger(1);
+   debugger(1,print(args()));
+
+   p.'action' ≔ 'approveUserCode';
+   cfg. ≔ args().0;
+   p.'username'≔cfg.'username';
+   p.'auth_time' ≔ ∃cfg.'auth_time' ⇒ cfg.'auth_time' :  date_ms()%1000;
+   p.'user_code' ≔ cfg.'user_code';
+   p.'approved' ≔ 1;
+   p.≔ p.~get_auth(cfg.);
+   http ≔ j_load('http');
+   http#host(cfg.'di'.'service');
+   http#open(true); // Opens for self-signed cert, no hostname verification.
+   resp. ≔ http#get(p.);
+   resp.'status'.'code' != 200 ⇒ return(resp.'content') : return(from_json(resp.'content'.0)); // server error
+];
+
+

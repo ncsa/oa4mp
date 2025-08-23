@@ -100,7 +100,7 @@
         <module>installer</module>
         <module>rfc8414</module>
         <module>myproxy</module>
-        <module>db-service</module>
+        <module>di-service</module>
     </modules>
     <dependencies>
         <dependency>

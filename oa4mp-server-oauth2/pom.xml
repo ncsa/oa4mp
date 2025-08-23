@@ -27,7 +27,7 @@
         </dependency>
         <dependency>
             <groupId>org.oa4mp</groupId>
-            <artifactId>db-service</artifactId>
+            <artifactId>di-service</artifactId>
             <version>6.x-SNAPSHOT</version>
         </dependency>
         <dependency>

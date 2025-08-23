@@ -11,25 +11,48 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="Port of CILogon DBService to OA4MP.">
-      <change afterPath="$PROJECT_DIR$/db-service/src/main/resources/context.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/servlet/DBServiceConfig.java" afterDir="false" />
+    <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="Port of CILogon DBService to OA4MP. Part 2">
+      <change afterPath="$PROJECT_DIR$/di-service/src/main/scripts/qdl/approve.qdl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/di-service/src/main/scripts/qdl/check_user_code.qdl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/di-service/src/main/scripts/qdl/di_utils.qdl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/di-service/src/main/scripts/qdl/finish_af.qdl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/di-service/src/main/scripts/qdl/my_module.mdl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/di-service/src/main/scripts/qdl/readme.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/di-service/src/main/scripts/qdl/start_af.qdl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/di-service/src/main/scripts/test-check-user-code.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/di-service/src/main/scripts/test-device-flow.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/di-service/src/main/scripts/test-set-transaction.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/di-service/src/main/scripts/test-transaction.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/di-service/src/main/scripts/test-user-code-approved.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/di-service/src/main/scripts/test-user.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/client-installer/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/db-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/db-service/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/db-service/src/main/java/org/oa4mp/dbservice/DBService.java" beforeDir="false" afterPath="$PROJECT_DIR$/db-service/src/main/java/org/oa4mp/dbservice/DBService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/db-service/src/main/java/org/oa4mp/dbservice/DBServiceSerializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/db-service/src/main/java/org/oa4mp/dbservice/DBServiceSerializer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/myproxy/src/main/java/org/oa4mp/myproxy/servlet/MyProxyServiceEnvironment.java" beforeDir="false" afterPath="$PROJECT_DIR$/myproxy/src/main/java/org/oa4mp/myproxy/servlet/MyProxyServiceEnvironment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/di-service/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db-service/src/main/java/org/oa4mp/dbservice/DBService.java" beforeDir="false" afterPath="$PROJECT_DIR$/di-service/src/main/java/org/oa4mp/di/DIService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db-service/src/main/java/org/oa4mp/dbservice/DBServiceException.java" beforeDir="false" afterPath="$PROJECT_DIR$/di-service/src/main/java/org/oa4mp/di/DIServiceException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db-service/src/main/java/org/oa4mp/dbservice/DBServiceExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/di-service/src/main/java/org/oa4mp/di/DIServiceExceptionHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db-service/src/main/java/org/oa4mp/dbservice/DBServiceSerializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/di-service/src/main/java/org/oa4mp/di/DIServiceSerializer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db-service/src/main/java/org/oa4mp/dbservice/Err.java" beforeDir="false" afterPath="$PROJECT_DIR$/di-service/src/main/java/org/oa4mp/di/Err.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db-service/src/main/java/org/oa4mp/dbservice/StatusCodes.java" beforeDir="false" afterPath="$PROJECT_DIR$/di-service/src/main/java/org/oa4mp/di/StatusCodes.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db-service/src/main/resources/META-INF/maven/archetype.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/db-service/src/main/resources/archetype-resources/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/db-service/src/main/resources/archetype-resources/src/main/java/App.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/db-service/src/main/resources/archetype-resources/src/test/java/AppTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/db-service/src/main/resources/context.xml" beforeDir="false" afterPath="$PROJECT_DIR$/di-service/src/main/resources/context.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/src/main/webapp/WEB-INF/web.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/src/main/webapp/WEB-INF/web.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/OA2AuthorizationServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/OA2AuthorizationServer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/OA2ATServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/OA2ATServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/RFC8628Servlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/RFC8628Servlet.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rfc8414/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/rfc8414/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-installer/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/OA2SE.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/OA2SE.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/loader/OA2ConfigurationLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/loader/OA2ConfigurationLoader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/servlet/OA2AuthorizedServletUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/servlet/OA2AuthorizedServletUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/scripting/OA2QDLConfigurationLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/scripting/OA2QDLConfigurationLoader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/scripting/OA2QDLEnvironment.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/scripting/OA2QDLEnvironment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/util/JWTCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/util/JWTCommands.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-test/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/buildNumber.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -56,7 +79,7 @@
     </option>
   </component>
   <component name="Git.Merge.Settings">
-    <option name="BRANCH" value="remove_functors" />
+    <option name="BRANCH" value="dbservice" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
@@ -146,12 +169,12 @@
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "Tomcat Server.DEV OA4MP.executor": "Run",
     "Tomcat Server.MyProxy.executor": "Run",
-    "Tomcat Server.OA4MP server.executor": "Debug",
+    "Tomcat Server.OA4MP server.executor": "Run",
     "WebServerToolWindowFactoryState": "false",
     "git-widget-placeholder": "master",
     "jdk.selected.JAVA_MODULE": "11 (2)",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests/auto/tests",
+    "last_opened_file_path": "/home/ncsa/dev/ncsa-git/oa4mp/db-service/src/main",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -174,18 +197,18 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/db-service/src/main" />
       <recent name="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/auto/tests" />
       <recent name="$PROJECT_DIR$/server-admin/src/main/resources/qdl/ligo/vo4" />
       <recent name="$PROJECT_DIR$/myproxy/src/main/webapp/WEB-INF" />
       <recent name="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/cm-tests" />
-      <recent name="$PROJECT_DIR$/server-admin/src/main/scripts" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/db-service/src/main/scripts/qdl" />
       <recent name="$PROJECT_DIR$/server-admin/src/main/resources/qdl/drac" />
       <recent name="$PROJECT_DIR$/server-admin/src/main/resources/qdl/esnet/v1" />
       <recent name="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/shared" />
       <recent name="$PROJECT_DIR$/oa4mp-server-oauth2/src/main/webapp" />
-      <recent name="$PROJECT_DIR$/server/src/main/java/org/oa4mp/delegation/server" />
     </key>
     <key name="MoveInnerDialog.RECENTS_KEY">
       <recent name="edu.uiuc.ncsa.oa4mp.delegation.server.storage" />
@@ -1226,14 +1249,6 @@
       <workItem from="1754487456460" duration="11877000" />
       <workItem from="1754563183586" duration="122054000" />
     </task>
-    <task id="LOCAL-00057" summary="Fix for https://github.com/ncsa/oa4mp/issues/218. Changed package and some class names related to virtual issuers.">
-      <option name="closed" value="true" />
-      <created>1730934496522</created>
-      <option name="number" value="00057" />
-      <option name="presentableId" value="LOCAL-00057" />
-      <option name="project" value="LOCAL" />
-      <updated>1730934496522</updated>
-    </task>
     <task id="LOCAL-00058" summary="RFC 6749 §4.4 documentation, client credentials flow">
       <option name="closed" value="true" />
       <created>1731356740850</created>
@@ -1618,7 +1633,15 @@
       <option name="project" value="LOCAL" />
       <updated>1755348980364</updated>
     </task>
-    <option name="localTasksCounter" value="106" />
+    <task id="LOCAL-00106" summary="Port of CILogon DBService to OA4MP. Part 2">
+      <option name="closed" value="true" />
+      <created>1755613814106</created>
+      <option name="number" value="00106" />
+      <option name="presentableId" value="LOCAL-00106" />
+      <option name="project" value="LOCAL" />
+      <updated>1755613814107</updated>
+    </task>
+    <option name="localTasksCounter" value="107" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1640,7 +1663,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
-    <MESSAGE value="https://jira.ncsa.illinois.edu/browse/CIL-2231 fallout. Changes to FNAL's LDAP for the cilogontest user broke several existing tests, so as part of comprehensive testing, these were rewritten and improved." />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/246 LDAP errors not quite getting propagated back to the QDL layer." />
     <MESSAGE value="Integrating fixes for 6.1.0" />
     <MESSAGE value="Changes reflecting https://github.com/ncsa/qdl/issues/123. All tests working as per requirements." />
@@ -1665,7 +1687,8 @@
     <MESSAGE value="https://github.com/cilogon/cilogon-java/issues/58 and streamlined creation of NCSA LDAP configuration stems. Integrating 6.2.0 changes" />
     <MESSAGE value="Routine checkin. Added a test, tweaked a few others." />
     <MESSAGE value="Port of CILogon DBService to OA4MP." />
-    <option name="LAST_COMMIT_MESSAGE" value="Port of CILogon DBService to OA4MP." />
+    <MESSAGE value="Port of CILogon DBService to OA4MP. Part 2" />
+    <option name="LAST_COMMIT_MESSAGE" value="Port of CILogon DBService to OA4MP. Part 2" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="GROUP_MULTIFILE_MERGE_BY_DIRECTORY" value="true" />
   </component>
@@ -1954,12 +1977,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/org/qdl_lang/language/1.6-QDL-SNAPSHOT/language-1.6-QDL-SNAPSHOT-sources.jar!/org/qdl_lang/workspace/WorkspaceCommands.java</url>
-          <line>7340</line>
+          <line>7341</line>
           <option name="timeStamp" value="696" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/org/qdl_lang/language/1.6-QDL-SNAPSHOT/language-1.6-QDL-SNAPSHOT-sources.jar!/org/qdl_lang/workspace/WorkspaceCommands.java</url>
-          <line>7299</line>
+          <line>7300</line>
           <option name="timeStamp" value="697" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2212,7 +2235,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/org/qdl_lang/language/1.6-QDL-SNAPSHOT/language-1.6-QDL-SNAPSHOT-sources.jar!/org/qdl_lang/evaluate/SystemEvaluator.java</url>
-          <line>2317</line>
+          <line>2421</line>
           <option name="timeStamp" value="1171" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2406,11 +2429,6 @@
           <option name="timeStamp" value="1372" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/OA2ATServlet.java</url>
-          <line>2753</line>
-          <option name="timeStamp" value="1378" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/ProxyCallbackServlet.java</url>
           <line>121</line>
           <option name="timeStamp" value="1379" />
@@ -2424,11 +2442,6 @@
           <url>file://$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/OA2ATServlet.java</url>
           <line>1945</line>
           <option name="timeStamp" value="1398" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/RFC8628Servlet.java</url>
-          <line>54</line>
-          <option name="timeStamp" value="1399" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/RFC8628AuthorizationServer.java</url>
@@ -2484,19 +2497,44 @@
           <option name="timeStamp" value="1451" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/db-service/src/main/java/org/oa4mp/dbservice/DBService.java</url>
-          <line>402</line>
-          <option name="timeStamp" value="1456" />
+          <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/util/JWTCommands.java</url>
+          <line>613</line>
+          <option name="timeStamp" value="1458" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/db-service/src/main/java/org/oa4mp/dbservice/DBService.java</url>
-          <line>86</line>
-          <option name="timeStamp" value="1457" />
+          <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/util/JWTCommands.java</url>
+          <line>598</line>
+          <option name="timeStamp" value="1459" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/servlet/OA2ExceptionHandler.java</url>
+          <line>172</line>
+          <option name="timeStamp" value="1465" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/di-service/src/main/java/org/oa4mp/di/DIService.java</url>
+          <line>399</line>
+          <option name="timeStamp" value="1476" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/OA2ATServlet.java</url>
+          <line>2780</line>
+          <option name="timeStamp" value="1477" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/di-service/src/main/java/org/oa4mp/di/DIService.java</url>
+          <line>506</line>
+          <option name="timeStamp" value="1480" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/di-service/src/main/java/org/oa4mp/di/DIService.java</url>
+          <line>457</line>
+          <option name="timeStamp" value="1481" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-method">
           <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/storage/transactions/OA2MTStore.java</url>
           <line>135</line>
-          <properties class="org.oa4mp.server.loader.oauth2.storage.transactions.OA2MTStore">
+          <properties class="org.oa4mp.server.loader.oauth2.storage.transactions.OA2MTStore" method="getByUserCode">
             <option name="EMULATED" value="true" />
             <option name="WATCH_EXIT" value="false" />
           </properties>
@@ -2505,7 +2543,7 @@
         <line-breakpoint enabled="true" type="java-method">
           <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/storage/transactions/OA2ServiceTransaction.java</url>
           <line>79</line>
-          <properties class="org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction">
+          <properties class="org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction" method="getCreatedCallback">
             <option name="EMULATED" value="true" />
             <option name="WATCH_EXIT" value="false" />
           </properties>

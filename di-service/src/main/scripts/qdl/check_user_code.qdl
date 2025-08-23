@@ -1,0 +1,15 @@
+block[
+  debugger(1);
+  debugger(1,print(args()));
+  cfg. ≔ args().0;
+  p.'action':='checkUserCode';
+  p.'user_code' := cfg.'user_code';
+  p.≔ p.~get_auth(cfg.);
+  debugger(1,'---p:\n'+print(p.));
+  http ≔ j_load('http');
+  http#host(cfg.'di'.'service');
+  http#open(true); // Opens for self-signed cert, no hostname verification.
+  resp. ≔ http#get(p.);
+  debugger(1,print(resp.));
+   resp.'status'.'code' != 200 ⇒ return(resp.'content') : return(from_json(resp.'content'.0)); // server error
+];

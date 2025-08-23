@@ -3,8 +3,10 @@ package org.oa4mp.server.loader.qdl.util;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.cli.CLIDriver;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import edu.uiuc.ncsa.security.util.jwk.JWKUtil2;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.oa4mp.delegation.server.JWTUtil;
 import org.oa4mp.delegation.server.jwt.MyOtherJWTUtil2;
@@ -24,7 +26,9 @@ import org.qdl_lang.variables.values.QDLValue;
 import org.qdl_lang.variables.values.StringValue;
 
 import java.net.URI;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.security.spec.InvalidKeySpecException;
 import java.util.*;
 
 import static org.oa4mp.server.loader.oauth2.state.ExtendedParameters.OA4MP_NS;
@@ -595,24 +599,47 @@ public class JWTCommands  {
             if (state instanceof OA2State) {
                 setJwks(((OA2State) state).getJsonWebKeys());
             }
-            if (!hasJWKS()) {
-                throw new IllegalStateException(" no keys loaded.");
-            }
+
             String kid = null;
+            JSONWebKey key = null;
             if (objects.length == 2) {
-                kid = objects[1].toString();
+                if(objects[1].isString()){
+                    if (!hasJWKS()) {
+                        throw new IllegalStateException(" no keys loaded.");
+                    }
+                    key = getJwks().get(objects[1].asString());
+                }
+                if(objects[1].isStem()){
+                    // they gave the key explicitly
+                    JSONObject newKey = new JSONObject();
+                    JSONArray jsonArray = new JSONArray();
+                    jsonArray.add(objects[1].asStem().toJSON());
+                    newKey.put("keys", jsonArray);
+                    try {
+                        JSONWebKeys keys = JSONWebKeyUtil.fromJSON(newKey);
+                        // should be a single key
+                        key = keys.values().iterator().next();
+                    } catch (NoSuchAlgorithmException e) {
+                        throw new RuntimeException(e);
+                    } catch (InvalidKeySpecException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
             } else {
+                if (!hasJWKS()) {
+                    throw new IllegalStateException(" no keys loaded.");
+                }
                 if (!getJwks().hasDefaultKey()) {
                     throw new IllegalStateException(" no default key.");
                 }
-                kid = getJwks().getDefaultKeyID();
+                key = getJwks().get(getJwks().getDefaultKeyID());
 
             }
             QDLStem arg = objects[0].asStem();
 
 
             try {
-                return asQDLValue(JWTUtil.createJWT((JSONObject) arg.toJSON(), getJwks().get(kid)));
+                return asQDLValue(JWTUtil.createJWT((JSONObject) arg.toJSON(), key));
 
             } catch (Throwable e) {
                 throw new QDLException("Error creating JWT:" + e.getMessage(), e);
@@ -630,8 +657,9 @@ public class JWTCommands  {
 
                     break;
                 case 2:
-                    docs.add(getName() + "(arg,id) takes a stem variable (the claims) and creates a signed JSON Web Token (JWT)");
+                    docs.add(getName() + "(arg.,id) takes a stem variable (the claims) and creates a signed JSON Web Token (JWT)");
                     docs.add("using the given id from the current set of keys.");
+                    docs.add(getName() + "(arg.,key.) takes a stem variable (the claims) and creates a signed JSON Web Token (JWT) using ther given key.");
 
             }
             docs.add("This returned  signed JWT is  a string.");

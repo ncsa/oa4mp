@@ -1,4 +1,4 @@
-package org.oa4mp.dbservice;
+package org.oa4mp.di;
 
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
@@ -47,11 +47,15 @@ import java.util.Map;
 
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 import static org.apache.http.HttpStatus.SC_OK;
-import static org.oa4mp.dbservice.StatusCodes.*;
+import static org.oa4mp.di.StatusCodes.*;
 import static org.oa4mp.server.api.ServiceConstantKeys.FORM_ENCODING_KEY;
 import static org.oa4mp.server.loader.oauth2.servlet.OA2AuthorizedServletUtil.createCallback;
 
-public class DBService extends OA4MPServlet {
+/**
+ * The dedicated issuer (DI) service. Only deploy this if you want to allow OA4MP to
+ * service DI requests.
+ */
+public class DIService extends OA4MPServlet {
     public static final String FINISH_AUTH_CODE_FLOW = "finishAuthCodeFlow";
 
     public static final String START_AUTH_CODE_FLOW = "startAuthCodeFlow";
@@ -70,28 +74,33 @@ public class DBService extends OA4MPServlet {
     public static final String STATUS_KEY = "status";
     public static final String ACTION_PARAMETER = "action";
 
-    protected DBServiceSerializer serializer;
+    protected DIServiceSerializer serializer;
 
     public static final String CHECK_USER_CODE = "checkUserCode";
     public static final String APPROVE_USER_CODE = "approveUserCode";
+    public static final String GRANT_PARAMETER = "code";
     public static final String USER_CODE_PARAMETER = "user_code";
-    public static final String USER_NAME_PARAMETER = "user_name";
+    public static final String USER_NAME_PARAMETER = "username";
     public static final String MYPROXY_USERNAME_PARAMETER = "myproxy_username";
     public static final String USER_CODE_APPROVED_PARAMETER = "approved";
-
+    public static final String DI_USER_PARAMETER = "oa4mp:di:user";
+    public static final String DI_PASSWORD_PARAMETER = "oa4mp:di:password";
 
 
     @Override
     protected void doIt(HttpServletRequest request, HttpServletResponse response) throws Throwable {
         ServletDebugUtil.printAllParameters(getClass(), request, true);
         if (getOA2SE().getDBServiceConfig().isEnabled()) {
-            String username = request.getParameter("username");
-            String password = request.getParameter("password");
-            if (isTrivial(username) || isTrivial(password)) {
-                throw new DBServiceConfig.UnknownDBSericeUserException();
+            String username = request.getParameter(DI_USER_PARAMETER);
+            String password = request.getParameter(DI_PASSWORD_PARAMETER);
+            if (isTrivial(username)) {
+                throw new DBServiceConfig.UnknownDBSericeUserException("Missing username");
+            }
+            if (isTrivial(password)) {
+                throw new DBServiceConfig.UnknownDBSericeUserException("Missing password");
             }
             getOA2SE().getDBServiceConfig().checkPassword(username, password);
-        }else{
+        } else {
             throw new ServletException("DB service is not enabled");
         }
         if (doPing(request, response)) {
@@ -105,8 +114,8 @@ public class DBService extends OA4MPServlet {
 
     protected void doAction(HttpServletRequest request, HttpServletResponse response, String action) throws IOException, ServletException {
         //   printAllParameters(request);
-        if(StringUtils.isTrivial(action)) {
-            throw new DBServiceException(STATUS_ACTION_NOT_FOUND);
+        if (StringUtils.isTrivial(action)) {
+            throw new DIServiceException(STATUS_ACTION_NOT_FOUND);
         }
 
         ServletDebugUtil.trace(this, "action = " + action);
@@ -126,7 +135,7 @@ public class DBService extends OA4MPServlet {
                 return;
             default:
                 info("Action \"" + action + "\" not found");
-                throw new DBServiceException(STATUS_ACTION_NOT_FOUND);
+                throw new DIServiceException(STATUS_ACTION_NOT_FOUND);
         }
     }
 
@@ -139,6 +148,7 @@ public class DBService extends OA4MPServlet {
     protected String getParam(HttpServletRequest request, String key) throws UnsupportedEncodingException {
         return getParam(request, key, false);
     }
+
     /**
      * Gets the parameter for the given key, decoding it as needed.
      *
@@ -156,20 +166,21 @@ public class DBService extends OA4MPServlet {
                 return null;
             }
             info("Error: missing parameter for key \"" + key + "\"");
-            throw new DBServiceException(STATUS_MISSING_ARGUMENT);
+            throw new DIServiceException(STATUS_MISSING_ARGUMENT);
         }
         if (1 < params.length) {
             info("Error: duplicate parameter for key \"" + key + "\"");
-            throw new DBServiceException(STATUS_DUPLICATE_ARGUMENT);
+            throw new DIServiceException(STATUS_DUPLICATE_ARGUMENT);
         }
         return params[0];
 
     }
+
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        serializer = new DBServiceSerializer(new OA2ClientKeys(), new ClientApprovalKeys());
-        setExceptionHandler(new DBServiceExceptionHandler(this, getMyLogger()));
+        serializer = new DIServiceSerializer(new OA2ClientKeys(), new ClientApprovalKeys());
+        setExceptionHandler(new DIServiceExceptionHandler(this, getMyLogger()));
     }
 
     /**
@@ -258,21 +269,13 @@ public class DBService extends OA4MPServlet {
         PrintWriter printWriter = response.getWriter();
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(STATUS_KEY, StatusCodes.STATUS_OK);
-        jsonObject.put(OA2Constants.CLIENT_ID ,transaction.getClient().getIdentifierString());
+        jsonObject.put(OA2Constants.CLIENT_ID, transaction.getClient().getIdentifierString());
         debugger.trace(this, "writing response for grant = " + ag.getToken());
-        jsonObject.put("grant" ,TokenUtils.b32EncodeToken(ag.getToken()));
-        jsonObject.put("scope",  transaction.getRFC8628State().originalScopes);
-        jsonObject.put("user_code" , userCode);
+        jsonObject.put(GRANT_PARAMETER, TokenUtils.b32EncodeToken(ag.getToken()));
+        jsonObject.put("scope", transaction.getRFC8628State().originalScopes);
+        jsonObject.put(USER_CODE_PARAMETER, userCode);
 
-        printWriter.println(jsonObject.toString(1));
-/*
-        printWriter.println(STATUS_KEY + "=" + StatusCodes.STATUS_OK);
-        printWriter.println(OA2Constants.CLIENT_ID + "=" + transaction.getClient().getIdentifierString());
-        debugger.trace(this, "writing response for grant = " + ag.getToken());
-        printWriter.println("grant=" + TokenUtils.b32EncodeToken(ag.getToken()));
-        printWriter.println("scope=" + transaction.getRFC8628State().originalScopes);
-        printWriter.println("user_code=" + userCode);
-*/
+        printWriter.println(jsonObject);
         printWriter.flush();
         printWriter.close();
         stopWrite(response);
@@ -343,7 +346,7 @@ public class DBService extends OA4MPServlet {
         RFC8628ServletConfig rfc8628ServletConfig = ((OA2SE) OA4MPServlet.getServiceEnvironment()).getRfc8628ServletConfig();
         userCode = RFC8628Servlet.convertToCanonicalForm(userCode, rfc8628ServletConfig);
 
-            OA2SE se = getOA2SE();
+        OA2SE se = getOA2SE();
         if (!se.isRfc8628Enabled()) {
             doError("Device flow is not available on this server.", STATUS_SERVICE_UNAVAILABLE, response);
             return;
@@ -386,7 +389,7 @@ public class DBService extends OA4MPServlet {
             jsonObject.put(STATUS_KEY, StatusCodes.STATUS_OK);
 
             printWriter.println(jsonObject);
-    //        printWriter.println(STATUS_KEY + "=" + StatusCodes.STATUS_OK);
+            //        printWriter.println(STATUS_KEY + "=" + StatusCodes.STATUS_OK);
             printWriter.flush();
             printWriter.close();
             stopWrite(response);
@@ -400,21 +403,15 @@ public class DBService extends OA4MPServlet {
         // The JSON library copies everything no matter what, so no guarantee what's in the transaction is the same object.
         // Just replace it with the good copy.
         startWrite(response);
-        PrintWriter printWriter = response.getWriter();        JSONObject jsonObject = new JSONObject();
+        PrintWriter printWriter = response.getWriter();
+        JSONObject jsonObject = new JSONObject();
         jsonObject.put(STATUS_KEY, StatusCodes.STATUS_OK);
-        jsonObject.put(OA2Constants.CLIENT_ID ,transaction.getClient().getIdentifierString());
+        jsonObject.put(OA2Constants.CLIENT_ID, transaction.getClient().getIdentifierString());
         debugger.trace(this, "encoding grant for " + userCode + " = " + ag.getToken());
-        jsonObject.put("grant",TokenUtils.b32EncodeToken(ag.getToken()));
-        jsonObject.put("user_code" , userCode);
+        jsonObject.put(GRANT_PARAMETER, TokenUtils.b32EncodeToken(ag.getToken()));
+        jsonObject.put(USER_CODE_PARAMETER, userCode);
         printWriter.println(jsonObject);
 
-/*
-        printWriter.println(STATUS_KEY + "=" + StatusCodes.STATUS_OK);
-        printWriter.println(OA2Constants.CLIENT_ID + "=" + transaction.getClient().getIdentifierString());
-        debugger.trace(this, "encoding grant for " + userCode + " = " + ag.getToken());
-        printWriter.println("grant=" + TokenUtils.b32EncodeToken(ag.getToken()));
-        printWriter.println("user_code=" + userCode);
-*/
         printWriter.flush();
         printWriter.close();
         stopWrite(response);
@@ -422,9 +419,9 @@ public class DBService extends OA4MPServlet {
 
     private void setNameAndTime(HttpServletRequest request, MetaDebugUtil debugger, OA2ServiceTransaction transaction) {
         String username = request.getParameter(USER_NAME_PARAMETER);
-        if(StringUtils.isTrivial(username)) {
+        if (StringUtils.isTrivial(username)) {
             debugger.warn("missing " + USER_NAME_PARAMETER + " parameter");
-        }else{
+        } else {
             transaction.setUsername(username);
         }
         long authTime = 0L;
@@ -437,7 +434,7 @@ public class DBService extends OA4MPServlet {
         } catch (Throwable t) {
             info("Got " + OA2Constants.AUTHORIZATION_TIME + "=" + request.getParameter(OA2Constants.AUTHORIZATION_TIME) + ", error=\"" + t.getMessage() + "\"");
         }
-        transaction.setAuthTime(new Date(authTime*1000));
+        transaction.setAuthTime(new Date(authTime * 1000));
     }
 
     /**
@@ -527,7 +524,7 @@ public class DBService extends OA4MPServlet {
                 // CIL-1187 support. Format response with error and description.
                 OA2GeneralError ge = (OA2GeneralError) t;
                 debugger.trace(this, "OA2GeneralError: " + ge);
-                DBServiceExceptionHandler.YAErr yaErr = DBServiceExceptionHandler.lookupErrorCode(ge.getError());
+                DIServiceExceptionHandler.YAErr yaErr = DIServiceExceptionHandler.lookupErrorCode(ge.getError());
                 if (yaErr.code == StatusCodes.STATUS_INTERNAL_ERROR) {
                     yaErr.code = STATUS_CREATE_TRANSACTION_FAILED; // what we should return for all calls to this action
                 }
@@ -659,7 +656,7 @@ public class DBService extends OA4MPServlet {
             debugger.trace(this, "Exception running QDL, throwing GeneralException", throwable);
             throw new GeneralException(throwable);
         }
-        setNameAndTime(req,debugger,t);
+        setNameAndTime(req, debugger, t);
         Map<String, String> cbParams = new HashMap<>();
         cbParams.put(OA2Constants.STATE, t.getRequestState()); // Make sure that the original state that was sent is returned to the client callback
         String cb = createCallback(t, cbParams);
@@ -749,6 +746,7 @@ public class DBService extends OA4MPServlet {
 
     /**
      * Convenience to get the service environment.
+     *
      * @return
      */
     protected OA2SE getOA2SE() {

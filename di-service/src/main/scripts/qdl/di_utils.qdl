@@ -1,0 +1,26 @@
+
+lib_support(true);
+lib_support(['/home/ncsa/dev/ncsa-git/oa4mp/di-service/src/main/scripts/qdl']);
+//ws_macro([')ws set library_support on',')ws set lib_path /home/ncsa/dev/ncsa-git/oa4mp/di-service/src/main/scripts/qdl']);
+
+simple_auth(cfg.)-> {'oa4mp:di:user':cfg.'di'.'username','oa4mp:di:password':cfg.'di'.'password'};
+define[rfc7523(cfg.)][
+    jwt ≔ j_load('oa4mp.util.jwt');
+    a. ≔ {'iss' : cfg.'client_id',
+          'sub' : cfg.'client_id',
+          'aud' : cfg.'di'.'server',
+          'iat' : date_ms()%1000,
+          'exp' : date_ms()%1000+15*60,
+          'jti' : 'oa4mp:jti/rfc7523/'+random_string(16)};
+    out. ≔ {'client_assertion_type':'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'};
+    out.'client_assertion' := jwt#create_jwt(a., cfg.'key');
+    return(out.);
+   ];
+get_auth(cfg.)->(cfg.'di'.'auth_type' == ['none',
+                                     'simple',
+                                     'rfc7523'])¿
+                                    [
+                                     [],
+                                     simple_auth(cfg.),
+                                     rfc7523(cfg.)];
+   return(true);

@@ -1,4 +1,4 @@
-package org.oa4mp.dbservice;
+package org.oa4mp.di;
 
 import java.net.URI;
 

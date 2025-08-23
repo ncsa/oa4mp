@@ -1,0 +1,43 @@
+/*
+    Start an authorization code flow. This takes an initial request to
+    an OA4MP service (such as the uri from the CLC) and turns it into a
+    DI request to start a flow.
+
+   cfg.'di_service' = address
+   cfg.'auth_type' = authorization type,
+                     none => no other parameters
+                   simple => cfg.'username'
+                              cfg.password'
+                  rfc7523 => cfg.'client_id'
+                             cfg.'jwks'
+  At least the cfg. is passed. The optional second argument is the uri.
+  If no second arg, it is read from clipboard.
+
+
+*/
+block[
+   debugger(1);
+   debugger(1,print(args()));
+   debugger(1,print(funcs()));
+   cfg. ≔ args().0;
+   debugger(1,'cfg:\n'+print(cfg.));
+   uri ≔args().1;
+   //(1 == size(args())) ? uri≔ cb_read() : args().1;
+   debugger(1,'uri=' + uri);
+   uri. ≔ to_uri(uri);
+   debugger(1,'uri:\n' + print(uri.));
+   di_service.≔ to_uri(cfg.'di'.'service'); // for uri rewrite
+   p_list. ≔ tokenize(tokenize(decode(uri.'query',1), '&'),'=');
+   debugger(1,'p_list:\n' + print(p_list.));
+   p. ≔ {'action':'startAuthCodeFlow'}; // parameters
+   while[x.∈p_list.][p.x.0 ≔ x.1;]; // schlepp over parameters
+
+   p.≔ p.~get_auth(cfg.);
+   debugger(1,'---p:\n'+print(p.));
+   //di_service ≔ 'https://localhost:9443/oauth2/di';
+   http ≔ j_load('http');
+   http#host(cfg.'di'.'service');
+   http#open(true); // Opens for self-signed cert, no hostname verification.
+   resp. ≔ http#get(p.);
+   resp.'status'.'code' != 200 ⇒ return(resp.'content') : return(from_json(resp.'content'.0)); // server error
+];

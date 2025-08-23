@@ -1,4 +1,4 @@
-package org.oa4mp.dbservice;
+package org.oa4mp.di;
 
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.servlet.ExceptionHandlerThingie;
@@ -11,22 +11,22 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static org.oa4mp.dbservice.DBService.STATUS_EXPIRED_TOKEN;
-import static org.oa4mp.dbservice.DBService.STATUS_MALFORMED_SCOPE;
-import static org.oa4mp.dbservice.StatusCodes.STATUS_CLIENT_NOT_FOUND;
+import static org.oa4mp.di.DIService.STATUS_EXPIRED_TOKEN;
+import static org.oa4mp.di.DIService.STATUS_MALFORMED_SCOPE;
+import static org.oa4mp.di.StatusCodes.STATUS_CLIENT_NOT_FOUND;
 
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 1/29/21 at  10:56 AM
  */
-public class DBServiceExceptionHandler extends OA2ExceptionHandler implements OA2Errors {
+public class DIServiceExceptionHandler extends OA2ExceptionHandler implements OA2Errors {
 
-    public DBServiceExceptionHandler(DBService dbServlet, MyLoggingFacade logger) {
+    public DIServiceExceptionHandler(DIService dbServlet, MyLoggingFacade logger) {
         super(logger);
         this.dbServlet = dbServlet;
     }
-    DBService dbServlet;
+    DIService dbServlet;
     @Override
     public void handleException(ExceptionHandlerThingie xh) throws IOException, ServletException {
         Throwable t = xh.throwable;
@@ -90,7 +90,7 @@ public class DBServiceExceptionHandler extends OA2ExceptionHandler implements OA
     public static YAErr lookupErrorCode(String oa2Error) {
         switch (oa2Error) {
             case OA2Errors.INTERACTION_REQUIRED:
-                return new YAErr(org.oa4mp.dbservice.StatusCodes.STATUS_INTERNAL_ERROR, null);
+                return new YAErr(org.oa4mp.di.StatusCodes.STATUS_INTERNAL_ERROR, null);
             case OA2Errors.LOGIN_REQUIRED:
                 return new YAErr(StatusCodes.STATUS_INTERNAL_ERROR, null);
             case OA2Errors.ACCOUNT_SELECTION_REQUIRED:

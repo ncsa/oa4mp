@@ -1,6 +1,6 @@
-package org.oa4mp.dbservice;
+package org.oa4mp.di;
 
-import static org.oa4mp.dbservice.DBService.*;
+import static org.oa4mp.di.DIService.*;
 
 /**
  * Lookup utility relating codes to human-readable error message
@@ -89,7 +89,7 @@ public class StatusCodes {
             case STATUS_SUBJECT_ID_MISMATCH: // 1048581
                 return "Subject ID mismatch.";
             // CIL-1625 DBService errors should have their own descriptions, not just default to "unknown error"
-            case DBService.STATUS_TRANSACTION_NOT_FOUND:  // 0x10001 = 65537
+            case DIService.STATUS_TRANSACTION_NOT_FOUND:  // 0x10001 = 65537
                 return "transaction not found";
             case STATUS_EXPIRED_TOKEN: // 0x10003 =65539
                 return "expired token";

@@ -1,4 +1,4 @@
-package org.oa4mp.dbservice;
+package org.oa4mp.di;
 
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
@@ -16,7 +16,7 @@ import java.net.URLEncoder;
 import java.util.Date;
 import java.util.Map;
 
-import static org.oa4mp.dbservice.DBService.STATUS_KEY;
+import static org.oa4mp.di.DIService.STATUS_KEY;
 
 
 /**
@@ -24,18 +24,14 @@ import static org.oa4mp.dbservice.DBService.STATUS_KEY;
  * <p>Created by Jeff Gaynor<br>
  * on Nov 19, 2010 at  11:03:15 AM
  */
-public class DBServiceSerializer {
-    public DBServiceSerializer(
+public class DIServiceSerializer {
+    public DIServiceSerializer(
                                ClientKeys cKeys,
                                ClientApprovalKeys caKeys) {
         this.clientKeys = cKeys;
         this.clientApprovalKeys = caKeys;
     }
 
-    public final static String CILOGON_SUCCESS_URI = "cilogon_success";
-    public final static String CILOGON_FAILURE_URI = "cilogon_failure";
-    public final static String CILOGON_PORTAL_NAME = "cilogon_portal_name";
-    public final static String CILOGON_CALLBACK_URI = "cilogon_callback";
     public static final String UTF8_ENCODING = "UTF-8"; // character encoding
 
     protected ClientKeys clientKeys;
@@ -66,53 +62,6 @@ public class DBServiceSerializer {
         }
     }
 
-
-    /**
-     * This takes the serialized payload and pulls it into a simple map. This is mostly
-     * used to deserialize things that might not be available to a client, such as a
-     * server transaction.
-     * <h3>Caveats</h3>
-     * <UL>
-     * <LI>The status is always stored as a Long</LI>
-     * <LI>List values are stored as List&lt;String&gt;'s</LI>
-     * <LI>This never throws an exception if there is an issue. You must decide on the course
-     * of action from the returned status code.</LI>
-     * </UL>
-     *
-     * @param is
-     * @return
-     * @throws IOException
-     */
- /*   public XMLMap deserializeToMap(InputStream is) throws IOException {
-        XMLMap buffer = new XMLMap();
-        BufferedReader br = new BufferedReader(new InputStreamReader(is));
-        String linein = br.readLine();
-        List<IdentityProvider> idps = null; // just in case it's needed
-        if (linein == null || linein.length() == 0) {
-            throw new NFWException("Error: service returned a trivial string. This means the service is not responding to requests correctly.");
-        }
-
-        try {
-            while (linein != null) {
-                String[] headAndTail = parseLine(linein);
-                if (headAndTail[0].equals(idpKeys.identifier())) {
-                    if (idps == null) {
-                        idps = new LinkedList<IdentityProvider>();
-                        buffer.put(headAndTail[0], idps);
-                    }
-                    idps.add(new IdentityProvider(BasicIdentifier.newID(headAndTail[1])));
-                } else if (headAndTail[0].equals(AbstractDBService.STATUS_KEY)) {
-                    buffer.put(headAndTail[0], Long.parseLong(headAndTail[1]));
-                } else {
-                    buffer.put(headAndTail[0], headAndTail[1]);
-                }
-                linein = br.readLine();
-            }
-        } finally {
-            br.close();
-        }
-        return buffer;
-    }*/
 
     /**
      * Checks that the serialized content of the input stream has an ok as its status. This
@@ -169,7 +118,7 @@ public class DBServiceSerializer {
             // Even return  codes are ok and informational.
             if (Integer.parseInt(tail) % 2 == 0) return;
             ServletDebugUtil.trace(this, "Got unrecognized response of head=\"" + head + "\" tail=\"" + tail + "\"");
-            throw new DBServiceException(tail);
+            throw new DIServiceException(tail);
         }
     }
 
@@ -228,17 +177,4 @@ public class DBServiceSerializer {
         }
         w.println(jsonObject);
     }
-   /* public void writeMessage(PrintWriter w, Err errResponse) throws IOException {
-        writeMessage(w, errResponse.code);
-        print(w, "error", errResponse.error);
-        print(w, "error_description", errResponse.description);
-        // CIL-1187 support.
-        // CIL-1388,  CIL-1342
-        if(errResponse.customErrorURI != null) {
-            print(w, "custom_error_uri", errResponse.customErrorURI.toString());
-        }
-        if(errResponse.errorURI != null) {
-            print(w, "error_uri", errResponse.errorURI.toString());
-        }
-    }*/
   }

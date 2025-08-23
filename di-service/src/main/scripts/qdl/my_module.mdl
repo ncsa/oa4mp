@@ -1,0 +1,3 @@
+module['test:/mine'][
+  f(x)->x^2;
+];

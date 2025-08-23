@@ -56,7 +56,8 @@ public class OA2QDLEnvironment extends QDLEnvironment {
                              LibLoader libLoader,
                              String logo,
                              boolean skipBadModulesOnLoad,
-                             boolean preprocessorOn) {
+                             boolean preprocessorOn,
+                             String librarySupportMode) {
         super(myLogger,
                 cfgFile,
                 name,
@@ -93,7 +94,8 @@ public class OA2QDLEnvironment extends QDLEnvironment {
                 logo,
                 WS_TERMINAL_TYPE_TEXT,
                 null,
-                preprocessorOn); // don't let anyone start in ANSI mode on the server since it will screw up logging.
+                preprocessorOn,
+                librarySupportMode); // don't let anyone start in ANSI mode on the server since it will screw up logging.
         if (serverScripts != null && !serverScripts.isEmpty()) {
             this.serverScripts = serverScripts;
         }

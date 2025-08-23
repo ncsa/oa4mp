@@ -1,4 +1,4 @@
-package org.oa4mp.dbservice;
+package org.oa4mp.di;
 
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 
@@ -8,15 +8,15 @@ import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
  * <p>Created by Jeff Gaynor<br>
  * on Nov 19, 2010 at  3:05:03 PM
  */
-public class DBServiceException extends GeneralException {
-    public DBServiceException() {
+public class DIServiceException extends GeneralException {
+    public DIServiceException() {
     }
 
-    public DBServiceException(Throwable cause) {
+    public DIServiceException(Throwable cause) {
         super(cause);
     }
 
-    public DBServiceException(String message) {
+    public DIServiceException(String message) {
         super(message);
         try{
             statusCode = Integer.parseInt(message);
@@ -25,12 +25,12 @@ public class DBServiceException extends GeneralException {
         }
     }
 
-    public DBServiceException(int message) {
+    public DIServiceException(int message) {
         super(Integer.toString(message));
         statusCode = message;
     }
 
-    public DBServiceException(String message, Throwable cause) {
+    public DIServiceException(String message, Throwable cause) {
         super(message, cause);
     }
 

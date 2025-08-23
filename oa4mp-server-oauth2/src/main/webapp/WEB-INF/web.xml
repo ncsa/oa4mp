@@ -62,12 +62,12 @@
     </servlet-mapping>
 
     <servlet>
-        <servlet-name>dbService</servlet-name>
-        <servlet-class>org.oa4mp.dbservice.DBService</servlet-class>
+        <servlet-name>dedicatedIssuerService</servlet-name>
+        <servlet-class>org.oa4mp.di.DIService</servlet-class>
     </servlet>
     <servlet-mapping>
-        <servlet-name>dbService</servlet-name>
-        <url-pattern>/dbService</url-pattern>
+        <servlet-name>dedicatedIssuerService</servlet-name>
+        <url-pattern>/di</url-pattern>
     </servlet-mapping>
     <filter>
         <filter-name>Remote Address Filter</filter-name>
@@ -87,7 +87,7 @@
 
     <filter-mapping>
         <filter-name>Remote Address Filter</filter-name>
-        <url-pattern>/oauth2/dbService</url-pattern>
+        <url-pattern>/oauth2/di</url-pattern>
     </filter-mapping>
     <servlet>
         <servlet-name>authorize</servlet-name>

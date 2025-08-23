@@ -152,7 +152,7 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
         }
 
         String userCode; //what the user is presented with
-        if (oa2SE.getAuthorizationServletConfig().isUseProxy()) {
+        if (oa2SE.hasAuthorizationServletConfig() && oa2SE.getAuthorizationServletConfig().isUseProxy()) {
             userCode = ProxyUtils.startProxyDeviceFlow(oa2SE, t, rfc8628State);
             lifetime = rfc8628State.lifetime; // This is set from the proxy and must be propagated to the user.
             // if use local DF consent is false,  can't get callback from DF, hence there can be

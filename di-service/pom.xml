@@ -6,7 +6,7 @@
         <artifactId>oa4mp-parent</artifactId>
         <version>6.x-SNAPSHOT</version>
     </parent>
-    <artifactId>db-service</artifactId>
+    <artifactId>di-service</artifactId>
     <name>Archetype - db-service</name>
     <url>http://maven.apache.org</url>
     <dependencies>

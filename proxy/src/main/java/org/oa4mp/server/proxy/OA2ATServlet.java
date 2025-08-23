@@ -2778,7 +2778,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                     HttpStatus.SC_BAD_REQUEST,
                     null);
         }
-        if (getOA2SE().getAuthorizationServletConfig().isLocalDFConsent() && !transaction.isConsentPageOK()) {
+        if (getOA2SE().hasAuthorizationServletConfig() && getOA2SE().getAuthorizationServletConfig().isLocalDFConsent() && !transaction.isConsentPageOK()) {
             throw new OA2ATException(OA2Errors.CONSENT_REQUIRED,
                     "consent required",
                     HttpStatus.SC_BAD_REQUEST,
@@ -2802,7 +2802,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
 
         // Logic is simple. If proxy, farm it out to the proxy and it works or doesn't.
         // otherwise, manage all the state for retries.
-        if (getOA2SE().getAuthorizationServletConfig().isUseProxy()) {
+        if (getOA2SE().hasAuthorizationServletConfig() && getOA2SE().getAuthorizationServletConfig().isUseProxy()) {
             //forward to the proxy. If it succeeds there, set the rfc state to valid.
             try {
                 ProxyUtils.getProxyAccessToken(getOA2SE(), transaction);
