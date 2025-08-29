@@ -36,8 +36,8 @@ import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
 import static org.apache.http.HttpStatus.*;
 import static org.oa4mp.delegation.server.OA2Errors.*;
 import static org.oa4mp.server.api.ServiceConstantKeys.TOKEN_KEY;
-import static org.oa4mp.server.api.storage.servlet.AbstractAuthorizationServlet.*;
-import static org.oa4mp.server.proxy.OA2AuthorizationServer.scopesToString;
+import static org.oa4mp.server.api.storage.servlet.AbstractAuthenticationServlet.*;
+import static org.oa4mp.server.proxy.OA2AuthenticationServer.scopesToString;
 
 /**
  * This does the authorization for the device flow.

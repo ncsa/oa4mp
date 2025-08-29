@@ -48,7 +48,7 @@
     
         
                     <div class="xleft">
-            Last Published: 2025-07-24
+            Last Published: 2025-08-29
                                 </div>
                 <div class="xright">            
     
@@ -144,18 +144,18 @@
         
 
 
-
-
 <section>
 <h2><a name="Introduction"></a>Introduction</h2>
 
 <p>
-   The authorization module for OA4MP can be replaced by various means, such as using Tomcat's built in
-    management. However, this means that you will need to have separate logins that you manage for each
+   The authentication module for OA4MP can be replaced by various means, such as using Tomcat's built in
+    management, or even a complete standalone replacement.
+    However, this means that you will need to have separate logins that you manage for each
     user. Another option is using a <i>proxy</i> service. This is an OIDC service that allows for logins.
     Your OA4MP can simply forward all requested scopes to that service (including the device flow) and use the
     service, allowing your users to effectively log in there. In short, it allows some other service to
-    do all your user management.
+    do all your user management, since you establish a trust relation that logins on the proxy
+    are exactly the logins on your system..
 </p>
 
 </section><section>
@@ -164,7 +164,8 @@
 <p>
     You need to register a client with the proxy service (henceforth known as <b>the proxy</b>), then enable
     using proxies in your server configuration (see below). Since the service is a client of the proxy,
-    you need to enable the callback servlet and register that as the callback.
+    you need to enable the callback servlet and register that as the callback. There is nothign special about this
+    client, it is a standard OAuth or OIDC client.
 </p>
 
 <section>
@@ -188,10 +189,11 @@
 
 <p>in a standard install. Key points are that https should be available, and that your server
     should be at host:port. The proxy must be able to contact your callback endpoint securely,
-    so self-signed certs hould be avoided unless you have a specific agreement with the proxy.</p>
+    so self-signed certs should be avoided unless you have a specific agreement with the proxy.</p>
 
-</section><section>
-<h4><a name="The_server_configuration_proper"></a>The server configuration proper</h4>
+
+</section></section><section>
+<h3><a name="The_server_configuration_proper"></a>The server configuration proper</h3>
 
 <p>
     You need to have using the proxy enabled within the <b>authorizationServlet</b>
@@ -209,8 +211,23 @@
                         /&gt;
 </pre></div>
 
-</section></section></section><section>
-<h2><a name="Using_the_results"></a>Using the results</h2>
+</section><section>
+<h3><a name="Configuring_the_client"></a>Configuring the client</h3>
+
+<p>The server configuration attribute <b>cfgFile</b> points to a standard <a class="externalLink" href="https://oa4mp.org/client/configuration/index.html">OA4MP client configuration.</a>
+    This may be in its own configuration file or in the main server configuration, e.g.
+</p>
+&lt;config&gt;
+    &lt;service&gt;
+        ... server config
+    &lt;/service&gt;
+    &lt;client&gt;
+        .. client config
+    &lt;/client&gt;
+&lt;/config&gt;
+
+</section></section><section>
+<h2><a name="Using_the_Proxy"></a>Using the Proxy</h2>
 
 <p>
     When your service contacts the proxy, a complete exchange is done including getting any
@@ -222,7 +239,7 @@
 
 <ul>
     
-<li>* = (an asterisk) pass along all claims</li>
+<li>* = (an asterisk) pass along all claims, the default</li>
     
 <li>[claim0,claim1,...] = list of specific claims. Note that putting * in this list
     will simply return all claims.<b>except</b> audience, issuer, issued at, expiration
@@ -250,17 +267,31 @@
 </p>
 
 </section><section>
-<h2><a name="Configuring_your_clients"></a>Configuring your clients</h2>
+<h2><a name="Configuring_the_scopes_your_client_is_to_use_with_the_proxy"></a>Configuring the scopes your client is to use with the proxy</h2>
+<section>
+<h3><a name="Using_the_scopes_in_the_client_configuration"></a>Using the scopes in the client configuration</h3>
 
 <p>Each client may be configured to request specific scopes from the proxy. These are in the
-attribute <b>proxy_request_scopes</b>. An empty list means to request no scopes. A list
-that contains an asterisk (&quot;*&quot;) means to request all configured scopes. If there is an
-asterisk anywhere on the list, all are requested. It is also possible that the client
-should simply forward scopes in the user request. In that case, set the attribute
-<b>forward_scopes_to_proxy</b> to true. If this flag is true, then any list of scopes
-you have will be ignored.</p>
+   attribute <b>proxy_request_scopes</b>. An empty list means to request no scopes.
+   In that case, the proxy simply confirms that the user has a valid login on that
+   system. A list that contains an asterisk (&quot;*&quot;) means to request all
+   scopes in the client's configuration file.
+   If there is an
+   asterisk anywhere on the list, all are requested.
+    </p>
+</section><section>
+<h3><a name="Forwarding_the_scopes_from_the_request."></a>Forwarding the scopes from the request.</h3>
 
-</section>
+<p>It is also possible that the client
+   should simply forward scopes from the user request. In that case, set the attribute
+   <b>forward_scopes_to_proxy</b> to true. (Since the user may be requesting scopes for
+   refresh and access tokens as well, this implies the proxy service is able to resolve these,
+    so it is also performing authorization for the user.)
+   If this flag is true, then the of scopes in the configuration you have will be ignored.</p>
+
+<p>Note that forwarding has precedence, so setting this flag true will override sending
+scopes in <b>proxy_request_scopes</b>.</p>
+</section></section>
 
     </div>
 </div>

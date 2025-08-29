@@ -19,12 +19,7 @@
         <maven.javadoc.skip>true</maven.javadoc.skip>
     </properties>
     <dependencies>
-        <dependency>
-            <groupId>org.jglobus</groupId>
-            <version>2.1.0</version>
-            <artifactId>jsse</artifactId>
-            <scope>provided</scope>
-        </dependency>
+
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>server</artifactId>
@@ -63,15 +58,12 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
+            <version>4.0.1</version>
+            <scope>provided</scope>
          <!--   <version>2.5</version>
             <scope>provided</scope>-->
         </dependency>
-        <dependency>
-            <groupId>org.jglobus</groupId>
-            <version>2.0.4</version>
-            <artifactId>JGlobus-Core</artifactId>
-            <scope>provided</scope>
-        </dependency>
+
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>client-loader</artifactId>

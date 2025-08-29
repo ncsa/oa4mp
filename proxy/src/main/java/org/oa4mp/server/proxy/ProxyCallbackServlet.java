@@ -41,7 +41,7 @@ import static org.oa4mp.server.proxy.ProxyUtils.setClaimsFromProxy;
  * <p>Created by Jeff Gaynor<br>
  * on 3/3/22 at  4:33 PM
  */
-public class ProxyCallbackServlet extends OA2AuthorizationServer {
+public class ProxyCallbackServlet extends OA2AuthenticationServer {
     @Override
     public ServiceTransaction verifyAndGet(IssuerResponse iResponse) throws IOException {
         return null;

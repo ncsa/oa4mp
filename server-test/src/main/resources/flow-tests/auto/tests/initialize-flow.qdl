@@ -30,6 +30,8 @@ $$ROOT_CONFIG_DIR := '/home/ncsa/dev/csd/config/';
 admins#init(cfg., $$STORE_TYPE.'admin');
 admin_client. ≔ admins#read(admin_id);
 clc#init($$ROOT_CONFIG_DIR + 'client-oa2.xml', client_id);
+clc#echo_http_request(true);
+clc#echo_http_response(true);
 // WLCG request, so have to send specific scopes.
 clc#set_param(params.);
 tokens. := clc#rfc7523({'sub':'jeff','admin_client':admin_client., 'admin_kid':admin_kid});
@@ -82,4 +84,7 @@ rt. := tokens.'refresh_token';
 
 test_lifetime(at., rt.);
 test(at.'jwt', rt.'jwt', user, expected_scopes., issuer);
+clc#echo_http_request(false);
+clc#echo_http_response(false);
+
 say('ok: Admin client is able to intialize a flow for one of its clients.');

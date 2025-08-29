@@ -733,7 +733,7 @@ public class OA2Client extends Client implements OA2ClientScopes {
     Collection<String> proxyClaimsList = new ArrayList<>();
 
     /**
-     * If the client needs a subset of scopes from the proxy, they go here.
+     * Send the scopes explicitly in the client configuration, not the vetted scopes.
      *
      * @return
      */
@@ -757,6 +757,12 @@ public class OA2Client extends Client implements OA2ClientScopes {
     }
 
     // CIL-1584
+
+    /**
+     * The scopes sentr to the proxy as the vetted scopes requested by the client. This may include
+     * scopes for access or refresh tokens
+     * @return
+     */
     public boolean isForwardScopesToProxy() {
         return forwardScopesToProxy;
     }

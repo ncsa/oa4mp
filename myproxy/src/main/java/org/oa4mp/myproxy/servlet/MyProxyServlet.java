@@ -7,7 +7,7 @@ import edu.uiuc.ncsa.security.core.cache.Cache;
 import edu.uiuc.ncsa.security.core.cache.CachedObject;
 import edu.uiuc.ncsa.security.core.cache.Cleanup;
 import org.oa4mp.server.api.storage.servlet.OA4MPServlet;
-import org.oa4mp.server.api.util.JGlobusUtil;
+import org.oa4mp.myproxy.util.JGlobusUtil;
 import org.oa4mp.delegation.common.token.AccessToken;
 import org.oa4mp.delegation.common.token.MyX509Certificates;
 import org.oa4mp.delegation.server.ServiceTransaction;

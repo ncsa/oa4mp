@@ -3,7 +3,7 @@ package org.oa4mp.di;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 
 /**
- * An exception that is thrown by the AbstractDBService. The message is one of the
+ * An exception that is thrown by the AbstractDIService. The message is one of the
  * given status string which is taken and sent along to the client.
  * <p>Created by Jeff Gaynor<br>
  * on Nov 19, 2010 at  3:05:03 PM

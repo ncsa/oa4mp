@@ -63,7 +63,7 @@
 
     <servlet>
         <servlet-name>authorize</servlet-name>
-        <servlet-class>org.oa4mp.server.proxy.OA2AuthorizationServer</servlet-class>
+        <servlet-class>org.oa4mp.server.proxy.OA2AuthenticationServer</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>authorize</servlet-name>

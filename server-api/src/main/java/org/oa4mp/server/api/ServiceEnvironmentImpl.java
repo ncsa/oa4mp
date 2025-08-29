@@ -37,7 +37,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import static org.oa4mp.server.api.storage.servlet.AbstractAuthorizationServlet.RETRY_MESSAGE;
+import static org.oa4mp.server.api.storage.servlet.AbstractAuthenticationServlet.RETRY_MESSAGE;
 
 
 /**

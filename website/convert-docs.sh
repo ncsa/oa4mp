@@ -17,9 +17,11 @@ lowriter --headless --convert-to pdf ${args[0]}/qdl/src/main/docs/oa4mp_running_
 lowriter --headless --convert-to pdf ${args[0]}/qdl/src/main/docs/qdl_clc_ini.odt                        > /dev/null
 lowriter --headless --convert-to pdf ${args[0]}/qdl/src/main/docs/qdl_oa4mp_store_access.odt             > /dev/null
 lowriter --headless --convert-to pdf ${args[0]}/qdl/src/main/docs/token_handler_configuration.odt        > /dev/null
+lowriter --headless --convert-to pdf ${args[0]}/server-admin/src/main/docs/Authentication_in_OA4MP.odt   > /dev/null
+lowriter --headless --convert-to pdf ${args[0]}/server-admin/src/main/docs/DIService-reference.odt       > /dev/null
 lowriter --headless --convert-to pdf ${args[0]}/server-admin/src/main/docs/filestore-migration.odt       > /dev/null
 lowriter --headless --convert-to pdf ${args[0]}/server-admin/src/main/docs/rfc7523_intro.odt             > /dev/null
-lowriter --headless --convert-to pdf ${args[0]}/server-admin/src/main/docs/rfc6749_4_4.odt              > /dev/null
+lowriter --headless --convert-to pdf ${args[0]}/server-admin/src/main/docs/rfc6749_4_4.odt               > /dev/null
 lowriter --headless --convert-to pdf ${args[0]}/server-admin/src/main/docs/jwt-util.odt                  > /dev/null
 lowriter --headless --convert-to pdf ${args[0]}/server-admin/src/main/docs/forking_a_flow_quickstart.odt > /dev/null
 lowriter --headless --convert-to pdf ${args[0]}/server-admin/src/main/docs/oa4mp_as_dedicated_issuer.odt > /dev/null

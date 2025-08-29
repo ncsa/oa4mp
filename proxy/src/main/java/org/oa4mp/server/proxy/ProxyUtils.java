@@ -14,7 +14,7 @@ import org.oa4mp.delegation.server.OA2Constants;
 import org.oa4mp.delegation.server.server.claims.OA2Claims;
 import org.oa4mp.server.admin.oauth2.tools.OA2CLCCommands;
 import org.oa4mp.server.admin.oauth2.tools.OA2CommandLineClient;
-import org.oa4mp.server.api.storage.servlet.AbstractAuthorizationServlet;
+import org.oa4mp.server.api.storage.servlet.AbstractAuthenticationServlet;
 import org.oa4mp.server.api.storage.servlet.AuthorizationServletConfig;
 import org.oa4mp.server.api.storage.servlet.OA4MPServlet;
 import org.oa4mp.server.loader.oauth2.OA2SE;
@@ -32,8 +32,8 @@ import java.util.*;
 
 import static java.net.URLEncoder.encode;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.oa4mp.server.api.storage.servlet.AbstractAuthorizationServlet.*;
-import static org.oa4mp.server.proxy.OA2AuthorizationServer.scopesToString;
+import static org.oa4mp.server.api.storage.servlet.AbstractAuthenticationServlet.*;
+import static org.oa4mp.server.proxy.OA2AuthenticationServer.scopesToString;
 
 /**
  * Class with shared proxy utilities. The client uses this to send requests via the proxy.
@@ -55,7 +55,7 @@ public class ProxyUtils {
         startProxyAuthCodeFlow(oa2SE, t, pendingState.getResponse());
     }
 
-    protected static void doProxy(OA2SE oa2SE, AbstractAuthorizationServlet.AuthorizedState state) throws Throwable {
+    protected static void doProxy(OA2SE oa2SE, AbstractAuthenticationServlet.AuthorizedState state) throws Throwable {
         OA2ServiceTransaction t = (OA2ServiceTransaction) state.getTransaction();
         startProxyAuthCodeFlow(oa2SE, t, state.getResponse());
     }
@@ -74,7 +74,7 @@ public class ProxyUtils {
         OA2CLCCommands clcCommands = createCLC(oa2SE, t);
         MetaDebugUtil debugger = OA4MPServlet.createDebugger(t.getOA2Client());
         debugger.trace(ProxyUtils.class, "doProxyRedirect, response committed? " + response.isCommitted());
-        AbstractAuthorizationServlet.MyHttpServletResponseWrapper wrapper = new AbstractAuthorizationServlet.MyHttpServletResponseWrapper(response);
+        AbstractAuthenticationServlet.MyHttpServletResponseWrapper wrapper = new AbstractAuthenticationServlet.MyHttpServletResponseWrapper(response);
         // set the specific scopes.
         Collection<String> requestScopes = getRequestScopes(t, clcCommands);
 
@@ -170,7 +170,7 @@ public class ProxyUtils {
         // Now we have determined that this is a pending transaction
         debugger.trace(ProxyUtils.class, "userCodeToProxyRedirect loading proxy client");
         debugger.trace(ProxyUtils.class, "userCodeToProxyRedirect response committed? " + response.isCommitted());
-        AbstractAuthorizationServlet.MyHttpServletResponseWrapper wrapper = new AbstractAuthorizationServlet.MyHttpServletResponseWrapper(response);
+        AbstractAuthenticationServlet.MyHttpServletResponseWrapper wrapper = new AbstractAuthenticationServlet.MyHttpServletResponseWrapper(response);
 
         OA2CLCCommands clcCommands = getCLC(oa2SE, t);
         JSONObject dfResponse = clcCommands.getDfResponse();

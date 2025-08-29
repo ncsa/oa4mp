@@ -1,16 +1,11 @@
 package org.oa4mp.myproxy.servlet;
 
 import edu.uiuc.ncsa.myproxy.MPSingleConnectionProvider;
-import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.InvalidTimestampException;
-import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
-import edu.uiuc.ncsa.security.servlet.HeaderUtils;
 import net.sf.json.JSONObject;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.HttpStatus;
 import org.oa4mp.delegation.common.servlet.TransactionState;
-import org.oa4mp.delegation.common.storage.clients.Client;
 import org.oa4mp.delegation.common.token.AccessToken;
 import org.oa4mp.delegation.common.token.impl.AccessTokenImpl;
 import org.oa4mp.delegation.common.token.impl.TokenUtils;
@@ -20,20 +15,16 @@ import org.oa4mp.delegation.server.request.IssuerResponse;
 import org.oa4mp.delegation.server.server.PAIResponse2;
 import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.servlet.OA2HeaderUtils;
-import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
 import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.security.GeneralSecurityException;
 import java.util.List;
 
 import static edu.uiuc.ncsa.security.core.util.DateUtils.checkTimestamp;
-import static org.oa4mp.delegation.server.OA2Constants.CLIENT_SECRET;
 import static org.oa4mp.delegation.server.server.claims.OA2Claims.JWT_ID;
-import static org.oa4mp.server.api.ServiceConstantKeys.CONSUMER_KEY;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -97,10 +88,21 @@ public class OA2CertServlet extends ACS2 {
     /**
      * This looks for the information about the client and checks the secret.
      *
-     * @param req
      * @return
      */
-    @Override
+    /*
+       NOTE: NOT SURE IF NEXT METHOD NEEDED!! Adding JGlobus to the dependencies in the module
+             causes a compilation error at line 144 executing
+
+             DigestUtils.sha1Hex(rawSecret
+
+             since there is a DigestUtils in the JGlobus API. I *think* this method is
+             probably redundant, but am not 100% sure until I can test against a MyProxy server
+             Keeping block in case it needs work.
+
+
+     */
+ /*   @Override
     public Client getClient(HttpServletRequest req) {
         String rawID = req.getParameter(CONST(CONSUMER_KEY));
         String rawSecret = getFirstParameterValue(req, CLIENT_SECRET);
@@ -154,7 +156,7 @@ public class OA2CertServlet extends ACS2 {
         }
         return client;
     }
-
+*/
     public ServiceTransaction verifyAndGet(IssuerResponse iResponse) throws IOException {
         PAIResponse2 par = (PAIResponse2) iResponse;
         AccessToken accessToken = par.getAccessToken();

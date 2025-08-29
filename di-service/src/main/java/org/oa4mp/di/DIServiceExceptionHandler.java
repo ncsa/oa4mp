@@ -22,11 +22,11 @@ import static org.oa4mp.di.StatusCodes.STATUS_CLIENT_NOT_FOUND;
  */
 public class DIServiceExceptionHandler extends OA2ExceptionHandler implements OA2Errors {
 
-    public DIServiceExceptionHandler(DIService dbServlet, MyLoggingFacade logger) {
+    public DIServiceExceptionHandler(DIService diService, MyLoggingFacade logger) {
         super(logger);
-        this.dbServlet = dbServlet;
+        this.diService = diService;
     }
-    DIService dbServlet;
+    DIService diService;
     @Override
     public void handleException(ExceptionHandlerThingie xh) throws IOException, ServletException {
         Throwable t = xh.throwable;
@@ -35,7 +35,7 @@ public class DIServiceExceptionHandler extends OA2ExceptionHandler implements OA
         if (t instanceof OA2GeneralError) {
             OA2GeneralError ge = (OA2GeneralError) t;
             Err err = new Err(StatusCodes.STATUS_INTERNAL_ERROR, ge.getError(), ge.getDescription());
-            dbServlet.writeMessage(response, err);
+            diService.writeMessage(response, err);
             return;
         }
         super.handleException(xh);

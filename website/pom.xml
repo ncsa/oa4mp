@@ -16,9 +16,34 @@
     </properties>
 
     <dependencies>
+        <!-- Client dependencies -->
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>client</artifactId>
+            <version>6.x-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.oa4mp</groupId>
+            <artifactId>client-api</artifactId>
+            <version>6.x-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.oa4mp</groupId>
+            <artifactId>client-installer</artifactId>
+            <version>6.x-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.oa4mp</groupId>
+            <artifactId>client-loader</artifactId>
+            <version>6.x-SNAPSHOT</version>
+        </dependency>
+
+
+        <!-- Common dependencies -->
+
+        <dependency>
+            <groupId>org.oa4mp</groupId>
+            <artifactId>common</artifactId>
             <version>6.x-SNAPSHOT</version>
         </dependency>
 
@@ -26,7 +51,84 @@
             <groupId>org.oa4mp</groupId>
             <artifactId>common</artifactId>
             <version>6.x-SNAPSHOT</version>
+            <type>test-jar</type>
+            <scope>test</scope>
         </dependency>
+
+<!-- server dependencies -->
+
+        <dependency>
+            <groupId>org.oa4mp</groupId>
+            <artifactId>di-service</artifactId>
+            <version>6.x-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.oa4mp</groupId>
+            <artifactId>installer</artifactId>
+            <version>6.x-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.oa4mp</groupId>
+            <artifactId>oa4mp-server-test</artifactId>
+            <version>6.x-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.oa4mp</groupId>
+            <artifactId>oauth2</artifactId>
+            <version>6.x-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.oa4mp</groupId>
+            <artifactId>proxy</artifactId>
+            <version>6.x-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.oa4mp</groupId>
+            <artifactId>qdl</artifactId>
+            <version>6.x-SNAPSHOT</version>
+        </dependency>
+<!--        <dependency>
+            <groupId>org.oa4mp</groupId>
+            <artifactId>rfc8414</artifactId>
+            <version>6.x-SNAPSHOT</version>
+        </dependency>-->
+        <dependency>
+            <groupId>org.oa4mp</groupId>
+            <artifactId>server</artifactId>
+            <version>6.x-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.oa4mp</groupId>
+            <artifactId>server-admin</artifactId>
+            <version>6.x-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.oa4mp</groupId>
+            <artifactId>server-api</artifactId>
+            <version>6.x-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.oa4mp</groupId>
+            <artifactId>server-installer</artifactId>
+            <version>6.x-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.oa4mp</groupId>
+            <artifactId>server-loader</artifactId>
+            <version>6.x-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.oa4mp</groupId>
+            <artifactId>server</artifactId>
+            <version>6.x-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.oa4mp</groupId>
+            <artifactId>server-test</artifactId>
+            <version>6.x-SNAPSHOT</version>
+        </dependency>
+
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>core</artifactId>
@@ -39,18 +141,7 @@
             <artifactId>servlet</artifactId>
             <version>6.x-SNAPSHOT</version>
         </dependency>
-        <dependency>
-            <groupId>org.oa4mp</groupId>
-            <artifactId>server</artifactId>
-            <version>6.x-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.oa4mp</groupId>
-            <artifactId>common</artifactId>
-            <version>6.x-SNAPSHOT</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
+
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>util</artifactId>
@@ -58,40 +149,10 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.oa4mp</groupId>
-            <artifactId>myproxy-logon</artifactId>
-            <version>6.x-SNAPSHOT</version>
-        </dependency>
 
-        <dependency>
-            <groupId>org.oa4mp</groupId>
-            <artifactId>client-api</artifactId>
-            <version>6.x-SNAPSHOT</version>
-        </dependency>
 
-        <dependency>
-            <groupId>org.oa4mp</groupId>
-            <artifactId>client-loader</artifactId>
-            <version>6.x-SNAPSHOT</version>
-        </dependency>
 
-        <dependency>
-            <groupId>org.oa4mp</groupId>
-            <artifactId>server-api</artifactId>
-            <version>6.x-SNAPSHOT</version>
-        </dependency>
 
-        <dependency>
-            <groupId>org.oa4mp</groupId>
-            <artifactId>server-loader</artifactId>
-            <version>6.x-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.oa4mp</groupId>
-            <artifactId>oauth2</artifactId>
-            <version>6.x-SNAPSHOT</version>
-        </dependency>
         <dependency>
             <groupId>org.apache.velocity</groupId>
             <artifactId>velocity</artifactId>
@@ -101,6 +162,13 @@
             <groupId>org.apache.maven.doxia</groupId>
             <artifactId>doxia-module-xhtml</artifactId>
             <version>1.9.1</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>4.0.1</version>
+            <scope>provided</scope>
+            <!--   <version>3.1.0</version>-->
         </dependency>
     </dependencies>
     <reporting>
@@ -183,6 +251,7 @@
                     <includeDependencySources>true</includeDependencySources>
                     <dependencySourceIncludes>
                         <dependencySourceInclude>edu.uiuc.ncsa:*</dependencySourceInclude>
+                        <dependencySourceInclude>org.oa4mp:*</dependencySourceInclude>
                     </dependencySourceIncludes>
                 </configuration>
             </plugin>

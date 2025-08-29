@@ -52,8 +52,9 @@ import static org.oa4mp.server.api.ServiceConstantKeys.FORM_ENCODING_KEY;
 import static org.oa4mp.server.loader.oauth2.servlet.OA2AuthorizedServletUtil.createCallback;
 
 /**
- * The dedicated issuer (DI) service. Only deploy this if you want to allow OA4MP to
- * service DI requests.
+ * The detached/independent (DI) service. This is the authentication case where there is
+ * a wholly standalone authentication service. It does authentication then notifies
+ * OA4MP via back channel callouts to OA4MP to start and finish flows.
  */
 public class DIService extends OA4MPServlet {
     public static final String FINISH_AUTH_CODE_FLOW = "finishAuthCodeFlow";
@@ -82,7 +83,7 @@ public class DIService extends OA4MPServlet {
     public static final String USER_CODE_PARAMETER = "user_code";
     public static final String USER_NAME_PARAMETER = "username";
     public static final String MYPROXY_USERNAME_PARAMETER = "myproxy_username";
-    public static final String USER_CODE_APPROVED_PARAMETER = "approved";
+    public static final String APPROVED_PARAMETER = "approved";
     public static final String DI_USER_PARAMETER = "oa4mp:di:user";
     public static final String DI_PASSWORD_PARAMETER = "oa4mp:di:password";
 
@@ -90,16 +91,16 @@ public class DIService extends OA4MPServlet {
     @Override
     protected void doIt(HttpServletRequest request, HttpServletResponse response) throws Throwable {
         ServletDebugUtil.printAllParameters(getClass(), request, true);
-        if (getOA2SE().getDBServiceConfig().isEnabled()) {
+        if (getOA2SE().getDIServiceConfig().isEnabled()) {
             String username = request.getParameter(DI_USER_PARAMETER);
             String password = request.getParameter(DI_PASSWORD_PARAMETER);
             if (isTrivial(username)) {
-                throw new DBServiceConfig.UnknownDBSericeUserException("Missing username");
+                throw new DIServiceConfig.UnknownDISericeUserException("Missing username");
             }
             if (isTrivial(password)) {
-                throw new DBServiceConfig.UnknownDBSericeUserException("Missing password");
+                throw new DIServiceConfig.UnknownDISericeUserException("Missing password");
             }
-            getOA2SE().getDBServiceConfig().checkPassword(username, password);
+            getOA2SE().getDIServiceConfig().checkPassword(username, password);
         } else {
             throw new ServletException("DB service is not enabled");
         }
@@ -189,14 +190,14 @@ public class DIService extends OA4MPServlet {
      * param: user_code (required, but can be empty)
      * <p>
      * Purpose:
-     * This is an "internal" dbService method used by the PHP web front end to
+     * This is an "internal" diService method used by the PHP web front end to
      * (1) verify that a user_code input by the user is valid and
      * (2) return the client_id associated with this transaction in order to display client
      * information to the end user. The user_code parameter is required, but it can be empty.
      * The user_code parameter can contain extra "user-friendly" characters such as
      * dash '-', space ' ', underscore '_', etc. These extra characters will be stripped
-     * out/ignored by the dbService. The user_code can contain lower-case and/or
-     * upper-case characters which will be transformed to upper-case characters by the dbService.
+     * out/ignored by the diService. The user_code can contain lower-case and/or
+     * upper-case characters which will be transformed to upper-case characters by the diService.
      * Returns: HTTP 200 response, body is basic text, one line per returned value:
      * <p>
      * status=INTEGER
@@ -288,8 +289,8 @@ public class DIService extends OA4MPServlet {
      * user_code (required)
      * approved (optional; defaults to 1; 1=approved; 0=denied)
      * <p>
-     * Purpose: This is an "internal" dbService method used by the PHP web front end
-     * to let the dbService know that the user has logged on to their
+     * Purpose: This is an "internal" diService method used by the PHP web front end
+     * to let the diService know that the user has logged on to their
      * chosen Identity Provider and approved the transaction OR
      * that the user has clicked a "Cancel" button and denied the transaction.
      * If the user has approved the transaction (approved=1 or 'approved'
@@ -323,13 +324,13 @@ public class DIService extends OA4MPServlet {
         If approved parameter is given but empty, that's the same as approved parameter is not given,
         so default to '1' (i.e., user_code is approved).
          */
-        if (request.getParameterMap().containsKey(USER_CODE_APPROVED_PARAMETER)) {
+        if (request.getParameterMap().containsKey(APPROVED_PARAMETER)) {
             try {
-                approved = Integer.parseInt(request.getParameter(USER_CODE_APPROVED_PARAMETER));
+                approved = Integer.parseInt(request.getParameter(APPROVED_PARAMETER));
             } catch (NumberFormatException nfx) {
                 doError("unknown value for " +
-                                USER_CODE_APPROVED_PARAMETER + " parameter \"" +
-                                request.getParameter(USER_CODE_APPROVED_PARAMETER) + "\"",
+                                APPROVED_PARAMETER + " parameter \"" +
+                                request.getParameter(APPROVED_PARAMETER) + "\"",
                         STATUS_MISSING_ARGUMENT, response);
             }
         }
@@ -379,20 +380,7 @@ public class DIService extends OA4MPServlet {
         } else {
             debugger.trace(this, "device flow for user code " + userCode + " cancelled");
             // means they cancelled the whole thing. Remove the transaction and the cache entry.
-            getTransactionStore().remove(transaction.getIdentifier());
-            //    RFC8628Servlet.getCache().remove(userCode);
-            // Now tell the system that it was cancelled. This means to return a status of 0, meaning
-            // the requested action was done.
-            startWrite(response);
-            PrintWriter printWriter = response.getWriter();
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put(STATUS_KEY, StatusCodes.STATUS_OK);
-
-            printWriter.println(jsonObject);
-            //        printWriter.println(STATUS_KEY + "=" + StatusCodes.STATUS_OK);
-            printWriter.flush();
-            printWriter.close();
-            stopWrite(response);
+            cancelFlow(response, transaction);
             return;
         }
 
@@ -415,6 +403,24 @@ public class DIService extends OA4MPServlet {
         printWriter.flush();
         printWriter.close();
         stopWrite(response);
+    }
+
+    private void cancelFlow(HttpServletResponse response, OA2ServiceTransaction transaction) throws IOException {
+        getTransactionStore().remove(transaction.getIdentifier());
+        //    RFC8628Servlet.getCache().remove(userCode);
+        // Now tell the system that it was cancelled. This means to return a status of 0, meaning
+        // the requested action was done.
+        startWrite(response);
+        PrintWriter printWriter = response.getWriter();
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(STATUS_KEY, StatusCodes.STATUS_OK);
+
+        printWriter.println(jsonObject);
+        //        printWriter.println(STATUS_KEY + "=" + StatusCodes.STATUS_OK);
+        printWriter.flush();
+        printWriter.close();
+        stopWrite(response);
+        return;
     }
 
     private void setNameAndTime(HttpServletRequest request, MetaDebugUtil debugger, OA2ServiceTransaction transaction) {
@@ -606,6 +612,30 @@ public class DIService extends OA4MPServlet {
             return;
         }
         MetaDebugUtil debugger = OA4MPServlet.createDebugger(t.getClient());
+        int approved = 1;
+        if (req.getParameterMap().containsKey(APPROVED_PARAMETER)) {
+            try {
+                approved = Integer.parseInt(req.getParameter(APPROVED_PARAMETER));
+            } catch (NumberFormatException nfx) {
+                doError("unknown value for " +
+                                APPROVED_PARAMETER + " parameter \"" +
+                                req.getParameter(APPROVED_PARAMETER) + "\"",
+                        STATUS_MISSING_ARGUMENT, resp);
+                return;
+            }
+        }
+        switch (approved){
+            case 0:
+                cancelFlow(resp, t);
+                return;
+            case 1:
+                // rock on
+                break;
+            default:
+                doError("illegal argument approved = \"" + approved + "\"", StatusCodes.STATUS_MALFORMED_INPUT, resp);
+                return;
+        }
+
         if (debugger instanceof ClientDebugUtil) {
             ((ClientDebugUtil) debugger).setTransaction(t);
         }

@@ -82,8 +82,17 @@ public interface ClaimSource  extends Serializable {
      */
     public boolean isRunOnlyAtAuthorization();
 
+    /**
+     * Deserialize this claim source from its QDL representation.
+     *
+     * @param stem
+     */
     public void fromQDL(QDLStem stem);
 
+    /**
+     * Serialize this claim source to its QDL representation.
+     * @return
+     */
     public QDLStem toQDL();
     
 }

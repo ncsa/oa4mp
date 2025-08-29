@@ -5,12 +5,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
     <title>Extending the Server</title>
-    <!--#include virtual="../../head.html" -->
 
 </head>
 <body class="composite">
-<!--#include virtual="../../header.html" -->
-<h1>(Deprecated) This is better done with scripting.</h1>
+<h1>(Deprecated) This is better done with QDL scripting.</h1>
 <h2>Extending the Server</h2>
 <p>The architecture of the OA4MP server (all versions, both based on OAuth 1.0a and OAuth 2.0)
     is designed to accommodate extensions. The delegation exchanges should, in
@@ -175,7 +173,6 @@ public void MyAuthServlet extends AuthorizationServlet{
 </pre>
 <p>To use this, deploy this in place of the standard AuthorizationServlet in the deployment descriptor (web.xml
     file).</p>
-<!--#include virtual="../../footer.html" -->
 
 </body>
 </html>

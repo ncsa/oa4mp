@@ -10,7 +10,7 @@ import edu.uiuc.ncsa.security.servlet.ExceptionHandlerThingie;
 import org.apache.http.HttpStatus;
 import org.oa4mp.delegation.common.storage.clients.BaseClient;
 import org.oa4mp.delegation.server.*;
-import org.oa4mp.server.api.storage.servlet.AbstractAuthorizationServlet;
+import org.oa4mp.server.api.storage.servlet.AbstractAuthenticationServlet;
 import org.oa4mp.server.loader.oauth2.claims.LDAPException;
 import org.qdl_lang.exceptions.QDLException;
 import org.qdl_lang.exceptions.QDLExceptionWithTrace;
@@ -227,9 +227,9 @@ public class OA2ExceptionHandler implements ExceptionHandler {
             return;
         }
         // Check is the response has been wrapped in a helper class and do a wee bit of management on said class.
-        AbstractAuthorizationServlet.MyHttpServletResponseWrapper wrapper = null;
-        if (response instanceof AbstractAuthorizationServlet.MyHttpServletResponseWrapper) {
-            wrapper = (AbstractAuthorizationServlet.MyHttpServletResponseWrapper) response;
+        AbstractAuthenticationServlet.MyHttpServletResponseWrapper wrapper = null;
+        if (response instanceof AbstractAuthenticationServlet.MyHttpServletResponseWrapper) {
+            wrapper = (AbstractAuthenticationServlet.MyHttpServletResponseWrapper) response;
             // set this so that other components know a redirect occurred and can handle that themselves (usually by just returning).
             wrapper.setExceptionEncountered(true);
         }

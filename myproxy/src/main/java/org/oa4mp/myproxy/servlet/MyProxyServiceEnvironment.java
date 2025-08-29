@@ -20,7 +20,7 @@ import org.oa4mp.server.api.admin.permissions.PermissionsStore;
 import org.oa4mp.server.api.storage.servlet.AuthorizationServletConfig;
 import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.cm.CMConfigs;
-import org.oa4mp.server.loader.oauth2.servlet.DBServiceConfig;
+import org.oa4mp.server.loader.oauth2.servlet.DIServiceConfig;
 import org.oa4mp.server.loader.oauth2.servlet.RFC8628ServletConfig;
 import org.oa4mp.server.loader.oauth2.storage.tx.TXStore;
 import org.oa4mp.server.loader.qdl.scripting.OA2QDLEnvironment;
@@ -99,7 +99,7 @@ public class MyProxyServiceEnvironment extends OA2SE {
                                      boolean clientCredentialFlowEnabled,
                                      MetaDebugUtil debugger,
                                      boolean allowPromptNone,
-                                     DBServiceConfig dbServiceConfig,
+                                     DIServiceConfig DIServiceConfig,
                                      List<MyProxyFacadeProvider> mfp
     ) {
         super(
@@ -163,7 +163,7 @@ public class MyProxyServiceEnvironment extends OA2SE {
                 clientCredentialFlowEnabled,
                 debugger,
                 allowPromptNone,
-                dbServiceConfig
+                DIServiceConfig
         );
         this.mfps = mfp;
 

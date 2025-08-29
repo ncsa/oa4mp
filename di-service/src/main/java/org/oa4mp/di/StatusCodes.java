@@ -88,7 +88,7 @@ public class StatusCodes {
                 return "Pairwise ID mismatch.";
             case STATUS_SUBJECT_ID_MISMATCH: // 1048581
                 return "Subject ID mismatch.";
-            // CIL-1625 DBService errors should have their own descriptions, not just default to "unknown error"
+            // CIL-1625 DIService errors should have their own descriptions, not just default to "unknown error"
             case DIService.STATUS_TRANSACTION_NOT_FOUND:  // 0x10001 = 65537
                 return "transaction not found";
             case STATUS_EXPIRED_TOKEN: // 0x10003 =65539
