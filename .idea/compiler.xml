@@ -3,6 +3,7 @@
   <component name="CompilerConfiguration">
     <excludeFromCompile>
       <directory url="file://$PROJECT_DIR$/db-service/src/main/resources/archetype-resources" includeSubdirectories="true" />
+      <directory url="file://$PROJECT_DIR$/server-webapp-jar/src/main/resources/archetype-resources" includeSubdirectories="true" />
     </excludeFromCompile>
     <wildcardResourcePatterns>
       <entry name="?*.properties" />
@@ -29,6 +30,7 @@
         <module name="server-test" />
         <module name="oa4mp-server-test" />
         <module name="client" />
+        <module name="server-webapp-jar" />
         <module name="website" />
         <module name="myproxy" />
         <module name="oa4mp-server-oauth2" />

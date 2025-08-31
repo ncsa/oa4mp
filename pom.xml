@@ -101,6 +101,7 @@
         <module>rfc8414</module>
         <module>myproxy</module>
         <module>di-service</module>
+        <module>server-webapp-jar</module>
     </modules>
     <dependencies>
         <dependency>

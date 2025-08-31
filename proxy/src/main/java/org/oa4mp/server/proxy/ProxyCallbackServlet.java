@@ -131,7 +131,7 @@ public class ProxyCallbackServlet extends OA2AuthenticationServer {
         request.setAttribute("tokenKey", CONST(TOKEN_KEY));
         // OAuth 2.0 specific values that must be preserved.
         request.setAttribute("stateKey", "state");
-        request.setAttribute("authorizationState", t.getRequestState());
+ //       request.setAttribute("authorizationState", t.getRequestState());
 
         request.setAttribute("clientHome", escapeHtml(t.getClient().getHomeUri()));
         request.setAttribute("clientName", escapeHtml(t.getClient().getName()));

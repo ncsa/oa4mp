@@ -8,6 +8,7 @@ $OA4MP_ROOT/website/convert-docs.sh $OA4MP_ROOT $GITHUB_ROOT/pdf
 
 
 cd $OA4MP_ROOT || exit
+# Fix https://github.com/ncsa/oa4mp/issues/262 Do ONE clean and do it here.
 mvn clean
 mvn javadoc:javadoc -Dmaven.javadoc.skip=false
 mvn javadoc:aggregate

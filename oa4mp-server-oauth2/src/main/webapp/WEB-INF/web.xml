@@ -109,7 +109,7 @@
 
     <servlet>
         <servlet-name>device</servlet-name>
-        <servlet-class>org.oa4mp.server.proxy.RFC8628AuthorizationServer</servlet-class>
+        <servlet-class>org.oa4mp.server.proxy.RFC8628AuthenticationServer</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>device</servlet-name>

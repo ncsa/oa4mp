@@ -11,6 +11,7 @@ import org.oa4mp.delegation.common.token.impl.TokenFactory;
 import org.oa4mp.delegation.server.OA2ATException;
 import org.oa4mp.delegation.server.OA2GeneralError;
 import org.oa4mp.delegation.server.jwt.HandlerRunner;
+import org.oa4mp.server.api.storage.servlet.AuthenticationUtil;
 import org.oa4mp.server.api.storage.servlet.EnvServlet;
 import org.oa4mp.server.api.storage.servlet.OA4MPServlet;
 import org.oa4mp.server.api.storage.servlet.PresentationState;
@@ -40,22 +41,17 @@ import static org.oa4mp.server.api.storage.servlet.AbstractAuthenticationServlet
 import static org.oa4mp.server.proxy.OA2AuthenticationServer.scopesToString;
 
 /**
- * This does the authorization for the device flow.
+ * This does the authentication for the device flow.
  * <p>Created by Jeff Gaynor<br>
  * on 2/12/21 at  6:19 AM
  */
-public class RFC8628AuthorizationServer extends EnvServlet {
+public class RFC8628AuthenticationServer extends EnvServlet {
     int DEFAULT_RETRY_COUNT = 3;
 
     public static final String USER_CODE_KEY = "AuthUserCode";
 
     protected String getInitialPage() {
-        return "/" +
-                "" +
-                "" +
-                "" +
-                "" +
-                "+---device-init.jsp";
+        return "/device-init.jsp";
     }
 
     protected String getRemoteUserInitialPage() {
@@ -133,6 +129,10 @@ public class RFC8628AuthorizationServer extends EnvServlet {
         request.setAttribute("actionOk", AUTHORIZATION_ACTION_OK_VALUE);
         request.setAttribute("identifier", pendingState.id);
         request.setAttribute("count", Integer.toString(pendingState.count));
+        String userCode = request.getParameter(RFC8628Constants2.USER_CODE);
+        if(!StringUtils.isTrivial(userCode)) {
+            request.setAttribute("userCode", userCode);
+        }
     }
 
     public void postprocess(PendingState pendingState) throws Throwable {
@@ -197,16 +197,14 @@ public class RFC8628AuthorizationServer extends EnvServlet {
                     }
                     trace(this, " starting with response committed #3?" + response.isCommitted());
                     pendingState = pending.get(id);
+                    pendingState.setResponse(response);
+                    pendingState.setState(getState(request)); // update it to whatever it is now
                     trace(this, " starting with PS response committed #3a?" + pendingState.getResponse().isCommitted());
                     if (pendingState == null) {
                         throw new OA2ATException(INVALID_REQUEST, "no pending flow found", SC_BAD_REQUEST, null);
                     }
                     trace(this, " starting with PS response committed #4?" + pendingState.getResponse().isCommitted());
-                    prepare(pendingState);
-                    trace(this, " starting with PS response committed #5?" + pendingState.getResponse().isCommitted());
-
-                    pendingState.setResponse(response);
-                    trace(this, " starting with PS response committed #6?" + pendingState.getResponse().isCommitted());
+                    //prepare(pendingState);
                     processRequest(request, pendingState, true);
                     //   JSPUtil.fwd(request, response, getOkPage());
                     logOK(request); // CIL-1722
@@ -246,7 +244,7 @@ public class RFC8628AuthorizationServer extends EnvServlet {
                 prepare(pendingState);
                 // If they sent the user code with the request, do it here.
                 //  printAllParameters(request);
-                if (getServiceEnvironment().getAuthorizationServletConfig().isUseProxy()) {
+                if (getServiceEnvironment().hasAuthorizationServletConfig() && getServiceEnvironment().getAuthorizationServletConfig().isUseProxy()) {
                     info("use proxy");
                     String userCode = request.getParameter(RFC8628Constants2.USER_CODE);
                     info("user code = " + userCode);
@@ -374,7 +372,7 @@ public class RFC8628AuthorizationServer extends EnvServlet {
 
 
         // Fixes OAUTH-192.
-        if (getServiceEnvironment().getAuthorizationServletConfig().isUseHeader()) {
+        if (getServiceEnvironment().hasAuthorizationServletConfig() && getServiceEnvironment().getAuthorizationServletConfig().isUseHeader()) {
             trace(this, "getting username from header");
 
             String headerName = getServiceEnvironment().getAuthorizationServletConfig().getHeaderFieldName();
@@ -410,7 +408,16 @@ public class RFC8628AuthorizationServer extends EnvServlet {
         } else {
             trace(this, "not using header");
 
-            if (!getServiceEnvironment().getAuthorizationServletConfig().isUseProxy()) {
+            if (!getServiceEnvironment().hasAuthorizationServletConfig()) {
+                switch (pendingState.getState()) {
+                    case AUTHORIZATION_ACTION_OK:
+                        // nothing to do, really
+                        break;
+                    case AUTHORIZATION_ACTION_START:
+                        info("3.a. Starting authorization device");
+                        JSPUtil.fwd(request, pendingState.getResponse(), getInitialPage());
+                        return;
+                }
                 trace(this, "getting username and password from form user filled in");
                 // Headers, proxy not used, just pull it off the form the user POSTs.
                 userName = request.getParameter(AUTHORIZATION_USER_NAME_KEY);
@@ -471,7 +478,7 @@ public class RFC8628AuthorizationServer extends EnvServlet {
                     null,
                     trans.getClient());
         }
-        if (getServiceEnvironment().getAuthorizationServletConfig().isUseProxy()) {
+        if (getServiceEnvironment().hasAuthorizationServletConfig() && getServiceEnvironment().getAuthorizationServletConfig().isUseProxy()) {
             // If this is a proxy, forward the user to do the login. we have to have gotten the transaction
             // to do this.
             try {
@@ -525,11 +532,11 @@ public class RFC8628AuthorizationServer extends EnvServlet {
 
     // Only set to true if you are debugging the login machinery.
     // It then allows exactly one user -- me -- to authenticate.
-    boolean DEBUG_LOGIN = false;
+    protected boolean DEBUG_LOGIN = false;
 
     public void debugCheckUser(String username, String password) throws GeneralSecurityException {
-        if (username.equals("jeff") && password.equals("changeme")) {
-            System.err.println(this.getClass().getSimpleName() + ": DEBUG_LOGIN FOR 'jeff' ONLY enabled");
+        if (username.equals("me") && password.equals("changeme")) {
+            System.err.println(this.getClass().getSimpleName() + ": DEBUG_LOGIN FOR 'me' ONLY enabled");
             return;
         }
     }
@@ -539,17 +546,11 @@ public class RFC8628AuthorizationServer extends EnvServlet {
         // At this point in the basic servlet, there is no system for passwords.
         // This is because OA4MP has no native concept of managing users, it being
         // far outside of the OAuth spec.
-        if (getServiceEnvironment().isDemoModeEnabled()) {
-            // In demo mode, this will display the pages and accept the username (so the subject
-            // gets set
-            // but no password protection of any sort is done. Demo mode really is just intended
-            // so that an admin can set up an instance of OA4MP to evaluate if it fits their needs.
-            info("demo mode enabled, no authorization is being used.");
-        } else {
-            // If you were checking users and there  were a problem, you would do this:
-            String message = "invalid login";
-            throw new OA2ATException(ACCESS_DENIED, message, SC_UNAUTHORIZED, null);
-            // which would display the message as the retry message.
+        try{
+            AuthenticationUtil.getInstance().checkUser(getServiceEnvironment(), username, password);
+        }catch(UserLoginException e){
+            // Spec says to throw one of these.
+            throw new OA2ATException(ACCESS_DENIED, e.getMessage(), SC_UNAUTHORIZED, null);
         }
     }
 
@@ -564,7 +565,7 @@ public class RFC8628AuthorizationServer extends EnvServlet {
             case AUTHORIZATION_ACTION_START:
                 String initPage = getInitialPage();
                 info("*** STARTING present");
-                if (getServiceEnvironment().getAuthorizationServletConfig().isUseHeader()) {
+                if (getServiceEnvironment().hasAuthorizationServletConfig() && getServiceEnvironment().getAuthorizationServletConfig().isUseHeader()) {
                     initPage = getRemoteUserInitialPage();
 
                     info("*** PRESENT: Use headers enabled.");
@@ -638,7 +639,7 @@ public class RFC8628AuthorizationServer extends EnvServlet {
         request.setAttribute("tokenKey", CONST(TOKEN_KEY));
         // OAuth 2.0 specific values that must be preserved.
         request.setAttribute("stateKey", "state");
-        request.setAttribute("authorizationState", t.getRequestState());
+ //       request.setAttribute("authorizationState", t.getRequestState());
 
         request.setAttribute("clientHome", escapeHtml(t.getClient().getHomeUri()));
         request.setAttribute("clientName", escapeHtml(t.getClient().getName()));

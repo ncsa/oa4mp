@@ -21,7 +21,7 @@
 <%@ page session="false" %>
 <html>
 <head>
-    <title>MyProxy Delegation Portal Authorization Page</title>
+    <title>OA4MP Device Flow Authentication Page</title>
     <link rel="stylesheet"
           type="text/css"
           media="all"
@@ -42,7 +42,7 @@
 </div>
 <br clear="all"/>
 <div class="main">
-    <h2>Welcome to the OA4MP device flow authorization page.</h2>
+    <h2>Welcome to the OA4MP device flow authentication page.</h2>
     <p>You will need to do your logon plus supply the user code that was given to you
         at the start of the interaction. </p>
     <p>

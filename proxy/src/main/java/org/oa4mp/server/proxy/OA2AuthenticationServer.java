@@ -43,7 +43,7 @@ public class OA2AuthenticationServer extends AbstractAuthenticationServlet {
 
     }
 
-    public String AUTHORIZATION_REFRESH_TOKEN_LIFETIME_KEY = "AuthRTL";
+ //   public String AUTHORIZATION_REFRESH_TOKEN_LIFETIME_KEY = "AuthRTL";
 
 
     /**
@@ -127,9 +127,10 @@ public class OA2AuthenticationServer extends AbstractAuthenticationServlet {
     @Override
     public void prepare(PresentableState state) throws Throwable {
         super.prepare(state);
+/*      See note in createRedirect below about removing setting the refresh token lifetime.
         if (state.getState() == AbstractAuthenticationServlet.AUTHORIZATION_ACTION_START) {
             state.getRequest().setAttribute(AUTHORIZATION_REFRESH_TOKEN_LIFETIME_KEY, AUTHORIZATION_REFRESH_TOKEN_LIFETIME_KEY);
-        }
+        }*/
         if (state.getState() == AbstractAuthenticationServlet.AUTHORIZATION_ACTION_OK) {
             AuthorizedState authorizedState = (AuthorizedState) state;
             OA2ServiceTransaction st = (OA2ServiceTransaction)authorizedState.getTransaction();
@@ -142,19 +143,22 @@ public class OA2AuthenticationServer extends AbstractAuthenticationServlet {
 
     @Override
     protected void createRedirect(HttpServletRequest request, HttpServletResponse response, ServiceTransaction trans) throws Throwable {
-        String rawrtl = request.getParameter(AUTHORIZATION_REFRESH_TOKEN_LIFETIME_KEY);
+//        String rawrtl = request.getParameter(AUTHORIZATION_REFRESH_TOKEN_LIFETIME_KEY);
         OA2SE oa2SE = (OA2SE) OA4MPServlet.getServiceEnvironment();
 
         OA2ServiceTransaction st2 = (OA2ServiceTransaction) trans;
         OA2Client resolvedClient = OA2ClientUtils.resolvePrototypes(oa2SE, st2.getOA2Client());
-        try {
+ /*      authorize-init used to allow setting the refresh token lifetime because there was no way to do this in the request.
+                        That is no longer the case and really having that in the authentication form seems like a bad idea.
+                        Keeping code here just in case.
+         try {
             if (rawrtl != null) {
                 st2.setRefreshTokenLifetime(Long.parseLong(rawrtl) * 1000);
             }
         } catch (Throwable t) {
             st2.setRefreshTokenLifetime(0L);
         }
-        super.createRedirect(request, response, trans);
+ */       super.createRedirect(request, response, trans);
         // At this point, all authentication has been done, everything is set up and the next stop in the flow is the
         // redirect back to the client.
         HandlerRunner handlerRunner = new HandlerRunner(st2, ScriptRuntimeEngineFactory.createRTE(oa2SE, st2, resolvedClient.getConfig()));

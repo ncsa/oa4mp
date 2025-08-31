@@ -1,0 +1,42 @@
+/**
+Really basic CSS for demo
+*/
+
+div#topimgfill {
+    background: transparent url('images/oa4mp-logo-small-2.png') no-repeat top right;
+    height: 112px;
+    width: 60%;
+    padding-bottom:  10px;
+}
+
+
+div#topimgfill div#topimg {
+    background: transparent url('images/oa4mp-logo-small-2.png') no-repeat top left;
+ /*   width: 273px; */
+    height: 111px;
+    float: left;
+}
+
+div.footer {
+    border: 1px solid #888;
+    color: #888;
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+div.footer p {
+    text-align: center;
+    font-size: x-small;
+    margin: 0px;
+}
+
+div.footer a:link {
+    color: #696;
+    text-decoration: none;
+}
+
+div.footer a:visited {
+    color: #696;
+    text-decoration: none;
+}
+

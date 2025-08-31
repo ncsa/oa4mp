@@ -19,7 +19,7 @@
 <%@ page session="false" %>
 <html>
 <head>
-    <title>OA4MP Authorization Page</title>
+    <title>OA4MP Authentication Page</title>
     <link rel="stylesheet"
           type="text/css"
           media="all"
@@ -82,13 +82,6 @@ please sign in with your username and password.
                             <input type="password" size="25" name="${AuthPassword}"/>
                         </td>
                     </tr>
-                 <!-- Unhide this when you want to support it. All the machinery is in place.
-                     <tr>
-                        <td>Refresh token lifetime</td>
-                        <td><input type="text" size="25" name="${AuthRTL}"
-                                   value="${rtLifetime}"/></td>
-                    </tr>
-                    -->
                     <tr>
                         <td colspan="2">&nbsp;</td>
                     </tr>
@@ -109,10 +102,10 @@ please sign in with your username and password.
                 <input type="hidden" id="status" name="${action}"
                        value="${actionOk}"/>
                 <input type="hidden" id="token" name="${tokenKey}" value="${authorizationGrant}"/>
-                <input type="hidden" id="state" name="${stateKey}" value="${authorizationState}"/>
-            </td>
-        </tr>
-    </table>
+<%--            <input type="hidden" id="state" name="${stateKey}" value="${authorizationState}"/> --%>
+        </td>
+    </tr>
+</table>
 </form>
 </div>
 </body>

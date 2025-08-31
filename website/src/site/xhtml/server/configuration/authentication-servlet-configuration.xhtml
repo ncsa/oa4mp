@@ -226,12 +226,19 @@ and authorization module are best dealt with elsewhere and a discussion can be f
         <td>Comment</td>
     </tr>
     <tr>
-        <td>oauth_token</td>
+        <td>authorizationGrant</td>
         <td>String</td>
         <td>This is the token sent to the authorize endpoint as per the specification and identifies this
             user's delegation request uniquely.
         </td>
     </tr>
+    <tr>
+        <td>authorizationState</td>
+        <td>String</td>
+        <td>This is the (optional) state parameter the user sent in the initial request. It is echoed back.
+        </td>
+    </tr>
+
     <tr>
         <td>AuthUserName</td>
         <td>String</td>
@@ -242,17 +249,7 @@ and authorization module are best dealt with elsewhere and a discussion can be f
         <td>String</td>
         <td>(Optional) the password the user will require to log in to MyProxy.</td>
     </tr>
-
-    <tr>
-        <td>lifetime</td>
-        <td>int</td>
-        <td>(Optional) The lifetime for the certificate. The client may request any value in the initial request,
-            but server policies may override this here. If missing, the request sent by the client
-            will be used and if there is none, any defaults will be used.
-        </td>
-    </tr>
-
-    </tbody>
+ </tbody>
 </table>
 
 

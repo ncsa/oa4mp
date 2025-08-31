@@ -166,7 +166,7 @@ public abstract class AbstractAuthenticationServlet extends OA4MPServlet impleme
         request.setAttribute("tokenKey", CONST(TOKEN_KEY));
         // OAuth 2.0 specific values that must be preserved.
         request.setAttribute("stateKey", "state");
-        request.setAttribute("authorizationState", getParam(aState.getRequest(), "state"));
+        //       request.setAttribute("authorizationState", getParam(aState.getRequest(), "state"));
         /* HTML escape it to guard against HTML injection attacks. Addresses issue OAUTH-87.
          If you aren't sure whether a form is secure against HTML injection attacks, paste the following into it:
 
@@ -341,6 +341,7 @@ public abstract class AbstractAuthenticationServlet extends OA4MPServlet impleme
     /**
      * Basically a switch statement for the auth actions, but with the special case that no action means
      * {@link #AUTHORIZATION_ACTION_START}, since that is an initial request with no state.
+     *
      * @param request
      * @return
      */
@@ -431,11 +432,12 @@ public abstract class AbstractAuthenticationServlet extends OA4MPServlet impleme
 
     /**
      * Additional setup for the callback. This is aimed at MyProxy aware services.
+     *
      * @param trans
      * @param userName
      * @param password
      */
-    protected abstract void createRedirectInit(ServiceTransaction trans,String userName, String password);
+    protected abstract void createRedirectInit(ServiceTransaction trans, String userName, String password);
 
     /*
       Body of createRedirectInit for MyProxy:
@@ -453,20 +455,13 @@ public abstract class AbstractAuthenticationServlet extends OA4MPServlet impleme
      * as a proxy) is configured. Therefore, the default behavior is to throw an exception, but this is where
      * the logic has to be.  To add a user, extend OA2AuthorizationServer, override this method to talk to
      * whatever manages your users and set your servlet as the authorization endpoint.
+     *
      * @param username
      * @param password
      * @throws GeneralSecurityException
      */
     public void checkUser(String username, String password) throws GeneralSecurityException {
-        // At this point in the basic servlet, there is no system for passwords.
-        // This is because OA4MP has no native concept of managing users, it being
-        // far outside of the OAuth spec.
-        // If you were checking users and there  were a problem, you would do this:
-        String message = "invalid login";
-        if(username.equals("jeff") && password.equals("1234567890")) {return;}
-        throw new UserLoginException(message, username, password);
-        // which would display the message as the retry message.
-
+        AuthenticationUtil.getInstance().checkUser(getServiceEnvironment(), username, password);
     }
 
     public static class UserLoginException extends GeneralException {

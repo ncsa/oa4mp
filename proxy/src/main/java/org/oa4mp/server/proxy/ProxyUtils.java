@@ -49,7 +49,7 @@ public class ProxyUtils {
      */
     public static final String LOCAL_DF_CONSENT_XA = ExtendedParameters.OA4MP_NS + ":/proxy/df/consent_uri";
 
-    protected static void doProxy(OA2SE oa2SE, RFC8628AuthorizationServer.PendingState pendingState) throws Throwable {
+    protected static void doProxy(OA2SE oa2SE, RFC8628AuthenticationServer.PendingState pendingState) throws Throwable {
         RFC8628Store<? extends OA2ServiceTransaction> rfc8628Store = (RFC8628Store) oa2SE.getTransactionStore();
         OA2ServiceTransaction t = rfc8628Store.getByUserCode("");
         startProxyAuthCodeFlow(oa2SE, t, pendingState.getResponse());
@@ -163,7 +163,7 @@ public class ProxyUtils {
      * @param oa2SE
      * @param t
      */
-    protected static void userCodeToProxyRedirect(OA2SE oa2SE, OA2ServiceTransaction t, RFC8628AuthorizationServer.PendingState pendingState) throws Throwable {
+    protected static void userCodeToProxyRedirect(OA2SE oa2SE, OA2ServiceTransaction t, RFC8628AuthenticationServer.PendingState pendingState) throws Throwable {
         HttpServletResponse response = pendingState.getResponse();
         MetaDebugUtil debugger = OA4MPServlet.createDebugger(t.getOA2Client());
 
