@@ -7,6 +7,7 @@
 
     <display-name>The OA4MP Service</display-name>
 
+
     <servlet>
         <servlet-name>discovery</servlet-name>
         <servlet-class>org.oa4mp.server.loader.oauth2.servlet.OA2DiscoveryServlet</servlet-class>
@@ -62,34 +63,6 @@
     </servlet-mapping>
 
     <servlet>
-        <servlet-name>dedicatedIssuerService</servlet-name>
-        <servlet-class>org.oa4mp.di.DIService</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>dedicatedIssuerService</servlet-name>
-        <url-pattern>/di</url-pattern>
-    </servlet-mapping>
-    <filter>
-        <filter-name>Remote Address Filter</filter-name>
-        <filter-class>org.apache.catalina.filters.RemoteAddrFilter</filter-class>
-        <init-param>
-            <param-name>allow</param-name>
-            <param-value>128\.0\.0\.1|192\.168\.1\.22</param-value>
-        </init-param>
-        <!-- Or, to deny specific IPs and allow others by default: -->
-        <!--
-        <init-param>
-            <param-name>deny</param-name>
-            <param-value>192\.168\.1\.101|172\.16\.0\.0/16</param-value>
-        </init-param>
-        -->
-    </filter>
-
-    <filter-mapping>
-        <filter-name>Remote Address Filter</filter-name>
-        <url-pattern>/oauth2/di</url-pattern>
-    </filter-mapping>
-    <servlet>
         <servlet-name>authorize</servlet-name>
         <servlet-class>org.oa4mp.server.proxy.OA2AuthenticationServer</servlet-class>
     </servlet>
@@ -109,7 +82,7 @@
 
     <servlet>
         <servlet-name>device</servlet-name>
-        <servlet-class>org.oa4mp.server.proxy.RFC8628AuthorizationServer</servlet-class>
+        <servlet-class>org.oa4mp.server.proxy.RFC8628AuthenticationServer</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>device</servlet-name>
@@ -146,77 +119,75 @@
     </servlet-mapping>
 
     <servlet>
-        <servlet-name>revoke</servlet-name>
-        <servlet-class>org.oa4mp.server.loader.oauth2.servlet.RFC7009</servlet-class>
-        <load-on-startup>0</load-on-startup>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>revoke</servlet-name>
-        <url-pattern>/revoke</url-pattern>
-    </servlet-mapping>
+         <servlet-name>revoke</servlet-name>
+         <servlet-class>org.oa4mp.server.loader.oauth2.servlet.RFC7009</servlet-class>
+         <load-on-startup>0</load-on-startup>
+     </servlet>
+     <servlet-mapping>
+         <servlet-name>revoke</servlet-name>
+         <url-pattern>/revoke</url-pattern>
+     </servlet-mapping>
 
     <servlet>
-        <servlet-name>introspect</servlet-name>
-        <servlet-class>org.oa4mp.server.loader.oauth2.servlet.RFC7662</servlet-class>
-        <load-on-startup>0</load-on-startup>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>introspect</servlet-name>
-        <url-pattern>/introspect</url-pattern>
-    </servlet-mapping>
+         <servlet-name>introspect</servlet-name>
+         <servlet-class>org.oa4mp.server.loader.oauth2.servlet.RFC7662</servlet-class>
+         <load-on-startup>0</load-on-startup>
+     </servlet>
+     <servlet-mapping>
+         <servlet-name>introspect</servlet-name>
+         <url-pattern>/introspect</url-pattern>
+     </servlet-mapping>
 
+    <!-- This forces all endpoints to use https. -->
+      <security-constraint>
+          <web-resource-collection>
+              <web-resource-name>portalSecurity</web-resource-name>
+              <url-pattern>/*</url-pattern>
+              <http-method>GET</http-method>
+              <http-method>POST</http-method>
+          </web-resource-collection>
+          <user-data-constraint>
+              <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+          </user-data-constraint>
+      </security-constraint>
 
+    <!-- This password protects the authorize endpoint -->
+     <security-constraint>
+         <web-resource-collection>
+           <web-resource-name>OAuth Security Device Flow</web-resource-name>
+           <url-pattern>/authorize</url-pattern>
+           <http-method>POST</http-method>
+           <http-method>GET</http-method>
+         </web-resource-collection>
+         <auth-constraint>
+           <role-name>oa4mp</role-name>
+         </auth-constraint>
+         <user-data-constraint>
+           <transport-guarantee>NONE</transport-guarantee>
+         </user-data-constraint>
+       </security-constraint>
+
+ <!-- This password protects the device endpoint -->
 
     <security-constraint>
         <web-resource-collection>
-            <web-resource-name>portalSecurity</web-resource-name>
-            <url-pattern>/*</url-pattern>
-            <http-method>GET</http-method>
-            <http-method>POST</http-method>
-        </web-resource-collection>
-        <user-data-constraint>
-            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
-        </user-data-constraint>
-    </security-constraint>
-    <!--
-       Uncomment the next sections if you are replacing the built-in authorization module with your own.
-       Look here for the details: https://oa4mp.org/server/manuals/remote-user.html
-    -->
-    <security-constraint>
-        <web-resource-collection>
-            <web-resource-name>OAuth Security Device Flow</web-resource-name>
-            <url-pattern>/authorize</url-pattern>
-            <http-method>POST</http-method>
-            <http-method>GET</http-method>
-        </web-resource-collection>
-        <auth-constraint>
-            <role-name>oa4mp</role-name>
-        </auth-constraint>
-        <user-data-constraint>
-            <transport-guarantee>NONE</transport-guarantee>
-        </user-data-constraint>
-    </security-constraint>
-
-    <!-- the next block allows log ins for testing REMOTE_USER with device flow-->
-    <security-constraint>
-        <web-resource-collection>
-            <web-resource-name>OAuth Security</web-resource-name>
-            <url-pattern>/device</url-pattern>
-            <http-method>POST</http-method>
-            <http-method>GET</http-method>
+          <web-resource-name>OAuth Security</web-resource-name>
+          <url-pattern>/device</url-pattern>
+          <http-method>POST</http-method>
+          <http-method>GET</http-method>
         </web-resource-collection>
         <auth-constraint>
-            <role-name>oa4mp</role-name>
+          <role-name>oa4mp</role-name>
         </auth-constraint>
         <user-data-constraint>
-            <transport-guarantee>NONE</transport-guarantee>
+          <transport-guarantee>NONE</transport-guarantee>
         </user-data-constraint>
-    </security-constraint>
-    <!-- no matter which security constraint(s) are allowed, this next bit has to be
-         ucommented to since it is what allows for logging -->
-    <login-config>
-        <auth-method>BASIC</auth-method>
-    </login-config>
+      </security-constraint>
+ <!-- no matter which security constraint(s) are allowed, this next bit has to be
+      ucommented to since it is what allows for logging -->
+       <login-config>
+          <auth-method>BASIC</auth-method>
+        </login-config>
 
     <resource-ref>
         <description>

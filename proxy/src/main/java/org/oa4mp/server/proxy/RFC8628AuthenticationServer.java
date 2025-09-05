@@ -11,6 +11,7 @@ import org.oa4mp.delegation.common.token.impl.TokenFactory;
 import org.oa4mp.delegation.server.OA2ATException;
 import org.oa4mp.delegation.server.OA2GeneralError;
 import org.oa4mp.delegation.server.jwt.HandlerRunner;
+import org.oa4mp.server.api.OA4MPConfigTags;
 import org.oa4mp.server.api.storage.servlet.AuthenticationUtil;
 import org.oa4mp.server.api.storage.servlet.EnvServlet;
 import org.oa4mp.server.api.storage.servlet.OA4MPServlet;
@@ -145,7 +146,6 @@ public class RFC8628AuthenticationServer extends EnvServlet {
         trace(this, "in RFC 8628 Authz server");
         trace(this, " starting with response committed #1?" + response.isCommitted());
         PendingState pendingState = null;
-        ServletDebugUtil.printAllParameters(getClass(), request, true);
 
 
         switch (getState(request)) {
@@ -244,7 +244,7 @@ public class RFC8628AuthenticationServer extends EnvServlet {
                 prepare(pendingState);
                 // If they sent the user code with the request, do it here.
                 //  printAllParameters(request);
-                if (getServiceEnvironment().hasAuthorizationServletConfig() && getServiceEnvironment().getAuthorizationServletConfig().isUseProxy()) {
+                if (getServiceEnvironment().getAuthorizationServletConfig().getUseMode().equals(OA4MPConfigTags.AUTHORIZATION_SERVLET_USE_MODE_PROXY)) {
                     info("use proxy");
                     String userCode = request.getParameter(RFC8628Constants2.USER_CODE);
                     info("user code = " + userCode);
@@ -372,7 +372,7 @@ public class RFC8628AuthenticationServer extends EnvServlet {
 
 
         // Fixes OAUTH-192.
-        if (getServiceEnvironment().hasAuthorizationServletConfig() && getServiceEnvironment().getAuthorizationServletConfig().isUseHeader()) {
+        if (getServiceEnvironment().getAuthorizationServletConfig().getUseMode().equals(OA4MPConfigTags.AUTHORIZATION_SERVLET_USE_MODE_HEADER)) {
             trace(this, "getting username from header");
 
             String headerName = getServiceEnvironment().getAuthorizationServletConfig().getHeaderFieldName();
@@ -478,7 +478,7 @@ public class RFC8628AuthenticationServer extends EnvServlet {
                     null,
                     trans.getClient());
         }
-        if (getServiceEnvironment().hasAuthorizationServletConfig() && getServiceEnvironment().getAuthorizationServletConfig().isUseProxy()) {
+        if (getServiceEnvironment().getAuthorizationServletConfig().getUseMode().equals(OA4MPConfigTags.AUTHORIZATION_SERVLET_USE_MODE_PROXY)) {
             // If this is a proxy, forward the user to do the login. we have to have gotten the transaction
             // to do this.
             try {
@@ -565,7 +565,7 @@ public class RFC8628AuthenticationServer extends EnvServlet {
             case AUTHORIZATION_ACTION_START:
                 String initPage = getInitialPage();
                 info("*** STARTING present");
-                if (getServiceEnvironment().hasAuthorizationServletConfig() && getServiceEnvironment().getAuthorizationServletConfig().isUseHeader()) {
+                if (getServiceEnvironment().getAuthorizationServletConfig().getUseMode().equals(OA4MPConfigTags.AUTHORIZATION_SERVLET_USE_MODE_HEADER)) {
                     initPage = getRemoteUserInitialPage();
 
                     info("*** PRESENT: Use headers enabled.");

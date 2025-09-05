@@ -10,6 +10,7 @@
    This has a dedicated AC and client so that if something goes wrong (e.g. the test fails)
    it does not impact other tests.
 */
+ws_macro([')ws set java_trace on']);
 admin_id := 'admin:/revoke/test';
 client_id :='localhost:test/revoke';
 cfg.'file' := '/home/ncsa/dev/csd/config/server-oa2.xml';

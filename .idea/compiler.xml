@@ -54,6 +54,7 @@
       <module name="client-webapp" target="11" />
       <module name="myproxy-website" target="1.8" />
       <module name="oa4mp-webapp" target="11" />
+      <module name="server-webapp-jar" target="11" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">

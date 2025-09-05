@@ -68,6 +68,12 @@ public interface OA4MPConfigTags extends StorageConfigurationTags, MailConfigura
 
     // for proxy authorization
     String AUTHORIZATION_SERVLET_USE_PROXY = "useProxy"; // Use a proxy for authorization
+    String AUTHORIZATION_SERVLET_USE_MODE = "use"; // Use a proxy for authorization
+    String AUTHORIZATION_SERVLET_USE_MODE_NATIVE = "default"; // Use built-in authuentication. Require extension to OA4MP
+    String AUTHORIZATION_SERVLET_USE_MODE_PROXY = "proxy"; // Use a proxy for authentication
+    String AUTHORIZATION_SERVLET_USE_MODE_HEADER = "header"; // Use an HTTP header for authentication
+    String AUTHORIZATION_SERVLET_USE_MODE_EXTERNAL_SERVICE = "external"; // Use the DI Service for authentication
+    String AUTHORIZATION_SERVLET_USE_MODE_DEDICATED_ISSUER = "dedicated"; // Use a detached service for authentication
     String AUTHORIZATION_SERVLET_PROXY_CONFIG_FILE = "cfgFile"; // The full path to the proxy configuration file
     String AUTHORIZATION_SERVLET_PROXY_CONFIG_NAME = "cfgName"; // The name of the configuration  to use.
     // If the proxy should forward the user to a consent page on the originiting server after DF is finished there.
@@ -96,6 +102,10 @@ public interface OA4MPConfigTags extends StorageConfigurationTags, MailConfigura
     String ID_SCHEME = "scheme";
     String ID_SPP = "schemeSpecificPart";
 
+    /*
+      The following are needed for CILogon support and thanks to the package structure, there
+      is no easy way to make everything available, except here.
+     */
     String USERS = "users";
     String ARCHIVED_USERS = "archivedUsers";
     String IDENTITY_PROVIDERS = "identityProviders";

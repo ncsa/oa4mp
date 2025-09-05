@@ -42,7 +42,7 @@ public class DiscoveryServlet extends OA4MPServlet implements OIDCDiscoveryTags 
         }
         String requestURI = getRequestURI(httpServletRequest);
         String authzEndpoint;
-        if (getServiceEnvironment().hasAuthorizationServletConfig() && !isEmpty(getServiceEnvironment().getAuthorizationServletConfig().getAuthorizationURI())) {
+        if ( !isEmpty(getServiceEnvironment().getAuthorizationServletConfig().getAuthorizationURI())) {
             authzEndpoint = getServiceEnvironment().getAuthorizationServletConfig().getAuthorizationURI();
         } else {
             authzEndpoint = requestURI + "/authorize";

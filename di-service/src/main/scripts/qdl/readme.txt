@@ -1,9 +1,22 @@
-This directory contains QDL scripts to use the Dedicated Issuer (DI) service. The scripts may be
+This directory contains QDL scripts to use the Detached/Independent (DI)  service. The scripts may be
 called individually (run di_utils.qdl first to load a bunch of helper functions).
+
++-----------------------+
+|  Testing  Quickstart  |
++-----------------------+
+
+╔═══════════════════════════════════════════════╗
+║    Be sure to change the web.xml to use       ║
+║    the DIService and update the server config ║
+║    accordingly!!                              ║
+╚═══════════════════════════════════════════════╝
+
+
 
 These let you be an Authorization Server from the command line easily. Useful for e.g. testing.
 
-This is designed to work as a library to QDL, to wit, you set the lib path and enable library_support
+This is designed to work as a library to QDL, to wit, in a workspace,
+you set the lib path and enable library_support
 then all the scripts become functions in the workspace, so you can call them directly, e.g.
 
 to run start_af.qdl with arguments cfg. and uri, just issue
@@ -21,7 +34,7 @@ facility in QDL lets you write some very complex scripting and use it easily.
 Data structures
 ---------------
 The di server requires a configuration with the endpoint, and authorization information. This is in
-the cofiguration stem as the element di, so a typical use might be
+the configuration stem as the element di, so a typical use might be
 
 di. := {'username':'bob',
         'password':'Oh sphinx of black onyx!',
@@ -36,7 +49,14 @@ then add any other configuration entries.
 
 The Authorization Code Flow
 ---------------------------
+start_af.qdl - Before any authentication is done, passes along the reuqest string
+               E.g. from the CLC's uri command. Creates a transaction and returns
+               the code aka auth grant
+finish_af.qdl - After authentication, notify OA4MP that it was successful and send
+                the user's name and auth time.
 
+OA4MP does not care how the user is authenticated, and has no access to any backing
+user management system. For testing, just run them sequentially.
 
 The Device Code Flow
 ---------------------------

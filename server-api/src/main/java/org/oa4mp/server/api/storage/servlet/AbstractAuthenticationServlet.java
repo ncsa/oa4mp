@@ -13,6 +13,7 @@ import org.oa4mp.delegation.common.token.AuthorizationGrant;
 import org.oa4mp.delegation.server.OA2Constants;
 import org.oa4mp.delegation.server.ServiceTransaction;
 import org.oa4mp.delegation.server.request.IssuerResponse;
+import org.oa4mp.server.api.OA4MPConfigTags;
 import org.oa4mp.server.api.OA4MPServiceTransaction;
 
 import javax.servlet.ServletException;
@@ -217,15 +218,15 @@ public abstract class AbstractAuthenticationServlet extends OA4MPServlet impleme
                     //https://github.com/ncsa/oa4mp/issues/236
                     // this is a new transaction, but there must be an existing one for this client
                 }
-                if (getServiceEnvironment().hasAuthorizationServletConfig() && getServiceEnvironment().getAuthorizationServletConfig().isUseProxy()) {
+                if (getServiceEnvironment().getAuthorizationServletConfig().getUseMode().equals(OA4MPConfigTags.AUTHORIZATION_SERVLET_USE_MODE_PROXY)) {
                     doProxy(aState);
                     return;
                 }
                 String initPage = getInitialPage();
                 info("*** STARTING present");
-                if (getServiceEnvironment().hasAuthorizationServletConfig() && getServiceEnvironment().getAuthorizationServletConfig().isUseHeader()) {
+                if (getServiceEnvironment().getAuthorizationServletConfig().getUseMode().equals(OA4MPConfigTags.AUTHORIZATION_SERVLET_USE_MODE_HEADER)) {
                     initPage = getRemoteUserInitialPage();
-                    ServletDebugUtil.printAllParameters(getClass(), state.getRequest(), true);
+    //                ServletDebugUtil.printAllParameters(getClass(), state.getRequest(), true);
                     info("*** PRESENT: Use headers enabled.");
                     String x = null;
                     if (getServiceEnvironment().getAuthorizationServletConfig().getHeaderFieldName().equals("REMOTE_USER")) {
@@ -292,6 +293,7 @@ public abstract class AbstractAuthenticationServlet extends OA4MPServlet impleme
 
     @Override
     protected void doIt(HttpServletRequest request, HttpServletResponse response) throws Throwable {
+//        ServletDebugUtil.printAllParameters(getClass(), request, true);
         info("starting request");
         String ag = getParam(request, CONST(TOKEN_KEY));
         ServiceTransaction trans = null;
@@ -383,7 +385,7 @@ public abstract class AbstractAuthenticationServlet extends OA4MPServlet impleme
         String password = null;
         // Fixes OAUTH-192.
         // Note this regets it from the header if present to check that the user got here legitimately
-        if (getServiceEnvironment().hasAuthorizationServletConfig() && getServiceEnvironment().getAuthorizationServletConfig().isUseHeader()) {
+        if (getServiceEnvironment().getAuthorizationServletConfig().getUseMode().equals(OA4MPConfigTags.AUTHORIZATION_SERVLET_USE_MODE_HEADER)) {
             String headerName = getServiceEnvironment().getAuthorizationServletConfig().getHeaderFieldName();
             if (isEmpty(headerName) || headerName.toLowerCase().equals("remote_user")) {
                 userName = request.getRemoteUser();

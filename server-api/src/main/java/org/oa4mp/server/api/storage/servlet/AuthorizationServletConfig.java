@@ -1,10 +1,21 @@
 package org.oa4mp.server.api.storage.servlet;
 
+import org.oa4mp.server.api.OA4MPConfigTags;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 12/4/12 at  11:28 AM
  */
-public class AuthorizationServletConfig {
+public class AuthorizationServletConfig implements OA4MPConfigTags {
+    public AuthorizationServletConfig() {
+        setUseMode(AUTHORIZATION_SERVLET_USE_MODE_NATIVE);
+    }
+
+    public AuthorizationServletConfig(String useMode, String authorizationURI) {
+        this.useMode = useMode;
+        this.authorizationURI = authorizationURI;
+    }
+
     /**
      * Constructor if a proxy is to be used for authorization. This points to a file
      * with the configuration in it and the name of the configuration to use.
@@ -17,11 +28,10 @@ public class AuthorizationServletConfig {
         this.cfgFile = cfgFile;
         this.cfgName = cfgName;
         this.localDFConsent = localDFConsent;
-        setUseProxy(true);
+        setUseMode(OA4MPConfigTags.AUTHORIZATION_SERVLET_USE_MODE_PROXY);
     }
 
     public AuthorizationServletConfig(String authorizationURI,
-                                      boolean useHeader,
                                       boolean requireHeader,
                                       String headerFieldName,
                                       boolean returnDnAsUsername,
@@ -30,21 +40,29 @@ public class AuthorizationServletConfig {
                                       boolean convertDNToGlobusID) {
         this.headerFieldName = headerFieldName;
         this.requireHeader = requireHeader;
-        this.useHeader = useHeader;
         this.returnDnAsUsername = returnDnAsUsername;
         this.showLogon = showLogon;
         this.verifyUsername = verifyUsername;
         this.convertDNToGlobusID = convertDNToGlobusID;
         this.authorizationURI = authorizationURI;
-
+        setUseMode(OA4MPConfigTags.AUTHORIZATION_SERVLET_USE_MODE_HEADER);
     }
 
+    public String getUseMode() {
+        return useMode;
+    }
+
+    public void setUseMode(String useMode) {
+        this.useMode = useMode;
+    }
+
+    String useMode = OA4MPConfigTags.AUTHORIZATION_SERVLET_USE_MODE_NATIVE;
     /**
      * Is authorization done with an external source, i.e., not OA4MP?
      * @return
      */
     public boolean useExternalAuthorization(){
-        return authorizationURI != null && !useProxy && !useHeader;
+        return getUseMode().equals(AUTHORIZATION_SERVLET_USE_MODE_DEDICATED_ISSUER) || getUseMode().equals(AUTHORIZATION_SERVLET_USE_MODE_EXTERNAL_SERVICE);
     }
     /**
      * This is used only if proxy mode is set true. It tells the local system to sent
@@ -62,13 +80,15 @@ public class AuthorizationServletConfig {
     }
 
     boolean localDFConsent = false;
+
+ /*   boolean useProxy = false;
     public boolean isUseProxy() {
         return useProxy;
     }
 
     public void setUseProxy(boolean useProxy) {
         this.useProxy = useProxy;
-    }
+    }*/
 
     public String getCfgFile() {
         return cfgFile;
@@ -86,7 +106,6 @@ public class AuthorizationServletConfig {
         this.cfgName = cfgName;
     }
 
-    boolean useProxy = false;
     String cfgFile = null;
     String cfgName = null;
 
@@ -109,7 +128,6 @@ public class AuthorizationServletConfig {
     }
 
     boolean verifyUsername;
-    boolean useHeader;
     boolean requireHeader;
     String headerFieldName;
     boolean returnDnAsUsername;
@@ -145,20 +163,20 @@ public class AuthorizationServletConfig {
     public boolean isRequireHeader() {
         return requireHeader;
     }
+  /*  boolean useHeader;
 
     public boolean isUseHeader() {
         return useHeader;
-    }
+    }*/
 
     @Override
     public String toString() {
         return "AuthorizationServletConfig{" +
-                "useProxy=" + useProxy +
+                "useMode=" + useMode +
                 ", cfgFile='" + cfgFile + '\'' +
                 ", cfgName='" + cfgName + '\'' +
                 ", showLogon=" + showLogon +
                 ", verifyUsername=" + verifyUsername +
-                ", useHeader=" + useHeader +
                 ", requireHeader=" + requireHeader +
                 ", headerFieldName='" + headerFieldName + '\'' +
                 ", returnDnAsUsername=" + returnDnAsUsername +

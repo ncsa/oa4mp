@@ -19,7 +19,6 @@ import org.oa4mp.delegation.common.storage.transactions.TransactionMemoryStore;
 import org.oa4mp.delegation.server.storage.ClientApprovalStore;
 import org.oa4mp.delegation.server.storage.ClientStore;
 import org.oa4mp.server.api.ClientApprovalProvider;
-import org.oa4mp.server.api.OA4MPConfigTags;
 import org.oa4mp.server.api.OA4MPServiceTransaction;
 import org.oa4mp.server.api.ServiceEnvironmentImpl;
 import org.oa4mp.server.api.admin.permissions.MultiDSPermissionStoreProvider;
@@ -39,6 +38,7 @@ import java.net.URI;
 import java.util.List;
 
 import static edu.uiuc.ncsa.security.core.configuration.Configurations.getFirstAttribute;
+import static org.oa4mp.server.api.OA4MPConfigTags.*;
 import static org.oa4mp.server.api.util.AbstractCLIApprover.POLLING_DIRECTORY;
 import static org.oa4mp.server.api.util.AbstractCLIApprover.POLLING_INTERVAL;
 
@@ -58,6 +58,7 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
     /**
      * Get the value from the configuration node as a boolean. This returns the default value if
      * no such configuration value. or if it does not parse to something reasonable.
+     *
      * @param sn
      * @param tagName
      * @param defaultValue
@@ -79,24 +80,48 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
 
     public AuthorizationServletConfig getAuthorizationServletConfig() {
         if (authorizationServletConfig == null) {
-            List kids = cn.getChildren(OA4MPConfigTags.AUTHORIZATION_SERVLET);
-            String headFieldName = null;
+            List kids = cn.getChildren(AUTHORIZATION_SERVLET);
+            String headerFieldName = null;
             boolean requiredHeader = false;
             boolean useHeader = false;
             boolean showLogon = true;
             boolean verifyUsername = true;
             boolean returnDnAsUsername = false;
             boolean convertDNToGlobusID = false;
+            String useMode = AUTHORIZATION_SERVLET_USE_MODE_NATIVE;
             String authorizationURI = null;
-            if (!kids.isEmpty()) {
+            if (kids.isEmpty()) {
+                authorizationServletConfig = new AuthorizationServletConfig(); // default mode
+
+            }else{
                 ConfigurationNode sn = (ConfigurationNode) kids.get(0);
-                try {
-                    boolean useProxy = getCfgBoolean(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_USE_PROXY, useHeader);
-                    // implicitly uses the fact that null (so missing parameter) parses to false.
-                    // If the useHeader tag is missing, then this is effectively false.
-                    useHeader = getCfgBoolean(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_HEADER_USE, useHeader);
-                    if (useProxy) {
-                        String cfgFile = getFirstAttribute(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_PROXY_CONFIG_FILE);
+                String x = getFirstAttribute(sn, AUTHORIZATION_SERVLET_USE_MODE);
+                if (!StringUtils.isTrivial(x)) {
+                    useMode = x;
+                }
+                // legacy. Test old attributes and set to new values.
+                x = getFirstAttribute(sn, AUTHORIZATION_SERVLET_USE_PROXY);
+                if (!StringUtils.isTrivial(x)) {
+                    if (x.equals("true")) {
+                        useMode = AUTHORIZATION_SERVLET_USE_MODE_PROXY;
+                    }
+                }
+                //boolean useProxy = getCfgBoolean(sn, AUTHORIZATION_SERVLET_USE_PROXY, useHeader);
+                // implicitly uses the fact that null (so missing parameter) parses to false.
+                // If the useHeader tag is missing, then this is effectively false.
+                x = getFirstAttribute(sn, AUTHORIZATION_SERVLET_HEADER_USE);
+                if (!StringUtils.isTrivial(x)) {
+                    if (x.equals("true")) {
+                        useMode = AUTHORIZATION_SERVLET_USE_MODE_HEADER;
+                    }
+                }
+                Boolean localDFConsent;
+                authorizationURI = getFirstAttribute(sn, AUTHORIZATION_SERVLET_URI);
+
+                //useHeader = getCfgBoolean(sn, AUTHORIZATION_SERVLET_HEADER_USE, useHeader);
+                switch (useMode) {
+                    case AUTHORIZATION_SERVLET_USE_MODE_PROXY:
+                        String cfgFile = getFirstAttribute(sn, AUTHORIZATION_SERVLET_PROXY_CONFIG_FILE);
                         if (StringUtils.isTrivial(cfgFile)) {
                             throw new IllegalArgumentException("Missing config file for the authorization proxy.");
                         }
@@ -111,58 +136,65 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
                         if (!f.canRead()) {
                             throw new IllegalArgumentException("The file \"" + cfgFile + "\" cannot be read. Check your permissions");
                         }
-                        String cfgName = getFirstAttribute(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_PROXY_CONFIG_NAME);
-                        boolean localDFConsent = getCfgBoolean(sn,
-                                OA4MPConfigTags.AUTHORIZATION_SERVLET_PROXY_DF_LOCAL_CONSENT_REQUIRED,
+                        String cfgName = getFirstAttribute(sn, AUTHORIZATION_SERVLET_PROXY_CONFIG_NAME);
+                        localDFConsent = getCfgBoolean(sn,
+                                AUTHORIZATION_SERVLET_PROXY_DF_LOCAL_CONSENT_REQUIRED,
                                 false);
 
                         // A missing config file is bad. However, if there is exactly one configuration in the file
                         // it does not need to be named, so the cfgName can be omitted.
                         authorizationServletConfig = new AuthorizationServletConfig(cfgFile, cfgName == null ? "" : cfgName, localDFConsent);
                         // Grab any authz URI or the discovery page does not get set right!
-                        authorizationURI = getFirstAttribute(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_URI);
                         if (authorizationURI != null) {
                             authorizationServletConfig.authorizationURI = authorizationURI;
                         }
 
-                    } else {
-                        authorizationURI = getFirstAttribute(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_URI);
-                        if (useHeader) {
-                            requiredHeader = getCfgBoolean(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_HEADER_REQUIRE, requiredHeader);
-                            headFieldName = getFirstAttribute(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_HEADER_FIELD_NAME);
-                            returnDnAsUsername = getCfgBoolean(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_RETURN_DN_AS_USERNAME, returnDnAsUsername);
-                            showLogon = getCfgBoolean(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_SHOW_LOGON, showLogon);
-                            verifyUsername = getCfgBoolean(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_VERIFY_USERNAME, verifyUsername);
-                            convertDNToGlobusID = getCfgBoolean(sn, OA4MPConfigTags.CONVERT_DN_TO_GLOBUS_ID, convertDNToGlobusID);
+                        break;
+                    case AUTHORIZATION_SERVLET_USE_MODE_HEADER:
+                        requiredHeader = getCfgBoolean(sn, AUTHORIZATION_SERVLET_HEADER_REQUIRE, requiredHeader);
+                        headerFieldName = getFirstAttribute(sn, AUTHORIZATION_SERVLET_HEADER_FIELD_NAME);
+                        if(StringUtils.isTrivial(headerFieldName)){
+                            headerFieldName = "REMOTE_USER";
                         }
+                        returnDnAsUsername = getCfgBoolean(sn, AUTHORIZATION_SERVLET_RETURN_DN_AS_USERNAME, returnDnAsUsername);
+                        showLogon = getCfgBoolean(sn, AUTHORIZATION_SERVLET_SHOW_LOGON, showLogon);
+                        verifyUsername = getCfgBoolean(sn, AUTHORIZATION_SERVLET_VERIFY_USERNAME, verifyUsername);
+                        convertDNToGlobusID = getCfgBoolean(sn, CONVERT_DN_TO_GLOBUS_ID, convertDNToGlobusID);
 
                         // Fall through. If  useHeader is true, then all the above values will be set.
                         // Otherwise, the previous defaults will be used.
                         authorizationServletConfig = new AuthorizationServletConfig(
                                 authorizationURI,
-                                useHeader,
                                 requiredHeader,
-                                headFieldName,
+                                headerFieldName,
                                 returnDnAsUsername,
                                 showLogon,
                                 verifyUsername,
                                 convertDNToGlobusID);
-                        authorizationServletConfig.setUseProxy(useProxy); // It's false here
-                        Boolean localDFConsent;
-                        String rawDFC = getFirstAttribute(sn, OA4MPConfigTags.AUTHORIZATION_SERVLET_PROXY_DF_LOCAL_CONSENT_REQUIRED );
-                        if(rawDFC == null) {
+                        String rawDFC = getFirstAttribute(sn, AUTHORIZATION_SERVLET_PROXY_DF_LOCAL_CONSENT_REQUIRED);
+                        if (rawDFC == null) {
                             // don't require local consent if replacing entire authorization machinery
                             // with an external one. External system should handle it all.
                             localDFConsent = !authorizationServletConfig.useExternalAuthorization();
-                        }else{
+                        } else {
                             localDFConsent = Boolean.parseBoolean(rawDFC); // use whatever they explicitly set, however
                         }
                         DebugUtil.trace(this, "setting local consent to " + localDFConsent);
                         authorizationServletConfig.setLocalDFConsent(localDFConsent);
-                    }
-                } catch (Throwable t) {
-                    info("Error loading authorization configuration. Disabling use of headers");
+                        break;
+                    case AUTHORIZATION_SERVLET_USE_MODE_NATIVE:
+                        authorizationServletConfig = new AuthorizationServletConfig();
+                        break;
+                    case AUTHORIZATION_SERVLET_USE_MODE_DEDICATED_ISSUER:
+                        authorizationServletConfig = new AuthorizationServletConfig(AUTHORIZATION_SERVLET_USE_MODE_DEDICATED_ISSUER, authorizationURI);
+                        break;
+                    case AUTHORIZATION_SERVLET_USE_MODE_EXTERNAL_SERVICE:
+                        authorizationServletConfig = new AuthorizationServletConfig(AUTHORIZATION_SERVLET_USE_MODE_EXTERNAL_SERVICE, authorizationURI);
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Unrecognized use mode \"" + useMode + "\" in " + AUTHORIZATION_SERVLET);
                 }
+
             }
 
 
@@ -177,12 +209,12 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
      * @throws Exception
      */
     protected void initialize() {
-        String scheme = Configurations.getFirstAttribute(cn, OA4MPConfigTags.ID_SCHEME);
+        String scheme = Configurations.getFirstAttribute(cn, ID_SCHEME);
         if (scheme != null && !scheme.isEmpty()) {
             IdentifierProvider.setScheme(scheme);
         }
         // scheme specific part
-        String spp = Configurations.getFirstAttribute(cn, OA4MPConfigTags.ID_SPP);
+        String spp = Configurations.getFirstAttribute(cn, ID_SPP);
         if (spp != null) {
             // If this is omitted in the configuration, then a null value results, so use the default.
             // It is possible to suppress this component by passing in an empty string.
@@ -197,7 +229,7 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
     public AbstractConfigurationLoader(ConfigurationNode node, MyLoggingFacade logger) {
         super(node, logger);
         // this.cn = node;
-        String x = Configurations.getFirstAttribute(cn, OA4MPConfigTags.DISABLE_DEFAULT_STORES);
+        String x = Configurations.getFirstAttribute(cn, DISABLE_DEFAULT_STORES);
         if (x != null) {
             isDefaultStoreDisabled(Boolean.parseBoolean(x));
         }
@@ -264,34 +296,34 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
             MultiDSTransactionStoreProvider storeProvider = new MultiDSTransactionStoreProvider(cn, isDefaultStoreDisabled(), loggerProvider.get(), tp);
             storeProvider.addListener(new DSSQLTransactionStoreProvider(cn,
                     getMySQLConnectionPoolProvider(),
-                    OA4MPConfigTags.MYSQL_STORE,
+                    MYSQL_STORE,
                     getCSP(),
                     tp,
                     getTokenForgeProvider(),
                     tc));
             storeProvider.addListener(new DSSQLTransactionStoreProvider(cn,
                     getMariaDBConnectionPoolProvider(),
-                    OA4MPConfigTags.MARIADB_STORE,
+                    MARIADB_STORE,
                     getCSP(),
                     tp,
                     getTokenForgeProvider(),
                     tc));
             storeProvider.addListener(new DSSQLTransactionStoreProvider(cn,
                     getPgConnectionPoolProvider(),
-                    OA4MPConfigTags.POSTGRESQL_STORE,
+                    POSTGRESQL_STORE,
                     getCSP(),
                     tp,
                     getTokenForgeProvider(),
                     tc));
             storeProvider.addListener(new DSSQLTransactionStoreProvider(cn,
                     getDerbyConnectionPoolProvider(),
-                    OA4MPConfigTags.DERBY_STORE,
+                    DERBY_STORE,
                     getCSP(),
                     tp,
                     getTokenForgeProvider(),
                     tc));
             storeProvider.addListener(new DSFSTransactionStoreProvider(cn, tp, getTokenForgeProvider(), tc));
-            storeProvider.addListener(new TypedProvider<TransactionStore>(cn, OA4MPConfigTags.MEMORY_STORE, OA4MPConfigTags.TRANSACTIONS_STORE) {
+            storeProvider.addListener(new TypedProvider<TransactionStore>(cn, MEMORY_STORE, TRANSACTIONS_STORE) {
 
                 @Override
                 public Object componentFound(CfgEvent configurationEvent) {
@@ -334,13 +366,13 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
             final ClientApprovalProvider caProvider = new ClientApprovalProvider();
             final ClientApproverConverter cp = new ClientApproverConverter(caProvider);
             casp.addListener(new DSFSClientApprovalStoreProvider(cn, cp));
-            casp.addListener(new DSSQLClientApprovalStoreProvider(cn, getMySQLConnectionPoolProvider(), OA4MPConfigTags.MYSQL_STORE, cp));
-            casp.addListener(new DSSQLClientApprovalStoreProvider(cn, getMariaDBConnectionPoolProvider(), OA4MPConfigTags.MARIADB_STORE, cp));
+            casp.addListener(new DSSQLClientApprovalStoreProvider(cn, getMySQLConnectionPoolProvider(), MYSQL_STORE, cp));
+            casp.addListener(new DSSQLClientApprovalStoreProvider(cn, getMariaDBConnectionPoolProvider(), MARIADB_STORE, cp));
 
-            casp.addListener(new DSSQLClientApprovalStoreProvider(cn, getPgConnectionPoolProvider(), OA4MPConfigTags.POSTGRESQL_STORE, cp));
-            casp.addListener(new DSSQLClientApprovalStoreProvider(cn, getDerbyConnectionPoolProvider(), OA4MPConfigTags.DERBY_STORE, cp));
+            casp.addListener(new DSSQLClientApprovalStoreProvider(cn, getPgConnectionPoolProvider(), POSTGRESQL_STORE, cp));
+            casp.addListener(new DSSQLClientApprovalStoreProvider(cn, getDerbyConnectionPoolProvider(), DERBY_STORE, cp));
 
-            casp.addListener(new TypedProvider<ClientApprovalStore>(cn, OA4MPConfigTags.MEMORY_STORE, OA4MPConfigTags.CLIENT_APPROVAL_STORE) {
+            casp.addListener(new TypedProvider<ClientApprovalStore>(cn, MEMORY_STORE, CLIENT_APPROVAL_STORE) {
 
                 @Override
                 public Object componentFound(CfgEvent configurationEvent) {
@@ -362,8 +394,8 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
 
     protected MailUtilProvider getMailUtilProvider() {
         if (mup == null) {
-            if (0 < cn.getChildrenCount(OA4MPConfigTags.MAIL)) {
-                mup = new ServletMailUtilProvider(((ConfigurationNode) cn.getChildren(OA4MPConfigTags.MAIL).get(0)));
+            if (0 < cn.getChildrenCount(MAIL)) {
+                mup = new ServletMailUtilProvider(((ConfigurationNode) cn.getChildren(MAIL).get(0)));
             } else {
                 mup = new ServletMailUtilProvider();
             }
@@ -373,8 +405,8 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
 
     protected ServiceEnvironmentImpl.MessagesProvider getMP() {
         if (messagesProvider == null) {
-            if (0 < cn.getChildrenCount(OA4MPConfigTags.MESSAGES)) {
-                messagesProvider = new ServiceEnvironmentImpl.MessagesProvider(((ConfigurationNode) cn.getChildren(OA4MPConfigTags.MESSAGES).get(0)));
+            if (0 < cn.getChildrenCount(MESSAGES)) {
+                messagesProvider = new ServiceEnvironmentImpl.MessagesProvider(((ConfigurationNode) cn.getChildren(MESSAGES).get(0)));
             }
         }
         return messagesProvider;
@@ -384,7 +416,7 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
     public T createInstance() {
         initialize();
         return (T) new ServiceEnvironmentImpl(loggerProvider.get(),
-              //  getMyProxyFacadeProvider(),
+                //  getMyProxyFacadeProvider(),
                 getTransactionStoreProvider(),
                 getClientStoreProvider(),
                 getMaxAllowedNewClientRequests(),
@@ -405,14 +437,14 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
     protected boolean getPingable() {
         boolean isPingable = true; //default
         try {
-            String y = Configurations.getFirstAttribute(cn, OA4MPConfigTags.PINGABLE);
+            String y = Configurations.getFirstAttribute(cn, PINGABLE);
             if (y == null || y.length() == 0) {
                 // use the default
             } else {
                 isPingable = Boolean.parseBoolean(y);
             }
         } catch (Throwable t) {
-            warn("Could not parse " + OA4MPConfigTags.PINGABLE + " property. Using default of " + isPingable);
+            warn("Could not parse " + PINGABLE + " property. Using default of " + isPingable);
         }
         if (isPingable) {
             info("ping enabled");
@@ -427,7 +459,7 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
     public int getMaxAllowedNewClientRequests() {
         if (maxAllowedNewClientRequests < 0) {
             maxAllowedNewClientRequests = 100; //default
-            String x = Configurations.getFirstAttribute(cn, OA4MPConfigTags.MAX_ALLOWED_NEW_CLIENT_REQUESTS);
+            String x = Configurations.getFirstAttribute(cn, MAX_ALLOWED_NEW_CLIENT_REQUESTS);
             if (x != null) {
                 try {
                     maxAllowedNewClientRequests = Integer.parseInt(x);
@@ -447,7 +479,7 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
             // The OAuth library requires this property but does not seem to use it. Omitting it though causes
             // failures though (null pointer exceptions), so it must be a valid address.
 
-            String x = Configurations.getFirstAttribute(cn, OA4MPConfigTags.SERVICE_ADDRESS);
+            String x = Configurations.getFirstAttribute(cn, SERVICE_ADDRESS);
             if (x == null) {
                 warn("Warning: service address set to default. Do you need an \"address\" attribute in your service config. tag?");
                 x = "http://localhost"; // MUST be a valid URI or this will fail later.
@@ -477,13 +509,12 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
         Object[] polling = loadPolling();
 
 
-        if (polling != null && 0<(long)polling[1]) {
+        if (polling != null && 0 < (long) polling[1]) {
             // only start polling if the polling interval is positive.
             info("Loading polling for " + polling[0]);
             AbstractCLIApprover.ClientApprovalThread cat = new AbstractCLIApprover.ClientApprovalThread(myLogger, se2, (File) polling[0], (Long) polling[1]);
             se2.setClientApprovalThread(cat);
         }
-
 
 
         return (T) se2;

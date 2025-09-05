@@ -1,6 +1,6 @@
 
 lib_support(true);
-lib_support(['/home/ncsa/dev/ncsa-git/oa4mp/di-service/src/main/scripts/qdl']);
+lib_support([os_env('NCSA_DEV_INPUT')+'/oa4mp/di-service/src/main/scripts/qdl']);
 //ws_macro([')ws set library_support on',')ws set lib_path /home/ncsa/dev/ncsa-git/oa4mp/di-service/src/main/scripts/qdl']);
 
 simple_auth(cfg.)-> {'oa4mp:di:user':cfg.'di'.'username','oa4mp:di:password':cfg.'di'.'password'};

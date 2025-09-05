@@ -90,7 +90,7 @@ public class DIService extends OA4MPServlet {
 
     @Override
     protected void doIt(HttpServletRequest request, HttpServletResponse response) throws Throwable {
-        ServletDebugUtil.printAllParameters(getClass(), request, true);
+     //   ServletDebugUtil.printAllParameters(getClass(), request, true);
         if (getOA2SE().getDIServiceConfig().isEnabled()) {
             String username = request.getParameter(DI_USER_PARAMETER);
             String password = request.getParameter(DI_PASSWORD_PARAMETER);

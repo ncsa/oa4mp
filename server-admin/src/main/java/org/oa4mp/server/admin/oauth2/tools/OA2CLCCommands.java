@@ -25,10 +25,7 @@ import org.oa4mp.client.loader.OA2MPService;
 import org.oa4mp.delegation.client.request.RTResponse;
 import org.oa4mp.delegation.common.token.Token;
 import org.oa4mp.delegation.common.token.impl.*;
-import org.oa4mp.delegation.server.JWTUtil;
-import org.oa4mp.delegation.server.NonceHerder;
-import org.oa4mp.delegation.server.OA2Constants;
-import org.oa4mp.delegation.server.UserInfo;
+import org.oa4mp.delegation.server.*;
 import org.oa4mp.delegation.server.client.ATResponse2;
 import org.oa4mp.delegation.server.client.RFC7523Utils;
 import org.oa4mp.delegation.server.jwt.MyOtherJWTUtil2;
@@ -325,7 +322,9 @@ public class OA2CLCCommands extends CommonCommands2 {
                 copyToClipboard(uriComplete, null);
             }
             isDeviceFlow = true;
-            grant = new AuthorizationGrantImpl(URI.create(dfResponse.getString(RFC8628Constants2.DEVICE_CODE)));
+            OA2TokenForge tf = new OA2TokenForge(null);
+            grant = (AuthorizationGrantImpl) tf.getAuthorizationGrant(dfResponse.getString(RFC8628Constants2.DEVICE_CODE));
+            //grant = new AuthorizationGrantImpl(URI.create(dfResponse.getString(RFC8628Constants2.DEVICE_CODE)));
             return dfResponse;
         } catch (
                 Throwable t) {
@@ -443,7 +442,7 @@ public class OA2CLCCommands extends CommonCommands2 {
         clear(inputLine, false); //clear out everything except any set parameters
         Identifier id = AssetStoreUtil.createID();
         HashMap<String, Object> copyOfParams = new HashMap<>();
-        copyOfParams.putAll(getRefreshParameters());
+        copyOfParams.putAll(getRequestParameters());
         createScopes(copyOfParams, true);
         OA4MPResponse resp = getService().requestCert(id, copyOfParams);
         getDebugger().trace(this, "client id = " + getCe().getClientId());
@@ -978,7 +977,11 @@ public class OA2CLCCommands extends CommonCommands2 {
         lastException = null;
         if (isDeviceFlow) {
             HashMap copyOfParams = new HashMap<>();
-            if (!getRequestParameters().isEmpty()) {
+            // If they specified auth parameters only, use those, assuming they got it slightly
+            // wrong, in that auth parameters are not sent in device flow.
+            // Otherwise, if they have token parameters, assume they are getting it right
+            // and have differentiated them.
+            if (getTokenParameters().isEmpty() && !getRequestParameters().isEmpty()) {
                 copyOfParams.putAll(getRequestParameters());
             } else {
                 copyOfParams.putAll(getTokenParameters());

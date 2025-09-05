@@ -82,7 +82,7 @@ public class OA2AuthenticationServer extends AbstractAuthenticationServlet {
 
     @Override
     protected void doIt(HttpServletRequest request, HttpServletResponse response) throws Throwable {
-        ServletDebugUtil.printAllParameters(getClass(), request,true);
+     //   ServletDebugUtil.printAllParameters(getClass(), request,true);
         Map<String, String> map = getFirstParameters(request);
         if(map.containsKey("action") && map.get("action").equals("ok")){
             // If authZ in progress, send to consent page here.
@@ -101,7 +101,8 @@ public class OA2AuthenticationServer extends AbstractAuthenticationServlet {
         // unscramble it.
         MyHttpServletResponseWrapper wrapper = new MyHttpServletResponseWrapper(response);
         OA2AuthorizedServletUtil init = getInitUtil();
-        init.doDelegation(request, wrapper); // creates transaction, writes it to wrapper
+        OA2ServiceTransaction t = init.doDelegation(request, wrapper); // creates transaction, writes it to wrapper
+        getTransactionStore().save(t);
         if (wrapper.isExceptionEncountered()) {
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, wrapper.toString(), wrapper.getStatus(),
                     HeaderUtils.getFirstParameterValue(request, OA2Constants.STATE));

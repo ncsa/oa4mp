@@ -1184,9 +1184,15 @@ public class CLC implements QDLMetaModule {
                 accessToken2.decodeToken(token.getToken());
                 token = accessToken2;
                 put(stem,"jti", token.getToken());
-                //say("   decoded token:" + accessToken.getToken());
             }
-            Date expirationDate = DateUtils.getDate(token.getToken());
+            Date expirationDate;
+            // Different client configurations have different attributes.
+            // Try to find the right one.
+            if(token.hasJTI()){
+                expirationDate = DateUtils.getDate(token.getJti());
+            }else{
+                expirationDate = DateUtils.getDate(token.getToken());
+            }
             expirationDate.setTime(expirationDate.getTime() + token.getLifetime());
             Boolean isExpired = expirationDate.getTime() < System.currentTimeMillis();
             put(stem,"expired", isExpired);

@@ -17,7 +17,7 @@ tokens. := clc#exchange(); // does fork
  Fixes https://github.com/ncsa/oa4mp/issues/211
 */
 
-debugger(1);
+debugger(10);
 args. := (0<size(args()))?args().0:['-subject', 'at']; // default is to use access token for exchange.
 saved_cfg := '/tmp/ersatz1-test.json';
 script_load('auto/tests/rfc8693/provision-github-211.qdl', saved_cfg);

@@ -9,8 +9,10 @@
     <!--
          Example file for using a proxy.
 
-          Be sure you have the correct authorizationServlet element in your server configuration.
-         See https://oa4mp.org/server/configuration/authentication-servlet-configuration.html
+         See: https://oa4mp.org/server/manuals/using-proxies.html
+         See: https://oa4mp.org/server/configuration/authentication-servlet-configuration.html
+
+
     -->
     <servlet>
         <servlet-name>discovery</servlet-name>
@@ -114,16 +116,6 @@
     </servlet-mapping>
 
     <servlet>
-        <servlet-name>sas</servlet-name>
-        <servlet-class>org.oa4mp.server.proxy.sas.CLISASServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>sas</servlet-name>
-        <url-pattern>/sas/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet>
         <servlet-name>userInfo</servlet-name>
         <servlet-class>org.oa4mp.server.loader.oauth2.servlet.UserInfoServlet</servlet-class>
     </servlet>
@@ -152,11 +144,8 @@
         <url-pattern>/introspect</url-pattern>
     </servlet-mapping>
 
-    <!--
-         Even though there is no password protection for the endpoints, this still should be
-         used to force all endpoints to use https.
-    -->
 
+    <!-- This forces all endpoints to use https. -->
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>portalSecurity</web-resource-name>

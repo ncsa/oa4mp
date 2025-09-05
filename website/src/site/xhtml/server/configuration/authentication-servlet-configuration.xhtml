@@ -4,25 +4,26 @@
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-    <title>Using the Authorization Header</title>
+    <title>Using the Authentication Configuration</title>
 </head>
 <body class="composite">
 
-<h2>Using the Authorization Servlet</h2>
+<h2>Using the Authentication Configuration</h2>
 
-<p>OA4MP has an authorization module that is built in. This may be replaced by installations as
-    needed. Part of the specification is that, if this is disabled, the username and information
-    about the client making the delegation request <b>must</b> be shown. This is called
-    <b>client verification</b> and is required by the OAuth protocol. You may have OA4MP
-    do this or disable this as well, though it is encumbant on the installation to show this information.
-    This results in 3 use cases:
+<p><a href="../pdf/Authentication_in_OA4MP.pdf">Authentication in OA4MP</a> may be accomplished in
+    several ways. This configuration element will tell the system which method you are using.
+    Note that the OAuth specification places <i>authentication</i> at the <b>/authorize</b>
+    endpoint, which does not help clarity. For purposes of this blurb, these should be
+    considered synonyms, but OA4MP itself has stark differences between them. T
 </p>
 <ol>
     <li><b>Replace authorization completely</b> In this case, you may write anything you like independent of
         OA4MP. CILogon, for instance, has its authorization layer written in PHP. You then notify OA4MP
-    when you are done. </li>
+        when you are done.
+    </li>
     <li><a href="../manuals/remote-user.html">Use Tomcat</a> and have it manage users. This can work for
-    very small systems.</li>
+        very small systems.
+    </li>
     <li><a href="../manuals/using-proxies.html">Use a proxy</a>, i.e., another OAuth server's authorization.</li>
 </ol>
 <p>The configuration has the elements for all three cases.</p>
@@ -39,16 +40,31 @@
         <td>N</td>
         <td>--</td>
         <td>(Replace authorization case). This is the address of whatever application does the authorization.
-        This must be specified so that it can be put into the well-known endpoint for discovery by
-        other services. It is required in the replacement case, but otherwise will be generated as
-        per standard location.</td>
+            This must be specified so that it can be put into the well-known endpoint for discovery by
+            other services. It is required in the replacement case, but otherwise will be generated as
+            per standard location.
+        </td>
     </tr>
+    <tr>
+        <td>use</td>
+        <td>N</td>
+        <td>default</td>
+        <td>Which paradigm of authentication you are using. Options are
+            <ul>
+                <li>default - extending the Java classes in OA4MP for direct user support</li>
+                <li>proxy - use a proxy</li>
+                <li>header - use an HTTP header to identify the user</li>
+                <li>external - Use and external authentication server and notify OA4MP with it DI Service</li>
+                <li>dedicated - Use OA4MP as a dedicated token issuer</li>
+            </ul>
+        </td>
+    </tr>
+
     <tr>
         <td>useProxy</td>
         <td>N</td>
         <td>false</td>
-        <td>(Proxy case) Valid values are "true" or "false".
-            This flag determines whether or not to use a proxy for authorization. <br/>
+        <td>(Deprecated) If "true" this is the same as setting the use attrbute to "proxy".<br/>
             See also cfgFile and cfgName
         </td>
     </tr>
@@ -84,8 +100,7 @@
         <td>useHeader</td>
         <td>N</td>
         <td>false</td>
-        <td>(Tomcat case) Valid values are "true" or "false".
-            This flag determines whether or not to enable this facility. Default is to not use this.
+        <td>(Deprecated) Use an HTTp header. Same as setting the use attribute to "header".
         </td>
     </tr>
 
@@ -93,23 +108,24 @@
         <td>requireHeader</td>
         <td>N</td>
         <td>false</td>
-        <td>(Tomcat case) Valid values are "true" or "false". This flag forces the server to use the specified header.
+        <td>(Header case) Valid values are "true" or "false". This flag forces the server to use the specified header.
             Note especially that if this is true and no such header is received then an exception is raised.
         </td>
     </tr>
     <tr>
         <td>headerFieldName</td>
         <td>N</td>
-        <td>N/A</td>
-        <td>(Tomcat case) The name of the header field to use. Generally this is <code>REMOTE_USER</code>, but this must
-            be specified. Other fields are permissible.
+        <td>REMOTE_USER</td>
+        <td>(Header case) The name of the header field to use. Generally this is <code>REMOTE_USER</code>.
+            Other fields are permissible.
         </td>
     </tr>
     <tr>
         <td>returnDNAsUsername</td>
         <td>N</td>
         <td>N/A</td>
-        <td>(Deprecated) Valid values are "true" or "false". This flag forces the server to return the DN (distinguished name)
+        <td>(Deprecated) Valid values are "true" or "false". This flag forces the server to return the DN (distinguished
+            name)
             on the certificate as the username, as opposed to the usual name of the user. This has nothing to do
             with enabling the use of the header field.
         </td>
@@ -118,10 +134,12 @@
         <td>convertDNToGlobusID</td>
         <td>N</td>
         <td>N/A</td>
-        <td>(Deprecated) Standard DN's (Distinguished names) are comma separated. Some versions of Globus, however, require
+        <td>(Deprecated) Standard DN's (Distinguished names) are comma separated. Some versions of Globus, however,
+            require
             that these be slash delimited. Enabling this option will convert commas to slashes using Globus's
             own utility for doing this. This means that you must
-            <a href="../manuals/getting-started.html">follow the installation instruction for JGlobus</a> to your Tomcat. Generally
+            <a href="../manuals/getting-started.html">follow the installation instruction for JGlobus</a> to your
+            Tomcat. Generally
             this option should rarely, if ever, be needed, so don't just enable it unless you are sure
             you know what it does and need it.
         </td>
@@ -134,7 +152,7 @@
 <pre>
 &lt;config&gt;
    &lt;server name="my-config"&gt;
-      &lt;authorizationServlet useProxy="true"
+      &lt;authorizationServlet use="proxy"
            cfgFile="/opt/oa4mp/etc/clients.xml"&gt;
            cfgName="cilogon-proxy"&gt;
       &lt;!-- rest of config --&gt;
@@ -149,35 +167,94 @@
     <a href="../manuals/using-proxies.html">using proxies</a>
 </p>
 
-<h3>Tomcat case, with the Remote User Header</h3>
+<h3>Header case, with the REMOTE_USER Header</h3>
 <pre>
 &lt;config&gt;
    &lt;server name="my-config"&gt;
-      &lt;authorizationServlet useHeader="true"
+      &lt;authorizationServlet use="header"
           headerFieldName="REMOTE_USER"/&gt;
       &lt;!-- rest of config --&gt;
    &lt;\server&gt;
 &lt;\config&gt;
 </pre>
-In this case, use of authorization headers is enabled and a header named <code>REMOTE_USER</code>
-will be used. If it is missing though, no exception will be raised. By default, the header field will
-be shown to the user along with client information and the user will be prompted if s/he wishes to continue.
-Be sure the enable the correct machinery in the web.xml file. The one supplied with the standard distribution
-is annotated.
+<p>
+    In this case, use of authentication headers is enabled and a header named <code>REMOTE_USER</code>
+    will be used. If it is missing though, no exception will be raised. By default, the header field will
+    be shown to the user along with client information and the user will be prompted if s/he wishes to continue.
+    Be sure to enable the correct machinery in the web.xml file. The one supplied with the standard distribution
+    is annotated.</p>
 
-<h3>Replacing the authorization module</h3>
+<p>Options that may be configured here to</p>
+<ul>
+    <li>use the header</li>
+    <li>required the header</li>
+    <li>specify the header name</li>
+</ul>
+
+<p>Specifying that the header should be used implies that the header <i>may</i> be present. Since the
+    username may be created also via an extension to the system (see below for details) the lack oof
+    a header field is not an error. However, requiring the header will cause an exception if the header is not found.
+    The default is to assume that the header is the <code>REMOTE_HEADER</code> field, though any field name
+    may be specified.</p>
+
+<h3>Replacing the authorization module with a Java extension of OA4MP</h3>
+
+<a href="https://github.com/ncsa/oa4mp-extension-example">Acomplete example of a an extensioin</a>.
+Either no configuration or if you want to make it explicit.
 <pre>
 &lt;config&gt;
    &lt;server name="my-config"&gt;
-      &lt;authorizationURI="https://address:port/my/auth_service"
-          /&gt;
+      &lt;authorizationServlet use="default"/&gt;
       &lt;!-- rest of config --&gt;
    &lt;\server&gt;
 &lt;\config&gt;
 </pre>
-<p>This tells the system that the entire authorization is handled at the endpoint given and the
-well-known file generated by OA4MP will point to that. See below for the particulars of how to
-integrate it with OA4MP.</p>
+<p>This tells the system that the entire authorization is handled at the endpoint in the
+    OAuth specification and the
+    well-known file generated by OA4MP will point to that. See below for the particulars of how to
+    integrate it with OA4MP.</p>
+
+<h3>Using your own Authentication Server (AS)</h3>
+<p>In this case, you have an external AS which handles all authentication and you need to simply
+    notify OA4MP of its state. </p>
+<pre>
+&lt;config&gt;
+   &lt;server name="my-config"&gt;
+      &lt;authorizationServlet use="external"
+          authorizationURI="https://your.AS.address"/&gt;
+      &lt;!-- rest of config --&gt;
+   &lt;\server&gt;
+&lt;\config&gt;
+</pre>
+<p>In this case, the well-known file points to the <b>authorizationURI</b> value and all clients will
+    therefore make requests to that. Your AS should be able to do all the authentication needed.
+    OA4MP must be configured to run its <a href="">DIService</a> so your system can send
+    it notifications.</p>
+
+<p>Additionally, make sure that if you set the <b>device</b> endpoiont for the device
+    flow (so user's are directed to your AS to authenticate for the device flow) by
+    configuring the <b>verficationURI</b> in the <a
+            href="https://oa4mp.org/server/configuration/device-flow-servlet-configuration.html">deviceFlowServlet
+        configuration</a>.
+    The <b>device_authorization</b> endpoint (where user's start the device flow) must be managed
+    by OA4MP, since that sets up all the state needed for the flow,
+    although you can hide it and simply call it on behalf of users.
+</p>
+
+<h3>Using OA4MP as a Dedicated Issuer</h3>
+<p>In this case, you have a DTI (Dedicated Token Issuer) service that generates token requests which OA4MP will service,
+    but there is need for the DIService. All that is needed is the endpoint for your service
+    to be specified in the configuration so it will be correctly set in the well-known page:</p>
+<pre>
+&lt;config&gt;
+   &lt;server name="my-config"&gt;
+      &lt;authorizationServlet use="dedicated"
+          authorizationURI="https://your.DTI.address"/&gt;
+      &lt;!-- rest of config --&gt;
+   &lt;\server&gt;
+&lt;\config&gt;
+</pre>
+
 
 <h3>Use cases</h3>
 There are three main use cases which should be discussed in more depth. The particulars of how to configure
@@ -192,22 +269,6 @@ and authorization module are best dealt with elsewhere and a discussion can be f
 
 <h4>Using another authorization module, but using OA4MP's verification page.</h4>
 
-<p>In this case, the username and (possibly) password will be delivered in the header. We generally suggest that
-    standard practice of using the <code>REMOTE_USER</code> header be used. Unless explicitly disabled,
-    the verification page with the displayed username will be shown.</p>
-
-<p>Options that may be configured here to</p>
-<ul>
-    <li>use the header</li>
-    <li>required the header</li>
-    <li>specify the header name</li>
-</ul>
-
-<p>Specifying that the header should be used implies that the header <i>may</i> be present. Since the
-    username may be created also via an extension to the system (see below for details) the lack oof
-    a header field is not an error. However, requiring the header will cause an exception if the header is not found.
-    The default is to assume that the header is the <code>REMOTE_HEADER</code> field, though any field name
-    may be specified.</p>
 
 <h4>Completely replacing the authorization module.</h4>
 
@@ -249,7 +310,7 @@ and authorization module are best dealt with elsewhere and a discussion can be f
         <td>String</td>
         <td>(Optional) the password the user will require to log in to MyProxy.</td>
     </tr>
- </tbody>
+    </tbody>
 </table>
 
 

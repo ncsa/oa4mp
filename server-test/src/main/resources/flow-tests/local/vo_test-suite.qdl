@@ -2,23 +2,44 @@
    This is not a standalone test. Several clients either extend this or are provisioned from it, so
    this just runs the tests against localhost:command.line2 and my be invoked as needed.
    The assumption is that the authorization has been done and then the client is simply used
+
+ Remember code and verifier are created using RS256 (from spec):
+ BASE64URL-ENCODE(SHA256(ASCII(code_verifier))) == code_challenge
+                           ^
+                           +- convert to bytes
+  QDL's hash outputs a hex value, so it would need to be converted to an integer.
 */
-/* Next should be set in the main.qdl script.*/
 issuer := args().1;
+c ≔ j_load('crypto');
+code_verifier := random_string(64); // 48 bytes = 64 characters long
+code_challenge := c#code_challenge(code_verifier);
+//  code_verifier := 'qBdfP8Wmpomgkq6aJwcvZQMHx553RK4P7LAYxmzMAkmo8cM7MlE8ViJSOx38nlHr';
+//  code_verifier := 'OVa8tAaTJ3D-ByH1oc8tNHlbu0jQrGhGhyDs1cC_JGc';
+
+// next two are from a web tutorial and should work
+//  code_verifier := 'dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk'; // From web
+// code_challenge := 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM'; // From web
+
+//debugger(1);
+debugger(1,'code_verifier = ' + code_verifier);
+debugger(1,'code_verifier int = ' + c#b64_to_int(code_verifier));
+debugger(1,'code_challenge = ' + code_challenge);
+debugger(1,'code_challenge #2 = ' + c#hex_to_b64(hash(code_verifier, 'sha-256')));
 params.'authz' :=  {
                     'scope': 'read: write: x.y',
-          'code_challenge' : 'N_zjM2czxZIWNar-lWUiuS7-Pacwh-k-L_Akpje6AmY',
+   //       'code_challenge' : 'N_zjM2czxZIWNar-lWUiuS7-Pacwh-k-L_Akpje6AmY',
+         'code_challenge' : code_challenge,
    'code_challenge_method' : 'S256'
    };
 params.'token' := {
-  'code_verifier' : 'qBdfP8Wmpomgkq6aJwcvZQMHx553RK4P7LAYxmzMAkmo8cM7MlE8ViJSOx38nlHr',
+  //'code_verifier' : 'qBdfP8Wmpomgkq6aJwcvZQMHx553RK4P7LAYxmzMAkmo8cM7MlE8ViJSOx38nlHr',
+  'code_verifier' : code_verifier,
           'scope' : 'read: write: x.y'
    };
 params.'exchange':={'scope':'read:/home/jeff write:/data/jeff/cluster x.y:/abc/def/ghi'};
 // params.'refresh':={'scope':'read:/home/jeff write:/data/jeff/cluster x.y:/abc/def/ghi'};
 rc := script_load('driver.qdl', args().0, params.);
 if[rc!='ok'][return(rc);];
-
 tokens. := clc#access();
 
 ⊨ is_defined(tokens.) : 'uh-oh, access endpoint failed:' + to_string(tokens., true);
@@ -40,7 +61,7 @@ define[test_lifetime(at., rt.)][
 define[test(at., rt., user, expected_scopes., issuer)][
    ss. := tokenize(at.'scope', ' ');
    //⊨ at.'iss' == 'http://localhost:9443/custom/issuer' : 'wrong issuer';
-   ⊨ at.'iss' == issuer : 'wrong issuer';
+   ⊨ at.'iss' == issuer : 'wrong issuer, expected ' + issuer + ', got ' + (at.'iss');
    ⊨ is_defined(at.'wlcg.ver')  : 'not an WLCG token';
    ⊨ at.'wlcg.ver' == '1.0' : 'wrong WLCG version';
    ⊨ user == at.'sub' : 'subject in id and access token do not match';

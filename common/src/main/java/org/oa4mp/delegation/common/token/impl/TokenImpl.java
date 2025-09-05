@@ -47,6 +47,7 @@ public class TokenImpl implements NewToken {
         return version;
     }
 
+    public boolean hasJTI(){return jti != null;}
     /**
      * If this is a JWT, then this returns the JTI. If not, it just returns the token.
      *

@@ -33,6 +33,7 @@ import org.oa4mp.delegation.server.request.ATRequest;
 import org.oa4mp.delegation.server.request.IssuerResponse;
 import org.oa4mp.delegation.server.server.*;
 import org.oa4mp.delegation.server.server.claims.OA2Claims;
+import org.oa4mp.server.api.OA4MPConfigTags;
 import org.oa4mp.server.api.admin.adminClient.AdminClient;
 import org.oa4mp.server.api.admin.permissions.Permission;
 import org.oa4mp.server.api.admin.permissions.PermissionsStore;
@@ -251,7 +252,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
      * @throws Throwable
      */
     protected void doRFC6749_4_4(HttpServletRequest request, HttpServletResponse response, OA2Client client) throws Throwable {
-        ServletDebugUtil.printAllParameters(getClass(), request, true);
         String state = getFirstParameterValue(request, STATE);
         String nonce = getFirstParameterValue(request, NONCE);
         OA2ServiceTransaction serviceTransaction = (OA2ServiceTransaction) getOA2SE().getTransactionStore().create();
@@ -403,7 +403,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
      */
     protected void doRFC7523InitiateFlow(HttpServletRequest request, HttpServletResponse response, BaseClient adminBaseClient) throws Throwable {
         JSONObject tokenRequest = null;
-        ServletDebugUtil.printAllParameters(getClass(), request, true);
         AdminClient adminClient = getOA2SE().getAdminClientStore().get(adminBaseClient.getIdentifier()); // get the full one
         if (adminClient == null) {
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, "no such admin client");
@@ -1941,7 +1940,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             }
             if (!codeChallenge.equals(serviceTransaction.getCodeChallenge())) {
                 // CIL-1307
-                OA4MPServlet.createDebugger(client).trace(this, "missing code challenge, PKCE (RFC 7636) failed");
+                OA4MPServlet.createDebugger(client).trace(this, "PKCE (RFC 7636) code challenge =\"" + codeChallenge + "\"  failed");
                 throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
                         "code challenge failed, access denied",
                         serviceTransaction.getRequestState());
@@ -1969,7 +1968,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         if (debugger instanceof ClientDebugUtil) {
             ((ClientDebugUtil) debugger).setTransaction(st2);
         }
-        if (getOA2SE().hasAuthorizationServletConfig() && getOA2SE().getAuthorizationServletConfig().isLocalDFConsent() && !st2.isConsentPageOK()) {
+        if (getOA2SE().getAuthorizationServletConfig().isLocalDFConsent() && !st2.isConsentPageOK()) {
             throw new OA2ATException(OA2Errors.CONSENT_REQUIRED,
                     "consent required",
                     HttpStatus.SC_BAD_REQUEST,
@@ -2778,7 +2777,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                     HttpStatus.SC_BAD_REQUEST,
                     null);
         }
-        if (getOA2SE().hasAuthorizationServletConfig() && getOA2SE().getAuthorizationServletConfig().isLocalDFConsent() && !transaction.isConsentPageOK()) {
+        if (getOA2SE().getAuthorizationServletConfig().isLocalDFConsent() && !transaction.isConsentPageOK()) {
             throw new OA2ATException(OA2Errors.CONSENT_REQUIRED,
                     "consent required",
                     HttpStatus.SC_BAD_REQUEST,
@@ -2802,7 +2801,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
 
         // Logic is simple. If proxy, farm it out to the proxy and it works or doesn't.
         // otherwise, manage all the state for retries.
-        if (getOA2SE().hasAuthorizationServletConfig() && getOA2SE().getAuthorizationServletConfig().isUseProxy()) {
+        if (getOA2SE().getAuthorizationServletConfig().getUseMode().equals(OA4MPConfigTags.AUTHORIZATION_SERVLET_USE_MODE_PROXY)) {
             //forward to the proxy. If it succeeds there, set the rfc state to valid.
             try {
                 ProxyUtils.getProxyAccessToken(getOA2SE(), transaction);

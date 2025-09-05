@@ -1,5 +1,6 @@
 package org.oa4mp.server.proxy;
 
+import org.oa4mp.server.api.OA4MPConfigTags;
 import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.storage.RFC8628Store;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
@@ -54,7 +55,6 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
     protected void doIt(HttpServletRequest req, HttpServletResponse resp) throws Throwable {
         ServletDebugUtil.trace(this, "starting device flow");
         OA2SE oa2SE = (OA2SE) OA4MPServlet.getServiceEnvironment();
-       ServletDebugUtil.printAllParameters(getClass(), req, true);
         if (!oa2SE.isRfc8628Enabled()) {
             ServletDebugUtil.trace(this, "device flow not enabled onthis server");
             throw new OA2ATException(OA2Errors.ACCESS_DENIED,
@@ -152,7 +152,7 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
         }
 
         String userCode; //what the user is presented with
-        if (oa2SE.hasAuthorizationServletConfig() && oa2SE.getAuthorizationServletConfig().isUseProxy()) {
+        if (oa2SE.getAuthorizationServletConfig().getUseMode().equals(OA4MPConfigTags.AUTHORIZATION_SERVLET_USE_MODE_PROXY)) {
             userCode = ProxyUtils.startProxyDeviceFlow(oa2SE, t, rfc8628State);
             lifetime = rfc8628State.lifetime; // This is set from the proxy and must be propagated to the user.
             // if use local DF consent is false,  can't get callback from DF, hence there can be

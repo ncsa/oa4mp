@@ -21,8 +21,8 @@ block[
    debugger(1,print(funcs()));
    cfg. ≔ args().0;
    debugger(1,'cfg:\n'+print(cfg.));
-   uri ≔args().1;
-   //(1 == size(args())) ? uri≔ cb_read() : args().1;
+   uri ≔ null;
+   (1 == size(args())) ? uri≔ cb_read() : args().1;
    debugger(1,'uri=' + uri);
    uri. ≔ to_uri(uri);
    debugger(1,'uri:\n' + print(uri.));

@@ -15,7 +15,6 @@ then[
 all_test_start:=date_ms();
 do_flows := '-flow' ∈ args();
 suites. := ['-dev', '-test', '-local']∈args();
-say(suites.);
 if[suites.0][
     script_load('test#/cm-tests/all.qdl','cm_dev');
       if[do_flows]

@@ -58,10 +58,13 @@ debugger(3,'args size= ' + size(args()));
 debugger(1,'this should not print!');
 claims.'seq0' := args().0.'port'; // returns 636
 claims.'seq0_phase' := exec_phase; // returns current exec phase
-  if[size(xas.) != 0]
-then[
+say('Getting ready to process XAS');
+   if[size(xas.) == 0]
+ then[say('NO XAS FOUND');]
+ else[
       say('xas.=' + to_string(xas.));
       claims.'roles' := xas.'org.oa4mp'.'/roles';
+      say('set claims.roles=' + claims.'roles');
         if[∃claims.'roles2']
       then[claims.'roles2' := xas.'org.oa4mp'.'/roles2';];
     ];
