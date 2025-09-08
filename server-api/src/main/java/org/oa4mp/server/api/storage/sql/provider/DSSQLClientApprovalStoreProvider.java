@@ -1,16 +1,17 @@
 package org.oa4mp.server.api.storage.sql.provider;
 
-import org.oa4mp.server.api.ClientApprovalProvider;
-import org.oa4mp.server.api.OA4MPConfigTags;
-import org.oa4mp.server.api.storage.sql.SQLClientApprovalStore;
-import org.oa4mp.server.api.storage.sql.table.ClientApprovalTable;
-import org.oa4mp.delegation.common.storage.clients.ClientApprovalKeys;
+import edu.uiuc.ncsa.security.core.cf.CFNode;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPoolProvider;
 import edu.uiuc.ncsa.security.storage.sql.SQLStoreProvider;
 import edu.uiuc.ncsa.security.storage.sql.internals.Table;
 import org.apache.commons.configuration.tree.ConfigurationNode;
+import org.oa4mp.delegation.common.storage.clients.ClientApprovalKeys;
+import org.oa4mp.server.api.ClientApprovalProvider;
+import org.oa4mp.server.api.OA4MPConfigTags;
+import org.oa4mp.server.api.storage.sql.SQLClientApprovalStore;
+import org.oa4mp.server.api.storage.sql.table.ClientApprovalTable;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -27,9 +28,23 @@ public class DSSQLClientApprovalStoreProvider extends SQLStoreProvider<SQLClient
             MapConverter converter) {
         super(config, cpp, type, target, tablename, converter);
     }
+    public DSSQLClientApprovalStoreProvider(
+            CFNode config,
+            ConnectionPoolProvider<? extends ConnectionPool> cpp,
+            String type,
+            String target,
+            String tablename,
+            MapConverter converter) {
+        super(config, cpp, type, target, tablename, converter);
+    }
 
     public DSSQLClientApprovalStoreProvider(
             ConfigurationNode config,
+            ConnectionPoolProvider<? extends ConnectionPool> cpp, String type, MapConverter converter) {
+        super(config, cpp, type, OA4MPConfigTags.CLIENT_APPROVAL_STORE, SQLClientApprovalStore.DEFAULT_TABLENAME, converter);
+    }
+    public DSSQLClientApprovalStoreProvider(
+            CFNode config,
             ConnectionPoolProvider<? extends ConnectionPool> cpp, String type, MapConverter converter) {
         super(config, cpp, type, OA4MPConfigTags.CLIENT_APPROVAL_STORE, SQLClientApprovalStore.DEFAULT_TABLENAME, converter);
     }

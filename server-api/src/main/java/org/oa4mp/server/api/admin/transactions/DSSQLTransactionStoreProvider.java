@@ -1,5 +1,6 @@
 package org.oa4mp.server.api.admin.transactions;
 
+import edu.uiuc.ncsa.security.core.cf.CFNode;
 import org.oa4mp.server.api.OA4MPConfigTags;
 import org.oa4mp.server.api.OA4MPServiceTransaction;
 import org.oa4mp.server.api.storage.MultiDSClientStoreProvider;
@@ -22,6 +23,19 @@ import static org.oa4mp.delegation.server.storage.SQLServiceTransactionStore.DEF
 public class DSSQLTransactionStoreProvider<T extends DSSQLTransactionStore> extends SQLStoreProvider<T> implements OA4MPConfigTags {
     public DSSQLTransactionStoreProvider(
             ConfigurationNode config,
+            ConnectionPoolProvider<? extends ConnectionPool> cpp,
+            String type,
+            MultiDSClientStoreProvider clientStoreProvider,
+            Provider<? extends OA4MPServiceTransaction> tp,
+            Provider<TokenForge> tfp,
+            MapConverter converter) {
+        super(config, cpp,  type, OA4MPConfigTags.TRANSACTIONS_STORE, DEFAULT_TABLENAME, converter);
+        this.clientStoreProvider = clientStoreProvider;
+        this.transactionProvider = tp;
+        tokenForgeProvider = tfp;
+    }
+    public DSSQLTransactionStoreProvider(
+            CFNode config,
             ConnectionPoolProvider<? extends ConnectionPool> cpp,
             String type,
             MultiDSClientStoreProvider clientStoreProvider,

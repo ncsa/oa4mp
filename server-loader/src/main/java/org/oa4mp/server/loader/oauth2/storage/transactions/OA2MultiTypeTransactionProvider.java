@@ -1,5 +1,6 @@
 package org.oa4mp.server.loader.oauth2.storage.transactions;
 
+import edu.uiuc.ncsa.security.core.cf.CFNode;
 import org.oa4mp.server.api.admin.transactions.MultiDSTransactionStoreProvider;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
@@ -15,8 +16,15 @@ public class OA2MultiTypeTransactionProvider extends MultiDSTransactionStoreProv
     public OA2MultiTypeTransactionProvider(ConfigurationNode config, boolean disableDefaultStore, MyLoggingFacade logger, IdentifiableProvider tp) {
         super(config, disableDefaultStore, logger, tp);
     }
+    public OA2MultiTypeTransactionProvider(CFNode config, boolean disableDefaultStore, MyLoggingFacade logger, IdentifiableProvider tp) {
+        super(config, disableDefaultStore, logger, tp);
+    }
 
     public OA2MultiTypeTransactionProvider(ConfigurationNode config, boolean disableDefaultStore, MyLoggingFacade logger, String type, String target, IdentifiableProvider tp) {
+        super(config, disableDefaultStore, logger, type, target, tp);
+    }
+
+    public OA2MultiTypeTransactionProvider(CFNode config, boolean disableDefaultStore, MyLoggingFacade logger, String type, String target, IdentifiableProvider tp) {
         super(config, disableDefaultStore, logger, type, target, tp);
     }
 

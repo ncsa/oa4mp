@@ -1,5 +1,6 @@
 package org.oa4mp.delegation.common.storage.transactions;
 
+import edu.uiuc.ncsa.security.core.cf.CFNode;
 import edu.uiuc.ncsa.security.core.configuration.provider.MultiTypeProvider;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import org.oa4mp.delegation.common.storage.TransactionStore;
@@ -16,5 +17,9 @@ public abstract class TransactionStoreProvider<T extends TransactionStore<? exte
         super(config, disableDefaultStore, loggingFacade, type, target);
     }
 
-
+    public TransactionStoreProvider(CFNode config,
+                                    boolean disableDefaultStore, MyLoggingFacade loggingFacade,
+                                    String type, String target) {
+        super(config, disableDefaultStore, loggingFacade, type, target);
+    }
 }

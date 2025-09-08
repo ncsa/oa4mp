@@ -1,5 +1,6 @@
 package org.oa4mp.server.api.admin.transactions;
 
+import edu.uiuc.ncsa.security.core.cf.CFNode;
 import org.oa4mp.server.api.OA4MPConfigTags;
 import org.oa4mp.server.api.OA4MPServiceTransaction;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
@@ -21,6 +22,15 @@ public class DSFSTransactionStoreProvider<T extends DSFSTransactionStore> extend
                                         Provider<TokenForge> tfp,
                                         TransactionConverter<? extends OA4MPServiceTransaction> tc
                                         ) {
+        super(config, FILE_STORE, TRANSACTIONS_STORE, tc);
+        this.transactionProvider = tp;
+        this.tokenForgeProvider = tfp;
+    }
+    public DSFSTransactionStoreProvider(CFNode config,
+                                        IdentifiableProvider<? extends OA4MPServiceTransaction> tp,
+                                        Provider<TokenForge> tfp,
+                                        TransactionConverter<? extends OA4MPServiceTransaction> tc
+    ) {
         super(config, FILE_STORE, TRANSACTIONS_STORE, tc);
         this.transactionProvider = tp;
         this.tokenForgeProvider = tfp;

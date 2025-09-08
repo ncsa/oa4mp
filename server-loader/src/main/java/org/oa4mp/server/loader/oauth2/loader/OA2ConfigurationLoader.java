@@ -9,6 +9,7 @@ import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.*;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
+import edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConfigUtils;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPoolProvider;
 import edu.uiuc.ncsa.security.storage.sql.SQLStore;
@@ -280,8 +281,9 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
      * @return
      */
     public Collection<LocalTime> getAlarms(ConfigurationNode node, String tag) {
-        return Configurations.getAlarms(node, tag);
+        return UpkeepConfigUtils.getAlarms(node, tag);
     }
+
 
     /**
      * Get alarms that are in the main service tag.
@@ -290,8 +292,10 @@ public class OA2ConfigurationLoader<T extends ServiceEnvironmentImpl> extends Ab
      * @return
      */
     public Collection<LocalTime> getAlarms(String tag) {
-        return Configurations.getAlarms(cn, tag);
+
+        return UpkeepConfigUtils.getAlarms(cn, tag);
     }
+
 
 
     public Collection<LocalTime> getMonitorAlarms() {
