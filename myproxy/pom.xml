@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.oa4mp</groupId>
         <artifactId>oa4mp-parent</artifactId>
-        <version>6.x-SNAPSHOT</version>
+        <version>6.2.1</version>
     </parent>
     <artifactId>myproxy</artifactId>
     <name>OA4MP MyProxy support</name>
@@ -15,7 +15,7 @@
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>oa4mp-server-oauth2</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.1</version>
             <type>war</type>
         </dependency>
         <dependency>
@@ -38,23 +38,23 @@
 <!--        <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>oa4mp-server-oauth2</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.1</version>
             <type>pom</type>
         </dependency>-->
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>server-api</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.1</version>
         </dependency>
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>server-loader</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.1</version>
         </dependency>
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>server-api</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.1</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -65,24 +65,24 @@
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>myproxy-logon</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.1</version>
         </dependency>
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>proxy</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.1</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>oauth2</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.1</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>core</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.1</version>
         </dependency>
     </dependencies>
 </project>
