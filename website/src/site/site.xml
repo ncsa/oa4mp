@@ -14,7 +14,7 @@
     <skin>
         <groupId>edu.uiuc.ncsa.maven.skin</groupId>
         <artifactId>skin</artifactId>
-        <version>6.x-SNAPSHOT</version>
+        <version>6.2.1</version>
     </skin>
     <body>
         <menu name="OA4MP">
