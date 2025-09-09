@@ -1,5 +1,6 @@
 package org.oa4mp.server.loader.oauth2.storage.tx;
 
+import edu.uiuc.ncsa.security.core.cf.CFNode;
 import org.oa4mp.server.api.OA4MPConfigTags;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPoolProvider;
@@ -21,6 +22,14 @@ public class SQLTXRStoreProvider<T extends SQLTXRecordStore> extends SQLStorePro
                                TXRecordProvider txRecordProvider) {
         super(config, cpp, type, OA4MPConfigTags.TOKEN_EXCHANGE_RECORD_STORE,DEFAULT_TABLENAME , converter);
          this.txRecordProvider = txRecordProvider;
+    }
+    public SQLTXRStoreProvider(CFNode config,
+                               ConnectionPoolProvider<? extends ConnectionPool> cpp,
+                               String type,
+                               TXRecordConverter converter,
+                               TXRecordProvider txRecordProvider) {
+        super(config, cpp, type, OA4MPConfigTags.TOKEN_EXCHANGE_RECORD_STORE,DEFAULT_TABLENAME , converter);
+        this.txRecordProvider = txRecordProvider;
     }
     TXRecordProvider txRecordProvider = null;
 

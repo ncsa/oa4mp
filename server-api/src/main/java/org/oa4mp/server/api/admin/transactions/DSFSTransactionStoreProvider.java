@@ -26,6 +26,7 @@ public class DSFSTransactionStoreProvider<T extends DSFSTransactionStore> extend
         this.transactionProvider = tp;
         this.tokenForgeProvider = tfp;
     }
+
     public DSFSTransactionStoreProvider(CFNode config,
                                         IdentifiableProvider<? extends OA4MPServiceTransaction> tp,
                                         Provider<TokenForge> tfp,
@@ -35,6 +36,7 @@ public class DSFSTransactionStoreProvider<T extends DSFSTransactionStore> extend
         this.transactionProvider = tp;
         this.tokenForgeProvider = tfp;
     }
+
 
     protected IdentifiableProvider<? extends OA4MPServiceTransaction> transactionProvider;
     protected Provider<TokenForge> tokenForgeProvider;

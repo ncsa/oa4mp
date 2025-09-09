@@ -1,29 +1,26 @@
 package org.oa4mp.server.loader.qdl.scripting;
 
+import edu.uiuc.ncsa.security.core.cf.CFNode;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.scripting.ScriptSet;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import org.apache.commons.configuration.tree.ConfigurationNode;
-import org.qdl_lang.config.QDLConfigurationLoader;
+import org.qdl_lang.config.QDLCFConfigurationLoader;
 import org.qdl_lang.scripting.AnaphorUtil;
 
 import java.util.List;
-
-import static edu.uiuc.ncsa.security.core.configuration.Configurations.getFirstNode;
-import static edu.uiuc.ncsa.security.core.configuration.Configurations.getNodeValue;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 4/29/22 at  9:31 AM
  */
-public class OA2QDLConfigurationLoader<T extends OA2QDLEnvironment> extends QDLConfigurationLoader<T> {
-    public OA2QDLConfigurationLoader(String cfgFile, ConfigurationNode node) {
+public class OA2QDLCFConfigurationLoader<T extends OA2QDLEnvironment> extends QDLCFConfigurationLoader<T> {
+    public OA2QDLCFConfigurationLoader(String cfgFile, CFNode node) {
         super(cfgFile, node);
     }
 
-    public OA2QDLConfigurationLoader(String cfgFile, ConfigurationNode node, MyLoggingFacade logger) {
+    public OA2QDLCFConfigurationLoader(String cfgFile, CFNode node, MyLoggingFacade logger) {
         super(cfgFile, node, logger);
     }
 
@@ -75,7 +72,7 @@ public class OA2QDLConfigurationLoader<T extends OA2QDLEnvironment> extends QDLC
     private boolean isSkipBadModulesOnLoad() {
         // Fix CIL-1772
         if (skipBadModulesOnLoad == null) {
-            String x = getNodeValue(cn, SKIP_BAD_MODULES_TAG);
+            String x = cn.getNodeContents(SKIP_BAD_MODULES_TAG);
             if (x == null) {
                 skipBadModulesOnLoad = true; // default
             } else {
@@ -90,24 +87,24 @@ public class OA2QDLConfigurationLoader<T extends OA2QDLEnvironment> extends QDLC
     public static String SKIP_BAD_MODULES_TAG = "skipBadModulesOnLoad";
 
     protected String getWSEnvFile() {
-        ConfigurationNode node = getFirstNode(cn, WS_TAG);
-        return getNodeValue(node, WS_ENV, "");
+        CFNode node = cn.getFirstNode( WS_TAG);
+        return node.getNodeContents(WS_ENV, "");
     }
 
     public ScriptSet getServerScriptSet() {
-        ConfigurationNode node = getFirstNode(cn, SCRIPTS_TAG);
+        CFNode node = cn.getFirstNode(SCRIPTS_TAG);
         if (node == null) {
             // no scripts.
             return null;
         }
-        List<ConfigurationNode> scripts = node.getChildren(SCRIPT_TAG);
+        List<CFNode> scripts = node.getChildren(SCRIPT_TAG);
         if (scripts == null || scripts.isEmpty()) {
             return null;
         }
         JSONArray allScripts = new JSONArray();
 
-        for (ConfigurationNode scriptNode : scripts) {
-            String rawJSON = (String) scriptNode.getValue();
+        for (CFNode scriptNode : scripts) {
+            String rawJSON =  scriptNode.getValue();
             if (rawJSON != null && !rawJSON.trim().isEmpty()) {
                 // skip empty tags
                 JSONObject jsonObject = JSONObject.fromObject(rawJSON);

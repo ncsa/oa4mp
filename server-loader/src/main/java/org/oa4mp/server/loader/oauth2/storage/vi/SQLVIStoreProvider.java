@@ -1,5 +1,6 @@
 package org.oa4mp.server.loader.oauth2.storage.vi;
 
+import edu.uiuc.ncsa.security.core.cf.CFNode;
 import org.oa4mp.server.api.OA4MPConfigTags;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPoolProvider;
@@ -21,6 +22,15 @@ public class SQLVIStoreProvider<T extends SQLVIStore> extends SQLStoreProvider<T
                               VIProvider VIProvider) {
         super(config, cpp, type, OA4MPConfigTags.VIRTUAL_ORGANIZATION_STORE,DEFAULT_TABLENAME , converter);
          this.VIProvider = VIProvider;
+    }
+
+    public SQLVIStoreProvider(CFNode config,
+                              ConnectionPoolProvider<? extends ConnectionPool> cpp,
+                              String type,
+                              VIConverter converter,
+                              VIProvider VIProvider) {
+        super(config, cpp, type, OA4MPConfigTags.VIRTUAL_ORGANIZATION_STORE,DEFAULT_TABLENAME , converter);
+        this.VIProvider = VIProvider;
     }
     VIProvider VIProvider = null;
 

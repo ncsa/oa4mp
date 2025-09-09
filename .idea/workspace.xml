@@ -11,30 +11,34 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="Website rebuild.">
-      <change afterPath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/servlet/AbstractCFConfigurationLoader.java" afterDir="false" />
+    <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="replacement configuration to CF system.">
+      <change afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/loader/OA2CFConfigurationLoader.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/scripting/OA2QDLCFConfigurationLoader.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/client-installer/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/src/main/java/org/oa4mp/delegation/common/storage/transactions/TransactionStoreProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/org/oa4mp/delegation/common/storage/transactions/TransactionStoreProvider.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/di-service/src/main/scripts/qdl/readme.txt" beforeDir="false" afterPath="$PROJECT_DIR$/di-service/src/main/scripts/qdl/readme.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client-loader/src/main/java/org/oa4mp/client/loader/OA2ClientBootstrapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-loader/src/main/java/org/oa4mp/client/loader/OA2ClientBootstrapper.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oauth2/src/main/java/org/oa4mp/delegation/server/OA2ConfigurationLoaderUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/oauth2/src/main/java/org/oa4mp/delegation/server/OA2ConfigurationLoaderUtils.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rfc8414/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/rfc8414/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/ServiceEnvironmentImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/ServiceEnvironmentImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/admin/permissions/MultiDSPermissionStoreProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/admin/permissions/MultiDSPermissionStoreProvider.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/admin/permissions/PermissionStoreProviders.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/admin/permissions/PermissionStoreProviders.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/admin/adminClient/AdminClientStoreProviders.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/admin/adminClient/AdminClientStoreProviders.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/admin/adminClient/MultiDSAdminClientStoreProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/admin/adminClient/MultiDSAdminClientStoreProvider.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/admin/transactions/DSFSTransactionStoreProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/admin/transactions/DSFSTransactionStoreProvider.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/admin/transactions/DSSQLTransactionStoreProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/admin/transactions/DSSQLTransactionStoreProvider.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/admin/transactions/MultiDSTransactionStoreProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/admin/transactions/MultiDSTransactionStoreProvider.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/MultiDSClientApprovalStoreProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/MultiDSClientApprovalStoreProvider.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/filestore/DSFSClientApprovalStoreProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/filestore/DSFSClientApprovalStoreProvider.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/sql/provider/DSClientSQLStoreProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/sql/provider/DSClientSQLStoreProvider.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/sql/provider/DSSQLClientApprovalStoreProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/sql/provider/DSSQLClientApprovalStoreProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/MultiDSClientStoreProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/MultiDSClientStoreProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/filestore/DSFSClientStoreProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/filestore/DSFSClientStoreProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/servlet/AbstractBootstrapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/servlet/AbstractBootstrapper.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-installer/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/loader/OA2ConfigurationLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/loader/OA2ConfigurationLoader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/storage/transactions/OA2MultiTypeTransactionProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/storage/transactions/OA2MultiTypeTransactionProvider.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/storage/transactions/OA2SQLTransactionStoreProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/storage/transactions/OA2SQLTransactionStoreProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/loader/OA2Bootstrapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/loader/OA2Bootstrapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/storage/transactions/OA2FSTStoreProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/storage/transactions/OA2FSTStoreProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/storage/tx/SQLTXRStoreProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/storage/tx/SQLTXRStoreProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/storage/tx/TXFSProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/storage/tx/TXFSProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/storage/tx/TXMultiStoreProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/storage/tx/TXMultiStoreProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/storage/vi/SQLVIStoreProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/storage/vi/SQLVIStoreProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/storage/vi/VIFSProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/storage/vi/VIFSProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/storage/vi/VIMultiStoreProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/storage/vi/VIMultiStoreProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/scripting/OA2QDLConfigurationLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/scripting/OA2QDLConfigurationLoader.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-test/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/org/oa4mp/delegation/server/storage/impl/ClientStoreProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/org/oa4mp/delegation/server/storage/impl/ClientStoreProvider.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -131,7 +135,7 @@
     "Application.OA4MPClientInstaller.executor": "Run",
     "Application.OA4MPServerInstaller.executor": "Run",
     "Application.QDL CLC.executor": "Debug",
-    "Application.QDL.executor": "Debug",
+    "Application.QDL.executor": "Run",
     "Application.QDLConfigLoader.executor": "Debug",
     "Application.SAS CLI.executor": "Debug",
     "Application.org.oa4mp.server.admin.oauth2.tools.JWKCLI.executor": "Debug",
@@ -156,7 +160,7 @@
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "Tomcat Server.DEV OA4MP.executor": "Run",
     "Tomcat Server.MyProxy.executor": "Run",
-    "Tomcat Server.OA4MP server.executor": "Run",
+    "Tomcat Server.OA4MP server.executor": "Debug",
     "WebServerToolWindowFactoryState": "false",
     "git-widget-placeholder": "CF-port",
     "jdk.selected.JAVA_MODULE": "11 (2)",
@@ -201,14 +205,14 @@
       <recent name="edu.uiuc.ncsa.oa4mp.delegation.server.storage" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="org.oa4mp.server.loader.qdl.scripting" />
+      <recent name="org.oa4mp.server.loader.oauth2.loader" />
       <recent name="org.oa4mp.server.api.storage.servlet" />
       <recent name="org.oa4mp.dbservice" />
       <recent name="org.oa4mp.server.admin.oauth2.base" />
-      <recent name="edu.uiuc.ncsa.oa2.qdl.storage" />
-      <recent name="edu.uiuc.ncsa.install" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.Test Suite">
+  <component name="RunManager" selected="Tomcat Server.OA4MP server">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="WIDTH" value="400" />
       <option name="HEIGHT" value="300" />
@@ -1236,14 +1240,6 @@
       <workItem from="1754487456460" duration="11877000" />
       <workItem from="1754563183586" duration="122054000" />
     </task>
-    <task id="LOCAL-00064" summary="https://github.com/ncsa/oa4mp/issues/224, https://github.com/ncsa/oa4mp/issues/225, https://github.com/ncsa/oa4mp/issues/226">
-      <option name="closed" value="true" />
-      <created>1732946634969</created>
-      <option name="number" value="00064" />
-      <option name="presentableId" value="LOCAL-00064" />
-      <option name="project" value="LOCAL" />
-      <updated>1732946634969</updated>
-    </task>
     <task id="LOCAL-00065" summary="documentation updates">
       <option name="closed" value="true" />
       <created>1733061027415</created>
@@ -1628,7 +1624,15 @@
       <option name="project" value="LOCAL" />
       <updated>1757110869894</updated>
     </task>
-    <option name="localTasksCounter" value="113" />
+    <task id="LOCAL-00113" summary="replacement configuration to CF system.">
+      <option name="closed" value="true" />
+      <created>1757356420437</created>
+      <option name="number" value="00113" />
+      <option name="presentableId" value="LOCAL-00113" />
+      <option name="project" value="LOCAL" />
+      <updated>1757356420437</updated>
+    </task>
+    <option name="localTasksCounter" value="114" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1650,7 +1654,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
-    <MESSAGE value="Removing dead code." />
     <MESSAGE value="Restructuring for https://jira.ncsa.illinois.edu/browse/CIL-2249." />
     <MESSAGE value="Before removing functors" />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/250 Last vestiges of the Verifier including the tests" />
@@ -1675,7 +1678,8 @@
     <MESSAGE value="Cleanup for various items including tracking down &quot;MyProxy&quot; in various text strings." />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/263&#10;&#10;Also audited and improved test scripts and made the DI Service QDL scripts usuable by non-me's." />
     <MESSAGE value="Website rebuild." />
-    <option name="LAST_COMMIT_MESSAGE" value="Website rebuild." />
+    <MESSAGE value="replacement configuration to CF system." />
+    <option name="LAST_COMMIT_MESSAGE" value="replacement configuration to CF system." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="GROUP_MULTIFILE_MERGE_BY_DIRECTORY" value="true" />
   </component>
@@ -2524,6 +2528,26 @@
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/core/6.x-SNAPSHOT/core-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/core/configuration/provider/MultiTypeProvider.java</url>
           <line>77</line>
           <option name="timeStamp" value="1510" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/loader/OA2Bootstrapper.java</url>
+          <line>29</line>
+          <option name="timeStamp" value="1511" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/servlet/AbstractBootstrapper.java</url>
+          <line>41</line>
+          <option name="timeStamp" value="1512" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/servlet/6.x-SNAPSHOT/servlet-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/servlet/ServletXMLConfigUtil.java</url>
+          <line>75</line>
+          <option name="timeStamp" value="1513" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/core/6.x-SNAPSHOT/core-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/core/inheritance/MultipleInheritanceEngine.java</url>
+          <line>118</line>
+          <option name="timeStamp" value="1514" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-method">
           <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/storage/transactions/OA2MTStore.java</url>

@@ -1,6 +1,7 @@
 package org.oa4mp.server.api.admin.adminClient;
 
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
+import edu.uiuc.ncsa.security.core.cf.CFNode;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.storage.monitored.MonitoredMultiTypeProvider;
 import org.apache.commons.configuration.tree.ConfigurationNode;
@@ -11,6 +12,11 @@ import org.apache.commons.configuration.tree.ConfigurationNode;
  */
 public class MultiDSAdminClientStoreProvider<V extends AdminClient> extends MonitoredMultiTypeProvider<AdminClientStore<V>> {
     public MultiDSAdminClientStoreProvider(ConfigurationNode config, boolean disableDefaultStore, MyLoggingFacade logger, String type, String target,
+                                           IdentifiableProvider<V> app) {
+        super(config, disableDefaultStore, logger, type, target);
+        this.acp = app;
+    }
+    public MultiDSAdminClientStoreProvider(CFNode config, boolean disableDefaultStore, MyLoggingFacade logger, String type, String target,
                                            IdentifiableProvider<V> app) {
         super(config, disableDefaultStore, logger, type, target);
         this.acp = app;

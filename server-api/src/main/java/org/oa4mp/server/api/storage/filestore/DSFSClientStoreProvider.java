@@ -1,5 +1,6 @@
 package org.oa4mp.server.api.storage.filestore;
 
+import edu.uiuc.ncsa.security.core.cf.CFNode;
 import org.oa4mp.server.api.OA4MPConfigTags;
 import org.oa4mp.delegation.common.storage.clients.Client;
 import edu.uiuc.ncsa.security.core.util.IdentifiableProviderImpl;
@@ -17,6 +18,12 @@ import java.io.File;
 public class DSFSClientStoreProvider extends FSProvider<DSFSClientStore> implements OA4MPConfigTags {
 
     public DSFSClientStoreProvider(ConfigurationNode config,
+                                   MapConverter<Client> cp,
+                                   Provider<? extends Client> clientProvider) {
+        super(config, FILE_STORE, CLIENTS_STORE, cp);
+        this.clientProvider = clientProvider;
+    }
+    public DSFSClientStoreProvider(CFNode config,
                                    MapConverter<Client> cp,
                                    Provider<? extends Client> clientProvider) {
         super(config, FILE_STORE, CLIENTS_STORE, cp);
