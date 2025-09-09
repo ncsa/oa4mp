@@ -120,6 +120,16 @@ if [[ $? -ne 0 ]] ; then
 fi
 cp target/client-installer-jar-with-dependencies.jar $OA4MP_SERVER_DEPLOY/client-installer.jar
 
+echo "building RFC 8414 (well-known) support ..."
+cd $OA4MP_ROOT/rfc8414 || exit
+mvn -P installer package > rfc8414.log
+if [[ $? -ne 0 ]] ; then
+    echo "could not build RFC 8414 war. See $OA4MP_ROOT/rfc8414/rfc8414.log"
+    exit 1
+fi
+cp target/well-known.war $OA4MP_SERVER_DEPLOY/well-known.war
+
+
 echo "building QDL OA4MP tools..."
 cd $QDL_OA2_TOOLS || exit
 mvn -P client package > tools.log
