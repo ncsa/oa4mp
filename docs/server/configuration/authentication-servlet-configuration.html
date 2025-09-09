@@ -1,0 +1,609 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OAuth for MyProxy</title>
+    <style type="text/css" media="all">
+        @import url("../../css/oa4mp-custom.css");
+        @import url("../../css/oa4mp-theme.css");
+        @import url("../../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../../css/print.css" type="text/css" media="print"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+<body class="composite">
+<div id="banner">
+                        <a href="http://www.ncsa.illinois.edu/" id="bannerLeft"  >
+        
+                                                                    <img src="../../css/images/ncsalogo_sm-2.gif" alt="NCSA"/>
+        
+                </a>
+                                    <a href="https://ncsa.github.io/oa4mp/" id="bannerRight"  >
+        
+                                                                    <img src="../../css/images/oa4mp-logo-small-2.png" alt="OA4MP site CSS"/>
+        
+                </a>
+                <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="breadcrumbs">
+            
+    
+
+    
+        
+                        
+    
+        
+                    <div class="xleft">
+            Last Published: 2025-09-09
+                                </div>
+                <div class="xright">            
+    
+
+    
+        
+                        
+    
+        
+                         Version: 6.2.1
+            </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+<div id="leftColumn">
+    <div id="navcolumn">
+                
+    
+
+    
+        
+                        
+    
+        
+                               <h5>OA4MP</h5>
+                        <ul>
+                    
+    <li class="none">
+                        <a href="../../oa4mp-faq.html">FAQ</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../server/index.html">Server</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../client/index.html">Client</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../common/configuration/supported-specifications.html">Supported specification</a>
+            </li>
+              
+    <li class="none">
+                        <a href="https://github.com/ncsa/oa4mp" class="externalLink">Source</a>
+            </li>
+              
+    <li class="none">
+                        <a href="../../apidocs/index.html">api docs</a>
+            </li>
+              </ul>
+                            <h5>Project Documentation</h5>
+                        <ul>
+                    
+                            
+                                        
+                                    
+                                    
+                            
+            <li class="collapsed">
+                        <a href="../../project-info.html">Project Information</a>
+                        </li>
+              
+                            
+                                        
+                            
+            <li class="collapsed">
+                        <a href="../../project-reports.html">Project Reports</a>
+                        </li>
+              </ul>
+                                               <a href="http://maven.apache.org/" title="Built by Maven"
+           class="poweredBy">
+            <img class="poweredBy"
+                 alt="Built by Maven"
+                 src="http://maven.apache.org/images/logos/maven-feather.png"
+                 width="90"
+                 height="30"
+                 border="1"/>
+        </a>
+                           
+    
+
+    
+        
+                        
+    
+        
+        </div>
+</div>
+<div id="bodyColumn">
+    <div id="contentBox">
+        
+
+
+
+<section>
+<h2><a name="Using_the_Authentication_Configuration"></a>Using the Authentication Configuration</h2>
+
+
+<p><a href="../pdf/Authentication_in_OA4MP.pdf">Authentication in OA4MP</a> may be accomplished in
+    several ways. This configuration element will tell the system which method you are using.
+    Note that the OAuth specification places <i>authentication</i> at the <b>/authorize</b>
+    endpoint, which does not help clarity. For purposes of this blurb, these should be
+    considered synonyms, but OA4MP itself has stark differences between them. T
+</p>
+
+<ol style="list-style-type: decimal">
+    
+<li><b>Replace authorization completely</b> In this case, you may write anything you like independent of
+        OA4MP. CILogon, for instance, has its authorization layer written in PHP. You then notify OA4MP
+        when you are done.
+    </li>
+    
+<li><a href="../manuals/remote-user.html">Use Tomcat</a> and have it manage users. This can work for
+        very small systems.
+    </li>
+    
+<li><a href="../manuals/using-proxies.html">Use a proxy</a>, i.e., another OAuth server's authorization.</li>
+</ol>
+
+<p>The configuration has the elements for all three cases.</p>
+
+<table class="bodyTable" border="2">
+    <tbody>
+    
+<tr class="a">
+        
+<td>Attribute</td>
+        
+<td>Required?</td>
+        
+<td>Default</td>
+        
+<td>Description</td>
+    </tr>
+    
+<tr class="b">
+        
+<td>authorizationURI</td>
+        
+<td>N</td>
+        
+<td>--</td>
+        
+<td>(Replace authorization case). This is the address of whatever application does the authorization.
+            This must be specified so that it can be put into the well-known endpoint for discovery by
+            other services. It is required in the replacement case, but otherwise will be generated as
+            per standard location.
+        </td>
+    </tr>
+    
+<tr class="a">
+        
+<td>use</td>
+        
+<td>N</td>
+        
+<td>default</td>
+        
+<td>Which paradigm of authentication you are using. Options are
+            
+<ul>
+                
+<li>default - extending the Java classes in OA4MP for direct user support</li>
+                
+<li>proxy - use a proxy</li>
+                
+<li>header - use an HTTP header to identify the user</li>
+                
+<li>external - Use and external authentication server and notify OA4MP with it DI Service</li>
+                
+<li>dedicated - Use OA4MP as a dedicated token issuer</li>
+            </ul>
+        </td>
+    </tr>
+
+    
+<tr class="b">
+        
+<td>useProxy</td>
+        
+<td>N</td>
+        
+<td>false</td>
+        
+<td>(Deprecated) If &quot;true&quot; this is the same as setting the use attrbute to &quot;proxy&quot;.<br />
+            See also cfgFile and cfgName
+        </td>
+    </tr>
+    
+<tr class="a">
+        
+<td>cfgFile</td>
+        
+<td>N</td>
+        
+<td></td>
+        
+<td>(Proxy case) This is required if <b>useProxy</b> is true and ignored otherwise. This is the path
+            to the <a class="externalLink" href="https://ncsa.github.io/oa4mp/client/configuration/index.html">
+                client configuration</a> file.
+        </td>
+    </tr>
+    
+<tr class="b">
+        
+<td>cfgName</td>
+        
+<td>N</td>
+        
+<td></td>
+        
+<td>(Proxy case) This is required if <b>useProxy</b> is true and ignored otherwise.
+            The name of the configuration within the cfgFile to use.
+        </td>
+    </tr>
+    
+<tr class="a">
+        
+<td>localDFConsent</td>
+        
+<td>N</td>
+        
+<td>false</td>
+        
+<td>(Proxy case) As per the OIDC specification, showing a consent screen is optional. When proxying,
+            this will request that the proxy redirect the user back to the local service to use the consent
+            screen there. Otherwise, the assumption is that the consent the user gave on the proxy
+            is sufficient. Also, note that the request parameters used are OA4MP only, so if
+            you are using another system for proxying, the request will be ignored by that proxy.
+        </td>
+    </tr>
+    
+<tr class="b">
+        
+<td>useHeader</td>
+        
+<td>N</td>
+        
+<td>false</td>
+        
+<td>(Deprecated) Use an HTTp header. Same as setting the use attribute to &quot;header&quot;.
+        </td>
+    </tr>
+
+    
+<tr class="a">
+        
+<td>requireHeader</td>
+        
+<td>N</td>
+        
+<td>false</td>
+        
+<td>(Header case) Valid values are &quot;true&quot; or &quot;false&quot;. This flag forces the server to use the specified header.
+            Note especially that if this is true and no such header is received then an exception is raised.
+        </td>
+    </tr>
+    
+<tr class="b">
+        
+<td>headerFieldName</td>
+        
+<td>N</td>
+        
+<td>REMOTE_USER</td>
+        
+<td>(Header case) The name of the header field to use. Generally this is REMOTE_USER.
+            Other fields are permissible.
+        </td>
+    </tr>
+    
+<tr class="a">
+        
+<td>returnDNAsUsername</td>
+        
+<td>N</td>
+        
+<td>N/A</td>
+        
+<td>(Deprecated) Valid values are &quot;true&quot; or &quot;false&quot;. This flag forces the server to return the DN (distinguished
+            name)
+            on the certificate as the username, as opposed to the usual name of the user. This has nothing to do
+            with enabling the use of the header field.
+        </td>
+    </tr>
+    
+<tr class="b">
+        
+<td>convertDNToGlobusID</td>
+        
+<td>N</td>
+        
+<td>N/A</td>
+        
+<td>(Deprecated) Standard DN's (Distinguished names) are comma separated. Some versions of Globus, however,
+            require
+            that these be slash delimited. Enabling this option will convert commas to slashes using Globus's
+            own utility for doing this. This means that you must
+            <a href="../manuals/getting-started.html">follow the installation instruction for JGlobus</a> to your
+            Tomcat. Generally
+            this option should rarely, if ever, be needed, so don't just enable it unless you are sure
+            you know what it does and need it.
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</section><section>
+<h2><a name="Example_of_each"></a>Example of each</h2>
+<section>
+<h3><a name="A_Proxy_Example"></a>A Proxy Example</h3>
+
+<div>
+<pre>
+&lt;config&gt;
+   &lt;server name=&quot;my-config&quot;&gt;
+      &lt;authorizationServlet use=&quot;proxy&quot;
+           cfgFile=&quot;/opt/oa4mp/etc/clients.xml&quot;&gt;
+           cfgName=&quot;cilogon-proxy&quot;&gt;
+      &lt;!-- rest of config --&gt;
+   &lt;\server&gt;
+&lt;\config&gt;
+</pre></div>
+
+<p>
+    In this case, there is a service configured (you have registered a client with it)
+    and you need to have calls for authorization forwarded to it. All you need to do
+    is ensure the configuration in the file is correct and that your Tomcat web.xml
+    file is set right and you are good to go. See more at
+    <a href="../manuals/using-proxies.html">using proxies</a>
+</p>
+
+</section><section>
+<h3><a name="Header_case.2C_with_the_REMOTE_USER_Header"></a>Header case, with the REMOTE_USER Header</h3>
+
+<div>
+<pre>
+&lt;config&gt;
+   &lt;server name=&quot;my-config&quot;&gt;
+      &lt;authorizationServlet use=&quot;header&quot;
+          headerFieldName=&quot;REMOTE_USER&quot;/&gt;
+      &lt;!-- rest of config --&gt;
+   &lt;\server&gt;
+&lt;\config&gt;
+</pre></div>
+
+<p>
+    In this case, use of authentication headers is enabled and a header named REMOTE_USER
+    will be used. If it is missing though, no exception will be raised. By default, the header field will
+    be shown to the user along with client information and the user will be prompted if s/he wishes to continue.
+    Be sure to enable the correct machinery in the web.xml file. The one supplied with the standard distribution
+    is annotated.</p>
+
+
+<p>Options that may be configured here to</p>
+
+<ul>
+    
+<li>use the header</li>
+    
+<li>required the header</li>
+    
+<li>specify the header name</li>
+</ul>
+
+
+<p>Specifying that the header should be used implies that the header <i>may</i> be present. Since the
+    username may be created also via an extension to the system (see below for details) the lack oof
+    a header field is not an error. However, requiring the header will cause an exception if the header is not found.
+    The default is to assume that the header is the REMOTE_HEADER field, though any field name
+    may be specified.</p>
+
+</section><section>
+<h3><a name="Replacing_the_authorization_module_with_a_Java_extension_of_OA4MP"></a>Replacing the authorization module with a Java extension of OA4MP</h3>
+
+<a class="externalLink" href="https://github.com/ncsa/oa4mp-extension-example">Acomplete example of a an extensioin</a>.
+Either no configuration or if you want to make it explicit.
+
+<div>
+<pre>
+&lt;config&gt;
+   &lt;server name=&quot;my-config&quot;&gt;
+      &lt;authorizationServlet use=&quot;default&quot;/&gt;
+      &lt;!-- rest of config --&gt;
+   &lt;\server&gt;
+&lt;\config&gt;
+</pre></div>
+
+<p>This tells the system that the entire authorization is handled at the endpoint in the
+    OAuth specification and the
+    well-known file generated by OA4MP will point to that. See below for the particulars of how to
+    integrate it with OA4MP.</p>
+
+</section><section>
+<h3><a name="Using_your_own_Authentication_Server_.28AS.29"></a>Using your own Authentication Server (AS)</h3>
+
+<p>In this case, you have an external AS which handles all authentication and you need to simply
+    notify OA4MP of its state. </p>
+
+<div>
+<pre>
+&lt;config&gt;
+   &lt;server name=&quot;my-config&quot;&gt;
+      &lt;authorizationServlet use=&quot;external&quot;
+          authorizationURI=&quot;https://your.AS.address&quot;/&gt;
+      &lt;!-- rest of config --&gt;
+   &lt;\server&gt;
+&lt;\config&gt;
+</pre></div>
+
+<p>In this case, the well-known file points to the <b>authorizationURI</b> value and all clients will
+    therefore make requests to that. Your AS should be able to do all the authentication needed.
+    OA4MP must be configured to run its <a href="">DIService</a> so your system can send
+    it notifications.</p>
+
+
+<p>Additionally, make sure that if you set the <b>device</b> endpoiont for the device
+    flow (so user's are directed to your AS to authenticate for the device flow) by
+    configuring the <b>verficationURI</b> in the <a class="externalLink" href="https://oa4mp.org/server/configuration/device-flow-servlet-configuration.html">deviceFlowServlet
+        configuration</a>.
+    The <b>device_authorization</b> endpoint (where user's start the device flow) must be managed
+    by OA4MP, since that sets up all the state needed for the flow,
+    although you can hide it and simply call it on behalf of users.
+</p>
+
+</section><section>
+<h3><a name="Using_OA4MP_as_a_Dedicated_Issuer"></a>Using OA4MP as a Dedicated Issuer</h3>
+
+<p>In this case, you have a DTI (Dedicated Token Issuer) service that generates token requests which OA4MP will service,
+    but there is need for the DIService. All that is needed is the endpoint for your service
+    to be specified in the configuration so it will be correctly set in the well-known page:</p>
+
+<div>
+<pre>
+&lt;config&gt;
+   &lt;server name=&quot;my-config&quot;&gt;
+      &lt;authorizationServlet use=&quot;dedicated&quot;
+          authorizationURI=&quot;https://your.DTI.address&quot;/&gt;
+      &lt;!-- rest of config --&gt;
+   &lt;\server&gt;
+&lt;\config&gt;
+</pre></div>
+
+
+</section><section>
+<h3><a name="Use_cases"></a>Use cases</h3>
+There are three main use cases which should be discussed in more depth. The particulars of how to configure
+and authorization module are best dealt with elsewhere and a discussion can be found
+<a href="../manuals/remote-user.xhtml">here</a>.
+<section>
+<h4><a name="Using_the_OA4MP_authorization_module"></a>Using the OA4MP authorization module</h4>
+
+
+<p>This is the default. In this case a logon will be shown to the user who will be prompted for the
+    username and password. Since this page also contains the client information, the verification
+    portion of the protocol is deemed satisfied. We highly recommend customizing the basic OA4MP page
+    for a consistent look and feel in your site.</p>
+
+</section><section>
+<h4><a name="Using_another_authorization_module.2C_but_using_OA4MP.27s_verification_page."></a>Using another authorization module, but using OA4MP's verification page.</h4>
+
+
+</section><section>
+<h4><a name="Completely_replacing_the_authorization_module."></a>Completely replacing the authorization module.</h4>
+
+
+<p>In this case the server must have some way of performing the client verification. You will need to write a webapp
+    that completely takes over the functions at the authorize endpoint.
+    (found in the <a href="../../apidocs/index.html">javadoc</a>)
+    should then be deployed elsewhere and invoked by your webapp when it has the username and password (if needed).
+    Note that it is up to you to keep access to this servlet safe. We normally suggest that access be restricted to
+    localhost only, so that only your webapp has access to the AuthorizationServlet.
+    The AuthorizationServlet accepts the following call directly:</p>
+
+<table class="bodyTable" border="2">
+    <tbody>
+    
+<tr class="a">
+        
+<td>Parameter key</td>
+        
+<td>Parameter values</td>
+        
+<td>Comment</td>
+    </tr>
+    
+<tr class="b">
+        
+<td>authorizationGrant</td>
+        
+<td>String</td>
+        
+<td>This is the token sent to the authorize endpoint as per the specification and identifies this
+            user's delegation request uniquely.
+        </td>
+    </tr>
+    
+<tr class="a">
+        
+<td>authorizationState</td>
+        
+<td>String</td>
+        
+<td>This is the (optional) state parameter the user sent in the initial request. It is echoed back.
+        </td>
+    </tr>
+
+    
+<tr class="b">
+        
+<td>AuthUserName</td>
+        
+<td>String</td>
+        
+<td>The username that will be sent unchanged to MyProxy</td>
+    </tr>
+    
+<tr class="a">
+        
+<td>AuthPassword</td>
+        
+<td>String</td>
+        
+<td>(Optional) the password the user will require to log in to MyProxy.</td>
+    </tr>
+    </tbody>
+</table>
+
+
+</section></section></section>
+
+    </div>
+</div>
+<div class="clear">
+    <hr/>
+</div>
+<div id="footer">
+    <div class="xright">&#169;    
+                    2025
+        
+                    
+    
+
+    
+        
+                        
+    
+        
+    </div>
+    <div class="clear">
+        <hr/>
+    </div>
+</div>
+</body>
+</html>
+
