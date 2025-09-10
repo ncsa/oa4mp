@@ -356,7 +356,10 @@ public class OA2CLCCommands extends CommonCommands2 {
         }
 
         requestString = requestString + "?" + OA2Constants.CLIENT_ID + "=" + oa2ce.getClientId();
-        requestString = requestString + "&" + SCOPE + "=" + URLEncoder.encode(scopes, "UTF-8");
+        if(scopes!=null && !scopes.isEmpty()) {
+            // If straight OAuth request, might not have scopes.
+            requestString = requestString + "&" + SCOPE + "=" + URLEncoder.encode(scopes, "UTF-8");
+        }
         for (Object key : parameters.keySet()) {
             if (!key.equals(ServiceClient.HEADER_KEY)) {
                 requestString = requestString + "&" + key + "=" + URLEncoder.encode(parameters.get(key).toString(), "UTF-8");
