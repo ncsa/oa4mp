@@ -1,6 +1,7 @@
 package org.oa4mp.server.api.storage;
 
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
+import edu.uiuc.ncsa.security.core.cf.CFNode;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import org.oa4mp.delegation.server.storage.ClientStore;
 import org.oa4mp.delegation.server.storage.impl.ClientMemoryStore;
@@ -26,6 +27,21 @@ public class MultiDSClientStoreProvider<V extends Client> extends ClientStorePro
         super(config, disableDefaultStore, logger, type, target);
         this.clientProvider = clientProvider;
     }
+
+
+    public MultiDSClientStoreProvider(CFNode config, boolean disableDefaultStore, MyLoggingFacade logger) {
+        this(config,disableDefaultStore, logger, null, null, null);
+    }
+    public MultiDSClientStoreProvider(CFNode config,
+                                      boolean disableDefaultStore,
+                                      MyLoggingFacade logger,
+                                      String type,
+                                      String target,
+                                      IdentifiableProvider<? extends Client> clientProvider) {
+        super(config, disableDefaultStore, logger, type, target);
+        this.clientProvider = clientProvider;
+    }
+
     protected IdentifiableProvider<? extends Client> clientProvider;
 
     @Override

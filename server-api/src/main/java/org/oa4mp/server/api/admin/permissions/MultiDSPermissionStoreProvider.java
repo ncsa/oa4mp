@@ -1,6 +1,7 @@
 package org.oa4mp.server.api.admin.permissions;
 
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
+import edu.uiuc.ncsa.security.core.cf.CFNode;
 import edu.uiuc.ncsa.security.core.configuration.provider.MultiTypeProvider;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import org.apache.commons.configuration.tree.ConfigurationNode;
@@ -11,6 +12,15 @@ import org.apache.commons.configuration.tree.ConfigurationNode;
  */
 public class MultiDSPermissionStoreProvider<V extends Permission> extends MultiTypeProvider<PermissionsStore<V>> {
     public MultiDSPermissionStoreProvider(ConfigurationNode config,
+                                          boolean disableDefaultStore,
+                                          MyLoggingFacade logger,
+                                          String type,
+                                          String target,
+                                          IdentifiableProvider<V> tp) {
+        super(config, disableDefaultStore, logger, type, target);
+        permissionProvider = tp;
+    }
+    public MultiDSPermissionStoreProvider(CFNode config,
                                           boolean disableDefaultStore,
                                           MyLoggingFacade logger,
                                           String type,

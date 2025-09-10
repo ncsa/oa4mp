@@ -1,5 +1,6 @@
 package org.oa4mp.delegation.server;
 
+import edu.uiuc.ncsa.security.core.cf.CFNode;
 import edu.uiuc.ncsa.security.core.configuration.Configurations;
 import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
 import org.apache.commons.configuration.tree.ConfigurationNode;
@@ -129,6 +130,42 @@ public class OA2ConfigurationLoaderUtils extends XMLConfigUtil {
         return scopes;
     }
 
+    public static Collection<String> getScopes(CFNode cn) {
+        //   if (scopes == null) {
+        Collection<String> scopes = new HashSet<>(); // keep the elements unique
+        // Fix https://github.com/ncsa/oa4mp/issues/103
+        // First thing is to take all the basic scopes supported and include them.
+/*
+            for (String s : OA2Scopes.basicScopes) {
+                scopes.add(s);
+            }
+*/
+        List<CFNode> scopesList = cn.getChildren(SCOPES);
+        if (0 < scopesList.size()) {
+            // Then we have some scopes
+            CFNode node = scopesList.get(0);
+            List<CFNode> kids = node.getChildren(SCOPE);
+            for (int i = 0; i < kids.size(); i++) {
+                CFNode currentNode = kids.get(i);
+
+                String currentScope = (currentNode.getValue()).trim(); // in case they leave a blank or two in the config.
+                String x = currentNode.getFirstAttribute( SCOPE_ENABLED);
+                if (x != null) {
+                    boolean isEnabled = Boolean.parseBoolean(x);
+                    if (isEnabled) {
+                        scopes.add(currentScope);
+                    } else {
+                        scopes.remove(currentScope);
+                    }
+                } else {
+                    // default is if the enabled flag is omitted, to assume it is enabled and add it.
+                    scopes.add(currentScope);
+                }
+            }
+        }
+        // }
+        return scopes;
+    }
 
 
 }

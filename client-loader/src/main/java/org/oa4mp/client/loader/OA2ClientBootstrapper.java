@@ -1,5 +1,6 @@
 package org.oa4mp.client.loader;
 
+import edu.uiuc.ncsa.security.core.cf.CFNode;
 import org.oa4mp.client.api.ClientXMLTags;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
@@ -29,6 +30,11 @@ public class OA2ClientBootstrapper extends Bootstrapper {
 
     public String getOa4mpConfigNameKey() {
         return OA2_CLIENT_CONFIG_NAME_KEY;
+    }
+
+    @Override
+    public ConfigurationLoader getConfigurationLoader(CFNode node) throws MyConfigurationException {
+        return null;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package org.oa4mp.server.loader.oauth2.loader;
 
+import edu.uiuc.ncsa.security.core.cf.CFNode;
 import org.oa4mp.server.api.storage.servlet.AbstractBootstrapper;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
@@ -32,5 +33,10 @@ public class OA2Bootstrapper extends AbstractBootstrapper {
     @Override
     public Initialization getInitialization() {
         return new OA2ServletInitializer();
+    }
+
+    @Override
+    public ConfigurationLoader getConfigurationLoader(CFNode node) throws MyConfigurationException {
+        return new OA2CFConfigurationLoader(node);
     }
 }

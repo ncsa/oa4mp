@@ -1,5 +1,6 @@
 package org.oa4mp.server.api;
 
+import edu.uiuc.ncsa.security.core.cf.CFNode;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import org.oa4mp.server.api.admin.adminClient.AdminClient;
 import org.oa4mp.server.api.admin.adminClient.AdminClientStore;
@@ -116,7 +117,9 @@ public class ServiceEnvironmentImpl extends AbstractEnvironment implements Servi
     }
 
     public static class MessagesProvider extends HierarchicalConfigProvider<Map<String, String>> {
-
+        public MessagesProvider(CFNode config) {
+            super(config);
+        }
         public MessagesProvider(ConfigurationNode config) {
             super(config);
         }
