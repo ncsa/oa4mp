@@ -64,7 +64,7 @@
               next dependency is needed for testing the JWT runner scripting framework
         -->
         <dependency>
-            <groupId>org.qdl_lang</groupId>
+            <groupId>org.qdl-lang</groupId>
             <artifactId>language</artifactId>
             <version>1.6.2.1</version>
             <scope>compile</scope>

@@ -237,7 +237,7 @@
                 <dependencies>
 
                     <dependency>
-                        <groupId>edu.uiuc.ncsa.maven.skin</groupId>
+                        <groupId>org.oa4mp</groupId>
                         <artifactId>skin</artifactId>
                         <version>6.2.1</version>
                     </dependency>
@@ -246,7 +246,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.4.0</version>
+                <version>3.11.3</version>
                 <configuration>
                     <includeDependencySources>true</includeDependencySources>
                     <dependencySourceIncludes>

@@ -11,11 +11,11 @@
     </parent>
 
     <artifactId>qdl</artifactId>
-    <name>OA4MP QD Language extensions</name>
+    <name>OA4MP QDL extensions</name>
     <packaging>jar</packaging>
     <dependencies>
         <dependency>
-            <groupId>org.qdl_lang</groupId>
+            <groupId>org.qdl-lang</groupId>
             <artifactId>language</artifactId>
             <version>1.6.2.1</version>
         </dependency>
@@ -30,7 +30,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <additionalparam>-Xdoclint:none</additionalparam>
-        <maven.javadoc.skip>true</maven.javadoc.skip>
+       <!-- <maven.javadoc.skip>true</maven.javadoc.skip>-->
     </properties>
     <profiles>
         <profile>
@@ -142,7 +142,19 @@
                     </items>
                 </configuration>
             </plugin>
-
+<!--            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.11.3</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>-->
         </plugins>
 
         <finalName>oa4mp-qdl</finalName>

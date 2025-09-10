@@ -113,7 +113,7 @@
             <version>6.2.1</version>
         </dependency>
         <dependency>
-            <groupId>org.qdl_lang</groupId>
+            <groupId>org.qdl-lang</groupId>
             <artifactId>tests</artifactId>
             <version>1.6.2.1</version>
             <type>test-jar</type>
