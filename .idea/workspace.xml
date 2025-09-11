@@ -11,14 +11,25 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="Incorporating changes in 6.2.1 to publish to Maven">
+    <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="Merged CF port into main">
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/client-installer/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rfc8414/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/rfc8414/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/docs/Authentication_in_OA4MP.odt" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/docs/Authentication_in_OA4MP.odt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/docs/Using_headers_for_authentication.odt" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/docs/Using_headers_for_authentication.odt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/docs/java-extension-to-oa4mp.odt" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/docs/java-extension-to-oa4mp.odt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/servlet/AbstractBootstrapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/servlet/AbstractBootstrapper.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-installer/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-loader/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/loader/OA2CFConfigurationLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/loader/OA2CFConfigurationLoader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/scripting/OA2QDLCFConfigurationLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/scripting/OA2QDLCFConfigurationLoader.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-test/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-test/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,7 +55,7 @@
     </option>
   </component>
   <component name="Git.Merge.Settings">
-    <option name="BRANCH" value="dbservice" />
+    <option name="BRANCH" value="CF-port" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
@@ -140,7 +151,7 @@
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
     &quot;Tomcat Server.DEV OA4MP.executor&quot;: &quot;Run&quot;,
     &quot;Tomcat Server.MyProxy.executor&quot;: &quot;Run&quot;,
-    &quot;Tomcat Server.OA4MP server.executor&quot;: &quot;Run&quot;,
+    &quot;Tomcat Server.OA4MP server.executor&quot;: &quot;Debug&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
     &quot;git-widget-placeholder&quot;: &quot;master&quot;,
     &quot;jdk.selected.JAVA_MODULE&quot;: &quot;11 (2)&quot;,
@@ -151,7 +162,7 @@
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Libraries&quot;,
     &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
     &quot;project.structure.side.proportion&quot;: &quot;0.45913818&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
@@ -1220,14 +1231,7 @@
       <workItem from="1754479297091" duration="5517000" />
       <workItem from="1754487456460" duration="11877000" />
       <workItem from="1754563183586" duration="122054000" />
-    </task>
-    <task id="LOCAL-00063" summary="https://github.com/ncsa/oa4mp/issues/224, https://github.com/ncsa/oa4mp/issues/225, https://github.com/ncsa/oa4mp/issues/226">
-      <option name="closed" value="true" />
-      <created>1732905181364</created>
-      <option name="number" value="00063" />
-      <option name="presentableId" value="LOCAL-00063" />
-      <option name="project" value="LOCAL" />
-      <updated>1732905181364</updated>
+      <workItem from="1757587053911" duration="18929000" />
     </task>
     <task id="LOCAL-00064" summary="https://github.com/ncsa/oa4mp/issues/224, https://github.com/ncsa/oa4mp/issues/225, https://github.com/ncsa/oa4mp/issues/226">
       <option name="closed" value="true" />
@@ -1613,7 +1617,15 @@
       <option name="project" value="LOCAL" />
       <updated>1757540537246</updated>
     </task>
-    <option name="localTasksCounter" value="112" />
+    <task id="LOCAL-00112" summary="Commit pre-merge">
+      <option name="closed" value="true" />
+      <created>1757541445204</created>
+      <option name="number" value="00112" />
+      <option name="presentableId" value="LOCAL-00112" />
+      <option name="project" value="LOCAL" />
+      <updated>1757541445204</updated>
+    </task>
+    <option name="localTasksCounter" value="113" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1635,7 +1647,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
-    <MESSAGE value="Needed to update create table QSL scripts." />
     <MESSAGE value="Removing dead code." />
     <MESSAGE value="Restructuring for https://jira.ncsa.illinois.edu/browse/CIL-2249." />
     <MESSAGE value="Before removing functors" />
@@ -1660,7 +1671,8 @@
     <MESSAGE value="Updated website by removing some old cruft then rebuilding." />
     <MESSAGE value="Cleanup for various items including tracking down &quot;MyProxy&quot; in various text strings." />
     <MESSAGE value="Incorporating changes in 6.2.1 to publish to Maven" />
-    <option name="LAST_COMMIT_MESSAGE" value="Incorporating changes in 6.2.1 to publish to Maven" />
+    <MESSAGE value="Commit pre-merge" />
+    <option name="LAST_COMMIT_MESSAGE" value="Commit pre-merge" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="GROUP_MULTIFILE_MERGE_BY_DIRECTORY" value="true" />
   </component>
@@ -1734,11 +1746,6 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/5.3-SNAPSHOT/storage-5.3-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/monitored/MonitoredMultiTypeProvider.java</url>
-          <line>30</line>
-          <option name="timeStamp" value="225" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/5.3-SNAPSHOT/storage-5.3-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/monitored/MonitoredMultiTypeProvider.java</url>
           <line>78</line>
           <option name="timeStamp" value="230" />
         </line-breakpoint>
@@ -1746,11 +1753,6 @@
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/5.3-SNAPSHOT/storage-5.3-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/sql/SQLStoreProvider.java</url>
           <line>140</line>
           <option name="timeStamp" value="247" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/servlet/5.3-SNAPSHOT/servlet-5.3-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/servlet/ServletXMLConfigUtil.java</url>
-          <line>37</line>
-          <option name="timeStamp" value="248" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server/src/main/java/org/oa4mp/delegation/server/storage/upkeep/UpkeepThread.java</url>
@@ -2466,26 +2468,6 @@
           <option name="timeStamp" value="1481" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/ProxyUtils.java</url>
-          <line>73</line>
-          <option name="timeStamp" value="1487" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/ProxyUtils.java</url>
-          <line>89</line>
-          <option name="timeStamp" value="1488" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/servlet/OA2AuthorizedServletUtil.java</url>
-          <line>119</line>
-          <option name="timeStamp" value="1490" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/servlet/AbstractAuthenticationServlet.java</url>
-          <line>296</line>
-          <option name="timeStamp" value="1493" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/servlet/OA2ServletUtils.java</url>
           <line>236</line>
           <option name="timeStamp" value="1494" />
@@ -2500,10 +2482,15 @@
           <line>96</line>
           <option name="timeStamp" value="1507" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/sql/mariadb/MariaDBConnectionPoolProvider.java</url>
+          <line>52</line>
+          <option name="timeStamp" value="1529" />
+        </line-breakpoint>
         <line-breakpoint enabled="true" type="java-method">
           <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/storage/transactions/OA2MTStore.java</url>
           <line>135</line>
-          <properties class="org.oa4mp.server.loader.oauth2.storage.transactions.OA2MTStore">
+          <properties class="org.oa4mp.server.loader.oauth2.storage.transactions.OA2MTStore" method="getByUserCode">
             <option name="EMULATED" value="true" />
             <option name="WATCH_EXIT" value="false" />
           </properties>
@@ -2512,7 +2499,7 @@
         <line-breakpoint enabled="true" type="java-method">
           <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/storage/transactions/OA2ServiceTransaction.java</url>
           <line>79</line>
-          <properties class="org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction">
+          <properties class="org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction" method="getCreatedCallback">
             <option name="EMULATED" value="true" />
             <option name="WATCH_EXIT" value="false" />
           </properties>

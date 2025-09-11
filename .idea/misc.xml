@@ -52,6 +52,7 @@
         <option value="$PROJECT_DIR$/client-webapp/pom.xml" />
         <option value="$PROJECT_DIR$/myproxy-website/pom.xml" />
         <option value="$PROJECT_DIR$/oa4mp-webapp/pom.xml" />
+        <option value="$PROJECT_DIR$/server-installer/pom.xml" />
         <option value="$PROJECT_DIR$/server-webapp-jar/pom.xml" />
       </set>
     </option>

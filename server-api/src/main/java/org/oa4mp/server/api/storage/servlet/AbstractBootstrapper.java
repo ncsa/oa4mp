@@ -27,7 +27,6 @@ public abstract class AbstractBootstrapper extends Bootstrapper {
         return OA4MP_CONFIG_NAME_KEY;
     }
 
-    boolean useCF = true;
     protected CFNode getCFNode(ServletContext servletContext) throws Exception {
         return ServletXMLConfigUtil.findCFConfigurationNode(servletContext, getOa4mpConfigFileKey(), getOa4mpConfigNameKey(), OA4MPConfigTags.COMPONENT);
     }
@@ -64,7 +63,7 @@ public abstract class AbstractBootstrapper extends Bootstrapper {
             throw new MyConfigurationException("Error: No configuration found for file '" + getOa4mpConfigFileKey()
                     + "'. Cannot configure the server. Init parameters are: " + initParams + ", attributes are " + attribs);
         }
-        if(useCF){
+        if(isUseCF()){
             return getConfigurationLoader(getCFNode(servletContext));
         }
 

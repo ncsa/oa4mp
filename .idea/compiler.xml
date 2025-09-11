@@ -36,7 +36,6 @@
         <module name="oa4mp-server-oauth2" />
         <module name="myproxy-logon" />
         <module name="server-loader" />
-        <module name="server-installer" />
         <module name="rfc8414" />
         <module name="client-test" />
         <module name="proxy" />
@@ -54,6 +53,7 @@
       <module name="client-webapp" target="11" />
       <module name="myproxy-website" target="1.8" />
       <module name="oa4mp-webapp" target="11" />
+      <module name="server-installer" target="11" />
       <module name="server-webapp-jar" target="11" />
     </bytecodeTargetLevel>
   </component>

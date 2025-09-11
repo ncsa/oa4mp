@@ -88,6 +88,7 @@ public class OA2QDLCFConfigurationLoader<T extends OA2QDLEnvironment> extends QD
 
     protected String getWSEnvFile() {
         CFNode node = cn.getFirstNode( WS_TAG);
+        if(node == null) {return "";}
         return node.getNodeContents(WS_ENV, "");
     }
 

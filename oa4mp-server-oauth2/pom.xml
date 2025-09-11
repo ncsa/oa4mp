@@ -87,7 +87,7 @@
             <version>42.4.3</version>
         </dependency>
         <dependency>
-            <groupId>org.qdl_lang</groupId>
+            <groupId>org.qdl-lang</groupId>
             <artifactId>sas</artifactId>
             <version>1.6-QDL-SNAPSHOT</version>
         </dependency>

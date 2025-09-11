@@ -1420,7 +1420,7 @@ Boolean ccfEnabled = null;
             if (claimSource == null) {
 
                 DebugUtil.trace(this, "No server-wide configured Scope handler");
-                if (getLdapConfiguration().isEnabled()) {
+                if (getLdapConfiguration() != null && getLdapConfiguration().isEnabled()) {
                     DebugUtil.trace(this, "   LDAP scope handler enabled, creating default");
                     claimSource = new LDAPClaimsSource(getLdapConfiguration(), myLogger);
                 } else {

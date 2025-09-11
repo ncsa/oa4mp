@@ -60,7 +60,7 @@
         </dependency>
 
         <dependency>
-            <groupId>org.qdl_lang</groupId>
+            <groupId>org.qdl-lang</groupId>
             <artifactId>language</artifactId>
             <version>1.6-QDL-SNAPSHOT</version>
             <scope>compile</scope>
