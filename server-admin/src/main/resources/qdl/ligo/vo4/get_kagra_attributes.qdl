@@ -1,0 +1,37 @@
+/*
+ ldapsearch \
+  -LLL \
+  -H ldaps://ldap.cilogon.org \
+  -x \
+  -b 'ou=people,o=KAGRA-LIGO,o=CO,dc=gwastronomy-data,dc=cgca,dc=uwm,dc=edu'
+  '(eduPersonPrincipalName=duncan.meacher@shibbi.pki.itc.u-tokyo.ac.jp)'
+
+
+ ldapsearch -LLL -H ldaps://ldap.cilogon.org  -x  -b 'ou=people,o=KAGRA-LIGO,o=CO,dc=gwastronomy-data,dc=cgca,dc=uwm,dc=edu'  '(eduPersonPrincipalName=duncan.meacher@shibbi.pki.itc.u-tokyo.ac.jp)'
+ // KAGRA test user: ayuki.abe@shibbi.pki.itc.u-tokyo.ac.jp
+ // IGWN test user: jeffrey.gaynor@ligo.org
+ */
+     kagra. := file_read('/home/ncsa/dev/csd/config/ini/ligo-ldap.ini',2).'kagra';
+       user := args().0; // This is actually the EPPN for the user.
+
+debugger(1,'*** KAGRA get_attributes, user=' + user);
+           kagra_cfg.'address' := kagra.'address';
+              kagra_cfg.'port' := 636;
+        kagra_cfg.'claim_name' := 'uid';
+              kagra_cfg.'type' := 'ldap';
+       kagra_cfg.'search_base' := kagra.'search_base';
+         kagra_cfg.'ldap_name' := 'eduPersonPrincipalName';
+         kagra_cfg.'auth_type' := 'simple';
+          kagra_cfg.'username' := kagra.'username';
+          kagra_cfg.'password' := kagra.'password';
+             kagra_cfg.groups. := ['isMemberOf'];
+  kagra_cfg.search_attributes. := ['isMemberOf','uid'];
+     kagra_cfg.'fail_on_error' := true;
+               kagra_response. := claims#get_claims(claims#create_source(kagra_cfg.), user);
+             debugger(1,'kagra_response. :\n' + print(kagra_response., true));
+                   debugger(1,'kagra_response.:\n' + print(kagra_response.'isMemberOf'));
+
+  ∄kagra_response.'isMemberOf'⇒
+       raise_error('Missing group information. Cannot determine scopes.', oa4mp_error,{'error_type':'access_denied'});
+
+return(kagra_response.);

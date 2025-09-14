@@ -18,17 +18,16 @@
 */
  debugger(1);
 
- trace('IGWN','starting init.');
+ debugger(1,'IGWN','starting init.');
        all_audience. := ['ANY', 'LIGO', 'segments.ligo.org'];
          robot_caput := 'igwn.robot:'; // marker in scopes for robots
   access_token.'ver' := 'scitoken:2.0';
 
- trace('IGWN', script_args()  + '=' + to_string(script_args(-1)));
- // is_igwn := script_args()==1?script_args(0)=='igwn':false;
- trace('IGWN','is_igwn=='+ is_igwn);
+ debugger(1,'IGWN', script_args()  + '=' + to_string(script_args(-1)));
+ debugger(1,'IGWN','is_igwn=='+ is_igwn);
 
-   if [!is_defined(claims.'eppn')]
- then [err('Missing EPPN. Cannot determine scopes.', 'invalid_request');];
+  ∄claims.'eppn' ⇒ err('Missing EPPN. Cannot determine scopes.', 'invalid_request');
+
            ζ.'Services:OSGPilotTest:SciTokens:scope_create' := ['scope_create'];
         ζ.'Services:OSGPilotTest:SciTokens:compute_create' := ['compute_create'];
         ζ.'Services:OSGPilotTest:SciTokens:compute_cancel' := ['compute_cancel'];
@@ -76,11 +75,10 @@
 
         get_permissions(γ.) -> reduce(@~,ζ\(γ\*\name));
          robots. := ~mask(scopes., 0 == starts_with(scopes., robot_caput));
-      if [1 < size(robots.)]
-    then [err('too many robots (' + size(robots.) +')','access_denied');];
+      1 < size(robots.) ⇒ err('too many robots (' + size(robots.) +')','access_denied');
 
     is_robot := 1 == size(robots.);
-    trace('is robot? ' + is_robot);
+    debugger(1,'is robot? ' + is_robot);
 
    // If there is no audience, use all_audience. Otherwise check if there is an override in tx_audience and use that.
     requested_audience. := (size(tx_audience.) == 0)?(size(audience.)==0?all_audience.:audience.):tx_audience.;

@@ -1,5 +1,6 @@
 package org.oa4mp.client.api.storage;
 
+import edu.uiuc.ncsa.security.core.cf.CFNode;
 import org.oa4mp.client.api.ClientXMLTags;
 import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
 import edu.uiuc.ncsa.security.storage.FSProvider;
@@ -14,6 +15,11 @@ import java.io.File;
  */
 public class FSAssetStoreProvider extends FSProvider<FSAssetStore> {
     public FSAssetStoreProvider(ConfigurationNode config,  AssetProvider assetProvider, MapConverter converter) {
+        super(config, ClientXMLTags.FILE_STORE, ClientXMLTags.ASSET_STORE, converter);
+        this.assetProvider = assetProvider;
+    }
+
+    public FSAssetStoreProvider(CFNode config, AssetProvider assetProvider, MapConverter converter) {
         super(config, ClientXMLTags.FILE_STORE, ClientXMLTags.ASSET_STORE, converter);
         this.assetProvider = assetProvider;
     }

@@ -49,12 +49,6 @@ public class ScopeTemplateQDLUtil implements Serializable {
                 return new StemValue(); // no computed scopes means nothing to return.
             }
 
-       /*     if(objects[0] instanceof QDLList){
-                if(((QDLList)objects[0]).isEmpty()){
-                    return new QDLStem();
-                }
-            }*/
-
             if (!(objects[0].isStem())) {
                 throw new BadArgException(" " + getName() +"(0)  (computed scopes) must be a stem, got a '" + objects[0] + "'",0);
             }

@@ -1,20 +1,16 @@
-//say(debugger(1));
-   if [!is_defined(claims.'eppn')]
- then [err('Missing EPPN. Cannot determine scopes.', 'invalid_request');];
+   !is_defined(claims.'eppn') ⇒ err('Missing EPPN. Cannot determine scopes.', 'invalid_request');
  debugger(1);
  requested_audience. := (size(tx_audience.) == 0)?audience.:tx_audience.;
  access_token.aud. := (size(requested_audience.) == 0)?all_audience.:requested_audience.;
  requested_scopes. := (0 < size(tx_scopes.))?tx_scopes.:scopes.;
- trace('IGWN', 'requested scopes = ' + to_string(requested_scopes.));
- trace('IGWN', 'original scopes = ' + to_string(original_scopes.));
+ debugger(1,'IGWN', 'requested scopes = ' + to_string(requested_scopes.));
+ debugger(1,'IGWN', 'original scopes = ' + to_string(original_scopes.));
  // Only grant scopes already granted, fixes CIL-1784, CIL-1828
  σ()→ (∃original_scopes. ∧ !is_null(original_scopes.))⇒original_scopes.:scopes.;
  permissions. := resolve_templates(σ(), requested_scopes., false);
- //permissions. := resolve_templates(scopes., requested_scopes., false);
- trace('IGWN', 'permissions = ' + to_string(permissions.));
- //permissions. := ~mask(permissions., !'write:/staging.*' =~ permissions.);
+ debugger(1,'IGWN', 'permissions = ' + to_string(permissions.));
  permissions. := ~(!'write:/staging/.*|'+robot_caput+'.*'=~permissions.)⌆permissions.; // CIL-1886 fix
- trace('IGWN', 'permissions #2 = ' + to_string(permissions.));
+ debugger(1,'IGWN', 'permissions #2 = ' + to_string(permissions.));
  // CIL-1808
  /*
    alternately , do the loop implicitly, since each element of ζ. is a list.
@@ -25,14 +21,12 @@
     templates. := ⊗~∀[⊢⊗pp∀[ζ.]]; // apply pp to each element, concatenate all the results.
  */
  templates. :=~pick((x)->'${'<x, ⊢ζ.); // unique set of templates
- trace('IGWN', 'templates = ' + to_string(templates.));
+ debugger(1,'IGWN', 'templates = ' + to_string(templates.));
  t2. := template_substitution(templates., claims.);
  t2. := resolve_templates(requested_scopes., t2., false); // if templates, by upscoping.
  permissions. := permissions. ~ t2.;
- //permissions. := (⊗∧⊙⊗!=∀[templates., permissions.])⌆permissions. // gets rid of the templates
- //permissions. := mask(permissions., permissions. != 'write:/staging'); // manually yank this one template. 8/17/2023
 
- trace('IGWN', 'permissions = ' + to_string(permissions.));
+ debugger(1,'IGWN', 'permissions = ' + to_string(permissions.));
  requested_audience. := (size(tx_audience.) == 0)?(size(audience.)==0?all_audience.:audience.):tx_audience.;
  access_token.'aud' := requested_audience.;
  access_token.scope := detokenize(unique(permissions.), ' '); // turn in to string, omit duplications, trailing space

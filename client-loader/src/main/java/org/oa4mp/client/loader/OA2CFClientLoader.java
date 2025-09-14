@@ -1,9 +1,6 @@
 package org.oa4mp.client.loader;
 
-import org.oa4mp.delegation.server.OA2ConfigurationLoaderUtils;
-import org.oa4mp.delegation.server.OA2Constants;
-import org.oa4mp.delegation.server.OA2TokenForge;
-import org.oa4mp.delegation.server.OIDCDiscoveryTags;
+import edu.uiuc.ncsa.security.core.cf.CFNode;
 import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
 import edu.uiuc.ncsa.security.core.configuration.provider.TypedProvider;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
@@ -15,16 +12,19 @@ import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import edu.uiuc.ncsa.security.util.jwk.JWKUtil2;
-import org.apache.commons.configuration.tree.ConfigurationNode;
 import org.oa4mp.client.api.ClientEnvironment;
 import org.oa4mp.client.api.ClientXMLTags;
 import org.oa4mp.client.api.OA4MPServiceProvider;
-import org.oa4mp.client.api.loader.AbstractClientLoader;
+import org.oa4mp.client.api.loader.AbstractCFClientLoader;
 import org.oa4mp.client.api.storage.*;
 import org.oa4mp.delegation.client.DelegationService;
 import org.oa4mp.delegation.common.OA4MPVersion;
 import org.oa4mp.delegation.common.storage.clients.Client;
 import org.oa4mp.delegation.common.token.TokenForge;
+import org.oa4mp.delegation.server.OA2ConfigurationLoaderUtils;
+import org.oa4mp.delegation.server.OA2Constants;
+import org.oa4mp.delegation.server.OA2TokenForge;
+import org.oa4mp.delegation.server.OIDCDiscoveryTags;
 import org.oa4mp.delegation.server.client.*;
 
 import javax.inject.Provider;
@@ -42,18 +42,18 @@ import static org.oa4mp.client.api.ClientXMLTags.*;
  * <p>Created by Jeff Gaynor<br>
  * on 6/4/13 at  4:34 PM
  */
-public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClientLoader<T> {
+public class OA2CFClientLoader<T extends ClientEnvironment> extends AbstractCFClientLoader<T> {
 
-    public OA2ClientLoader(ConfigurationNode node) {
+    public OA2CFClientLoader(CFNode node) {
         super(node);
     }
 
     /**
-     * Constructor to inject a logger. 
+     * Constructor to inject a logger.
      * @param node
      * @param logger
      */
-    public OA2ClientLoader(ConfigurationNode node, MyLoggingFacade logger ) {
+    public OA2CFClientLoader(CFNode node, MyLoggingFacade logger ) {
         super(node, logger);
     }
 
@@ -167,7 +167,11 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
      */
     public boolean isShowIDToken() {
         if (showIDToken == null) {
-
+/*            try {
+                showIDToken = Boolean.parseBoolean(getCfgValue(ClientXMLTags.SHOW_ID_TOKEN));
+            } catch (Throwable t) {
+                showIDToken = Boolean.FALSE;
+            }*/
             // from https://github.com/rcauth-eu/OA4MP/commit/c7c49a750b3138e542353a1acb01d4e4eb3883cf
             String showIDTokenValue = getCfgValue(ClientXMLTags.SHOW_ID_TOKEN);
             if (showIDTokenValue == null) {
@@ -403,7 +407,6 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
             dsp = new Provider<DelegationService>() {
                 @Override
                 public DelegationService get() {
-                    //return new DS2(new AGServer2(createServiceClient(getAuthzURI())), // as per spec, request for AG comes through authz endpoint.
                     return new DS2(new AGServer2(createServiceClient(getAuthorizeURI())), // as per spec, request for AG comes through authz endpoint.
                             new ATServer2(createServiceClient(getAccessTokenURI()),
                                     getIssuer(),
@@ -425,7 +428,6 @@ public class OA2ClientLoader<T extends ClientEnvironment> extends AbstractClient
         }
         return dsp;
     }
-
     public URI getUIURI() {
         return createServiceURI(getCfgValue(ClientXMLTags.USER_INFO_URI),
                 OIDCDiscoveryTags.USER_INFO_ENDPOINT_DEFAULT,

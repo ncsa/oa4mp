@@ -41,7 +41,6 @@ public class OA2ConfigurationLoaderUtils extends XMLConfigUtil {
      * @return
      */
     public static Map<String, List<String>> getAdditionalParameters(ConfigurationNode cn) {
-//        if (params == null) {
         Map<String, List<String>> params = new HashMap<>();
         if (0 < cn.getChildrenCount(ADDITIONAL_PARAMETERS)) {
             ConfigurationNode node = Configurations.getFirstNode(cn, ADDITIONAL_PARAMETERS);
@@ -72,10 +71,43 @@ public class OA2ConfigurationLoaderUtils extends XMLConfigUtil {
 
             }
         }
-
-        //      }
         return params;
     }
+
+    public static Map<String, List<String>> getAdditionalParameters(CFNode cn) {
+        Map<String, List<String>> params = new HashMap<>();
+        List<CFNode> aparams = cn.getChildren(ADDITIONAL_PARAMETER);
+        if (0 < aparams.size()) {
+            List<CFNode> kids = aparams.get(0).getChildren(ADDITIONAL_PARAMETER);
+            for (int i = 0; i < kids.size(); i++) {
+                CFNode currentNode =  kids.get(i);
+                String x = currentNode.getFirstAttribute( PARAMETER_KEY);
+
+                if (x == null) {
+                    continue; // no key means skip it!
+                }
+                String y = currentNode.getFirstAttribute(SCOPE_ENABLED);
+                boolean isEnabled = true; // default
+                if (y != null) {
+                    isEnabled = Boolean.parseBoolean(y);
+                }
+                if (isEnabled) {
+                    List<String> values;
+                    if (params.containsKey(x)) {
+                        values = params.get(x);
+                    } else {
+                        values = new ArrayList<>();
+                    }
+                    // in case they leave a blank or two in the config.
+                    values.add(currentNode.getValue().trim());
+                    params.put(x, values);
+                }
+
+            }
+        }
+        return params;
+    }
+
 
     /**
      * The block containing the scopes. Format is  (there may be more, just add them)
@@ -94,15 +126,10 @@ public class OA2ConfigurationLoaderUtils extends XMLConfigUtil {
      * @return
      */
     public static Collection<String> getScopes(ConfigurationNode cn) {
-        //   if (scopes == null) {
         Collection<String> scopes = new HashSet<>(); // keep the elements unique
         // Fix https://github.com/ncsa/oa4mp/issues/103
         // First thing is to take all the basic scopes supported and include them.
-/*
-            for (String s : OA2Scopes.basicScopes) {
-                scopes.add(s);
-            }
-*/
+
         if (0 < cn.getChildrenCount(SCOPES)) {
             // Then we have some scopes
             ConfigurationNode node = Configurations.getFirstNode(cn, SCOPES);
@@ -126,20 +153,14 @@ public class OA2ConfigurationLoaderUtils extends XMLConfigUtil {
                 }
             }
         }
-        // }
         return scopes;
     }
 
     public static Collection<String> getScopes(CFNode cn) {
-        //   if (scopes == null) {
         Collection<String> scopes = new HashSet<>(); // keep the elements unique
         // Fix https://github.com/ncsa/oa4mp/issues/103
         // First thing is to take all the basic scopes supported and include them.
-/*
-            for (String s : OA2Scopes.basicScopes) {
-                scopes.add(s);
-            }
-*/
+
         List<CFNode> scopesList = cn.getChildren(SCOPES);
         if (0 < scopesList.size()) {
             // Then we have some scopes
@@ -163,7 +184,6 @@ public class OA2ConfigurationLoaderUtils extends XMLConfigUtil {
                 }
             }
         }
-        // }
         return scopes;
     }
 

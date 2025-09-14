@@ -4,21 +4,20 @@ attributes. := script_load('ligo/vo4/get_attributes.qdl', claims.'eppn');
      robot_name := null;
    if[is_robot]
 then [
-             robot_name := robots.0 - robot_caput;
-      robot_test_names. := [ 'gw-astronomy:KAGRA-LIGO:Robots:' + robot_name + ':SciTokens:authorized',
-                          'Services:Robots:' + robot_name + ':SciTokens:authorized'];
-      r_test.:=robot_test_names. ∈ attributes\'isMemberOf'\*\'name';
-        if [true ∈ r_test.]
-      then [
-                       moniker := robot_name + '@ligo.org';
-            access_token.'sub' :=   claims.'sub' := moniker ;
-                 r_attributes. := script_load('ligo/vo4/get_robots.qdl', moniker);
-                  permissions. := get_permissions(r_attributes.'isMemberOf');
-                   attributes. := r_attributes.; // use robot attributes instead now.
-            ]
-       else [err('you do not have permission to use the robot named "' + robot_name + '"','access_denied');];
-       ]
-    else [
+              robot_name := robots.0 - robot_caput;
+       robot_test_names. := [ 'gw-astronomy:KAGRA-LIGO:Robots:' + robot_name + ':SciTokens:authorized',
+                              'Services:Robots:' + robot_name + ':SciTokens:authorized'];
+                  r_test.:=robot_test_names. ∈ attributes\'isMemberOf'\*\'name';
+
+      true ∉ r_test. ⇒ err('you do not have permission to use the robot named "' + robot_name + '"','access_denied');
+
+                 moniker := robot_name + '@ligo.org';
+      access_token.'sub' := claims.'sub' := moniker ;
+           r_attributes. := script_load('ligo/vo4/get_robots.qdl', moniker);
+            permissions. := get_permissions(r_attributes.'isMemberOf');
+             attributes. := r_attributes.; // use robot attributes instead now.
+
+    ]else [
             permissions. := get_permissions(attributes.'isMemberOf');
       access_token.'sub' := claims.'sub' := claims.'eppn';
    ]; // end robots
@@ -33,12 +32,12 @@ access_token.'aud' := requested_audience.;
 /*
    Tidy up id token aka claims.
 */
-  if [!is_defined(attributes.'uid')]
-then [err('missing uid','access_denied');];
+  ∄attributes.'uid' ⇒ err('missing uid','access_denied');
+
 //claims.'uid' := attributes.'uid';
 access_token.'uid':=claims.'uid'; // CIL-1681
   if [is_defined(attributes.'uin')]
 then [claims.'uin' := attributes.'uin';];
  access_token.'scope' := detokenize(unique(permissions.), ' '); // turn in to string, omit duplications, trailing space
- trace('in access.qdl, permissions = ' + print(permissions.));
+ debugger(1,'in access.qdl, permissions = ' + print(permissions.));
  original_scopes.. := permissions.; // the original scopes

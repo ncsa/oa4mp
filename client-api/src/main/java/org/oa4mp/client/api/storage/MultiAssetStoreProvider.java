@@ -1,5 +1,6 @@
 package org.oa4mp.client.api.storage;
 
+import edu.uiuc.ncsa.security.core.cf.CFNode;
 import edu.uiuc.ncsa.security.core.configuration.provider.MultiTypeProvider;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import org.apache.commons.configuration.tree.ConfigurationNode;
@@ -11,6 +12,10 @@ import org.apache.commons.configuration.tree.ConfigurationNode;
 public class MultiAssetStoreProvider extends MultiTypeProvider<AssetStore> {
 
     public MultiAssetStoreProvider(ConfigurationNode config, boolean disableDefaultStore, MyLoggingFacade logger) {
+        super(config, disableDefaultStore, logger, null, null);
+    }
+
+    public MultiAssetStoreProvider(CFNode config, boolean disableDefaultStore, MyLoggingFacade logger) {
         super(config, disableDefaultStore, logger, null, null);
     }
 

@@ -29,8 +29,8 @@ cfg.'file' := $$OA4MP_CLC_XML_INI;
 cfg.'description' :=  'Test basic configuration for LIGO';
 cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
 user_id := 'http://cilogon.org/serverT/users/21340363'; // id from Github on test.cilogon.org
-params.'authz' :=  {'scope': 'read:/frames'}; // initial request
-params.'token' :=  {'scope': 'write:/frames', 'audience':'ALL'}; // initial request
+params.'authz' :=  {'scope': 'read:/frames write:/frames'}; // initial request
+params.'token' :=  {'scope': 'read:/frames', 'audience':'ALL'}; // initial request
 params.'exchange' :=  {'scope': 'read:/frames'}; // initial request
 
 rc := script_load('driver.qdl', cfg., params.);
@@ -40,13 +40,14 @@ tokens. := clc#access();
 at. := tokens.'access_token'.'jwt';
 rt. := tokens.'refresh_token';
 idt.:= clc#claims();
+say(input_form(idt.));
 ⊨ idt.'sub' ≡ 'jeffrey.gaynor@ligo.org' : 'wrong ID token subject';
 ⊨ idt.'iss' ≡ 'https://test.cilogon.org/igwn': 'wrong issuer'; // Check it's in VO
 ⊨ idt.'aud' ≡ 'test:jeff/ligo' : 'wrong audience';
 ⊨ idt.'uid' ≡ 'jeffrey.gaynor' : 'wrong uid'; // uid must not have trailing domain or LIGO's credmon will lose track
-
+say('at:\n'+print(at.));
 ⊨ at.'sub' ≡ 'jeffrey.gaynor@ligo.org' : 'wrong AT subject';
-⊨ at.'aud' ≡ 'ANY' : 'wrong AT audience, expected \'ANY\' and got ' + (at.'aud');
+⊨ at.'aud' ≡ 'ALL' : 'wrong AT audience, expected \'ANY\' and got ' + (at.'aud');
 ⊨ at.'scope' ≡ 'read:/frames' : 'wrong AT scope, expected \'read:/frames\' and got ' + (at.'scope');
 ⊨ at.'iss' ≡ 'https://test.cilogon.org/igwn' : 'wrong AT sissuer';
 

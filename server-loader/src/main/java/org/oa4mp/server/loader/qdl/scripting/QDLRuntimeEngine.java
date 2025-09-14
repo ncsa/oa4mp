@@ -28,6 +28,7 @@ import org.qdl_lang.state.LibLoader;
 import org.qdl_lang.state.StateUtils;
 import org.qdl_lang.variables.QDLList;
 import org.qdl_lang.variables.QDLStem;
+import org.qdl_lang.variables.values.QDLKey;
 import org.qdl_lang.variables.values.QDLValue;
 import org.qdl_lang.variables.values.StemValue;
 import org.qdl_lang.workspace.WorkspaceCommands;
@@ -612,8 +613,8 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
 
     public List<String> stemToList(QDLStem arg) {
         ArrayList<String> scopes = new ArrayList<>();
-        for (Object key : arg.keySet()) {
-            scopes.add(String.valueOf(arg.get(key)));
+        for (QDLKey key : arg.keySet()) {
+            scopes.add(arg.get(key).toString());
         }
         return scopes;
     }
@@ -693,9 +694,9 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
      * @return
      */
     protected ScriptRunResponse createSRResponse() {
-        Object x = state.getValue(SYS_ERR_VAR);
-        if (x != null && x instanceof QDLStem) {
-            QDLStem sysErr = (QDLStem) x;
+        QDLValue x = state.getValue(SYS_ERR_VAR);
+        if (x != null && x.isStem()) {
+            QDLStem sysErr =  x.asStem();
             if (sysErr.containsKey(SYS_ERR_OK) && !sysErr.getBoolean(SYS_ERR_OK)) {
                 // In OAuth this is the error_description
                 String message = sysErr.getString(SYS_ERR_MESSAGE);

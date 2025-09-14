@@ -1,5 +1,7 @@
 package org.oa4mp.client.loader;
 
+import edu.uiuc.ncsa.security.core.cf.CFBundle;
+import edu.uiuc.ncsa.security.core.cf.CFLoader;
 import edu.uiuc.ncsa.security.core.cf.CFNode;
 import org.oa4mp.client.api.ClientXMLTags;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
@@ -14,12 +16,17 @@ import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import javax.servlet.ServletContext;
 import java.io.File;
+import java.io.FileInputStream;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 6/5/13 at  2:40 PM
  */
 public class OA2ClientBootstrapper extends Bootstrapper {
+    public OA2ClientBootstrapper() {
+        setUseCF(true);
+    }
+
     public static final String OA2_CLIENT_CONFIG_FILE_KEY= "oa4mp:oauth2.client.config.file";
     public static final String OA2_CLIENT_CONFIG_NAME_KEY= "oa4mp:oauth2.client.config.name";
     public static final String DEFAULT_CONFIG_FILE_NAME = "client.xml";
@@ -34,7 +41,7 @@ public class OA2ClientBootstrapper extends Bootstrapper {
 
     @Override
     public ConfigurationLoader getConfigurationLoader(CFNode node) throws MyConfigurationException {
-        return null;
+        return new OA2CFClientLoader(node);
     }
 
     @Override
@@ -55,11 +62,19 @@ public class OA2ClientBootstrapper extends Bootstrapper {
             if (f.exists() && f.isFile()) {
                 try {
                     logger.info("loading configuration \"" + (configName == null ? "(none)" : configName) + "\" from file " + fileName);
-                    ConfigurationNode node = XMLConfigUtil.findMultiNode(fileName, configName, ClientXMLTags.COMPONENT);
-                    // old single inheritance
-                    //ConfigurationNode node = ConfigUtil.findConfiguration(fileName, configName, ClientXMLTags.COMPONENT);
+                    ConfigurationNode node;
+                    if(isUseCF()){
+                        CFLoader cfLoader = new CFLoader();
+                        CFBundle bundle = cfLoader.loadBundle(new FileInputStream(fileName), ClientXMLTags.COMPONENT);
+                        CFNode cfNode = bundle.getNamedConfig(configName);
+                        return getConfigurationLoader(cfNode);
+                    }else{
+                        node = XMLConfigUtil.findMultiNode(fileName, configName, ClientXMLTags.COMPONENT);
+                        // old single inheritance
+                        //ConfigurationNode node = ConfigUtil.findConfiguration(fileName, configName, ClientXMLTags.COMPONENT);
+                        return getConfigurationLoader(node);
+                    }
 
-                    return getConfigurationLoader(node);
                 } catch (Throwable t) {
                 }
                 logger.info("  ** configuration not found for \"" + fileName + "\"");
@@ -76,13 +91,16 @@ public class OA2ClientBootstrapper extends Bootstrapper {
         ServletDebugUtil.trace(this, "Attempting to load configuration \"" + cfgName + "\" from file \"" + fileName + "\"");
         logger.info("Starting to load configuration");
         try {
-            ConfigurationLoader x = getConfigurationLoader(
-                    ServletXMLConfigUtil.findConfigurationNode(servletContext, getOa4mpConfigFileKey(), getOa4mpConfigNameKey(), ClientXMLTags.COMPONENT));
+            ConfigurationLoader x;
+            if(isUseCF()){
+                x = getConfigurationLoader(getCFNode(servletContext));
+            }else{
+                x = getConfigurationLoader(getNode(servletContext));
+            }
             logger.info("Loaded configuration named " + cfgName + " from file " + fileName);
             return x;
         } catch (MyConfigurationException ce) {
             ServletDebugUtil.trace(this, "Did not find a configuration via the servlet context.");
-
             logger.info("Did not find a configuration via the servlet context:" + ce.getMessage());
         }
 
@@ -100,12 +118,20 @@ public class OA2ClientBootstrapper extends Bootstrapper {
         throw cx;
     }
 
+    protected CFNode getCFNode(ServletContext servletContext) throws Exception {
+        return ServletXMLConfigUtil.findCFConfigurationNode(servletContext, getOa4mpConfigFileKey(), getOa4mpConfigNameKey(), ClientXMLTags.COMPONENT);
+    }
+
+    protected ConfigurationNode getNode(ServletContext servletContext) throws Exception {
+        return ServletXMLConfigUtil.findConfigurationNode(servletContext, getOa4mpConfigFileKey(), getOa4mpConfigNameKey(), ClientXMLTags.COMPONENT);
+    }
+
     public static final String[] DEFAULT_CONFIG_LOCATIONS = new String[]{
             System.getProperty("user.home") + File.separator + "oa4mp" + File.separator + DEFAULT_CONFIG_FILE_NAME,
             System.getProperty("user.home") + File.separator + DEFAULT_CONFIG_FILE_NAME,
             System.getProperty("user.dir") + File.separator + "oa4mp" + File.separator + DEFAULT_CONFIG_FILE_NAME,
             System.getProperty("user.dir") + File.separator + DEFAULT_CONFIG_FILE_NAME,
-            "/var/www/config/" + DEFAULT_CONFIG_FILE_NAME,
-            "/var/www/config/" + "oa4mp/" + DEFAULT_CONFIG_FILE_NAME
+            "/var/www/config/" + DEFAULT_CONFIG_FILE_NAME, // Apache location
+            "/var/www/config/" + "oa4mp/" + DEFAULT_CONFIG_FILE_NAME // ditto
     }; // last one is unix specific.
 }
