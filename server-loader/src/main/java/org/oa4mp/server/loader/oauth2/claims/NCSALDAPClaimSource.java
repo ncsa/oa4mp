@@ -104,8 +104,6 @@ public class NCSALDAPClaimSource extends LDAPClaimsSource {
             "            \"keystore\": {},\n" +
             "            \"tlsVersion\": \"TLS\",\n" +
             "            \"useJavaTrustStore\": true,\n" +
-            //"            \"password\": \"changeit\",\n" +
-            //"            \"type\": \"jks\"\n" +
             "          }\n" +
             "        }\n" +
             "      }";

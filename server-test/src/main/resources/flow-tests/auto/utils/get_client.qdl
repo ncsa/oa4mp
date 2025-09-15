@@ -16,9 +16,10 @@ q:=load('test#/utils/cm.mdl');
 use(q);
 http#host(admin.'address' + '/oidc-cm') ;
 h. := {'Authorization': 'Bearer ' + bearer_token(admin.'id', admin.'secret'),
-       'Content-Type':'application/json; charset=UTF-8'};
+       'Content-Type':'application/json;charset=UTF-8'};
 http#headers(h.);
 http#open(true);
 response. := http#get({'client_id':client_id});
+assert 'charset=UTF-8' < response.'headers'.'Content-Type' : 'Wrong character set encoding from server';
 return(response\content);
 

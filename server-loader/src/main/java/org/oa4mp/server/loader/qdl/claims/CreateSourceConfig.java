@@ -16,7 +16,7 @@ import static org.qdl_lang.variables.StemUtility.put;
 import static org.qdl_lang.variables.values.QDLValue.asQDLValue;
 
 /**
- * This fills in all of the missing configuration values with their defaults. Sp the contract is
+ * This fills in all of the missing configuration values with their defaults. So the contract is
  * that the argument is a stem with the minimum required parameters. All of those are taken and any
  * missing parameters are supplied.
  * <p>Created by Jeff Gaynor<br>
@@ -122,6 +122,7 @@ public class CreateSourceConfig implements QDLFunction, CSConstants {
         QDLStem renames = new QDLStem();
         put(renames, "memberOf", "isMemberOf");
         put(renames, "mail", "email");
+        put(renames, "cn", "name");
         put(output, CS_LDAP_RENAME,renames);
         return output.union(arg);
     }

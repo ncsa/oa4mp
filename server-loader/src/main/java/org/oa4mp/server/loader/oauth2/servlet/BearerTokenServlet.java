@@ -17,6 +17,8 @@ import org.apache.http.HttpStatus;
 
 import java.io.IOException;
 
+import static org.oa4mp.delegation.server.server.RFC8693Constants.ACCESS_TOKEN_TYPE;
+
 /**
  * For endpoints that use bearer tokens. The issue is that bearer tokens may be JWTs and
  * have to be verified, but the information to do so is not available until the transaction
@@ -56,6 +58,14 @@ public abstract class BearerTokenServlet extends OA4MPServlet {
                            null);
                    ge.setForensicMessage("Error getting exchange record for the access token \"" + at.getJti() + "\"");
                    throw ge;
+               }
+               // Fix https://github.com/ncsa/oa4mp/issues/267
+               if(!oldTXR.getTokenType().equals(ACCESS_TOKEN_TYPE)){
+                   OA2GeneralError ge = new OA2GeneralError(OA2Errors.INVALID_TOKEN,
+                           "not an access token",
+                           HttpStatus.SC_UNAUTHORIZED,
+                           null);
+
                }
                transaction = (OA2ServiceTransaction) getTransactionStore().get(oldTXR.getParentID());
 

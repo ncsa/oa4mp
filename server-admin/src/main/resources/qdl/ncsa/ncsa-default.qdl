@@ -28,7 +28,7 @@ script_load('utils/init.qdl');
 if[
      exec_phase ≡ 'pre_auth'
 ]then[
-     cc ≔ j_load($$OA4MP_PATH + '.util.claims');
+     cc ≔ j_load('oa4mp.util.claims');
      cfg. ≔ cc#new_template('ncsa');
      debugger('*** NCSA claims=' + print(claims.));
      claims.'uid' ≔ head(claims.'eppn', '@'); // set search key

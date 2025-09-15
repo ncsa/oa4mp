@@ -17,7 +17,12 @@ if[rc!='ok'][return(rc);];
 
 tokens. := clc#access();
 claims. := clc#claims();
-
+⊨ ∄claims.'memberof' : 'memberof claim not removed';
+⊨ ∄claims.'cn' : 'cn claim not removed';
+⊨ ∄claims.'mail' : 'mail claim not removed';
+⊨ ∃claims.'isMemberOf' : 'isMemberOf claim is missing';
+⊨ ∃claims.'name' : 'name claim is missing';
+⊨ ∃claims.'email' : 'email claim is missing';
 ⊨ claims.'aud' == cfg.'id' : 'wrong audience';
 groups. := claims.'isMemberOf';
 ⊨ groups. << List : 'is member of claim is not a group';
