@@ -29,6 +29,7 @@ say('checking runtime variables');
                    if[∄resource.][raise_error('resource. not set', oa4mp_error);];
                      if[∄scopes.][raise_error('scopes. not set', oa4mp_error);];
                 if[∄flow_states.][raise_error('missing flow states', oa4mp_error);];
+                       if[∄mail.][raise_error('mail. not set', oa4mp_error);];
                   if[∄mail.'cfg'][raise_error('missing mail configuration', oa4mp_error);];
               if[∄mail.'message'][raise_error('missing default mail message', oa4mp_error);];
          if[∄at_original_scopes.][raise_error('missing original access token scopes', oa4mp_error);];

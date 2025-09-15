@@ -4,15 +4,18 @@ debugger(1,'initial at:\n' + print(access_token.));
 
 cfg. := claims#new_template('file');
 cfg.'file_path' := 'test#/auto/server/test-claims.json';
+debugger(1, 'got claims from file');
 
 // critical regression testing. if this fails, then the QDL scripting environment
 // is broken.
 script_load('test#/auto/server/runtime-vars-check.qdl', true, false);
+debugger(1, 'auto/server/runtime-vars-check.qdl: passed');
 
 // Note that depending upon the user metadata scopes, the claims may
 // be severely restricted. Resolving the access token scopes should be
 // done against the full claims generally, so we use those.
 full_claims.:= claims#get_claims(claims#create_source(cfg.), claims.'sub');
+debugger(1, 'got claims from file source:\n' + print(full_claims.));
 full_claims.'sub':=claims.'sub';
 epe.:=full_claims.'eduPersonEntitlement';
 debugger(1, '  epe = ' + to_string(epe.));

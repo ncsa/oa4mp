@@ -28,6 +28,15 @@ claims. :=clc#claims();
 ⊨ tokens.'refresh_token'.'lifetime' == 950400000 : 'wrong refresh token lifetime';
 ⊨ claims.'aud' == cfg.'id' : 'wrong audience';  // Audience is a little different than usual.
 ⊨ claims.'eppn' == 'jgaynor@illinois.edu' : 'wrong eppn';
+// Claims checking. Making sure the required attribute are returned and
+// for the ones that are renamed, the original attributes is removed
+⊨ ∄claims.'memberof' : 'memberof claim not removed';
+⊨ ∄claims.'cn' : 'cn claim not removed';
+⊨ ∄claims.'mail' : 'mail claim not removed';
+⊨ ∃claims.'isMemberOf' : 'isMemberOf claim is missing';
+⊨ ∃claims.'name' : 'name claim is missing';
+⊨ ∃claims.'email' : 'email claim is missing';
+// check that the elements of isMemberOf are correct
 ⊨ claims.'isMemberOf' << List : 'isMemberOf claim is not a simple list';
 ⊨ claims.'isMemberOf'.0 << String  : ' isMemberOf should be a list';
 issued_at := claims.'iat'; // store for future use.
