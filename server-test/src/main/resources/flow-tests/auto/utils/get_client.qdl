@@ -20,5 +20,6 @@ h. := {'Authorization': 'Bearer ' + bearer_token(admin.'id', admin.'secret'),
 http#headers(h.);
 http#open(true);
 response. := http#get({'client_id':client_id});
+say('get_client resp:\n' + print(response.'headers'.'Content-Type'));
 return(response\content);
 

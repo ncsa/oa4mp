@@ -14,6 +14,7 @@
 
 
     -->
+
     <servlet>
         <servlet-name>discovery</servlet-name>
         <servlet-class>org.oa4mp.server.loader.oauth2.servlet.OA2DiscoveryServlet</servlet-class>

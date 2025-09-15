@@ -1291,7 +1291,7 @@ public class OIDCCMServlet extends EnvServlet {
 
     private void writeOK(HttpServletResponse httpServletResponse, JSON resp) throws IOException {
         httpServletResponse.setStatus(HttpStatus.SC_OK);
-        httpServletResponse.setContentType("application/json");
+        httpServletResponse.setContentType("application/json;charset=UTF-8"); // Fix https://github.com/ncsa/oa4mp/issues/266
         httpServletResponse.getWriter().println(resp.toString());
         httpServletResponse.getWriter().flush(); // commit it
     }
@@ -1299,7 +1299,7 @@ public class OIDCCMServlet extends EnvServlet {
     private void writeCreateOK(HttpServletResponse httpServletResponse, JSON resp) throws IOException {
         // write first since after flush(), no updates work and the status is set as SC_OK, regardless.
         httpServletResponse.setStatus(HttpStatus.SC_CREATED);
-        httpServletResponse.setContentType("application/json");
+        httpServletResponse.setContentType("application/json;charset=UTF-8"); // Fix https://github.com/ncsa/oa4mp/issues/266
         httpServletResponse.getWriter().println(resp.toString());
         httpServletResponse.getWriter().flush(); // commit it
     }
