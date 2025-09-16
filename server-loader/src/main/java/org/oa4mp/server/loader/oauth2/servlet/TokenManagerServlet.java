@@ -327,9 +327,8 @@ public abstract class TokenManagerServlet extends BearerTokenServlet implements 
 
     protected void writeOK(HttpServletResponse httpServletResponse, JSONObject resp) throws IOException {
         if (resp != null) {
-            httpServletResponse.setContentType("application/json");
-            httpServletResponse.getWriter().println(resp.toString());
-            httpServletResponse.setContentType("application/json");
+            httpServletResponse.setContentType("application/json;charset=UTF-8");
+            httpServletResponse.getWriter().println(resp);
             httpServletResponse.getWriter().flush(); // commit it
         }
         httpServletResponse.setStatus(HttpStatus.SC_OK);

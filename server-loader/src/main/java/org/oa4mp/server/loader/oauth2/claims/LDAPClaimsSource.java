@@ -724,6 +724,7 @@ throwable.printStackTrace();
 
     @Override
     public void fromQDL(QDLStem arg) {
+        DebugUtil.trace(this, "fromQDL:\n" + arg.toString(1));
         LDAPConfiguration ldapCfg = new LDAPConfiguration();
         setConfiguration(ldapCfg);
         super.fromQDL(arg);
