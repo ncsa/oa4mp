@@ -20,7 +20,6 @@ cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token 
 params.'a' := {'org.oa4mp:/tokens/access/lifetime':1000000,'org.oa4mp:/roles':'admin,all-user'};
 rc := script_load('driver.qdl', cfg., params.);
 if[rc!='ok'][return(rc);];
-say('params:\n' + clc#get_param('a'));
 tokens. := clc#access();
 claims. := clc#claims();
 ⊨ tokens.'access_token'.'lifetime' ≡ 900000 : 'wrong access token lifetime, got ' + tokens.'access_token'.'lifetime';

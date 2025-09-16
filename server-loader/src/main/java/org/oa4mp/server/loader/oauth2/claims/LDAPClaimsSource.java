@@ -724,7 +724,7 @@ throwable.printStackTrace();
 
     @Override
     public void fromQDL(QDLStem arg) {
-        System.out.println("LDAPClaimsSource::fromQDL:\n"+arg.toString(1));
+        DebugUtil.trace(this, "fromQDL:\n" + arg.toString(1));
         LDAPConfiguration ldapCfg = new LDAPConfiguration();
         setConfiguration(ldapCfg);
         super.fromQDL(arg);
@@ -737,7 +737,6 @@ throwable.printStackTrace();
         if (arg.containsKey(CS_LDAP_SEARCH_SCOPE)) {
             ldapCfg.setSearchScope(arg.getString(CS_LDAP_SEARCH_SCOPE));
         }
-
 
         if (arg.containsKey(CS_DEFAULT_IS_ENABLED)) {
             ldapCfg.setEnabled(arg.getBoolean(CS_DEFAULT_IS_ENABLED));
