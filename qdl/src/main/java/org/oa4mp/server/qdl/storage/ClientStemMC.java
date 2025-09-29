@@ -339,9 +339,13 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
         if(v.hasPrototypes()){
             QDLList list = new QDLList();
             for(Identifier id : v.getPrototypes()){
-                list.add(new StringValue(id.toString()));
+                if(!id.isTrivial()) {
+                    list.add(new StringValue(id.toString()));
+                }
             }
-            put(stem,kk().prototypes(), list);
+            if(!list.isEmpty()) {
+                put(stem, kk().prototypes(), list);
+            }
         }
         // 15 attributes
         return stem;

@@ -191,7 +191,14 @@ abstract   public String getToken(JSONWebKey key)
 
     /**
      * Used by access tokens and refresh tokens. This allows for certain substitutions for various server
-     * variables.
+     * variables. So e.g. if a template is of the form
+     * <pre>
+     *     read:/path/to/${sub}
+     * </pre>
+     * then the value of the sub claim will be used in place of ${sub}.
+     * <p>
+     *     See the <b>Server Constants</b> section in the <a href="https://oa4mp.org/pdf/token_handler_configuration.pdf">token handler configuration</a>.
+     * </p>
      *
      * @param targetClaims
      */

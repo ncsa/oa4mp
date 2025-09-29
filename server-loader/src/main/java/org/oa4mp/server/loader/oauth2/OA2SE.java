@@ -4,8 +4,7 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
-import edu.uiuc.ncsa.security.core.exceptions.NFWException;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.core.util.BeanUtils;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.servlet.UsernameTransformer;
@@ -603,7 +602,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
      * This has its own call here because it involves multiple store lookups. It cannot
      * be done as a join in SQL or some such because there are no guarantees the stores
      * are all SQL -- some may be file stores or even in another unrelated database.
-     *
+     *<p>Note that this will throw an exception is the client is in multiple VIs.</p>
      * @param clientID
      * @return
      */
@@ -615,6 +614,42 @@ public class OA2SE extends ServiceEnvironmentImpl {
         if (adminIDs == null || adminIDs.isEmpty()) {
             return null; // happens for every unmanaged client.
         }
+        // We don't care how many admin clients there are, just that the virtual
+        // issuer is not ambiguous.
+        // Fix https://github.com/ncsa/oa4mp/issues/271
+        Identifier currentVI = null;
+        Identifier lastVI = null;
+        boolean firstPass = true;
+        for(Identifier adminID : adminIDs){
+            AdminClient ac = getAdminClientStore().get(adminID);
+            if (ac == null) {
+                currentVI = null; // no VI set. Most common case.
+            }else{
+                currentVI = ac.getVirtualIssuer();
+            }
+            if(firstPass){
+                lastVI = currentVI;
+                firstPass = false;
+            }
+            if(!BeanUtils.checkEquals(lastVI, currentVI)){
+                // then we have different VIs and cannot resolve it
+                throw new GeneralException("too many VIs for client \"" + clientID + "\".");
+            }
+            lastVI = currentVI;
+        }
+        if(lastVI == null){
+            return null; // so no VIs set anywhere. Use server default.
+        }
+        VirtualIssuer vi = (VirtualIssuer) getVIStore().get(lastVI);
+        if (vi == null) {
+            throw new GeneralException("unknown virtual issuer \"" + vi.getIdentifierString() + "\" for client \"" + clientID + "\".");
+        }
+        if (!vi.isValid()) {
+            throw new GeneralException("invalid virtual issuer \"" + vi.getIdentifierString() + "\" for client \"" + clientID + "\".");
+        }
+        return vi;
+
+/*
         switch (adminIDs.size()) {
             case 0:
                 return null;
@@ -634,10 +669,12 @@ public class OA2SE extends ServiceEnvironmentImpl {
                 }
                 return vi;
             case 2:
-                throw new NFWException("too many admins for this client.");
+                throw new NFWException("too many admins for client \"" + clientID + "\".");
         }
         return null;
+*/
     }
+
 
     @Override
     public List<Store> listStores() {

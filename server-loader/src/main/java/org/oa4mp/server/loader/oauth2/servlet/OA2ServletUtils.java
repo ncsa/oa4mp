@@ -80,7 +80,10 @@ public class OA2ServletUtils {
             // This can happen if something very deep in the stack (non QDL) blows up and QDL
             // has caught it.
 
-            message = "error processing request:" + exception.getMessage();
+            message = "QDL error processing request:" + exception.getMessage();
+            if(debugger != null) {
+                debugger.trace(message,((QDLExceptionWithTrace)exception).stackTrace());
+            }
             atException = new OA2ATException(OA2Errors.INVALID_REQUEST,
                     message,
                     HttpStatus.SC_BAD_REQUEST,

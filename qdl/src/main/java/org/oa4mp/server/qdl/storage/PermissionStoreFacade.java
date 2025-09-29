@@ -45,7 +45,7 @@ public class PermissionStoreFacade extends StoreFacade {
             checkInit();
 
             if (objects.length != 1 || !(objects[0].isString())) {
-                throw new BadArgException(getName() + " requires the admin id as its argument",0);
+                throw new BadArgException(getName() + " requires the admin id as its argument", 0);
             }
             return asQDLValue(Long.valueOf(getPS().getClientCount(BasicIdentifier.newID(objects[0].asString()))));
         }
@@ -76,7 +76,7 @@ public class PermissionStoreFacade extends StoreFacade {
             checkInit();
 
             if (objects.length != 1 || !(objects[0].isString())) {
-                throw new BadArgException(getName() + " requires the admin id as its argument",0);
+                throw new BadArgException(getName() + " requires the admin id as its argument", 0);
             }
             List<Identifier> ids = getPS().getClients(BasicIdentifier.newID(objects[0].asString()));
 
@@ -112,7 +112,7 @@ public class PermissionStoreFacade extends StoreFacade {
             checkInit();
 
             if (objects.length != 1 || !(objects[0].isString())) {
-                throw new BadArgException(getName() + " requires the client id as its argument",0);
+                throw new BadArgException(getName() + " requires the client id as its argument", 0);
             }
             List<Identifier> ids = getPS().getAdmins(BasicIdentifier.newID(objects[0].asString()));
 
@@ -136,16 +136,17 @@ public class PermissionStoreFacade extends StoreFacade {
     protected QDLStoreAccessor createAccessor(String storeType) throws Exception {
         QDLStoreAccessor a = null;
 
-        a = super.createAccessor(storeType);
-        if (a != null) {
-            return a;
-        }
         switch (storeType) {
             case STORE_TYPE_PERMISSION_STORE:
                 a = new QDLPermissionStoreAccessor(storeType, getEnvironment().getPermissionStore(), getEnvironment().getMyLogger());
                 a.setMapConverter(new PermissionStemMC(getEnvironment().getPermissionStore().getMapConverter()));
                 break;
         }
+        if (a != null) {
+            return a;
+        }
+        a = super.createAccessor(storeType);
+
         return a;
     }
 }

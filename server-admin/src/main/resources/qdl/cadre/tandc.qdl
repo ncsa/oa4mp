@@ -1,0 +1,39 @@
+// Function to reconcile defined terms and conditions for a CO
+// with agreements by the authenticated CO Person and return
+// a stem representing the current agreements that can be
+// returned as a claim.
+//
+// Arguments:
+//   t_and_c    : list, current terms and conditions in the CO
+//   agreements : list, agreements to T&C made by the user
+//
+// Return:
+//   list representing the state of current terms and conditions
+//   agreements for the user. Each element of the list is a
+//   stem with key 'name' and value the name or description of
+//   the terms and conditions and key 'agreed' with value a boolen
+//   for whether or not the user has agreed to that terms and
+//   condition.
+//
+define[get_t_and_c_claim(t_and_c., agreements.)]
+[
+    // Hold the list of terms and conditions/agreement stems.
+    c. := [];
+
+    while[for_next(t., t_and_c.)]
+    [
+        i. := {'name': t.'Description', 'agreed': false};
+
+        while[for_next(a., agreements.)]
+        [
+            if[a.'CoTermsAndConditionsId' == t.'Id']
+            [
+                i.'agreed' := true;
+            ];
+        ];
+
+        c. := c.~[i.];
+    ];
+
+    return(c.);
+];

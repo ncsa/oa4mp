@@ -217,7 +217,7 @@ public class StoreAccessModule extends JavaModule {
             descr.add("\n   clients. := j_load('oa4mp.client.store');\n");
             descr.add("2. initialize the store, last argument sets the type");
             descr.add("   clients#init('/home/ncsa/dev/csd/config/server-oa2.xml', 'localhost:oa4mp.oa2.mariadb', "
-                    + STORE_TYPES_STEM_NAME + ".'" + STORE_TYPE_CLIENT + "');");
+                    + STORE_TYPES_STEM_NAME +  STORE_TYPE_CLIENT + "');");
             descr.add("This returns true if the store intialized ok.");
             descr.add("3. Issue commands, e.g.");
             descr.add("   x. := clients#search('client_id', '.*234.*');\n" +

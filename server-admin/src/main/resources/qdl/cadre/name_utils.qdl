@@ -1,0 +1,69 @@
+// Function to determine if the CO Person record Name object
+// needs to be synchronized with current IdP asserted claims.
+//
+// Arguments:
+//   co_person. : stem, CO person record
+//   claims.    : stem, current claims asserted by IdP
+//
+// Return:
+//   stem, with key 'sync_needed' set to a boolean indicating
+//   whether a sync is needed and key 'record' set to the
+//   updated CO Person record stem.
+//
+define[co_person_name_sync_needed(co_person., claims.)]
+[
+    ret. := {
+        'sync_needed' : false,
+        'record'      : co_person.
+        };
+
+    if[ has_key('given_name', claims.)]
+    [
+      if[ claims.'given_name' != co_person.'OrgIdentity'.0.'Name'.0.'given']
+      [
+        ret.'sync_needed' := true;
+        co_person.'OrgIdentity'.0.'Name'.0.'given' := claims.'given_name';
+        co_person.'Name'.0.'given' := claims.'given_name';
+      ];
+
+      if[ claims.'given_name' != co_person.'Name'.0.'given']
+      [
+        ret.'sync_needed' := true;
+        co_person.'OrgIdentity'.0.'Name'.0.'given' := claims.'given_name';
+        co_person.'Name'.0.'given' := claims.'given_name';
+      ];
+    ];
+
+    if[ has_key('family_name', claims.)]
+    [
+      if[ claims.'family_name' != co_person.'OrgIdentity'.0.'Name'.0.'family']
+      [
+        ret.'sync_needed' := true;
+        co_person.'OrgIdentity'.0.'Name'.0.'family' := claims.'family_name';
+        co_person.'Name'.0.'family' := claims.'family_name';
+      ];
+
+      if[ claims.'family_name' != co_person.'Name'.0.'family']
+      [
+        ret.'sync_needed' := true;
+        co_person.'OrgIdentity'.0.'Name'.0.'family' := claims.'family_name';
+        co_person.'Name'.0.'family' := claims.'family_name';
+      ];
+    ];
+
+    // Special logic for IdPs like GitHub since it only asserts the name claim
+    // and not given_name nor family_name.
+    if[(!has_key('given_name', claims.)) &&
+       (!has_key('family_name', claims.)) &&
+       has_key('name', claims.)]
+    [
+      if [ claims.'name' != co_person.'OrgIdentity'.0.'Name'.0.'given']
+      [
+        ret.'sync_needed' := true;
+        co_person.'OrgIdentity'.0.'Name'.0.'given' := claims.'name';
+        co_person.'Name'.0.'given' := claims.'name';
+      ];
+    ];
+
+    return(ret.);
+];

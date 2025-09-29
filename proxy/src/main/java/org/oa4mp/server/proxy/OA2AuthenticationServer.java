@@ -3,7 +3,6 @@ package org.oa4mp.server.proxy;
 
 import edu.uiuc.ncsa.security.servlet.HeaderUtils;
 import edu.uiuc.ncsa.security.servlet.PresentableState;
-import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.http.HttpStatus;
@@ -172,36 +171,6 @@ public class OA2AuthenticationServer extends AbstractAuthenticationServlet {
     @Override
     public String createCallback(ServiceTransaction trans, Map<String, String> params) {
         return OA2AuthorizedServletUtil.createCallback(trans, params);
-       /* String cb = trans.getCallback().toString();
-        OA2ServiceTransaction st = (OA2ServiceTransaction) trans;
-        *//*
-        CIL-545: The checking for valid callbacks is done at registration time. No checking should be done
-        any place else since we must support a much wider range of these (e.g. for mobile devices). 
-         *//*
-
-        String idStr = st.getIdentifierString();
-        // Fixes GitHub OA4MP issue 5, support multiple response modes.
-        String responseDelimiter = "?"; // default
-        if (st.hasResponseMode()) {
-            if (st.getResponseMode().equals(OA2Constants.RESPONSE_MODE_FRAGMENT)) {
-                responseDelimiter = "#";
-            }
-        }
-        try {
-            cb = cb + (cb.indexOf(responseDelimiter) == -1 ? responseDelimiter : "&") + AUTHORIZATION_CODE + "=" + TokenUtils.b32EncodeToken(idStr);
-            if (params.containsKey(OA2Constants.STATE)) {
-                cb = cb + "&" + OA2Constants.STATE + "=" + URLEncoder.encode(params.get(OA2Constants.STATE), "UTF-8");
-            }
-            // Fix https://github.com/ncsa/oa4mp/issues/214 RFC 9207 support
-            if(((OA2ServiceTransaction) trans).getUserMetaData().containsKey(OA2Claims.ISSUER)){
-                cb = cb + (cb.indexOf(responseDelimiter) == -1 ? responseDelimiter : "&")  + OA2Claims.ISSUER + "=" + st.getUserMetaData().get(OA2Claims.ISSUER);
-            }
-
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace(); // now way this can happen, but if it does, we want to know about it.
-        }
-        ((OA2ServiceTransaction) trans).setCreatedCallback(cb);
-        return cb;*/
     }
 
     @Override

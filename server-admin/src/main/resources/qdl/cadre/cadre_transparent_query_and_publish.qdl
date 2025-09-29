@@ -1,0 +1,222 @@
+/*
+╔══════════════════════════════════════════╗
+║  see                                     ║
+║  /home/ncsa/dev/csd/config/cadre-cfg.json║
+║  for the corresponding anaphor           ║
+╚══════════════════════════════════════════╝
+
+*/
+// Argument 0 should be a JSON object containing configuration details.
+// Argument 0 will be converted into a stem.
+//
+// An example is
+//
+// {
+//  "comanage_registry_host_url": "https://registry-test.cadre5safes.org.au",
+//  "api_user_name" : "co_2.rest_user_01",
+//  "api_user_password" : "XXXXXXXX",
+//  "co_id": 2,
+//  "training_host_url": "https://admin-test.cadre.ada.edu.au",
+//  "training_api_user_name": "http://cilogon.org/serverI/users/1067",
+//  "training_api_password": "YYYYYYYY",
+//  "non_active_user_redirect_url": "https://dataverse.ada.edu.au/403.xhtml"
+// }
+
+// Load the configuration parameters.
+config_params. := args(0);
+
+co_id := config_params.'co_id';
+
+// Define logging prefix.
+log_prefix := '--------CADRE transparent: ';
+
+// This script requires at least the profile and email scopes
+// but works better when the org.cilogon.userinfo scope is also
+// used.
+if[(!has_value('profile', scopes.)) || (!has_value('email', scopes.))]
+[
+  say(log_prefix + 'Insufficient scopes ' + to_string(scopes.) + ' requested so exiting');
+  sys_err.ok := false;
+  sys_err.message := 'client requires profile and email scopes be requested';
+  sys_err.error_type := 'invalid_request';
+  return([]);
+];
+
+// Load utilities for working with COmanage Registry.
+script_load('/home/ncsa/dev/ncsa-git/oa4mp/server-admin/src/main/resources/qdl/cadre/comanage_registry_utils.qdl');
+
+// Configure an HTTP client.
+http#host(config_params.'comanage_registry_host_url');
+
+username := config_params.'api_user_name';
+password := config_params.'api_user_password';
+
+my_credential := http#credentials(username, password);
+
+my_headers.'Authorization' := 'Basic' + ' ' + my_credential;
+my_headers.'Content-Type'  := 'application/json';
+
+http#headers(my_headers.);
+
+// Query for the CO person record using the OIDC sub
+// claim or CILogon identifier.
+// If config_params.'non_active_user_redirect_url' set, redirect to non_active_user_redirect_url
+// Otherwise use standard OIDC error message
+co_person. := get_co_person(http, co_id, claims.'sub');
+
+if[size(co_person.) == 0]
+[
+    say(log_prefix + 'User with OIDC sub ' + to_string(claims.'sub') + ' is not registered');
+
+    co_person_message. := create_co_person_message(co_id, claims.);
+
+    created := create_co_person(http, co_id, co_person_message.);
+
+    if[created]
+    [
+        say(log_prefix + 'User with OIDC sub ' + to_string(claims.'sub') + ' was successfully registered');
+        co_person. := get_co_person(http, co_id, claims.'sub');
+    ] else [
+        say(log_prefix + 'Unable to register user with OIDC sub ' + to_string(claims.'sub'));
+        co_person. := {};
+    ];
+] else [
+    say(log_prefix + 'User with OIDC sub ' + to_string(claims.'sub') + ' is already registered');
+
+    co_person_status := co_person.'CoPerson'.'status';
+
+    if[co_person_status != 'A']
+    [
+        if[ is_defined(config_params.'non_active_user_redirect_url') ]
+        [
+            say(log_prefix + 'User status is not Active so raising error and redirecting to ' + config_params.'non_active_user_redirect_url');
+
+            state. := {};
+            state.'error_type' := 'qdl_error';
+            state.'custom_error_uri' := config_params.'non_active_user_redirect_url';
+            state.'status' := 302;
+            raise_error('User status is not Active', oa4mp_error, state.);
+        ] else [
+            say(log_prefix + 'User status is not Active so raising error');
+            raise_error('User status is not Active', oa4mp_error, {'error_type': 'access_denied'});
+        ];
+    ];
+];
+
+// If the CO Person record was not found and cannot be created
+// we just return here to allow the flow to continue.
+
+if[size(co_person.) == 0]
+[
+  return();
+];
+
+// Load utilities for working with COmanage Registry Name object.
+script_load('/home/ncsa/dev/ncsa-git/oa4mp/server-admin/src/main/resources/qdl/cadre/name_utils.qdl');
+
+// Since we have a CO Person record determine if the Name object
+// can be updated to replace Unknownname.
+name_analysis. := co_person_name_sync_needed(co_person., claims.);
+
+if[name_analysis.'sync_needed']
+[
+    updated := update_co_person(http, co_id, claims.'sub', co_person.);
+
+    if[updated]
+    [
+        say(log_prefix + 'Updated CO Person record Name object for user with OIDC sub ' + to_string(claims.'sub'));
+
+        // Pull the updated CO Person record.
+        co_person. := get_co_person(http, co_id, claims.'sub');
+    ] else [
+        say(log_prefix + 'Unable to update CO Person record Name object');
+    ];
+] else [
+    say(log_prefix + 'No update required for CO Person Name object');
+];
+
+// Update the claims to assert given_name and family_name
+// using values from the CO Person record. This has the side
+// effect of always making sure the claims are asserted, even
+// if the IdP did not assert them.
+
+claims.'given_name' := co_person.'Name'.0.'given';
+claims.'family_name' := co_person.'Name'.0.'family';
+
+// Query for CoTermsAndConditions.
+// Exclude if config_params.'non_active_user_redirect_url' not defined
+if[ !(is_defined(config_params.'non_active_user_redirect_url')) ]
+[
+    t_and_c. := {};
+
+    try[
+        t_and_c. := get_co_terms_and_conditions(http, co_id);
+
+        if[size(t_and_c.) > 0]
+        [
+            count_str := to_string(size(t_and_c.));
+            say(log_prefix + 'Found ' + count_str + ' current terms and conditions ');
+        ] else [
+            say(log_prefix + 'No terms and conditions found');
+        ];
+    ] catch [
+        say(log_prefix + error_message);
+    ];
+
+    // If there are current terms and conditions then query for
+    // agreements by the user and add a claim representing those
+    // T&C and agreements.
+    if[size(t_and_c.) > 0]
+    [
+        // Query for terms and conditions agreements by authenticated user.
+        agreements. := {};
+        co_person_id := co_person.'CoPerson'.'meta'.'id';
+
+        try[
+            agreements. := get_co_t_and_c_agreements(http, co_person_id);
+            say(log_prefix + 'Found terms and conditions agreements for user ' + claims.'sub');
+
+            // Load utilities for working with terms and conditions.
+            script_load('/home/ncsa/dev/ncsa-git/oa4mp/server-admin/src/main/resources/qdl/cadre/tandc.qdl');
+
+            claims.'terms_and_conditions' := get_t_and_c_claim(t_and_c., agreements.);
+            say(log_prefix + 'Added terms_and_conditions claim ' + to_string(claims.'terms_and_conditions'));
+        ] catch [
+            say(log_prefix + error_message);
+        ];
+    ];
+];
+
+// Exclude if config_params.'non_active_user_redirect_url' not defined
+if[ !(is_defined(config_params.'non_active_user_redirect_url')) ]
+[
+    // Query the training API for training course claims.
+
+    // Load utilities for working with training API.
+    script_load('/home/ncsa/dev/ncsa-git/oa4mp/server-admin/src/main/resources/qdl/cadre/training.qdl');
+
+    // Configure the HTTP client.
+    training_host := config_params.'training_host_url';
+    http#host(training_host);
+
+    my_headers.'x-rems-user-id' := config_params.'training_api_user_name';
+    my_headers.'x-rems-api-key' := config_params.'training_api_password';
+    my_headers.'Content-Type'  := 'application/json';
+
+    http#headers(my_headers.);
+
+    // Query to see if the authenticated user with sub claim has
+    // training records.
+    try[
+        training. := get_training(http, claims.'sub');
+        if[size(training.) != 0]
+        [
+            claims.'training_courses' := training.;
+            say(log_prefix + 'Added claim training_courses with value' + to_string(claims.'training_courses'));
+        ] else [
+            say(log_prefix + 'User has no training information');
+        ];
+    ] catch [
+        say(log_prefix + error_message);
+    ];
+];

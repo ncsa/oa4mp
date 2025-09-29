@@ -268,8 +268,8 @@ public class StoreFacade /*implements QDLMetaModule*/ {
     }
 
     /**
-     * Thanks to the vagaraies of Java non-static inner class inheritence, it is just best if this
-     * livesin the encloising class and is called. That means it can be easily (and predictably) overridden.
+     * Thanks to the vagaries of Java non-static inner class inheritence, it is just best if this
+     * lives in the enclosing class and is called. That means it can be easily (and predictably) overridden.
      *
      * @param storeType
      * @return
@@ -303,10 +303,10 @@ public class StoreFacade /*implements QDLMetaModule*/ {
                         getEnvironment().getTxStore(),
                         getEnvironment().getClientStore()));
                 break;
-            case STORE_TYPE_PERMISSION_STORE:
+/*            case STORE_TYPE_PERMISSION_STORE:
                 storeAccessor = new QDLPermissionStoreAccessor(storeType, getEnvironment().getPermissionStore(), getEnvironment().getMyLogger());
                 storeAccessor.setMapConverter(new PermissionStemMC(getEnvironment().getPermissionStore().getMapConverter()));
-                break;
+                break;*/
             default:
                 throw new IllegalArgumentException("unsupported store '" + storeType + "'");
 
@@ -573,7 +573,7 @@ public class StoreFacade /*implements QDLMetaModule*/ {
                     doxx.add(getName() + "(id, version) - get a versioned object");
                     break;
             }
-            doxx.add("If there is no such element for a given id, a null will be returned");
+            doxx.add("This always returns a stem. If there is no such element for a given id, the empty stem will be returned.");
             doxx.add(checkInitMessage);
             return doxx;
         }
@@ -654,11 +654,13 @@ public class StoreFacade /*implements QDLMetaModule*/ {
                 throw new BadArgException(" The argument must be a stem variable", 0);
             }
             QDLStem QDLStem = objects[0].asStem();
+            boolean isList = QDLStem.isList();
             List<Boolean> out = getStoreAccessor().saveOrUpdate(QDLStem, true);
             if (out.size() == 0) {
                 return BooleanValue.False;
             }
-            if (out.size() == 1) {
+            // "scalar" case
+            if (isList) {
                 return asQDLValue(out.get(0));
             }
             QDLStem QDLStem1 = new QDLStem();
@@ -671,7 +673,7 @@ public class StoreFacade /*implements QDLMetaModule*/ {
         public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
             doxx.add(getName() + "(obj.) - save the object to the store. This returns true if the operation succeeds.");
-            doxx.add(getName() + "This may also be a list of stems and each will be saved if possible. Be sure you send along what you want!");
+            doxx.add("This may also be a list of stems and each will be saved if possible. Be sure you send along what you want!");
             doxx.add(checkInitMessage);
             return doxx;
         }
@@ -990,6 +992,7 @@ public class StoreFacade /*implements QDLMetaModule*/ {
             doxx.add(getName() + "(id | ids.) - create versions the current stored client(s) whose ids are given.");
             doxx.add("Either supply an id for the object or a list of ids.");
             doxx.add(checkInitMessage);
+            doxx.add("\nSee also:" + VERSION_RESTORE_NAME + ", " + VERSION_GET_VERSIONS_NAME + ", dyadic " + READ_NAME);
             return doxx;
         }
     }
@@ -1106,6 +1109,7 @@ public class StoreFacade /*implements QDLMetaModule*/ {
             doxx.add("{'client0':[1,3],'client42':[0,1,2,3,5]}");
             doxx.add("These are the valid version of each of these.");
             doxx.add(checkInitMessage);
+            doxx.add("\nSee also:" + VERSION_RESTORE_NAME + ", " + VERSION_CREATE_NAME+ ", dyadic " + READ_NAME);
             return doxx;
         }
     }
@@ -1159,8 +1163,7 @@ public class StoreFacade /*implements QDLMetaModule*/ {
             doxx.add("Restores the given version to be to active one.");
             doxx.add("NOTE: This overwrites the currently active object and replaces it!");
             doxx.add("Good practice is to version first whatever you are going to restore.");
-            doxx.add("");
-            doxx.add("");
+            doxx.add("\nSee also:" + VERSION_GET_VERSIONS_NAME + ", " + VERSION_CREATE_NAME + ", dyadic " + READ_NAME);
             return doxx;
         }
     }

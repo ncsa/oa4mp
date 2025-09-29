@@ -1,0 +1,44 @@
+// Function to query the training API endpoint and
+// obtain training information for the current user.
+//
+// Arguments:
+//   client     : reference, reference to configured http module
+//   identifier : string, identifier for user
+//
+// Return:
+//   stem representing the training claims, empty if no
+//   training is returned by the API
+//
+define[get_training(client, identifier)]
+[
+    training. := {};
+
+    // Open a connection.
+    client#open();
+
+    url_path := '/api/partner/trainings/user-training-details';
+    query_param_name := 'user-id';
+    query_params.query_param_name := identifier;
+
+    response. := http#get(url_path, query_params.);
+    response_code := response.'status'.'code';
+
+    client#close();
+
+    if[ response_code == 200 ]
+    [
+        response_body. := response.'content';
+        if [ size(response_body.) > 0 ]
+        [
+            try [
+                training. := response_body\>*\['o', 'courses'];
+            ] catch [
+                raise_error('Error extracting training from response');
+            ];
+        ];
+    ] else [
+         raise_error('Unable to query training API return code was' + to_string(response_code));
+    ];
+
+    return(training.);
+];

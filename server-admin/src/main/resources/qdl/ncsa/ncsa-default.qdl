@@ -30,16 +30,18 @@ if[
 ]then[
      cc ≔ j_load('oa4mp.util.claims');
      cfg. ≔ cc#new_template('ncsa');
-     debugger('*** NCSA claims=' + print(claims.));
+     debugger(1,'*** NCSA claims=' + print(claims.));
      claims.'uid' ≔ head(claims.'eppn', '@'); // set search key
+     source. := cc#create_source(cfg.);
+     // if need be replace source.'address' with NCSA LDAP servers
      claim_sources. ≔ claim_sources. ~ [cc#create_source(cfg.)]; // add it to any claims
-     debugger('*** NCSA updated claims #1 =' + print(claims.));
+     debugger(1,'*** NCSA updated claims #1 =' + print(claims.));
      return();
 ]; //end if
 
  (exec_phase ∉ ['post_token', 'post_refresh', 'post_user_info']) ⇒ return();
- 0≡script_args() ⇒ return(); // do not process claims
+ 0≡size(args()) ⇒ return(); // do not process claims
 
  (!is_defined(claims.'isMemberOf')) ⇒ return();
- if[to_boolean(script_args(0))][claims.'isMemberOf' := claims.isMemberOf\*\name;];
+ if[args().0 ≡ 'true'][claims.'isMemberOf' := claims\isMemberOf\*\name;];
  return();

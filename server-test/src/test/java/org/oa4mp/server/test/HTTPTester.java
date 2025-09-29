@@ -72,14 +72,14 @@ public class HTTPTester extends TestBase {
     protected HttpResponse doPut() throws IOException, NoSuchAlgorithmException, KeyStoreException {
         HttpPut putReq = new HttpPut(getAddress());
         putReq.setHeader("Authorization: Bearer", createCreds());
-        putReq.setHeader("Content-Type", "application/json; charset=UTF-8");
+        putReq.setHeader("Content-Type", "application/json;charset=UTF-8");
         return doRequest(putReq);
     }
 
     protected HttpResponse doPost() throws IOException, NoSuchAlgorithmException, KeyStoreException {
         HttpPost postReq = new HttpPost(getAddress());
         postReq.setHeader("Authorization: Bearer", createCreds());
-        postReq.setHeader("Content-Type", "application/json; charset=UTF-8");
+        postReq.setHeader("Content-Type", "application/json;charset=UTF-8");
         return doRequest(postReq);
     }
 

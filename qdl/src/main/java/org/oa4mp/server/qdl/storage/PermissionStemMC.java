@@ -118,7 +118,7 @@ public class PermissionStemMC<V extends Permission> extends StemConverter<V> {
             }
             QDLStem e = new QDLStem();
             e.setQDLList(list);
-            put(stem,kk().ersatzID(), list);
+            put(stem,kk().ersatzID(),   e);
         }
 
         put(stem, kk().substitute(), v.canSubstitute());

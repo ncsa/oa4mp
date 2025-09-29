@@ -1,0 +1,291 @@
+// Function to create a CO Person record using the
+// COmanage Registry Core API Person Write API.
+//
+// Arguments:
+//   client             : reference, reference to configured http module
+//   co_id              : integer, CO ID
+//   co_person_message. : stem, represents CO Person message for Core API Person Write
+//
+// Return:
+//   boolean, true if record created and false otherwise
+//
+define[create_co_person(client, co_id, co_person_message.)]
+[
+    // Open a connection.
+    client#open();
+
+    url_path := '/registry/api/co/' + to_string(co_id) + '/core/v1/people';
+
+    response. := client#post(url_path, co_person_message.);
+    response_code := response.'status'.'code';
+
+    client#close();
+
+    if [ response_code == 201 ]
+    [
+      return(true);
+    ]else[
+      return(false);
+    ];
+];
+
+// Function to create a stem that represents the
+// CO Person message needed to pass to the COmanage Registry
+// Core API to create a new CO Person record.
+//
+// Arguments:
+//   co_id   : integer, the CO ID
+//   claims. : stem, standard claims expected from IdP
+//
+// Return:
+//   stem representing the CO Person message
+define[create_co_person_message(co_id, claims.)]
+[
+    CoPerson.'co_id' := co_id;
+    CoPerson.'status' := 'A';
+
+    co_person_message.'CoPerson' := CoPerson.;
+
+    email.'mail' := claims.'email';
+    email.'type' := 'official';
+    email.'verified' := true;
+
+    EmailAddress.0 := email.;
+
+    co_person_message.'EmailAddress' := EmailAddress.;
+
+    role.'affiliation' := 'member';
+    role.'status' := 'A';
+
+    CoPersonRole.0 := role.;
+
+    co_person_message.'CoPersonRole' := CoPersonRole.;
+
+    identifier_sub.'identifier' := claims.'sub';
+    identifier_sub.'type' := 'oidcsub';
+    identifier_sub.'login' := null;
+    identifier_sub.'status' := 'A';
+
+    Identifier.0 := identifier_sub.;
+
+    if[ is_defined(claims.'eduPersonOrcid') ]
+    [
+      identifier_orcid.'identifier' := claims.'eduPersonOrcid';
+      identifier_orcid.'type' := 'orcid';
+      identifier_orcid.'login' := null;
+      identifier_orcid.'status' := 'A';
+
+      Identifier.1 := identifier_orcid.;
+    ];
+
+    co_person_message.'Identifier' := Identifier.;
+
+    name.'type' := 'official';
+    name.'primary_name' := true;
+
+    // Use the string 'Unknownname' if a name component is not defined.
+    // This particular value is used because it is what COmanage Registry EnvSource
+    // uses by default when it cannot find a name component.
+    switch[
+      if[(!has_key('given_name', claims.)) && (!has_key('family_name', claims.))]
+      [
+        name.'given' := is_defined(claims.'name') ? claims.'name' : 'Unknownname';
+        name.'family' := 'Unknownname';
+      ];
+      if[true]
+      [
+        name.'given' := is_defined(claims.'given_name') ? claims.'given_name' : 'Unknownname';
+        name.'family' := is_defined(claims.'family_name') ? claims.'family_name': 'Unknownname';
+      ];
+    ];
+
+    Name.0 := name.;
+
+    co_person_message.'Name' := Name.;
+
+    org_identity.'co_id' := co_id;
+    org_identity.'EmailAddress' := EmailAddress.;
+    org_identity.'Name' := Name.;
+    org_identity.'Identifier' := Identifier.;
+
+    // The Identifier holding the OIDC sub claim when attached
+    // to the OrgIdentity is marked with login set to true so
+    // that later CO Persons may authenticate to Registry and execute
+    // the enrollment flow to add an ORCiD.
+    org_identity.'Identifier'.0.'login' := true;
+
+    if[is_defined(claims.'idp_name')]
+    [
+      org_identity.'o' := claims.'idp_name';
+    ] else [
+      org_identity.'o' := 'Unknown';
+    ];
+
+    if[ is_defined(claims.'affiliation') ]
+    [
+      add_hoc_attribute_affiliation_scoped.'tag' := 'affiliation_scoped';
+      add_hoc_attribute_affiliation_scoped.'value' := claims.'affiliation';
+
+      add_hoc_attribute_affiliation.'tag' := 'affiliation';
+      add_hoc_attribute_affiliation.'value' := detokenize(head(tokenize(claims.'affiliation', ';'), '@'), ';');
+
+      org_identity.'AdHocAttribute'.0 := add_hoc_attribute_affiliation_scoped.;
+      org_identity.'AdHocAttribute'.1 := add_hoc_attribute_affiliation.;
+    ];
+
+    OrgIdentity.0 := org_identity.;
+
+    co_person_message.'OrgIdentity' := OrgIdentity.;
+
+    return(co_person_message.);
+];
+
+// Function to query COmanage Registry using the Core API
+// and obtain the CO Person record.
+//
+// Arguments:
+//   client     : reference, reference to configured http module
+//   co_id      : integer, CO ID
+//   identifier : string, identifier value for Core API Person Read query
+//
+// Return:
+//   stem representing the CO Person or empty stem if record not found
+//
+define[get_co_person(client, co_id, identifier)]
+[
+    // Open a connection.
+    client#open();
+
+    url_path := '/registry/api/co/' + to_string(co_id) + '/core/v1/people';
+    query_params.'identifier' := identifier;
+
+    response. := client#get(url_path, query_params.);
+    response_code := response.'status'.'code';
+
+    // Close the connection.
+    client#close();
+
+    if[ response_code == 200 ]
+    [
+        co_person. := response.'content'.0;
+        return(co_person.);
+    ] else [
+        return({});
+    ];
+];
+
+// Function to query COmanage Registry using the REST API v1
+// and obtain the current CoTermsAndConditions for a CO.
+//
+// Arguments:
+//   client     : reference, reference to configured http module
+//   co_id      : integer, CO ID
+//
+// Return:
+//   stem representing the CoTermsAndConditions, or an empty stem
+//
+//
+define[get_co_t_and_c_agreements(client, co_person_id)]
+[
+    // Open a connection.
+    client#open();
+
+    url_path := '/registry/co_t_and_c_agreements.json';
+    query_params.'copersonid' := co_person_id;
+
+    response. := client#get(url_path, query_params.);
+    response_code := response.'status'.'code';
+
+    // Close the connection.
+    client#close();
+
+    switch[
+        if[response_code == 204]
+        [
+            return({});
+        ];
+
+        if[response_code == 200]
+        [
+            t_and_c_agreements. := response.'content'.'CoTAndCAgreements';
+            return(t_and_c_agreements.);
+        ];
+
+        if[true]
+        [
+            raise_error('Error querying for CoTAndCAgreement response code was ' + to_string(response_code));
+        ];
+    ];
+];
+
+// Function to query COmanage Registry using the REST API v1
+// and obtain the current CoTermsAndConditions for a CO.
+//
+// Arguments:
+//   client     : reference, reference to configured http module
+//   co_id      : integer, CO ID
+//
+// Return:
+//   stem representing the CoTermsAndConditions, or an empty stem
+//
+//
+define[get_co_terms_and_conditions(client, co_id)]
+[
+    // Open a connection.
+    client#open();
+
+    url_path := '/registry/co_terms_and_conditions.json';
+    query_params.'coid' := co_id;
+
+    response. := client#get(url_path, query_params.);
+    response_code := response.'status'.'code';
+    say('*****\n'+print(response.));
+    // Close the connection.
+    client#close();
+
+    if[response_code != 200]
+    [
+        raise_error('Error querying for CoTermsAndConditions response code was ' + to_string(response_code));
+    ];
+
+    if[size(response.'content'.'CoTermsAndConditions') > 0]
+    [
+        t_and_c. := response.'content'.'CoTermsAndConditions';
+        return(t_and_c.);
+    ] else [
+        return({});
+    ];
+];
+
+// Function to query COmanage Registry using the Core API
+// and update the CO Person record.
+//
+// Arguments:
+//   client     : reference, reference to configured http module
+//   co_id      : integer, CO ID
+//   identifier : string, identifier value for Core API Person Read query
+//   co_person. : stem, CO person record
+//
+// Return:
+//   boolean, true if record updated and false otherwise
+//
+define[update_co_person(client, co_id, identifier, co_person.)]
+[
+    // Open a connection.
+    client#open();
+
+    url_path := '/registry/api/co/' + to_string(co_id) + '/core/v1/people?identifier=' + identifier;
+
+    response. := client#put(url_path, co_person.);
+    response_code := response.'status'.'code';
+
+    // Close the connection.
+    client#close();
+
+    if[ response_code == 200 ]
+    [
+        return(true);
+    ] else [
+        return(false);
+    ];
+];
