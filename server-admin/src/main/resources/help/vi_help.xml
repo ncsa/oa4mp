@@ -30,7 +30,7 @@ So for instance, if your site is at
 
 https://login.bgsu.edu/oauth2
 
-and you have a discover_path of
+and you have a discovery_path of
 
 login.bgsu.edu/my_issuer
 

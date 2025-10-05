@@ -183,7 +183,8 @@ public abstract class AbstractConfigurationLoader<T extends ServiceEnvironmentIm
                         authorizationServletConfig.setLocalDFConsent(localDFConsent);
                         break;
                     case AUTHORIZATION_SERVLET_USE_MODE_NATIVE:
-                        authorizationServletConfig = new AuthorizationServletConfig();
+                        // Fix https://jira.ncsa.illinois.edu/browse/CIL-2341
+                        authorizationServletConfig = new AuthorizationServletConfig(AUTHORIZATION_SERVLET_USE_MODE_NATIVE, authorizationURI);
                         break;
                     case AUTHORIZATION_SERVLET_USE_MODE_DEDICATED_ISSUER:
                         authorizationServletConfig = new AuthorizationServletConfig(AUTHORIZATION_SERVLET_USE_MODE_DEDICATED_ISSUER, authorizationURI);

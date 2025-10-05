@@ -33,13 +33,17 @@ public abstract class OA4MPStoreCommands extends StoreCommands2 {
 
     public OA4MPStoreCommands(CLIDriver driver, String defaultIndent, Store store) throws Throwable {
         super(driver, defaultIndent, store);
+        initialize();
     }
 
     public OA4MPStoreCommands(CLIDriver driver, Store store) throws Throwable {
         super(driver, store);
+        initialize();
     }
     @Override
-    public void initialize() throws Throwable{}
+    public void initialize() throws Throwable{
+        initHelp();
+    }
 
     public void load(InputLine inputLine){}
 

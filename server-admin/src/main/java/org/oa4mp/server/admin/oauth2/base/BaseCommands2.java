@@ -89,39 +89,6 @@ public abstract class BaseCommands2 extends ConfigurableCommandsImpl2 implements
 
     }
 
-/*    @Override
-    public void bootstrap(InputLine args) throws Throwable {
-        IOInterface ioInterface = null;
-        PrintStream out = System.out;
-        PrintStream err = System.err;
-        if (!getDriver().isVerbose()) {
-            ioInterface = getIOInterface();
-            BasicIO basicIO = new BasicIO();
-            setIOInterface(basicIO);
-            System.setOut(new PrintStream(OutputStream.nullOutputStream()));
-            System.setErr(new PrintStream(OutputStream.nullOutputStream()));
-        }
-        super.bootstrap(args);
-        if (ioInterface != null) {
-            initialize();
-            System.setOut(out);
-            System.setErr(err);
-            setIOInterface(ioInterface);
-        }
-        showLogo = !args.hasArg("-noLogo");
-        showHeader = !args.hasArg("-noHeader");
-        if (args.hasArg("-silent")) {
-            showHeader = false;
-            showLogo = false;
-        }
-        if (args.hasArg("-logo")) {
-            logoName = args.getNextArgFor("-logo").toLowerCase();
-        }
-
-        about();
-
-        init();
-    }*/
 
 
     public ServiceEnvironment getServiceEnvironment() throws Exception {
@@ -129,8 +96,16 @@ public abstract class BaseCommands2 extends ConfigurableCommandsImpl2 implements
     }
 
 
+    ClientApprovalStoreCommands clientApprovalStoreCommands = null;
     public ClientApprovalStoreCommands getClientApprovalCommands() throws Throwable {
-        return new ClientApprovalStoreCommands(getDriver(), "  ", getServiceEnvironment().getClientApprovalStore());
+        if(clientApprovalStoreCommands == null) {
+            clientApprovalStoreCommands = new ClientApprovalStoreCommands(new CLIDriver(), "  ", getServiceEnvironment().getClientApprovalStore());
+            clientApprovalStoreCommands.setEnvironment(getEnvironment());
+            configureCommands(getDriver(), clientApprovalStoreCommands);
+            clientApprovalStoreCommands.initHelp();
+        }
+        return clientApprovalStoreCommands;
+
     }
 
     @Override
@@ -164,6 +139,18 @@ public abstract class BaseCommands2 extends ConfigurableCommandsImpl2 implements
         CLIDriver cli = new CLIDriver();
 
         cli.setIOInterface(getDriver().getIOInterface());
+        cli.getHelpUtil().addHelp(getHelpUtil());
+        try {
+            commands.initialize();
+        } catch (Throwable e) {
+            if(getDriver().isTraceOn()) {
+                e.printStackTrace();
+            }
+            if(e instanceof RuntimeException) {
+                throw (RuntimeException)e;
+            }
+            throw new GeneralException(e);
+        }
         cli.addCommands(commands);
         cli.setEnv(getDriver().getEnv());
         cli.setComponentManager(this);
@@ -194,25 +181,6 @@ public abstract class BaseCommands2 extends ConfigurableCommandsImpl2 implements
 
         }
     }
-
-//    public abstract ParserCommands getNewParserCommands() throws Throwable;
-
-/*    protected boolean executeComponent() throws Throwable {
-        if (hasOption(USE_COMPONENT_OPTION, USE_COMPONENT_LONG_OPTION)) {
-            String component = getCommandLine().getOptionValue(USE_COMPONENT_OPTION);
-            if (component != null && 0 < component.length()) {
-                if (!hasComponent(component)) {
-                    say("Unknown component name of \"" + component + "\". ");
-                    return false;
-                }
-                runComponent(component);
-                return true;
-            } else {
-                say("Caution, you specified using a component, but did not specify what the component is.");
-            }
-        }
-        return false;
-    }*/
 
     public void useHelp() {
         say("Choose the component you wish to use.");

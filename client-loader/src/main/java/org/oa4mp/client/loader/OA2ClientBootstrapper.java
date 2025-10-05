@@ -24,7 +24,7 @@ import java.io.FileInputStream;
  */
 public class OA2ClientBootstrapper extends Bootstrapper {
     public OA2ClientBootstrapper() {
-        setUseCF(true);
+        //setUseCF(true);
     }
 
     public static final String OA2_CLIENT_CONFIG_FILE_KEY= "oa4mp:oauth2.client.config.file";

@@ -71,7 +71,6 @@ public class OA2Commands extends BaseCommands2 {
                 drivers.put(ADMINS, createCLIDriver(getAdminClientCommands()));
                 drivers.put(PERMISSIONS, createCLIDriver(getPermissionCommands()));
                 drivers.put(TOKENS, createCLIDriver(getTokenCommands()));
-                //   drivers.put(TRANSACTION_COMMAND, createCLIDriver(getTransactionCommands()));
                 drivers.put(VIRTUAL_ISSUER, createCLIDriver(getVICommands()));
             }
         } catch (Throwable t) {
@@ -215,17 +214,16 @@ protected static void newMain(String[] args) {
     @Override
     public ClientStoreCommands getClientCommands() throws Throwable {
         if (oa2ClientCommands == null) {
-            oa2ClientCommands = new OA2ClientCommands(getDriver(),
+            oa2ClientCommands = new OA2ClientCommands(new CLIDriver(),
                     "  ",
                     getServiceEnvironment().getClientStore(),
                     getClientApprovalCommands(),
                     getOA2SE().getPermissionStore());
-
+            configureCommands(getDriver(), oa2ClientCommands);
+            oa2ClientCommands.initHelp();
             oa2ClientCommands.setRefreshTokensEnabled(getOA2SE().isRefreshTokenEnabled());
             oa2ClientCommands.setSupportedScopes(getOA2SE().getScopes());
-            //       oa2ClientCommands.setUucConfiguration(getOA2SE().getUucConfiguration());
             oa2ClientCommands.setEnvironment(getOA2SE());
-         //   oa2ClientCommands.setIOInterface(getIOInterface());
         }
         return oa2ClientCommands;
     }
@@ -239,7 +237,9 @@ protected static void newMain(String[] args) {
 
     protected TokenStoreCommands getTokenCommands() throws Throwable {
         if (tokenStoreCommands == null) {
-            tokenStoreCommands = new TokenStoreCommands(getDriver(), "  ", getOA2SE().getTxStore());
+            tokenStoreCommands = new TokenStoreCommands(new CLIDriver(), "  ", getOA2SE().getTxStore());
+            configureCommands(getDriver(), tokenStoreCommands);
+            tokenStoreCommands.initHelp();
             tokenStoreCommands.setEnvironment(getOA2SE());
         }
 
@@ -250,7 +250,9 @@ protected static void newMain(String[] args) {
 
     protected VICommands getVICommands() throws Throwable {
         if (VICommands == null) {
-            VICommands = new VICommands(getDriver(), "  ", getOA2SE().getVIStore());
+            VICommands = new VICommands(new CLIDriver(), "  ", getOA2SE().getVIStore());
+            configureCommands(getDriver(), VICommands);
+            VICommands.initHelp();
             VICommands.setEnvironment(getOA2SE());
         }
         return VICommands;
@@ -261,9 +263,11 @@ protected static void newMain(String[] args) {
     @Override
     protected TransactionStoreCommands getTransactionCommands() throws Throwable {
         if (transactionStoreCommands == null) {
-            transactionStoreCommands = new TransactionStoreCommands(getDriver(),
+            transactionStoreCommands = new TransactionStoreCommands(new CLIDriver(),
                     "  ",
                     getOA2SE());
+            configureCommands(getDriver(), transactionStoreCommands);
+            transactionStoreCommands.initHelp();
             transactionStoreCommands.setEnvironment(getOA2SE());
             transactionStoreCommands.initHelp();
         }
@@ -275,13 +279,15 @@ protected static void newMain(String[] args) {
 
     public OA2AdminClientCommands getAdminClientCommands() throws Throwable {
         if (oa2AdminClientCommands == null) {
-            oa2AdminClientCommands = new OA2AdminClientCommands(getDriver(),
+            oa2AdminClientCommands = new OA2AdminClientCommands(new CLIDriver(),
                     "  ",
                     getOA2SE().getAdminClientStore(),
                     getClientApprovalCommands(),
                     getOA2SE().getPermissionStore(),
                     getOA2SE().getClientStore());
             oa2AdminClientCommands.setEnvironment(getOA2SE());
+            configureCommands(getDriver(), oa2AdminClientCommands);
+            oa2AdminClientCommands.initHelp();
         }
         return oa2AdminClientCommands;
     }
@@ -290,8 +296,10 @@ protected static void newMain(String[] args) {
 
     public OA2PermissionCommands getPermissionCommands() throws Throwable {
         if (oa2PermissionCommands == null) {
-            oa2PermissionCommands = new OA2PermissionCommands(getDriver(), "  ", getOA2SE().getPermissionStore());
+            oa2PermissionCommands = new OA2PermissionCommands(new CLIDriver(), "  ", getOA2SE().getPermissionStore());
             oa2PermissionCommands.setEnvironment(getOA2SE());
+            configureCommands(getDriver(), oa2PermissionCommands);
+            oa2PermissionCommands.initHelp();
         }
         return oa2PermissionCommands;
     }

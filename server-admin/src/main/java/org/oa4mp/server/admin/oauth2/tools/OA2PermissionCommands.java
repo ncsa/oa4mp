@@ -1,18 +1,17 @@
 package org.oa4mp.server.admin.oauth2.tools;
 
+import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.Store;
+import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.util.cli.CLIDriver;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
+import net.sf.json.JSONObject;
+import org.oa4mp.server.admin.oauth2.base.OA4MPStoreCommands;
 import org.oa4mp.server.api.admin.permissions.Permission;
 import org.oa4mp.server.api.admin.permissions.PermissionKeys;
 import org.oa4mp.server.api.admin.permissions.PermissionsStore;
-import org.oa4mp.server.admin.oauth2.base.OA4MPStoreCommands;
-import edu.uiuc.ncsa.security.core.Identifiable;
-import edu.uiuc.ncsa.security.core.Store;
-import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.storage.data.MapConverter;
-import net.sf.json.JSONObject;
 
 import java.io.IOException;
 import java.util.HashMap;

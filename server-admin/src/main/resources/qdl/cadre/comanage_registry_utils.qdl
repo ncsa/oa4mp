@@ -195,7 +195,7 @@ define[get_co_t_and_c_agreements(client, co_person_id)]
 
     response. := client#get(url_path, query_params.);
     response_code := response.'status'.'code';
-
+say('response:\n' + print(response.));
     // Close the connection.
     client#close();
 

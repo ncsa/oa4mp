@@ -6,7 +6,6 @@ import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.exceptions.ObjectNotFoundException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.cli.FoundIdentifiables;
 import edu.uiuc.ncsa.security.util.cli.CLIDriver;
@@ -45,10 +44,12 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
         this.clientStore = clientStore;
         this.permissionsStore = permissionsStore;
     }
-@Override
-        public void initialize() throws Throwable{
 
-}
+    @Override
+    public void initialize() throws Throwable {
+    //    initHelp();
+    }
+
     ClientStore clientStore;
 
     @Override
@@ -464,7 +465,7 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
         for (Permission p : provisioners) {
             if (p.getErsatzChain().contains(ersatzID)) {
                 // since we have to muck about with JSON internally, make sure this is not a false positive
-            //    AdminClient x = (AdminClient) getStore().get(p.getAdminID());
+                //    AdminClient x = (AdminClient) getStore().get(p.getAdminID());
                 OA2Client pClient = (OA2Client) getEnvironment().getClientStore().get(p.getClientID());
                 if (pClient != null) { // possible this is stale reference. Don't add it
                     count++;
@@ -511,8 +512,8 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
         }
         AdminClient adminClient;
         try {
-             adminClient = (AdminClient) findSingleton(inputLine, "admin client not found");
-        }catch( ObjectNotFoundException e){
+            adminClient = (AdminClient) findSingleton(inputLine, "admin client not found");
+        } catch (ObjectNotFoundException e) {
             say(e.getMessage());
             return;
         }
@@ -545,7 +546,7 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
             width = width + 2;
             int count = 0;
             boolean printHeader = true;
-            String hLine = StringUtils.repeatString("-" , width) + " + " + StringUtils.repeatString("-", width);
+            String hLine = StringUtils.repeatString("-", width) + " + " + StringUtils.repeatString("-", width);
 
             for (Identifier id : idsByProvisioner.keySet()) {
                 ersatzIds = idsByProvisioner.get(id);
@@ -553,16 +554,16 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
                 if (!ersatzIds.isEmpty()) {
                     for (Identifier eID : ersatzIds) {
                         Identifiable x = (Identifiable) getEnvironment().getClientStore().get(eID);
-                        if(x != null){
+                        if (x != null) {
                             count++;
-                            if(hasRS){
-                                if(!rsErsatzIDs.contains(eID)){
+                            if (hasRS) {
+                                if (!rsErsatzIDs.contains(eID)) {
                                     rsErsatzIDs.add(eID);
                                     allErsatz.add(x);
                                 }
                             }
                             if (firstPass) {
-                                if(printHeader) {
+                                if (printHeader) {
                                     say(StringUtils.center("client id", width) + " | " + StringUtils.center("ersatz client id", width));
                                     printHeader = false;
                                 }
@@ -577,12 +578,12 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
                     }
                 }
             }
-            if(count == 0){
+            if (count == 0) {
                 say("no ersatz clients found");
                 return;
             }
-            if(hasRS){
-                if(!rsErsatzIDs.isEmpty()){
+            if (hasRS) {
+                if (!rsErsatzIDs.isEmpty()) {
                     OA2ClientKeys keys = new OA2ClientKeys();
                     rsRecord = new RSRecord(allErsatz, keys.allKeys());
                     getResultSets().put(rsName, rsRecord);
