@@ -256,7 +256,7 @@ public class OA2TokenUtils {
             isRTExpired = txRecord.getExpiresAt() < System.currentTimeMillis();
         } catch (Throwable tt) {
             // This is serious. It means that there was a problem getting the transaction vs. the transaction did not exist.
-            debugger.error(OA2TokenUtils.class, "error getting refresh token:" + refreshToken.getJti() + " message:" + tt.getMessage());
+            debugger.error(OA2TokenUtils.class, "error getting refresh token:" + refreshToken.getJti() + " message:" + tt.getMessage(),tt);
             OA2ATException x = new OA2ATException(OA2Errors.INVALID_GRANT, "invalid refresh token", (t == null ? (BaseClient) null : t.getClient()));
             x.setForensicMessage("invalid refresh token, could not get transaction");
             throw x;

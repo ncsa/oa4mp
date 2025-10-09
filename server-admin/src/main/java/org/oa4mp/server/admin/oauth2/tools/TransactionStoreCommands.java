@@ -856,7 +856,7 @@ if(1 < foundIdentifiables.size()){
 
 
     @Override
-    protected void initHelp() throws Throwable {
+    public void initHelp() throws Throwable {
         super.initHelp();
         getHelpUtil().load("/help/transaction_help.xml");
     }

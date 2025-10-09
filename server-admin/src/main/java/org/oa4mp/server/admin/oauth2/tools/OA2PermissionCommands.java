@@ -104,7 +104,7 @@ public class OA2PermissionCommands extends OA4MPStoreCommands {
     }
 
     @Override
-    protected void initHelp() throws Throwable {
+    public void initHelp() throws Throwable {
         super.initHelp();
         getHelpUtil().load("/help/permission_help.xml");
     }

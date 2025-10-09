@@ -672,7 +672,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
 
 
     @Override
-    protected void initHelp() throws Throwable {
+    public void initHelp() throws Throwable {
         super.initHelp();
         getHelpUtil().load("/help/client_help.xml");
     }

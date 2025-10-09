@@ -376,11 +376,13 @@ public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
             approver = inputLine.getNextArgFor(APPROVER_KEY);
             inputLine.removeSwitchAndValue(APPROVER_KEY);
         } else {
-            approver = getInput("Enter the name of the approver:", "");
+            approver = getInput("Enter the name of the approver:", ClientApprovalStoreCommands.getApprover());
+
             if (approver.isEmpty()) {
                 say("approver required, exiting...");
                 return;
             }
+            ClientApprovalStoreCommands.setApprover(approver);
         }
         boolean approvalFlag = inputLine.hasArg(APPROVE_FLAG);
         Boolean doApproval = true;
@@ -394,7 +396,16 @@ public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
         }
 
         for (Identifiable identifiable : identifiables) {
-            BaseClient client = (BaseClient) identifiable;
+            BaseClient client = null;
+            if(identifiable instanceof BaseClient) {
+                client = (BaseClient) identifiable;
+            }
+            if(identifiable instanceof ClientApproval) {
+                client = (BaseClient) getStore().get(identifiable.getIdentifier());
+            }
+            if(client == null) {
+                say("unknown identifiable " + identifiable.getClass().getSimpleName());
+            }
             approvalModsConfig.client = client;
             client = doApprovalMods(approvalModsConfig);
             ClientApprovalStoreCommands.setupApprovalRecord(getClientApprovalStore(), client.getIdentifier(), doApproval, approver);
@@ -407,7 +418,16 @@ public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
 
     protected void old_approve(InputLine inputLine, Identifiable identifiable) throws Throwable {
         // But everyone expects it to behave in the kludgy way for single approvals.
-        BaseClient client = (BaseClient) identifiable;
+        BaseClient client = null;
+        if(identifiable instanceof BaseClient) {
+             client = (BaseClient) identifiable;
+        }
+        if(identifiable instanceof ClientApproval) {
+            client = (BaseClient) getStore().get(identifiable.getIdentifier());
+        }
+        if(client == null) {
+            say("unknown identifiable " + identifiable.getClass().getSimpleName());
+        }
         client = doApprovalMods(new ApprovalModsConfig(client, true));
         approve(client);
     }

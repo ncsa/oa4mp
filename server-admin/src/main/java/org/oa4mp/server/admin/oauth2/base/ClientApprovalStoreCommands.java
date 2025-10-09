@@ -111,6 +111,19 @@ public class ClientApprovalStoreCommands extends OA4MPStoreCommands {
         say("\nSee also: set_status");
     }
 
+    public static boolean hasApprover(){
+        return approver.length()!=0;
+    }
+    public static String getApprover() {
+        return approver;
+    }
+
+    public static void setApprover(String approver) {
+        ClientApprovalStoreCommands.approver = approver;
+    }
+
+    static String approver = "";
+
     public void approve(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
             showApproveHelp();
@@ -119,7 +132,7 @@ public class ClientApprovalStoreCommands extends OA4MPStoreCommands {
         int pass = 0;
         int fail = 0;
         boolean isapproved = isOk(getInput("set approved?", "y"));
-        String approver = getInput("approver", "");
+        approver = getInput("approver", getApprover());
         FoundIdentifiables identifiables = findItem(inputLine);
         for (Identifiable identifiable : identifiables) {
             if(approve((ClientApproval) identifiable, isapproved, approver)){
@@ -342,7 +355,7 @@ public class ClientApprovalStoreCommands extends OA4MPStoreCommands {
 
 
     @Override
-    protected void initHelp() throws Throwable {
+    public void initHelp() throws Throwable {
         super.initHelp();
         getHelpUtil().load("/help/approver_help.xml");
     }

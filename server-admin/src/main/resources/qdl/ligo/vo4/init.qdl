@@ -41,29 +41,28 @@
     // The following are created with the extract.qdl script and pasted here.
     // It's the only way to be sure the policy document is actually processed right,
     // since doing it manually is a real error-prone chore.
-                              ζ.'gw-astronomy:KAGRA-LIGO:members' ≔ ['read:/frames','read:/ligo','read:/kagra','read:/virgo','read:/shared','read:/staging','dqsegdb.read','gracedb.read','gwdatafind.read'];
-                      ζ.'Communities:LVC:LSC:LDG:CIT:LDGCITUsers' ≔ ['write:/staging/${uid}'];
-               ζ.'CO:COU:LDG Grid Account Holders:members:active' ≔ ['write:/staging/${uid}'];
-               ζ.'Services:WLCG:SciTokens:scopes:read:authorized' ≔ ['compute.read'];
-             ζ.'Services:WLCG:SciTokens:scopes:cancel:authorized' ≔ ['compute.cancel'];
-             ζ.'Services:WLCG:SciTokens:scopes:create:authorized' ≔ ['compute.create'];
-             ζ.'Services:WLCG:SciTokens:scopes:modify:authorized' ≔ ['compute.modify'];
-            ζ.'Services:DQSegDB:SciTokens:scopes:read:authorized' ≔ ['dqsegdb.read'];
-            ζ.'Services:GraceDB:SciTokens:scopes:read:authorized' ≔ ['gracedb.read'];
-          ζ.'Services:DQSegDB:SciTokens:scopes:create:authorized' ≔ ['dqsegdb.create'];
-          ζ.'Services:DQSegDB:SciTokens:scopes:modify:authorized' ≔ ['dqsegdb.modify'];
-         ζ.'Services:gwDataFind:SciTokens:scopes:read:authorized' ≔ ['gwdatafind.read'];
-        ζ.'Services:XRootD:SciTokens:scopes:read-ligo:authorized' ≔ ['read:/ligo'];
-       ζ.'Services:XRootD:SciTokens:scopes:read-kagra:authorized' ≔ ['read:/kagra'];
-       ζ.'Services:XRootD:SciTokens:scopes:read-virgo:authorized' ≔ ['read:/virgo'];
-      ζ.'Services:XRootD:SciTokens:scopes:read-frames:authorized' ≔ ['read:/frames'];
-      ζ.'Services:XRootD:SciTokens:scopes:read-shared:authorized' ≔ ['read:/shared'];
-     ζ.'Services:XRootD:SciTokens:scopes:read-staging:authorized' ≔ ['read:/staging'];
-     ζ.'Services:XRootD:SciTokens:scopes:write-frames:authorized' ≔ ['write:/frames'];
-    ζ.'Services:GraceDB:SciTokens:scopes:write-gstlal:authorized' ≔ ['gracedb.write-gstlal'];
-    ζ.'Services:SciTokenTesting:SciTokens:scopes:read:authorized' ≔ ['scitokentesting.read'];
-   ζ.'Services:SciTokenTesting:SciTokens:scopes:write:authorized' ≔ ['scitokentesting.write'];
-
+                               ζ.'gw-astronomy:KAGRA-LIGO:members' ≔ ['read:/frames','read:/ligo','read:/kagra','read:/virgo','read:/shared','read:/staging','dqsegdb.read','gracedb.read','gwdatafind.read'];
+                       ζ.'Communities:LVC:LSC:LDG:CIT:LDGCITUsers' ≔ ['write:/staging/${uid}'];
+                ζ.'CO:COU:LDG Grid Account Holders:members:active' ≔ ['write:/staging/${uid}'];
+                ζ.'Services:WLCG:SciTokens:scopes:read:authorized' ≔ ['compute.read'];
+              ζ.'Services:WLCG:SciTokens:scopes:cancel:authorized' ≔ ['compute.cancel'];
+              ζ.'Services:WLCG:SciTokens:scopes:create:authorized' ≔ ['compute.create'];
+              ζ.'Services:WLCG:SciTokens:scopes:modify:authorized' ≔ ['compute.modify'];
+             ζ.'Services:DQSegDB:SciTokens:scopes:read:authorized' ≔ ['dqsegdb.read'];
+             ζ.'Services:GraceDB:SciTokens:scopes:read:authorized' ≔ ['gracedb.read'];
+           ζ.'Services:DQSegDB:SciTokens:scopes:create:authorized' ≔ ['dqsegdb.create'];
+           ζ.'Services:DQSegDB:SciTokens:scopes:modify:authorized' ≔ ['dqsegdb.modify'];
+          ζ.'Services:gwDataFind:SciTokens:scopes:read:authorized' ≔ ['gwdatafind.read'];
+         ζ.'Services:XRootD:SciTokens:scopes:read-ligo:authorized' ≔ ['read:/ligo'];
+        ζ.'Services:XRootD:SciTokens:scopes:read-kagra:authorized' ≔ ['read:/kagra'];
+        ζ.'Services:XRootD:SciTokens:scopes:read-virgo:authorized' ≔ ['read:/virgo'];
+       ζ.'Services:XRootD:SciTokens:scopes:read-frames:authorized' ≔ ['read:/frames'];
+       ζ.'Services:XRootD:SciTokens:scopes:read-shared:authorized' ≔ ['read:/shared'];
+      ζ.'Services:XRootD:SciTokens:scopes:read-staging:authorized' ≔ ['read:/staging'];
+      ζ.'Services:XRootD:SciTokens:scopes:write-frames:authorized' ≔ ['write:/frames'];
+     ζ.'Services:GraceDB:SciTokens:scopes:write-gstlal:authorized' ≔ ['gracedb.write-gstlal'];
+     ζ.'Services:SciTokenTesting:SciTokens:scopes:read:authorized' ≔ ['scitokentesting.read'];
+    ζ.'Services:SciTokenTesting:SciTokens:scopes:write:authorized' ≔ ['scitokentesting.write'];
     ]
    else[
                               ζ.'gw-astronomy:KAGRA-LIGO:members' := ['read:/GraceDB', 'read:/frames','write:/GraceDB']; //CIL-1345, CIL-1427

@@ -14,10 +14,11 @@ import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.qdl_lang.evaluate.SystemEvaluator;
 import org.qdl_lang.parsing.QDLInterpreter;
 import org.qdl_lang.state.State;
-import org.qdl_lang.variables.QDLList;
 import org.qdl_lang.variables.QDLStem;
+import org.qdl_lang.variables.values.QDLValue;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static edu.uiuc.ncsa.security.util.cli.CLIDriver.LIST_ALL_METHODS_COMMAND;
@@ -152,10 +153,10 @@ rs show -range [2^2;2^3] -attr [client_id,creation_ts] X
         String originalLine = inputLine.getOriginalLine();
         try {
             int index = Integer.parseInt(inputLine.getNextArgFor(key));
-            QDLList qdlList = new QDLList();
-            qdlList.add(index);
+            List<Integer> outList = new ArrayList<Integer>(1);
+            outList.add(index);
             inputLine.removeSwitchAndValue(key);
-            return qdlList;
+            return outList ;
         } catch (Throwable t) {
             // was not just a number
         }
@@ -167,13 +168,19 @@ rs show -range [2^2;2^3] -attr [client_id,creation_ts] X
 
         try {
             interpreter.execute(executableLine);
-            Object o = state.getValue(varName);
+            QDLValue o = state.getValue(varName);
             QDLStem qdlStem;
             if (o == null) {
                 throw new ObjectNotFoundException("no such value for'" + key + "'");
             }
-            qdlStem = (QDLStem) o;
-            return qdlStem.getQDLList();
+            qdlStem =  o.asStem();
+            // NCSA Sec Lib does not understand QDLValues. Have to convert
+            // https://github.com/ncsa/oa4mp/issues/273
+            List<Long> outList = new ArrayList<>(qdlStem.getQDLList().size());
+            for(QDLValue qdlValue : qdlStem.getQDLList()) {
+                outList.add(qdlValue.asLong());
+            }
+            return outList;
         } catch (Throwable e) {
             // last ditch effort...
             inputLine = new InputLine(originalLine);

@@ -643,7 +643,7 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
      */
 
     @Override
-    protected void initHelp() throws Throwable {
+    public void initHelp() throws Throwable {
         super.initHelp();
         getHelpUtil().load("/help/admin_help.xml");
     }

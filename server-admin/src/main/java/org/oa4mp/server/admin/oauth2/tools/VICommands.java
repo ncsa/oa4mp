@@ -304,7 +304,7 @@ public class VICommands extends OA4MPStoreCommands {
 
 
     @Override
-    protected void initHelp() throws Throwable {
+    public void initHelp() throws Throwable {
         super.initHelp();
         getHelpUtil().load("/help/vi_help.xml");
     }

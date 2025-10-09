@@ -10,7 +10,8 @@
   or the individual formatted statements (which are a lot more readable).
 
 */
-igwn_file := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-admin/src/main/resources/qdl/ligo/vo4/scitokens-scopes4.json';
+igwn_file := args().0;
+//igwn_file := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-admin/src/main/resources/qdl/ligo/vo4/scitokens-scopes4.json';
 igwn. := from_json(file_read(igwn_file));
 q. := igwn\Issuers\0\Services\*\Scopes; // Dig through all the cruft to the actual entries.
 p. := q\*\*\ScopeName; // permissions

@@ -11,7 +11,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="https://github.com/ncsa/oa4mp/issues/272 side effect of https://github.com/ncsa/security-lib/issues/60, help system sudited and now displaying properly in the CLI">
+    <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="6.2.2 checkin, includes website rebuild">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/client-installer/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/client/configuration/client-tag.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/client/configuration/client-tag.html" afterDir="false" />
@@ -118,9 +118,23 @@
       <change beforePath="$PROJECT_DIR$/docs/summary.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/summary.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qdl/src/main/docs/claim_source_examples.odt" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/src/main/docs/claim_source_examples.odt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rfc8414/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/rfc8414/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/BaseClientStoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/BaseClientStoreCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/ClientApprovalStoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/ClientApprovalStoreCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/OA4MPStoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/OA4MPStoreCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2AdminClientCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2AdminClientCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2ClientCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2ClientCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2PermissionCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2PermissionCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/TokenStoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/TokenStoreCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/TransactionStoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/TransactionStoreCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/VICommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/VICommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/ligo/vo4/extract.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/ligo/vo4/extract.qdl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/ligo/vo4/init.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/ligo/vo4/init.qdl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-installer/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/servlet/OA2TokenUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/servlet/OA2TokenUtils.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-test/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/auto/utils/get_client.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/auto/utils/get_client.qdl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -211,7 +225,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Application.CLC.executor": "Run",
-    "Application.CLI.executor": "Run",
+    "Application.CLI.executor": "Debug",
     "Application.FSMigrate.executor": "Run",
     "Application.JWKCLI.executor": "Run",
     "Application.OA4MPClientInstaller.executor": "Run",
@@ -294,7 +308,7 @@
       <recent name="edu.uiuc.ncsa.oa2.qdl.storage" />
     </key>
   </component>
-  <component name="RunManager" selected="Tomcat Server.OA4MP server">
+  <component name="RunManager" selected="Application.CLI">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="WIDTH" value="400" />
       <option name="HEIGHT" value="300" />
@@ -1324,15 +1338,7 @@
       <workItem from="1754563183586" duration="122054000" />
       <workItem from="1757587053911" duration="18929000" />
       <workItem from="1758279554829" duration="31666000" />
-      <workItem from="1759145755319" duration="68599000" />
-    </task>
-    <task id="LOCAL-00068" summary="Missing file">
-      <option name="closed" value="true" />
-      <created>1733507784031</created>
-      <option name="number" value="00068" />
-      <option name="presentableId" value="LOCAL-00068" />
-      <option name="project" value="LOCAL" />
-      <updated>1733507784031</updated>
+      <workItem from="1759145755319" duration="94242000" />
     </task>
     <task id="LOCAL-00069" summary="https://github.com/ncsa/oa4mp/issues/228 Improve error messages from QDL modules so scripts give more detailed messages.">
       <option name="closed" value="true" />
@@ -1718,7 +1724,15 @@
       <option name="project" value="LOCAL" />
       <updated>1759664679839</updated>
     </task>
-    <option name="localTasksCounter" value="117" />
+    <task id="LOCAL-00117" summary="6.2.2 checkin, includes website rebuild">
+      <option name="closed" value="true" />
+      <created>1759756516273</created>
+      <option name="number" value="00117" />
+      <option name="presentableId" value="LOCAL-00117" />
+      <option name="project" value="LOCAL" />
+      <updated>1759756516273</updated>
+    </task>
+    <option name="localTasksCounter" value="118" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1740,7 +1754,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
-    <MESSAGE value="https://github.com/ncsa/oa4mp/issues/251&#10;https://github.com/ncsa/oa4mp/issues/252" />
     <MESSAGE value="Before moving MyProxy stuff" />
     <MESSAGE value="https://jira.ncsa.illinois.edu/browse/CIL-2249&#10;https://github.com/ncsa/oa4mp/issues/254&#10; Isolate old MyProxy code into its own Maven module. In the future, OA4MP instances that need MyProxy can just use that module." />
     <MESSAGE value="Getting webapp to actually deploy witht he right dependencies, part 2 of &#10;https://jira.ncsa.illinois.edu/browse/CIL-2249&#10;https://github.com/ncsa/oa4mp/issues/254" />
@@ -1765,7 +1778,8 @@
     <MESSAGE value="Integrating fixes for https://github.com/ncsa/oa4mp/issues/267&#10;https://github.com/ncsa/oa4mp/issues/268&#10;https://github.com/ncsa/oa4mp/issues/269" />
     <MESSAGE value="Added QDL stack trace when debugging enabled for a client. Store accessors needed cleanup too." />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/272 side effect of https://github.com/ncsa/security-lib/issues/60, help system sudited and now displaying properly in the CLI" />
-    <option name="LAST_COMMIT_MESSAGE" value="https://github.com/ncsa/oa4mp/issues/272 side effect of https://github.com/ncsa/security-lib/issues/60, help system sudited and now displaying properly in the CLI" />
+    <MESSAGE value="6.2.2 checkin, includes website rebuild" />
+    <option name="LAST_COMMIT_MESSAGE" value="6.2.2 checkin, includes website rebuild" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="GROUP_MULTIFILE_MERGE_BY_DIRECTORY" value="true" />
   </component>
@@ -2169,7 +2183,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/BaseClientStoreCommands.java</url>
-          <line>606</line>
+          <line>626</line>
           <option name="timeStamp" value="987" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2224,7 +2238,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/OA4MPStoreCommands.java</url>
-          <line>197</line>
+          <line>203</line>
           <option name="timeStamp" value="1023" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2244,7 +2258,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/OA4MPStoreCommands.java</url>
-          <line>188</line>
+          <line>194</line>
           <option name="timeStamp" value="1056" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2462,7 +2476,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/BaseClientStoreCommands.java</url>
-          <line>715</line>
+          <line>735</line>
           <option name="timeStamp" value="1358" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2607,12 +2621,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/util/6.x-SNAPSHOT/util-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/util/cli/HelpUtil.java</url>
-          <line>222</line>
+          <line>220</line>
           <option name="timeStamp" value="1579" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/util/6.x-SNAPSHOT/util-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/util/cli/HelpUtil.java</url>
-          <line>198</line>
+          <line>196</line>
           <option name="timeStamp" value="1580" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2621,44 +2635,54 @@
           <option name="timeStamp" value="1591" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/util/6.x-SNAPSHOT/util-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/util/cli/ConfigurableCommandsImpl2.java</url>
-          <line>433</line>
-          <option name="timeStamp" value="1592" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/util/6.x-SNAPSHOT/util-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/util/cli/ConfigurableCommandsImpl2.java</url>
-          <line>457</line>
-          <option name="timeStamp" value="1596" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/BaseCommands2.java</url>
-          <line>115</line>
-          <option name="timeStamp" value="1597" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2ClientCommands.java</url>
           <line>486</line>
           <option name="timeStamp" value="1600" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/util/6.x-SNAPSHOT/util-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/util/cli/ConfigurableCommandsImpl2.java</url>
-          <line>459</line>
-          <option name="timeStamp" value="1602" />
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/BaseClientStoreCommands.java</url>
+          <line>403</line>
+          <option name="timeStamp" value="1615" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/BaseClientStoreCommands.java</url>
+          <line>408</line>
+          <option name="timeStamp" value="1616" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/BaseClientStoreCommands.java</url>
+          <line>355</line>
+          <option name="timeStamp" value="1617" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands2.java</url>
+          <line>1575</line>
+          <option name="timeStamp" value="1618" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/BaseClientStoreCommands.java</url>
+          <line>364</line>
+          <option name="timeStamp" value="1619" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2ClientCommands.java</url>
-          <line>675</line>
-          <option name="timeStamp" value="1604" />
+          <line>696</line>
+          <option name="timeStamp" value="1620" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2Commands.java</url>
-          <line>221</line>
-          <option name="timeStamp" value="1605" />
+          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands2.java</url>
+          <line>843</line>
+          <option name="timeStamp" value="1621" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/util/6.x-SNAPSHOT/util-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/util/cli/HelpUtil.java</url>
-          <line>126</line>
-          <option name="timeStamp" value="1610" />
+          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands2.java</url>
+          <line>1585</line>
+          <option name="timeStamp" value="1622" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/OA4MPStoreCommands.java</url>
+          <line>169</line>
+          <option name="timeStamp" value="1623" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-method">
           <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/storage/transactions/OA2MTStore.java</url>
