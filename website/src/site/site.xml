@@ -12,7 +12,7 @@
     </bannerRight>
     <version position="right"/>
     <skin>
-        <groupId>edu.uiuc.ncsa.maven.skin</groupId>
+        <groupId>org.oa4mp</groupId>
         <artifactId>skin</artifactId>
         <version>6.2.2</version>
     </skin>
