@@ -942,12 +942,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         String subjectToken = getFirstParameterValue(request, SUBJECT_TOKEN);
         MetaDebugUtil debugger = OA4MPServlet.createDebugger(client);
         debugger.trace(this, "Starting RFC 8693 token exchange");
-        printAllParameters(request, debugger);
-/*
-        if (debugger.isEnabled()) {
-            ServletDebugUtil.printAllParameters(this.getClass(), request, true);
-        }
-*/
+   //     printAllParameters(request, debugger);
         if (subjectToken == null) {
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, "missing subject token");
         }
@@ -2260,7 +2255,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
     protected TransactionState doNEWRefresh(OA2Client client, HttpServletRequest request, HttpServletResponse response) throws Throwable {
         // Grants are checked in the doIt method
         MetaDebugUtil debugger = OA4MPServlet.createDebugger(client);
-        printAllParameters(request, debugger);
+  //      printAllParameters(request, debugger);
         String rawRefreshToken = request.getParameter(OA2Constants.REFRESH_TOKEN);
         if (StringUtils.isTrivial(rawRefreshToken)) {
             // Then this request is, in fact, invalid.
@@ -2718,7 +2713,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
      */
     protected void doRFC8628(OA2Client client, HttpServletRequest request, HttpServletResponse response) throws Throwable {
         MetaDebugUtil debugger = OA4MPServlet.createDebugger(client);
-        printAllParameters(request, debugger);
+  //      printAllParameters(request, debugger);
         debugger.trace(this, "starting RFC 8628 access token exchange.");
         //  printAllParameters(request);
         long now = System.currentTimeMillis();

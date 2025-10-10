@@ -277,7 +277,7 @@ public class RFC8628AuthenticationServer extends EnvServlet {
                             getServiceEnvironment().getTransactionStore().save(trans);
                         }
                         MetaDebugUtil debugger = OA4MPServlet.createDebugger(trans.getOA2Client());
-                        printAllParameters(request, debugger);
+              //          printAllParameters(request, debugger);
                         // RFC 7636 support for device flow
 
                         try {
