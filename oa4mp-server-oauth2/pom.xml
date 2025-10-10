@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.oa4mp</groupId>
         <artifactId>oa4mp-parent</artifactId>
-        <version>6.x-SNAPSHOT</version>
+        <version>6.2.2</version>
     </parent>
 
     <artifactId>oa4mp-server-oauth2</artifactId>
@@ -28,37 +28,37 @@
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>di-service</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.2</version>
         </dependency>
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>server-api</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.2</version>
         </dependency>
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>proxy</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.2</version>
         </dependency>
 
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>core</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.2</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>common</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.2</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>util</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.2</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
@@ -89,7 +89,7 @@
         <dependency>
             <groupId>org.qdl-lang</groupId>
             <artifactId>sas</artifactId>
-            <version>1.6-QDL-SNAPSHOT</version>
+            <version>1.6.2.2</version>
         </dependency>
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
