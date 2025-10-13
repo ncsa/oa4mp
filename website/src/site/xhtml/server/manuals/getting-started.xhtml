@@ -52,9 +52,9 @@
         JGlobus-Core 2.0.4 includes Bouncy Castle classes.
     </li>
 </ul>
-<h2>Getting and deploying from the war.</h2>
-<p>This is available as an installer. Download <a href="https://github.com/ncsa/oa4mp/releases/download/v6.0/server-installer.jar">server-installer.jar</a>
-from the website. This will download and install a full distribution for the version you want. A full set of help is built in
+<h2>Getting and deploying with the installer.</h2>
+<p>This is available as an server-installer.jar. Download from the <a href="https://github.com/ncsa/oa4mp/releases/latest">latest release</a>
+on the website. This will download and install a full distribution for the version you want. A full set of help is built in
 to the installer and if you issue</p>
 <pre>
     java -jar server-installer.jar
@@ -90,7 +90,8 @@ oa4mp&gt;
 
 <p>You may now profitably read how to <a title="Server Configuration Reference Manual"
                              href="../configuration/config-index.html">configure
-    the deployment</a>, and deploy it to Tomcat. The basic configuration for the CLI
+    the deployment</a>, and deploy it to Tomcat. The current war is at $OA4MP_SERVER/lib/oauth2.war
+    The basic configuration for the CLI
 as delivered should work for the server, although there are many ways to extend and
 configure OA4MP, so read the comments in the configuration file (has suggestions
     based on your installation choices) and the documentation.</p>
@@ -113,7 +114,7 @@ ProxyPass /oauth/authorize ajp://localhost:8009/oauth/authorize
 <h2>Location of database scripts</h2>
 <p>In a standard OA4MP install, the scripts to create the databases are all in </p>
 <pre>$OA4MP_SERVER/etc</pre>
-<p>These should be run before trying tos tart either the CLI or the server.</p>
+<p>These should be run before trying to start either the CLI or the server.</p>
 
 <h2>File-based storage</h2>
 
