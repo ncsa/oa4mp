@@ -130,6 +130,9 @@ fi
 cd target
 cp clc-jar-with-dependencies.jar $OA4MP_SERVER_DEPLOY/clc.jar
 
+# RFC8414 support
+cd $OA4MP_ROOT/rfc8414/target
+cp well-known.war $OA4MP_SERVER_DEPLOY/well-known.war
 
 cd $OA2_TOOLS/src/main/resources
 cp *.sql $OA4MP_SERVER_DEPLOY

@@ -112,6 +112,7 @@ public class OA2CommandLineClient extends ConfigurableCommandsImpl2 {
     protected  void runnit(String[] args, OA2CommandLineClient clc) throws Throwable {
         InputLine inputLine = new InputLine(getClass().getSimpleName(), args);
         CLIDriver cli = new CLIDriver(clc);
+        setDriver(cli);
 /*        try {// actually run the driver that parses commands and passes them along
            inputLine = cli.bootstrap(inputLine);
         }catch(ConnectionException ce){

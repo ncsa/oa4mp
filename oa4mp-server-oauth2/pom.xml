@@ -159,6 +159,7 @@
                 </executions>
 
                 <configuration>
+                    <packagingExcludes>WEB-INF/lib/mail-1.4.jar</packagingExcludes>
 
                     <archive>
                         <manifest>
