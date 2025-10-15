@@ -423,6 +423,8 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
     public static String ACCESS_CONTROL = "access_control" + STEM_INDEX_MARKER;
     public static String AT_ORIGINAL_SCOPES = "at_original_scopes" + STEM_INDEX_MARKER;
     public static String AUTH_HEADERS_VAR = "auth_headers" + STEM_INDEX_MARKER;
+    public static String REQUEST_URI_VAR = "request_uri";
+
 
     public static Long OA4MP_ERROR_CODE = 1000L; // reserved error code by OA4MP.
     public static String OA4MP_ERROR_CODE_NAME = "oa4mp_error";
@@ -599,6 +601,12 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
             originalScopes.getQDLList().appendAll(arrayList);
         }
         state.setValue(AT_ORIGINAL_SCOPES, asQDLValue(originalScopes));
+        if(state.getTransaction().hasOriginalURL()){
+            // Fix https://github.com/ncsa/oa4mp/issues/276
+            state.setValue(REQUEST_URI_VAR, asQDLValue(originalScopes));
+        }else{
+            state.setValue(REQUEST_URI_VAR, QDLValue.getNullValue());
+        }
 
     }
 

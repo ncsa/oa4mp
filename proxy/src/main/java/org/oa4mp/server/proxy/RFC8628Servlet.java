@@ -112,6 +112,7 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
         AGResponse agResponse = (AGResponse) getAGI().process(agRequest2);
         AuthorizationGrantImpl ag = ((OA2TokenForge) oa2SE.getTokenForge()).createToken(agRequest2);
         OA2ServiceTransaction t = (OA2ServiceTransaction) getTransactionStore().create();
+        t.setOriginalURL(req.getRequestURI() + "?" + req.getQueryString());
         debugger.trace(this, "created transaction \"" + t.getIdentifierString() + "\"");
         t.setClient(client);
         OA2Client resolvedClient = OA2ClientUtils.resolvePrototypes(oa2SE, client);

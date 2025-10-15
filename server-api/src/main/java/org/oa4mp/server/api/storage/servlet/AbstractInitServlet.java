@@ -44,10 +44,13 @@ public abstract class AbstractInitServlet extends OA4MPServlet {
        protected ServiceTransaction doDelegation(HttpServletRequest req, HttpServletResponse resp) throws Throwable {
            Client client = getClient(req);
             ServiceTransaction transaction = newTransaction();
+
            transaction.setClient(client);
+           transaction.setOriginalURL(req.getRequestURI() + "?" + req.getQueryString());
+
            try {
                String cid = "client=" + client.getIdentifier();
-               info("2.a. Starting a new cert request: " + cid);
+               info("2.a. Starting a new request: " + cid);
                checkClientApproval(client);
 
                AGResponse agResponse = (AGResponse) getAGI().process(new AGRequest(req, transaction));

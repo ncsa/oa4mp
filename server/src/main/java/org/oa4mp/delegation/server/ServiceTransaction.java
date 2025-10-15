@@ -24,6 +24,7 @@ public class ServiceTransaction extends BasicTransaction {
     public String ID_TOKEN_HINT_KEY = "id_token_hint";
     public String STATE_KEY = "state";
     public String STATE_COMMENT_KEY = "comment";
+    public String ORIGINAL_URL_STATE_KEY = "original_url";
 
     // Fix for https://github.com/ncsa/oa4mp/issues/236
     public boolean hasPromptKey(){
@@ -203,4 +204,18 @@ public class ServiceTransaction extends BasicTransaction {
    public List<String> getResponseTypes(){
       return null;
    }
+   // Fix https://github.com/ncsa/oa4mp/issues/276
+    /**
+     * For authorization code and device flows, the request that started the flow. Null in all other cases.
+     * @return
+     */
+    public String getOriginalURL(){
+        return getState().getString(ORIGINAL_URL_STATE_KEY);
+    }
+    public void setOriginalURL(String oiriginalURL){
+        getState().put(ORIGINAL_URL_STATE_KEY, oiriginalURL);
+    }
+    public boolean hasOriginalURL(){
+        return getState().containsKey(ORIGINAL_URL_STATE_KEY);
+    }
 }
