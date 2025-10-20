@@ -22,5 +22,15 @@ claims. := clc#claims();
 ⊨ tokens.'access_token'.'lifetime' == 1009000 : 'wrong access token lifetime';
 ⊨ tokens.'refresh_token'.'lifetime' == 950400000 : 'wrong refresh token lifetime';
 ⊨clc#claims().'aud' == cfg.'id' : 'wrong audience';
+while[i∈[1;20]]
+ do[
+     if[0==mod(i, 2)]
+   then[
+       if[0==mod(i%2, 2)]
+     then[clc#exchange('-at');]
+     else[clc#exchange('-rt');];
+       ]
+   else[clc#refresh();];
+ ]; // end while
 
-say('Test no config: ok');
+say('Test no config with refreshes and exchanges: ok');

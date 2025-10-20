@@ -48,10 +48,6 @@ public class DiscoveryServlet extends OA4MPServlet implements OIDCDiscoveryTags 
             authzEndpoint = requestURI + "/authorize";
         }
         jsonObject.put(AUTHORIZATION_ENDPOINT, authzEndpoint);
-        // The next line points to the native OA4MP registration protocol
-        //jsonObject.put(REGISTRATION_ENDPOINT, requestURI + "/register");
-        // The next line points to the RFC 7591/7592 protocol.
-        // Should be the same as in ClientManagementConstants.DEFAULT_RFC7591_ENDPOINT
         jsonObject.put(REGISTRATION_ENDPOINT, requestURI + "/" + DEFAULT_REGISTRATION_ENDPOINT);
         return jsonObject;
     }

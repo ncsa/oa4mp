@@ -1,0 +1,50 @@
+/*
+ Argument 0 should be a JSON object containing LDAP configuration
+ details and an another embedded JSON object containing mappings
+ from LDAP attribute names to claim names. Argument 0 will be converted
+ into a stem.
+
+ An example JSON object is
+
+ {
+                "bind_dn"  : "uid=oa4mp_user,ou=system,o=MESS,o=CO,dc=cilogon,dc=org",
+            "search_base"  : "ou=people,o=MESS,o=CO,dc=cilogon,dc=org",
+            "server_fqdn"  : "ldap-test.cilogon.org",
+            "server_port"  : 636,
+          "bind_password"  : "XXXXXXXX",
+  "ldap_to_claim_mappings" : {
+                               "eduPersonPrincipalName": "sub",
+                               "isMemberOf": "is_member_of",
+                               "voPersonID": "voPersonID"
+                               }
+         list_attributes"  : ["isMemberOf"],
+       "search_attribute"  : "uid",
+      "return_attributes"  : ["isMemberOf","voPersonID"],
+  }
+*/
+
+ // Fix https://github.com/cilogon/cilogon-java/issues/45
+
+// Load the configuration parameters.
+config_params. := args().0;
+
+// Configure a LDAP client.
+                   ldap_client. := claims#new_template('ldap');
+             ldap_client.'type' := 'ldap';
+          ldap_client.'address' := config_params.'server_fqdn';
+             ldap_client.'port' := config_params.'server_port';
+        ldap_client.'auth_type' := 'simple';
+         ldap_client.'username' := config_params.'bind_dn';
+         ldap_client.'password' := config_params.'bind_password';
+      ldap_client.'search_base' := config_params.'search_base';
+       ldap_client.'claim_name' := 'sub';
+        ldap_client.'ldap_name' := config_params.'search_attribute';
+ldap_client.'search_attributes' := config_params.'return_attributes';
+             ldap_client.'list' := config_params.'list_attributes';
+
+// Create a LDAP claim source and get claims.
+             ldap_claim_source. := claims#create_source(ldap_client.);
+            ldap_query_results. := claims#get_claims(ldap_claim_source., claims.'sub'); // get  claims
+                        claims. := claims. ~ ldap_query_results.; // add claims to claims.
+
+rename_keys(claims., config_params.'ldap_to_claim_mappings', true);

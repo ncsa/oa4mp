@@ -33,6 +33,7 @@ say('checking runtime variables');
                   if[∄mail.'cfg'][raise_error('missing mail configuration', oa4mp_error);];
               if[∄mail.'message'][raise_error('missing default mail message', oa4mp_error);];
          if[∄at_original_scopes.][raise_error('missing original access token scopes', oa4mp_error);];
+         if[∄request_uri][raise_error('missing request_uri', oa4mp_error);];
                if[∄auth_headers.][raise_error('missing authorization headers', oa4mp_error);];
 if[exec_phase != 'post_auth'][
     if[atJWT][

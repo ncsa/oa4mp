@@ -9,7 +9,7 @@
    Run it in QDL:
    path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tests';
    script_path(path ~ script_path());
-   script_load('/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests/local/revoke.qdl');
+   script_load('/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests/auto/tests/revoke.qdl');
 
    Run it in the CLC
    load ashigaru:command.line2

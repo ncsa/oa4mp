@@ -41,6 +41,7 @@ import org.oa4mp.server.loader.oauth2.tokens.AccessTokenConfig;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpUtils;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -103,6 +104,9 @@ public class OA2AuthorizedServletUtil {
             AGIResponse2 agResponse = (AGIResponse2) servlet.getAGI().process(agRequest2);
             agResponse.setEncodeToken(encodeTokenInResponse);
             OA2ServiceTransaction transaction = createNewTransaction(agResponse.getGrant());
+            transaction.setOriginalURL( HttpUtils. getRequestURL(req).toString() + "?" + req.getQueryString());
+            //transaction.setOriginalURL(req.getRequestURI() + "?" + req.getQueryString());
+
             transaction.setResponseTypes(getAndCheckResponseTypes(req));
             transaction.setAuthGrantLifetime(oa2se.getAuthorizationGrantLifetime()); // make sure these match.
             String requestState = req.getParameter(OA2Constants.STATE);

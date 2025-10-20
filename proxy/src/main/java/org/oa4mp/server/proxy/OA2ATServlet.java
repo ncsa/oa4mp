@@ -2201,7 +2201,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         if (client.isRTLifetimeEnabled() && oa2SE.isRefreshTokenEnabled()) {
             RefreshTokenImpl rt = tokenResponse.getRefreshToken();
             // rt is used as a key in the database. If the refresh token is  JWT, it will be used as the jti.
-          /*  if (!isTokenExchange) {
+       /*    if (!isTokenExchange) {
                 st2.setRefreshToken(rt);
                 st2.setRefreshTokenValid(true);
             }*/
@@ -2210,7 +2210,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 tokenResponse.setRefreshToken(newRT);
                 debugger.trace(this, "Returned RT from handler:" + newRT + ", for claims " + st2.getRTData().toString(2));
             }
-            debugger.trace(this, "setting refresh token to " + st2.getRefreshToken().getToken());
         } else {
             // Even if a token is sent, do not return a refresh token.
             // This might be in a legacy case where a server changes it policy to prohibit  issuing refresh tokens but
@@ -2305,7 +2304,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 OA2ATException x = new OA2ATException(OA2Errors.INVALID_TOKEN, "The token could not be associated with a pending flow",
                         HttpStatus.SC_BAD_REQUEST, null);
                 x.setClient(client);
-                x.setForensicMessage("token cannot be associated witH a pending flow:" + oldRT);
+                x.setForensicMessage("token cannot be associated with a pending flow:" + oldRT);
                 throw x;
             }
             oldTXRT = (TXRecord) getOA2SE().getTxStore().get(BasicIdentifier.newID(oldRT.getJti()));
@@ -2336,17 +2335,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             throw x;
         }
         OA2ServletUtils.processXAs(request, t, client);
-/*
-        if (client.hasExtendedAttributeSupport()) {
-            ExtendedParameters xp = new ExtendedParameters();
-            // Take the parameters and parse them into configuration objects,
-            JSONObject extAttr = xp.snoopParameters(request.getParameterMap());
-            if (extAttr != null && !extAttr.isEmpty()) {
-                t.setExtendedAttributes(extAttr);
-            }
-        }
-*/
-        AccessTokenImpl at = (AccessTokenImpl) t.getAccessToken();
+     AccessTokenImpl at = (AccessTokenImpl) t.getAccessToken();
         debugger.trace(this, "old access token = " + at.getToken());
         List<String> scopes = convertToList(request, OA2Constants.SCOPE);
         List<String> audience = convertToList(request, AUDIENCE);
@@ -2398,6 +2387,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             txRT.setTokenType(REFRESH_TOKEN_TYPE);
             txRT.setParentID(t.getIdentifier());
             txRT.setIdentifier(rtiResponse.getRefreshToken().getJTIAsIdentifier());
+            debugger.trace(this, "setting refresh token to " + txRT.getIdentifier());
         }
 
 
@@ -2411,10 +2401,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             txAT.setAudience(audience);
             txAT.setResource(resources);
         }
-    /*    if (scopes == null || scopes.isEmpty()) {
-            scopes = new ArrayList<>();
-            scopes.addAll(t.getScopes()); // default to original
-        }*/
+
         if (scopes == null) {
             scopes = new ArrayList<>();
             //scopes.addAll(t.getScopes()); // default to original

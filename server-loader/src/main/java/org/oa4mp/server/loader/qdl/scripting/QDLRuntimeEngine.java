@@ -603,7 +603,7 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         state.setValue(AT_ORIGINAL_SCOPES, asQDLValue(originalScopes));
         if(state.getTransaction().hasOriginalURL()){
             // Fix https://github.com/ncsa/oa4mp/issues/276
-            state.setValue(REQUEST_URI_VAR, asQDLValue(originalScopes));
+            state.setValue(REQUEST_URI_VAR, asQDLValue(state.getTransaction().getOriginalURL()));
         }else{
             state.setValue(REQUEST_URI_VAR, QDLValue.getNullValue());
         }
