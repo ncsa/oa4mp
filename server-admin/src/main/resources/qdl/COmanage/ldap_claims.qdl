@@ -26,7 +26,7 @@
  // Fix https://github.com/cilogon/cilogon-java/issues/45
 
 // Load the configuration parameters.
-config_params. := args().0;
+                 config_params. := args().0;
 
 // Configure a LDAP client.
                    ldap_client. := claims#new_template('ldap');

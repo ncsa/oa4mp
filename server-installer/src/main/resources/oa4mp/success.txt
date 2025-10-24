@@ -42,7 +42,7 @@ Assuming that Tomcat is installed in $CATALINA_HOME, you should
 (2) Copy the oauth2.war to $CATALINA_HOME/webapps
     This should be noticed by Tomcat and auto-deployed
 
-(3) Copy ${OA4MP_HOME}/lib/wdll-known.war to $CATALINA_HOME/webapps/.well-known.war
+(3) Copy ${OA4MP_HOME}lib/well-known.war to $CATALINA_HOME/webapps/.well-known.war
     This should be noticed and deployed by Tomcat
 
     NOTE the leading period in the target!! The correct name  of this war is

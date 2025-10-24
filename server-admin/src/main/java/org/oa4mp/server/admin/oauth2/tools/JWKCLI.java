@@ -111,6 +111,7 @@ public class JWKCLI extends ConfigurableCommandsImpl2 {
             JWKUtilCommands jwkUtilCommands = new JWKUtilCommands(null);
 
             CLIDriver cli = new CLIDriver(jwkUtilCommands); // actually run the driver that parses commands and passes them along
+            jwkUtilCommands.setDriver(cli);
             inputLine = cli.bootstrap(inputLine);
             jwkUtilCommands.bootstrap(inputLine); // read the command line options and such to set the state
             if (inputLine.hasArg(SHORT_HELP_FLAG,LONG_HELP_FLAG)) {

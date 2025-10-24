@@ -2,7 +2,7 @@
 /* Comment this if you did the test above and have already created the schema. */
 CREATE SCHEMA oa4mp;
 
-
+/* Fix https://github.com/ncsa/oa4mp/issues/279 */
 CREATE TABLE oa4mp.transactions
 (
     access_token              VARCHAR(255),
@@ -15,7 +15,7 @@ CREATE TABLE oa4mp.transactions
     certificate               clob,
     certlifetime              bigint,
     certreq                   clob,
-    client_id                 clob,
+    client_id                 VARCHAR(255),
     consent_page_ok           boolean,
     description               clob,
     expires_in                bigint,
@@ -150,6 +150,8 @@ CREATE TABLE oa4mp.permissions
 );
 CREATE INDEX p_client ON oa4mp.permissions(client_id);
 
+/* Fix https://github.com/ncsa/oa4mp/issues/278 */
+
 CREATE TABLE oa4mp.tx_records
 (
    audience            clob,
@@ -164,6 +166,7 @@ CREATE TABLE oa4mp.tx_records
    state               clob,
    stored_token        clob,
    token_id            VARCHAR(255) PRIMARY KEY,
+   token               clob,
    token_type          clob,
    valid               boolean
 );
