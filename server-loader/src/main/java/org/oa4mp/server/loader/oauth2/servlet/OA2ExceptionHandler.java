@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.servlet.AbstractServlet;
 import edu.uiuc.ncsa.security.servlet.ExceptionHandler;
 import edu.uiuc.ncsa.security.servlet.ExceptionHandlerThingie;
+import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import org.apache.http.HttpStatus;
 import org.oa4mp.delegation.common.storage.clients.BaseClient;
 import org.oa4mp.delegation.server.*;
@@ -169,7 +170,9 @@ public class OA2ExceptionHandler implements ExceptionHandler {
                             HttpStatus.SC_BAD_REQUEST, null), response);
             return;
         }
-        t.printStackTrace();
+        if(ServletDebugUtil.isTraceEnabled()) {
+            t.printStackTrace();
+        }
         // This handles every other type of exception.
         handleOA2Error(new OA2GeneralError(OA2Errors.SERVER_ERROR, t.getMessage(), HttpStatus.SC_INTERNAL_SERVER_ERROR, null), response);
     }
