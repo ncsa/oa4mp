@@ -48,7 +48,7 @@
     
         
                     <div class="xleft">
-            Last Published: 2025-10-10
+            Last Published: 2025-10-27
                                 </div>
                 <div class="xright">            
     
@@ -203,10 +203,10 @@
     </li>
 </ul>
 </section><section>
-<h2><a name="Getting_and_deploying_from_the_war."></a>Getting and deploying from the war.</h2>
+<h2><a name="Getting_and_deploying_with_the_installer."></a>Getting and deploying with the installer.</h2>
 
-<p>This is available as an installer. Download <a class="externalLink" href="https://github.com/ncsa/oa4mp/releases/download/v6.0/server-installer.jar">server-installer.jar</a>
-from the website. This will download and install a full distribution for the version you want. A full set of help is built in
+<p>This is available as an server-installer.jar. Download from the <a class="externalLink" href="https://github.com/ncsa/oa4mp/releases/latest">latest release</a>
+on the website. This will download and install a full distribution for the version you want. A full set of help is built in
 to the installer and if you issue</p>
 
 <div>
@@ -247,7 +247,8 @@ oa4mp&gt;
 
 
 <p>You may now profitably read how to <a href="../configuration/config-index.html" title="Server Configuration Reference Manual">configure
-    the deployment</a>, and deploy it to Tomcat. The basic configuration for the CLI
+    the deployment</a>, and deploy it to Tomcat. The current war is at $OA4MP_SERVER/lib/oauth2.war
+    The basic configuration for the CLI
 as delivered should work for the server, although there are many ways to extend and
 configure OA4MP, so read the comments in the configuration file (has suggestions
     based on your installation choices) and the documentation.</p>
@@ -281,7 +282,7 @@ ProxyPass /oauth/authorize ajp://localhost:8009/oauth/authorize
 <div>
 <pre>$OA4MP_SERVER/etc</pre></div>
 
-<p>These should be run before trying tos tart either the CLI or the server.</p>
+<p>These should be run before trying to start either the CLI or the server.</p>
 
 </section><section>
 <h2><a name="File-based_storage"></a>File-based storage</h2>

@@ -11,30 +11,117 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="Added printing a stack trace (if servlet debug is set to trace only) in case of very odd errors.">
-      <change afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/src/main/resources/web-inf/readme.txt" afterDir="false" />
+    <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="Lots of documentation tweaks.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/client-installer/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/configuration/authorization-servlet-configuration.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/configuration/authentication-servlet-configuration.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/myproxy/src/main/webapp/WEB-INF/web.xml" beforeDir="false" afterPath="$PROJECT_DIR$/myproxy/src/main/webapp/WEB-INF/web.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/client/configuration/client-tag.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/client/configuration/client-tag.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/client/configuration/configuration-file.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/client/configuration/configuration-file.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/client/configuration/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/client/configuration/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/client/dtd/asset-store.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/client/dtd/asset-store.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/client/dtd/dtd-file.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/client/dtd/dtd-file.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/client/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/client/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/client/manuals/api-reference.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/client/manuals/api-reference.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/client/manuals/changelog.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/client/manuals/changelog.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/client/manuals/getting-started.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/client/manuals/getting-started.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/client/manuals/oa2-refresh-tokens.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/client/manuals/oa2-refresh-tokens.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/client/manuals/parameters.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/client/manuals/parameters.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/client/manuals/registering-with-an-oauth2-server.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/client/manuals/registering-with-an-oauth2-server.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/client/manuals/storage.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/client/manuals/storage.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/client/manuals/troubleshooting.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/client/manuals/troubleshooting.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/common/configuration/configuration-files.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/common/configuration/configuration-files.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/common/configuration/derby-store.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/common/configuration/derby-store.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/common/configuration/file-store.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/common/configuration/file-store.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/common/configuration/keystore.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/common/configuration/keystore.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/common/configuration/logging.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/common/configuration/logging.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/common/configuration/mariadb-store.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/common/configuration/mariadb-store.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/common/configuration/memory-store.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/common/configuration/memory-store.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/common/configuration/mysql-store.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/common/configuration/mysql-store.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/common/configuration/postgres-store.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/common/configuration/postgres-store.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/common/configuration/scopes.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/common/configuration/scopes.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/common/configuration/ssl.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/common/configuration/ssl.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/common/configuration/supported-specifications.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/common/configuration/supported-specifications.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/common/manuals/expiration-of-tokens.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/common/manuals/expiration-of-tokens.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/common/manuals/using-self-signed-cert.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/common/manuals/using-self-signed-cert.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/dependencies.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/dependencies.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/dependency-analysis.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/dependency-analysis.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/oa4mp-faq.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/oa4mp-faq.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/pdf/Authentication_in_OA4MP.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/Authentication_in_OA4MP.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/pdf/DIService-reference.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/DIService-reference.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/pdf/Using_headers_for_authentication.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/Using_headers_for_authentication.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/pdf/claim_source_examples.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/claim_source_examples.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/pdf/creating_claim_sources2.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/creating_claim_sources2.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/pdf/filestore-migration.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/filestore-migration.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/pdf/forking_a_flow_quickstart.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/forking_a_flow_quickstart.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/pdf/java-extension-to-oa4mp.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/java-extension-to-oa4mp.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/pdf/jwt-util.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/jwt-util.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/pdf/oa2-client.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/oa2-client.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/pdf/oa4mp-modules.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/oa4mp-modules.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/pdf/oa4mp_as_dedicated_issuer.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/oa4mp_as_dedicated_issuer.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/pdf/oa4mp_running_qdl_scripts.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/oa4mp_running_qdl_scripts.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/pdf/policies.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/policies.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/pdf/qdl_clc_ini.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/qdl_clc_ini.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/pdf/qdl_oa4mp_store_access.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/qdl_oa4mp_store_access.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/pdf/rfc6749_4_4.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/rfc6749_4_4.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/pdf/rfc7523_intro.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/rfc7523_intro.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/pdf/scopes.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/scopes.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/pdf/token_handler_configuration.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/token_handler_configuration.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/project-info.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/project-info.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/project-reports.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/project-reports.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server-faq.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server-faq.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/configuration/authentication-servlet-configuration.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/configuration/authentication-servlet-configuration.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/configuration/client_management-configuration.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/configuration/client_management-configuration.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/configuration/config-index.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/configuration/config-index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/configuration/device-flow-servlet-configuration.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/configuration/device-flow-servlet-configuration.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/configuration/ldap.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/configuration/ldap.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/configuration/qdl-config.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/configuration/qdl-config.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/configuration/server-configuration-file.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/configuration/server-configuration-file.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/configuration/server-email.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/configuration/server-email.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/configuration/server-messages.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/configuration/server-messages.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/configuration/server-myproxy.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/configuration/server-myproxy.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/configuration/signing.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/configuration/signing.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/dtd/server-dtd-content-tags.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/dtd/server-dtd-content-tags.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/dtd/server-dtd-service-tag.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/dtd/server-dtd-service-tag.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/dtd/server-dtd.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/dtd/server-dtd.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/manuals/Username-transformations.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/Username-transformations.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/manuals/administrative-clients.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/administrative-clients.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/manuals/changelog.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/changelog.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/manuals/cli.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/cli.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/manuals/client-prototypes.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/client-prototypes.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/manuals/custom-scope-handler.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/custom-scope-handler.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/manuals/demo-mode.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/demo-mode.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/manuals/discovery.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/discovery.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/manuals/driver-config.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/driver-config.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/manuals/dynamic-client-registration.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/dynamic-client-registration.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/manuals/ersatz_clients.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/ersatz_clients.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/manuals/exception-notifications.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/exception-notifications.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/manuals/extended-attributes.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/extended-attributes.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/manuals/extending-the-server.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/extending-the-server.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/manuals/gc.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/gc.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/manuals/getting-started.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/getting-started.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/manuals/install-walkthrough.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/install-walkthrough.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/manuals/issuers.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/issuers.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/manuals/manually-approving-clients.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/manually-approving-clients.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/manuals/monitor.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/monitor.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/manuals/monitoring-access-times.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/monitoring-access-times.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/manuals/remote-user.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/remote-user.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/manuals/scripting-hooks.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/scripting-hooks.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/manuals/service-clients.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/service-clients.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/manuals/template.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/template.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/manuals/test-client.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/test-client.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/manuals/testing-from-the-command-line.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/testing-from-the-command-line.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/manuals/token-info.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/token-info.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/manuals/units.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/units.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/manuals/unused-client-cleanup.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/unused-client-cleanup.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/manuals/using-proxies.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/using-proxies.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/server/manuals/virtual-issuers.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/virtual-issuers.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/summary.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/summary.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/overlays/edu.uiuc.ncsa.myproxy.oa4mp-webapp-3.4-SNAPSHOT.info" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/src/main/webapp/WEB-INF/dedicated-web.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/src/main/resources/web-inf/dedicated-web.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/src/main/webapp/WEB-INF/di-service-web.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/src/main/resources/web-inf/di-service-web.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/src/main/webapp/WEB-INF/header-web.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/src/main/resources/web-inf/header-web.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/src/main/webapp/WEB-INF/proxy-web.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/src/main/resources/web-inf/proxy-web.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/src/main/webapp/WEB-INF/sas-web.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/src/main/resources/web-inf/sas-web.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rfc8414/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/rfc8414/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/docs/Authentication_in_OA4MP.odt" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/docs/Authentication_in_OA4MP.odt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/docs/DIService-reference.odt" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/docs/DIService-reference.odt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/scripts/installer/cfg.xml" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/scripts/installer/cfg.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-installer/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-installer/src/main/resources/installer/cfg.xml" beforeDir="false" afterPath="$PROJECT_DIR$/server-installer/src/main/resources/installer/cfg.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-installer/src/main/scripts/create-distro.sh" beforeDir="false" afterPath="$PROJECT_DIR$/server-installer/src/main/scripts/create-distro.sh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-test/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/website/src/site/xhtml/server/configuration/authentication-servlet-configuration.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/xhtml/server/configuration/authentication-servlet-configuration.xhtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/website/src/site/xhtml/server/manuals/using-proxies.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/xhtml/server/manuals/using-proxies.xhtml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -1257,15 +1344,7 @@
       <workItem from="1760643219546" duration="779000" />
       <workItem from="1760644047320" duration="506000" />
       <workItem from="1760644825842" duration="81000" />
-      <workItem from="1760644921271" duration="61842000" />
-    </task>
-    <task id="LOCAL-00078" summary="While chasing down formatting errors, got tired of doing the same 4 queries repeatedly to test, and created https://github.com/ncsa/oa4mp/issues/245 which wonderfully streamlines it.">
-      <option name="closed" value="true" />
-      <created>1745674740942</created>
-      <option name="number" value="00078" />
-      <option name="presentableId" value="LOCAL-00078" />
-      <option name="project" value="LOCAL" />
-      <updated>1745674740942</updated>
+      <workItem from="1760644921271" duration="63163000" />
     </task>
     <task id="LOCAL-00079" summary="Failing test needed slight tweak (turned out to be wrong phase in the client configuration, but a few minor mods were made along the way).">
       <option name="closed" value="true" />
@@ -1651,7 +1730,15 @@
       <option name="project" value="LOCAL" />
       <updated>1761342455974</updated>
     </task>
-    <option name="localTasksCounter" value="127" />
+    <task id="LOCAL-00127" summary="Lots of documentation tweaks.">
+      <option name="closed" value="true" />
+      <created>1761566743209</created>
+      <option name="number" value="00127" />
+      <option name="presentableId" value="LOCAL-00127" />
+      <option name="project" value="LOCAL" />
+      <updated>1761566743209</updated>
+    </task>
+    <option name="localTasksCounter" value="128" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1673,7 +1760,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
-    <MESSAGE value="Checkin before release" />
     <MESSAGE value="https://github.com/cilogon/cilogon-java/issues/58 and streamlined creation of NCSA LDAP configuration stems. Integrating 6.2.0 changes" />
     <MESSAGE value="Routine checkin. Added a test, tweaked a few others." />
     <MESSAGE value="Port of CILogon DBService to OA4MP." />
@@ -1698,7 +1784,8 @@
     <MESSAGE value="https://github.com/cilogon/cilogon-java/issues/45" />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/278, https://github.com/ncsa/oa4mp/issues/279 Derby issues so that the OOBE (Out Of Box Experience) is as smooth as possible." />
     <MESSAGE value="Added printing a stack trace (if servlet debug is set to trace only) in case of very odd errors." />
-    <option name="LAST_COMMIT_MESSAGE" value="Added printing a stack trace (if servlet debug is set to trace only) in case of very odd errors." />
+    <MESSAGE value="Lots of documentation tweaks." />
+    <option name="LAST_COMMIT_MESSAGE" value="Lots of documentation tweaks." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="GROUP_MULTIFILE_MERGE_BY_DIRECTORY" value="true" />
   </component>
