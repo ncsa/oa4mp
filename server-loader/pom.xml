@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.oa4mp</groupId>
         <artifactId>oa4mp-parent</artifactId>
-        <version>6.x-SNAPSHOT</version>
+        <version>6.2.3</version>
     </parent>
 
     <artifactId>server-loader</artifactId>
@@ -33,17 +33,17 @@
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>server-api</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.3</version>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>servlet</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.3</version>
         </dependency>
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>myproxy-logon</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.3</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -55,20 +55,20 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>util</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.3</version>
             <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.qdl-lang</groupId>
             <artifactId>language</artifactId>
-            <version>1.6-QDL-SNAPSHOT</version>
+            <version>1.6.2.3</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>common</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.3</version>
         </dependency>
     </dependencies>
 

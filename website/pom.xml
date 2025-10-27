@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.oa4mp</groupId>
-    <version>6.x-SNAPSHOT</version>
+    <version>6.2.3</version>
 
     <artifactId>website</artifactId>
     <packaging>jar</packaging>
@@ -20,22 +20,22 @@
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>client</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.3</version>
         </dependency>
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>client-api</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.3</version>
         </dependency>
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>client-installer</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.3</version>
         </dependency>
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>client-loader</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.3</version>
         </dependency>
 
 
@@ -44,13 +44,13 @@
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>common</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.3</version>
         </dependency>
 
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>common</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.3</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
@@ -60,92 +60,92 @@
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>di-service</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.3</version>
         </dependency>
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>installer</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.3</version>
         </dependency>
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>oa4mp-server-test</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.3</version>
         </dependency>
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>oauth2</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.3</version>
         </dependency>
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>proxy</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.3</version>
         </dependency>
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>qdl</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.3</version>
         </dependency>
 <!--        <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>rfc8414</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.3</version>
         </dependency>-->
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>server</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.3</version>
         </dependency>
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>server-admin</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.3</version>
         </dependency>
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>server-api</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.3</version>
         </dependency>
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>server-installer</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.3</version>
         </dependency>
 
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>server-loader</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.3</version>
         </dependency>
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>server</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.3</version>
         </dependency>
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>server-test</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.3</version>
         </dependency>
 
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>core</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.3</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>servlet</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.3</version>
         </dependency>
 
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>util</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.3</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
@@ -239,7 +239,7 @@
                     <dependency>
                         <groupId>org.oa4mp</groupId>
                         <artifactId>skin</artifactId>
-                        <version>6.x-SNAPSHOT</version>
+                        <version>6.2.3</version>
                     </dependency>
                 </dependencies>
             </plugin>

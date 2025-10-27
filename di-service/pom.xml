@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.oa4mp</groupId>
         <artifactId>oa4mp-parent</artifactId>
-        <version>6.x-SNAPSHOT</version>
+        <version>6.2.3</version>
     </parent>
     <artifactId>di-service</artifactId>
     <name>Archetype - db-service</name>
@@ -13,25 +13,25 @@
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>server-api</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.3</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>server-loader</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.3</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>proxy</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.3</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>server</artifactId>
-            <version>6.x-SNAPSHOT</version>
+            <version>6.2.3</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
