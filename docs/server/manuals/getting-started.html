@@ -153,7 +153,7 @@
     and allows open authorization with multiple identities.
     The server  allows for authorization and issues tokens,
     (hence some call it an <i>issuer</i>). There is also an
-    <a href="../../client/index.html">OA4MP client</a>. Current release is <b>6.0</b>.</p>
+    <a href="../../client/index.html">OA4MP client</a>. Current release is <b>6.x-SNAPSHOT</b>.</p>
 
 <section>
 <h2><a name="Prerequisites"></a>Prerequisites</h2>
@@ -219,8 +219,15 @@ to the installer and if you issue</p>
     go into different directories. The suggested directory for the server is /opt/oa4mp_server.
    This jar will install the CLI, download the current war and so forth. It will also
 create a barebones configuration for you server, in $OA4MP_SERVER/etc. After the installation has finished,
-follow the instructions. You should set up any databases (see comments in the configuration file and below for databases).
-A good post install test is to see if the CLI comes up:</p>
+follow the instructions. You should set up any databases (see comments in the configuration file and below for databases).</p>
+<section>
+<h3><a name="Default_server_deploy"></a>Default server deploy</h3>
+
+<p>What the installer does is create aset of scripts and a default configuration in <b>$OA4MP_SERVER/etc/cfg.xml</b>. It
+will also set up storage (local fuile system using embedded Derby) and basic authentication using Tomcat's login. See
+<a class="externalLink" href="https://oa4mp.org/pdf/Using_headers_for_authentication.pdf">using headers for authentication</a> for details.</p>
+
+<p>A good post install test is to see if the CLI comes up:</p>
 
 <div>
 <pre>
@@ -253,7 +260,7 @@ as delivered should work for the server, although there are many ways to extend 
 configure OA4MP, so read the comments in the configuration file (has suggestions
     based on your installation choices) and the documentation.</p>
 
-</section><section>
+</section></section><section>
 <h2><a name="Deploying_to_Apache"></a>Deploying to Apache</h2>
 
 
