@@ -9,7 +9,7 @@
          Web deployment descriptor for the case that OA4MP is a dedicated issuer.
 
          See: https://oa4mp.org/pdf/oa4mp_as_dedicated_issuer.pdf
-         See: https://oa4mp.org/server/configuration/authorization-servlet-configuration.html
+         See: https://oa4mp.org/server/configuration/authentication-servlet-configuration.html
 
          This means there is NO access except from a service that makes signed
          requests. Therefore, there is no authorize, device, or device_authorization
@@ -17,9 +17,7 @@
 
          It is not mandatory these go away, and it is certainly possible to have OA4MP use them in
          this case, since the entire protocol that allows this is strictly controlled with
-         signed requests to the token endpoint. This example is to the minimum.
-
-
+         signed requests to the token endpoint. This example is the minimum.
     -->
     <display-name>The OA4MP Service</display-name>
 

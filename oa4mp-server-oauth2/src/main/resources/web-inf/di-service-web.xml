@@ -9,7 +9,7 @@
          Web deployment descriptor for a detached/independent AS (authentication server).
 
          See: https://oa4mp.org/pdf/DIService-reference.pdf
-         See: https://oa4mp.org/server/configuration/authorization-servlet-configuration.html
+         See: https://oa4mp.org/server/configuration/authentication-servlet-configuration.html
 
          This has a restriction in place to only allow for connections to the DIService from
          localhost (128.0.0.1)

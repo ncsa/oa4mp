@@ -12,21 +12,15 @@
 
 <p><a href="../pdf/Authentication_in_OA4MP.pdf">Authentication in OA4MP</a> may be accomplished in
     several ways. This configuration element will tell the system which method you are using.
+    It also is used in constructing the well-known endpoint's information.
     Note that the OAuth specification places <i>authentication</i> at the <b>/authorize</b>
     endpoint, which does not help clarity. For purposes of this blurb, these should be
-    considered synonyms, but OA4MP itself has stark differences between them. T
+    considered synonyms, but OA4MP itself has stark differences between them. Authentication identifies
+    you to the system (typically via a login) while authorization is <i>what</i> you can access,
+    typically set through policies per client.
 </p>
-<ol>
-    <li><b>Replace authorization completely</b> In this case, you may write anything you like independent of
-        OA4MP. CILogon, for instance, has its authorization layer written in PHP. You then notify OA4MP
-        when you are done.
-    </li>
-    <li><a href="../manuals/remote-user.html">Use Tomcat</a> and have it manage users. This can work for
-        very small systems.
-    </li>
-    <li><a href="../manuals/using-proxies.html">Use a proxy</a>, i.e., another OAuth server's authorization.</li>
-</ol>
-<p>The configuration has the elements for all three cases.</p>
+
+<p>The configuration has the elements for all cases.</p>
 <table border="2">
     <tbody>
     <tr>
@@ -39,10 +33,11 @@
         <td>authorizationURI</td>
         <td>N</td>
         <td>--</td>
-        <td>(Replace authorization case). This is the address of whatever application does the authorization.
-            This must be specified so that it can be put into the well-known endpoint for discovery by
-            other services. It is required in the replacement case, but otherwise will be generated as
-            per standard location.
+        <td>This is the address of whatever application does the authentication. It may be specified in all cases.
+            In various default cases (such as OA4MP extended) it is optional, since the system will
+            assum that the specification default is in use.
+            Otherwise, this must be specified so that it can be put into the well-known endpoint for discovery by
+            other services. It is required in replacement cases.
         </td>
     </tr>
     <tr>
@@ -100,7 +95,7 @@
         <td>useHeader</td>
         <td>N</td>
         <td>false</td>
-        <td>(Deprecated) Use an HTTp header. Same as setting the use attribute to "header".
+        <td>(Deprecated) Use an HTTP header. Same as setting the use attribute to "header".
         </td>
     </tr>
 
@@ -147,7 +142,7 @@
     </tbody>
 </table>
 
-<h2>Example of each</h2>
+<h2>An Example of Each</h2>
 <h3>A Proxy Example</h3>
 <pre>
 &lt;config&gt;
@@ -156,15 +151,15 @@
            cfgFile="/opt/oa4mp/etc/clients.xml"&gt;
            cfgName="cilogon-proxy"&gt;
       &lt;!-- rest of config --&gt;
-   &lt;\server&gt;
-&lt;\config&gt;
+   &lt;/server&gt;
+&lt;/config&gt;
 </pre>
 <p>
     In this case, there is a service configured (you have registered a client with it)
-    and you need to have calls for authorization forwarded to it. All you need to do
+    and you need to have calls for authentication forwarded to it. All you need to do
     is ensure the configuration in the file is correct and that your Tomcat web.xml
     file is set right and you are good to go. See more at
-    <a href="../manuals/using-proxies.html">using proxies</a>
+    <a href="https://oa4mp.org/server/manuals/using-proxies.html">using proxies for authentication</a>
 </p>
 
 <h3>Header case, with the REMOTE_USER Header</h3>
@@ -182,7 +177,8 @@
     will be used. If it is missing though, no exception will be raised. By default, the header field will
     be shown to the user along with client information and the user will be prompted if s/he wishes to continue.
     Be sure to enable the correct machinery in the web.xml file. The one supplied with the standard distribution
-    is annotated.</p>
+    is annotated. See more at
+    <a href="https://oa4mp.org/pdf/Using_headers_for_authentication.pdf">using headers for authentication</a>.</p>
 
 <p>Options that may be configured here to</p>
 <ul>
@@ -197,38 +193,38 @@
     The default is to assume that the header is the <code>REMOTE_HEADER</code> field, though any field name
     may be specified.</p>
 
-<h3>Replacing the authorization module with a Java extension of OA4MP</h3>
+<h3>Extending OA4MP (in Java) with your own authentication module.</h3>
 
-<a href="https://github.com/ncsa/oa4mp-extension-example">Acomplete example of a an extensioin</a>.
-Either no configuration or if you want to make it explicit.
+There is either no configuration or if you want to make it explicit. There is a
+<a href="https://github.com/ncsa/oa4mp-extension-example">complete example of a an extension</a>
+available in GitHub.
 <pre>
 &lt;config&gt;
    &lt;server name="my-config"&gt;
       &lt;authorizationServlet use="default"/&gt;
       &lt;!-- rest of config --&gt;
-   &lt;\server&gt;
-&lt;\config&gt;
+   &lt;/server&gt;
+&lt;/config&gt;
 </pre>
-<p>This tells the system that the entire authorization is handled at the endpoint in the
+<p>This tells the system that the entire authentication is handled at the endpoint in the
     OAuth specification and the
-    well-known file generated by OA4MP will point to that. See below for the particulars of how to
-    integrate it with OA4MP.</p>
+    well-known file generated by OA4MP will point to that. See <a href="https://oa4mp.org/pdf/java-extension-to-oa4mp.pdf">extending OA4MP</a>.</p>
 
 <h3>Using your own Authentication Server (AS)</h3>
 <p>In this case, you have an external AS which handles all authentication and you need to simply
-    notify OA4MP of its state. </p>
+    notify OA4MP of its state. Thius implies you have deployed the DI service as well.</p>
 <pre>
 &lt;config&gt;
    &lt;server name="my-config"&gt;
       &lt;authorizationServlet use="external"
-          authorizationURI="https://your.AS.address"/&gt;
+          authorizationURI="https://your/AS/address"/&gt;
       &lt;!-- rest of config --&gt;
-   &lt;\server&gt;
-&lt;\config&gt;
+   &lt;/server&gt;
+&lt;/config&gt;
 </pre>
 <p>In this case, the well-known file points to the <b>authorizationURI</b> value and all clients will
     therefore make requests to that. Your AS should be able to do all the authentication needed.
-    OA4MP must be configured to run its <a href="">DIService</a> so your system can send
+    OA4MP must be configured to run its <a href="https://oa4mp.org/pdf/DIService-reference.pdf">DIService</a> so your system can send
     it notifications.</p>
 
 <p>Additionally, make sure that if you set the <b>device</b> endpoiont for the device
@@ -249,70 +245,12 @@ Either no configuration or if you want to make it explicit.
 &lt;config&gt;
    &lt;server name="my-config"&gt;
       &lt;authorizationServlet use="dedicated"
-          authorizationURI="https://your.DTI.address"/&gt;
+          authorizationURI="https://your/DTI/address"/&gt;
       &lt;!-- rest of config --&gt;
-   &lt;\server&gt;
-&lt;\config&gt;
+   &lt;/server&gt;
+&lt;/config&gt;
 </pre>
-
-
-<h3>Use cases</h3>
-There are three main use cases which should be discussed in more depth. The particulars of how to configure
-and authorization module are best dealt with elsewhere and a discussion can be found
-<a href="../manuals/remote-user.xhtml">here</a>.
-<h4>Using the OA4MP authorization module</h4>
-
-<p>This is the default. In this case a logon will be shown to the user who will be prompted for the
-    username and password. Since this page also contains the client information, the verification
-    portion of the protocol is deemed satisfied. We highly recommend customizing the basic OA4MP page
-    for a consistent look and feel in your site.</p>
-
-<h4>Using another authorization module, but using OA4MP's verification page.</h4>
-
-
-<h4>Completely replacing the authorization module.</h4>
-
-<p>In this case the server must have some way of performing the client verification. You will need to write a webapp
-    that completely takes over the functions at the <code>authorize</code> endpoint.
-    (found in the <a href="../../apidocs/index.html">javadoc</a>)
-    should then be deployed elsewhere and invoked by your webapp when it has the username and password (if needed).
-    Note that it is up to you to keep access to this servlet safe. We normally suggest that access be restricted to
-    localhost only, so that only your webapp has access to the <code>AuthorizationServlet</code>.
-    The <code>AuthorizationServlet</code> accepts the following call directly:</p>
-<table border="2">
-    <tbody>
-    <tr>
-        <td>Parameter key</td>
-        <td>Parameter values</td>
-        <td>Comment</td>
-    </tr>
-    <tr>
-        <td>authorizationGrant</td>
-        <td>String</td>
-        <td>This is the token sent to the authorize endpoint as per the specification and identifies this
-            user's delegation request uniquely.
-        </td>
-    </tr>
-    <tr>
-        <td>authorizationState</td>
-        <td>String</td>
-        <td>This is the (optional) state parameter the user sent in the initial request. It is echoed back.
-        </td>
-    </tr>
-
-    <tr>
-        <td>AuthUserName</td>
-        <td>String</td>
-        <td>The username that will be sent unchanged to MyProxy</td>
-    </tr>
-    <tr>
-        <td>AuthPassword</td>
-        <td>String</td>
-        <td>(Optional) the password the user will require to log in to MyProxy.</td>
-    </tr>
-    </tbody>
-</table>
-
-
+See <a href="https://oa4mp.org/pdf/oa4mp_as_dedicated_issuer.pdf">using OA4MP as a dedicated token issuer</a>
+for more.
 </body>
 </html>

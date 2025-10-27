@@ -67,7 +67,7 @@
             <!-- <scope>org.oa4mp:userinfo</scope> -->
         </scopes>
         <!--
-            See https://oa4mp.org/server/configuration/authorization-servlet-configuration.html for a discussions
+            See https://oa4mp.org/server/configuration/authentication-servlet-configuration.html for a discussions
             of these two possible authorization servlet configurations. The first is when using Tomcat
             and the second is when proxying through another OAuth service (e.g. CILogon).
         -->

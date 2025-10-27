@@ -30,8 +30,8 @@
 <h3>Configuring the server</h3>
 <h4>The Tomcat deployment descriptor (web.xml)</h4>
 <p>
-    There is an included web.xml file, called <b><code>proxy.xml</code></b> that has a complete setup.
-    Copy that over your web.xml file. The major point is that it enables the
+    There is an included web.xml file, at <b><code>$OA4MP_SERVER/etc/WEB-INF/proxy-web.xml</code></b> that has a complete setup.
+    Copy that over your web.xml file, then restart Tomcat. The major point is that it enables the
     callback servlet (with endpoint <b>ready</b>) at
 </p>
 <pre>/oauth2/ready</pre>

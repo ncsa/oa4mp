@@ -13,6 +13,7 @@
 DEFAULT_OA4MP_ROOT=$NCSA_DEV_INPUT/oa4mp
 OA4MP_ADMIN_SOURCES=$NCSA_DEV_INPUT/oa4mp/server-admin
 OA4MP_SERVER_SOURCES=$NCSA_DEV_INPUT/oa4mp/server-installer/
+OA4MP_TOMCAT_SOURCES=$NCSA_DEV_INPUT/oa4mp/oa4mp-server-oauth2/
 JAR_NAME="server-archive.jar"
 # The next is where the full build places the constructed wars and jars.
 OA4MP_SERVER_DEPLOY=$NCSA_DEV_OUTPUT/oa4mp
@@ -55,6 +56,9 @@ cp $OA4MP_ADMIN_SOURCES/src/main/resources/*.sql .
 cp $OA4MP_ADMIN_SOURCES/src/main/resources/oa4mp-subject.template .
 cp $OA4MP_ADMIN_SOURCES/src/main/resources/oa4mp-message.template .
 cp $OA4MP_ADMIN_SOURCES/src/main/resources/derby-setup.txt .
+mkdir "WEB-INF"
+cd "WEB-INF"
+cp $OA4MP_TOMCAT_SOURCES/src/main/resources/web-inf/*.xml .
 cd $TEMP_DIR || exit
 mkdir "lib"
 mkdir "lib/cp"
