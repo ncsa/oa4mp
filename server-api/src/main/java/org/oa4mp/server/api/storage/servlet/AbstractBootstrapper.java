@@ -20,7 +20,7 @@ public abstract class AbstractBootstrapper extends Bootstrapper {
     private static String OA4MP_CONFIG_NAME_KEY = "oa4mp:server.config.name";
 
     public AbstractBootstrapper() {
-    //    setUseCF(true);
+      //  setUseCF(true);
     }
 
     public String getOa4mpConfigFileKey() {

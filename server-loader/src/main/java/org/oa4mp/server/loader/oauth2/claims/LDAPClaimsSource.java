@@ -15,6 +15,7 @@ import org.oa4mp.delegation.server.server.claims.ClaimSourceConfiguration;
 import org.oa4mp.delegation.server.server.config.LDAPConfiguration;
 import org.oa4mp.delegation.server.server.config.LDAPConfigurationUtil;
 import org.oa4mp.server.api.storage.servlet.OA4MPServlet;
+import org.oa4mp.server.api.util.ExceptionEvent;
 import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.servlet.GroupHandler;
 import org.oa4mp.server.loader.oauth2.servlet.NCSAGroupHandler;
@@ -199,8 +200,8 @@ throwable.printStackTrace();
                     replacements.put("host", x);
                     replacements.put("ldap_host", getLDAPCfg().getServer());
                     replacements.put("message", throwable.getMessage());
-
-                    getOa2SE().getMailUtil().sendMessage(subjectTemplate, messageTemplate, replacements);
+                    ExceptionEvent exceptionEvent = new ExceptionEvent(this, throwable, replacements);
+                    getOa2SE().getMailUtil().sendMessage(exceptionEvent, subjectTemplate, messageTemplate, replacements);
                 }
             }
 

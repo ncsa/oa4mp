@@ -6,8 +6,14 @@
          version="2.5">
 
     <display-name>The OA4MP Service</display-name>
+    <!--
+         Example file for using a proxy.
+
+         See: https://oa4mp.org/server/manuals/using-proxies.html
+         See: https://oa4mp.org/server/configuration/authentication-servlet-configuration.html
 
 
+    -->
     <servlet>
         <servlet-name>discovery</servlet-name>
         <servlet-class>org.oa4mp.server.loader.oauth2.servlet.OA2DiscoveryServlet</servlet-class>
@@ -138,6 +144,7 @@
         <url-pattern>/introspect</url-pattern>
     </servlet-mapping>
 
+
     <!-- This forces all endpoints to use https. -->
     <security-constraint>
         <web-resource-collection>
@@ -151,44 +158,6 @@
         </user-data-constraint>
     </security-constraint>
 
-    <!-- This password protects the authorize endpoint -->
-    <security-constraint>
-        <web-resource-collection>
-            <web-resource-name>OAuth Security Device Flow</web-resource-name>
-            <url-pattern>/authorize</url-pattern>
-            <http-method>POST</http-method>
-            <http-method>GET</http-method>
-        </web-resource-collection>
-        <auth-constraint>
-            <role-name>oa4mp</role-name>
-        </auth-constraint>
-        <user-data-constraint>
-            <transport-guarantee>NONE</transport-guarantee>
-        </user-data-constraint>
-    </security-constraint>
-
-    <!-- This password protects the device endpoint -->
-
-    <security-constraint>
-        <web-resource-collection>
-            <web-resource-name>OAuth Security</web-resource-name>
-            <url-pattern>/device</url-pattern>
-            <http-method>POST</http-method>
-            <http-method>GET</http-method>
-        </web-resource-collection>
-        <auth-constraint>
-            <role-name>oa4mp</role-name>
-        </auth-constraint>
-        <user-data-constraint>
-            <transport-guarantee>NONE</transport-guarantee>
-        </user-data-constraint>
-    </security-constraint>
-    <!-- no matter which security constraint(s) are allowed, this next bit has to be
-         ucommented to since it is what allows for logging -->
-    <login-config>
-        <auth-method>BASIC</auth-method>
-    </login-config>
-
     <resource-ref>
         <description>
             Resource reference to a factory for javax.mail.Session
@@ -200,8 +169,10 @@
         <res-type>javax.mail.Session</res-type>
         <res-auth>Container</res-auth>
     </resource-ref>
+
     <listener>
         <listener-class>org.oa4mp.server.loader.oauth2.loader.OA2Bootstrapper</listener-class>
+
     </listener>
 
     <error-page>

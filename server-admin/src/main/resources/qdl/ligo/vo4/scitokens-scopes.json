@@ -1,178 +1,319 @@
 {
-  "Issuers": [
+  "Issuers" : [
     {
-      "IssuerName": "IGWN",
-      "Services": [
+      "IssuerName" : "IGWN",
+      "Services" : [
         {
-          "ServiceName": "XRootD",
-          "Scopes": [
+          "ServiceName" : "XRootD",
+          "Scopes" : [
             {
-              "ScopeName": "read:/frames",
+              "ScopeName" : "read:/frames",
               "ScopeGroups": [
                 {
-                  "EligibleGroup": "cn=eligible_factor,ou=read-frames,ou=scopes,ou=SciTokens,ou=XRootD,ou=Services,ou=grouper,dc=ligo,dc=org",
-                  "AuthorizedGroup": "cn=authorized,ou=read-frames,ou=scopes,ou=SciTokens,ou=XRootD,ou=Services,ou=grouper,dc=ligo,dc=org",
-                  "isMemberOf": "Services:XRootD:SciTokens:scopes:read-frames:authorized",
-                  "LDAP": "ldaps://ldap.ligo.org"
+                  "EligibleGroup" : "cn=eligible_factor,ou=read-frames,ou=scopes,ou=SciTokens,ou=XRootD,ou=Services,ou=grouper,dc=ligo,dc=org",
+                  "AuthorizedGroup" :"cn=authorized,ou=read-frames,ou=scopes,ou=SciTokens,ou=XRootD,ou=Services,ou=grouper,dc=ligo,dc=org",
+                  "isMemberOf" : "Services:XRootD:SciTokens:scopes:read-frames:authorized",
+                  "LDAP" : "ldaps://ldap.ligo.org"
                 },
                 {
-                  "EligibleGroup": "cn=CO:members:active,ou=groups,o=KAGRA-LIGO,o=CO,dc=gwastronomy-data,dc=cgca,dc=uwm,dc=edu",
-                  "AuthorizedGroup": "cn=CO:members:active,ou=groups,o=KAGRA-LIGO,o=CO,dc=gwastronomy-data,dc=cgca,dc=uwm,dc=edu",
-                  "isMemberOf": "gw-astronomy:KAGRA-LIGO:members",
-                  "LDAP": "ldaps://ldap.gw-astronomy.cilogon.org"
+                  "EligibleGroup" : "cn=CO:members:active,ou=groups,o=KAGRA,dc=igwn,dc=org",
+                  "AuthorizedGroup" : "cn=CO:members:active,ou=groups,o=KAGRA,dc=igwn,dc=org",
+                  "isMemberOf" : "gw-astronomy:KAGRA-LIGO:members",
+                  "LDAP" : "ldaps://ldap.igwn.org"
                 }
               ]
             },
             {
-              "ScopeName": "write:/frames",
+              "ScopeName" : "read:/ligo",
               "ScopeGroups": [
                 {
-                  "EligibleGroup": "cn=eligible_factor,ou=write-frames,ou=scopes,ou=SciTokens,ou=XRootD,ou=Services,ou=grouper,dc=ligo,dc=org",
-                  "AuthorizedGroup": "cn=authorized,ou=write-frames,ou=scopes,ou=SciTokens,ou=XRootD,ou=Services,ou=grouper,dc=ligo,dc=org",
-                  "isMemberOf": "Services:XRootD:SciTokens:scopes:write-frames:authorized",
-                  "LDAP": "ldaps://ldap.ligo.org"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "ServiceName": "DQSegDB",
-          "Scopes": [
-            {
-              "ScopeName": "dqsegdb.create",
-              "ScopeGroups": [
-                {
-                  "EligibleGroup": "cn=eligible_factor,ou=create,ou=scopes,ou=SciTokens,ou=DQSegDB,ou=Services,ou=grouper,dc=ligo,dc=org",
-                  "AuthorizedGroup": "cn=authorized,ou=create,ou=scopes,ou=SciTokens,ou=DQSegDB,ou=Services,ou=grouper,dc=ligo,dc=org",
-                  "isMemberOf": "Services:DQSegDB:SciTokens:scopes:create:authorized",
-                  "LDAP": "ldaps://ldap.ligo.org"
-                }
-              ]
-            },
-            {
-              "ScopeName": "dqsegdb.read",
-              "ScopeGroups": [
-                {
-                  "EligibleGroup": "cn=eligible_factor,ou=modify,ou=scopes,ou=SciTokens,ou=DQSegDB,ou=Services,ou=grouper,dc=ligo,dc=org",
-                  "AuthorizedGroup": "cn=authorized,ou=modify,ou=scopes,ou=SciTokens,ou=DQSegDB,ou=Services,ou=grouper,dc=ligo,dc=org",
-                  "isMemberOf": "Services:DQSegDB:SciTokens:scopes:read:authorized",
-                  "LDAP": "ldaps://ldap.ligo.org"
+                  "EligibleGroup" : "cn=eligible_factor,ou=read-ligo,ou=scopes,ou=SciTokens,ou=XRootD,ou=Services,ou=grouper,dc=ligo,dc=org",
+                  "AuthorizedGroup" :"cn=authorized,ou=read-ligo,ou=scopes,ou=SciTokens,ou=XRootD,ou=Services,ou=grouper,dc=ligo,dc=org",
+                  "isMemberOf" : "Services:XRootD:SciTokens:scopes:read-ligo:authorized",
+                  "LDAP" : "ldaps://ldap.ligo.org"
                 },
                 {
-                  "EligibleGroup": "cn=CO:members:active,ou=groups,o=KAGRA-LIGO,o=CO,dc=gwastronomy-data,dc=cgca,dc=uwm,dc=edu",
-                  "AuthorizedGroup": "cn=CO:members:active,ou=groups,o=KAGRA-LIGO,o=CO,dc=gwastronomy-data,dc=cgca,dc=uwm,dc=edu",
-                  "isMemberOf": "gw-astronomy:KAGRA-LIGO:members",
-                  "LDAP": "ldaps://ldap.gw-astronomy.cilogon.org"
+                  "EligibleGroup" : "cn=CO:members:active,ou=groups,o=KAGRA,dc=igwn,dc=org",
+                  "AuthorizedGroup" : "cn=CO:members:active,ou=groups,o=KAGRA,dc=igwn,dc=org",
+                  "isMemberOf" : "gw-astronomy:KAGRA-LIGO:members",
+                  "LDAP" : "ldaps://ldap.igwn.org"
                 }
               ]
             },
             {
-              "ScopeName": "dqsegdb.modify",
+              "ScopeName" : "read:/kagra",
               "ScopeGroups": [
                 {
-                  "EligibleGroup": "cn=eligible_factor,ou=modify,ou=scopes,ou=SciTokens,ou=DQSegDB,ou=Services,ou=grouper,dc=ligo,dc=org",
-                  "AuthorizedGroup": "cn=authorized,ou=modify,ou=scopes,ou=SciTokens,ou=DQSegDB,ou=Services,ou=grouper,dc=ligo,dc=org",
-                  "isMemberOf": "Services:DQSegDB:SciTokens:scopes:modify:authorized",
-                  "LDAP": "ldaps://ldap.ligo.org"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "ServiceName": "GraceDB",
-          "Scopes": [
-            {
-              "ScopeName": "gracedb.read",
-              "ScopeGroups": [
-                {
-                  "EligibleGroup": "cn=eligible_factor,ou=read,ou=scopes,ou=SciTokens,ou=GraceDB,ou=Services,ou=grouper,dc=ligo,dc=org",
-                  "AuthorizedGroup": "cn=authorized,ou=read,ou=scopes,ou=SciTokens,ou=GraceDB,ou=Services,ou=grouper,dc=ligo,dc=org",
-                  "isMemberOf": "Services:DQSegDB:SciTokens:scopes:read:authorized",
-                  "LDAP": "ldaps://ldap.ligo.org"
+                  "EligibleGroup" : "cn=eligible_factor,ou=read-kagra,ou=scopes,ou=SciTokens,ou=XRootD,ou=Services,ou=grouper,dc=ligo,dc=org",
+                  "AuthorizedGroup" :"cn=authorized,ou=read-kagra,ou=scopes,ou=SciTokens,ou=XRootD,ou=Services,ou=grouper,dc=ligo,dc=org",
+                  "isMemberOf" : "Services:XRootD:SciTokens:scopes:read-kagra:authorized",
+                  "LDAP" : "ldaps://ldap.ligo.org"
                 },
                 {
-                  "EligibleGroup": "cn=CO:members:active,ou=groups,o=KAGRA-LIGO,o=CO,dc=gwastronomy-data,dc=cgca,dc=uwm,dc=edu",
-                  "AuthorizedGroup": "cn=CO:members:active,ou=groups,o=KAGRA-LIGO,o=CO,dc=gwastronomy-data,dc=cgca,dc=uwm,dc=edu",
-                  "isMemberOf": "gw-astronomy:KAGRA-LIGO:members",
-                  "LDAP": "ldaps://ldap.gw-astronomy.cilogon.org"
+                  "EligibleGroup" : "cn=CO:members:active,ou=groups,o=KAGRA,dc=igwn,dc=org",
+                  "AuthorizedGroup" : "cn=CO:members:active,ou=groups,o=KAGRA,dc=igwn,dc=org",
+                  "isMemberOf" : "gw-astronomy:KAGRA-LIGO:members",
+                  "LDAP" : "ldaps://ldap.igwn.org"
+                }
+              ]
+            },
+            {
+              "ScopeName" : "read:/virgo",
+              "ScopeGroups": [
+                {
+                  "EligibleGroup" : "cn=eligible_factor,ou=read-virgo,ou=scopes,ou=SciTokens,ou=XRootD,ou=Services,ou=grouper,dc=ligo,dc=org",
+                  "AuthorizedGroup" :"cn=authorized,ou=read-virgo,ou=scopes,ou=SciTokens,ou=XRootD,ou=Services,ou=grouper,dc=ligo,dc=org",
+                  "isMemberOf" : "Services:XRootD:SciTokens:scopes:read-virgo:authorized",
+                  "LDAP" : "ldaps://ldap.ligo.org"
+                },
+                {
+                  "EligibleGroup" : "cn=CO:members:active,ou=groups,o=KAGRA,dc=igwn,dc=org",
+                  "AuthorizedGroup" : "cn=CO:members:active,ou=groups,o=KAGRA,dc=igwn,dc=org",
+                  "isMemberOf" : "gw-astronomy:KAGRA-LIGO:members",
+                  "LDAP" : "ldaps://ldap.igwn.org"
+                }
+              ]
+            },
+            {
+              "ScopeName" : "read:/shared",
+              "ScopeGroups": [
+                {
+                  "EligibleGroup" : "cn=eligible_factor,ou=read-shared,ou=scopes,ou=SciTokens,ou=XRootD,ou=Services,ou=grouper,dc=ligo,dc=org",
+                  "AuthorizedGroup" :"cn=authorized,ou=read-shared,ou=scopes,ou=SciTokens,ou=XRootD,ou=Services,ou=grouper,dc=ligo,dc=org",
+                  "isMemberOf" : "Services:XRootD:SciTokens:scopes:read-shared:authorized",
+                  "LDAP" : "ldaps://ldap.ligo.org"
+                },
+                {
+                  "EligibleGroup" : "cn=CO:members:active,ou=groups,o=KAGRA,dc=igwn,dc=org",
+                  "AuthorizedGroup" : "cn=CO:members:active,ou=groups,o=KAGRA,dc=igwn,dc=org",
+                  "isMemberOf" : "gw-astronomy:KAGRA-LIGO:members",
+                  "LDAP" : "ldaps://ldap.igwn.org"
+                }
+              ]
+            },
+            {
+              "ScopeName" : "read:/staging",
+              "ScopeGroups": [
+                {
+                  "EligibleGroup" : "cn=eligible_factor,ou=read-staging,ou=scopes,ou=SciTokens,ou=XRootD,ou=Services,ou=grouper,dc=ligo,dc=org",
+                  "AuthorizedGroup" :"cn=authorized,ou=read-staging,ou=scopes,ou=SciTokens,ou=XRootD,ou=Services,ou=grouper,dc=ligo,dc=org",
+                  "isMemberOf" : "Services:XRootD:SciTokens:scopes:read-staging:authorized",
+                  "LDAP" : "ldaps://ldap.ligo.org"
+                },
+                {
+                  "EligibleGroup" : "cn=CO:members:active,ou=groups,o=KAGRA,dc=igwn,dc=org",
+                  "AuthorizedGroup" : "cn=CO:members:active,ou=groups,o=KAGRA,dc=igwn,dc=org",
+                  "isMemberOf" : "gw-astronomy:KAGRA-LIGO:members",
+                  "LDAP" : "ldaps://ldap.igwn.org"
+                }
+              ]
+            },
+            {
+              "ScopeName" : "write:/frames",
+              "ScopeGroups" : [
+                {
+                  "EligibleGroup" : "cn=eligible_factor,ou=write-frames,ou=scopes,ou=SciTokens,ou=XRootD,ou=Services,ou=grouper,dc=ligo,dc=org",
+                  "AuthorizedGroup" :"cn=authorized,ou=write-frames,ou=scopes,ou=SciTokens,ou=XRootD,ou=Services,ou=grouper,dc=ligo,dc=org",
+                  "isMemberOf" : "Services:XRootD:SciTokens:scopes:write-frames:authorized",
+                  "LDAP" : "ldaps://ldap.ligo.org"
+                }
+              ]
+            },
+            {
+              "ScopeName" : "write:/staging/${uid}",
+              "ScopeGroups" : [
+                {
+                  "EligibleGroup" : "cn=LDGCITUsers,ou=CIT,ou=LDG,ou=LSC,ou=LVC,ou=Communities,ou=grouper,dc=ligo,dc=org",
+                  "AuthorizedGroup" :"cn=LDGCITUsers,ou=CIT,ou=LDG,ou=LSC,ou=LVC,ou=Communities,ou=grouper,dc=ligo,dc=org",
+                  "isMemberOf" : "Communities:LVC:LSC:LDG:CIT:LDGCITUsers",
+                  "LDAP" : "ldaps://ldap.ligo.org"
+                },
+                {
+                  "EligibleGroup" : "cn=CO:COU:LDG Grid Account Holders:members:active,ou=groups,o=KAGRA,dc=igwn,dc=org",
+                  "AuthorizedGroup" : "cn=CO:COU:LDG Grid Account Holders:members:active,ou=groups,o=KAGRA,dc=igwn,dc=org",
+                  "isMemberOf" : "CO:COU:LDG Grid Account Holders:members:active",
+                  "LDAP" : "ldaps://ldap.igwn.org"
                 }
               ]
             }
           ]
         },
         {
-          "ServiceName": "SciTokenTesting",
-          "Scopes": [
+          "ServiceName" : "DQSegDB",
+          "Scopes" : [
             {
-              "ScopeName": "scitokentesting.write",
-              "ScopeGroups": [
+              "ScopeName" : "dqsegdb.create",
+              "ScopeGroups" : [
                 {
-                  "EligibleGroup": "cn=eligible_factor,ou=write,ou=scopes,ou=SciTokens,ou=SciTokenTesting,ou=Services,ou=grouper,dc=ligo,dc=org",
-                  "AuthorizedGroup": "cn=authorized,ou=write,ou=scopes,ou=SciTokens,ou=SciTokenTesting,ou=Services,ou=grouper,dc=ligo,dc=org",
-                  "isMemberOf": "Services:SciTokenTesting:SciTokens:scopes:write:authorized",
-                  "LDAP": "ldaps://ldap.ligo.org"
+                  "EligibleGroup" : "cn=eligible_factor,ou=create,ou=scopes,ou=SciTokens,ou=DQSegDB,ou=Services,ou=grouper,dc=ligo,dc=org",
+                  "AuthorizedGroup" : "cn=authorized,ou=create,ou=scopes,ou=SciTokens,ou=DQSegDB,ou=Services,ou=grouper,dc=ligo,dc=org",
+                  "isMemberOf" : "Services:DQSegDB:SciTokens:scopes:create:authorized",
+                  "LDAP" : "ldaps://ldap.ligo.org"
+                },
+                {
+                  "EligibleGroup" : "cn=Services:DQSegDB:SciTokens:scopes:create,ou=groups,o=KAGRA,dc=igwn,dc=org",
+                  "AuthorizedGroup" : "cn=Services:DQSegDB:SciTokens:scopes:create,ou=groups,o=KAGRA,dc=igwn,dc=org",
+                  "isMemberOf" : "Services:DQSegDB:SciTokens:scopes:create",
+                  "LDAP" : "ldaps://ldap.igwn.org"
                 }
               ]
             },
             {
-              "ScopeName": "scitokentesting.read",
-              "ScopeGroups": [
+              "ScopeName" : "dqsegdb.read",
+              "ScopeGroups" : [
                 {
-                  "EligibleGroup": "cn=eligible_factor,ou=read,ou=scopes,ou=SciTokens,ou=SciTokenTesting,ou=Services,ou=grouper,dc=ligo,dc=org",
-                  "AuthorizedGroup": "cn=authorized,ou=read,ou=scopes,ou=SciTokens,ou=SciTokenTesting,ou=Services,ou=grouper,dc=ligo,dc=org",
-                  "isMemberOf": "Services:SciTokenTesting:SciTokens:scopes:read:authorized",
-                  "LDAP": "ldaps://ldap.ligo.org"
+                  "EligibleGroup" : "cn=eligible_factor,ou=read,ou=scopes,ou=SciTokens,ou=DQSegDB,ou=Services,ou=grouper,dc=ligo,dc=org",
+                  "AuthorizedGroup" : "cn=authorized,ou=read,ou=scopes,ou=SciTokens,ou=DQSegDB,ou=Services,ou=grouper,dc=ligo,dc=org",
+                  "isMemberOf" : "Services:DQSegDB:SciTokens:scopes:read:authorized",
+                  "LDAP" : "ldaps://ldap.ligo.org"
+                },
+                {
+                  "EligibleGroup" : "cn=CO:members:active,ou=groups,o=KAGRA,dc=igwn,dc=org",
+                  "AuthorizedGroup" : "cn=CO:members:active,ou=groups,o=KAGRA,dc=igwn,dc=org",
+                  "isMemberOf" : "gw-astronomy:KAGRA-LIGO:members",
+                  "LDAP" : "ldaps://ldap.igwn.org"
+                }
+              ]
+            },
+            {
+              "ScopeName" : "dqsegdb.modify",
+              "ScopeGroups" : [
+                {
+                  "EligibleGroup" : "cn=eligible_factor,ou=modify,ou=scopes,ou=SciTokens,ou=DQSegDB,ou=Services,ou=grouper,dc=ligo,dc=org",
+                  "AuthorizedGroup" : "cn=authorized,ou=modify,ou=scopes,ou=SciTokens,ou=DQSegDB,ou=Services,ou=grouper,dc=ligo,dc=org",
+                  "isMemberOf" : "Services:DQSegDB:SciTokens:scopes:modify:authorized",
+                  "LDAP" : "ldaps://ldap.ligo.org"
                 }
               ]
             }
           ]
         },
         {
-          "ServiceName": "WLCG",
-          "Scopes": [
+          "ServiceName" : "GraceDB",
+          "Scopes" : [
             {
-              "ScopeName": "compute.read",
-              "ScopeGroups": [
+              "ScopeName" : "gracedb.read",
+              "ScopeGroups" : [
                 {
-                  "EligibleGroup": "cn=eligible_factor,ou=read,ou=scopes,ou=SciTokens,ou=WLCG,ou=Services,ou=grouper,dc=ligo,dc=org",
-                  "AuthorizedGroup": "cn=authorized,ou=read,ou=scopes,ou=SciTokens,ou=WLCG,ou=Services,ou=grouper,dc=ligo,dc=org",
-                  "isMemberOf": "Services:WLCG:SciTokens:scopes:read:authorized",
-                  "LDAP": "ldaps://ldap.ligo.org"
+                  "EligibleGroup" : "cn=eligible_factor,ou=read,ou=scopes,ou=SciTokens,ou=GraceDB,ou=Services,ou=grouper,dc=ligo,dc=org",
+                  "AuthorizedGroup" : "cn=authorized,ou=read,ou=scopes,ou=SciTokens,ou=GraceDB,ou=Services,ou=grouper,dc=ligo,dc=org",
+                  "isMemberOf" : "Services:GraceDB:SciTokens:scopes:read:authorized",
+                  "LDAP" : "ldaps://ldap.ligo.org"
+                },
+                {
+                  "EligibleGroup" : "cn=CO:members:active,ou=groups,o=KAGRA,dc=igwn,dc=org",
+                  "AuthorizedGroup" : "cn=CO:members:active,ou=groups,o=KAGRA,dc=igwn,dc=org",
+                  "isMemberOf" : "gw-astronomy:KAGRA-LIGO:members",
+                  "LDAP" : "ldaps://ldap.igwn.org"
                 }
               ]
             },
             {
-              "ScopeName": "compute.modify",
-              "ScopeGroups": [
+              "ScopeName" : "gracedb.write-gstlal",
+              "ScopeGroups" : [
                 {
-                  "EligibleGroup": "cn=eligible_factor,ou=modify,ou=scopes,ou=SciTokens,ou=WLCG,ou=Services,ou=grouper,dc=ligo,dc=org",
-                  "AuthorizedGroup": "cn=authorized,ou=modify,ou=scopes,ou=SciTokens,ou=WLCG,ou=Services,ou=grouper,dc=ligo,dc=org",
-                  "isMemberOf": "Services:WLCG:SciTokens:scopes:modify:authorized",
-                  "LDAP": "ldaps://ldap.ligo.org"
+                  "EligibleGroup" : "cn=eligible_factor,ou=read,ou=scopes,ou=SciTokens,ou=GraceDB,ou=Services,ou=grouper,dc=ligo,dc=org",
+                  "AuthorizedGroup" : "cn=authorized,ou=write-gstlal,ou=scopes,ou=SciTokens,ou=GraceDB,ou=Services,ou=grouper,dc=ligo,dc=org",
+                  "isMemberOf" : "Services:GraceDB:SciTokens:scopes:write-gstlal:authorized",
+                  "LDAP" : "ldaps://ldap.ligo.org"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "ServiceName" : "gwDataFind",
+          "Scopes" : [
+            {
+              "ScopeName" : "gwdatafind.read",
+              "ScopeGroups" : [
+                {
+                  "EligibleGroup" : "cn=eligible_factor,ou=read,ou=scopes,ou=SciTokens,ou=gwDataFind,ou=Services,ou=grouper,dc=ligo,dc=org",
+                  "AuthorizedGroup" : "cn=authorized,ou=read,ou=scopes,ou=SciTokens,ou=gwDataFind,ou=Services,ou=grouper,dc=ligo,dc=org",
+                  "isMemberOf" : "Services:gwDataFind:SciTokens:scopes:read:authorized",
+                  "LDAP" : "ldaps://ldap.ligo.org"
+                },
+                {
+                  "EligibleGroup" : "cn=CO:members:active,ou=groups,o=KAGRA,dc=igwn,dc=org",
+                  "AuthorizedGroup" : "cn=CO:members:active,ou=groups,o=KAGRA,dc=igwn,dc=org",
+                  "isMemberOf" : "gw-astronomy:KAGRA-LIGO:members",
+                  "LDAP" : "ldaps://ldap.igwn.org"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "ServiceName" : "SciTokenTesting",
+          "Scopes" : [
+            {
+              "ScopeName" : "scitokentesting.write",
+              "ScopeGroups" : [
+                {
+                  "EligibleGroup" : "cn=eligible_factor,ou=write,ou=scopes,ou=SciTokens,ou=SciTokenTesting,ou=Services,ou=grouper,dc=ligo,dc=org",
+                  "AuthorizedGroup" : "cn=authorized,ou=write,ou=scopes,ou=SciTokens,ou=SciTokenTesting,ou=Services,ou=grouper,dc=ligo,dc=org",
+                  "isMemberOf" : "Services:SciTokenTesting:SciTokens:scopes:write:authorized",
+                  "LDAP" : "ldaps://ldap.ligo.org"
                 }
               ]
             },
             {
-              "ScopeName": "compute.create",
-              "ScopeGroups": [
+              "ScopeName" : "scitokentesting.read",
+              "ScopeGroups" : [
                 {
-                  "EligibleGroup": "cn=eligible_factor,ou=create,ou=scopes,ou=SciTokens,ou=WLCG,ou=Services,ou=grouper,dc=ligo,dc=org",
-                  "AuthorizedGroup": "cn=authorized,ou=create,ou=scopes,ou=SciTokens,ou=WLCG,ou=Services,ou=grouper,dc=ligo,dc=org",
-                  "isMemberOf": "Services:WLCG:SciTokens:scopes:create:authorized",
-                  "LDAP": "ldaps://ldap.ligo.org"
+                  "EligibleGroup" : "cn=eligible_factor,ou=read,ou=scopes,ou=SciTokens,ou=SciTokenTesting,ou=Services,ou=grouper,dc=ligo,dc=org",
+                  "AuthorizedGroup" : "cn=authorized,ou=read,ou=scopes,ou=SciTokens,ou=SciTokenTesting,ou=Services,ou=grouper,dc=ligo,dc=org",
+                  "isMemberOf" : "Services:SciTokenTesting:SciTokens:scopes:read:authorized",
+                  "LDAP" : "ldaps://ldap.ligo.org"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "ServiceName" : "WLCG",
+          "Scopes" : [
+            {
+              "ScopeName" : "compute.read",
+              "ScopeGroups" : [
+                {
+                  "EligibleGroup" : "cn=eligible_factor,ou=read,ou=scopes,ou=SciTokens,ou=WLCG,ou=Services,ou=grouper,dc=ligo,dc=org",
+                  "AuthorizedGroup" : "cn=authorized,ou=read,ou=scopes,ou=SciTokens,ou=WLCG,ou=Services,ou=grouper,dc=ligo,dc=org",
+                  "isMemberOf" : "Services:WLCG:SciTokens:scopes:read:authorized",
+                  "LDAP" : "ldaps://ldap.ligo.org"
                 }
               ]
             },
             {
-              "ScopeName": "compute.cancel",
-              "ScopeGroups": [
+              "ScopeName" : "compute.modify",
+              "ScopeGroups" : [
                 {
-                  "EligibleGroup": "cn=eligible_factor,ou=cancel,ou=scopes,ou=SciTokens,ou=WLCG,ou=Services,ou=grouper,dc=ligo,dc=org",
-                  "AuthorizedGroup": "cn=authorized,ou=cancel,ou=scopes,ou=SciTokens,ou=WLCG,ou=Services,ou=grouper,dc=ligo,dc=org",
-                  "isMemberOf": "Services:WLCG:SciTokens:scopes:cancel:authorized",
-                  "LDAP": "ldaps://ldap.ligo.org"
+                  "EligibleGroup" : "cn=eligible_factor,ou=modify,ou=scopes,ou=SciTokens,ou=WLCG,ou=Services,ou=grouper,dc=ligo,dc=org",
+                  "AuthorizedGroup" : "cn=authorized,ou=modify,ou=scopes,ou=SciTokens,ou=WLCG,ou=Services,ou=grouper,dc=ligo,dc=org",
+                  "isMemberOf" : "Services:WLCG:SciTokens:scopes:modify:authorized",
+                  "LDAP" : "ldaps://ldap.ligo.org"
+                }
+              ]
+            },
+            {
+              "ScopeName" : "compute.create",
+              "ScopeGroups" : [
+                {
+                  "EligibleGroup" : "cn=eligible_factor,ou=create,ou=scopes,ou=SciTokens,ou=WLCG,ou=Services,ou=grouper,dc=ligo,dc=org",
+                  "AuthorizedGroup" : "cn=authorized,ou=create,ou=scopes,ou=SciTokens,ou=WLCG,ou=Services,ou=grouper,dc=ligo,dc=org",
+                  "isMemberOf" : "Services:WLCG:SciTokens:scopes:create:authorized",
+                  "LDAP" : "ldaps://ldap.ligo.org"
+                }
+              ]
+            },
+            {
+              "ScopeName" : "compute.cancel",
+              "ScopeGroups" : [
+                {
+                  "EligibleGroup" : "cn=eligible_factor,ou=cancel,ou=scopes,ou=SciTokens,ou=WLCG,ou=Services,ou=grouper,dc=ligo,dc=org",
+                  "AuthorizedGroup" : "cn=authorized,ou=cancel,ou=scopes,ou=SciTokens,ou=WLCG,ou=Services,ou=grouper,dc=ligo,dc=org",
+                  "isMemberOf" : "Services:WLCG:SciTokens:scopes:cancel:authorized",
+                  "LDAP" : "ldaps://ldap.ligo.org"
                 }
               ]
             }
@@ -182,4 +323,3 @@
     }
   ]
 }
-

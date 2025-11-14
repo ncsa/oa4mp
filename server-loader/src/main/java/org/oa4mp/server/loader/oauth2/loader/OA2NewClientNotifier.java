@@ -89,7 +89,7 @@ public class OA2NewClientNotifier extends NewClientNotifier {
                     "\n" +
                     "Name: ${name}\n" +
                     "Contact email: ${email}";
-            rc = mailUtil.sendMessage(subject, body, replacements);
+            rc = mailUtil.sendMessage(notificationEvent,subject, body, replacements);
             done = true;
         }
         //CIL-607 fix. May want to make templates customizable?
@@ -120,11 +120,11 @@ public class OA2NewClientNotifier extends NewClientNotifier {
                     "   Public client?  : ${isPublic}\n" +
                     "   Strict Scopes?  : ${strictScopes}\n";
 
-            rc = mailUtil.sendMessage(subject, body, replacements);
+            rc = mailUtil.sendMessage(notificationEvent, subject, body, replacements);
             done = true;
         }
         if (!done) {
-            rc = mailUtil.sendMessage(replacements);
+            rc = mailUtil.sendMessage(notificationEvent, replacements);
 
         }
         if (rc) {

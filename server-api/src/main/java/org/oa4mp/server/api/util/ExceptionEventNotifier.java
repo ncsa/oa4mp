@@ -19,6 +19,6 @@ public class ExceptionEventNotifier extends Notifier implements ExceptionEventLi
     public void fireExceptionCaught(ExceptionEvent exceptionEvent) {
         loggingFacade.info("preparing to send notice for exception");
         Map<String, String> params = exceptionEvent.getState();
-        mailUtil.sendMessage(params);
+        mailUtil.sendMessage(exceptionEvent, params);
     }
 }

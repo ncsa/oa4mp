@@ -63,7 +63,7 @@ public class NewClientNotifier extends Notifier implements NewClientListener {
         BaseClient client = notificationEvent.getClient();
         Map<String,String> replacements = getReplacements(client);
 
-        boolean rc = mailUtil.sendMessage(replacements);
+        boolean rc = mailUtil.sendMessage(notificationEvent,replacements);
         if (rc) {
             loggingFacade.info("sending email notification for client " + client.getIdentifierString());
         } else {

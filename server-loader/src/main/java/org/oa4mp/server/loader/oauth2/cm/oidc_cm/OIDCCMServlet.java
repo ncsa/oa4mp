@@ -16,6 +16,7 @@ import edu.uiuc.ncsa.security.servlet.HeaderUtils;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
+import edu.uiuc.ncsa.security.util.events.NotificationEvent;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JWKUtil2;
 import net.sf.json.*;
@@ -30,6 +31,7 @@ import org.oa4mp.server.api.admin.adminClient.AdminClient;
 import org.oa4mp.server.api.admin.permissions.Permission;
 import org.oa4mp.server.api.storage.servlet.EnvServlet;
 import org.oa4mp.server.api.storage.servlet.OA4MPServlet;
+import org.oa4mp.server.api.util.UpdateClientEvent;
 import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.cm.CM7591Config;
 import org.oa4mp.server.loader.oauth2.cm.CMConfig;
@@ -721,7 +723,8 @@ public class OIDCCMServlet extends EnvServlet {
             if (adminClient.isDebugOn()) {
                 // CIL-607
                 // Never an anonymous client for a delete
-                fireMessage(false, getOA2SE(), defaultReplacements(req, adminClient, client));
+                UpdateClientEvent updateClientEvent = new UpdateClientEvent(this, client);
+                fireMessage(updateClientEvent, false, getOA2SE(), defaultReplacements(req, adminClient, client));
             }
             return;
         } catch (Throwable t) {
@@ -926,7 +929,9 @@ public class OIDCCMServlet extends EnvServlet {
                 if (adminClient.isDebugOn()) {
                     // CIL-607
                     // Never an anonymous client for a put.
-                    fireMessage(false, getOA2SE(), defaultReplacements(req, adminClient, newClient));
+                    UpdateClientEvent updateClientEvent = new UpdateClientEvent(this, newClient);
+
+                    fireMessage(updateClientEvent, false, getOA2SE(), defaultReplacements(req, adminClient, newClient));
                 }
                 newClient.setDebugOn(isDebugOn); // CIL-1538
                 getOA2SE().getClientStore().save(newClient);
@@ -1178,12 +1183,18 @@ public class OIDCCMServlet extends EnvServlet {
 
         OA2Client newClient = processRegistrationRequest(jsonRequest, adminClient, isAnonymous, template, version);
         if (isAnonymous) {
+            UpdateClientEvent updateClientEvent = new UpdateClientEvent(this, newClient);
+
             // All anonymous requests send a notification.
-            fireMessage(isAnonymous, getOA2SE(), defaultReplacements(httpServletRequest, adminClient, newClient));
+            fireMessage(updateClientEvent, isAnonymous, getOA2SE(), defaultReplacements(httpServletRequest, adminClient, newClient));
         } else {
             if (adminClient.isDebugOn()) {
                 // CIL-607
-                fireMessage(false, getOA2SE(), defaultReplacements(httpServletRequest, adminClient, newClient));
+                UpdateClientEvent updateClientEvent = new UpdateClientEvent(this, newClient);
+                fireMessage(updateClientEvent,
+                        false,
+                        getOA2SE(),
+                        defaultReplacements(httpServletRequest, adminClient, newClient));
             }
         }
 
@@ -1957,11 +1968,19 @@ public class OIDCCMServlet extends EnvServlet {
     String messageTemplate = "The \"${admin_name}\" (${admin_id}) ${action} the following client:\n\n${client} ";
 
     //CIL-607
-    protected void fireMessage(boolean isAnonymous, OA2SE oa2SE, HashMap<String, String> replacements) {
+    protected void fireMessage(NotificationEvent notificationEvent, boolean isAnonymous, OA2SE oa2SE, HashMap<String, String> replacements) {
         if (isAnonymous) {
-            oa2SE.getMailUtil().sendMessage(anonSubjectTemplate, anonMessageTemplate, replacements, oa2SE.getNotifyACEventEmailAddresses());
+            oa2SE.getMailUtil().sendMessage(notificationEvent,
+                    anonSubjectTemplate,
+                    anonMessageTemplate,
+                    replacements,
+                    oa2SE.getNotifyACEventEmailAddresses());
         } else {
-            oa2SE.getMailUtil().sendMessage(subjectTemplate, messageTemplate, replacements, oa2SE.getNotifyACEventEmailAddresses());
+            oa2SE.getMailUtil().sendMessage(notificationEvent,
+                    subjectTemplate,
+                    messageTemplate,
+                    replacements,
+                    oa2SE.getNotifyACEventEmailAddresses());
         }
     }
 

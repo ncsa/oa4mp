@@ -16,24 +16,29 @@ igwn. := from_json(file_read(igwn_file));
 q. := igwn\Issuers\0\Services\*\Scopes; // Dig through all the cruft to the actual entries.
 p. := q\*\*\ScopeName; // permissions
 n. := q\*\*\ScopeGroups\*\isMemberOf; // names associated with the permissions
+say(print(n.));
 z. := null;
 
 while[x∈indices(p.)]
   // Take size(n.x) copies of the permission, change the names
   // the ⊗~ turns each element into a list rather than a scalar.
   do [temp.:=⊗~∀[rename_keys(n(size(n.x), [p.x]),n.x)];
+  say('temp:\n' + print(temp.));
      while[for_keys(kk, temp.)]                  // Loop through to make sure that the output is
         do[  if [∃z.kk]                          // constructed correctly.
            then [z.kk := (z.kk)~temp.kk;]
            else [z.kk:= temp.kk;];
+           say('z.' + kk +'=' + to_string(z.kk));
        ];
     ];
  say('ζ. ≔ ' + input_form(z.) + ';');
  say('\n*** or *** \n');
-
+say(print(z.));
+ say('\n*** or *** \n');
  out. :=[];
  while[for_keys(x, z.)]
    do [caput := 'ζ.' + input_form(x);
+   say('ζ.' + x);
        caput :=  ((65 - size(caput))*' ')+ caput; // justifies on the ≔ sign
        //say(caput + ' ≔ ' + input_form(z.x) + ';');
        out. := out. ~ (caput + ' ≔ ' + input_form(z.x) + ';');

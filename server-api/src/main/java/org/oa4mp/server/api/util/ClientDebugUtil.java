@@ -27,7 +27,11 @@ public class ClientDebugUtil extends MetaDebugUtil {
                         + toLabel(level) + ": [" + client.getIdentifierString() + "]" +
                         " " + message);
             }else{
-                printIt((isPrintTS()?Iso8601.date2String(new Date()):"") + " " + host + " " + callingClass.getSimpleName() + " " + toLabel(level) + ": " + message);
+                printIt((isPrintTS()?Iso8601.date2String(new Date()):"") + " " +
+                        host + " " +
+                        callingClass.getSimpleName() + " " +
+                        toLabel(level) + ": " +
+                        message);
             }
         }
     }
