@@ -280,8 +280,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             // the contract is that the issuers must match the client id if present
             for (String issuer : issuers) {
                 if (!client.getIdentifierString().equals(issuer)) {
-                    throw new OA2ATException(OA2Errors.INVALID_SCOPE,
-                            "unable to determine scopes",
+                    throw new OA2ATException(OA2Errors.INVALID_REQUEST,
+                            "incorrect issuer \"" + issuer + "\"",
                             HttpStatus.SC_BAD_REQUEST,
                             state, client);
 

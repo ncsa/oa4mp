@@ -48,7 +48,7 @@
     
         
                     <div class="xleft">
-            Last Published: 2025-10-27
+            Last Published: 2025-11-14
                                 </div>
                 <div class="xright">            
     
@@ -239,6 +239,25 @@
     
 <tr class="b">
         
+<td style="vertical-align: top;">throttleInterval</td>
+        
+<td style="vertical-align: top;">N</td>
+        
+<td style="vertical-align: top;">-1</td>
+        
+<td style="vertical-align: top;">
+            
+<p>An interval which if set &gt; 0 will restrict sending notifications so one per
+                unit time is sent per component. So if this is set to 60, then no more
+                than a single email every 60 seconds will be sent.
+                Units are supported, if no units, the assumption is seconds.
+                This is for the case where other services might be failing badly and you do not
+            want OA4MP to simply bomb you with error messages.</p>
+        </td>
+    </tr>
+    
+<tr class="a">
+        
 <td style="vertical-align: top;">useSSL</td>
         
 <td style="vertical-align: top;">N</td>
@@ -250,7 +269,7 @@
         </td>
     </tr>
     
-<tr class="a">
+<tr class="b">
         
 <td style="vertical-align: top;">username</td>
         

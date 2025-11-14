@@ -959,7 +959,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
     }
 
     protected boolean hasEChain(PermissionList permissions, List<Identifier> eChain) {
-        if (permissions.isEmpty()) {
+        if (eChain == null || permissions.isEmpty()) {
             return false;
         }
         for (Permission p : permissions) {
