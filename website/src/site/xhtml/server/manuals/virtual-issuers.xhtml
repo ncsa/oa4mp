@@ -9,7 +9,7 @@
 
 <body class="composite">
 <h1>Overview</h1>
-<p>OA4MP is an OAuth 2 <i>issuer</i>, meaning that it creates tokens. It must set itself as
+<p>OA4MP is an OAuth 2 <i>issuer</i>, meaning that it creates ("issues") tokens. It must set itself as
     the originator of the token by asserting an <b>iss</b> claim wherever needed. E.g.,
     <font color="blue">https://math.bigstate.edu/oauth2</font>. A common situation is that
     an institution requires that the issuer be scoped to itself (so all of the tokens used by group X
@@ -17,7 +17,7 @@
     The issuer claim reflects this, e.g. If the Geometry group at Big State University wanted to set
     up a token issuer for all of its users, a reasonable <b>iss</b> claim in the tokens would be <font
             color="blue">https://math.bigstate.edu/oauth2/geometry</font>.
-    Specialized issuers are really quite handly since they can ensure that tokens can be ignored or
+    Specialized issuers are really quite handy since they can ensure that tokens can be ignored or
     not misued. As such, once savored, people tend to want to have an issuer for each and every
     project, group, department, you name it.</p>
 
@@ -133,14 +133,14 @@
     <li>Enter the key type. The two types are RSA and EC (for elliptic curve). Each will prompt you for any specifics
         to that set of keys. Here we accept the default of RSA.
     </li>
-    <li>For RSA keys, the key leangth is required. The larger the key size, the better the security and the longer key
-        generation takes. Note that the key length must be a multiple 256. Each geenrated key has a unique identifier.
+    <li>For RSA keys, the key length is required. The larger the key size, the better the security and the longer key
+        generation takes. Note that the key length must be a multiple 256. Each generated key has a unique identifier.
         These are printed and the most common one for whatever the set is, is selected as the default for signing.
     </li>
     <li>If you wish to select a different default key than the one given, select it from the printed list and
         paste it (or type) it in. It is case sensitive.
     </li>
-    <li>The entire record is printed and you are asked if you want to save it. If you answer <b>n</b> then the entire
+    <li>The entire record is printed, and you are asked if you want to save it. If you answer <b>n</b> then the entire
         set of edits is lost, requiring that you set up the record manually.
     </li>
 </ol>

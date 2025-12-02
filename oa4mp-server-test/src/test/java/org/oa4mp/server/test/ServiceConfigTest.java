@@ -40,6 +40,7 @@ import static org.oa4mp.server.api.OA4MPConfigTags.*;
 public class ServiceConfigTest extends ConfigTest {
     @Override
     protected XMLConfiguration getConfiguration() throws ConfigurationException {
+        // File at oa4mp/server-api/src/main/resources/server-test.xml
         return getConfiguration("/server-test.xml");
     }
 

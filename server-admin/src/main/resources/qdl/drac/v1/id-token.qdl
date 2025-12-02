@@ -1,6 +1,10 @@
 /*
 Current policy is at https://github.com/cilogon/drac-policies/blob/main/DRAC_Policy_Specification.md
 
+Test named configurations at
+ https://registry-test.alliancecan.ca/registry/oa4mp_client/oa4mp_client_co_named_configs
+
+
 Note that this runs in the post_auth phase only since
 the only place that there is a browser to redirect from
 is during the auth phase.
@@ -16,7 +20,7 @@ Configurations for the client are either
   }
 }}
 
-which checks if the user is in the base gorup
+which checks if the user is in the base group
       CO:COU:UVic Staff:members:active.
 
 Or the following,
@@ -29,6 +33,20 @@ a member of, in addition to the base group.
     "qdl":  {
      "load": "drac/v1/id-token.qdl",
      "args":["CO:COU:CADC:members:active"],
+     "xmd": {"exec_phase": ["post_auth"]}
+    },
+  "type": "identity"
+  }
+}}
+
+
+// Arbutus team
+
+{"tokens": {
+  "identity": {
+    "qdl":  {
+     "load": "drac/v1/id-token.qdl",
+     "args":["CO:COU:CADC:members:active","CO:COU:ArbutusNT:members:active"],
      "xmd": {"exec_phase": ["post_auth"]}
     },
   "type": "identity"
@@ -51,3 +69,18 @@ trace(drac_cc,'result of user query =' + to_string(results.));
                          size(args()) ≡ 1 ⇒ groups. := groups.~args().0;
                   (∄results.'isMemberOf') ⇒ err_uri('no groups for user found',error_uri);
 (true ∉ (groups. ∈ results.'isMemberOf')) ⇒ err_uri('user not in group', error_uri);
+/*
+
+* OIDC client ID on PROD is currently
+    * None
+* OIDC client ID on TEST is currently
+    * None
+* Policy:
+    * Use OIDC tokens.
+    * Refresh token is not required.
+    * Scopes required are openid, profile, email and org.cilogon.userinfo
+    * Need the LDAP to Claim mapping for the LDAP attribute isMemberOf to be put in the groups claim which is multivalued
+    * Membership in the group CO:COU:ArbutusNT:members:active is required in order for the flow to continue.
+     * Users that are not in the group should be redirected to [https://object-arbutus.cloud.computecanada.ca/cilogon/error.html](https://object-arbutus.cloud.computecanada.ca/cilogon/error.html).
+    * LDAP to Claim mapping for LDAP attribute isMemberOf to be added to OIDC claim name groups and multivalued
+*/

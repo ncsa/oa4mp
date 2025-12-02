@@ -50,7 +50,7 @@
 
 <p>Additional notes:</p>
 <ul>
-    <li>Remeber that ersatz clients cannot start flows, they may only substitute for a provisioning client.</li>
+    <li>Remember that ersatz clients cannot start flows, they may only substitute for a provisioning client.</li>
     <li>The scopes for <b>α</b> are restricted to be <i>at most</i> what <b>A</b> was granted.
         During the fork, you may downscope. At that point, the resulting scopes become the maximum
         for <b>α</b>.
@@ -60,7 +60,7 @@
         access tokens as needed. This can be useful if the ersatz client may have a long wait before
         actually needing an access token.
     </li>
-    <li>You may fork as freely as you like. Every exchange as per above will fork the flow.</li>
+    <li>You may fork as freely as you like. <i>Every exchange as per above will fork the flow.</i> </li>
     <li>OA4MP supports <a href="https://www.rfc-editor.org/rfc/rfc7523">JWTs for authorization</a>
         which means that <b>A</b> may start a completely automated flow and hand off its
         work to ersatz clients -- no human intervention is needed. Do read about
@@ -79,14 +79,11 @@
 
 <h3>Ersatz Client Properties</h3>
 <ul>
-    <li>All ersatz relations are explicit and must be set out of band.</li>
+    <li>All ersatz relations are explicit and must be set out of band. This may be done with via the client management endpoint too.</li>
     <li>Ersatz clients cannot start a flow.</li>
     <li>Ersatz clients can only be substituted at the token exchange (RFC 8693) endpoint.</li>
-    <li>once provisioned, they are simply clients can be used at the
-        refresh endpoint, revoked, introspected etc.
-    </li>
-    <li>Ersatz clients are restricted in their scopes to whatever the provisioning client has and may only downscope.
-    </li>
+    <li>Once provisioned, they are simply clients can be used at the refresh endpoint, revoked, introspected etc.</li>
+    <li>Ersatz clients are restricted in their scopes to whatever the provisioning client has and may only downscope.</li>
     <li>If A ≻ α, then α inherits the configuration (lifetimes, scripts etc.) from A unless explicitly overridden.</li>
     <li>Provisioning chains may have multiple elements: A ≻ α ≻ β ≻ γ ... which connotes
         an inheritance chain for abilities, not necessarily a custodial chain. Note especially that α, β and γ
@@ -119,15 +116,15 @@
 <p>What this means is that our substitutions are a form of impersonation and that
     the trust relations are made out of band. Why not call this impersonation? Because
     other OAuth systems are free to implement this any way they want, and we want to be clear
-    exactly how we do it. </p>
+    exactly how we do it. Sad differently, there can be many implmenetations of <i>impersonation</i>
+    with their own policies. We want a unique name so there is no confusion what OA4MP does.</p>
 
 <h3>Note on provisioning chains</h3>
 <p>
     You may have ersatz clients substitute for other ersatz clients, so A ≻ α, α ≻ β and β ≻ γ is perfectly fine.
-    This means that A provisions and that α may substitute for it. Later, β may substitute for α, but cannot substitute
-    for
-    A (unless that relation is made explicit). This allows for chains of substitution. We may write this chain
-    more compactly as A ≻ α ≻ β ≻ γ
+    This means that A provisions α, and that α may substitute for it. Later, β may substitute for α, but cannot substitute
+    for A. This allows for chains of substitution. We may write this chain
+    more compactly as A ≻ α ≻ β ≻ γ.
 </p>
 
 <h2>Creation of Ersatz Clients via the Client Management API</h2>

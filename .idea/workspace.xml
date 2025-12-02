@@ -11,120 +11,22 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="https://github.com/ncsa/oa4mp/issues/280">
+    <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="website update">
+      <change afterPath="$PROJECT_DIR$/CIL-2357.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/client-installer/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/client/configuration/client-tag.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/client/configuration/client-tag.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/client/configuration/configuration-file.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/client/configuration/configuration-file.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/client/configuration/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/client/configuration/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/client/dtd/asset-store.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/client/dtd/asset-store.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/client/dtd/dtd-file.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/client/dtd/dtd-file.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/client/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/client/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/client/manuals/api-reference.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/client/manuals/api-reference.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/client/manuals/changelog.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/client/manuals/changelog.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/client/manuals/getting-started.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/client/manuals/getting-started.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/client/manuals/oa2-refresh-tokens.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/client/manuals/oa2-refresh-tokens.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/client/manuals/parameters.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/client/manuals/parameters.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/client/manuals/registering-with-an-oauth2-server.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/client/manuals/registering-with-an-oauth2-server.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/client/manuals/storage.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/client/manuals/storage.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/client/manuals/troubleshooting.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/client/manuals/troubleshooting.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/common/configuration/configuration-files.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/common/configuration/configuration-files.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/common/configuration/derby-store.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/common/configuration/derby-store.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/common/configuration/file-store.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/common/configuration/file-store.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/common/configuration/keystore.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/common/configuration/keystore.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/common/configuration/logging.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/common/configuration/logging.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/common/configuration/mariadb-store.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/common/configuration/mariadb-store.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/common/configuration/memory-store.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/common/configuration/memory-store.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/common/configuration/mysql-store.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/common/configuration/mysql-store.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/common/configuration/postgres-store.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/common/configuration/postgres-store.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/common/configuration/scopes.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/common/configuration/scopes.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/common/configuration/ssl.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/common/configuration/ssl.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/common/configuration/supported-specifications.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/common/configuration/supported-specifications.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/common/manuals/expiration-of-tokens.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/common/manuals/expiration-of-tokens.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/common/manuals/using-self-signed-cert.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/common/manuals/using-self-signed-cert.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/dependencies.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/dependencies.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/dependency-analysis.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/dependency-analysis.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/oa4mp-faq.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/oa4mp-faq.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/pdf/Authentication_in_OA4MP.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/Authentication_in_OA4MP.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/pdf/DIService-reference.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/DIService-reference.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/pdf/Using_headers_for_authentication.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/Using_headers_for_authentication.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/pdf/claim_source_examples.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/claim_source_examples.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/pdf/creating_claim_sources2.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/creating_claim_sources2.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/pdf/filestore-migration.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/filestore-migration.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/pdf/forking_a_flow_quickstart.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/forking_a_flow_quickstart.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/pdf/java-extension-to-oa4mp.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/java-extension-to-oa4mp.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/pdf/jwt-util.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/jwt-util.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/pdf/oa2-client.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/oa2-client.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/pdf/oa4mp-modules.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/oa4mp-modules.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/pdf/oa4mp_as_dedicated_issuer.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/oa4mp_as_dedicated_issuer.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/pdf/oa4mp_running_qdl_scripts.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/oa4mp_running_qdl_scripts.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/pdf/policies.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/policies.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/pdf/qdl_clc_ini.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/qdl_clc_ini.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/pdf/qdl_oa4mp_store_access.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/qdl_oa4mp_store_access.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/pdf/rfc6749_4_4.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/rfc6749_4_4.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/pdf/rfc7523_intro.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/rfc7523_intro.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/pdf/scopes.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/scopes.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/pdf/token_handler_configuration.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/token_handler_configuration.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/project-info.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/project-info.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/project-reports.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/project-reports.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server-faq.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server-faq.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/configuration/authentication-servlet-configuration.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/configuration/authentication-servlet-configuration.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/configuration/client_management-configuration.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/configuration/client_management-configuration.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/configuration/config-index.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/configuration/config-index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/configuration/device-flow-servlet-configuration.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/configuration/device-flow-servlet-configuration.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/configuration/ldap.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/configuration/ldap.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/configuration/qdl-config.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/configuration/qdl-config.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/configuration/server-configuration-file.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/configuration/server-configuration-file.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/configuration/server-email.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/configuration/server-email.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/configuration/server-messages.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/configuration/server-messages.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/configuration/server-myproxy.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/configuration/server-myproxy.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/configuration/signing.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/configuration/signing.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/dtd/server-dtd-content-tags.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/dtd/server-dtd-content-tags.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/dtd/server-dtd-service-tag.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/dtd/server-dtd-service-tag.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/dtd/server-dtd.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/dtd/server-dtd.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/manuals/Username-transformations.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/Username-transformations.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/manuals/administrative-clients.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/administrative-clients.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/manuals/changelog.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/changelog.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/manuals/cli.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/cli.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/manuals/client-prototypes.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/client-prototypes.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/manuals/custom-scope-handler.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/custom-scope-handler.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/manuals/demo-mode.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/demo-mode.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/manuals/discovery.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/discovery.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/manuals/driver-config.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/driver-config.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/manuals/dynamic-client-registration.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/dynamic-client-registration.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/manuals/ersatz_clients.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/ersatz_clients.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/manuals/exception-notifications.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/exception-notifications.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/manuals/extended-attributes.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/extended-attributes.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/manuals/extending-the-server.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/extending-the-server.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/manuals/gc.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/gc.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/manuals/getting-started.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/getting-started.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/manuals/install-walkthrough.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/install-walkthrough.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/manuals/issuers.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/issuers.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/manuals/manually-approving-clients.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/manually-approving-clients.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/manuals/monitor.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/monitor.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/manuals/monitoring-access-times.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/monitoring-access-times.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/manuals/remote-user.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/remote-user.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/manuals/scripting-hooks.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/scripting-hooks.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/manuals/service-clients.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/service-clients.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/manuals/template.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/template.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/manuals/test-client.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/test-client.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/manuals/testing-from-the-command-line.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/testing-from-the-command-line.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/manuals/token-info.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/token-info.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/manuals/units.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/units.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/manuals/unused-client-cleanup.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/unused-client-cleanup.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/manuals/using-proxies.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/using-proxies.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/server/manuals/virtual-issuers.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/server/manuals/virtual-issuers.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/summary.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/summary.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-test/src/test/java/org/oa4mp/server/test/ServiceConfigTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test/src/test/java/org/oa4mp/server/test/ServiceConfigTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/OA2ATServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/OA2ATServlet.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rfc8414/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/rfc8414/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2ClientCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2ClientCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/drac/v1/id-token.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/resources/qdl/drac/v1/id-token.qdl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/admin/permissions/PermissionConverter.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/admin/permissions/PermissionConverter.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/admin/permissions/PermissionStoreUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/admin/permissions/PermissionStoreUtil.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-installer/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-test/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/website/src/site/xhtml/server/manuals/ersatz_clients.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/xhtml/server/manuals/ersatz_clients.xhtml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/website/src/site/xhtml/server/manuals/virtual-issuers.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/xhtml/server/manuals/virtual-issuers.xhtml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -212,68 +114,68 @@
     <option name="showMembers" value="true" />
     <option name="showModules" value="false" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Application.CLC.executor&quot;: &quot;Run&quot;,
-    &quot;Application.CLI.executor&quot;: &quot;Run&quot;,
-    &quot;Application.FSMigrate.executor&quot;: &quot;Run&quot;,
-    &quot;Application.JWKCLI.executor&quot;: &quot;Debug&quot;,
-    &quot;Application.OA4MPClientInstaller.executor&quot;: &quot;Run&quot;,
-    &quot;Application.OA4MPServerInstaller.executor&quot;: &quot;Run&quot;,
-    &quot;Application.QDL CLC.executor&quot;: &quot;Debug&quot;,
-    &quot;Application.QDL.executor&quot;: &quot;Run&quot;,
-    &quot;Application.QDLConfigLoader.executor&quot;: &quot;Debug&quot;,
-    &quot;Application.SAS CLI.executor&quot;: &quot;Debug&quot;,
-    &quot;Application.jwt.executor&quot;: &quot;Debug&quot;,
-    &quot;Application.org.oa4mp.server.admin.oauth2.tools.JWKCLI.executor&quot;: &quot;Debug&quot;,
-    &quot;Application.org.oa4mp.server.installer.OA4MPServerInstaller.executor&quot;: &quot;Run&quot;,
-    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
-    &quot;Downloaded.Files.Path.Enabled&quot;: &quot;false&quot;,
-    &quot;JUnit.QDLTests.testVFSFileClaimSourceA.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.Test Suite.executor&quot;: &quot;Run&quot;,
-    &quot;Java Scratch.Scratch (3).executor&quot;: &quot;Run&quot;,
-    &quot;Java Scratch.Scratch.executor&quot;: &quot;Run&quot;,
-    &quot;Maven. [org.apache.maven.plugins:maven-archetype-plugin:RELEASE:generate].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.myproxy [clean,install].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.myproxy-website [clean,install].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.oa4mp-parent [clean,install].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.proxy [org.apache.maven.plugins:maven-javadoc-plugin:3.5.0:javadoc].executor&quot;: &quot;Run&quot;,
-    &quot;Repository.Attach.Annotations&quot;: &quot;false&quot;,
-    &quot;Repository.Attach.JavaDocs&quot;: &quot;false&quot;,
-    &quot;Repository.Attach.Sources&quot;: &quot;false&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;Tomcat Server.DEV OA4MP.executor&quot;: &quot;Run&quot;,
-    &quot;Tomcat Server.MyProxy.executor&quot;: &quot;Run&quot;,
-    &quot;Tomcat Server.OA4MP server.executor&quot;: &quot;Run&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;jdk.selected.JAVA_MODULE&quot;: &quot;11 (2)&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests/local&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Libraries&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.45913818&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;ml.llm.LLMConfigurable&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.CLC.executor": "Run",
+    "Application.CLI.executor": "Run",
+    "Application.FSMigrate.executor": "Run",
+    "Application.JWKCLI.executor": "Debug",
+    "Application.OA4MPClientInstaller.executor": "Run",
+    "Application.OA4MPServerInstaller.executor": "Run",
+    "Application.QDL CLC.executor": "Debug",
+    "Application.QDL.executor": "Run",
+    "Application.QDLConfigLoader.executor": "Debug",
+    "Application.SAS CLI.executor": "Debug",
+    "Application.jwt.executor": "Debug",
+    "Application.org.oa4mp.server.admin.oauth2.tools.JWKCLI.executor": "Debug",
+    "Application.org.oa4mp.server.installer.OA4MPServerInstaller.executor": "Run",
+    "DefaultHtmlFileTemplate": "HTML File",
+    "Downloaded.Files.Path.Enabled": "false",
+    "JUnit.QDLTests.testVFSFileClaimSourceA.executor": "Run",
+    "JUnit.Test Suite.executor": "Run",
+    "Java Scratch.Scratch (3).executor": "Run",
+    "Java Scratch.Scratch.executor": "Run",
+    "Maven. [org.apache.maven.plugins:maven-archetype-plugin:RELEASE:generate].executor": "Run",
+    "Maven.myproxy [clean,install].executor": "Run",
+    "Maven.myproxy-website [clean,install].executor": "Run",
+    "Maven.oa4mp-parent [clean,install].executor": "Run",
+    "Maven.proxy [org.apache.maven.plugins:maven-javadoc-plugin:3.5.0:javadoc].executor": "Run",
+    "Repository.Attach.Annotations": "false",
+    "Repository.Attach.JavaDocs": "false",
+    "Repository.Attach.Sources": "false",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Tomcat Server.DEV OA4MP.executor": "Run",
+    "Tomcat Server.MyProxy.executor": "Run",
+    "Tomcat Server.OA4MP server.executor": "Run",
+    "WebServerToolWindowFactoryState": "false",
+    "git-widget-placeholder": "master",
+    "jdk.selected.JAVA_MODULE": "11 (2)",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests/local",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Libraries",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.45913818",
+    "settings.editor.selected.configurable": "ml.llm.LLMConfigurable",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
-      &quot;Markdown&quot;,
-      &quot;PLAIN_TEXT&quot;,
-      &quot;JSON&quot;,
-      &quot;JAVA&quot;
+  "keyToStringList": {
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "Markdown",
+      "PLAIN_TEXT",
+      "JSON",
+      "JAVA"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/local" />
@@ -313,7 +215,7 @@
       </map>
     </option>
   </component>
-  <component name="RunManager" selected="Tomcat Server.OA4MP server">
+  <component name="RunManager" selected="JUnit.Test Suite">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="WIDTH" value="400" />
       <option name="HEIGHT" value="300" />
@@ -1349,15 +1251,7 @@
       <workItem from="1760644825842" duration="81000" />
       <workItem from="1760644921271" duration="69068000" />
       <workItem from="1761688277821" duration="2575000" />
-      <workItem from="1762196578368" duration="37424000" />
-    </task>
-    <task id="LOCAL-00082" summary="Integrating fixes for 6.1.0">
-      <option name="closed" value="true" />
-      <created>1747141636992</created>
-      <option name="number" value="00082" />
-      <option name="presentableId" value="LOCAL-00082" />
-      <option name="project" value="LOCAL" />
-      <updated>1747141636992</updated>
+      <workItem from="1762196578368" duration="94122000" />
     </task>
     <task id="LOCAL-00083" summary="Changes reflecting https://github.com/ncsa/qdl/issues/123. All tests working as per requirements.">
       <option name="closed" value="true" />
@@ -1743,7 +1637,15 @@
       <option name="project" value="LOCAL" />
       <updated>1763121835811</updated>
     </task>
-    <option name="localTasksCounter" value="131" />
+    <task id="LOCAL-00131" summary="website update">
+      <option name="closed" value="true" />
+      <created>1763161504314</created>
+      <option name="number" value="00131" />
+      <option name="presentableId" value="LOCAL-00131" />
+      <option name="project" value="LOCAL" />
+      <updated>1763161504314</updated>
+    </task>
+    <option name="localTasksCounter" value="132" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1765,7 +1667,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
-    <MESSAGE value="Port of CILogon DBService to OA4MP. Part 2" />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/261" />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/262 recreate the oa4mp website since an extra clean command to maven was in a build scipt, effectively removing newly created javadoc." />
     <MESSAGE value="Updated website by removing some old cruft then rebuilding." />
@@ -1790,7 +1691,8 @@
     <MESSAGE value="Website rebuild" />
     <MESSAGE value="FOund/corrected info in getting started blurb." />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/280" />
-    <option name="LAST_COMMIT_MESSAGE" value="https://github.com/ncsa/oa4mp/issues/280" />
+    <MESSAGE value="website update" />
+    <option name="LAST_COMMIT_MESSAGE" value="website update" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="GROUP_MULTIFILE_MERGE_BY_DIRECTORY" value="true" />
   </component>
@@ -2144,12 +2046,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>3851</line>
+          <line>3889</line>
           <option name="timeStamp" value="962" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>1692</line>
+          <line>1730</line>
           <option name="timeStamp" value="963" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2174,7 +2076,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>3895</line>
+          <line>3933</line>
           <option name="timeStamp" value="974" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2194,27 +2096,27 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>3074</line>
+          <line>3112</line>
           <option name="timeStamp" value="990" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>3066</line>
+          <line>3104</line>
           <option name="timeStamp" value="995" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>4111</line>
+          <line>4149</line>
           <option name="timeStamp" value="1003" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>4155</line>
+          <line>4193</line>
           <option name="timeStamp" value="1004" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>4165</line>
+          <line>4203</line>
           <option name="timeStamp" value="1005" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2234,7 +2136,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>3626</line>
+          <line>3664</line>
           <option name="timeStamp" value="1010" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2259,7 +2161,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>2769</line>
+          <line>2807</line>
           <option name="timeStamp" value="1049" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2282,12 +2184,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>2483</line>
+          <line>2521</line>
           <option name="timeStamp" value="1077" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>1143</line>
+          <line>1181</line>
           <option name="timeStamp" value="1078" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2317,17 +2219,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>1921</line>
+          <line>1959</line>
           <option name="timeStamp" value="1172" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>1600</line>
+          <line>1638</line>
           <option name="timeStamp" value="1173" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>1096</line>
+          <line>1134</line>
           <option name="timeStamp" value="1176" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2367,12 +2269,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>2975</line>
+          <line>3013</line>
           <option name="timeStamp" value="1259" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>2970</line>
+          <line>3008</line>
           <option name="timeStamp" value="1260" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2397,7 +2299,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>2381</line>
+          <line>2419</line>
           <option name="timeStamp" value="1285" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2572,7 +2474,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/util/6.x-SNAPSHOT/util-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/util/mail/MailUtilProvider.java</url>
-          <line>303</line>
+          <line>190</line>
           <option name="timeStamp" value="1554" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2582,12 +2484,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/org/qdl-lang/language/1.6-QDL-SNAPSHOT/language-1.6-QDL-SNAPSHOT-sources.jar!/org/qdl_lang/workspace/WorkspaceCommands.java</url>
-          <line>1710</line>
+          <line>1708</line>
           <option name="timeStamp" value="1558" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/org/qdl-lang/language/1.6-QDL-SNAPSHOT/language-1.6-QDL-SNAPSHOT-sources.jar!/org/qdl_lang/workspace/WorkspaceCommands.java</url>
-          <line>1828</line>
+          <line>1826</line>
           <option name="timeStamp" value="1559" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2627,7 +2529,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/util/6.x-SNAPSHOT/util-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/util/cli/ConfigurableCommandsImpl.java</url>
-          <line>548</line>
+          <line>556</line>
           <option name="timeStamp" value="1591" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2652,7 +2554,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands2.java</url>
-          <line>1576</line>
+          <line>1616</line>
           <option name="timeStamp" value="1618" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2667,12 +2569,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands2.java</url>
-          <line>844</line>
+          <line>884</line>
           <option name="timeStamp" value="1621" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands2.java</url>
-          <line>1588</line>
+          <line>1628</line>
           <option name="timeStamp" value="1622" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2697,7 +2599,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/OA2ATServlet.java</url>
-          <line>2255</line>
+          <line>2257</line>
           <option name="timeStamp" value="1635" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2707,8 +2609,23 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>1655</line>
+          <line>1693</line>
           <option name="timeStamp" value="1638" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/oa4mp-server-test/src/test/java/org/oa4mp/server/test/ServiceConfigTest.java</url>
+          <line>131</line>
+          <option name="timeStamp" value="1639" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/oa4mp-server-test/src/test/java/org/oa4mp/server/test/ServiceConfigTest.java</url>
+          <line>143</line>
+          <option name="timeStamp" value="1640" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/oa4mp-server-test/src/test/java/org/oa4mp/server/test/ServiceConfigTest.java</url>
+          <line>86</line>
+          <option name="timeStamp" value="1641" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-method">
           <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/storage/transactions/OA2MTStore.java</url>

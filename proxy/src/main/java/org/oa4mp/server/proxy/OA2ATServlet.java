@@ -300,6 +300,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                         scopes,
                         true, false, true));
             } catch (OA2RedirectableError redirectableError) {
+                // Can be caused if strict_scopes in the client configuration is true
                 throw new OA2ATException(OA2Errors.INVALID_SCOPE,
                         "unable to determine scopes",
                         HttpStatus.SC_BAD_REQUEST,
@@ -1105,7 +1106,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 ersatzChain = pStore.getErsatzChain(pAdminID, t.getOA2Client().getIdentifier(), client.getIdentifier());
                 if (1 < eAdminIDS.size()) {
                     // So if there is a client managed by multiple admins, we don't just switch
-                    // virtual organizations in the middle. No hijacking allowed. This is possible to do, but generally
+                    // virtual organizations in the middle. No hijacking allowed. Multi-admins is possible to do,
+                    // // (need some disambiguation method, probably another custom parameter) but generally
                     // admins do not share clients, so we'll flag it as an exception here and if this
                     // ever needs to change, this tells us it is not working.
                     debugger.trace(this, "multiple admins for client " + client.getIdentifierString());

@@ -39,6 +39,8 @@ public class PermissionConverter<V extends Permission> extends MapConverter<V> {
                   }
             }
             value.setErsatzChain(x);
+        }else{
+            value.setErsatzChain(new ArrayList<>()); // zero it out.
         }
         value.setSubstitute(map.getBoolean(pk().substitute()));
         value.setApprove(map.getBoolean(pk().canApprove()));

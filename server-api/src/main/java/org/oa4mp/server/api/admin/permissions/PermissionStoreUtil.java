@@ -21,7 +21,7 @@ public class PermissionStoreUtil {
         PermissionList pList = permissionsStore.getErsatzChains(adminID, clientID);
         for (Permission p : pList) {
             if (p.canSubstitute()) {
-                if(p.getErsatzChain() != null) {
+                if(p.hasErsatzChain()) {
                     if (p.getErsatzChain().get(p.getErsatzChain().size() - 1).equals(ersatzID)) {
                         return p;
                     }

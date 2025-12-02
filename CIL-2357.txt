@@ -1,0 +1,16 @@
+These are notes for Patrick Carnussio's request. The request is to allow for sending a user right after authentication,
+ but who needs some other onboarding process to a site, which can then forward them back to OA4MP and resume the
+ flow. This will be invoked in a QDL script.
+
+ Tasks
+ -----
+ * Allow for configuring AG (auth grant) lifetimes and max lifetimes, like AT, RT.
+ * Have specific QDL flag for this. OA4MP should then create the necessary uri.
+ * The uri has address for the service authroize endpoint, it includes as parameters the
+   grant_type=oa4mp:grant-type:authentication:resume
+   jwt=JHWT (see below)
+ * The JWT payload consists of the AG, iat and exp claims.
+ * If the client has a registered public key, sign the JWT with it so the receiver can verify its
+   authenticity.
+ * Allow configuration of client to do authN resumption, as well as allow for unsigned JWTs.
+ * authN resumes with processing of the QDL script, which is where the flow was interuppted.
