@@ -1,9 +1,8 @@
 package org.oa4mp.server.loader.oauth2.storage.vi;
 
 import edu.uiuc.ncsa.security.core.cf.CFNode;
-import org.oa4mp.server.api.OA4MPConfigTags;
 import edu.uiuc.ncsa.security.storage.FSProvider;
-import org.apache.commons.configuration.tree.ConfigurationNode;
+import org.oa4mp.server.api.OA4MPConfigTags;
 
 import java.io.File;
 
@@ -12,12 +11,7 @@ import java.io.File;
  * on 12/14/20 at  1:14 PM
  */
 public class VIFSProvider<T extends VIFileStore> extends FSProvider<T> implements OA4MPConfigTags {
-    public VIFSProvider(ConfigurationNode config,
-                        VIProvider provider,
-                        VIConverter converter) {
-        super(config, FILE_STORE, VIRTUAL_ORGANIZATION_STORE, converter);
-        this.provider = provider;
-    }
+
     public VIFSProvider(CFNode config,
                         VIProvider provider,
                         VIConverter converter) {

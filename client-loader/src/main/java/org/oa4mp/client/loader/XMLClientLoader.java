@@ -1,11 +1,11 @@
 package org.oa4mp.client.loader;
 
+import edu.uiuc.ncsa.security.core.cf.CFNode;
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
+import edu.uiuc.ncsa.security.util.ssl.SSLConfiguration;
 import org.oa4mp.client.api.ClientLoaderInterface;
 import org.oa4mp.client.api.OA4MPServiceProvider;
 import org.oa4mp.client.api.storage.AssetStore;
-import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
-import edu.uiuc.ncsa.security.util.ssl.SSLConfiguration;
-import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import javax.inject.Provider;
 import java.net.URI;
@@ -20,19 +20,20 @@ import java.util.Map;
  * on 12/18/23 at  4:04 PM
  */
 public class XMLClientLoader<T extends OA2ClientEnvironment> implements ClientLoaderInterface<T> {
-    public XMLClientLoader(ConfigurationNode node) {
-           oldLoader = new OA2ClientLoader<>(node);
+
+    public XMLClientLoader(CFNode node) {
+           oldLoader = new OA2CFClientLoader<>(node);
     }
 
-    public OA2ClientLoader getOldLoader() {
+    public OA2CFClientLoader getOldLoader() {
         return oldLoader;
     }
 
-    public void setOldLoader(OA2ClientLoader oldLoader) {
+    public void setOldLoader(OA2CFClientLoader oldLoader) {
         this.oldLoader = oldLoader;
     }
 
-    OA2ClientLoader oldLoader;
+    OA2CFClientLoader oldLoader;
 
     @Override
     public OA4MPServiceProvider getServiceProvider() {

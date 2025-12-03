@@ -1,7 +1,7 @@
 package org.oa4mp.server.qdl.testUtils;
 
 import org.oa4mp.server.loader.oauth2.OA2SE;
-import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
+import org.oa4mp.server.loader.oauth2.loader.OA2CFConfigurationLoader;
 import org.oa4mp.server.loader.oauth2.servlet.ClientUtils;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2ClientKeys;
 import org.oa4mp.delegation.server.OA2Constants;
@@ -10,7 +10,7 @@ import org.qdl_lang.extensions.QDLFunction;
 import org.qdl_lang.extensions.QDLMetaModule;
 import org.qdl_lang.state.State;
 import org.qdl_lang.variables.QDLStem;
-import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
+import edu.uiuc.ncsa.security.util.configuration.TimeUtil;
 import net.sf.json.JSONObject;
 import org.qdl_lang.variables.values.LongValue;
 import org.qdl_lang.variables.values.QDLKey;
@@ -222,11 +222,11 @@ public class TestUtils implements QDLMetaModule {
             checkArgs(objects, getName()); // don't need output
             QDLStem serverDefaults = objects[0].asStem();
             QDLStem client = objects[1].asStem();
-            if(serverDefaults.getLong(OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_TAG) == OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_DISABLED){
+            if(serverDefaults.getLong(OA2CFConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_TAG) == OA2CFConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_DISABLED){
                 return LongValue.Zero;
             }
-            if(client.getLong(oa2ClientKeys.rtGracePeriod()) == OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_USE_SERVER_DEFAULT){
-               return asQDLValue(serverDefaults.getLong(OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_TAG));
+            if(client.getLong(oa2ClientKeys.rtGracePeriod()) == OA2CFConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_USE_SERVER_DEFAULT){
+               return asQDLValue(serverDefaults.getLong(OA2CFConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_TAG));
             }
             return asQDLValue(client.getLong(oa2ClientKeys.rtGracePeriod()));
         }
@@ -273,7 +273,7 @@ public class TestUtils implements QDLMetaModule {
         Pattern pattern = Pattern.compile("^[0-9]*$");
 
         long convertSingle(String x){
-            return XMLConfigUtil.getValueSecsOrMillis(x, !pattern.matcher(x).matches()); // only digits assumed to be ms
+            return TimeUtil.getValueSecsOrMillis(x, !pattern.matcher(x).matches()); // only digits assumed to be ms
         }
         @Override
         public List<String> getDocumentation(int argCount) {

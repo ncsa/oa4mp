@@ -6,7 +6,6 @@ import org.oa4mp.delegation.common.storage.clients.Client;
 import edu.uiuc.ncsa.security.core.util.IdentifiableProviderImpl;
 import edu.uiuc.ncsa.security.storage.FSProvider;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
-import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import javax.inject.Provider;
 import java.io.File;
@@ -17,12 +16,6 @@ import java.io.File;
  */
 public class DSFSClientStoreProvider extends FSProvider<DSFSClientStore> implements OA4MPConfigTags {
 
-    public DSFSClientStoreProvider(ConfigurationNode config,
-                                   MapConverter<Client> cp,
-                                   Provider<? extends Client> clientProvider) {
-        super(config, FILE_STORE, CLIENTS_STORE, cp);
-        this.clientProvider = clientProvider;
-    }
     public DSFSClientStoreProvider(CFNode config,
                                    MapConverter<Client> cp,
                                    Provider<? extends Client> clientProvider) {

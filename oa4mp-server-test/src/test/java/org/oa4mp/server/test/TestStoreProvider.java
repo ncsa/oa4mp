@@ -12,7 +12,6 @@ import org.oa4mp.delegation.common.storage.clients.Client;
 import org.oa4mp.delegation.common.storage.TransactionStore;
 import org.oa4mp.delegation.common.storage.transactions.BasicTransaction;
 import org.oa4mp.delegation.common.token.TokenForge;
-import org.apache.commons.configuration.tree.ConfigurationNode;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -21,7 +20,6 @@ import org.apache.commons.configuration.tree.ConfigurationNode;
 public abstract class TestStoreProvider implements TestStoreProviderInterface {
 
 
-    protected ConfigurationNode node;
 
     @Override
     public ServiceEnvironment getSE()  {

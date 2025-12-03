@@ -1,24 +1,24 @@
 package org.oa4mp.server.qdl;
 
+import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.cf.CFNode;
+import edu.uiuc.ncsa.security.core.cf.CFXMLConfigurations;
+import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
+import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
+import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import net.sf.json.JSON;
+import net.sf.json.JSONObject;
+import org.oa4mp.delegation.server.storage.ClientApproval;
 import org.oa4mp.server.loader.oauth2.OA2SE;
-import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
+import org.oa4mp.server.loader.oauth2.loader.OA2CFConfigurationLoader;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2ClientConverter;
-import org.oa4mp.delegation.server.storage.ClientApproval;
 import org.qdl_lang.exceptions.BadArgException;
 import org.qdl_lang.extensions.QDLFunction;
 import org.qdl_lang.extensions.QDLMetaModule;
 import org.qdl_lang.state.State;
 import org.qdl_lang.variables.QDLStem;
-import edu.uiuc.ncsa.security.core.Identifier;
-import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
-import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
-import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
-import net.sf.json.JSON;
-import net.sf.json.JSONObject;
-import org.apache.commons.configuration.tree.ConfigurationNode;
 import org.qdl_lang.variables.values.BooleanValue;
 import org.qdl_lang.variables.values.QDLValue;
 
@@ -42,21 +42,23 @@ public class ClientManagementCommands implements QDLMetaModule {
     }
 
     transient MyLoggingFacade logger = null;
-    transient ConfigurationNode configurationNode;
+
+    public CFNode getCFNode() {
+        return cfNode;
+    }
+
+    public void setCFNode(CFNode cfNode) {
+        this.cfNode = cfNode;
+    }
+
+    transient CFNode cfNode;
     transient OA2SE environment = null;
 
 
     public ConfigurationLoader<? extends AbstractEnvironment> getLoader() {
-        return new OA2ConfigurationLoader<OA2SE>(getConfigurationNode(), getLogger());
+        return new OA2CFConfigurationLoader<>(getCFNode(), getLogger());
     }
 
-    public ConfigurationNode getConfigurationNode() {
-        return configurationNode;
-    }
-
-    public void setConfigurationNode(ConfigurationNode configurationNode) {
-        this.configurationNode = configurationNode;
-    }
 
 
     public OA2SE getEnvironment() throws Exception {
@@ -76,7 +78,7 @@ public class ClientManagementCommands implements QDLMetaModule {
 
     protected void init(String configFile, String cfgName) throws Throwable {
 
-        setConfigurationNode(XMLConfigUtil.findConfiguration(configFile, cfgName, "service"));
+        setCFNode(CFXMLConfigurations.findConfiguration(configFile,  "service", cfgName));
         initCalled = true;
     }
 

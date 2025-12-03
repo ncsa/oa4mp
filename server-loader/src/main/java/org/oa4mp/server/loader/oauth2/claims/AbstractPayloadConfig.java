@@ -5,7 +5,7 @@ import org.oa4mp.server.loader.qdl.scripting.QDLRuntimeEngine;
 import org.qdl_lang.scripting.AnaphorUtil;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
-import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
+import edu.uiuc.ncsa.security.util.configuration.TimeUtil;
 import edu.uiuc.ncsa.security.util.scripting.ScriptSet;
 import net.sf.json.JSON;
 import net.sf.json.JSONException;
@@ -65,7 +65,7 @@ public abstract class AbstractPayloadConfig implements Serializable {
         if (jsonObject.containsKey(LIFETIME_KEY)) {
             Object rawLifetime = jsonObject.get(LIFETIME_KEY);
             if (rawLifetime instanceof String) {
-                lifetime = XMLConfigUtil.getValueSecsOrMillis((String) rawLifetime, false);
+                lifetime = TimeUtil.getValueSecsOrMillis((String) rawLifetime, false);
             } else {
                 // assume it is a long and let JSON figure it out
                 lifetime = jsonObject.getLong(LIFETIME_KEY);

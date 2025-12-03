@@ -2,17 +2,17 @@ package org.oa4mp.server.qdl.storage;
 
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
+import edu.uiuc.ncsa.security.core.cf.CFNode;
+import edu.uiuc.ncsa.security.core.cf.CFXMLConfigurations;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
-import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
-import org.apache.commons.configuration.tree.ConfigurationNode;
 import org.oa4mp.delegation.common.storage.TransactionStore;
 import org.oa4mp.delegation.server.storage.ClientStore;
 import org.oa4mp.server.loader.oauth2.OA2SE;
-import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
+import org.oa4mp.server.loader.oauth2.loader.OA2CFConfigurationLoader;
 import org.qdl_lang.exceptions.BadArgException;
 import org.qdl_lang.extensions.QDLFunction;
 import org.qdl_lang.extensions.QDLVariable;
@@ -38,7 +38,7 @@ import static org.qdl_lang.variables.values.QDLValue.asQDLValue;
  * <p>Created by Jeff Gaynor<br>
  * on 12/18/20 at  7:05 AM
  */
-public class StoreFacade /*implements QDLMetaModule*/ {
+public class StoreFacade  {
     QDLStem types;
 
     public QDLStem getStoreTypes() {
@@ -63,21 +63,24 @@ public class StoreFacade /*implements QDLMetaModule*/ {
     }
 
     transient MyLoggingFacade logger = null;
-    transient ConfigurationNode configurationNode;
+
+    public CFNode getCFNode() {
+        return cfNode;
+    }
+
+    public void setCFNode(CFNode cfNode) {
+        this.cfNode = cfNode;
+    }
+
+    transient CFNode cfNode ;
     transient protected OA2SE environment = null;
 
 
     public ConfigurationLoader<? extends AbstractEnvironment> getLoader() {
-        return new OA2ConfigurationLoader<OA2SE>(getConfigurationNode(), getLogger());
+        return new OA2CFConfigurationLoader<OA2SE>(getCFNode(), getLogger());
     }
 
-    public ConfigurationNode getConfigurationNode() {
-        return configurationNode;
-    }
 
-    public void setConfigurationNode(ConfigurationNode configurationNode) {
-        this.configurationNode = configurationNode;
-    }
 
 
     public OA2SE getEnvironment() throws Exception {
@@ -103,7 +106,7 @@ public class StoreFacade /*implements QDLMetaModule*/ {
     }
 
     protected void init(String configFile, String cfgName) throws Throwable {
-        setConfigurationNode(XMLConfigUtil.findConfiguration(configFile, cfgName, "service"));
+        setCFNode(CFXMLConfigurations.findConfiguration(configFile, "service", cfgName));
         initCalled = true;
     }
 

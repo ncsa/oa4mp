@@ -1,9 +1,9 @@
 package org.oa4mp.server.admin.oauth2.base;
 
-import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
+import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import org.oa4mp.server.api.ServiceEnvironmentImpl;
 import org.oa4mp.server.api.util.AbstractCLIApprover;
-import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
+import org.oa4mp.server.loader.oauth2.loader.OA2CFConfigurationLoader;
 
 import java.io.File;
 
@@ -14,7 +14,7 @@ import java.io.File;
 public class CLIApprover extends AbstractCLIApprover {
     @Override
     public ConfigurationLoader<? extends ServiceEnvironmentImpl> getLoader() {
-        return new OA2ConfigurationLoader<>(getConfigurationNode());
+        return new OA2CFConfigurationLoader<>(getCfNode());
     }
 
     public static void main(String[] args) {

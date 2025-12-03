@@ -32,7 +32,6 @@
         <module name="client" />
         <module name="server-webapp-jar" />
         <module name="website" />
-        <module name="myproxy" />
         <module name="oa4mp-server-oauth2" />
         <module name="myproxy-logon" />
         <module name="server-loader" />
@@ -51,6 +50,7 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="client-webapp" target="11" />
+      <module name="myproxy" target="11" />
       <module name="myproxy-website" target="1.8" />
       <module name="oa4mp-webapp" target="11" />
       <module name="server-installer" target="11" />

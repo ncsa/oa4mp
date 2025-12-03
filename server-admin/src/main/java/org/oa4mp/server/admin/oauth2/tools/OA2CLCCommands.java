@@ -30,7 +30,7 @@ import org.oa4mp.delegation.server.client.ATResponse2;
 import org.oa4mp.delegation.server.client.RFC7523Utils;
 import org.oa4mp.delegation.server.jwt.MyOtherJWTUtil2;
 import org.oa4mp.delegation.server.server.claims.OA2Claims;
-import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
+import org.oa4mp.server.loader.oauth2.loader.OA2CFConfigurationLoader;
 import org.oa4mp.server.loader.oauth2.servlet.RFC8628Constants2;
 import org.qdl_lang.variables.Constant;
 import org.qdl_lang.variables.Constants;
@@ -52,8 +52,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 import static org.oa4mp.delegation.server.OA2Constants.*;
@@ -1028,10 +1028,10 @@ public class OA2CLCCommands extends CommonCommands2 {
 
     private void processATResponse(InputLine inputLine) {
         if (getDummyAsset().getAccessToken().isOldVersion() && getDummyAsset().getAccessToken().getLifetime() < 0) {
-            getDummyAsset().getAccessToken().setLifetime(OA2ConfigurationLoader.ACCESS_TOKEN_LIFETIME_DEFAULT);
+            getDummyAsset().getAccessToken().setLifetime(OA2CFConfigurationLoader.ACCESS_TOKEN_LIFETIME_DEFAULT);
         }
         if (getDummyAsset().hasRefreshToken() && getDummyAsset().getRefreshToken().isOldVersion() && getDummyAsset().getRefreshToken().getLifetime() < 0) {
-            getDummyAsset().getRefreshToken().setLifetime(OA2ConfigurationLoader.MAX_REFRESH_TOKEN_LIFETIME_DEFAULT);
+            getDummyAsset().getRefreshToken().setLifetime(OA2CFConfigurationLoader.MAX_REFRESH_TOKEN_LIFETIME_DEFAULT);
         }
 
         if (inputLine.hasArg(CLAIMS_FLAG)) {

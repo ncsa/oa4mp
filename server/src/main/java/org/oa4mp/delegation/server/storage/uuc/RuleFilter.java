@@ -6,7 +6,7 @@ import java.text.ParseException;
 import java.util.Calendar;
 import java.util.HashMap;
 
-import static edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil.getValueSecsOrMillis;
+import static edu.uiuc.ncsa.security.util.configuration.TimeUtil.getValueSecsOrMillis;
 
 /**
  * <p>Created by Jeff Gaynor<br>

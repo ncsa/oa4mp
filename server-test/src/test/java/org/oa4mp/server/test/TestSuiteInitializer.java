@@ -10,7 +10,7 @@ import org.oa4mp.server.api.ServiceEnvironment;
 import org.oa4mp.server.api.admin.adminClient.AdminClientStoreProviders;
 import org.oa4mp.server.api.admin.things.SATFactory;
 import org.oa4mp.server.api.storage.servlet.AbstractBootstrapper;
-import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
+import org.oa4mp.server.loader.oauth2.loader.OA2CFConfigurationLoader;
 
 import static org.oa4mp.server.test.TestUtils.findConfigNode;
 
@@ -28,12 +28,12 @@ public class TestSuiteInitializer extends AbstractTestSuiteInitializer {
     @Override
     public TestStoreProvider2 getTSP(final String namedNode) {
         return new TestStoreProvider2() {
-            OA2ConfigurationLoader loader;
+            OA2CFConfigurationLoader loader;
 
             @Override
             public ConfigurationLoader<? extends ServiceEnvironment> getConfigLoader() {
                 if (loader == null) {
-                    loader = new OA2ConfigurationLoader(findConfigNode(namedNode));
+                    loader = new OA2CFConfigurationLoader(findConfigNode(namedNode));
                 }
                 return loader;
             }

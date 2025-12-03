@@ -14,7 +14,7 @@ import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.storage.sql.SQLStore;
 import edu.uiuc.ncsa.security.storage.sql.derby.DerbyConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
-import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
+import edu.uiuc.ncsa.security.util.configuration.TimeUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import net.sf.json.JSONArray;
@@ -42,7 +42,7 @@ import org.oa4mp.server.api.storage.servlet.OA4MPServlet;
 import org.oa4mp.server.api.util.ClientDebugUtil;
 import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.claims.IDTokenHandler;
-import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
+import org.oa4mp.server.loader.oauth2.loader.OA2CFConfigurationLoader;
 import org.oa4mp.server.loader.oauth2.servlet.*;
 import org.oa4mp.server.loader.oauth2.state.ScriptRuntimeEngineFactory;
 import org.oa4mp.server.loader.oauth2.storage.RefreshTokenStore;
@@ -66,9 +66,9 @@ import java.util.*;
 
 import static org.oa4mp.delegation.server.OA2Constants.NONCE;
 import static org.oa4mp.delegation.server.OA2Constants.STATE;
+import static org.oa4mp.delegation.server.server.RFC8693Constants.*;
 import static org.oa4mp.delegation.server.server.RFC8693Constants.AUDIENCE;
 import static org.oa4mp.delegation.server.server.RFC8693Constants.RESOURCE;
-import static org.oa4mp.delegation.server.server.RFC8693Constants.*;
 import static org.oa4mp.delegation.server.server.claims.OA2Claims.*;
 
 /**
@@ -321,7 +321,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         if (request.getParameter(OA2Constants.ACCESS_TOKEN_LIFETIME) != null) {
             String rawATLifetime = getFirstParameterValue(request, OA2Constants.ACCESS_TOKEN_LIFETIME);
             try {
-                long at = XMLConfigUtil.getValueSecsOrMillis(rawATLifetime);
+                long at = TimeUtil.getValueSecsOrMillis(rawATLifetime);
                 serviceTransaction.setRequestedATLifetime(at);
             } catch (Throwable t) {
                 getServiceEnvironment().info("Could not set requested access token lifetime to \"" + rawATLifetime
@@ -334,7 +334,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         if (request.getParameter(OA2Constants.REFRESH_LIFETIME) != null) {
             String rawATLifetime = getFirstParameterValue(request, OA2Constants.REFRESH_LIFETIME);
             try {
-                long rt = XMLConfigUtil.getValueSecsOrMillis(rawATLifetime);
+                long rt = TimeUtil.getValueSecsOrMillis(rawATLifetime);
                 serviceTransaction.setRequestedRTLifetime(rt);
             } catch (Throwable t) {
                 getServiceEnvironment().info("Could not set requested refresh token lifetime to \"" + rawATLifetime
@@ -352,7 +352,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         if (request.getParameter(OA2Constants.ID_TOKEN_LIFETIME) != null) {
             String rawATLifetime = getFirstParameterValue(request, OA2Constants.ID_TOKEN_LIFETIME);
             try {
-                long idt = XMLConfigUtil.getValueSecsOrMillis(rawATLifetime);
+                long idt = TimeUtil.getValueSecsOrMillis(rawATLifetime);
                 serviceTransaction.setRequestedIDTLifetime(idt);
             } catch (Throwable t) {
                 getServiceEnvironment().info("Could not set requested ID token lifetime to \"" + rawATLifetime
@@ -524,7 +524,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         if (tokenRequest.containsKey(OA2Constants.ACCESS_TOKEN_LIFETIME)) {
             String rawATLifetime = tokenRequest.getString(OA2Constants.ACCESS_TOKEN_LIFETIME);
             try {
-                long at = XMLConfigUtil.getValueSecsOrMillis(rawATLifetime);
+                long at = TimeUtil.getValueSecsOrMillis(rawATLifetime);
                 //               long at = Long.parseLong(rawATLifetime);
                 serviceTransaction.setRequestedATLifetime(at);
             } catch (Throwable t) {
@@ -538,7 +538,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         if (tokenRequest.containsKey(OA2Constants.REFRESH_LIFETIME)) {
             String rawRTLifetime = tokenRequest.getString(OA2Constants.REFRESH_LIFETIME);
             try {
-                long at = XMLConfigUtil.getValueSecsOrMillis(rawRTLifetime);
+                long at = TimeUtil.getValueSecsOrMillis(rawRTLifetime);
                 serviceTransaction.setRequestedRTLifetime(at);
             } catch (Throwable t) {
                 getServiceEnvironment().info("Could not set requested refresh token lifetime to \"" + rawRTLifetime
@@ -551,7 +551,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         if (tokenRequest.containsKey(OA2Constants.ID_TOKEN_LIFETIME)) {
             String rawLifetime = tokenRequest.getString(OA2Constants.ID_TOKEN_LIFETIME);
             try {
-                long at = XMLConfigUtil.getValueSecsOrMillis(rawLifetime);
+                long at = TimeUtil.getValueSecsOrMillis(rawLifetime);
                 serviceTransaction.setRequestedIDTLifetime(at);
             } catch (Throwable t) {
                 getServiceEnvironment().info("Could not set requested ID token lifetime to \"" + rawLifetime
@@ -1897,7 +1897,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             // update old version 1 token.
             AuthorizationGrantImpl ag0 = (AuthorizationGrantImpl) ag;
             ag0.setIssuedAt(DateUtils.getDate(ag0.getToken()).getTime());
-            ag0.setLifetime(OA2ConfigurationLoader.AUTHORIZATION_GRANT_LIFETIME_DEFAULT);
+            ag0.setLifetime(OA2CFConfigurationLoader.AUTHORIZATION_GRANT_LIFETIME_DEFAULT);
             ag0.setVersion(Identifiers.VERSION_1_0_TAG);  // just in case.
             return ag0;
         }

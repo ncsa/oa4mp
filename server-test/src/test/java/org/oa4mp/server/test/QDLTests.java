@@ -1,11 +1,12 @@
 package org.oa4mp.server.test;
 
 
+import edu.uiuc.ncsa.security.core.cf.CFXMLConfigurations;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import net.sf.json.JSONObject;
 import org.oa4mp.server.loader.oauth2.OA2SE;
-import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
+import org.oa4mp.server.loader.oauth2.loader.OA2CFConfigurationLoader;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
 import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
 import org.oa4mp.server.loader.qdl.scripting.OA2State;
@@ -14,9 +15,8 @@ import org.qdl_lang.TestUtils;
 import org.qdl_lang.exceptions.QDLExceptionWithTrace;
 import org.qdl_lang.parsing.QDLInterpreter;
 
+import java.net.URI;
 import java.util.List;
-
-import static org.oa4mp.server.test.TestUtils.findConfigNode;
 
 /**
  * Tests for QDL. There are versions of these that end in A or not. Those that do not end in A
@@ -344,7 +344,7 @@ public class QDLTests extends AbstractQDLTester {
     protected void setFakeState(OA2State oa2State) {
         OA2ServiceTransaction oa2ServiceTransaction = new OA2ServiceTransaction(BasicIdentifier.randomID());
         OA2Client oa2Client = new OA2Client(BasicIdentifier.randomID());
-        OA2ConfigurationLoader loader = new OA2ConfigurationLoader(findConfigNode(DebugUtil.getConfigPath()+"/server-oa2.xml", "localhost:oa4mp.oa2.mariadb"));
+        OA2CFConfigurationLoader loader = new OA2CFConfigurationLoader(CFXMLConfigurations.findConfiguration(URI.create(DebugUtil.getConfigPath()+"/server-oa2.xml"), "server", "localhost:oa4mp.oa2.mariadb"));
         OA2SE oa2SE = (OA2SE) loader.load();
         oa2State.setOa2se(oa2SE);
         oa2Client.setConfig(new JSONObject());

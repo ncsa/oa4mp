@@ -2,7 +2,7 @@ package org.oa4mp.server.loader.oauth2.storage.clients;
 
 import org.oa4mp.server.loader.oauth2.claims.AbstractPayloadConfig;
 import org.oa4mp.server.loader.oauth2.claims.IDTokenClientConfig;
-import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
+import org.oa4mp.server.loader.oauth2.loader.OA2CFConfigurationLoader;
 import org.oa4mp.server.loader.oauth2.servlet.OA2ClientUtils;
 import org.oa4mp.server.loader.oauth2.tokens.AccessTokenConfig;
 import org.oa4mp.server.loader.oauth2.tokens.RefreshTokenConfig;
@@ -781,7 +781,7 @@ public class OA2Client extends Client implements OA2ClientScopes {
         this.rtGracePeriod = rtGracePeriod;
     }
 
-    long rtGracePeriod = OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_USE_SERVER_DEFAULT;
+    long rtGracePeriod = OA2CFConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_USE_SERVER_DEFAULT;
 
     /**
      * If this is an ersatz client, should it inherit the id token of its provisioner

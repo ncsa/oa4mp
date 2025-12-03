@@ -1,6 +1,5 @@
 package org.oa4mp.server.test;
 
-import org.oa4mp.server.test.TestUtils;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
 import org.oa4mp.server.api.admin.adminClient.AdminClient;
 import org.oa4mp.server.api.admin.adminClient.AdminClientStore;

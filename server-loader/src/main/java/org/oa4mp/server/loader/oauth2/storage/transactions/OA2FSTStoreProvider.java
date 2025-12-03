@@ -2,7 +2,6 @@ package org.oa4mp.server.loader.oauth2.storage.transactions;
 
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.cf.CFNode;
-import org.apache.commons.configuration.tree.ConfigurationNode;
 import org.oa4mp.delegation.common.token.TokenForge;
 import org.oa4mp.server.api.admin.transactions.DSFSTransactionStoreProvider;
 import org.oa4mp.server.api.admin.transactions.TransactionConverter;
@@ -15,12 +14,6 @@ import java.io.File;
  * on 3/25/14 at  12:15 PM
  */
 public class OA2FSTStoreProvider<T extends OA2FSTStore> extends DSFSTransactionStoreProvider<T> {
-    public OA2FSTStoreProvider(ConfigurationNode config,
-                               IdentifiableProvider<? extends OA2ServiceTransaction> tp,
-                               Provider<TokenForge> tfp,
-                               TransactionConverter<? extends OA2ServiceTransaction> tc) {
-        super(config, tp, tfp, tc);
-    }
 
     public OA2FSTStoreProvider(CFNode config,
                                IdentifiableProvider<? extends OA2ServiceTransaction> tp,

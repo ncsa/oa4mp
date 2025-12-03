@@ -1,16 +1,14 @@
 package org.oa4mp.server.test;
 
-import org.oa4mp.server.api.storage.servlet.AbstractBootstrapper;
-import edu.uiuc.ncsa.security.core.configuration.Configurations;
+import edu.uiuc.ncsa.security.core.cf.CFNode;
+import edu.uiuc.ncsa.security.core.cf.CFXMLConfigurations;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import org.apache.commons.configuration.XMLConfiguration;
-import org.apache.commons.configuration.tree.ConfigurationNode;
+import org.oa4mp.server.api.storage.servlet.AbstractBootstrapper;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -109,7 +107,7 @@ public class TestUtils {
         return getBootstrapper().getOa4mpConfigFileKey();
     }
 
-    public static ConfigurationNode findConfigNode(String configName) {
+    public static CFNode findConfigNode(String configName) {
         return findConfigNode(null, configName);
     }
 
@@ -126,52 +124,54 @@ public class TestUtils {
      * @param configName
      * @return
      */
-    public static ConfigurationNode findConfigNode(String fileName, String configName) {
+    public static CFNode findConfigNode(String fileName, String configName) {
         if (fileName == null) {
             fileName = System.getProperty(getConfigFileKey());
         }
         if (fileName == null) {
             throw new MyConfigurationException("Error: No configuration file specified. Did you set the system property correctly?");
         }
+        if (configName == null) {
+            // try to find a specified configuration.
+            String cfgName = System.getProperty(getBootstrapper().getOa4mpConfigNameKey());
+            if (cfgName == null) {
+                DebugUtil.trace(TestUtils.class, "no name for a configuration given");
+                throw new MyConfigurationException("Error: No configuration name specified. Did you set the system property correctly?");
+
+            }
+        }/*else {
+                DebugUtil.trace(TestUtils.class, "getting named configuration \"" + cfgName + "\"");
+                return CFXMLConfigurations.findConfiguration(cfg, COMPONENT, cfgName);
+            }
+         } else {
+            cn = Configurations.getConfig(cfg, COMPONENT, configName);
+        }*/
         try {
 
-            XMLConfiguration cfg = null;
-            if (fileName.length() != 0) {
-                // A properties file is supplied. Use that.
-                try {
-                    cfg = Configurations.getConfiguration(new File(fileName));
-                } catch (MyConfigurationException cx) {
-                    cx.printStackTrace();
-                    // plan B, maybe it's in the deployment itself? try to get as a resource
-                    URL url = TestUtils.class.getResource(fileName);
+            if (fileName.length() == 0) {
+                throw new MyConfigurationException("Error:No configuration file found.");
+            }
+
+            // A properties file is supplied. Use that.
+            try {
+                return CFXMLConfigurations.findConfiguration(fileName, COMPONENT, configName);
+                // cfg = CFXMLConfigurations.getConfiguration(new File(fileName));
+            } catch (MyConfigurationException cx) {
+                cx.printStackTrace();
+                // plan B, maybe it's in the deployment itself? try to get as a resource
+                return CFXMLConfigurations.findConfiguration(TestUtils.class.getResourceAsStream(fileName), COMPONENT, configName);
+
+                   /* URL url = TestUtils.class.getResource(fileName);
                     if (url == null) {
                         throw new MyConfigurationException("Error:No configuration found. for \"" + fileName + "\"");
                     }
-                    cfg = Configurations.getConfiguration(url);
-
-                }
-            } else {
-                throw new MyConfigurationException("Error:No configuration file found.");
+                    cfg = Configurations.getConfiguration(url);*/
 
             }
-            ConfigurationNode cn = null;
 
-            if (configName == null) {
-                // try to find a specified configuration.
-                String cfgName = System.getProperty(getBootstrapper().getOa4mpConfigNameKey());
-                if (cfgName == null) {
-                    DebugUtil.trace(TestUtils.class, "no name for a configuration given");
-                    cn = cfg.configurationAt(COMPONENT).getRootNode();
 
-                } else {
-                    DebugUtil.trace(TestUtils.class, "getting named configuration \"" + cfgName + "\"");
-                    cn = Configurations.getConfig(cfg, COMPONENT, cfgName);
-                }
-
-            } else {
-                cn = Configurations.getConfig(cfg, COMPONENT, configName);
-            }
-            return cn;
+        } catch (MyConfigurationException cx) {
+            throw cx;
         } catch (Exception x) {
             MyConfigurationException ex = new MyConfigurationException("Error loading configuration with " +
                     "name \"" + configName + "\" from file \"" + fileName + "\".", x);
@@ -179,6 +179,7 @@ public class TestUtils {
             throw ex;
         }
     }
+
 
     public static void setH2StoreProvider(TestStoreProviderInterface h2) {
         h2StoreProvider = h2;

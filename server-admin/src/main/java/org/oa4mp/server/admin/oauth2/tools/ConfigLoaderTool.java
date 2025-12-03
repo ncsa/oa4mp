@@ -1,11 +1,11 @@
 package org.oa4mp.server.admin.oauth2.tools;
 
-import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
-import org.oa4mp.client.loader.XMLClientLoader;
+import edu.uiuc.ncsa.security.core.cf.CFNode;
+import edu.uiuc.ncsa.security.core.cf.CFXMLConfigurations;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
-import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
-import org.apache.commons.configuration.tree.ConfigurationNode;
+import org.oa4mp.client.loader.XMLClientLoader;
+import org.oa4mp.server.loader.oauth2.loader.OA2CFConfigurationLoader;
 
 /**
  * Wraps what used to be method in {@link edu.uiuc.ncsa.security.util.cli.ConfigurableCommandsImpl}
@@ -16,7 +16,7 @@ import org.apache.commons.configuration.tree.ConfigurationNode;
 public class ConfigLoaderTool {
     public  ConfigurationLoader<? extends AbstractEnvironment> figureOutClientLoader(String fileName, String configName, String componentName) throws Throwable {
         if (fileName.endsWith(".xml")) {
-            ConfigurationNode node = XMLConfigUtil.findConfiguration(fileName, configName, componentName);
+            CFNode node = CFXMLConfigurations.findConfiguration(fileName, componentName, configName);
             XMLClientLoader xmlClientLoader = new XMLClientLoader(node);
             return xmlClientLoader;
         }
@@ -24,8 +24,8 @@ public class ConfigLoaderTool {
     }
     public  ConfigurationLoader<? extends AbstractEnvironment> figureOutServerLoader(String fileName, String configName, String componentName) throws Throwable {
         if (fileName.endsWith(".xml")) {
-            ConfigurationNode node = XMLConfigUtil.findConfiguration(fileName, configName, componentName);
-            OA2ConfigurationLoader serverLoader = new OA2ConfigurationLoader<>(node);
+            CFNode node = CFXMLConfigurations.findConfiguration(fileName, componentName, configName);
+            OA2CFConfigurationLoader serverLoader = new OA2CFConfigurationLoader<>(node);
             return serverLoader;
         }
         return null;

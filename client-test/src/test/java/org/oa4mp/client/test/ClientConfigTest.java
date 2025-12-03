@@ -1,10 +1,8 @@
 package org.oa4mp.client.test;
 
+import edu.uiuc.ncsa.security.core.cf.CFBundle;
+import edu.uiuc.ncsa.security.core.cf.CFNode;
 import edu.uiuc.ncsa.security.core.configuration.ConfigTest;
-import edu.uiuc.ncsa.security.core.configuration.Configurations;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.XMLConfiguration;
-import org.apache.commons.configuration.tree.ConfigurationNode;
 import org.junit.Test;
 
 /**
@@ -14,13 +12,13 @@ import org.junit.Test;
 public class ClientConfigTest extends ConfigTest {
     @Test
     public void testConfig() throws Exception{
-        ConfigurationNode cn = getConfig("sample");
-        say("id = " +Configurations.getNodeValue(cn, "id"));
-        printNodes(cn);
+        CFNode cn = getConfig("sample");
+        say("id = " +cn.getNodeContents("id"));
+        print(cn);
     }
 
     @Override
-    protected XMLConfiguration getConfiguration() throws ConfigurationException {
+    protected CFBundle getConfiguration() {
         return getConfiguration("/client.xml");
     }
 

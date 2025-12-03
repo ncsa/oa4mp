@@ -21,7 +21,7 @@ import org.oa4mp.server.admin.oauth2.base.ClientStoreCommands;
 import org.oa4mp.server.api.admin.permissions.Permission;
 import org.oa4mp.server.api.admin.permissions.PermissionList;
 import org.oa4mp.server.api.admin.permissions.PermissionsStore;
-import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
+import org.oa4mp.server.loader.oauth2.loader.OA2CFConfigurationLoader;
 import org.oa4mp.server.loader.oauth2.servlet.OA2ClientUtils;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2ClientKeys;
@@ -237,15 +237,15 @@ public class OA2ClientCommands extends ClientStoreCommands {
             // now do grace periods. These are complex.
             // Again, no switch for longs.
             long rtGracePeriod = oa2Client.getRtGracePeriod();
-            if (rtGracePeriod == OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_DISABLED) {
+            if (rtGracePeriod == OA2CFConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_DISABLED) {
                 rawLifetime = RT_DISABLED;
             } else {
-                if (rtGracePeriod == OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_USE_SERVER_DEFAULT) {
+                if (rtGracePeriod == OA2CFConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_USE_SERVER_DEFAULT) {
                     rawLifetime = DEFAULT_SERVER_VALUE;
                 } else {
-                    if (rtGracePeriod == OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_NOT_CONFIGURED) {
+                    if (rtGracePeriod == OA2CFConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_NOT_CONFIGURED) {
                         // not configured means no action has been taken, so set to default
-                        rawLifetime = Long.toString(OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_DEFAULT);
+                        rawLifetime = Long.toString(OA2CFConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_DEFAULT);
                     } else {
                         rawLifetime = Long.toString(rtGracePeriod);
                     }
@@ -254,10 +254,10 @@ public class OA2ClientCommands extends ClientStoreCommands {
             rawLifetime = getPropertyHelp(keys.rtGracePeriod(), "  enter grace period in sec., " + RT_DISABLED + ", or " + DEFAULT_SERVER_VALUE, rawLifetime);
             switch (rawLifetime) {
                 case RT_DISABLED:
-                    oa2Client.setRtGracePeriod(OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_DISABLED);
+                    oa2Client.setRtGracePeriod(OA2CFConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_DISABLED);
                     break;
                 case DEFAULT_SERVER_VALUE:
-                    oa2Client.setRtGracePeriod(OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_USE_SERVER_DEFAULT);
+                    oa2Client.setRtGracePeriod(OA2CFConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_USE_SERVER_DEFAULT);
                     break;
                 default:
                     try {

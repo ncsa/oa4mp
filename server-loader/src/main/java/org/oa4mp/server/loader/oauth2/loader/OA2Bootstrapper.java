@@ -1,11 +1,10 @@
 package org.oa4mp.server.loader.oauth2.loader;
 
 import edu.uiuc.ncsa.security.core.cf.CFNode;
-import org.oa4mp.server.api.storage.servlet.AbstractBootstrapper;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import edu.uiuc.ncsa.security.servlet.Initialization;
-import org.apache.commons.configuration.tree.ConfigurationNode;
+import org.oa4mp.server.api.storage.servlet.AbstractBootstrapper;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -23,11 +22,6 @@ public class OA2Bootstrapper extends AbstractBootstrapper {
     @Override
     public String getOa4mpConfigNameKey() {
         return OA2_CONFIG_NAME_KEY;
-    }
-
-    @Override
-    public ConfigurationLoader getConfigurationLoader(ConfigurationNode node) throws MyConfigurationException {
-        return new OA2ConfigurationLoader(node);
     }
 
     @Override

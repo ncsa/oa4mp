@@ -1,9 +1,7 @@
 package org.oa4mp.delegation.server;
 
 import edu.uiuc.ncsa.security.core.cf.CFNode;
-import edu.uiuc.ncsa.security.core.configuration.Configurations;
-import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
-import org.apache.commons.configuration.tree.ConfigurationNode;
+import edu.uiuc.ncsa.security.util.configuration.TimeUtil;
 
 import java.util.*;
 
@@ -14,7 +12,7 @@ import static org.oa4mp.delegation.server.OA2Constants.SCOPE;
  * <p>Created by Jeff Gaynor<br>
  * on 8/26/15 at  3:59 PM
  */
-public class OA2ConfigurationLoaderUtils extends XMLConfigUtil {
+public class OA2ConfigurationLoaderUtils extends TimeUtil {
 
     /**
      * <p>To read a block of parameters from a (client) configuration. These are sent along with the
@@ -40,7 +38,7 @@ public class OA2ConfigurationLoaderUtils extends XMLConfigUtil {
      * @param cn
      * @return
      */
-    public static Map<String, List<String>> getAdditionalParameters(ConfigurationNode cn) {
+   /* public static Map<String, List<String>> getAdditionalParameters(ConfigurationNode cn) {
         Map<String, List<String>> params = new HashMap<>();
         if (0 < cn.getChildrenCount(ADDITIONAL_PARAMETERS)) {
             ConfigurationNode node = Configurations.getFirstNode(cn, ADDITIONAL_PARAMETERS);
@@ -73,7 +71,7 @@ public class OA2ConfigurationLoaderUtils extends XMLConfigUtil {
         }
         return params;
     }
-
+*/
     public static Map<String, List<String>> getAdditionalParameters(CFNode cn) {
         Map<String, List<String>> params = new HashMap<>();
         List<CFNode> aparams = cn.getChildren(ADDITIONAL_PARAMETER);
@@ -125,7 +123,7 @@ public class OA2ConfigurationLoaderUtils extends XMLConfigUtil {
      * @param cn
      * @return
      */
-    public static Collection<String> getScopes(ConfigurationNode cn) {
+   /* public static Collection<String> getScopes(ConfigurationNode cn) {
         Collection<String> scopes = new HashSet<>(); // keep the elements unique
         // Fix https://github.com/ncsa/oa4mp/issues/103
         // First thing is to take all the basic scopes supported and include them.
@@ -155,7 +153,7 @@ public class OA2ConfigurationLoaderUtils extends XMLConfigUtil {
         }
         return scopes;
     }
-
+*/
     public static Collection<String> getScopes(CFNode cn) {
         Collection<String> scopes = new HashSet<>(); // keep the elements unique
         // Fix https://github.com/ncsa/oa4mp/issues/103

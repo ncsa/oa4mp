@@ -1,7 +1,7 @@
 package org.oa4mp.client.loader;
 
+import edu.uiuc.ncsa.security.core.cf.CFXMLConfigurations;
 import org.oa4mp.client.api.ClientXMLTags;
-import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
 
 import java.io.File;
 
@@ -12,8 +12,9 @@ import java.io.File;
  */
 public class OA2ClientEnvironmentUtil {
     public static OA2ClientEnvironment load(File configFile, String configName) throws Exception{
-        return (OA2ClientEnvironment) new OA2ClientLoader(XMLConfigUtil.findConfiguration(configFile.getAbsolutePath(),
-                configName, ClientXMLTags.COMPONENT)).load();
+        return  (OA2ClientEnvironment)  new OA2CFClientLoader(CFXMLConfigurations.findConfiguration(configFile.getAbsolutePath(),
+                ClientXMLTags.COMPONENT,
+                configName)).load();
     }
 
     /**

@@ -1,12 +1,11 @@
 package org.oa4mp.server.loader.oauth2.storage.tx;
 
 import edu.uiuc.ncsa.security.core.cf.CFNode;
-import org.oa4mp.server.api.OA4MPConfigTags;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPoolProvider;
 import edu.uiuc.ncsa.security.storage.sql.SQLStoreProvider;
 import edu.uiuc.ncsa.security.storage.sql.internals.Table;
-import org.apache.commons.configuration.tree.ConfigurationNode;
+import org.oa4mp.server.api.OA4MPConfigTags;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -15,14 +14,6 @@ import org.apache.commons.configuration.tree.ConfigurationNode;
 public class SQLTXRStoreProvider<T extends SQLTXRecordStore> extends SQLStoreProvider<T> implements OA4MPConfigTags {
     public static final String DEFAULT_TABLENAME = "tx_records";
 
-    public SQLTXRStoreProvider(ConfigurationNode config,
-                               ConnectionPoolProvider<? extends ConnectionPool> cpp,
-                               String type,
-                               TXRecordConverter converter,
-                               TXRecordProvider txRecordProvider) {
-        super(config, cpp, type, OA4MPConfigTags.TOKEN_EXCHANGE_RECORD_STORE,DEFAULT_TABLENAME , converter);
-         this.txRecordProvider = txRecordProvider;
-    }
     public SQLTXRStoreProvider(CFNode config,
                                ConnectionPoolProvider<? extends ConnectionPool> cpp,
                                String type,

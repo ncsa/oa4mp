@@ -5,16 +5,14 @@ import edu.uiuc.ncsa.sas.SASEnvironment;
 import edu.uiuc.ncsa.sas.SASServlet;
 import edu.uiuc.ncsa.sas.StringIO;
 import edu.uiuc.ncsa.sas.cli.SASCLIDriver;
-import edu.uiuc.ncsa.sas.loader.SASConfigurationLoader;
+import edu.uiuc.ncsa.sas.loader.SASCFConfigurationLoader;
+import edu.uiuc.ncsa.security.core.cf.CFNode;
+import edu.uiuc.ncsa.security.core.cf.CFXMLConfigurations;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
-import org.apache.commons.configuration.tree.ConfigurationNode;
 import org.oa4mp.server.admin.oauth2.tools.OA2Commands;
 import org.oa4mp.server.api.storage.servlet.OA4MPServlet;
 import org.oa4mp.server.loader.oauth2.OA2SE;
-
-import static edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil.findConfiguration;
-
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 3/7/24 at  1:27 PM
@@ -45,8 +43,9 @@ public class CLISASServlet extends SASServlet {
     @Override
     protected SASEnvironment getSASE() {
         if(sase == null){
-            ConfigurationNode node =  findConfiguration("/home/ncsa/dev/csd/config/sas/sat.xml", "oa4mp", "sas");
-            SASConfigurationLoader configurationLoader = new SASConfigurationLoader(node);
+            CFNode node = CFXMLConfigurations.findConfiguration("/home/ncsa/dev/csd/config/sas/sat.xml", "sas", "oa4mp");
+            SASCFConfigurationLoader configurationLoader = new SASCFConfigurationLoader(node);
+
             sase = configurationLoader.load();
             System.out.println(getClass().getSimpleName() + ":\n" + sase.getClientStore());
         }

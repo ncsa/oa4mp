@@ -1,9 +1,9 @@
 package org.oa4mp.server.admin.oauth2.tools;
 
-import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
-import org.oa4mp.server.admin.oauth2.base.CopyTool;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
+import org.oa4mp.server.admin.oauth2.base.CopyTool;
+import org.oa4mp.server.loader.oauth2.loader.OA2CFConfigurationLoader;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -12,7 +12,7 @@ import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 public class OA2CopyTool extends CopyTool {
     @Override
     public ConfigurationLoader<? extends AbstractEnvironment> getLoader() throws Exception {
-        return new OA2ConfigurationLoader<>(getConfigurationNode(), getMyLogger());
+        return new OA2CFConfigurationLoader<>(getCfNode(), getMyLogger());
     }
 
     public static void main(String[] args) {

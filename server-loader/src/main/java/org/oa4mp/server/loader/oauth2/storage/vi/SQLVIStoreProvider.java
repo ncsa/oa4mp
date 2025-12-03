@@ -1,12 +1,11 @@
 package org.oa4mp.server.loader.oauth2.storage.vi;
 
 import edu.uiuc.ncsa.security.core.cf.CFNode;
-import org.oa4mp.server.api.OA4MPConfigTags;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPoolProvider;
 import edu.uiuc.ncsa.security.storage.sql.SQLStoreProvider;
 import edu.uiuc.ncsa.security.storage.sql.internals.Table;
-import org.apache.commons.configuration.tree.ConfigurationNode;
+import org.oa4mp.server.api.OA4MPConfigTags;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -14,15 +13,6 @@ import org.apache.commons.configuration.tree.ConfigurationNode;
  */
 public class SQLVIStoreProvider<T extends SQLVIStore> extends SQLStoreProvider<T> implements OA4MPConfigTags {
     public static final String DEFAULT_TABLENAME = "virtual_organizations";
-
-    public SQLVIStoreProvider(ConfigurationNode config,
-                              ConnectionPoolProvider<? extends ConnectionPool> cpp,
-                              String type,
-                              VIConverter converter,
-                              VIProvider VIProvider) {
-        super(config, cpp, type, OA4MPConfigTags.VIRTUAL_ORGANIZATION_STORE,DEFAULT_TABLENAME , converter);
-         this.VIProvider = VIProvider;
-    }
 
     public SQLVIStoreProvider(CFNode config,
                               ConnectionPoolProvider<? extends ConnectionPool> cpp,

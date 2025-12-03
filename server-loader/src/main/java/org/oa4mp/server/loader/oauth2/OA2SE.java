@@ -29,7 +29,7 @@ import org.oa4mp.server.api.admin.permissions.PermissionsStore;
 import org.oa4mp.server.api.storage.servlet.AuthorizationServletConfig;
 import org.oa4mp.server.loader.oauth2.claims.BasicClaimsSourceImpl;
 import org.oa4mp.server.loader.oauth2.cm.CMConfigs;
-import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
+import org.oa4mp.server.loader.oauth2.loader.OA2CFConfigurationLoader;
 import org.oa4mp.server.loader.oauth2.servlet.DIServiceConfig;
 import org.oa4mp.server.loader.oauth2.servlet.RFC8628ServletConfig;
 import org.oa4mp.server.loader.oauth2.storage.tx.TXStore;
@@ -44,7 +44,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader.*;
+import static org.oa4mp.server.loader.oauth2.loader.OA2CFConfigurationLoader.*;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -705,7 +705,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
     long rtGracePeriod = -1L;
 
     public boolean isRTGracePeriodEnabled() {
-        return rtGracePeriod != OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_DISABLED;
+        return rtGracePeriod != OA2CFConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_DISABLED;
     }
 
     public boolean isUseProxyForCerts() {

@@ -1,28 +1,19 @@
 package org.oa4mp.client.api.storage;
 
 import edu.uiuc.ncsa.security.core.cf.CFNode;
-import org.oa4mp.client.api.ClientXMLTags;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPoolProvider;
 import edu.uiuc.ncsa.security.storage.sql.SQLStoreProvider;
 import edu.uiuc.ncsa.security.storage.sql.internals.Table;
-import org.apache.commons.configuration.tree.ConfigurationNode;
+import org.oa4mp.client.api.ClientXMLTags;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 1/31/13 at  12:26 PM
  */
 public class SQLAssetStoreProvider extends SQLStoreProvider<AssetStore> {
-    public SQLAssetStoreProvider(ConfigurationNode config,
-                                 String storeType,
-                                 ConnectionPoolProvider<? extends ConnectionPool> cpp,
-                                 AssetProvider assetProvider,
-                                 MapConverter converter
-    ) {
-        super(config, cpp, storeType, ClientXMLTags.ASSET_STORE, converter);
-        this.assetProvider = assetProvider;
-    }
+
 
     public SQLAssetStoreProvider(CFNode config,
                                  String storeType,

@@ -18,7 +18,6 @@ import org.oa4mp.delegation.server.storage.ClientApproval;
 import org.oa4mp.delegation.server.storage.ClientApprovalStore;
 import org.oa4mp.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.core.Store;
-import edu.uiuc.ncsa.security.core.configuration.Configurations;
 import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
 import edu.uiuc.ncsa.security.core.configuration.provider.HierarchicalConfigProvider;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
@@ -28,7 +27,6 @@ import edu.uiuc.ncsa.security.servlet.UsernameTransformer;
 import edu.uiuc.ncsa.security.util.mail.MailUtil;
 import edu.uiuc.ncsa.security.util.mail.MailUtilProvider;
 import edu.uiuc.ncsa.security.util.pkcs.KeyPairQueue;
-import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import javax.inject.Provider;
 import java.net.URI;
@@ -120,14 +118,12 @@ public class ServiceEnvironmentImpl extends AbstractEnvironment implements Servi
         public MessagesProvider(CFNode config) {
             super(config);
         }
-        public MessagesProvider(ConfigurationNode config) {
-            super(config);
-        }
+
 
         @Override
         protected boolean checkEvent(CfgEvent cfgEvent) {
-            if (cfgEvent.getConfiguration().getName().equals("messages")) {
-                setConfig(cfgEvent.getConfiguration());
+            if (cfgEvent.getCFNode().getName().equals("messages")) {
+                setCFNode(cfgEvent.getCFNode());
                 return true;
             }
             return false;
@@ -144,7 +140,7 @@ public class ServiceEnvironmentImpl extends AbstractEnvironment implements Servi
         @Override
         public Map<String, String> get() {
             HashMap<String, String> messages = new HashMap<String, String>();
-            messages.put(RETRY_MESSAGE, Configurations.getNodeValue(getConfig(), RETRY_MESSAGE, "Authentication failed."));
+            messages.put(RETRY_MESSAGE, getCFNode().getNodeContents( RETRY_MESSAGE, "Authentication failed."));
             return messages;
         }
     }

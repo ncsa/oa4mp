@@ -5,20 +5,20 @@ import edu.uiuc.ncsa.sas.cli.SASCLIDriver;
 import edu.uiuc.ncsa.sas.thing.response.LogonResponse;
 import edu.uiuc.ncsa.sas.webclient.Client;
 import edu.uiuc.ncsa.sas.webclient.ResponseDeserializer;
+import edu.uiuc.ncsa.security.core.cf.CFNode;
+import edu.uiuc.ncsa.security.core.cf.CFXMLConfigurations;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import edu.uiuc.ncsa.security.util.cli.*;
-import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
 import edu.uiuc.ncsa.security.util.terminal.ISO6429IO;
-import org.apache.commons.configuration.tree.ConfigurationNode;
 import org.oa4mp.delegation.common.OA4MPVersion;
 import org.oa4mp.server.admin.oauth2.Banners;
 import org.oa4mp.server.admin.oauth2.base.BaseCommands2;
 import org.oa4mp.server.admin.oauth2.base.ClientStoreCommands;
 import org.oa4mp.server.admin.oauth2.base.CopyCommands;
 import org.oa4mp.server.loader.oauth2.OA2SE;
-import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
+import org.oa4mp.server.loader.oauth2.loader.OA2CFConfigurationLoader;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -105,9 +105,9 @@ public class OA2Commands extends BaseCommands2 {
     @Override
     public ConfigurationLoader<? extends AbstractEnvironment> getLoader() {
         if (loader == null) {
-            ConfigurationNode node =
-                    XMLConfigUtil.findConfiguration(getConfigFile(), getConfigName(), getComponentName());
-            loader = new OA2ConfigurationLoader<>(node, getDriver().getLogger());
+            CFNode node =
+                    CFXMLConfigurations.findConfiguration(getConfigFile(), getComponentName(), getConfigName());
+            loader = new OA2CFConfigurationLoader<>(node, getDriver().getLogger());
         }
         return loader;
     }

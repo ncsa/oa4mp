@@ -8,7 +8,7 @@ import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import edu.uiuc.ncsa.security.util.jwk.JWKUtil2;
 import edu.uiuc.ncsa.security.util.ssl.SSLConfiguration;
 import net.sf.json.JSONObject;
-import org.oa4mp.client.api.loader.AbstractClientLoader;
+import org.oa4mp.client.api.loader.AbstractCFClientLoader;
 import org.oa4mp.client.api.storage.AssetStore;
 import org.oa4mp.client.api.storage.FSAssetStore;
 import org.oa4mp.client.api.storage.MemoryAssetStore;
@@ -39,7 +39,7 @@ import java.util.logging.Level;
 
 import static org.oa4mp.client.api.ClientXMLTags.CERT_LIFETIME;
 import static org.oa4mp.client.api.ClientXMLTags.*;
-import static org.oa4mp.client.api.loader.AbstractClientLoader.defaultCertLifetime;
+import static org.oa4mp.client.api.loader.AbstractCFClientLoader.defaultCertLifetime;
 import static org.oa4mp.delegation.server.OA2Constants.*;
 import static org.qdl_lang.variables.StemUtility.put;
 
@@ -592,7 +592,7 @@ public class QDLConfigLoader<T extends OA2ClientEnvironment> extends OA2ClientLo
         if (maxAssetLiftime == null) {
             maxAssetLiftime = getConfig().getLong(MAX_ASSET_LIFETIME);
             if (maxAssetLiftime == null) {
-                maxAssetLiftime = AbstractClientLoader.defaultMaxAssetLifetime;
+                maxAssetLiftime = AbstractCFClientLoader.defaultMaxAssetLifetime;
             }
         }
         return maxAssetLiftime;

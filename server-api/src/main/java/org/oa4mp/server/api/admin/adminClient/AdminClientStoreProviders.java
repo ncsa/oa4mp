@@ -10,7 +10,6 @@ import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPoolProvider;
 import edu.uiuc.ncsa.security.storage.sql.SQLStoreProvider;
 import edu.uiuc.ncsa.security.storage.sql.internals.Table;
-import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import java.io.File;
 
@@ -61,10 +60,6 @@ public class AdminClientStoreProviders {
 
     public static class AdminClientFSProvider extends FSProvider<AdminClientFS> implements OA4MPConfigTags {
 
-        public AdminClientFSProvider(ConfigurationNode config) {
-            super(config, FILE_STORE, ADMIN_CLIENT_STORE, getAdminClientConverter());
-        }
-
         public AdminClientFSProvider(CFNode config) {
             super(config, FILE_STORE, ADMIN_CLIENT_STORE, getAdminClientConverter());
         }
@@ -82,9 +77,7 @@ public class AdminClientStoreProviders {
 
     }
 
-    public static AdminClientFSProvider getACFSP(ConfigurationNode node) {
-        return new AdminClientFSProvider(node);
-    }
+
 
     public static AdminClientFSProvider getACFSP(CFNode node) {
         return new AdminClientFSProvider(node);
@@ -92,10 +85,6 @@ public class AdminClientStoreProviders {
 
 
     public static class AdminClientMSProvider extends TypedProvider<AdminClientMemoryStore> implements OA4MPConfigTags {
-        public AdminClientMSProvider(ConfigurationNode node) {
-            super(node, MEMORY_STORE, ADMIN_CLIENT_STORE);
-        }
-
         public AdminClientMSProvider(CFNode node) {
             super(node, MEMORY_STORE, ADMIN_CLIENT_STORE);
         }
@@ -115,19 +104,12 @@ public class AdminClientStoreProviders {
         }
     }
 
-    public static AdminClientMSProvider getACMP(ConfigurationNode node) {
-        return new AdminClientMSProvider(node);
-    }
+
     public static AdminClientMSProvider getACMP(CFNode node) {
         return new AdminClientMSProvider(node);
     }
 
     public static class AdminClientSQLStoreProvider extends SQLStoreProvider<AdminClientSQLStore> implements OA4MPConfigTags {
-        public AdminClientSQLStoreProvider(ConfigurationNode config, String type,
-                                           ConnectionPoolProvider<? extends ConnectionPool> cpp) {
-            super(config, cpp, type, ADMIN_CLIENT_STORE, AdminClientSQLStore.DEFAULT_TABLENAME, getAdminClientConverter());
-        }
-
         public AdminClientSQLStoreProvider(CFNode config, String type,
                                            ConnectionPoolProvider<? extends ConnectionPool> cpp) {
             super(config, cpp, type, ADMIN_CLIENT_STORE, AdminClientSQLStore.DEFAULT_TABLENAME, getAdminClientConverter());
@@ -146,29 +128,16 @@ public class AdminClientStoreProviders {
         }
     }
 
-    public static AdminClientSQLStoreProvider getMariaACS(ConfigurationNode node, ConnectionPoolProvider<? extends ConnectionPool> cpp ){
-        return new AdminClientSQLStoreProvider(node, OA4MPConfigTags.MARIADB_STORE, cpp);
-    }
     public static AdminClientSQLStoreProvider getMariaACS(CFNode node, ConnectionPoolProvider<? extends ConnectionPool> cpp ){
         return new AdminClientSQLStoreProvider(node, OA4MPConfigTags.MARIADB_STORE, cpp);
-    }
-    public static AdminClientSQLStoreProvider getMysqlACS(ConfigurationNode node, ConnectionPoolProvider<? extends ConnectionPool> cpp ){
-        return new AdminClientSQLStoreProvider(node, OA4MPConfigTags.MYSQL_STORE, cpp);
     }
     public static AdminClientSQLStoreProvider getMysqlACS(CFNode node, ConnectionPoolProvider<? extends ConnectionPool> cpp ){
         return new AdminClientSQLStoreProvider(node, OA4MPConfigTags.MYSQL_STORE, cpp);
     }
 
-    public static AdminClientSQLStoreProvider getPostgresACS(ConfigurationNode node, ConnectionPoolProvider<? extends ConnectionPool> cpp ){
-        return new AdminClientSQLStoreProvider(node, OA4MPConfigTags.POSTGRESQL_STORE, cpp);
-    }
 
     public static AdminClientSQLStoreProvider getPostgresACS(CFNode node, ConnectionPoolProvider<? extends ConnectionPool> cpp ){
         return new AdminClientSQLStoreProvider(node, OA4MPConfigTags.POSTGRESQL_STORE, cpp);
-    }
-
-    public static AdminClientSQLStoreProvider getDerbyACS(ConfigurationNode node, ConnectionPoolProvider<? extends ConnectionPool> cpp ){
-        return new AdminClientSQLStoreProvider(node, OA4MPConfigTags.DERBY_STORE, cpp);
     }
 
     public static AdminClientSQLStoreProvider getDerbyACS(CFNode node, ConnectionPoolProvider<? extends ConnectionPool> cpp ){

@@ -23,7 +23,7 @@ import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
-import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
+import edu.uiuc.ncsa.security.util.configuration.TimeUtil;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.HttpStatus;
@@ -232,7 +232,7 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
         String rawATLifetime = params.get(OA2Constants.ACCESS_TOKEN_LIFETIME);
         if (!StringUtils.isTrivial(rawATLifetime)) {
             try {
-                long at = XMLConfigUtil.getValueSecsOrMillis(rawATLifetime);
+                long at = TimeUtil.getValueSecsOrMillis(rawATLifetime);
                 //               long at = Long.parseLong(rawATLifetime);
                 t.setRequestedATLifetime(at);
             } catch (Throwable throwable) {
@@ -244,7 +244,7 @@ public class RFC8628Servlet extends MultiAuthServlet implements RFC8628Constants
         String rawRefreshLifetime = params.get(OA2Constants.REFRESH_LIFETIME);
         if (!StringUtils.isTrivial(rawRefreshLifetime)) {
             try {
-                long rt = XMLConfigUtil.getValueSecsOrMillis(rawRefreshLifetime);
+                long rt = TimeUtil.getValueSecsOrMillis(rawRefreshLifetime);
                 //long rt = Long.parseLong(rawRefreshLifetime);
                 t.setRequestedRTLifetime(rt);
             } catch (Throwable throwable) {

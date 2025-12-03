@@ -1,12 +1,11 @@
 package org.oa4mp.server.api.storage.servlet;
 
 import edu.uiuc.ncsa.security.core.cf.CFNode;
+import edu.uiuc.ncsa.security.servlet.ServletTimeUtil;
 import org.oa4mp.server.api.OA4MPConfigTags;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import edu.uiuc.ncsa.security.servlet.Bootstrapper;
-import edu.uiuc.ncsa.security.servlet.ServletXMLConfigUtil;
-import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import javax.servlet.ServletContext;
 import java.util.Enumeration;
@@ -32,13 +31,8 @@ public abstract class AbstractBootstrapper extends Bootstrapper {
     }
 
     protected CFNode getCFNode(ServletContext servletContext) throws Exception {
-        return ServletXMLConfigUtil.findCFConfigurationNode(servletContext, getOa4mpConfigFileKey(), getOa4mpConfigNameKey(), OA4MPConfigTags.COMPONENT);
+        return ServletTimeUtil.findCFConfigurationNode(servletContext, getOa4mpConfigFileKey(), getOa4mpConfigNameKey(), OA4MPConfigTags.COMPONENT);
     }
-
-    protected ConfigurationNode getNode(ServletContext servletContext) throws Exception {
-        return ServletXMLConfigUtil.findConfigurationNode(servletContext, getOa4mpConfigFileKey(), getOa4mpConfigNameKey(), OA4MPConfigTags.COMPONENT);
-    }
-
 
     @Override
     public ConfigurationLoader getConfigurationLoader(ServletContext servletContext) throws Exception {
@@ -67,11 +61,7 @@ public abstract class AbstractBootstrapper extends Bootstrapper {
             throw new MyConfigurationException("Error: No configuration found for file '" + getOa4mpConfigFileKey()
                     + "'. Cannot configure the server. Init parameters are: " + initParams + ", attributes are " + attribs);
         }
-        if(isUseCF()){
             return getConfigurationLoader(getCFNode(servletContext));
-        }
-
-        return getConfigurationLoader(getNode(servletContext));
     }
 
 }

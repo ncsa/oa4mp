@@ -10,7 +10,7 @@ import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.XMLMap;
-import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
+import edu.uiuc.ncsa.security.util.configuration.TimeUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -448,7 +448,7 @@ public class OA2AuthorizedServletUtil {
         if (!isTrivial(rawATLifetime)) {
 
             try {
-                long at = XMLConfigUtil.getValueSecsOrMillis(rawATLifetime);
+                long at = TimeUtil.getValueSecsOrMillis(rawATLifetime);
                 //               long at = Long.parseLong(rawATLifetime);
                 st.setRequestedATLifetime(at);
             } catch (Throwable t) {
@@ -460,7 +460,7 @@ public class OA2AuthorizedServletUtil {
         String rawRefreshLifetime = params.get(REFRESH_LIFETIME);
         if (!isTrivial(rawRefreshLifetime)) {
             try {
-                long rt = XMLConfigUtil.getValueSecsOrMillis(rawRefreshLifetime);
+                long rt = TimeUtil.getValueSecsOrMillis(rawRefreshLifetime);
                 //long rt = Long.parseLong(rawRefreshLifetime);
                 st.setRequestedRTLifetime(rt);
             } catch (Throwable t) {

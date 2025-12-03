@@ -15,7 +15,7 @@ import edu.uiuc.ncsa.security.servlet.ExceptionHandlerThingie;
 import edu.uiuc.ncsa.security.servlet.HeaderUtils;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.storage.XMLMap;
-import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
+import edu.uiuc.ncsa.security.util.configuration.TimeUtil;
 import edu.uiuc.ncsa.security.util.events.NotificationEvent;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JWKUtil2;
@@ -38,7 +38,7 @@ import org.oa4mp.server.loader.oauth2.cm.CMConfig;
 import org.oa4mp.server.loader.oauth2.cm.util.permissions.AddClientRequest;
 import org.oa4mp.server.loader.oauth2.cm.util.permissions.PermissionServer;
 import org.oa4mp.server.loader.oauth2.cm.util.permissions.RemoveClientRequest;
-import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
+import org.oa4mp.server.loader.oauth2.loader.OA2CFConfigurationLoader;
 import org.oa4mp.server.loader.oauth2.servlet.OA2ExceptionHandlerThingie;
 import org.oa4mp.server.loader.oauth2.servlet.OA2HeaderUtils;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
@@ -327,8 +327,8 @@ public class OIDCCMServlet extends EnvServlet {
             versions.add(API_VERSION_5_5);
             versions.add(API_VERSION_5_4);
             jsonObject.put("api_versions", versions);  // version list supported on this server
-            jsonObject.put(OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_TAG, getOA2SE().getRtGracePeriod() / 1000);
-            jsonObject.put(OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_TAG, getOA2SE().getRtGracePeriod() / 1000);
+            jsonObject.put(OA2CFConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_TAG, getOA2SE().getRtGracePeriod() / 1000);
+            jsonObject.put(OA2CFConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_TAG, getOA2SE().getRtGracePeriod() / 1000);
             if (adminClient == null || !adminClient.hasVirtualIssuer()) {
                 // Fix https://github.com/ncsa/oa4mp/issues/177
                 jsonObject.put("issuer", getOA2SE().getIssuer());
@@ -1656,7 +1656,7 @@ public class OIDCCMServlet extends EnvServlet {
                 client.setRtGracePeriod(lifetimeFromParameter(jsonRequest.get(clientKeys.rtGracePeriod())));
             } else {
                 // if missing, set it to use whatever the server default is.
-                client.setRtGracePeriod(OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_USE_SERVER_DEFAULT);
+                client.setRtGracePeriod(OA2CFConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_USE_SERVER_DEFAULT);
             }
             if (jsonRequest.containsKey(clientKeys.extendsProvisioners())) {
                 client.setExtendsProvisioners(jsonRequest.getBoolean(clientKeys.extendsProvisioners()));
@@ -1760,7 +1760,7 @@ public class OIDCCMServlet extends EnvServlet {
         if (raw instanceof Long) {
             return lifetimeFromSec((Long) raw);
         }
-        return XMLConfigUtil.getValueSecsOrMillis(raw.toString(), true);
+        return TimeUtil.getValueSecsOrMillis(raw.toString(), true);
     }
 
     protected JSONArray toJSONArray(JSONObject jsonRequest,
@@ -1896,7 +1896,7 @@ public class OIDCCMServlet extends EnvServlet {
                             // assumption is they are sending it in seconds
                             client.setRtLifetime(((Long) raw) * 1000L);
                         } else {
-                            client.setRtLifetime(XMLConfigUtil.getValueSecsOrMillis(raw.toString(), true));
+                            client.setRtLifetime(TimeUtil.getValueSecsOrMillis(raw.toString(), true));
                         }
                     }
                 } else {

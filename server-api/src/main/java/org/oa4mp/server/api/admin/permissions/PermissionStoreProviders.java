@@ -10,7 +10,6 @@ import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPoolProvider;
 import edu.uiuc.ncsa.security.storage.sql.SQLStoreProvider;
 import edu.uiuc.ncsa.security.storage.sql.internals.Table;
-import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import java.io.File;
 
@@ -47,10 +46,6 @@ public class PermissionStoreProviders {
     protected static PermissionConverter<? extends Permission> permissionConverter;
 
     public static class FSPermissionStoreProvider extends FSProvider<PermissionFileStore> implements OA4MPConfigTags {
-        public FSPermissionStoreProvider(ConfigurationNode config) {
-            super(config, FILE_STORE, PERMISSION_STORE, getPermissionConverter());
-        }
-
         public FSPermissionStoreProvider(CFNode config) {
             super(config, FILE_STORE, PERMISSION_STORE, getPermissionConverter());
         }
@@ -62,48 +57,29 @@ public class PermissionStoreProviders {
         }
     }
 
-    public static FSPermissionStoreProvider getFSP(ConfigurationNode node) {
-        return new FSPermissionStoreProvider(node);
-    }
+
     public static FSPermissionStoreProvider getFSP(CFNode node) {
         return new FSPermissionStoreProvider(node);
     }
 
-    public static SQLPermissionStoreProvider getMariaPS(ConfigurationNode node, ConnectionPoolProvider<? extends ConnectionPool> cpp ){
-        return new SQLPermissionStoreProvider(node, OA4MPConfigTags.MARIADB_STORE, cpp);
-    }
     public static SQLPermissionStoreProvider getMariaPS(CFNode node, ConnectionPoolProvider<? extends ConnectionPool> cpp ){
         return new SQLPermissionStoreProvider(node, OA4MPConfigTags.MARIADB_STORE, cpp);
     }
 
-    public static SQLPermissionStoreProvider getPostgresPS(ConfigurationNode node, ConnectionPoolProvider<? extends ConnectionPool> cpp ){
-        return new SQLPermissionStoreProvider(node, OA4MPConfigTags.POSTGRESQL_STORE, cpp);
-    }
     public static SQLPermissionStoreProvider getPostgresPS(CFNode node, ConnectionPoolProvider<? extends ConnectionPool> cpp ){
         return new SQLPermissionStoreProvider(node, OA4MPConfigTags.POSTGRESQL_STORE, cpp);
-    }
-    public static SQLPermissionStoreProvider getDerbyPS(ConfigurationNode node, ConnectionPoolProvider<? extends ConnectionPool> cpp ){
-        return new SQLPermissionStoreProvider(node, OA4MPConfigTags.DERBY_STORE, cpp);
     }
 
     public static SQLPermissionStoreProvider getDerbyPS(CFNode node, ConnectionPoolProvider<? extends ConnectionPool> cpp ){
         return new SQLPermissionStoreProvider(node, OA4MPConfigTags.DERBY_STORE, cpp);
     }
 
-    public static SQLPermissionStoreProvider getMysqlPS(ConfigurationNode node, ConnectionPoolProvider<? extends ConnectionPool> cpp ){
-        return new SQLPermissionStoreProvider(node, OA4MPConfigTags.MYSQL_STORE, cpp);
-    }
     public static SQLPermissionStoreProvider getMysqlPS(CFNode node, ConnectionPoolProvider<? extends ConnectionPool> cpp ){
         return new SQLPermissionStoreProvider(node, OA4MPConfigTags.MYSQL_STORE, cpp);
     }
 
 
     public static class SQLPermissionStoreProvider extends SQLStoreProvider<SQLPermissionStore> implements OA4MPConfigTags {
-        public SQLPermissionStoreProvider(ConfigurationNode config, String type,
-                                          ConnectionPoolProvider<? extends ConnectionPool> cpp ) {
-            super(config, cpp, type, OA4MPConfigTags.PERMISSION_STORE, SQLPermissionStore.DEFAULT_TABLENAME, getPermissionConverter());
-        }
-
         public SQLPermissionStoreProvider(CFNode config, String type,
                                           ConnectionPoolProvider<? extends ConnectionPool> cpp ) {
             super(config, cpp, type, OA4MPConfigTags.PERMISSION_STORE, SQLPermissionStore.DEFAULT_TABLENAME, getPermissionConverter());
@@ -122,9 +98,6 @@ public class PermissionStoreProviders {
     }
 
     public static class MemoryPermissionStoreProvider<V> extends TypedProvider<PermissionMemoryStore> implements OA4MPConfigTags {
-        public MemoryPermissionStoreProvider(ConfigurationNode config) {
-            super(config, OA4MPConfigTags.MEMORY_STORE, OA4MPConfigTags.PERMISSION_STORE);
-        }
         public MemoryPermissionStoreProvider(CFNode config) {
             super(config, OA4MPConfigTags.MEMORY_STORE, OA4MPConfigTags.PERMISSION_STORE);
         }
@@ -146,10 +119,6 @@ public class PermissionStoreProviders {
         }
     }
 
-    public static MemoryPermissionStoreProvider<? extends PermissionMemoryStore> getM(ConfigurationNode node) {
-        MemoryPermissionStoreProvider<? extends PermissionMemoryStore> mpp = new MemoryPermissionStoreProvider<>(node);
-        return mpp;
-    }
     public static MemoryPermissionStoreProvider<? extends PermissionMemoryStore> getM(CFNode node) {
         MemoryPermissionStoreProvider<? extends PermissionMemoryStore> mpp = new MemoryPermissionStoreProvider<>(node);
         return mpp;

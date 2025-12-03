@@ -1,16 +1,16 @@
 package org.oa4mp.server.qdl;
 
-import org.oa4mp.server.loader.oauth2.OA2SE;
-import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
-import org.oa4mp.server.api.OA4MPConfigTags;
-import org.qdl_lang.config.QDLConfigurationConstants;
-import org.qdl_lang.state.LibLoader;
-import org.qdl_lang.workspace.WorkspaceCommands;
+import edu.uiuc.ncsa.security.core.cf.CFNode;
+import edu.uiuc.ncsa.security.core.cf.CFXMLConfigurations;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.util.cli.IOInterface;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
-import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
-import org.apache.commons.configuration.tree.ConfigurationNode;
+import org.oa4mp.server.api.OA4MPConfigTags;
+import org.oa4mp.server.loader.oauth2.OA2SE;
+import org.oa4mp.server.loader.oauth2.loader.OA2CFConfigurationLoader;
+import org.qdl_lang.config.QDLConfigurationConstants;
+import org.qdl_lang.state.LibLoader;
+import org.qdl_lang.workspace.WorkspaceCommands;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,8 +34,8 @@ public class OA4MPQDLWorkspaceCommands extends WorkspaceCommands {
         } catch (MyConfigurationException mcx) {
             // try to process it as a server config
             // https://github.com/ncsa/oa4mp/issues/196
-            ConfigurationNode node = XMLConfigUtil.findConfiguration(inputLine.getNextArgFor(QDLConfigurationConstants.CONFIG_FILE_FLAG), cfgName, OA4MPConfigTags.COMPONENT);
-            OA2ConfigurationLoader sourceLoader = new OA2ConfigurationLoader<>(node);
+            CFNode node = CFXMLConfigurations.findConfiguration(inputLine.getNextArgFor(QDLConfigurationConstants.CONFIG_FILE_FLAG),  OA4MPConfigTags.COMPONENT, cfgName);
+            OA2CFConfigurationLoader sourceLoader = new OA2CFConfigurationLoader<>(node);
             OA2SE sourceSE = (OA2SE) sourceLoader.load();
             setQdlEnvironment(sourceSE.getQDLEnvironment());
         }

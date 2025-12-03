@@ -1,21 +1,20 @@
 package org.oa4mp.server.loader.qdl.scripting;
 
-import org.oa4mp.server.loader.oauth2.OA2SE;
-import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
-import org.oa4mp.server.loader.oauth2.storage.tx.TXRecord;
-import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
-import org.oa4mp.server.loader.qdl.QDLXMLConstants;
-import org.qdl_lang.evaluate.MetaEvaluator;
-import org.qdl_lang.evaluate.OpEvaluator;
-import org.qdl_lang.functions.FStack;
-import org.qdl_lang.expressions.module.MIStack;
-import org.qdl_lang.expressions.module.MTStack;
-import org.qdl_lang.state.State;
-import org.qdl_lang.variables.QDLStem;
-import org.qdl_lang.variables.VStack;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
+import org.oa4mp.server.loader.oauth2.OA2SE;
+import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
+import org.oa4mp.server.loader.oauth2.storage.tx.TXRecord;
+import org.oa4mp.server.loader.qdl.QDLXMLConstants;
+import org.qdl_lang.evaluate.MetaEvaluator;
+import org.qdl_lang.evaluate.OpEvaluator;
+import org.qdl_lang.expressions.module.MIStack;
+import org.qdl_lang.expressions.module.MTStack;
+import org.qdl_lang.functions.FStack;
+import org.qdl_lang.state.State;
+import org.qdl_lang.variables.QDLStem;
+import org.qdl_lang.variables.VStack;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.stream.XMLEventReader;
@@ -103,7 +102,7 @@ public class OA2State extends State {
      * Strict ACLs means there must be an exact match of one of the identifiers.
      * <br/><br/>
      * Setting this true in the configuration (with the
-     * {@link OA2ConfigurationLoader#STRICT_ACLS} attribute of the qdl tag) will
+     * {@link org.oa4mp.server.loader.oauth2.loader.OA2CFConfigurationLoader#STRICT_ACLS} attribute of the qdl tag) will
      * lock down the server so that nothing can execute unless everything is granted explicit permission. Use this wisely.
      *
      * @return

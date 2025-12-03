@@ -1,13 +1,13 @@
 package org.oa4mp.server.test;
 
-import org.oa4mp.delegation.server.storage.*;
-import org.oa4mp.server.api.ServiceEnvironment;
-import org.oa4mp.server.api.storage.servlet.AbstractConfigurationLoader;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import org.oa4mp.delegation.common.storage.AggregateTransactionStore;
-import org.oa4mp.delegation.common.storage.clients.Client;
 import org.oa4mp.delegation.common.storage.TransactionStore;
+import org.oa4mp.delegation.common.storage.clients.Client;
 import org.oa4mp.delegation.common.storage.transactions.BasicTransaction;
+import org.oa4mp.delegation.server.storage.*;
+import org.oa4mp.server.api.ServiceEnvironment;
+import org.oa4mp.server.api.storage.servlet.AbstractCFConfigurationLoader;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -20,7 +20,7 @@ public abstract class AGTestStoreProvider extends TestStoreProvider {
 
     String nodeName;
         // Default environment is the filestore test. change as needed.
-        AbstractConfigurationLoader loader;
+        AbstractCFConfigurationLoader loader;
 
     abstract public ConfigurationLoader<? extends ServiceEnvironment> getConfigLoader();
 

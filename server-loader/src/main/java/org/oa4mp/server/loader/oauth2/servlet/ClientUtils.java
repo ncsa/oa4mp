@@ -2,7 +2,7 @@ package org.oa4mp.server.loader.oauth2.servlet;
 
 import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.claims.AbstractPayloadConfig;
-import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
+import org.oa4mp.server.loader.oauth2.loader.OA2CFConfigurationLoader;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
 import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
 import org.oa4mp.server.api.storage.servlet.OA4MPServlet;
@@ -65,7 +65,7 @@ public class ClientUtils {
         }
         return computeTokenLifetime(oa2SE.getMaxATLifetime(),
                 oa2SE.getAccessTokenLifetime(),
-                //OA2ConfigurationLoader.ACCESS_TOKEN_LIFETIME_DEFAULT,
+                //OA2CFConfigurationLoader.ACCESS_TOKEN_LIFETIME_DEFAULT,
                 client.getAtLifetime(),
                 client.getMaxATLifetime(),
                 client.getAccessTokensConfig(),
@@ -196,7 +196,7 @@ public class ClientUtils {
         if (!oa2SE.isRTGracePeriodEnabled()) {
             return 0L; // means no grace period.
         }
-        if (client.getRtGracePeriod() == OA2ConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_USE_SERVER_DEFAULT) {
+        if (client.getRtGracePeriod() == OA2CFConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_USE_SERVER_DEFAULT) {
             return oa2SE.getRtGracePeriod();
         }
         return client.getRtGracePeriod();
@@ -212,7 +212,7 @@ public class ClientUtils {
         }
         return computeTokenLifetime(oa2SE.getMaxIdTokenLifetime(),
                 oa2SE.getIdTokenLifetime(),
-                //OA2ConfigurationLoader.ID_TOKEN_LIFETIME_DEFAULT,
+                //OA2CFConfigurationLoader.ID_TOKEN_LIFETIME_DEFAULT,
                 client.getIdTokenLifetime(),
                 client.getMaxIDTLifetime(),
                 client.getIDTokenConfig(),
@@ -260,7 +260,7 @@ public class ClientUtils {
         if (0 < client.getRtLifetime()) {
             lifetime = Math.min(oa2SE.getMaxRTLifetime(), client.getRtLifetime());
         } else {
-            lifetime = OA2ConfigurationLoader.REFRESH_TOKEN_LIFETIME_DEFAULT;
+            lifetime = OA2CFConfigurationLoader.REFRESH_TOKEN_LIFETIME_DEFAULT;
         }
         st2.setMaxRTLifetime(lifetime);// absolute max allowed on this server for this request
 
@@ -288,7 +288,7 @@ public class ClientUtils {
 
         return computeTokenLifetime(oa2SE.getMaxRTLifetime(),
                 oa2SE.getRefreshTokenLifetime(),
-                //OA2ConfigurationLoader.REFRESH_TOKEN_LIFETIME_DEFAULT,
+                //OA2CFConfigurationLoader.REFRESH_TOKEN_LIFETIME_DEFAULT,
                 client.getRtLifetime(),
                 client.getMaxRTLifetime(),
                 client.getRefreshTokensConfig(),

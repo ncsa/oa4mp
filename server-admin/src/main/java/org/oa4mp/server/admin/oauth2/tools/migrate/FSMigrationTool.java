@@ -1,5 +1,7 @@
 package org.oa4mp.server.admin.oauth2.tools.migrate;
 
+import edu.uiuc.ncsa.security.core.cf.CFNode;
+import edu.uiuc.ncsa.security.core.cf.CFXMLConfigurations;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import edu.uiuc.ncsa.security.core.util.FileUtil;
@@ -9,10 +11,8 @@ import edu.uiuc.ncsa.security.storage.sql.derby.DerbyConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.derby.DerbyConnectionPoolProvider;
 import edu.uiuc.ncsa.security.util.cli.CLITool2;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
-import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
-import org.apache.commons.configuration.tree.ConfigurationNode;
 import org.oa4mp.server.loader.oauth2.OA2SE;
-import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
+import org.oa4mp.server.loader.oauth2.loader.OA2CFConfigurationLoader;
 
 import java.io.*;
 import java.lang.reflect.Field;
@@ -185,12 +185,12 @@ public class FSMigrationTool extends CLITool2 {
 
         List<String> createScript = null;
         try {
-            ConfigurationNode node = XMLConfigUtil.findConfiguration(getSourceFile(), getSourceConfigName(), COMPONENT);
-            OA2ConfigurationLoader sourceLoader = new OA2ConfigurationLoader<>(node);
+            CFNode node =CFXMLConfigurations.findConfiguration(getSourceFile(), COMPONENT, getSourceConfigName());
+            OA2CFConfigurationLoader sourceLoader = new OA2CFConfigurationLoader<>(node);
             sourceSE = (OA2SE) sourceLoader.load();
 
-            node = XMLConfigUtil.findConfiguration(getTargetFile(), getTargetConfigName(), COMPONENT);
-            OA2ConfigurationLoader targetLoader = new OA2ConfigurationLoader<>(node);
+            node = CFXMLConfigurations.findConfiguration(getTargetFile(),COMPONENT,  getTargetConfigName());
+            OA2CFConfigurationLoader targetLoader = new OA2CFConfigurationLoader<>(node);
             targetSE = (OA2SE) targetLoader.load();
 
             if (targetSE.getClientStore() instanceof SQLStore) {
@@ -588,8 +588,8 @@ public class FSMigrationTool extends CLITool2 {
         // This exists as a separate call mostly because my debugger attempts to load the entire
         // client configuration database to display it as a map -- test store had 800+k entries! and never completed
         // If this is in a separate call, that is avoided.
-        ConfigurationNode node = XMLConfigUtil.findConfiguration(getSourceFile(), getSourceConfigName(), COMPONENT);
-        OA2ConfigurationLoader sourceLoader = new OA2ConfigurationLoader<>(node);
+        CFNode node = CFXMLConfigurations.findConfiguration(getSourceFile(), getSourceConfigName(), COMPONENT);
+        OA2CFConfigurationLoader sourceLoader = new OA2CFConfigurationLoader<>(node);
         sourceSE = (OA2SE) sourceLoader.load();
         FileStore clientStore = (FileStore) sourceSE.getClientStore();
         return new File(clientStore.getStorageDirectory().getParentFile().getParentFile(), INGESTION_FILE_NAME);

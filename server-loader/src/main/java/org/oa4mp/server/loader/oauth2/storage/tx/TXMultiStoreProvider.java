@@ -4,25 +4,12 @@ import edu.uiuc.ncsa.security.core.cf.CFNode;
 import edu.uiuc.ncsa.security.core.configuration.provider.MultiTypeProvider;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import org.apache.commons.configuration.tree.ConfigurationNode;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 12/17/20 at  10:02 AM
  */
 public class TXMultiStoreProvider<T extends TXStore<? extends TXRecord>> extends MultiTypeProvider<T> {
-    public TXMultiStoreProvider(ConfigurationNode config,
-                                boolean disableDefaultStore,
-                                MyLoggingFacade logger,
-                                String type,
-                                String target,
-                                TXRecordProvider txRecordProvider,
-                                TXRecordConverter txRecordConverter) {
-        super(config, disableDefaultStore, logger, type, target);
-        this.txRecordConverter = txRecordConverter;
-        this.txRecordProvider = txRecordProvider;
-    }
-
     public TXMultiStoreProvider(CFNode config,
                                 boolean disableDefaultStore,
                                 MyLoggingFacade logger,

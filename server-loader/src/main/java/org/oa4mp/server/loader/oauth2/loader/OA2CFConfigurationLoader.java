@@ -14,7 +14,7 @@ import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPoolProvider;
 import edu.uiuc.ncsa.security.storage.sql.SQLStore;
 import edu.uiuc.ncsa.security.storage.sql.derby.DerbyConnectionPoolProvider;
-import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
+import edu.uiuc.ncsa.security.util.configuration.TimeUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import org.oa4mp.delegation.common.OA4MPVersion;
@@ -336,7 +336,7 @@ public class OA2CFConfigurationLoader<T extends ServiceEnvironmentImpl> extends 
                 x = sn.getFirstAttribute( OA4MPConfigTags.DEVICE_FLOW_LIFETIME);
                 if (!isTrivial(x)) {
                     try {
-                        rfc8628ServletConfig.lifetime = XMLConfigUtil.getValueSecsOrMillis(x, true);
+                        rfc8628ServletConfig.lifetime = TimeUtil.getValueSecsOrMillis(x, true);
                     } catch (NumberFormatException numberFormatException) {
 
                     }
@@ -344,7 +344,7 @@ public class OA2CFConfigurationLoader<T extends ServiceEnvironmentImpl> extends 
                 x = sn.getFirstAttribute( OA4MPConfigTags.DEVICE_FLOW_INTERVAL);
                 if (!StringUtils.isTrivial(x)) {
                     try {
-                        rfc8628ServletConfig.interval = XMLConfigUtil.getValueSecsOrMillis(x, true);
+                        rfc8628ServletConfig.interval = TimeUtil.getValueSecsOrMillis(x, true);
                     } catch (NumberFormatException nfe) {
                         // do nothing. Default is set in servlet config.
                     }
@@ -534,7 +534,7 @@ Boolean allowPromptNone = null;
             if (StringUtils.isTrivial(raw)) {
                 uucConfiguration.interval = UUC_INTERVAL_DEFAULT;
             } else {
-                uucConfiguration.interval = XMLConfigUtil.getValueSecsOrMillis(raw, true);
+                uucConfiguration.interval = TimeUtil.getValueSecsOrMillis(raw, true);
             }
             uucConfiguration.alarms = getAlarms(node, UUC_ALARMS);
             // Fix https://github.com/ncsa/oa4mp/issues/139
@@ -579,7 +579,7 @@ Boolean allowPromptNone = null;
         if (StringUtils.isTrivial(rawDate)) {
             throw new IllegalArgumentException("Missing " + UUC_RULE_UNUSED_GRACE_PERIOD + " attribute.");
         }
-        gpRule.setGracePeriod(XMLConfigUtil.getValueSecsOrMillis(rawDate, true));
+        gpRule.setGracePeriod(TimeUtil.getValueSecsOrMillis(rawDate, true));
 
         return gpRule;
     }
@@ -637,7 +637,7 @@ Boolean allowPromptNone = null;
             if (StringUtils.isTrivial(raw)) {
                 interval = CLEANUP_INTERVAL_DEFAULT;
             } else {
-                interval = XMLConfigUtil.getValueSecsOrMillis(raw, true);
+                interval = TimeUtil.getValueSecsOrMillis(raw, true);
             }
         } catch (Throwable t) {
             // use default which is to do safe garbage collection.
@@ -902,7 +902,7 @@ Boolean ccfEnabled = null;
                         );
                         String raw = sn.getFirstAttribute( ClientManagementConstants.DEFAULT_REFRESH_TOKEN_LIFETIME);
                         if (!StringUtils.isTrivial(raw)) {
-                            cfg.setDefaultRefreshTokenLifetime(XMLConfigUtil.getValueSecsOrMillis(raw, false));
+                            cfg.setDefaultRefreshTokenLifetime(TimeUtil.getValueSecsOrMillis(raw, false));
                         }
                         if (cfg instanceof CM7591Config) {
                             CM7591Config ccc = (CM7591Config)cfg;
@@ -1116,7 +1116,7 @@ Boolean ccfEnabled = null;
                 rtGracePeriod = REFRESH_TOKEN_GRACE_PERIOD_DEFAULT; // set the grace period to be the default
             } else {
                 try {
-                    rtGracePeriod = XMLConfigUtil.getValueSecsOrMillis(x, true);
+                    rtGracePeriod = TimeUtil.getValueSecsOrMillis(x, true);
                 } catch (Throwable t) {
                     rtGracePeriod = REFRESH_TOKEN_GRACE_PERIOD_DEFAULT;
                 }
@@ -1136,7 +1136,7 @@ Boolean ccfEnabled = null;
                 agLifetime = AUTHORIZATION_GRANT_LIFETIME_DEFAULT;
             } else {
                 try {
-                    agLifetime = XMLConfigUtil.getValueSecsOrMillis(x, true);
+                    agLifetime = TimeUtil.getValueSecsOrMillis(x, true);
                     //agLifetime = Long.parseLong(x) * 1000; // The configuration file has this in seconds. Internally this is ms.
                 } catch (Throwable t) {
                     agLifetime = AUTHORIZATION_GRANT_LIFETIME_DEFAULT;
@@ -1155,7 +1155,7 @@ Boolean ccfEnabled = null;
                 idTokenLifetime = ID_TOKEN_LIFETIME_DEFAULT;
             } else {
                 try {
-                    idTokenLifetime = XMLConfigUtil.getValueSecsOrMillis(x, true);
+                    idTokenLifetime = TimeUtil.getValueSecsOrMillis(x, true);
                 } catch (Throwable t) {
                     idTokenLifetime = ID_TOKEN_LIFETIME_DEFAULT;
                 }
@@ -1171,7 +1171,7 @@ Boolean ccfEnabled = null;
                 maxIDTokenLifetime = MAX_ID_TOKEN_LIFETIME_DEFAULT;
             } else {
                 try {
-                    maxIDTokenLifetime = XMLConfigUtil.getValueSecsOrMillis(x, true);
+                    maxIDTokenLifetime = TimeUtil.getValueSecsOrMillis(x, true);
                 } catch (Throwable t) {
                     maxIDTokenLifetime = MAX_ID_TOKEN_LIFETIME_DEFAULT;
                 }
@@ -1195,7 +1195,7 @@ Boolean ccfEnabled = null;
                 atLifetime = ACCESS_TOKEN_LIFETIME_DEFAULT;
             } else {
                 try {
-                    atLifetime = XMLConfigUtil.getValueSecsOrMillis(x, true);
+                    atLifetime = TimeUtil.getValueSecsOrMillis(x, true);
                 } catch (Throwable t) {
                     atLifetime = ACCESS_TOKEN_LIFETIME_DEFAULT;
                 }
@@ -1219,7 +1219,7 @@ Boolean ccfEnabled = null;
                 rtLifetime = REFRESH_TOKEN_LIFETIME_DEFAULT;
             } else {
                 try {
-                    rtLifetime = XMLConfigUtil.getValueSecsOrMillis(x, false);
+                    rtLifetime = TimeUtil.getValueSecsOrMillis(x, false);
                 } catch (Throwable t) {
                     rtLifetime = REFRESH_TOKEN_LIFETIME_DEFAULT;
                 }
@@ -1237,7 +1237,7 @@ Boolean ccfEnabled = null;
                 maxAGLifetime = MAX_AUTHORIZATION_GRANT_LIFETIME_DEFAULT;
             } else {
                 try {
-                    maxAGLifetime = XMLConfigUtil.getValueSecsOrMillis(x, false);
+                    maxAGLifetime = TimeUtil.getValueSecsOrMillis(x, false);
                 } catch (Throwable t) {
                     maxAGLifetime = MAX_AUTHORIZATION_GRANT_LIFETIME_DEFAULT;
                 }
@@ -1253,7 +1253,7 @@ Boolean ccfEnabled = null;
                 maxATLifetime = MAX_ACCESS_TOKEN_LIFETIME_DEFAULT;
             } else {
                 try {
-                    maxATLifetime = XMLConfigUtil.getValueSecsOrMillis(x, false);
+                    maxATLifetime = TimeUtil.getValueSecsOrMillis(x, false);
                 } catch (Throwable t) {
                     maxATLifetime = MAX_ACCESS_TOKEN_LIFETIME_DEFAULT;
                 }
@@ -1277,7 +1277,7 @@ Boolean ccfEnabled = null;
                 maxRTLifetime = MAX_REFRESH_TOKEN_LIFETIME_DEFAULT;
             } else {
                 try {
-                    maxRTLifetime = XMLConfigUtil.getValueSecsOrMillis(x, true);
+                    maxRTLifetime = TimeUtil.getValueSecsOrMillis(x, true);
                     //maxRTLifetime = Long.parseLong(x) * 1000; // The configuration file has this in seconds. Internally this is ms.
                 } catch (Throwable t) {
                     maxRTLifetime = MAX_REFRESH_TOKEN_LIFETIME_DEFAULT;
@@ -1313,7 +1313,7 @@ Boolean ccfEnabled = null;
                 maxClientRefreshTokenLifetime = 13 * 30 * 24 * 3600 * 1000L; // default of 13 months.
             } else {
                 try {
-                    maxClientRefreshTokenLifetime = XMLConfigUtil.getValueSecsOrMillis(x, true); // The configuration file has this in seconds. Internally this is ms.
+                    maxClientRefreshTokenLifetime = TimeUtil.getValueSecsOrMillis(x, true); // The configuration file has this in seconds. Internally this is ms.
                     //maxClientRefreshTokenLifetime = Long.parseLong(x) * 1000; // The configuration file has this in seconds. Internally this is ms.
                 } catch (Throwable t) {
                     maxClientRefreshTokenLifetime = 13 * 30 * 24 * 3600 * 1000L; // default of 13 months.

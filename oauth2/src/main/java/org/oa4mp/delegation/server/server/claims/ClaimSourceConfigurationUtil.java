@@ -1,13 +1,8 @@
 package org.oa4mp.delegation.server.server.claims;
 
-import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import org.oa4mp.delegation.common.storage.JSONUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import org.apache.commons.configuration.tree.ConfigurationNode;
-
-import static edu.uiuc.ncsa.security.core.configuration.Configurations.getFirstAttribute;
-import static edu.uiuc.ncsa.security.core.configuration.Configurations.getNodeValue;
+import org.oa4mp.delegation.common.storage.JSONUtil;
 
 /**
  * This is a utility that will take a claim source and make a configuration for it.
@@ -62,6 +57,7 @@ public class ClaimSourceConfigurationUtil {
      * @param node
      * @return
      */
+/*
     public ClaimSourceConfiguration getConfiguration(
             MyLoggingFacade logger,
             ConfigurationNode node) {
@@ -101,6 +97,7 @@ public class ClaimSourceConfigurationUtil {
         return config;
     }
 
+*/
 
     /**
      * Note that is is assumed that the json object is the correct

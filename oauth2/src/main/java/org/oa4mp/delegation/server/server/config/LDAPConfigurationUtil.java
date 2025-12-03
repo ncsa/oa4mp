@@ -1,24 +1,17 @@
 package org.oa4mp.delegation.server.server.config;
 
-import edu.uiuc.ncsa.security.core.configuration.Configurations;
-import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import org.oa4mp.delegation.common.storage.JSONUtil;
-import org.oa4mp.delegation.server.server.claims.ClaimSourceConfiguration;
-import org.oa4mp.delegation.server.server.claims.ClaimSourceConfigurationUtil;
-import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.util.ssl.SSLConfiguration;
-import edu.uiuc.ncsa.security.util.ssl.SSLConfigurationUtil;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONNull;
 import net.sf.json.JSONObject;
-import org.apache.commons.configuration.tree.ConfigurationNode;
+import org.oa4mp.delegation.common.storage.JSONUtil;
+import org.oa4mp.delegation.server.server.claims.ClaimSourceConfiguration;
+import org.oa4mp.delegation.server.server.claims.ClaimSourceConfigurationUtil;
 
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.LinkedList;
-
-import static edu.uiuc.ncsa.security.core.configuration.Configurations.*;
 
 /**
  * A utility that loads the configuration from a node and has the tags, etc. for it.
@@ -94,14 +87,14 @@ public class LDAPConfigurationUtil extends ClaimSourceConfigurationUtil {
         }
     }
 
-    /**
+  /*  *//**
      * Converts an XML configuration into an configuration. This is used at bootstrap time if there
      * is a default configuration for the server.
      *
      * @param logger
      * @param node
      * @return
-     */
+     *//*
     public LDAPConfiguration getLdapConfiguration(MyLoggingFacade logger, ConfigurationNode node) {
         ConfigurationNode ldapNode = Configurations.getFirstNode(node, LDAP_TAG);
         // This comes from the server configuration so we have to look for the right node to kick this off.
@@ -190,7 +183,7 @@ public class LDAPConfigurationUtil extends ClaimSourceConfigurationUtil {
 
         return ldapConfiguration;
     }
-
+*/
     public String getAuthName(int authType) {
         switch (authType) {
             case LDAP_AUTH_NONE_KEY:

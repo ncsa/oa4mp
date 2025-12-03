@@ -1,16 +1,16 @@
 package org.oa4mp.server.admin.oauth2.base;
 
 import edu.uiuc.ncsa.security.core.Store;
+import edu.uiuc.ncsa.security.core.cf.CFNode;
+import edu.uiuc.ncsa.security.core.cf.CFXMLConfigurations;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import edu.uiuc.ncsa.security.util.cli.CLITool2;
-import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
-import org.apache.commons.configuration.tree.ConfigurationNode;
 import org.oa4mp.server.api.OA4MPConfigTags;
 import org.oa4mp.server.api.ServiceEnvironmentImpl;
-import org.oa4mp.server.loader.oauth2.loader.OA2ConfigurationLoader;
+import org.oa4mp.server.loader.oauth2.loader.OA2CFConfigurationLoader;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -20,7 +20,7 @@ public  class CopyTool extends CLITool2 {
 
     @Override
         public ConfigurationLoader<? extends AbstractEnvironment> getLoader() throws Exception {
-            return new OA2ConfigurationLoader<>(getConfigurationNode());
+            return new OA2CFConfigurationLoader<>(getCfNode());
         }
 
     public CopyTool(ServiceEnvironmentImpl srcEnv, ServiceEnvironmentImpl targetEnv) {
@@ -88,12 +88,13 @@ public  class CopyTool extends CLITool2 {
 
         String configName = getInputLine().getNextArgFor(cfgNameOption);
         sayv("loading configuration \"" + (configName == null ? "(none)" : configName) + "\" from file " + fileName);
-        ConfigurationNode node = XMLConfigUtil.findConfiguration(fileName,
-                getInputLine().getNextArgFor(cfgNameOption),
-                OA4MPConfigTags.COMPONENT);
+        CFNode node = CFXMLConfigurations.findConfiguration(fileName,
+                OA4MPConfigTags.COMPONENT,
+                getInputLine().getNextArgFor(cfgNameOption)
+                );
         // override the logging in the configuration file, since that might be remote.
         ConfigurationLoader loader = null;
-        setConfigurationNode(node);
+        setCFNode(node);
         try {
             loader = getLoader();
         } catch (Exception e) {
