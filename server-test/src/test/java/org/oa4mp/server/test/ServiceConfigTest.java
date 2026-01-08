@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.security.core.cf.CFNode;
 import edu.uiuc.ncsa.security.core.configuration.ConfigTest;
 import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
 import edu.uiuc.ncsa.security.core.configuration.provider.HierarchicalConfigProvider;
+import edu.uiuc.ncsa.security.core.configuration.provider.TypedProvider;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.storage.sql.derby.DerbyConnectionPoolProvider;
@@ -25,9 +26,12 @@ import org.oa4mp.server.api.storage.MultiDSClientApprovalStoreProvider;
 import org.oa4mp.server.api.storage.MultiDSClientStoreProvider;
 import org.oa4mp.server.api.storage.filestore.DSFSClientApprovalStoreProvider;
 import org.oa4mp.server.api.storage.filestore.DSFSClientStoreProvider;
+import org.oa4mp.server.api.storage.sql.SQLClientApprovalStore;
+import org.oa4mp.server.api.storage.sql.SQLClientStore;
 import org.oa4mp.server.api.storage.sql.provider.DSSQLClientApprovalStoreProvider;
 import org.oa4mp.server.api.util.ClientApproverConverter;
 import org.oa4mp.server.loader.oauth2.loader.OA2CFConfigurationLoader;
+import org.oa4mp.server.loader.oauth2.storage.clients.OA2ClientMemoryStore;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2ClientSQLStoreProvider;
 
 import static org.oa4mp.server.api.OA4MPConfigTags.*;
@@ -86,10 +90,11 @@ public class ServiceConfigTest extends ConfigTest {
      */
     @Test
     public void testClientStoreProvider() throws Exception {
-        CFNode cn = getConfig("minimum config");
+       CFNode cn = getConfig("mixed config");
+       // CFNode cn = getConfig("postgresql config");
+
         ClientProvider clientProvider = new ClientProvider(new OA4MPIdentifierProvider(OA4MPIdentifierProvider.CLIENT_ID));
-        MultiDSClientStoreProvider csp = new MultiDSClientStoreProvider(cn, true, new MyLoggingFacade("test"), null, null, clientProvider);
-        csp = new OA2CFConfigurationLoader.OA2MultiDSClientStoreProvider(cn, true, new MyLoggingFacade("test"), null, null, clientProvider);
+        MultiDSClientStoreProvider csp = new OA2CFConfigurationLoader.OA2MultiDSClientStoreProvider(cn, false, new MyLoggingFacade("test"), null, null, clientProvider);
         ClientConverter converter = new ClientConverter(clientProvider);
         csp.addListener(new DSFSClientStoreProvider(cn, converter, clientProvider));
         csp.addListener(new OA2ClientSQLStoreProvider(new MySQLConnectionPoolProvider("oauth", "oauth"),
@@ -104,8 +109,22 @@ public class ServiceConfigTest extends ConfigTest {
         csp.addListener(new OA2ClientSQLStoreProvider(new DerbyConnectionPoolProvider("oauth", "oauth"),
                 OA4MPConfigTags.DERBY_STORE,
                 converter, clientProvider));
+        csp.addListener(new TypedProvider<ClientStore>(cn, OA4MPConfigTags.MEMORY_STORE, OA4MPConfigTags.CLIENTS_STORE) {
+            @Override
+            public Object componentFound(CfgEvent configurationEvent) {
+                if (checkEvent(configurationEvent)) {
+                    return get();
+                }
+                return null;
+            }
 
+            @Override
+            public ClientStore get() {
+                return new OA2ClientMemoryStore(clientProvider);
+            }
+        });
         ClientStore<Client> cs = (ClientStore<Client>) csp.get();
+        assert cs instanceof SQLClientStore;
     }
 
     /*
@@ -137,6 +156,9 @@ public class ServiceConfigTest extends ConfigTest {
         dap.addListener(new DSSQLClientApprovalStoreProvider(cn, new PGConnectionPoolProvider("oauth", "oauth"), POSTGRESQL_STORE, cp));
         dap.addListener(new DSSQLClientApprovalStoreProvider(cn, new DerbyConnectionPoolProvider("oa4mp", "oauth2"), DERBY_STORE, cp));
         ClientApprovalStore<ClientApproval> as = (ClientApprovalStore<ClientApproval>) dap.get();
+        assert as instanceof SQLClientApprovalStore;
+
+
     }
 
 

@@ -30,6 +30,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.text.ParseException;
+import java.util.Date;
 import java.util.StringTokenizer;
 
 /**
@@ -83,11 +84,11 @@ public class MyOtherJWTUtil2 {
         return concat(header, payload) + "."; // as per spec.
     }
 
-    public static String createJWT(JSONObject payload, JSONWebKey jsonWebKey) throws ParseException, JOSEException {
+    public static String createJWT(JSONObject payload, JSONWebKey jsonWebKey) throws ParseException, JOSEException, InvalidKeyException {
         return createJWT(payload, jsonWebKey, DEFAULT_TYPE);
     }
 
-    public static String createJWT(JSONObject payload, JSONWebKey jsonWebKey, String type) throws ParseException, JOSEException {
+    public static String createJWT(JSONObject payload, JSONWebKey jsonWebKey, String type) throws ParseException, JOSEException, InvalidKeyException {
         JSONObject header = new JSONObject();
         header.put(TYPE, type);
         // Don't send an empty kid. Every key should have one though, but a missing one is not an error.
@@ -129,23 +130,24 @@ public class MyOtherJWTUtil2 {
     public static final String RS512_JAVA = "SHA512withRSA";
     public static final int RS512_KEY = 103;
 
-    /*
-        protected static String sign(JSONObject header,
-                                     JSONObject payload,
-                                     JSONWebKey webkey) throws IOException, InvalidKeySpecException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
-
-            return sign(concat(header, payload), webkey);
+    // Fix https://github.com/ncsa/oa4mp/issues/282
+    public static void checkKeyExpiration(JSONWebKey key)  {
+        if(key == null) {
+            throw new GeneralException("key is null");
         }
-    */
-
+        if (key.expiresAt != null) {
+            Date now = new Date();
+            if (key.expiresAt.getTime() < now.getTime()) {
+                throw new ExpiredKeyException("key with id \"" + (key.id == null?"(no id)":key.id) + "\" expired at " + key.expiresAt);
+            }
+        }
+    }
 
     protected static String sign(JSONObject header,
                                  JSONObject payload,
                                  JSONWebKey webkey) throws JOSEException, ParseException {
-        JWSAlgorithm jwsAlgorithm = new JWSAlgorithm(header.getString(ALGORITHM));
+        checkKeyExpiration(webkey);
         JWSHeader jwsHeader = JWSHeader.parse(header);
-
-
 
                 /* for some reason, the builder is not compiling right in the IDE.
                 .Builder(Algorithm.parse(header.getString(ALGORITHM)))
@@ -203,7 +205,7 @@ val jwt: String = signedJWT.serialize()     */
          RS348                    SHA384withRSA
          RS512                    SHA512withRSA
           */
-
+        checkKeyExpiration(webkey);
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(webkey.privateKey.getEncoded());
         RSAPrivateKey privateKey = (RSAPrivateKey) keyFactory.generatePrivate(keySpec);
@@ -251,6 +253,8 @@ val jwt: String = signedJWT.serialize()     */
         SignedJWT signedJWT = new SignedJWT(header, payload, signature);
         JWSVerifier verifier = null;
         boolean unsupportedProtocol = true;
+        // Fix https://github.com/ncsa/oa4mp/issues/282
+        checkKeyExpiration(webKey);
         if (webKey.isRSAKey()) {
             verifier = new RSASSAVerifier((RSAPublicKey) webKey.publicKey);
             unsupportedProtocol = false;
@@ -341,8 +345,8 @@ val jwt: String = signedJWT.serialize()     */
      * there is no key
      *
      * @param jwt
-     * @throws IllegalArgumentException    if this is not a JWT, the JWT is signed.
      * @return
+     * @throws IllegalArgumentException if this is not a JWT, the JWT is signed.
      */
     public static JSONObject verifyAndReadJWT(String jwt) {
         return verifyAndReadJWT(jwt, (JSONWebKeys) null);

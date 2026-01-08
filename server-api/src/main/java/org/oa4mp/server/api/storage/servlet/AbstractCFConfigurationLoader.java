@@ -64,18 +64,6 @@ public abstract class AbstractCFConfigurationLoader<T extends ServiceEnvironment
      */
     boolean getCfgBoolean( CFNode sn, String tagName, boolean defaultValue) {
         return sn.getFirstBooleanValue(tagName, defaultValue); // CFNode does this now.
-/*
-        String x = getFirstAttribute(sn, tagName);
-        if (x == null || x.length() == 0) return defaultValue;
-        x = x.trim().toLowerCase();
-        if ("true".equals(x) || "on".equals(x)) {
-            return true;
-        }
-        if ("false".equals(x.trim()) || "off".equals(x)) {
-            return false;
-        }
-        return defaultValue;
-*/
     }
 
 

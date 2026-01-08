@@ -105,39 +105,6 @@ public class ClientUtils {
                 clientMaxLifetime,
                 config == null ? null : config.getLifetime(),
                 requestLifetime);
-        // If the server default is <= 0 that implies there is some misconfiguration. Better to find that out here than
-        // get squirrelly results later.
-/*
-        if (serverMaxLifetime <= 0) {
-            throw new NFWException("the server-wide default for the token lifetime has not been set.");
-        }
-        long maxLifetime = serverMaxLifetime;
-        if (0 < clientMaxLifetime) {
-            maxLifetime = Math.min(clientMaxLifetime, serverMaxLifetime);
-        }
-//        OA2Client client = (OA2Client) st2.getClient();
-        long lifetime = -1L;
-        if (0 < clientLifetime) {
-            lifetime = Math.min(clientLifetime, maxLifetime);
-        } else {
-            // client lifetime <= 0
-            lifetime = defaultServerLifetime;
-        }
-
-        if (config != null) {
-            if (0 < config.getLifetime()) {
-                lifetime = Math.min(config.getLifetime(), maxLifetime);
-            }
-        }
-
-        // If the transaction has a specific request, take it in to account.
-        if (0 < requestLifetime) {
-            // IF they specified an  access token lifetime in the request, take the minimum of that
-            // and whatever they client is allowed.
-            lifetime = Math.min(requestLifetime, maxLifetime);
-        }
-        return lifetime;
-*/
 
     }
 
