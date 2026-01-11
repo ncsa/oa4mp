@@ -56,6 +56,7 @@ public abstract class StemConverter<V extends Identifiable> extends MapConverter
     public V fromMap(QDLStem stem, V v) {
         v = createIfNeeded(v);
         v.setIdentifier(BasicIdentifier.newID(stem.getString(getKeys().identifier())));
+        if(stem.containsKey(getKeys().description())){v.setDescription(stem.getString(getKeys().description()));}
         return v;
     }
 
@@ -180,7 +181,12 @@ public abstract class StemConverter<V extends Identifiable> extends MapConverter
      */
     protected void setNonNullStemValue(QDLStem stem, String key, Object value){
         if(value != null){
-            put(stem,key, value);
+            if(value instanceof Date){
+                put(stem,key, ((Date)value).getTime());
+            }else{
+
+                put(stem,key, value);
+            }
         }
     }
 }

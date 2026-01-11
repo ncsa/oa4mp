@@ -87,6 +87,10 @@ public class VirtualIssuer extends Monitored {
         this.issuer = issuer;
     }
 
+    /**
+     * The signing keys for this issuer.
+     * @return
+     */
     public JSONWebKeys getJsonWebKeys() {
         return jsonWebKeys;
     }

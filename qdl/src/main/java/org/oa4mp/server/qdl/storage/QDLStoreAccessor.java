@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
 
 /**
  * This gives QDL the ability to look into stores such as clients, approvals, etc.
@@ -284,8 +285,14 @@ public class QDLStoreAccessor {
 
     //  store#init('/home/ncsa/dev/csd/config/server-oa2.xml', 'localhost:oa4mp.oa2.mariadb', 'transaction')
     //  t. :=  store#search('temp_token', '.*23.*')
+
+    /**
+     * Lists keys in alphabetical order.
+     * @return
+     */
     public QDLStem listKeys() {
-        List<String> keys = getStoreKeys().allKeys();
+        TreeSet<String> sortedKeys = new TreeSet<>(getStoreKeys().allKeys());
+        List<String> keys = new ArrayList<>(sortedKeys);
         QDLStem QDLStem = new QDLStem();
         QDLStem.addList(keys);
         return QDLStem;

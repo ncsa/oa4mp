@@ -1,12 +1,8 @@
 package org.oa4mp.server.qdl.storage;
 
 import edu.uiuc.ncsa.security.core.Identifier;
-import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
-import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
-import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
@@ -16,7 +12,6 @@ import org.qdl_lang.variables.QDLList;
 import org.qdl_lang.variables.QDLStem;
 import org.qdl_lang.variables.values.StringValue;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +22,7 @@ import static org.qdl_lang.variables.StemUtility.put;
  * <p>Created by Jeff Gaynor<br>
  * on 12/20/20 at  7:24 AM
  */
-public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
+public class ClientStemMC<V extends OA2Client> extends BaseClientStemMC<V> {
     public ClientStemMC(MapConverter<V> mapConverter) {
         super(mapConverter);
     }
@@ -39,142 +34,36 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
         // Since these are created interactively, we have no choice really but to check each attribute.
         // We don't want cruft getting in to the store.
         /*
-            List of base client keys  (9 of these)
-         String creationTS = "creation_ts";
-         String debugOn = "debug_on";
-         String email = "email";
-         String errorURL = "error_url";
-         String homeURL = "home_url";
-         String lastModifiedTS = "last_modified_ts";
-         String name = "name";
-         String proxyLimited = "proxy_limited";
-         String secret = "oauth_client_pubkey";
-             String ersatzInheritIDToken = "ersatz_inherit_id_token";
-
+            List of base client keys
+          String errorURL = "error_url";
+          String homeURL = "home_url";
+          String proxyLimited = "proxy_limited";
          */
-        if (isTimeOk(stem, kk().creationTS())) {
-            v.setCreationTS(toDate(stem, kk().creationTS()));
-        }
-        if(stem.containsKey(kk().ersatzInheritIDToken())){
-            v.setErsatzInheritIDToken(stem.getBoolean(kk().ersatzInheritIDToken()));
-        }
-        if (stem.containsKey(kk().debugOn())) {
-            v.setDebugOn(stem.getBoolean(kk().debugOn()));
-        }
-        if(stem.containsKey(kk().forwardScopesToProxy())){
-            v.setForwardScopesToProxy(stem.getBoolean(kk().forwardScopesToProxy()));
-        }
-        if (isStringKeyOK(stem, kk().email())) {
-            v.setEmail(stem.getString(kk().email()));
-        }
-        if (isStringKeyOK(stem, kk().errorURL())) {
-            v.setErrorUri(stem.getString(kk().errorURL()));
-        }
-        if (isStringKeyOK(stem, kk().homeURL())) {
-            v.setHomeUri(stem.getString(kk().homeURL()));
-        }
-        // 5
-        if (isTimeOk(stem, kk().lastModifiedTS())) {
-            v.setLastModifiedTS(toDate(stem, kk().lastModifiedTS()));
-        }
-        if (isStringKeyOK(stem, kk().name())) {
-            v.setName(stem.getString(kk().name()));
-        }
-        if (stem.containsKey(kk().proxyLimited())) {
-            v.setProxyLimited(stem.getBoolean(kk().proxyLimited()));
-        }
-        if (isStringKeyOK(stem, kk().secret())) {
-            v.setSecret(stem.getString(kk().secret()));
-        }
-        if(stem.containsKey(kk().rfc7523Client())){
-             v.setServiceClient(stem.getBoolean(kk().rfc7523Client()));
-        }
-        if(stem.containsKey(kk().rfc7523ClientUsers())){
-           v.setServiceClientUsers(toList(stem, kk().rfc7523ClientUsers()));
-        }
+        if (isStringKeyOK(stem, kk().errorURL())) {v.setErrorUri(stem.getString(kk().errorURL()));}
+        if (isStringKeyOK(stem, kk().homeURL())) {v.setHomeUri(stem.getString(kk().homeURL()));}
+        if (stem.containsKey(kk().proxyLimited())) {v.setProxyLimited(stem.getBoolean(kk().proxyLimited()));}
 
-        if (stem.containsKey(kk().jwksURI())) {
-            v.setJwksURI(URI.create(stem.getString( kk().proxyClaimsList())));
-        }
-        if(stem.containsKey(kk().jwks())){
-            try {
-                JSONWebKeys jwks = JSONWebKeyUtil.fromJSON( stem.getStem(kk().jwks()).toJSON());
-                v.setJWKS(jwks);
-            } catch (Throwable e) {
-               if(DebugUtil.isEnabled()){ e.printStackTrace();}
-               if(e instanceof RuntimeException){
-                   throw (RuntimeException)e;
-               }
-               throw new GeneralException("could not convert to JSON web key.", e);
-            }
-        }
-        // 9 attributes
-        /* Alphabetical list of OA2 client attributes. (18 of these)
-         String atLifetime = "at_lifetime";
-         String audience="audience";
-         String callback_uri = "callback_uri";
-         String config = "cfg";
-         String dfInterval="df_interval";
-         String allowQDLCodeBlocks;
-
-         String dfLifetime="df_lifetime";
-         String ersatzClient = "ersatz_client";
-         String extended_attributes = "extended_attributes";
-         String issuer = "issuer";
-         String ldap = "ldap";
-         String maxATLifetime = "maxATLifetime";
-         String maxRTLifetime = "maxRTLifetime";
-         String proxyClaims="proxy_claims";
-         String publicClient="public_client";
-
-         String resource="resource";
-         String rtLifetime = "rt_lifetime";
-         String rtGracePeriod = "rt_grace_period";
-         String scopes = "scopes";
-         String signTokens="sign_tokens";
-         String signTokens="skipServerScripts";
-         String strictScopes="strict_scopes";
-         String superTypes="super_types";
-         */
 
         // OA2 client attributes
-        if (stem.containsKey(kk().atLifetime())) {
-            v.setAtLifetime(stem.getLong(kk().atLifetime()));
-        }
-        if (stem.containsKey(kk().audience())) {
-            v.setAudience(toList(stem, kk().audience()));
-            v.setAudience(toList(stem, kk().audience()));
-        }
-        if (stem.containsKey(kk().callbackUri())) {
-            v.setCallbackURIs(toList(stem, kk().callbackUri()));
-        }
+        if (stem.containsKey(kk().atLifetime())) {v.setAtLifetime(stem.getLong(kk().atLifetime()));}
+        if (stem.containsKey(kk().audience())) {v.setAudience(toList(stem, kk().audience()));}
+        if (stem.containsKey(kk().callbackUri())) {v.setCallbackURIs(toList(stem, kk().callbackUri()));}
+        if (stem.containsKey(kk().ersatzClient())) {v.setErsatzClient(stem.getBoolean(kk().ersatzClient()));}
         if (stem.containsKey(kk().cfg())) {
             QDLStem j =  stem.get(kk().cfg()).asStem();
             v.setConfig((JSONObject) j.toJSON());
         }
-
-        if (stem.containsKey(kk().dfInterval())) {
-            v.setDfInterval(stem.getLong(kk().dfInterval()));
-        }
-        // 7
-        if (stem.containsKey(kk().rtGracePeriod())) {
-            v.setRtGracePeriod(stem.getLong(kk().rtGracePeriod()));
-        }
-
-        if (stem.containsKey(kk().dfLifetime())) {
-            v.setDfLifetime(stem.getLong(kk().dfLifetime()));
-        }
-        if (stem.containsKey(kk().ersatzClient())) {
-            v.setErsatzClient(stem.getBoolean(kk().ersatzClient()));
-        }
-
+        if (stem.containsKey(kk().dfInterval())) {v.setDfInterval(stem.getLong(kk().dfInterval()));}
+        if (stem.containsKey(kk().dfLifetime())) {v.setDfLifetime(stem.getLong(kk().dfLifetime()));}
+        if (stem.containsKey(kk().ersatzInheritIDToken())) {v.setErsatzInheritIDToken(stem.getBoolean(kk().ersatzInheritIDToken()));}
         if (stem.containsKey(kk().ea())) {
             QDLStem j = stem.get(kk().ea()).asStem();
             v.setExtendedAttributes((JSONObject) j.toJSON());
         }
-        if (isStringKeyOK(stem, kk().issuer())) {
-            v.setIssuer(stem.getString(kk().issuer()));
-        }
+        if (stem.containsKey(kk().extendsProvisioners())) {v.setExtendsProvisioners(stem.getBoolean(kk().extendsProvisioners()));}
+        if (stem.containsKey(kk().forwardScopesToProxy())) {v.setForwardScopesToProxy(stem.getBoolean(kk().forwardScopesToProxy()));}
+        if (stem.containsKey(kk().idtLifetime())) {v.setIdTokenLifetime(stem.getLong(kk().idtLifetime()));}
+        if (isStringKeyOK(stem, kk().issuer())) {v.setIssuer(stem.getString(kk().issuer()));}
         if (stem.containsKey(kk().ldap())) {
             if (stem.get(kk().ldap()).isStem()) {
                 QDLStem ldap = stem.get(kk().ldap()).asStem();
@@ -182,10 +71,9 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
                 v.setLdaps(getCC().getLdapConfigurationUtil().fromJSON(array));
             }
         }
-        if (stem.containsKey(kk().extendsProvisioners())) {
-            v.setExtendsProvisioners(stem.getBoolean(kk().extendsProvisioners()));
-        }
-
+        if (stem.containsKey(kk().maxATLifetime())) {v.setMaxATLifetime(stem.getLong(kk().maxATLifetime()));}
+        if (stem.containsKey(kk().maxIDTLifetime())) {v.setMaxIDTLifetime(stem.getLong(kk().maxIDTLifetime()));}
+        if (stem.containsKey(kk().maxRTLifetime())) {v.setMaxRTLifetime(stem.getLong(kk().maxRTLifetime()));}
         if (stem.containsKey(kk().prototypes())) {
             ArrayList<Identifier> ids = new ArrayList<>();
             List list = toList(stem, kk().prototypes()); // generic list of strings
@@ -199,51 +87,17 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
             }
         }
 
-        if (stem.containsKey(kk().proxyClaimsList())) {
-            v.setProxyClaimsList(toList(stem, kk().proxyClaimsList()));
-        }
-        if (stem.containsKey(kk().proxyRequestScopes())) {
-                 v.setProxyRequestScopes(toList(stem, kk().proxyRequestScopes()));
-             }
-        if (stem.containsKey(kk().publicClient())) {
-            v.setPublicClient(stem.getBoolean(kk().publicClient()));
-        }
-        //  11
-        if (stem.containsKey(kk().resource())) {
-            v.setResource(toList(stem, kk().resource()));
-        }
-        if (stem.containsKey(kk().rtLifetime())) {
-            v.setRtLifetime(stem.getLong(kk().rtLifetime()));
-        }
-        if (stem.containsKey(kk().idtLifetime())) {
-            v.setIdTokenLifetime(stem.getLong(kk().idtLifetime()));
-        }
-        if (stem.containsKey(kk().maxIDTLifetime())) {
-            v.setMaxIDTLifetime(stem.getLong(kk().maxIDTLifetime()));
-        }
+        if (stem.containsKey(kk().proxyClaimsList())) {v.setProxyClaimsList(toList(stem, kk().proxyClaimsList()));}
+        if (stem.containsKey(kk().proxyRequestScopes())) {v.setProxyRequestScopes(toList(stem, kk().proxyRequestScopes()));}
+        if (stem.containsKey(kk().publicClient())) {v.setPublicClient(stem.getBoolean(kk().publicClient()));}
+        if (stem.containsKey(kk().resource())) {v.setResource(toList(stem, kk().resource()));}
+        if (stem.containsKey(kk().rtGracePeriod())) {v.setRtGracePeriod(stem.getLong(kk().rtGracePeriod()));}
+        if (stem.containsKey(kk().rtLifetime())) {v.setRtLifetime(stem.getLong(kk().rtLifetime()));}
+        if (stem.containsKey(kk().scopes())) {v.setScopes(toList(stem, kk().scopes()));}
+        if (stem.containsKey(kk().signTokens())) {v.setSignTokens(stem.getBoolean(kk().signTokens()));}
+        if (stem.containsKey(kk().skipServerScripts())) {v.setSkipServerScripts(stem.getBoolean(kk().skipServerScripts()));}
+        if (stem.containsKey(kk().strictScopes())) {v.setStrictscopes(stem.getBoolean(kk().strictScopes()));}
 
-        if (stem.containsKey(kk().maxATLifetime())) {
-            v.setMaxATLifetime(stem.getLong(kk().maxATLifetime()));
-        }
-        if (stem.containsKey(kk().maxRTLifetime())) {
-            v.setMaxRTLifetime(stem.getLong(kk().maxRTLifetime()));
-        }
-
-
-        if (stem.containsKey(kk().scopes())) {
-            v.setScopes(toList(stem, kk().scopes()));
-        }
-        if (stem.containsKey(kk().signTokens())) {
-            v.setSignTokens(stem.getBoolean(kk().signTokens()));
-        }
-        if (stem.containsKey(kk().skipServerScripts())) {
-            v.setSkipServerScripts(stem.getBoolean(kk().skipServerScripts()));
-        }
-
-        if (stem.containsKey(kk().strictScopes())) {
-            v.setStrictscopes(stem.getBoolean(kk().strictScopes()));
-        }
-        // 15 attributes
         return v;
     }
 
@@ -251,45 +105,58 @@ public class ClientStemMC<V extends OA2Client> extends StemConverter<V> {
         return (OA2ClientKeys) keys;
     }
 
+    /*        String atLifetime = "at_lifetime";
+        String atLifetime = "at_lifetime";
+        String audience="audience";
+        String callback_uri = "callback_uri";
+        String config = "cfg";
+        String dfInterval="df_interval";
+        String dfLifetime="df_lifetime";
+        String ersatzClient="ersatz_client";
+        String ersatzInheritIDToken = "ersatz_inherit_id_token";
+        String extended_attributes = "extended_attributes";
+        String extendsProvisioners = "extends_provisioners";
+        String forwardScopesToProxy = "forward_scopes_to_proxy";
+        String idTokenLifetime = "idt_lifetime";
+        String issuer = "issuer";
+        String ldap = "ldap";
+        String maxATLifetime = "at_max_lifetime";
+        String maxIDTLifetime = "idt_max_lifetime";
+        String maxRTLifetime = "rt_max_lifetime";
+        String prototypes ="prototypes";
+        String proxyClaimsList ="proxy_claims_list";
+        String proxyRequestScopes ="proxy_request_scopes";
+        String publicClient="public_client";
+        String resource="resource";
+        String rtGracePeriod = "rt_grace_period";
+        String rtLifetime = "rt_lifetime";
+        String scopes = "scopes";
+        String signTokens="sign_tokens";
+        String skipServerScripts="skip_server_scripts";
+        String strictScopes="strict_scopes";
+     */
     @Override
     public QDLStem toMap(V v, QDLStem stem) {
         stem = super.toMap(v, stem);
         // basic client attributes
-        setNonNullStemValue(stem, kk().secret(), v.getSecret());
-        setNonNullStemValue(stem, kk().debugOn(), v.isDebugOn());
 
         setNonNullStemValue(stem, kk().forwardScopesToProxy(), v.isForwardScopesToProxy());
-        setNonNullStemValue(stem, kk().email(), v.getEmail());
-        setNonNullStemValue(stem, kk().name(), v.getName());
-        setNonNullStemValue(stem, kk().creationTS(), v.getCreationTS().getTime());
-        if(v.getJwksURI() != null) {
-            setNonNullStemValue(stem, kk().jwksURI(), v.getJwksURI().toString());
-        }
-
-        if(v.hasJWKS()) {
-            QDLStem ss = new QDLStem();
-            ss.fromJSON(JSONWebKeyUtil.toJSON(v.getJWKS()));
-            setNonNullStemValue(stem, kk().jwks(), ss);
-        }
         // 6
-        setNonNullStemValue(stem, kk().lastModifiedTS(), v.getLastModifiedTS().getTime());
         setNonNullStemValue(stem, kk().homeURL(), v.getHomeUri());
         setNonNullStemValue(stem, kk().errorURL(), v.getErrorUri());
         setNonNullStemValue(stem, kk().proxyLimited(), v.isProxyLimited());
-        setNonNullStemValue(stem, kk().rfc7523Client(), v.isServiceClient());
-        fromList(v.getServiceClientUsers(), stem, kk().rfc7523ClientUsers());
         setNonNullStemValue(stem, kk().extendsProvisioners(), v.isExtendsProvisioners());
         // 10 attributes
 
         // OA2 client attributes
         setNonNullStemValue(stem, kk().atLifetime(), v.getAtLifetime());
-        setNonNullStemValue(stem, kk().idtLifetime(), v.getIdTokenLifetime());
         if (v.getAudience() != null && !v.getAudience().isEmpty()) {
             fromList(v.getAudience(), stem, kk().audience());
         }
         if (v.getCallbackURIs() != null && !v.getCallbackURIs().isEmpty()) {
             fromList(v.getCallbackURIs(), stem, kk().callbackUri());
         }
+        setNonNullStemValue(stem, kk().idtLifetime(), v.getIdTokenLifetime());
         if (v.getProxyClaimsList() != null && !v.getProxyClaimsList().isEmpty()) {
             fromList(v.getProxyClaimsList(), stem, kk().proxyClaimsList());
         }

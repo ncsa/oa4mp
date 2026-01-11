@@ -15,9 +15,8 @@ public class OA2ClientKeys extends ClientKeys {
         identifier("client_id");
         secret("public_key");
     }
+  //  String allowPromptNone = "allow_prompt_none";
     String atLifetime = "at_lifetime";
-    String allowPromptNone = "allow_prompt_none";
-    String idTokenLifetime = "idt_lifetime";
     String audience="audience";
     String callback_uri = "callback_uri";
     String config = "cfg";
@@ -28,22 +27,23 @@ public class OA2ClientKeys extends ClientKeys {
     String extended_attributes = "extended_attributes";
     String extendsProvisioners = "extends_provisioners";
     String forwardScopesToProxy = "forward_scopes_to_proxy";
+    String idTokenLifetime = "idt_lifetime";
     String issuer = "issuer";
     String ldap = "ldap";
     String maxATLifetime = "at_max_lifetime";
-    String maxRTLifetime = "rt_max_lifetime";
     String maxIDTLifetime = "idt_max_lifetime";
+    String maxRTLifetime = "rt_max_lifetime";
+    String prototypes ="prototypes";
     String proxyClaimsList ="proxy_claims_list";
     String proxyRequestScopes ="proxy_request_scopes";
     String publicClient="public_client";
-    String rtLifetime = "rt_lifetime";
-    String rtGracePeriod = "rt_grace_period";
     String resource="resource";
+    String rtGracePeriod = "rt_grace_period";
+    String rtLifetime = "rt_lifetime";
+    String scopes = "scopes";
     String signTokens="sign_tokens";
     String skipServerScripts="skip_server_scripts";
-    String scopes = "scopes";
     String strictScopes="strict_scopes";
-    String prototypes ="prototypes";
 
     /*
       If you add attributes, make sure you update
@@ -51,11 +51,11 @@ public class OA2ClientKeys extends ClientKeys {
            (in  oa4mp-qdl)
       or you may break the QDL module that handles clients.
      */
-
+/*
     public String allowPromptNone(String... x) {
         if (0 < x.length) allowPromptNone = x[0];
         return allowPromptNone;
-    }
+    }*/
     public String idtLifetime(String... x) {
            if (0 < x.length) idTokenLifetime = x[0];
            return idTokenLifetime;

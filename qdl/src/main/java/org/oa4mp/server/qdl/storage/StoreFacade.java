@@ -48,6 +48,7 @@ public class StoreFacade  {
             put(types, "approval", STORE_TYPE_APPROVALS);
             put(types, "admin", STORE_TYPE_ADMIN_CLIENT_STORE);
             put(types, "permission", STORE_TYPE_PERMISSION_STORE);
+            put(types, "vi", STORE_TYPE_VI_STORE);
             put(types, "transaction", STORE_TYPE_TRANSACTION);
             put(types, "tx", STORE_TYPE_TX_STORE);
         }
@@ -117,6 +118,7 @@ public class StoreFacade  {
     public static final String STORE_TYPE_APPROVALS = "client_approval";
     public static final String STORE_TYPE_TRANSACTION = "transaction";
     public static final String STORE_TYPE_TX_STORE = "tx_record";
+    public static final String STORE_TYPE_VI_STORE = "vi";
     public static final String STORE_TYPE_PERMISSION_STORE = "permission";
     public static final String STORE_TYPE_ADMIN_CLIENT_STORE = "admin_client";
 
@@ -306,10 +308,11 @@ public class StoreFacade  {
                         getEnvironment().getTxStore(),
                         getEnvironment().getClientStore()));
                 break;
-/*            case STORE_TYPE_PERMISSION_STORE:
-                storeAccessor = new QDLPermissionStoreAccessor(storeType, getEnvironment().getPermissionStore(), getEnvironment().getMyLogger());
-                storeAccessor.setMapConverter(new PermissionStemMC(getEnvironment().getPermissionStore().getMapConverter()));
-                break;*/
+            case STORE_TYPE_VI_STORE:
+                storeAccessor = new QDLStoreAccessor(storeType, getEnvironment().getVIStore(), getEnvironment().getMyLogger());
+                storeAccessor.setMapConverter(new VIStemMC(getEnvironment().getVIStore().getMapConverter()));
+                break;
+
             default:
                 throw new IllegalArgumentException("unsupported store '" + storeType + "'");
 

@@ -130,6 +130,18 @@ public class MyOtherJWTUtil2 {
     public static final String RS512_JAVA = "SHA512withRSA";
     public static final int RS512_KEY = 103;
 
+    /**
+     * Checks if the given JSON web key has expired. If the key has expired, an exception
+     * is thrown. This method ensures that the key is still valid for use by comparing its
+     * expiration time with the current time.
+     *
+     * @param key the JSONWebKey to validate for expiration. If the key is null, a
+     *            {@code GeneralException} is thrown. If the key has expired, an
+     *            {@code ExpiredKeyException} is thrown, including the key ID (if available)
+     *            and expiration timestamp.
+     * @throws GeneralException if the key is null.
+     * @throws ExpiredKeyException if the key has expired.
+     */
     // Fix https://github.com/ncsa/oa4mp/issues/282
     public static void checkKeyExpiration(JSONWebKey key)  {
         if(key == null) {

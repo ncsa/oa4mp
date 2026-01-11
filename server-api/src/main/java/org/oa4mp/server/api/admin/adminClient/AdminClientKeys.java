@@ -14,22 +14,22 @@ public class AdminClientKeys extends BaseClientKeys {
         identifier("admin_id");
         secret("secret");
     }
+
+    String allowCustomIDs = "allow_custom_ids";
     String allowQDL = "allow_qdl";
     String allowQDLCodeBlocks = "allow_qdl_code_blocks";
-
     String config = "config";
-    String allowCustomIDs = "allow_custom_ids";
     String generateIDs = "generate_ids";
-    String useTimestampsInIDs = "use_timestamps_in_ids";
     String idStart = "id_start";
-    String issuer = "issuer";
     String initializeFlows = "initialize_flows";
-    String maxClients = "max_clients";
-    String notifyOnNewClientCreate="new_client_notify";
-    String vo="vo";
-    String voURI="vo_uri";
+    String issuer = "issuer";
     String listUsers = "list_users";
     String listUsersInOtherClients = "list_users_other_clients";
+    String maxClients = "max_clients";
+    String notifyOnNewClientCreate="new_client_notify";
+    String useTimestampsInIDs = "use_timestamps_in_ids";
+    String vo="vo";
+    String voURI="vo_uri";
 
 
     public String initializeFlows(String... x) {

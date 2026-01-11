@@ -23,27 +23,27 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="server" />
-        <module name="server-api" />
-        <module name="skin" />
-        <module name="oauth2" />
-        <module name="common" />
-        <module name="server-test" />
-        <module name="oa4mp-server-test" />
-        <module name="client" />
-        <module name="server-webapp-jar" />
         <module name="website" />
         <module name="oa4mp-server-oauth2" />
         <module name="myproxy-logon" />
+        <module name="server-api" />
+        <module name="skin" />
         <module name="server-loader" />
+        <module name="oauth2" />
         <module name="rfc8414" />
         <module name="client-test" />
         <module name="proxy" />
         <module name="server-admin" />
         <module name="installer" />
+        <module name="common" />
+        <module name="server-test" />
         <module name="client-loader" />
+        <module name="oa4mp-server-test" />
         <module name="di-service" />
         <module name="qdl" />
+        <module name="client" />
         <module name="client-oauth2" />
+        <module name="server-webapp-jar" />
         <module name="client-installer" />
         <module name="client-api" />
       </profile>
@@ -52,6 +52,7 @@
       <module name="client-webapp" target="11" />
       <module name="myproxy" target="11" />
       <module name="myproxy-website" target="1.8" />
+      <module name="oa4mp-parent" target="11" />
       <module name="oa4mp-webapp" target="11" />
       <module name="server-installer" target="11" />
       <module name="server-webapp-jar" target="11" />

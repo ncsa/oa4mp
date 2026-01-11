@@ -19,7 +19,6 @@ public class OA2ClientTable extends ClientStoreTable {
         super.createColumnDescriptors();
         OA2ClientKeys k = (OA2ClientKeys)keys;
         getColumnDescriptor().add(new ColumnDescriptorEntry(k.atLifetime(), BIGINT));
-        getColumnDescriptor().add(new ColumnDescriptorEntry(k.allowPromptNone(), BOOLEAN));
         getColumnDescriptor().add(new ColumnDescriptorEntry(k.audience(), LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(k.callbackUri(), LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(k.cfg(), LONGVARCHAR));

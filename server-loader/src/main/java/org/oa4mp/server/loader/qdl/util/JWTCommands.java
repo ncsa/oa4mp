@@ -272,6 +272,7 @@ public class JWTCommands  {
             switch (argCount) {
                 case 0:
                     doc.add(getName() + "() - create a set of RSA JSON WebKeys and sets the current set of web keys.");
+                    doc.add("If you need elliptic keys, use the monadic version of this function.");
                     break;
                 case 1:
                     doc.add(getName() + "(arg. | file_path) - create a set of JSON WebKeys.");
