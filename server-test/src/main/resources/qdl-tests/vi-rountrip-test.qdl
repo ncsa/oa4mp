@@ -1,0 +1,18 @@
+/*
+   This tests the rountrip mechanism of the storage engine. It creates a new
+   VI, then gets it with the store, checks the values, does an update and rechecks.
+*/
+
+db := j_load('db');
+cfg. := interpret(file_read('/home/ncsa/dev/csd/config/oa4mp-connector.qdl'));
+db#connect(cfg.);
+say(db#read('select count(*) from ' + cfg.schema + '.clients'));
+
+
+
+vi := j_load('oa4mp.client.store');
+ vi#init('/home/ncsa/dev/csd/config/server-oa2.xml', // config file
+             'localhost:oa4mp.oa2.mariadb',                    // config name
+              $$STORE_TYPE.'vi'                      // store type
+    );
+    lh. ≔ vi#read('oa4mp:test')

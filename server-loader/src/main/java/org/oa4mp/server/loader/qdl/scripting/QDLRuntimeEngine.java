@@ -564,6 +564,8 @@ public class QDLRuntimeEngine extends ScriptRuntimeEngine implements ScriptingCo
         QDLStem acl = new QDLStem();
         // There is always a client id.
         put(acl,"client_id", state.getClientID().toString());
+        // Fix for https://github.com/ncsa/oa4mp/issues/284
+        put(acl, "client_debug_on", state.transaction.getOA2Client().isDebugOn());
         // Convert to a list of strings. List of admins may be empty.
         ArrayList<Object> adminIDs = new ArrayList<>();
         for (Identifier id : state.getAdminIDs()) {
