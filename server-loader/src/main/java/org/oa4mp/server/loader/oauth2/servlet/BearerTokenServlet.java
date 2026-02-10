@@ -1,19 +1,19 @@
 package org.oa4mp.server.loader.oauth2.servlet;
 
-import org.oa4mp.server.loader.oauth2.OA2SE;
-import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
-import org.oa4mp.server.loader.oauth2.storage.tx.TXRecord;
-import org.oa4mp.server.loader.oauth2.storage.vi.VirtualIssuer;
-import org.oa4mp.server.api.storage.servlet.OA4MPServlet;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
+import org.apache.http.HttpStatus;
 import org.oa4mp.delegation.common.token.impl.AccessTokenImpl;
 import org.oa4mp.delegation.server.JWTUtil;
 import org.oa4mp.delegation.server.OA2Errors;
 import org.oa4mp.delegation.server.OA2GeneralError;
 import org.oa4mp.delegation.server.OA2RedirectableError;
-import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
-import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
-import org.apache.http.HttpStatus;
+import org.oa4mp.server.api.storage.servlet.OA4MPServlet;
+import org.oa4mp.server.loader.oauth2.OA2SE;
+import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
+import org.oa4mp.server.loader.oauth2.storage.tx.TXRecord;
+import org.oa4mp.server.loader.oauth2.storage.vi.VirtualIssuer;
 
 import java.io.IOException;
 
@@ -108,12 +108,14 @@ public abstract class BearerTokenServlet extends OA4MPServlet {
            //CIL-974 fix:
 
            if(at.isJWT()){
+
                JSONWebKeys keys = ((OA2SE) getServiceEnvironment()).getJsonWebKeys();
                VirtualIssuer vo = oa2SE.getVI(transaction.getClient().getIdentifier());
 
                if(vo != null){
                     keys = vo.getJsonWebKeys();
                }
+
                try{
                     JWTUtil.verifyAndReadJWT(at.getToken(), keys);
                     // all we care about is that the right set of keys works for this.

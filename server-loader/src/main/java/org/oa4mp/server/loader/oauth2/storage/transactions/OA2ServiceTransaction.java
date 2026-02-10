@@ -1018,6 +1018,4 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         }
         getState().put(RESPONSE_TYPE_KEY, r);
     }
-
-
 }

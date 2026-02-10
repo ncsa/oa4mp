@@ -80,6 +80,7 @@ CREATE TABLE oa4mp.adminClients
     rfc7523_client              boolean,
     rfc7523_client_users        clob,
     secret                      clob,
+    state                       clob,
     use_timestamps_in_ids       boolean,
     vo                          clob,
     vo_uri                      clob
@@ -130,6 +131,7 @@ CREATE TABLE oa4mp.clients
    scopes                    clob,
    sign_tokens               boolean,
    skip_server_scripts       boolean,
+    state                    clob,
    strict_scopes             boolean
    );
 

@@ -15,6 +15,7 @@ import edu.uiuc.ncsa.security.util.jwk.JWKUtil2;
 import org.oa4mp.server.admin.oauth2.base.OA4MPStoreCommands;
 import org.oa4mp.server.api.admin.adminClient.AdminClient;
 import org.oa4mp.server.api.admin.adminClient.AdminClientKeys;
+import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.storage.vi.VISerializationKeys;
 import org.oa4mp.server.loader.oauth2.storage.vi.VIStore;
 import org.oa4mp.server.loader.oauth2.storage.vi.VirtualIssuer;
@@ -388,6 +389,46 @@ List<Identifiable> identifiables = findByIDOrRS(getEnvironment().getAdminClientS
             say(adminClient.getIdentifierString());
         }
         say("found " + admins.size() + " admin clients");
+    }
+    public void set_default_key(InputLine inputLine) throws Throwable{
+        if(showHelp(inputLine)){
+            say("set_default_key id [-show] key_id - set the default key for the given VI.");
+            say("Setting it to " + OA2SE.NO_KEY_ID + " will disable the default key.");
+            say("-show = will list the current key ids in the VI.");
+            return;
+        }
+        FoundIdentifiables identifiables = findItem(inputLine);
+        if (identifiables == null) {
+            say("sorry, no such virtual issuer");
+            return;
+        }      if(!identifiables.isSingleton()){
+            say("only a single object is supported by this operation");
+            return;
+        }
+        VirtualIssuer vi = (VirtualIssuer) identifiables.get(0);
+        List<String> currentIDs = new ArrayList<>(vi.getJsonWebKeys().keySet());;
+        if(inputLine.hasArg("-show")){
+            say("The current keys have ids:");
+            for(String keyId: currentIDs){
+                say(keyId);
+            }
+        }
+        boolean retry = true;
+        String kid = null;
+        while(retry){
+            kid = readline("Enter the new default key id (or exit to cancel):");
+            if(kid.equalsIgnoreCase("exit")){
+                say("Settting default key cancelled");
+                return;
+            }
+            if(!(kid.equals(OA2SE.NO_KEY_ID) || currentIDs.contains(kid))){
+                say("   Sorry, that key id is not in the list of keys for this VI.");
+            }else{
+                retry = false;
+            }
+        }
+        vi.setDefaultKeyID(kid);
+        getStore().save(vi);
 
     }
 }

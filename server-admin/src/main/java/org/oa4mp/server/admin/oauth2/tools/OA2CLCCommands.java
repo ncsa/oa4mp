@@ -2355,15 +2355,18 @@ public class OA2CLCCommands extends CommonCommands2 {
 
     public void ccf(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
-            say("ccf [" + CCF_SUB + " subject | " + CCF_RFC7523 + "] - client credential flow with a given subject");
+            say("ccf [" + CCF_SUB + " " + "[" + RAW_FLAG + " subject | " + CCF_RFC7523 + "] - client credential flow with a given subject");
             say(CCF_RFC7523 + " if present forces using that. The default is to use a standard client_id");
             say("         and secret. Including this when there are no keys raises an error.");
             say(CCF_SUB + " subject - sets the subject for the request. If this is configured to return an ID token");
             say("         with the openid scopes, this will be used as the subject of that token");
+            say(RAW_FLAG + " - show the raw returned response. Use the tokens command to see the tokens.");
             return;
         }
         boolean useRFC7523 = inputLine.hasArg(CCF_RFC7523);
         inputLine.removeSwitch(CCF_RFC7523);
+        boolean useRaw = inputLine.hasArg(RAW_FLAG);
+        inputLine.removeSwitch(RAW_FLAG);
 
         String subject = null;
         if (inputLine.hasArg(CCF_SUB)) {
@@ -2374,10 +2377,12 @@ public class OA2CLCCommands extends CommonCommands2 {
         if (subject != null) {
             parameters.put(OA2Claims.SUBJECT, subject);
         }
-
-        say(getCcfResponse().toString(1));
+        ccf(parameters, useRFC7523);
+        if(useRaw) {
+            say(getCcfResponse().toString(1));
+        }
     }
-
+// load localhost:p2 /home/ncsa/dev/csd/config/client-oa2.xml
     public JSONObject ccf(Map parameters, boolean useRFC7523) throws Exception {
         dummyAsset = (OA2Asset) getCe().getAssetStore().create();
 
@@ -2397,6 +2402,11 @@ public class OA2CLCCommands extends CommonCommands2 {
             parameters.put(OA2Claims.SUBJECT, getCe().getClient().getIdentifierString());
         }
         parameters.put(GRANT_TYPE, GRANT_TYPE_CLIENT_CREDENTIALS);
+        if(tokenParameters != null) {
+            for (String key : tokenParameters.keySet()) {
+                parameters.put(key, tokenParameters.get(key));
+            }
+        }
         JSONObject jsonObject = getService().rfc6749_4_4(getDummyAsset(), parameters, useRFC7523);
         setCcfResponse(jsonObject);
         return jsonObject;

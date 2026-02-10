@@ -48,6 +48,28 @@ public class OA2State extends State {
         this.jsonWebKeys = keys;
     }
 
+    /**
+     * Constructor for converting a state object into an OA2State object.
+     * @param state
+     * @param strictACLs
+     * @param keys
+     */
+    public OA2State(State state, boolean strictACLs, JSONWebKeys keys) {
+        this(state.getVStack(),
+                state.getOpEvaluator(),
+                state.getMetaEvaluator(),
+                state.getFTStack(),
+                state.getMTemplates(),
+                state.getMInstances(),
+                state.getLogger(),
+                state.isServerMode(),
+                state.isRestrictedIO(),
+                state.isAssertionsOn(),
+                strictACLs,
+                keys
+                );
+    }
+
     @Override
     public State newLocalState() {
         OA2State oa2State = (OA2State) super.newLocalState();

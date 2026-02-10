@@ -1,8 +1,11 @@
 package org.oa4mp.server.test;
 
+import edu.uiuc.ncsa.security.storage.sql.SQLStore;
+import edu.uiuc.ncsa.security.storage.sql.derby.DerbyConnectionParameters;
+import edu.uiuc.ncsa.security.storage.sql.derby.DerbyConnectionPool;
+import edu.uiuc.ncsa.security.util.TestBase;
 import org.oa4mp.delegation.common.storage.clients.Client;
 import org.oa4mp.delegation.server.storage.ClientStore;
-import edu.uiuc.ncsa.security.util.TestBase;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -10,7 +13,17 @@ import edu.uiuc.ncsa.security.util.TestBase;
  */
 public class NewClientStoreTest extends TestBase {
     public void testFS() throws Exception {
-        testBasic(TestUtils.getFsStoreProvider().getClientStore());
+        try {
+            testBasic(TestUtils.getFsStoreProvider().getClientStore());
+        }catch(Throwable t){
+            if(TestUtils.getFsStoreProvider().getClientStore() instanceof SQLStore) {
+                SQLStore sqlStore = (SQLStore) TestUtils.getFsStoreProvider().getClientStore();
+                DerbyConnectionParameters derbyConnectionParameters = ((DerbyConnectionPool) sqlStore.getConnectionPool()).getConnectionParameters();
+                System.out.println("***Derby failed. Clean up  dir=" + derbyConnectionParameters.getRootDirectory() + ", name=" + derbyConnectionParameters.getDatabaseName());
+                System.out.println("***Check that the database creation script in server-admin/src/main/resources is up to date.");
+            }
+            throw t;
+        }
     }
 
     public void testMYSQL() throws Exception {
@@ -26,7 +39,15 @@ public class NewClientStoreTest extends TestBase {
     }
 
     public void testDerby() throws Exception {
-        testBasic(TestUtils.getDerbyStoreProvider().getClientStore());
+        try {
+            testBasic(TestUtils.getDerbyStoreProvider().getClientStore());
+        }catch(Throwable t){
+            SQLStore sqlStore = (SQLStore) TestUtils.getDerbyStoreProvider().getClientStore();
+            DerbyConnectionParameters derbyConnectionParameters = ((DerbyConnectionPool)sqlStore.getConnectionPool()).getConnectionParameters();
+            System.out.println("Derby failed. Clean up  dir=" + derbyConnectionParameters.getRootDirectory() + ", name" + derbyConnectionParameters.getDatabaseName() );
+            System.out.println("Check that the database creation script in server-admin/src/main/resources is up to date.");
+            throw t;
+        }
     }
 
 

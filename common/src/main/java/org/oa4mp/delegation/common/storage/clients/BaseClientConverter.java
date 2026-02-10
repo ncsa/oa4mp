@@ -24,11 +24,12 @@ import java.util.Date;
  * <p>Created by Jeff Gaynor<br>
  * on 10/20/16 at  12:58 PM
  */
-public  class BaseClientConverter<V extends BaseClient> extends MonitoredConverter<V> {
-   // public  String getJSONComponentName(){return null;}
-   public String getJSONComponentName() {
-       return "client";
-   }
+public class BaseClientConverter<V extends BaseClient> extends MonitoredConverter<V> {
+    // public  String getJSONComponentName(){return null;}
+    public String getJSONComponentName() {
+        return "client";
+    }
+
     public JSONUtil getJsonUtil() {
         if (jsonUtil == null) {
             jsonUtil = new JSONUtil(getJSONComponentName());
@@ -55,11 +56,15 @@ public  class BaseClientConverter<V extends BaseClient> extends MonitoredConvert
         value.setLastModifiedTS(map.getDate(getBKK().lastModifiedTS()));
         value.setEmail(map.getString(getBKK().email()));
         value.setDebugOn(map.getBoolean(getBKK().debugOn()));
-        if(map.containsKey(getBKK().jwksURI())){
+        if (map.containsKey(getBKK().jwksURI())) {
             value.setJwksURI(map.getURI(getBKK().jwksURI()));
         }
+        if (map.containsKey(getBKK().state()) && map.get(getBKK().state()) != null) {
+            JSONObject jsonObject = JSONObject.fromObject(map.getString(getBKK().state()));
+            value.setState(jsonObject);
+        }
         // database may report this as being null. Do not propagate it along.
-        if (map.containsKey(getBKK().jwks()) && map.get(getBKK().jwks())!=null) {
+        if (map.containsKey(getBKK().jwks()) && map.get(getBKK().jwks()) != null) {
             try {
                 JSONWebKeys jwks = jwkUtil2.fromJSON(map.getString(getBKK().jwks()));
                 value.setJWKS(jwks);
@@ -76,7 +81,7 @@ public  class BaseClientConverter<V extends BaseClient> extends MonitoredConvert
         if (map.containsKey(getBKK().rfc7523Client())) {
             value.setServiceClient(map.getBoolean(getBKK().rfc7523Client()));
         }
-        if (map.containsKey(getBKK().rfc7523ClientUsers()) && map.get(getBKK().rfc7523ClientUsers())!=null) {
+        if (map.containsKey(getBKK().rfc7523ClientUsers()) && map.get(getBKK().rfc7523ClientUsers()) != null) {
             value.setServiceClientUsers(jsonArrayToCollection(map, getBKK().rfc7523ClientUsers()));
         } else {
             JSONArray array = new JSONArray();
@@ -85,6 +90,7 @@ public  class BaseClientConverter<V extends BaseClient> extends MonitoredConvert
         }
         return value;
     }
+
     protected JWKUtil2 jwkUtil2 = new JWKUtil2();
 
     @Override
@@ -96,11 +102,14 @@ public  class BaseClientConverter<V extends BaseClient> extends MonitoredConvert
         map.put(getBKK().creationTS(), client.getCreationTS());
         map.put(getBKK().lastModifiedTS(), client.getLastModifiedTS());
         map.put(getBKK().debugOn(), client.isDebugOn());
+        if (client.getState() != null) {
+            map.put(getBKK().state(), client.getState().toString());
+        }
         if (client.hasJWKS()) {
             // Webkeys are stored as a serialized JSON string.
             map.put(getBKK().jwks(), JSONWebKeyUtil.toJSON(client.getJWKS()).toString());
         }
-        if(client.hasJWKSURI()){
+        if (client.hasJWKSURI()) {
             map.put(getBKK().jwksURI(), client.getJwksURI().toString());
         }
         map.put(getBKK().rfc7523Client(), client.isServiceClient());
@@ -117,6 +126,7 @@ public  class BaseClientConverter<V extends BaseClient> extends MonitoredConvert
 
     /**
      * Assumes client JSON is an object of the form {"client":JSONObject} and searches the object as client.key
+     *
      * @param json
      * @return
      */
@@ -128,15 +138,18 @@ public  class BaseClientConverter<V extends BaseClient> extends MonitoredConvert
         v.setEmail(getJsonUtil().getJSONValueString(json, getBKK().email()));
         v.setDebugOn(getJsonUtil().getJSONValueBoolean(json, getBKK().debugOn()));
         v.setServiceClient(getJsonUtil().getJSONValueBoolean(json, getBKK().rfc7523Client()));
+        if (json.containsKey(getBKK().state())) {
+            v.setState(JSONObject.fromObject(json.getJSONObject(getBKK().state())));
+        }
         if (json.containsKey(getBKK().rfc7523ClientUsers())) {
             v.setServiceClientUsers(getJsonUtil().getJSONArray(json, getBKK().rfc7523ClientUsers()));
         }
         String jwksuri = getJsonUtil().getJSONValueString(json, getBKK().jwksURI());
-        if(jwksuri != null){
+        if (jwksuri != null) {
             v.setJwksURI(URI.create(jwksuri));
         }
         JSONObject keys = getJsonUtil().getJSONObject(json, getBKK().jwks());
-        if(keys != null){
+        if (keys != null) {
             try {
                 v.setJWKS(jwkUtil2.fromJSON(keys));
             } catch (Throwable e) {
@@ -150,36 +163,36 @@ public  class BaseClientConverter<V extends BaseClient> extends MonitoredConvert
             }
         }
         Object raw = getJsonUtil().getJSONValue(json, getBKK().creationTS());
-        if(raw instanceof Long){
-            v.setCreationTS(new Date((Long)raw));
-        }else{
+        if (raw instanceof Long) {
+            v.setCreationTS(new Date((Long) raw));
+        } else {
             if (raw != null) {
-                if(raw instanceof String){
+                if (raw instanceof String) {
                     try {
-                        v.setCreationTS(Iso8601.string2Date((String)raw).getTime());
+                        v.setCreationTS(Iso8601.string2Date((String) raw).getTime());
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
 
-                }else{
+                } else {
                     throw new IllegalArgumentException("Unknown date format " + raw);
                 }
             }
 
         }
-         raw = getJsonUtil().getJSONValue(json, getBKK().lastModifiedTS());
-        if(raw instanceof Long){
-            v.setLastModifiedTS(new Date((Long)raw));
-        }else{
+        raw = getJsonUtil().getJSONValue(json, getBKK().lastModifiedTS());
+        if (raw instanceof Long) {
+            v.setLastModifiedTS(new Date((Long) raw));
+        } else {
             if (raw != null) {
-                if(raw instanceof String){
+                if (raw instanceof String) {
                     try {
-                        v.setLastModifiedTS(Iso8601.string2Date((String)raw).getTime());
+                        v.setLastModifiedTS(Iso8601.string2Date((String) raw).getTime());
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
 
-                }else{
+                } else {
                     throw new IllegalArgumentException("Unknown date format " + raw);
                 }
             }
@@ -203,8 +216,11 @@ public  class BaseClientConverter<V extends BaseClient> extends MonitoredConvert
         getJsonUtil().setJSONValue(json, getBKK().debugOn(), client.isDebugOn());
         getJsonUtil().setJSONValue(json, getBKK().rfc7523Client(), client.isServiceClient());
         getJsonUtil().setJSONValue(json, getBKK().rfc7523ClientUsers(), client.getServiceClientUsers());
-        if(client.hasJWKSURI()){
-            getJsonUtil().setJSONValue(json, getBKK().jwksURI(),client.getJwksURI().toString());
+        if (client.getState() != null) {
+            getJsonUtil().setJSONValue(json, getBKK().state(), client.getState());
+        }
+        if (client.hasJWKSURI()) {
+            getJsonUtil().setJSONValue(json, getBKK().jwksURI(), client.getJwksURI().toString());
         }
         if (client.hasJWKS()) {
             // Stash JWKS as JSON. May revisit this decision later if it does not work for some reason.

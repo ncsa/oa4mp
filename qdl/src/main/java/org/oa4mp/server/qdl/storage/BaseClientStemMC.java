@@ -7,9 +7,11 @@ import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
+import net.sf.json.JSONObject;
 import org.oa4mp.delegation.common.storage.clients.BaseClient;
 import org.oa4mp.delegation.common.storage.clients.BaseClientKeys;
 import org.qdl_lang.variables.QDLStem;
+import org.qdl_lang.variables.values.QDLValue;
 
 import java.net.URI;
 
@@ -37,12 +39,16 @@ public class BaseClientStemMC<V extends BaseClient> extends MonitoredStemMC<V> {
     String jwksURI = "jwks_uri";
     String rfc7523Client = "rfc7523_client";
     String rfc7523ClientUsers = "rfc7523_client_users";
+    String state = "state";
      */
     @Override
     public V fromMap(QDLStem stem, V v) {
         super.fromMap(stem, v);
         if (stem.containsKey(bck().debugOn())) {
             v.setDebugOn(stem.getBoolean(bck().debugOn()));
+        }
+        if(stem.containsKey(bck().state())){
+            v.setState((JSONObject) stem.getStem(bck().state()).toJSON());
         }
         if (isStringKeyOK(stem, bck().email())) {
             v.setName(stem.getString(bck().email()));
@@ -88,6 +94,11 @@ public class BaseClientStemMC<V extends BaseClient> extends MonitoredStemMC<V> {
         setNonNullStemValue(stem, bck().email(), v.getEmail());
         setNonNullStemValue(stem, bck().name(), v.getName());
         setNonNullStemValue(stem, bck().secret(), v.getSecret());
+        if(v.getState()!=null){
+            QDLStem j = new QDLStem();
+            j.fromJSON(v.getState());
+            stem.put(bck().state(), QDLValue.asQDLValue(j));
+        }
         if (v.hasJWKS()) {
             QDLStem ss = new QDLStem();
             ss.fromJSON(JSONWebKeyUtil.toJSON(v.getJWKS()));

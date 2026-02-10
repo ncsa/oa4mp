@@ -11,6 +11,7 @@ import edu.uiuc.ncsa.security.servlet.HeaderUtils;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.storage.events.LastAccessedThread;
 import edu.uiuc.ncsa.security.util.pkcs.KeyPairPopulationThread;
+import net.sf.json.JSONArray;
 import org.apache.http.HttpStatus;
 import org.oa4mp.delegation.common.servlet.TransactionFilter;
 import org.oa4mp.delegation.common.servlet.TransactionState;
@@ -38,6 +39,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
+import static org.oa4mp.delegation.server.OA2Constants.OA4MP_TOKEN_SIGNING_KEY_ID;
 import static org.oa4mp.server.api.ServiceConstantKeys.CONSUMER_KEY;
 
 
@@ -329,6 +331,44 @@ public abstract class OA4MPServlet extends EnvServlet implements TransactionFilt
                         "Admin client is not approved , access denied",
                         HttpStatus.SC_UNAUTHORIZED, null);
             }
+        }
+    }
+    /**
+     * Checks if the signing key ID is in the request and if so, adds it to the list of key ids.
+     * Noe that this allows for repeated ids but not if they are adjacent, so
+     * <pre>ABCACAC</pre>
+     * is fine, but not
+     * <pre>ABCC</pre>
+     * This way if a token is refreshed/exchanged repeatedly witht he same requested key, the list of keys does not
+     * just turn into a huge string of the same thing like
+     * <pre>ABCCCCCCCCCCCC</pre>
+     * @param request
+     * @param serviceTransaction
+     */
+    public static void findSigningKey(HttpServletRequest request, ServiceTransaction serviceTransaction) {
+
+        if(request.getParameterMap().containsKey(OA4MP_TOKEN_SIGNING_KEY_ID)) {
+            Object ooo = request.getParameterMap().get(OA4MP_TOKEN_SIGNING_KEY_ID);
+            JSONArray aaa = serviceTransaction.getSigningKeyIds();
+
+            if(ooo instanceof String[]) {
+                for(String s : (String[])ooo) {
+                    if(aaa.isEmpty()){
+                     aaa.add(s);
+                    }else {
+                        if (!aaa.get(aaa.size() - 1).equals(s)) {
+                            aaa.add(s);
+                        }
+                    }
+                }
+            }else{
+                if(ooo instanceof String) {
+                    if(!aaa.get(aaa.size()-1).equals(ooo)) {
+                        aaa.add(ooo);
+                    }
+                }
+            }
+            serviceTransaction.setSigningKeyIds(aaa);
         }
     }
 }

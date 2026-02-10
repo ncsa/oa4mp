@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
+import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.BeanUtils;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
@@ -441,14 +442,37 @@ public class OA2SE extends ServiceEnvironmentImpl {
         return issuer;
     }
 
+    Identifier serverVIID = new BasicIdentifier("oa4mp:/vi/default");
+    /**
+     * This is used in the default VI to indicate there is no set default key id.
+     * Otherwise the default ID in the VI will be used.
+     */
+    public static final String NO_KEY_ID = "--";
+
     public JSONWebKeys getJsonWebKeys() {
-        return jsonWebKeys;
+        VirtualIssuer vi = (VirtualIssuer) getVIStore().get(serverVIID);
+        String defaultKeyID = getServerJWKS().getDefaultKeyID();
+        JSONWebKeys jwks = new JSONWebKeys(defaultKeyID);
+        jwks.putAll(getServerJWKS());
+        if(vi != null){
+            jwks.putAll(vi.getJsonWebKeys());
+            if(!vi.getDefaultKeyID().equals(NO_KEY_ID)){
+                jwks.setDefaultKeyID(vi.getDefaultKeyID());
+            }
+        }
+        return jwks;
     }
 
     public void setJsonWebKeys(JSONWebKeys jsonWebKeys) {
         this.jsonWebKeys = jsonWebKeys;
     }
 
+    protected JSONWebKeys getServerJWKS(){
+        return jsonWebKeys;
+    }
+    protected void setServerJWKS(JSONWebKeys jsonWebKeys){
+        this.jsonWebKeys = jsonWebKeys;
+    }
     protected JSONWebKeys jsonWebKeys;
 
     public boolean isTwoFactorSupportEnabled() {

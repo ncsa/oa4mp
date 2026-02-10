@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.DateUtils;
 import edu.uiuc.ncsa.security.storage.monitored.Monitored;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
+import net.sf.json.JSONObject;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -189,4 +190,18 @@ public class BaseClient extends Monitored {
     public boolean hasServiceClientUsers(){
         return serviceClientUsers!=null;
     }
+
+    public JSONObject getState() {
+        if(state==null){
+            state = JSONObject.fromObject("{}"); // uing constructor yields JSONNUll object.
+            state = new JSONObject(); // uing constructor yields JSONNUll object.
+        }
+        return state;
+    }
+
+    public void setState(JSONObject state) {
+        this.state = state;
+    }
+
+    JSONObject state = null;
 }

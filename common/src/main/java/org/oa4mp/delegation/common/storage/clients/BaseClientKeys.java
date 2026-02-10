@@ -17,10 +17,16 @@ public class BaseClientKeys extends MonitoredKeys {
     String jwksURI = "jwks_uri";
     String rfc7523Client = "rfc7523_client";
     String rfc7523ClientUsers = "rfc7523_client_users";
+    String state = "state";
 
     public String name(String... x) {
         if (0 < x.length) name = x[0];
         return name;
+    }
+
+    public String state(String... x) {
+        if (0 < x.length) state = x[0];
+        return state;
     }
 
     public String jwks(String... x) {
@@ -69,6 +75,7 @@ public class BaseClientKeys extends MonitoredKeys {
         allKeys.add(jwksURI());
         allKeys.add(rfc7523Client());
         allKeys.add(rfc7523ClientUsers());
+        allKeys.add(state());
         return allKeys;
     }
 }

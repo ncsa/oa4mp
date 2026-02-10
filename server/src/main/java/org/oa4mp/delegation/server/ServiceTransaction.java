@@ -1,6 +1,7 @@
 package org.oa4mp.delegation.server;
 
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.oa4mp.delegation.common.storage.clients.Client;
 import org.oa4mp.delegation.common.storage.transactions.BasicTransaction;
@@ -46,6 +47,33 @@ public class ServiceTransaction extends BasicTransaction {
     public void setIDTokenHint(JSONObject idTokenHint){
         getState().put(ID_TOKEN_HINT_KEY, idTokenHint);
     }
+
+    public static String SIGNING_KEY_ID_KEY = "signingKeyId";
+
+    /**
+     * An array of string ids for singing keys. If the user requests one, it is added to the end
+     * (and this is effectively a LIFO stack). If no valid ones are found, then the default
+     * singing key for the issuer is used.
+     * @return
+     */
+    public JSONArray getSigningKeyIds() {
+        JSONArray j;
+        if(!hasSigningKeyIds()){
+            j = new JSONArray();
+            getState().put(SIGNING_KEY_ID_KEY, j);
+        }else{
+            j = getState().getJSONArray(SIGNING_KEY_ID_KEY);
+        }
+        return j;
+    }
+    public void setSigningKeyIds(JSONArray signingKeyIds) {
+        getState().put(SIGNING_KEY_ID_KEY, signingKeyIds);
+    }
+    public boolean hasSigningKeyIds() {
+        return getState().containsKey(SIGNING_KEY_ID_KEY);
+    }
+
+
     JSONObject state;
 
     /**

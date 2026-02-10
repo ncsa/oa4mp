@@ -145,6 +145,7 @@ public interface OA2Constants {
     String TOKEN_ENDPOINT_AUTH_PRIVATE_KEY = "private_key_jwt";
     String TOKEN_ENDPOINT_AUTH_NONE = "none";
 
+    String OA4MP_TOKEN_SIGNING_KEY_ID = "oa4mp:/jwt/signing/keyID";
 
 
 }

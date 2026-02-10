@@ -514,8 +514,6 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
             atData.put(SUBJECT, newSubject);
         }
         refreshAccountingInformation();
-
-        //     setPayload(atData);
     }
 
     @Override

@@ -9,15 +9,13 @@ import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.scripting.ScriptSet;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.http.HttpStatus;
 import org.oa4mp.delegation.common.storage.clients.Client;
-import org.oa4mp.delegation.server.OA2ATException;
-import org.oa4mp.delegation.server.OA2Constants;
-import org.oa4mp.delegation.server.OA2Errors;
-import org.oa4mp.delegation.server.OA2GeneralError;
+import org.oa4mp.delegation.server.*;
 import org.oa4mp.delegation.server.jwt.HandlerRunner;
 import org.oa4mp.delegation.server.server.RFC9068Constants;
 import org.oa4mp.delegation.server.storage.ClientStore;
@@ -29,6 +27,7 @@ import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2ClientKeys;
 import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
 import org.oa4mp.server.loader.oauth2.storage.tx.TXRecord;
+import org.oa4mp.server.loader.oauth2.storage.vi.VirtualIssuer;
 import org.oa4mp.server.loader.oauth2.tokens.*;
 import org.qdl_lang.scripting.AnaphorUtil;
 import org.qdl_lang.scripting.QDLScript;
@@ -183,7 +182,7 @@ public class OA2ClientUtils {
      */
     public static LinkedList<String> createCallbacksForWebUI(OA2Client client,
                                                              String rawCBs) throws IOException {
-        if(StringUtils.isTrivial(rawCBs)){
+        if (StringUtils.isTrivial(rawCBs)) {
             // Fix https://github.com/ncsa/oa4mp/issues/206.
             // no callbacks should not require they pass muster, since some clients
             // only want to have the device flow.
@@ -206,10 +205,10 @@ public class OA2ClientUtils {
             boolean isFirst = true;
             boolean isOne = dudUris.size() == 1;
             for (String y : dudUris) {
-                if(isFirst){
-                    xx = y ;
+                if (isFirst) {
+                    xx = y;
                     isFirst = false;
-                }else {
+                } else {
                     xx = xx + ", " + y;
                 }
             }
@@ -435,10 +434,11 @@ public class OA2ClientUtils {
         return computedScopes;
 
     }
-     // Fixes https://github.com/ncsa/oa4mp/issues/222
+    // Fixes https://github.com/ncsa/oa4mp/issues/222
 
     /**
      * Create an ersatz client given the information about its provenence.
+     *
      * @param provisioningClientID
      * @param oa2se
      * @param ersatzClient
@@ -459,20 +459,22 @@ public class OA2ClientUtils {
     /**
      * Used to create the ersatz client when the service transaction has already been setup to have th provisioning
      * admin and client IDs.
+     *
      * @return
      */
-    public static OA2Client createErsatz(OA2SE oa2SE, OA2ServiceTransaction t, OA2Client client){
-    try {
-        Permission ersatzChain = oa2SE.getPermissionStore().getErsatzChain(t.getProvisioningAdminID(), t.getProvisioningClientID(), client.getIdentifier());
-        return createErsatz(t.getProvisioningClientID(), oa2SE, client, ersatzChain.getErsatzChain());
-    } catch (UnknownClientException ucx) {
+    public static OA2Client createErsatz(OA2SE oa2SE, OA2ServiceTransaction t, OA2Client client) {
+        try {
+            Permission ersatzChain = oa2SE.getPermissionStore().getErsatzChain(t.getProvisioningAdminID(), t.getProvisioningClientID(), client.getIdentifier());
+            return createErsatz(t.getProvisioningClientID(), oa2SE, client, ersatzChain.getErsatzChain());
+        } catch (UnknownClientException ucx) {
 
-        throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
-                ucx.getMessage(), HttpStatus.SC_INTERNAL_SERVER_ERROR,
-                t.getRequestState(),
-                t.getClient());
+            throw new OA2ATException(OA2Errors.UNAUTHORIZED_CLIENT,
+                    ucx.getMessage(), HttpStatus.SC_INTERNAL_SERVER_ERROR,
+                    t.getRequestState(),
+                    t.getClient());
+        }
     }
-}
+
     public static OA2Client resolvePrototypes(OA2SE oa2SE, OA2Client baseClient) {
         return resolvePrototypes(oa2SE.getClientStore(), baseClient);
     }
@@ -564,5 +566,42 @@ public class OA2ClientUtils {
             }
         }
         pc.setScriptSet(scriptSet);
+    }
+
+    /**
+     * Retrieves the signing key. This will
+     *
+     * @param oa2SE
+     * @param transaction
+     * @param client
+     * @return
+     * @throws OA2ATException
+     */
+    public static JSONWebKey getSigningKey(OA2SE oa2SE, ServiceTransaction transaction, OA2Client client) throws OA2ATException {
+        VirtualIssuer vo = oa2SE.getVI(client.getIdentifier());
+        boolean hasVOKeys = vo != null && vo.getJsonWebKeys() != null;
+        JSONWebKey key = null;
+        JSONArray keyIDs = transaction.getSigningKeyIds();
+
+        // so the requested a specific signing key. Find it. Search backwards in list to emulate a stack.
+        if (keyIDs != null && !keyIDs.isEmpty()) {
+            for (int i = keyIDs.size() - 1; 0 <= i; i--) {
+                String currentKeyID = keyIDs.getString(i);
+                if (hasVOKeys) {
+                    key = vo.getJsonWebKeys().get(currentKeyID);
+                } else {
+                    key = oa2SE.getJsonWebKeys().get(currentKeyID);
+                }
+                if (key != null) {
+                    return key;
+                }
+            }
+        }
+
+        if (hasVOKeys) {
+            return vo.getJsonWebKeys().get(vo.getDefaultKeyID());
+        } else {
+            return oa2SE.getJsonWebKeys().getDefault();
+        }
     }
 }

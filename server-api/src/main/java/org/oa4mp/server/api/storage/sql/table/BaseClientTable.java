@@ -28,6 +28,7 @@ public  class BaseClientTable extends MonitoredTable {
         getColumnDescriptor().add(new ColumnDescriptorEntry(getKeys().secret(), LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(getKeys().debugOn(), BOOLEAN));
         getColumnDescriptor().add(new ColumnDescriptorEntry(getKeys().jwks(), LONGVARCHAR)); // RFC 7523 support
+        getColumnDescriptor().add(new ColumnDescriptorEntry(getKeys().state(), LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(getKeys().rfc7523Client(), BOOLEAN));
         getColumnDescriptor().add(new ColumnDescriptorEntry(getKeys().rfc7523ClientUsers(), LONGVARCHAR));
 

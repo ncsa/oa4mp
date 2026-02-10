@@ -266,6 +266,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         serviceTransaction.setNonce(nonce);
         serviceTransaction.setClient(client);
         serviceTransaction.setConsentPageOK(true);
+        findSigningKey(request, serviceTransaction);
         Date now = new Date();
         serviceTransaction.setAuthTime(now); // auth time is now.
         client.setLastAccessed(now);
@@ -369,6 +370,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         processServiceClientRequest(request, response, client, serviceTransaction, true);
 
     }
+
+
 
     protected OA2Client getRFC7523Client(BaseClient baseClient, JSONObject jsonRequest) {
         if (baseClient instanceof OA2Client) {
@@ -477,7 +480,10 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         serviceTransaction.setAuthorizationGrant(new AuthorizationGrantImpl(newURI));
         serviceTransaction.setRequestState(state);
         serviceTransaction.setNonce(nonce);
+        findSigningKey(request, serviceTransaction);
         serviceTransaction.setClient(client);
+        findSigningKey(request,serviceTransaction);
+
         Date now = new Date();
         serviceTransaction.setAuthTime(now); // auth time is now.
         client.setLastAccessed(now);
@@ -680,13 +686,15 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         }
         issuerTransactionState = doAT(issuerTransactionState, client);
         // Now, get the right signing key
+        JSONWebKey key = OA2ClientUtils.getSigningKey(getOA2SE(), serviceTransaction, client);
+/*
         VirtualIssuer vo = getOA2SE().getVI(client.getIdentifier());
-        JSONWebKey key = null;
         if (vo != null && vo.getJsonWebKeys() != null) {
             key = vo.getJsonWebKeys().get(vo.getDefaultKeyID());
         } else {
             key = getOA2SE().getJsonWebKeys().getDefault();
         }
+*/
         ATIResponse2 atResponse = (ATIResponse2) issuerTransactionState.getIssuerResponse();
         atResponse.setJsonWebKey(key);
         if (isRFC6749_4_4) {
@@ -1289,7 +1297,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
            */
         XMLMap tBackup = GenericStoreUtils.toXML(getTransactionStore(), t);
         OA2ServletUtils.processXAs(request, t, client);
-/*
+        findSigningKey(request, t);
+
+        /*
         if (client.hasExtendedAttributeSupport()) {
             ExtendedParameters xp = new ExtendedParameters();
             // Take the parameters and parse them into configuration objects,
@@ -1520,6 +1530,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
 
         XMLMap tBackup = GenericStoreUtils.toXML(getTransactionStore(), t);
         OA2ServletUtils.processXAs(request, t, client);
+        findSigningKey(request, t);
 /*
         if (client.hasExtendedAttributeSupport()) {
             ExtendedParameters xp = new ExtendedParameters();
@@ -2165,13 +2176,15 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         if (debugger == null) {
             debugger = OA4MPServlet.createDebugger(client);
         }
+        JSONWebKey key = OA2ClientUtils.getSigningKey(oa2SE, st2, (OA2Client) st2.getClient());
+/*
         VirtualIssuer vo = oa2SE.getVI(client.getIdentifier());
-        JSONWebKey key = null;
         if (vo != null && vo.getJsonWebKeys() != null) {
             key = vo.getJsonWebKeys().get(vo.getDefaultKeyID());
         } else {
             key = oa2SE.getJsonWebKeys().getDefault();
         }
+*/
         if (handlerRunner.hasATHandler()) {
             AccessTokenImpl newAT = (AccessTokenImpl) handlerRunner.getAccessTokenHandler().getSignedPayload(key);
             debugger.trace(this, "jwt has at handler: at=" + newAT + ", for claims " + st2.getATData().toString(2));
@@ -2315,6 +2328,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             Permission ersatzChain = getOA2SE().getPermissionStore().getErsatzChain(t.getProvisioningAdminID(), t.getProvisioningClientID(), client.getIdentifier());
             client = OA2ClientUtils.createErsatz(t.getProvisioningClientID(), getOA2SE(), client, ersatzChain.getErsatzChain());
         }
+        // so by this point, we finally have the transaction and client. See if they specified a signing key
+        findSigningKey(request, t);
         XMLMap backup = GenericStoreUtils.toXML(getTransactionStore(), t);
         if (debugger instanceof ClientDebugUtil) {
             ((ClientDebugUtil) debugger).setTransaction(t);
@@ -2452,6 +2467,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         }
 
         rtiResponse.setServiceTransaction(t);
+        JSONWebKey key = OA2ClientUtils.getSigningKey(oa2SE, t, client);
+        rtiResponse.setJsonWebKey(key);
+/*
         VirtualIssuer vo = oa2SE.getVI(client.getIdentifier());
 
         if (vo == null) {
@@ -2459,6 +2477,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         } else {
             rtiResponse.setJsonWebKey(vo.getJsonWebKeys().get(vo.getDefaultKeyID()));
         }
+*/
         if (txIDT == null) {
             rtiResponse.setUserMetadata(t.getUserMetaData());
         } else {
@@ -2633,12 +2652,16 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         //      atResponse.setClaimSources(setupClaimSources(transaction, oa2SE));
 
         atResponse.setServiceTransaction(transaction);
+        JSONWebKey key = OA2ClientUtils.getSigningKey(oa2SE, transaction, (OA2Client) transaction.getClient());
+        atResponse.setJsonWebKey(key);
+/*
         VirtualIssuer vo = oa2SE.getVI(transaction.getClient().getIdentifier());
         if (vo == null) {
             atResponse.setJsonWebKey(oa2SE.getJsonWebKeys().getDefault());
         } else {
             atResponse.setJsonWebKey(vo.getJsonWebKeys().get(vo.getDefaultKeyID()));
         }
+*/
         atResponse.setUserMetadata(transaction.getUserMetaData());
         // Need to do some checking but for now, just return transaction
         //return null;

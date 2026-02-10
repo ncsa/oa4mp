@@ -30,7 +30,7 @@ public class ExtendedParameters {
      * {"NS":{"attr":[val1,val2,val3,...]}}
      * <br/><br/>
      * These are then stored in the transaction if the client has extended attribute support allowed. Note
-     * that if there is no such parameter, then this return null;
+     * that if there is no such parameter, then this returns null;
      *
      * @param rawKey
      * @param rawValues

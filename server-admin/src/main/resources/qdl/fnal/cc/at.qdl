@@ -1,0 +1,15 @@
+/*
+{"tokens": {"access": {
+    "audience": "https://wlcg.cern.ch/jwt/v1/any",
+    "qdl":  {
+     "load": "fnal/cc/at.qdl",
+     "xmd": {"exec_phase": ["post_token"]}
+    },
+    "type": "wlcg"
+   }
+  }
+ }
+
+*/
+access_token.'sub' := access_control.'client_id';
+access_token.'scope' := ['NONE'];

@@ -1,19 +1,22 @@
 package org.oa4mp.server.test;
 
-import org.oa4mp.server.api.ClientApprovalProvider;
-import org.oa4mp.server.api.storage.filestore.DSFSClientApprovalStore;
-import org.oa4mp.server.api.util.ClientApproverConverter;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.FilePermissionsException;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
+import edu.uiuc.ncsa.security.storage.sql.SQLStore;
+import edu.uiuc.ncsa.security.storage.sql.derby.DerbyConnectionParameters;
+import edu.uiuc.ncsa.security.storage.sql.derby.DerbyConnectionPool;
+import edu.uiuc.ncsa.security.util.TestBase;
+import org.oa4mp.delegation.common.storage.clients.Client;
 import org.oa4mp.delegation.server.storage.ClientApproval;
 import org.oa4mp.delegation.server.storage.ClientApprovalStore;
 import org.oa4mp.delegation.server.storage.ClientStore;
 import org.oa4mp.delegation.server.storage.impl.FSClientApprovalStore;
-import org.oa4mp.delegation.common.storage.clients.Client;
-import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
-import edu.uiuc.ncsa.security.util.TestBase;
+import org.oa4mp.server.api.ClientApprovalProvider;
+import org.oa4mp.server.api.storage.filestore.DSFSClientApprovalStore;
+import org.oa4mp.server.api.util.ClientApproverConverter;
 
 import java.io.File;
 import java.util.Date;
@@ -26,8 +29,16 @@ import java.util.List;
 
 public class NewCAStoreTest extends TestBase {
     public void testFS() throws Exception {
-        testApprovalStore(TestUtils.getFsStoreProvider().getClientStore(), TestUtils.getFsStoreProvider().getClientApprovalStore());
-        testApprovalCycle(TestUtils.getFsStoreProvider().getClientStore(), TestUtils.getFsStoreProvider().getClientApprovalStore());
+        try {
+            testApprovalStore(TestUtils.getFsStoreProvider().getClientStore(), TestUtils.getFsStoreProvider().getClientApprovalStore());
+            testApprovalCycle(TestUtils.getFsStoreProvider().getClientStore(), TestUtils.getFsStoreProvider().getClientApprovalStore());
+        }catch(Exception t){
+            SQLStore sqlStore = (SQLStore) TestUtils.getDerbyStoreProvider().getClientStore();
+            DerbyConnectionParameters derbyConnectionParameters = ((DerbyConnectionPool)sqlStore.getConnectionPool()).getConnectionParameters();
+            System.out.println("***Derby failed. Clean up  dir=" + derbyConnectionParameters.getRootDirectory() + ", name" + derbyConnectionParameters.getDatabaseName() );
+            System.out.println("***Check that the database creation script in server-admin/src/main/resources is up to date.");
+            throw t;
+        }
     }
 
     public void testMYSQL() throws Exception {

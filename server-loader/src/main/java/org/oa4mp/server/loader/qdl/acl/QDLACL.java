@@ -122,13 +122,13 @@ public class QDLACL implements QDLMetaModule {
         if (qdlValues.length == 0) {
             throw new IllegalArgumentException("Error: " + name + " requires an argument");
         }
-        List<Object> ids;
+        JSONArray ids;
         switch (qdlValues[0].getType()) {
             case Constant.STEM_TYPE:
                 ids = qdlValues[0].asStem().getQDLList().toJSON();
                 break;
             case Constant.STRING_TYPE:
-                ids = new ArrayList<>();
+                ids = new JSONArray();
                 ids.add(qdlValues[0].asString());
                 break;
             default:
@@ -147,7 +147,7 @@ public class QDLACL implements QDLMetaModule {
         for (Object id : ids) {
             Identifier identifier;
             if (!(id instanceof String)) {
-                throw new IllegalArgumentException("Error: '" + id + "' is not a valid identifier");
+                throw new IllegalArgumentException("Error: '" + id + "' is not a string");
             }
             try {
                 URI uri = URI.create((String) id);
@@ -157,6 +157,8 @@ public class QDLACL implements QDLMetaModule {
                     throw new IllegalArgumentException("Error: " + name + " requires a valid identifier");
                 } else {
                     badIds.add(id.toString());
+                    // Fix https://github.com/ncsa/oa4mp/issues/286
+                    oa2State.getOa2se().getMyLogger().warn("ACL - invalid identifier (" + t.getMessage() + "): " + id);
                     continue;
                 }
                 // can get exception here from bad id
@@ -170,6 +172,8 @@ public class QDLACL implements QDLMetaModule {
                 if (failOnBadIds) {
                     throw new QDLIllegalAccessException(" There is a no such client with id '" + identifier.toString() + "'. Access denied.");
                 } else {
+                    // Fix https://github.com/ncsa/oa4mp/issues/286
+                    oa2State.getOa2se().getMyLogger().warn("ACL - invalid client :" + identifier);
                     badIds.add(identifier.toString());
                 }
             }
@@ -181,6 +185,8 @@ public class QDLACL implements QDLMetaModule {
                 //    oa2State.getAclBlackList().add(identifier);
             }
         }
+
+/* Don't need to return list, just log bad ids above.
         if (0 < badIds.size()) {
             StringBuilder sb = new StringBuilder(badIds.size() + 2);
             sb.append("[");
@@ -196,6 +202,7 @@ public class QDLACL implements QDLMetaModule {
             sb.append("]");
             oa2State.getOa2se().getMyLogger().warn("failed to add the following IDs to the ACLs :" + sb);
         }
+*/
 
         return Boolean.TRUE;
     }
@@ -225,7 +232,10 @@ public class QDLACL implements QDLMetaModule {
             if (argCount == 1) {
                 doxx.add("Accepts either a string or a list of them.");
                 doxx.add("if fail_on_bad_ids is true, then check each id to ensure it is valid and if not, throw an  exception.");
-                doxx.add("   fail_on_bad_ids default is false.");
+                doxx.add("   fail_on_bad_ids default is false, then this call will silently ignore bad ids.");
+                doxx.add("   This can be used if there are possibly unknown client IDs or the syntax is bad.");
+                doxx.add("   Note that this id is not added, so in fact, it allows processing to continue rather than stopping the whole system,");
+                doxx.add("   but does not alter the security one iota. Check the logs if there is a question.");
                 doxx.add("This sets the admin_id or client_id. If an admin id, then any client has access ");
                 doxx.add("to this object. If a client id, then precisely that client is allowed");
             }

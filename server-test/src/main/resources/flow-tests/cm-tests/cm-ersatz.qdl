@@ -6,6 +6,7 @@
 
    Test for https://github.com/ncsa/oa4mp/issues/252
 */
+debugger(10);
 script_load('test#/cm-tests/init.qdl', args(0));
 payload. := from_json(file_read(ini.'payloads' + 'create.json'));
 provisioner_id := custom_id();

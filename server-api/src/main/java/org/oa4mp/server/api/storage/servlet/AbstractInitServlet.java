@@ -1,13 +1,13 @@
 package org.oa4mp.server.api.storage.servlet;
 
+import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
+import edu.uiuc.ncsa.security.storage.XMLMap;
+import org.oa4mp.delegation.common.servlet.TransactionState;
+import org.oa4mp.delegation.common.storage.clients.Client;
 import org.oa4mp.delegation.server.ServiceTransaction;
 import org.oa4mp.delegation.server.UnapprovedClientException;
 import org.oa4mp.delegation.server.request.AGRequest;
 import org.oa4mp.delegation.server.request.AGResponse;
-import org.oa4mp.delegation.common.servlet.TransactionState;
-import org.oa4mp.delegation.common.storage.clients.Client;
-import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
-import edu.uiuc.ncsa.security.storage.XMLMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -47,7 +47,7 @@ public abstract class AbstractInitServlet extends OA4MPServlet {
 
            transaction.setClient(client);
            transaction.setOriginalURL(req.getRequestURI() + "?" + req.getQueryString());
-
+           findSigningKey(req, transaction);
            try {
                String cid = "client=" + client.getIdentifier();
                info("2.a. Starting a new request: " + cid);

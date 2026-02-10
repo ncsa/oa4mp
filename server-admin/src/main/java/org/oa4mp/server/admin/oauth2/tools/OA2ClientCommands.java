@@ -607,7 +607,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
             say(" if arg is present it must be one of on|true or off|false");
             say("extended attributes are namespace qualified attributes that a client may");
             say("pass in and are simply forwarded to the scripting engine in the variable xas.");
-            say("EA support is not stored in a regular DB column but ina special structure.");
+            say("EA support is not stored in a regular DB column but in a special structure.");
             say("This utility is the only to reliably interact with it.");
             say("The effect is to toggle whether EAs in a request are passed along to the runtime envirnoment");
             say("or not. You do not set EAs here, but let the policy handle what it gets.");

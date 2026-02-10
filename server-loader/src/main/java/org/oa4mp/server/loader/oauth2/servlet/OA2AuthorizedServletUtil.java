@@ -104,6 +104,7 @@ public class OA2AuthorizedServletUtil {
             AGIResponse2 agResponse = (AGIResponse2) servlet.getAGI().process(agRequest2);
             agResponse.setEncodeToken(encodeTokenInResponse);
             OA2ServiceTransaction transaction = createNewTransaction(agResponse.getGrant());
+            OA4MPServlet.findSigningKey(req, transaction);
             transaction.setOriginalURL( HttpUtils. getRequestURL(req).toString() + "?" + req.getQueryString());
             //transaction.setOriginalURL(req.getRequestURI() + "?" + req.getQueryString());
 
