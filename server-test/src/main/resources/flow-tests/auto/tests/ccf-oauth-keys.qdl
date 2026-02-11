@@ -7,52 +7,74 @@
    access{
      type=wlcg
        "qdl":{
-         "code":"access_token.scope :=detokenize(scopes., ' ');",
+         "code":"access_token.scope ≔detokenize(scopes., ' ');",
          "xmd":{"exec_phase":["post_token", "post_refresh","post_exchange"]}
        } //end QDL
      } //end access token
  }// end tokens
 */
-test_id:= 'ccf.oauth.qdl';
-initialization := null;
-is_rfc7523 := false;
-http:= j_load('http');
-host := 'https://localhost:9443';
-http#host('https://localhost:9443')
+
+/*
+0: http≔j_load('http');
+http#host('https:/localhost:9443');
+http#open(true);
+1: http#get('oauth2/.well-known/openid_configuration')
+2: http≔j_load('http');
+http#host('http:/localhost:4444');
+http#open(true);
+3: http#get('oauth2/.well-known/openid_configuration')
+4: http#get('oauth2/.well-known/openid-configuration')
+5: http#get('/oauth2/.well-known/openid-configuration')
+6: http≔j_load('http');
+http#host('https://localhost:9443');
+http#open(true);
+7: http#get('/oauth2/.well-known/openid-configuration')
+8: http#get('/oauth2/.well-known/openid-configuration').'content'.'jwks_uri'
+9: http#get('oauth2/certs')
+10: http#get('oauth2/certs')\content\keys\*\kid
+11: http#get('https://localhost:9443/oauth2/certs')\content\keys\*\kid
+12: http#get('oauth2/certs/oa4mp_test')\content\keys\*\kid
+
+*/
+test_id≔ 'ccf.oauth.keys';
+   // Next function takes the raw JWT, pulls off teh header and turns it into a stem.
+jwt_to_h(raw)-> from_json(decode(tokenize(raw, '.').0));
+
+/*
+   Now let's go grab the certs from the well-known page and use them to configure the client..
+   Each phase should get a different cert.
+*/
+             http ≔ j_load('http');
+             host ≔ 'https://localhost:9443';
+           key_xa ≔ 'oa4mp:/jwt/signing/keyID'; // extended attribute to store the key id
+http#host(host);
 http#open(true); // allow self-signed certs
-jwks_uri := http#get('oauth2/.well-known/openid-configuration/oa4mp_test').'content'.'jwks_uri';
-http#host(jwks_uri-host);
-kid.[] := http#get()\content\keys\*\kid';
+         jwks_uri ≔ http#get('oauth2/.well-known/openid-configuration/oa4mp_test').'content'.'jwks_uri';
+             kid. ≔ http#get(jwks_uri-host)\content\keys\*\kid; // kid. now has all the ids of the certs
+              ⊨ 0 ≠ (cert_count ≔ size(kid.)) : 'no certs found';
+                i ≔ 0;
+params.'exchange' ≔ {key_xa : kid.mod(i++, cert_count)}; // just loop through the certs
+ params.'refresh' ≔ {key_xa : kid.mod(i++, cert_count)};
+   params.'token' ≔ {key_xa : kid.mod(i++, cert_count)};
 
-params := http#params('scope')
-params.'exchange' := ;
-params.'refresh' := ;
-params.'token' := ;
-  if[0 < size(args())]
-then[
-            test_id := args().0.0;
-     initialization := args().0.1;
-         is_rfc7523 := args().0.2;
-  ]
-else[
-     initialization := import(load('test#/auto/utils/initialization.mdl'));
-];
 clc#init($$OA4MP_CLC_INI, test_id);
-//initialization := size(args())==1⇒args().0:import(load('test#/auto/utils/initialization.mdl'));
-ini.:=initialization#get_client_ini(test_id);
-server_defaults.:=initialization# server_defaults();
-// Three quick tests. This client is no configured to return id token or refresh tokens ever,
-// so requests for them should simply be ignored
-scopes. := ['read:/foo', 'write:/bar', 'compute.start'];
-aud := 'ANY';
-tokens. := clc#ccf({'audience':aud,'scope':scopes., 'rfc7523':is_rfc7523}); // from the raw response
+clc#set_param(params.);
+ccf_resp. := clc#ccf();
+⊨ ∃ccf_resp.'access_token' : 'missing access token';
+⊨ jwt_to_h(ccf_resp.'access_token').'kid' == params.'token'.key_xa : 'wrong signing key id in token phase';
 
-⊨ tokens.'expires_in' == server_defaults.'at_lifetime' : 'wrong access token lifetime';
-⊨ ∄tokens.'refresh_token' : 'should not get a refresh token by default.';
-⊨ size(clc#claims()) == 0 : 'should not get id token by default';
-at. := clc#tokens().'access_token'.'jwt';
-⊨ false ∉ (scopes. ∈ tokenize(at.scope, ' ')) : 'wrong scopes: ' + at.scope;
-⊨ at.'aud' == aud;
+raw. ≔ clc#exchange();
+⊨jwt_to_h(raw.'access_token'.'raw_token').'kid' == params.'exchange'.key_xa : 'wrong signing key id in exchange phase';
 
+// Do a few more exchanges
+j := 0;
+while[j <5]
+   do[
+      params.'exchange' ≔ {key_xa : kid.mod(i++, cert_count)}; // just loop through the certs
+      clc#set_param(params.);
+      raw. ≔ clc#exchange();
+      ⊨jwt_to_h(raw.'access_token'.'raw_token').'kid' == params.'exchange'.key_xa : 'wrong signing key id in exchange phase';
+      j++;
+   ];
 
-say('ok: OAuth client credentials flow, refresh token, with scripting');
+say('ok: OAuth client credentials flow, checking custom signing keys');
