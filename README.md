@@ -1,4 +1,4 @@
-# OAuth for MyProxy
+# OAuth for Many People
 
 [![DOI](https://zenodo.org/badge/58557836.svg)](https://zenodo.org/badge/latestdoi/58557836)
 [![Javadocs](https://www.javadoc.io/badge/edu.uiuc.ncsa.myproxy/oa4mp-client-api.svg)](https://www.javadoc.io/doc/edu.uiuc.ncsa.myproxy/oa4mp-client-api)
