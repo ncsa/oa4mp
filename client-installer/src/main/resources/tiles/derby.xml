@@ -17,5 +17,6 @@
     <permissions/>
     <adminClients/>
     <txStore/>
+    <keyStore/>
     <voStore/>
 </derby>

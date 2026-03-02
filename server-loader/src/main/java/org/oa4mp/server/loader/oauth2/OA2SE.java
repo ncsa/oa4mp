@@ -33,6 +33,7 @@ import org.oa4mp.server.loader.oauth2.cm.CMConfigs;
 import org.oa4mp.server.loader.oauth2.loader.OA2CFConfigurationLoader;
 import org.oa4mp.server.loader.oauth2.servlet.DIServiceConfig;
 import org.oa4mp.server.loader.oauth2.servlet.RFC8628ServletConfig;
+import org.oa4mp.server.loader.oauth2.storage.keys.KEStore;
 import org.oa4mp.server.loader.oauth2.storage.tx.TXStore;
 import org.oa4mp.server.loader.oauth2.storage.vi.VIStore;
 import org.oa4mp.server.loader.oauth2.storage.vi.VirtualIssuer;
@@ -57,6 +58,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  Provider<TXStore> txStoreProvider,
                  Provider<VIStore> voStoreProvider,
                  Provider<ClientStore> csp,
+                 Provider<KEStore> keStoreProvider,
                  int maxAllowedNewClientRequests,
                  long agLifetime,
                  long maxAGLifetime,
@@ -173,6 +175,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.rfc8693Enabled = rfc8693Enabled;
         this.txStore = txStoreProvider.get();
         this.VIStore = voStoreProvider.get();
+        this.keStore = keStoreProvider.get();
         this.maxIdTokenLifetime = maxIDTokenLifetime;
         this.idTokenLifetime = idTokenLifetime;
         this.maxATLifetime = maxATLifetime;
@@ -330,6 +333,15 @@ public class OA2SE extends ServiceEnvironmentImpl {
 
     long maxRTLifetime = -1L;
 
+    public KEStore getKEStore() {
+        return keStore;
+    }
+
+    public void setKEStore(KEStore keStore) {
+        this.keStore = keStore;
+    }
+
+    KEStore keStore;
     VIStore VIStore;
 
     public VIStore getVIStore() {
@@ -442,15 +454,57 @@ public class OA2SE extends ServiceEnvironmentImpl {
         return issuer;
     }
 
-    Identifier serverVIID = new BasicIdentifier("oa4mp:/vi/default");
+    public static final Identifier SERVER_VI_ID = new BasicIdentifier("oa4mp:/vi/default");
     /**
      * This is used in the default VI to indicate there is no set default key id.
      * Otherwise the default ID in the VI will be used.
      */
     public static final String NO_KEY_ID = "--";
 
+    /**
+     * Get the keys for the Virtual issuer (may be null implying use
+     * server default). This is used in cases where there is no client
+     * ID, such as you are accessing the keys for an admin client directly.
+     * @param vi
+     * @return
+     */
+    public JSONWebKeys getJsonWebKeys(VirtualIssuer vi) {
+        JSONWebKeys jsonWebKeys = getKEStore().getCurrentKeys(vi);
+        if (!jsonWebKeys.isEmpty()) return jsonWebKeys;
+        //  Not in new place, start looking in the old ones in case
+        // it's an older install and they did not migrate.
+        if(vi != null){
+            if(vi.hasJWKs()) {
+                jsonWebKeys = vi.getJsonWebKeys();
+                jsonWebKeys.setDefaultKeyID(vi.getDefaultKeyID());
+                return jsonWebKeys;
+            }
+        }
+        VirtualIssuer defaultVI = (VirtualIssuer) getVIStore().get(SERVER_VI_ID);
+        if(defaultVI != null){
+            if(defaultVI.hasJWKs()){ jsonWebKeys = defaultVI.getJsonWebKeys();
+            jsonWebKeys.setDefaultKeyID(defaultVI.getDefaultKeyID());
+            return jsonWebKeys;
+            }
+        }
+        return getServerJWKS(); // *should* have a default.
+    }
+
+    /**
+     * For a given client, get the keys for the Virtual issuer (may be null implying use)
+     * @param clientID
+     * @return
+     */
+    public JSONWebKeys getJsonWebKeys(Identifier clientID) {
+        return getJsonWebKeys(getVI(clientID));
+    }
+
+    /**
+     * @deprecated
+     * @return
+     */
     public JSONWebKeys getJsonWebKeys() {
-        VirtualIssuer vi = (VirtualIssuer) getVIStore().get(serverVIID);
+        VirtualIssuer vi = (VirtualIssuer) getVIStore().get(SERVER_VI_ID);
         String defaultKeyID = getServerJWKS().getDefaultKeyID();
         JSONWebKeys jwks = new JSONWebKeys(defaultKeyID);
         jwks.putAll(getServerJWKS());

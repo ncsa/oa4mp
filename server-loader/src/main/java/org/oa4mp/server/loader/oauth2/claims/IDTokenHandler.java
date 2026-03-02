@@ -431,7 +431,9 @@ public class IDTokenHandler extends AbstractPayloadHandler implements IDTokenHan
         // did not request.
          if (!configuredScopes.contains(OA2Scopes.SCOPE_EMAIL)) {
             getUserMetaData().remove(EMAIL);
-            getUserMetaData().remove(EMAIL_VERIFIED);
+             // N.B. we don't assert this, but we might remove it if the IDP asserts it
+             // but the user did not request it.
+             getUserMetaData().remove(EMAIL_VERIFIED);
         }
         if (!configuredScopes.contains(SCOPE_PHONE)) {
             getUserMetaData().remove(PHONE_NUMBER);

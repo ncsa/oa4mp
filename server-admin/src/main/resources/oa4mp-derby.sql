@@ -135,6 +135,29 @@ CREATE TABLE oa4mp.clients
    strict_scopes             boolean
    );
 
+CREATE TABLE oa4mp.key_records
+(
+    alg              VARCHAR(256),
+    creation_ts      timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    is_default       BOOLEAN,
+    exp              BIGINT,
+    iat              BIGINT,
+    description      CLOB,
+    key_id           VARCHAR(256) PRIMARY KEY,
+    is_valid         BOOLEAN,
+    jwk              CLOB,
+    kid              VARCHAR(256) UNIQUE,
+    kty              VARCHAR(256),
+    last_accessed    BIGINT,
+    last_modified_ts timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    nbf              BIGINT,
+    key_use          VARCHAR(256),
+    vi               VARCHAR(2048)
+);
+
+CREATE INDEX p_keys ON oa4mp.key_records(vi);
+
+
 CREATE TABLE oa4mp.permissions
 (
    admin_id                 VARCHAR(255),

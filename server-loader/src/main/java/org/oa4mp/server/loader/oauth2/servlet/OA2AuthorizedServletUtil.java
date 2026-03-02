@@ -347,21 +347,16 @@ public class OA2AuthorizedServletUtil {
      * @param callback
      * @return
      */
-    protected OA2ServiceTransaction CheckIdTokenHint(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, String callback) {
+    protected OA2ServiceTransaction CheckIdTokenHint(HttpServletRequest httpServletRequest,
+                                                     HttpServletResponse httpServletResponse,
+                                                     String callback) {
         if (!httpServletRequest.getParameterMap().containsKey(ID_TOKEN_HINT)) {
             return null;
         }
         UsernameFindable ufStore = null;
         String rawIDToken = String.valueOf(httpServletRequest.getParameterMap().get(ID_TOKEN_HINT));
         JSONObject idToken = null;
-        try {
-            idToken = JWTUtil.verifyAndReadJWT(rawIDToken, ((OA2SE) getServiceEnvironment()).getJsonWebKeys());
-        } catch (Throwable e) {
-            throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
-                    "cannot read ID token hint",
-                    HttpStatus.SC_BAD_REQUEST,
-                    null);
-        }
+
 
         String username = null;
         if (idToken.containsKey(OA2Claims.SUBJECT)) {
@@ -409,6 +404,15 @@ public class OA2AuthorizedServletUtil {
                 }
                 httpServletResponse.setStatus(HttpStatus.SC_OK);
                 // The spec does not state that anything is returned, just a positive response.
+                // We can now check the signature on the token to make sure that it is valid.
+                try {
+                    JWTUtil.verifyAndReadJWT(rawIDToken, ((OA2SE) getServiceEnvironment()).getJsonWebKeys(t.getOA2Client().getIdentifier()));
+                } catch (Throwable e) {
+                    throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                            "cannot read ID token hint",
+                            HttpStatus.SC_BAD_REQUEST,
+                            null);
+                }
                 return t;
 
             }
@@ -636,14 +640,12 @@ public class OA2AuthorizedServletUtil {
             boolean ok = false;
             //     try {
             VirtualIssuer vi = oa2SE.getVI(transaction.getClient().getIdentifier());
-            boolean isInVI = vi != null;
+            boolean isInVI = vi != null; // ∃
             String issuer;
-            JSONWebKeys keys;
+            JSONWebKeys keys = oa2SE.getJsonWebKeys(vi);
             if (isInVI) {
-                keys = oa2SE.getJsonWebKeys();
                 issuer = oa2SE.getIssuer();
             } else {
-                keys = vi.getJsonWebKeys();
                 issuer = vi.getIssuer();
             }
             JSONObject idTokenHint;

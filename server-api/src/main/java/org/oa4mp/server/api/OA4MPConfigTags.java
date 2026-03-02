@@ -17,6 +17,7 @@ public interface OA4MPConfigTags extends StorageConfigurationTags, MailConfigura
     String PERMISSION_STORE = "permissions";
     String TOKEN_EXCHANGE_RECORD_STORE = "txStore";
     String VIRTUAL_ORGANIZATION_STORE = "voStore";
+    String KEY_STORE = "keyStore";
 
     String MYPROXY = "myproxy";
     String MYPROXY_PORT = "port";

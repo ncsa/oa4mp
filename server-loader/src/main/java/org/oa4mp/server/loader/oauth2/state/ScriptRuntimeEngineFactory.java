@@ -8,7 +8,6 @@ import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
 import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
 import org.oa4mp.server.loader.oauth2.storage.tx.TXRecord;
-import org.oa4mp.server.loader.oauth2.storage.vi.VirtualIssuer;
 import org.oa4mp.server.loader.qdl.scripting.OA2State;
 import org.oa4mp.server.loader.qdl.scripting.QDLRuntimeEngine;
 import org.qdl_lang.evaluate.MetaEvaluator;
@@ -71,12 +70,15 @@ public class ScriptRuntimeEngineFactory {
             qrt.setConfigToCS(transaction.getConfigToCS());
             OA2State state = qrt.getState();
             state.setOa2se(oa2SE);
-            VirtualIssuer vo = oa2SE.getVI(oa2Client.getIdentifier());
+            //VirtualIssuer vo = oa2SE.getVI(oa2Client.getIdentifier());
+            state.setJsonWebKeys(oa2SE.getJsonWebKeys(oa2Client.getIdentifier()));
+/*
             if (vo != null) {
                 state.setJsonWebKeys(vo.getJsonWebKeys());
             } else {
                 state.setJsonWebKeys(oa2SE.getJsonWebKeys());
             }
+*/
             state.setTransaction(transaction);
             state.setTxRecord(txRecord);
             state.setLogger(oa2SE.getMyLogger()); // This lets scripts write to the log.

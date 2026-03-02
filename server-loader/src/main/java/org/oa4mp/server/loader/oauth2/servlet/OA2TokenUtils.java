@@ -1,13 +1,5 @@
 package org.oa4mp.server.loader.oauth2.servlet;
 
-import org.oa4mp.server.loader.oauth2.OA2SE;
-import org.oa4mp.server.loader.oauth2.storage.RefreshTokenStore;
-import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
-import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
-import org.oa4mp.server.loader.oauth2.storage.tx.TXRecord;
-import org.oa4mp.server.loader.oauth2.storage.vi.VirtualIssuer;
-import org.oa4mp.server.api.util.ClientDebugUtil;
-import org.oa4mp.delegation.common.storage.clients.BaseClient;
 import edu.uiuc.ncsa.security.core.exceptions.InvalidAlgorithmException;
 import edu.uiuc.ncsa.security.core.exceptions.InvalidSignatureException;
 import edu.uiuc.ncsa.security.core.exceptions.TransactionNotFoundException;
@@ -19,6 +11,7 @@ import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 import org.apache.http.HttpStatus;
+import org.oa4mp.delegation.common.storage.clients.BaseClient;
 import org.oa4mp.delegation.common.token.impl.AccessTokenImpl;
 import org.oa4mp.delegation.common.token.impl.IDTokenImpl;
 import org.oa4mp.delegation.common.token.impl.RefreshTokenImpl;
@@ -27,11 +20,16 @@ import org.oa4mp.delegation.server.JWTUtil;
 import org.oa4mp.delegation.server.OA2ATException;
 import org.oa4mp.delegation.server.OA2Errors;
 import org.oa4mp.delegation.server.OA2GeneralError;
+import org.oa4mp.server.api.util.ClientDebugUtil;
+import org.oa4mp.server.loader.oauth2.OA2SE;
+import org.oa4mp.server.loader.oauth2.storage.RefreshTokenStore;
+import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
+import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
+import org.oa4mp.server.loader.oauth2.storage.tx.TXRecord;
 
 import java.io.IOException;
 import java.net.URI;
 
-import static org.oa4mp.server.api.storage.servlet.OA4MPServlet.getServiceEnvironment;
 import static org.oa4mp.delegation.server.server.claims.OA2Claims.JWT_ID;
 
 /**
@@ -46,16 +44,18 @@ public class OA2TokenUtils {
      * @param client
      * @return
      */
+    // Revisions to getting keys now make this just a wrapper for the call to OA2SE
     public static JSONWebKeys getKeys(OA2SE oa2se, OA2Client client) {
-        VirtualIssuer vo = oa2se.getVI(client.getIdentifier());
         //CIL-974
-        JSONWebKeys keys = ((OA2SE) getServiceEnvironment()).getJsonWebKeys();
-
+        return oa2se.getJsonWebKeys(client.getIdentifier());
+/* ∃
         if (vo != null) {
             keys = vo.getJsonWebKeys();
             ServletDebugUtil.trace(OA2TokenUtils.class, "Got VI for client " + client.getIdentifierString());
         }
         return keys;
+        */
+
     }
 
     /**

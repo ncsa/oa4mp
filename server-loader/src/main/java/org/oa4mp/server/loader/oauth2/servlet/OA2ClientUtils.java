@@ -10,6 +10,7 @@ import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import edu.uiuc.ncsa.security.util.scripting.ScriptSet;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -579,6 +580,7 @@ public class OA2ClientUtils {
      */
     public static JSONWebKey getSigningKey(OA2SE oa2SE, ServiceTransaction transaction, OA2Client client) throws OA2ATException {
         VirtualIssuer vo = oa2SE.getVI(client.getIdentifier());
+        JSONWebKeys keys = oa2SE.getJsonWebKeys(vo);
         boolean hasVOKeys = vo != null && vo.getJsonWebKeys() != null;
         JSONWebKey key = null;
         JSONArray keyIDs = transaction.getSigningKeyIds();
@@ -587,21 +589,27 @@ public class OA2ClientUtils {
         if (keyIDs != null && !keyIDs.isEmpty()) {
             for (int i = keyIDs.size() - 1; 0 <= i; i--) {
                 String currentKeyID = keyIDs.getString(i);
+                key = keys.get(currentKeyID);
+/*∃
                 if (hasVOKeys) {
                     key = vo.getJsonWebKeys().get(currentKeyID);
                 } else {
                     key = oa2SE.getJsonWebKeys().get(currentKeyID);
                 }
+*/
                 if (key != null) {
                     return key;
                 }
             }
         }
-
+        // no such requested key, return default
+        return keys.getDefault();
+/*
         if (hasVOKeys) {
             return vo.getJsonWebKeys().get(vo.getDefaultKeyID());
         } else {
             return oa2SE.getJsonWebKeys().getDefault();
         }
+*/
     }
 }

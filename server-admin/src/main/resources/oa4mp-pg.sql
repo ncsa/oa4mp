@@ -23,6 +23,8 @@
 \set oa4mpApproverTable client_approvals
 \set oa4mpAdminClientTable adminClients
 \set oa4mpPermissionsTable permissions
+\set oa4mpVI virtual_organizations
+\set oa4mpKeyRecords key_records
 
 
 /*
@@ -103,20 +105,55 @@ create table :oa4mpSchema.:oa4mpApproverTable(
     approved    boolean,
     approval_ts TIMESTAMP);
 
+
+
+
 CREATE TABLE :oa4mpSchema.tx_records
 (
-    token_id   VARCHAR(255) PRIMARY KEY,
-    lifetime   bigint,
-    issued_at  bigint,
-    expires_at bigint,
-    parent_id  text,
-    token_type text,
-    valid      boolean,
-    scopes     text,
-    audience   text,
-    issuer     text,
-    resource   text
+    audience        text,
+    description     text,
+    expires_at      bigint,
+    issued_at       bigint,
+    issuer          text,
+    lifetime        bigint,
+    parent_id       text,
+    resource        text,
+    scopes          text,
+    state           text,
+    stored_token    text,
+    token_id        VARCHAR(255) PRIMARY KEY,
+    token_type      text,
+    token           text,
+    valid           boolean,
+    INDEX parents (parent_id(255))
+
 );
+
+CREATE UNIQUE INDEX tx_ndx ON :oa4mpSchema.tx_records (client_id);
+
+CREATE TABLE :oa4mpSchema.:oa4mpKeyRecords
+(
+    alg              text,
+    creation_ts      timestamp default now(),
+    is_default       BOOLEAN,
+    exp              BIGINT,
+    iat              BIGINT,
+    description      TEXT,
+    key_id           text PRIMARY KEY,
+    is_valid         BOOLEAN,
+    jwk              TEXT,
+    kid              text UNIQUE,
+    kty              text,
+    last_modified_ts timestamp,
+    nbf              BIGINT,
+    use              text,
+    vi               text
+);
+CREATE UNIQUE INDEX key_ndx ON :oa4mpSchema.:oa4mpKeyRecords (vi);
+
+
+
+CREATE UNIQUE INDEX keys_ndx ON :oa4mpSchema.:oa4mpKeyRecords (vi);
 
 create table :oa4mpSchema.:oa4mpTransactionTable  (
    temp_token           text primary key,
@@ -144,6 +181,25 @@ create table :oa4mpSchema.:oa4mpTransactionTable  (
 
 CREATE UNIQUE INDEX trans_ndx ON :oa4mpSchema.:oa4mpTransactionTable (temp_token, refresh_token, access_token, username);
 
+CREATE TABLE :oa4mpSchema.:oa4mpVI
+(
+    at_issuer      text,
+    created        bigint,
+    default_key_id text,
+    discovery_path text,
+    issuer         text,
+    json_web_keys  text,
+    last_modified  bigint,
+    resource       text,
+    title          text,
+    valid          boolean,
+    vo_id          text PRIMARY KEY,
+    INDEX discovery_path (discovery_path(255))
+);
+
+CREATE UNIQUE INDEX vo_ndx ON :oa4mpSchema.oa4mpVI (vo_id);
+
+
 /*
  Set permissions. There is an admin user name oa4mp-admin to help with this.
  Note that you may, depending on some other issues, have to grant privileges on the schema
@@ -158,7 +214,8 @@ GRANT ALL PRIVILEGES ON :oa4mpSchema.:oa4mpClientTable TO :oa4mpServerUser;
 GRANT ALL PRIVILEGES ON :oa4mpSchema.:oa4mpClientCallbackTable TO :oa4mpServerUser;
 GRANT ALL PRIVILEGES ON :oa4mpSchema.:oa4mpAdminClientTable TO :oa4mpServerUser;
 GRANT ALL PRIVILEGES ON :oa4mpSchema.:oa4mpPermissionsTable TO :oa4mpServerUser;
-GRANT ALL PRIVILEGES ON :oa4mpSchema.:oa4mpLDAPTable TO :oa4mpServerUser;
+GRANT ALL PRIVILEGES ON :oa4mpSchema.key_records TO :oa4mpServerUser;
+GRANT ALL PRIVILEGES ON :oa4mpSchema.tx_records TO :oa4mpServerUser;
 
 commit;
 

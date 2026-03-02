@@ -70,6 +70,7 @@ import org.oa4mp.server.loader.oauth2.storage.clients.OA2ClientConverter;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2ClientMemoryStore;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2ClientProvider;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2ClientSQLStoreProvider;
+import org.oa4mp.server.loader.oauth2.storage.keys.*;
 import org.oa4mp.server.loader.oauth2.storage.transactions.*;
 import org.oa4mp.server.loader.oauth2.storage.tx.*;
 import org.oa4mp.server.loader.oauth2.storage.vi.*;
@@ -85,8 +86,8 @@ import java.time.LocalTime;
 import java.util.*;
 
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
-import static org.oa4mp.delegation.server.OA2ConfigTags.ACCESS_TOKEN_LIFETIME;
 import static org.oa4mp.delegation.server.OA2ConfigTags.*;
+import static org.oa4mp.delegation.server.OA2ConfigTags.ACCESS_TOKEN_LIFETIME;
 import static org.oa4mp.delegation.server.OA2Constants.*;
 import static org.oa4mp.server.api.admin.transactions.OA4MPIdentifierProvider.TRANSACTION_ID;
 
@@ -196,6 +197,7 @@ public class OA2CFConfigurationLoader<T extends ServiceEnvironmentImpl> extends 
                     getTXStoreProvider(),
                     getVOStoreProvider(),
                     getClientStoreProvider(),
+                    getKEStoreProvider(),
                     getMaxAllowedNewClientRequests(),
                     getAGLifetime(),
                     getMaxAGLifetime(),
@@ -1558,6 +1560,14 @@ Boolean ccfEnabled = null;
         return new SQLTXRStoreProvider(config, cpp, type, converter, tp);
     }
 
+    protected KESQLStoreProvider createSQLKERecordP( CFNode config,
+                                                      ConnectionPoolProvider<? extends ConnectionPool> cpp,
+                                                      String type,
+                                                      KERecordProvider<? extends KERecord> tp,
+                                                      Provider<TokenForge> tfp,
+                                                      KEConverter converter) {
+        return new KESQLStoreProvider(config, cpp, type, converter, tp);
+    }
 
     protected SQLVIStoreProvider createSQLVOP( CFNode config,
                                               ConnectionPoolProvider<? extends ConnectionPool> cpp,
@@ -1630,6 +1640,72 @@ Boolean ccfEnabled = null;
         return voStoreProvider;
     }
 
+Provider<KEStore> keStoreProvider;
+    protected Provider<KEStore> getKEStoreProvider(){
+        KERecordProvider keRecordProvider = new KERecordProvider(new KEIdentifierProvider());
+        KEConverter keConverter = new KEConverter(new KESerializationKeys(),
+                keRecordProvider);
+        return getKEStoreProvider(keRecordProvider, keConverter);
+    }
+
+    protected Provider<KEStore> getKEStoreProvider(KERecordProvider keRecordProvider,
+                                                   KEConverter<? extends KERecord> keRecordConverter) {
+        if (keStoreProvider == null) {
+            KEMultiStoreProvider storeProvider = new KEMultiStoreProvider(cn,
+                    isDefaultStoreDisabled(),
+                    getMyLogger(),
+                    null, null,
+                    keRecordProvider, keRecordConverter);
+
+            storeProvider.addListener(createSQLKERecordP(cn,
+                    getMySQLConnectionPoolProvider(),
+                    OA4MPConfigTags.MYSQL_STORE,
+                    keRecordProvider,
+                    getTokenForgeProvider(),
+                    keRecordConverter));
+            storeProvider.addListener(createSQLKERecordP(cn,
+                    getMariaDBConnectionPoolProvider(),
+                    OA4MPConfigTags.MARIADB_STORE,
+                    keRecordProvider,
+                    getTokenForgeProvider(),
+                    keRecordConverter));
+            storeProvider.addListener(createSQLKERecordP(cn,
+                    getPgConnectionPoolProvider(),
+                    OA4MPConfigTags.POSTGRESQL_STORE,
+                    keRecordProvider,
+                    getTokenForgeProvider(),
+                    keRecordConverter));
+            storeProvider.addListener(createSQLKERecordP(cn,
+                    getDerbyConnectionPoolProvider(),
+                    OA4MPConfigTags.DERBY_STORE,
+                    keRecordProvider,
+                    getTokenForgeProvider(),
+                    keRecordConverter));
+
+            storeProvider.addListener(new KEFSProvider(cn, keRecordConverter, keRecordProvider));
+
+            storeProvider.addListener(new TypedProvider<KEStore>(cn, OA4MPConfigTags.MEMORY_STORE, OA4MPConfigTags.KEY_STORE) {
+                @Override
+                public Object componentFound(CfgEvent configurationEvent) {
+                    if (checkEvent(configurationEvent)) {
+                        return get();
+                    }
+                    return null;
+                }
+
+                @Override
+                public KEStore get() {
+                    return new KEMemoryStore(keRecordProvider, keRecordConverter);
+                }
+
+            });
+            keStoreProvider = storeProvider;
+        }
+        return keStoreProvider;
+    }
+
+
+    // =================
 
     Provider<TXStore> txStoreProvider;
 

@@ -37,6 +37,7 @@ public class OA2Commands extends BaseCommands2 {
     public static final String ADMINS = "admins";
     public static final String TOKENS = "tokens";
     public static final String VIRTUAL_ISSUER = "vi";
+    public static final String KEYS = "keys";
 
     /**
      * This snoops through all components and gloms every call together. This does not
@@ -72,6 +73,7 @@ public class OA2Commands extends BaseCommands2 {
                 drivers.put(PERMISSIONS, createCLIDriver(getPermissionCommands()));
                 drivers.put(TOKENS, createCLIDriver(getTokenCommands()));
                 drivers.put(VIRTUAL_ISSUER, createCLIDriver(getVICommands()));
+                drivers.put(KEYS, createCLIDriver(getKECommands()));
             }
         } catch (Throwable t) {
             if (t instanceof RuntimeException) {
@@ -169,6 +171,7 @@ protected static void newMain(String[] args) {
         say(PERMISSIONS + " - basic permission management.");
         say(ADMINS + " - create or manage administrative clients.");
         say(TOKENS + " - manage tokens created in the token exchange endpoint");
+        sayi(KEYS + " - manage keys used for singing and validation");
         say(VIRTUAL_ISSUER + " - manage virtual issuers");
         say("e.g.\n\nuse " + CLIENTS + "\n\nwill call up the client management component.");
         say("Type 'exit' or /q when you wish to exit the component and return to the main menu");
@@ -246,6 +249,17 @@ protected static void newMain(String[] args) {
         return tokenStoreCommands;
     }
 
+    KeyCommands keyCommands = null;
+    protected KeyCommands getKECommands() throws Throwable {
+        if (keyCommands == null) {
+            keyCommands = new KeyCommands(new CLIDriver(),  getOA2SE());
+            configureCommands(getDriver(), keyCommands);
+            keyCommands.initHelp();
+            keyCommands.setEnvironment(getOA2SE());
+        }
+        return keyCommands;
+    }
+
     VICommands VICommands;
 
     protected VICommands getVICommands() throws Throwable {
@@ -319,6 +333,9 @@ protected static void newMain(String[] args) {
         }
         if (inputLine.hasArg(VIRTUAL_ISSUER)) {
             commands = getVICommands();
+        }
+        if (inputLine.hasArg(KEYS)) {
+            commands = getKECommands();
         }
         if (commands != null) {
             return switchOrRun(inputLine, commands);

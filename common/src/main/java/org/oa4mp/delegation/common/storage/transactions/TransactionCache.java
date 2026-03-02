@@ -275,7 +275,7 @@ public class TransactionCache<V extends BasicTransaction> extends CachedMapFacad
         super.clear();
     }
 
-    public Set<Identifier> keySet() {
+    public HashSet<Identifier> keySet() {
         checkDestroyed();
         return super.keySet();
     }
@@ -515,8 +515,19 @@ public class TransactionCache<V extends BasicTransaction> extends CachedMapFacad
         throw new NotImplementedException(" This is not yet implemented for cache");
     }
 
-    @Override
+/*    @Override
     public void update(List<Identifier> ids, Map<String, Object> values) throws UnregisteredObjectException {
         throw new NotImplementedException(" This is not yet implemented for cache");
+    }*/
+
+    @Override
+    public void updateRS(List<Identifier> ids, Map<String, Object> values) throws UnregisteredObjectException {
+        throw new NotImplementedException(" This is not yet implemented for cache");
     }
+
+    @Override
+    public void update(Map<? extends Identifier, V> m) {
+        throw new NotImplementedException(" This is not yet implemented for cache");
+    }
+
 }

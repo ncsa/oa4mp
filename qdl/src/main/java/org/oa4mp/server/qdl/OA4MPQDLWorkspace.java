@@ -18,6 +18,8 @@ public class OA4MPQDLWorkspace extends QDLWorkspace {
         QDLWorkspace.setWorkspaceProvider(workspaceProvider);
         WorkspaceCommands.setWorkspaceCommandsProvider(new QDLOA4MPWorkspaceCommandsProvider());
         OA4MPQDLWorkspace workspace = (OA4MPQDLWorkspace) init(args);
+        workspace.getWorkspaceCommands().getState().createSystemInfo(null);
+        workspace.getWorkspaceCommands().getState().createSystemConstants();
         if (workspace != null) {
             workspace.mainLoop();
         }

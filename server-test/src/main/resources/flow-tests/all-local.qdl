@@ -11,6 +11,7 @@ then[
   say('You may specify multiple test suites, but if you specify nothing, only local tests run.');
   return();
   ];
+clc:=j_load('oa4mp.client.clc');
 
 all_test_start:=date_ms();
 do_flows := '-flow' ∈ args();

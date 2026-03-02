@@ -753,7 +753,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             }
             isAdminClient = true; // if we get here, we have one.
         } catch (UnknownClientException unknownClientException) {
-            oa2Client = (OA2Client) getClient(request);
+            oa2Client =  getClient(request);
         }
         // So the test is this: One of the above gets for a client has to work. If getClient fails
         // it will be because of an unknown client exception. At this point, one of the two clients
@@ -811,28 +811,31 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         TokenImpl token = at == null ? rt : at;
         if (isAdminClient) {
             if (token.isJWT()) {
-                JSONWebKeys jsonWebKeys;
-                if (adminClient.getVirtualIssuer() == null) {
+                VirtualIssuer vi = (VirtualIssuer) oa2SE.getVIStore().get(adminClient.getVirtualIssuer());
+                JSONWebKeys jsonWebKeys = oa2SE.getJsonWebKeys(vi);
+      /* ∃         if (adminClient.getVirtualIssuer() == null) {
                     jsonWebKeys = oa2SE.getJsonWebKeys();
                 } else {
-                    VirtualIssuer vo = (VirtualIssuer) oa2SE.getVIStore().get(adminClient.getVirtualIssuer());
-                    if (vo == null) {
-                        // Admin client is in a VO but no such VO is found. This implies an internal error
+                    VirtualIssuer vi = (VirtualIssuer) oa2SE.getVIStore().get(adminClient.getVirtualIssuer());
+                    if (vi == null) {
+                        // Admin client is in a VI but no such VI is found. This implies an internal error
                         throw new NFWException("Virtual issuer \"" + adminClient.getVirtualIssuer() + "\"not found.");
                     }
-                    jsonWebKeys = vo.getJsonWebKeys();
-                }
+                    jsonWebKeys = vi.getJsonWebKeys();
+                }*/
                 JWTUtil.verifyAndReadJWT(token.getToken(), jsonWebKeys); // might throw an exception
             }
         } else {
             if (at.isJWT()) {
-                JSONWebKeys jsonWebKeys;
+                JSONWebKeys jsonWebKeys = getOA2SE().getJsonWebKeys(clientID);
+/*
                 VirtualIssuer vo = getOA2SE().getVI(clientID);
                 if (vo == null) {
                     jsonWebKeys = oa2SE.getJsonWebKeys();
                 } else {
                     jsonWebKeys = vo.getJsonWebKeys();
                 }
+*/
                 JWTUtil.verifyAndReadJWT(at.getToken(), jsonWebKeys); // might throw an exception
             }
         }
@@ -2241,7 +2244,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         }
         RefreshTokenStore rts = (RefreshTokenStore) getTransactionStore();
         try {
-            JSONObject jsonObject = MyOtherJWTUtil2.verifyAndReadJWT(refreshToken.getToken(), ((OA2SE) OA4MPServlet.getServiceEnvironment()).getJsonWebKeys());
+            // ∃ JSONObject jsonObject = MyOtherJWTUtil2.verifyAndReadJWT(refreshToken.getToken(), ((OA2SE) OA4MPServlet.getServiceEnvironment()).getJsonWebKeys());
+            // Refresh tokens are, in general, never signed.
+            JSONObject jsonObject = MyOtherJWTUtil2.verifyAndReadJWT(refreshToken.getToken(), (JSONWebKeys) null);
             if (jsonObject.containsKey(JWT_ID)) {
                 refreshToken = TokenFactory.createRT(jsonObject);
             } else {
@@ -2881,14 +2886,16 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         }
         debugger.trace(this, "returns from doAT");
         OA2SE oa2se = (OA2SE) OA4MPServlet.getServiceEnvironment();
-        VirtualIssuer vo = oa2se.getVI(transaction.getClient().getIdentifier());
+//        VirtualIssuer vo = oa2se.getVI(transaction.getClient().getIdentifier());
+        JSONWebKeys keys = oa2se.getJsonWebKeys(transaction.getClient().getIdentifier());
+        ((ATIResponse2) issuerTransactionState.getIssuerResponse()).setJsonWebKey(keys.getDefault());
+/*
         if (vo == null) {
-            debugger.trace(this, "no vi");
             ((ATIResponse2) issuerTransactionState.getIssuerResponse()).setJsonWebKey((oa2se).getJsonWebKeys().getDefault());
         } else {
-            debugger.trace(this, "has vi");
             ((ATIResponse2) issuerTransactionState.getIssuerResponse()).setJsonWebKey(vo.getJsonWebKeys().get(vo.getDefaultKeyID()));
         }
+*/
         debugger.trace(this, "writing AT response");
         writeATResponse(response, issuerTransactionState);
 

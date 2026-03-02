@@ -1,6 +1,5 @@
 package org.oa4mp.server.loader.oauth2.storage.vi;
 
-import org.qdl_lang.xml.XMLUtils;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.storage.monitored.Monitored;
@@ -8,6 +7,7 @@ import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
+import org.qdl_lang.xml.XMLUtils;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
@@ -18,8 +18,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Iterator;
 
-import static org.oa4mp.server.loader.qdl.QDLXMLConstants.*;
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
+import static org.oa4mp.server.loader.qdl.QDLXMLConstants.*;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -202,6 +202,9 @@ public class VirtualIssuer extends Monitored {
         }
     }
 
+    public boolean hasJWKs() {
+        return jsonWebKeys != null;
+    }
     @Override
     public String toString() {
         return "VirtualIssuer{" +
@@ -216,4 +219,5 @@ public class VirtualIssuer extends Monitored {
                 ", valid=" + valid +
                 '}';
     }
+
 }

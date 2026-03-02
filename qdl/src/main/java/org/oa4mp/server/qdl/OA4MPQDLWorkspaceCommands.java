@@ -37,7 +37,9 @@ public class OA4MPQDLWorkspaceCommands extends WorkspaceCommands {
     public void loadQE(InputLine inputLine, String cfgName) throws Throwable {
         try {
             OA2SE oa2SE = null;
+            // load QDL
             super.loadQE(inputLine, cfgName);
+            // Load OA4MP service environment
             if(inputLine.hasArg(OA4MP_CONFIG_FILE_FLAG) && inputLine.hasArg(OA4MP_CONFIG_NAME)){
                 CFNode node =
                         CFXMLConfigurations.findConfiguration(inputLine.getNextArgFor(OA4MP_CONFIG_FILE_FLAG), OA4MPConfigTags.COMPONENT, inputLine.getNextArgFor(OA4MP_CONFIG_NAME));

@@ -44,12 +44,22 @@ public class OA2State extends State {
             JSONWebKeys keys) {
         super(vStack, opEvaluator, metaEvaluator,
                 ft, mTemplates, mInstance, myLoggingFacade, isServerMode, isRestrictedIO, assertionsOn);
+      //  System.out.println("constructing OA2State 1");
         this.strictACLs = strictACLs;
         this.jsonWebKeys = keys;
+    //    System.out.println(this);
+/*        if(getWorkspaceCommands() != null){
+            System.out.println(getWorkspaceCommands().getState().getSystemInfo().toJSON().toString(1));
+        }else{
+            System.out.println("getWorkspaceCommands() is null");
+        }
+        System.out.println(this);
+        (new RuntimeException()).printStackTrace();*/
     }
 
     /**
      * Constructor for converting a state object into an OA2State object.
+     *
      * @param state
      * @param strictACLs
      * @param keys
@@ -67,16 +77,28 @@ public class OA2State extends State {
                 state.isAssertionsOn(),
                 strictACLs,
                 keys
-                );
+        );
+    //    System.out.println("constructing OA2State 2");
+      //  System.out.println("   passed in state:" + state);
+        if (getWorkspaceCommands() == null) {
+        //    System.out.println("getWorkspaceCommands() is null");
+            this.setWorkspaceCommands(state.getWorkspaceCommands());
+        }else{
+          //  System.out.println(getWorkspaceCommands().getState().getSystemInfo().toJSON().toString(1));
+        }
+        //System.out.println(this);
     }
 
     @Override
     public State newLocalState() {
         OA2State oa2State = (OA2State) super.newLocalState();
+  //      System.out.println("constructing OA2State 3");
         return oa2StateInit(oa2State);
     }
 
     private OA2State oa2StateInit(OA2State oa2State) {
+     //   System.out.println("oa2StateInit");
+
         oa2State.setOa2se(getOa2se());
         oa2State.setTransaction(getTransaction());
         oa2State.setStrictACLs(isStrictACLs());
@@ -85,12 +107,24 @@ public class OA2State extends State {
         oa2State.setAclList(getAclList());
         oa2State.setAclBlackList(getAclBlackList());
         oa2State.setRequest(getRequest());
+        oa2State.setWorkspaceCommands(getWorkspaceCommands());
+/*
+        System.out.println(this);
+        if(getWorkspaceCommands() != null){
+            System.out.println(getWorkspaceCommands().getState().getSystemInfo().toJSON().toString(1));
+        }else{
+            System.out.println("getWorkspaceCommands() is null");
+        }
+*/
+
         return oa2State;
     }
 
     @Override
     public State newFunctionState() {
         OA2State oa2State = (OA2State) super.newFunctionState();
+  //      System.out.println("constructing OA2State 4");
+
         return oa2StateInit(oa2State);
     }
 
@@ -98,6 +132,7 @@ public class OA2State extends State {
     public State newCleanState() {
         // Note that clean state refers to the QDL state -- the OA2 service environment does not change!
         OA2State oa2State = (OA2State) super.newCleanState();
+   //     System.out.println("constructing OA2State 5");
         return oa2StateInit(oa2State);
     }
 
@@ -243,9 +278,22 @@ public class OA2State extends State {
                 isStrictACLs(),
                 getJsonWebKeys());
         return oa2StateInit(s);
-
     }
 
+    @Override
+    public String toString() {
+        return "OA2State{" +
+                "transaction=" + transaction +
+                ", oa2se=" + oa2se +
+                ", request=" + request +
+                ", jsonWebKeys=" + jsonWebKeys +
+                ", strictACLs=" + strictACLs +
+                ", aclList=" + aclList +
+                ", aclBlackList=" + aclBlackList +
+                ", txRecord=" + txRecord +
+                ", WS commands =" + getWorkspaceCommands() +
+                '}';
+    }
 
     @Override
     protected QDLStem addManifestConstants(String path) {

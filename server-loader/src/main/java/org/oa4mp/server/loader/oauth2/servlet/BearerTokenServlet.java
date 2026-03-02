@@ -13,7 +13,6 @@ import org.oa4mp.server.api.storage.servlet.OA4MPServlet;
 import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
 import org.oa4mp.server.loader.oauth2.storage.tx.TXRecord;
-import org.oa4mp.server.loader.oauth2.storage.vi.VirtualIssuer;
 
 import java.io.IOException;
 
@@ -109,6 +108,8 @@ public abstract class BearerTokenServlet extends OA4MPServlet {
 
            if(at.isJWT()){
 
+               JSONWebKeys keys = ((OA2SE) getServiceEnvironment()).getJsonWebKeys(transaction.getClient().getIdentifier());
+/* ∃
                JSONWebKeys keys = ((OA2SE) getServiceEnvironment()).getJsonWebKeys();
                VirtualIssuer vo = oa2SE.getVI(transaction.getClient().getIdentifier());
 
@@ -116,6 +117,7 @@ public abstract class BearerTokenServlet extends OA4MPServlet {
                     keys = vo.getJsonWebKeys();
                }
 
+*/
                try{
                     JWTUtil.verifyAndReadJWT(at.getToken(), keys);
                     // all we care about is that the right set of keys works for this.

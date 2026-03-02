@@ -52,7 +52,25 @@ CREATE TABLE oa4mp.clients (
 
 );
 
-
+CREATE TABLE oa4mp.tx_records
+(
+    audience        text,
+    description     text,
+    expires_at      bigint,
+    issued_at       bigint,
+    issuer          text,
+    lifetime        bigint,
+    parent_id       text,
+    resource        text,
+    scopes          text,
+    state           text,
+    stored_token    text,
+    token_id        VARCHAR(255) PRIMARY KEY,
+    token_type      text,
+    token           text,
+    valid           boolean,
+    INDEX parents (parent_id(255))
+);
 
 CREATE TABLE oa4mp.adminClients (
   admin_id     VARCHAR(255) PRIMARY KEY,
@@ -86,6 +104,25 @@ CREATE TABLE oa4mp.client_approvals (
   approval_ts TIMESTAMP DEFAULT NULL
 );
 
+CREATE TABLE oa4mp.key_records
+(
+    alg              VARCHAR(256),
+    creation_ts      timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    exp              BIGINT,
+    iat              BIGINT,
+    description      TEXT,
+    key_id           VARCHAR(256) PRIMARY KEY,
+    is_valid         BOOLEAN,
+    jwk              TEXT,
+    kid              VARCHAR(256) UNIQUE,
+    kty              VARCHAR(256),
+    last_modified_ts timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    nbf              BIGINT,
+    use              VARCHAR,
+    vi               VARCHAR(2048),
+    UNIQUE INDEX vi_uri (vi(512))
+);
+
 CREATE TABLE oa4mp.transactions (
   temp_token          VARCHAR(255) PRIMARY KEY,
   temp_token_valid    BOOLEAN,
@@ -111,6 +148,24 @@ CREATE TABLE oa4mp.transactions (
   UNIQUE INDEX refreshToken (refresh_token(255))
 );
 
+CREATE TABLE oa4mp.key_records
+(
+    alg              VARCHAR(256),
+    creation_ts      timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    exp              BIGINT,
+    iat              BIGINT,
+    description      TEXT,
+    key_id           VARCHAR(256) PRIMARY KEY,
+    is_valid         BOOLEAN,
+    jwk              TEXT,
+    kid              VARCHAR(256) ,
+    kty              VARCHAR(256),
+    last_modified_ts timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    nbf              BIGINT,
+    use              VARCHAR,
+    vi               VARCHAR(2048),
+    UNIQUE INDEX vi_uri (vi(512))
+);
 
 COMMIT;
 # Now to grant restricted access. The  tables have to exist before this step
@@ -120,5 +175,7 @@ GRANT ALL  ON oa4mp.clients TO 'oa4mp-server'@'localhost';
 GRANT ALL  ON oa4mp.adminClients TO 'oa4mp-server'@'localhost';
 GRANT ALL  ON oa4mp.transactions TO 'oa4mp-server'@'localhost';
 GRANT ALL  ON oa4mp.permissions TO 'oa4mp-server'@'localhost';
+GRANT ALL  ON oa4mp.tx_records TO 'oa4mp-server'@'localhost';
+GRANT ALL  ON oa4mp.key_records TO 'oa4mp-server'@'localhost';
 
 commit;

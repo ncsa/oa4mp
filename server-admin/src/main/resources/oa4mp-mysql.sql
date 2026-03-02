@@ -64,6 +64,27 @@ CREATE TABLE oa4mp.adminClients
     config           TEXT
 );
 
+CREATE TABLE key_records
+(
+    alg              VARCHAR(256),
+    creation_ts      timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    is_default       BOOLEAN,
+    exp              BIGINT,
+    iat              BIGINT,
+    description      TEXT,
+    key_id           VARCHAR(256) PRIMARY KEY,
+    is_valid         BOOLEAN,
+    jwk              TEXT,
+    kid              VARCHAR(256) UNIQUE,
+    kty              VARCHAR(256),
+    last_accessed    BIGINT,
+    last_modified_ts timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    nbf              BIGINT,
+    key_use          VARCHAR(256),
+    vi               VARCHAR(2048),
+    INDEX vi_uri (vi(512))
+);
+
 
 CREATE TABLE permissions
 (
@@ -111,7 +132,7 @@ CREATE TABLE oa4mp.transactions
     states                   TEXT,
     temp_token               VARCHAR(255) PRIMARY KEY,
     temp_token_valid         BOOLEAN,
-   user_code                 text,
+    user_code                text,
     username                 TEXT,
     validated_scopes         text,
     verifier_token           TEXT,
@@ -176,5 +197,6 @@ GRANT ALL ON oa4mp.transactions TO 'oa4mp-server'@'localhost';
 GRANT ALL ON oa4mp.permissions TO 'oa4mp-server'@'localhost';
 GRANT ALL ON oa4mp.tx_records TO 'oa4mp-server'@'localhost';
 GRANT ALL ON oa4mp.virtual_organizations TO 'oa4mp-server'@'localhost';
+GRANT ALL ON oa4mp.key_records TO 'oa4mp-server'@'localhost';
 
 commit;
