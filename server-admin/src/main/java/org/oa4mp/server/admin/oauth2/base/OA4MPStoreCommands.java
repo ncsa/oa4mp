@@ -176,9 +176,11 @@ rs show -range [2^2;2^3] -attr [client_id,creation_ts] X
             qdlStem =  o.asStem();
             // NCSA Sec Lib does not understand QDLValues. Have to convert
             // https://github.com/ncsa/oa4mp/issues/273
-            List<Long> outList = new ArrayList<>(qdlStem.getQDLList().size());
+            // https://github.com/ncsa/oa4mp/issues/289 -- Return string, not longs since these are the
+            // the keys of the formatted output.
+            List outList = new ArrayList<>(qdlStem.getQDLList().size());
             for(QDLValue qdlValue : qdlStem.getQDLList()) {
-                outList.add(qdlValue.asLong());
+                if(qdlValue.isString()) outList.add(qdlValue.asString());
             }
             return outList;
         } catch (Throwable e) {
