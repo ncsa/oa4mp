@@ -8,7 +8,9 @@ Test named configurations at
 Note that this runs in the post_auth phase only since
 the only place that there is a browser to redirect from
 is during the auth phase.
-Configurations for the client are either
+Configurations for the client pass in the names of groups to test or
+use the default of
+      CO:COU:UVic Staff:members:active.
 
 {"tokens": {
   "identity": {
@@ -20,13 +22,12 @@ Configurations for the client are either
   }
 }}
 
-which checks if the user is in the base group
+This is the default, which checks if the user is in the base group
       CO:COU:UVic Staff:members:active.
 
-Or the following,
-which may have another argument for an additional group(s)
-or list of them that this person must be
-a member of, in addition to the base group.
+Every user must be in this group, so it is always checked.
+
+Check for membership in the group CO:COU:CADC:members:active in addition to staff
 
 {"tokens": {
   "identity": {
@@ -40,7 +41,7 @@ a member of, in addition to the base group.
 }}
 
 
-// Arbutus team
+Arbutus team membership
 
 {"tokens": {
   "identity": {
@@ -52,6 +53,22 @@ a member of, in addition to the base group.
   "type": "identity"
   }
 }}
+
+ For UVic Staff, CADC Members, SRCnet Scientists, Arbutus National Team or SRCnet Scientists membership
+
+{"tokens": {
+  "identity": {
+    "qdl":  {
+     "load": "drac/v1/id-token.qdl",
+     "args":[ "CO:COU:CADC:members:active",
+              "CO:COU:ArbutusNT:members:active",
+              "CO:COU:SRCnet Scientists:members:active"],
+     "xmd": {"exec_phase": ["post_auth"]}
+    },
+  "type": "identity"
+  }
+}}
+
 
 N.B. No refresh tokens!
 */
@@ -83,4 +100,33 @@ trace(drac_cc,'result of user query =' + to_string(results.));
     * Membership in the group CO:COU:ArbutusNT:members:active is required in order for the flow to continue.
      * Users that are not in the group should be redirected to [https://object-arbutus.cloud.computecanada.ca/cilogon/error.html](https://object-arbutus.cloud.computecanada.ca/cilogon/error.html).
     * LDAP to Claim mapping for LDAP attribute isMemberOf to be added to OIDC claim name groups and multivalued
+
+
+============
+
+### UVic Staff, CADC Members, SRCnet Scientists, Arbutus National Team or SRCnet Scientists
+
+* Named configuration
+   * UVic Staff, CADC Members, Arbutus National Team or SRCnet Scientists
+* OIDC client ID on PROD is currently
+    * None
+* OIDC client ID on TEST is currently
+    * None
+* Policy:
+    * Use OIDC tokens.
+    * Refresh token is not required.
+    * Scopes required are openid, profile, email and org.cilogon.userinfo
+    * Need the LDAP to Claim mapping for the LDAP attribute isMemberOf to be put in the groups claim which is multivalued
+    * Membership in one of the groups
+
+      CO:COU:UVic Staff:members:active
+      CO:COU:CADC:members:active
+      CO:COU:ArbutusNT:members:active
+      CO:COU:SRCnet Scientists:members:active
+
+      is required in order for the flow to continue.
+    * Users that are not in the group should be redirected to [https://object-arbutus.cloud.computecanada.ca/cilogon/error.html](https://object-arbutus.cloud.computecanada.ca/cilogon/error.html).
+    * LDAP to Claim mapping for LDAP attribute isMemberOf to be added to OIDC claim name groups and multivalued
+
+
 */

@@ -19,10 +19,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 public class KESQLStore<V extends KERecord> extends SQLStore<V> implements KEStore<V> {
     public KESQLStore(ConnectionPool connectionPool, Table table, Provider<V> identifiableProvider, MapConverter<V> converter) {
@@ -74,7 +71,7 @@ public class KESQLStore<V extends KERecord> extends SQLStore<V> implements KESto
             releaseConnection(cr); // CIL-1833
             t = create();
             populate(map, t);
-          //  setJWKDatesFromKERecord(t);
+            //  setJWKDatesFromKERecord(t);
         } catch (SQLException e) {
             destroyConnection(cr);
             throw new GeneralException("Error getting object with identifier \"" + kid + "\"", e);
@@ -95,35 +92,45 @@ public class KESQLStore<V extends KERecord> extends SQLStore<V> implements KESto
 
     @Override
     public HashSet<String> getKIDs() {
-            HashSet<String> keys = new HashSet<>();
-            String query = "Select " + getKeys().kid() + " from " + getTable().getFQTablename();
-            ConnectionRecord cr = getConnection();
-            Connection c = cr.connection;
+        HashSet<String> keys = new HashSet<>();
+        String query = "Select " + getKeys().kid() + " from " + getTable().getFQTablename();
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
 
-            try {
-                PreparedStatement stmt = c.prepareStatement(query);
-                stmt.execute();
-                ResultSet rs = stmt.getResultSet();
-                // Figure out the type of argument. Can't do this in java without annoying reflection
-                while (rs.next()) {
-                    keys.add(rs.getString(1));
-                }
-                rs.close();
-                stmt.close();
-                releaseConnection(cr);
-
-            } catch (SQLException e) {
-                destroyConnection(cr);
-                throw new GeneralException("Error getting the user ids", e);
+        try {
+            PreparedStatement stmt = c.prepareStatement(query);
+            stmt.execute();
+            ResultSet rs = stmt.getResultSet();
+            // Figure out the type of argument. Can't do this in java without annoying reflection
+            while (rs.next()) {
+                keys.add(rs.getString(1));
             }
-            return keys;
+            rs.close();
+            stmt.close();
+            releaseConnection(cr);
+
+        } catch (SQLException e) {
+            destroyConnection(cr);
+            throw new GeneralException("Error getting the user ids", e);
+        }
+        return keys;
     }
 
     @Override
     public JSONWebKeys getCurrentKeys(VirtualIssuer vi) {
+        return (JSONWebKeys) getByVID(vi, true);
+    }
+
+    protected Map getByVID(VirtualIssuer vi, boolean keysOnly) {
         Identifier viID = OA2SE.SERVER_VI_ID; // default.
-        if(vi != null) viID = vi.getIdentifier();
-        JSONWebKeys jsonWebKeys = new JSONWebKeys(null);
+        if (vi != null) viID = vi.getIdentifier();
+        Map outMap = null;
+        JSONWebKeys jsonWebKeys = null;
+        if (keysOnly) {
+            jsonWebKeys = new JSONWebKeys(null);
+        } else {
+            outMap = new HashMap();
+        }
         String rawStatement = "SELECT * from " + getTable().getFQTablename() + " where " +
                 getKeys().vi() + "=? AND " +
                 getKeys().isValid() + "=1 AND " +
@@ -143,8 +150,12 @@ public class KESQLStore<V extends KERecord> extends SQLStore<V> implements KESto
                 ColumnMap map = rsToMap(rs);
                 t = create();
                 populate(map, t);
-                jsonWebKeys.put(t.toJWK());
-                if(t.getDefault()) jsonWebKeys.setDefaultKeyID(t.getKid());
+                if (keysOnly) {
+                    jsonWebKeys.put(t.toJWK());
+                    if (t.getDefault()) jsonWebKeys.setDefaultKeyID(t.getKid());
+                } else {
+                    outMap.put(t.getIdentifier(), t);
+                }
             }
 
             rs.close();
@@ -158,6 +169,13 @@ public class KESQLStore<V extends KERecord> extends SQLStore<V> implements KESto
         } catch (InvalidKeySpecException e) {
             throw new RuntimeException(e);
         }
+        if (keysOnly) return jsonWebKeys;
         return jsonWebKeys;
     }
+
+    @Override
+    public Map<Identifier, KERecord> getByVI(VirtualIssuer vi) {
+        return getByVID(vi, false);
+    }
+
 }

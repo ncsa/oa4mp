@@ -1,0 +1,85 @@
+/*
+* OIDC client ID on PROD is currently
+    *  [cilogon:/client_id/654fa4dbeb730a6f09920b5fe5230917]
+* OIDC client on TEST is currently
+    *  [cilogon:/client_id/5f302d02fa23ad43848a451d2bbdbf20]
+* Policy:
+    * Use OIDC tokens
+    * Refresh token is not required.
+    * Tokens can only be obtained by COPeople in group invenio-star-public-reader
+    * Access token can be just an opaque string.
+    * Audience for ID token should be set to OIDC client ID.
+    * ID token “sub” claim should be set to “sdccid” of logged in user. This number is currently provisioned
+      into the “voPersonID” field of LDAP.
+    * ID token claim “isMemberOf” should contain only a list of Registry groups that start with
+      string 'invenio-star' to which the logged in user belongs
+    * ID token claim "orcid" should contain the authenticated orcid of the user if present in COPerson profile.
+      This is currently provisioned into LDAP field eduPersonOrcid
+    * The following scopes are allowed openid, profile, email, org.cilogon.userinfo
+    * ID token “acr” claim should convey information from the IDP as to whether the user logged in
+      with Single Factor Authorization(SFA) or Multifactor Authorization(MFA)
+    * Users that are denied authorization at the issuer should be redirected to the help
+      page located at [https://www.sdcc.bnl.gov/registry-login-error.php](https://www.sdcc.bnl.gov/registry-login-error.php)
+        * The following get parameters should be sent
+            * error
+                * Same as would normally go to client callback uri
+            * error_description
+                * Same as would normally go to client callback uri
+            * serviceid
+                * “scdf-star”
+    * The allowed IDP list for this client should only include:
+        * https://idp.sdcc.bnl.gov/idp
+        * https://idp.bnl.gov/idp/shibboleth
+
+https://comanage-test.sdcc.bnl.gov/registry/oa4mp_client/oa4mp_client_co_named_configs/edit/12
+*/
+/*
+    Access token support for Jefferson Lab. Typical configuration for the client
+    is
+{"tokens":
+ {"identity":
+  {"qdl":  {
+   "load": "bnl/scdf-star/v1/id-token.qdl",
+   "xmd": {"exec_phase": ["post_auth"]}
+   },
+  "type": "identity"
+ }}}
+
+*/
+//script_load('bnl/acl.qdl');
+script_load('utils/init.qdl'); // set up stuff
+
+
+     DEBUG := true; // set false everywhere but on my test server.
+ // Robert Hancock's uid.
+  if [DEBUG]
+then [
+      claims.'eppn':='hancock@bnl.gov';
+      claims.'sub' := 'http://cilogon.org/serverA/users/1774626';
+     ];
+
+true ∉ (claims.'idp' ≡ ['https://idp.sdcc.bnl.gov/idp','https://idp.bnl.gov/idp/shibboleth'])
+   ⇒ err('invalid IDP', 'access_denied');
+
+user := claims.'sub';
+debugger(1,'BNL-SCDF-star: starting id-token for user =' + user);
+
+
+       γ := 'invenio-star-public-reader'; // head of list of groups. User ony needs to be in one.
+results. := script_load('bnl/scdf-star/v1/get-user.qdl', user); // user == claims.sub
+ debugger(1, 'BNL-SCDF-star: result of query =' + to_string(results.));
+
+  ∄results.'isMemberOf' // something went wrong, probably LDAP is down.
+     ⇒  err('no group memberships found.', 'access_denied');
+say(print(results.'isMemberOf'));
+  if [γ ∉ results.'isMemberOf']
+then [uri :='https://www.sdcc.bnl.gov/registry-login-error.php'+
+            '?error=access_denied' +
+            '&error_description=' + encode('user not in group',1) +
+            '&serviceid=scdf-star';
+    err_uri('user not in group',uri);
+    ];
+
+          claims.'sub' := results.'sdccid';
+          ∃results.'eduPersonOrcid' ⇒ claims.'orcid' := results.'eduPersonOrcid';
+   claims.'isMemberOf' := ~'invenio-star'<results.'isMemberOf' ⌆ results.'isMemberOf';

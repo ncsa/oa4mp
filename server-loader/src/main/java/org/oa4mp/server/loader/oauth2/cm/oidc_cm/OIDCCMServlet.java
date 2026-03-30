@@ -1666,6 +1666,9 @@ public class OIDCCMServlet extends EnvServlet {
             }
             if (jsonRequest.containsKey(clientKeys.ersatzInheritIDToken())) {
                 client.setErsatzInheritIDToken(jsonRequest.getBoolean(clientKeys.ersatzInheritIDToken()));
+            }else{
+                if(newClient )
+                    client.setErsatzInheritIDToken(true); // default on new clients
             }
             if (jsonRequest.containsKey(EA_SUPPORT)) {
                 client.setExtendedAttributeSupport(jsonRequest.getBoolean(EA_SUPPORT));

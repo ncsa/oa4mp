@@ -6,12 +6,15 @@ import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.storage.cli.FoundIdentifiables;
 import edu.uiuc.ncsa.security.util.cli.CLIDriver;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
+import edu.uiuc.ncsa.security.util.configuration.TimeUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import org.oa4mp.server.admin.oauth2.base.OA4MPStoreCommands;
 import org.oa4mp.server.loader.oauth2.OA2SE;
+import org.oa4mp.server.loader.oauth2.storage.keys.KEConfiguration;
 import org.oa4mp.server.loader.oauth2.storage.keys.KERecord;
 import org.oa4mp.server.loader.oauth2.storage.keys.KEStore;
+import org.oa4mp.server.loader.oauth2.storage.keys.KEStoreUtilities;
 import org.oa4mp.server.loader.oauth2.storage.vi.VIStore;
 import org.oa4mp.server.loader.oauth2.storage.vi.VirtualIssuer;
 
@@ -31,7 +34,7 @@ public class KeyCommands extends OA4MPStoreCommands {
     }
 
     @Override
-    public KEStore getStore() {
+    public KEStore<KERecord> getStore() {
         return getEnvironment().getKEStore();
     }
 
@@ -41,11 +44,11 @@ public class KeyCommands extends OA4MPStoreCommands {
         int width = 25; // long width, for ISO dates e.g.
         int s = 5; // short width
         String out = keRecord.getKid() +
-                " "+ LJustify(keRecord.getAlg(),s) +
-                " " + LJustify(keRecord.getUse(),s) +
+                " " + LJustify(keRecord.getAlg(), s) +
+                " " + LJustify(keRecord.getUse(), s) +
                 " " + keRecord.getValid() +
-          //      " " + center((keRecord.getNbf() == null?"--": Iso8601.date2String(keRecord.getNbf())),width) +
-                " " + center((keRecord.getExp()==null?"--":Iso8601.date2String(keRecord.getExp())),width) +
+                //      " " + center((keRecord.getNbf() == null?"--": Iso8601.date2String(keRecord.getNbf())),width) +
+                " " + center((keRecord.getExp() == null ? "--" : Iso8601.date2String(keRecord.getExp())), width) +
                 " " + keRecord.getVi() +
                 " " + keRecord.getIdentifierString();
         return out;
@@ -111,7 +114,7 @@ public class KeyCommands extends OA4MPStoreCommands {
                 }
                 try {
                     keRecord.fromJWK(jsonWebKey, vi.getDefaultKeyID().equals(kid));
-                    if(keRecord.getVi() == null || !keRecord.getVi().equals(vi.getIdentifier().getUri())){
+                    if (keRecord.getVi() == null || !keRecord.getVi().equals(vi.getIdentifier().getUri())) {
                         keRecord.setVi(vi.getIdentifier().getUri());// if its in the VI record, it's implicitly valid
                     }
                 } catch (Throwable e) {
@@ -139,10 +142,10 @@ public class KeyCommands extends OA4MPStoreCommands {
                 getEnvironment().getVIStore().update(updateVIRecords);
             }
         }
-        if(0 < newKERecords.size()) {
+        if (0 < newKERecords.size()) {
             getStore().putAll(newKERecords); // remember that putAll will update or create as needed.
         }
-        if(0 < updateKERecords.size()) {
+        if (0 < updateKERecords.size()) {
             getStore().update(updateKERecords);
         }
         return ignoredVIRecords;
@@ -192,10 +195,14 @@ public class KeyCommands extends OA4MPStoreCommands {
             return;
         }
         FoundIdentifiables foundIdentifiables = null;
-        if (inputLine.hasArgs()) {
-            foundIdentifiables = findByIDOrRS(viStore, inputLine.getLastArg());
+        if (migrateAll) {
+            migrate(null, cleanupMigrated);
+        } else {
+            if (inputLine.hasArgs()) {
+                foundIdentifiables = findByIDOrRS(viStore, inputLine.getLastArg());
+            }
+            migrate(foundIdentifiables, cleanupMigrated);
         }
-        migrate(foundIdentifiables, cleanupMigrated);
         Map<Identifier, KERecord> newRecords = new HashMap<>();
         // case 1, do explicitly requested migration
         if (foundIdentifiables != null && !foundIdentifiables.isEmpty()) {
@@ -227,33 +234,116 @@ public class KeyCommands extends OA4MPStoreCommands {
             return;
         }
     }
+
     public static final String SET_NBF = "-nbf";
     public static final String SET_IAT = "-iat";
     public static final String SET_EXP = "-exp";
+
     public void set(InputLine inputLine) throws Throwable {
-        if(showHelp(inputLine)){
+        if (showHelp(inputLine)) {
             say("set " + SET_IAT + " | " + SET_NBF + " | " + SET_EXP + " index - set the iat, nbf, or exp fields");
             say("You may set these with ISO 8601 dates or integers (as seconds since epoch)");
             return;
         }
     }
+
     public void get_current(InputLine inputLine) throws Throwable {
-        if(showHelp(inputLine)){
+        if (showHelp(inputLine)) {
             say("get_current index - get the current values for the given key");
             return;
         }
         VIStore viStore = getEnvironment().getVIStore();
 
         FoundIdentifiables foundIdentifiables = findByIDOrRS(viStore, inputLine.getLastArg());
-        if(foundIdentifiables == null || foundIdentifiables.isEmpty()){
+        if (foundIdentifiables == null || foundIdentifiables.isEmpty()) {
             say("no VIs found");
             return;
         }
-        for(Identifiable identifiable : foundIdentifiables){
+        for (Identifiable identifiable : foundIdentifiables) {
             VirtualIssuer vi = (VirtualIssuer) identifiable;
             say(getStore().getCurrentKeys(vi).toString());
         }
 
+    }
+
+    public static String KR_ALL = "-all";
+    public static String KR_KID = "-kid";
+    public static String KR_CACHE_LIFETIME = "-cache";
+    public static String KR_AT_LIFETIME = "-at";
+
+    protected void rotateHelp(InputLine inputLine) {
+        say("rotate [" + KR_ALL + " | " + KR_KID + " id " +
+                KR_CACHE_LIFETIME + " cache_lifetime " +
+                KR_AT_LIFETIME + "access_token_lifetime | index] - rotate the key at the given index");
+        say("This will rotate the key(s) either per VI's policy or you may directly set the lifetimes");
+        say("Setting at least one of " + KR_CACHE_LIFETIME + " or " + KR_AT_LIFETIME + " will override the policy");
+        say("These accept lifetime in seconds (default) or with units, e.g. " + KR_AT_LIFETIME + "\"25 min\" (note the quotes!)");
+    }
+
+    public void rotate(InputLine inputLine) throws Throwable {
+        if (showHelp(inputLine)) {
+            rotateHelp(inputLine);
+            return;
+        }
+        Long cacheLifetime = null;
+        Long atLifetime = null;
+        boolean overrideKEC = false;
+        if (inputLine.hasArg(KR_CACHE_LIFETIME)) {
+            cacheLifetime = TimeUtil.getValueSecsOrMillis(inputLine.getNextArgFor(KR_CACHE_LIFETIME), true);
+            inputLine.removeSwitchAndValue(KR_CACHE_LIFETIME);
+            overrideKEC = true;
+        }
+        if (inputLine.hasArg(KR_AT_LIFETIME)) {
+            atLifetime = TimeUtil.getValueSecsOrMillis(inputLine.getNextArgFor(KR_AT_LIFETIME), true);
+            inputLine.removeSwitchAndValue(KR_AT_LIFETIME);
+            overrideKEC = true;
+        }
+        boolean doKID = inputLine.hasArg("-kid");
+        if (doKID) {
+            String kid = inputLine.getNextArgFor("-kid");
+            inputLine.removeSwitchAndValue("-kid");
+            KERecord keRecord = getEnvironment().getKEStore().getByKID(kid);
+            if (keRecord != null) {
+                // get the policy.
+                VirtualIssuer vi = (VirtualIssuer) getEnvironment().getVIStore().get(keRecord.getVi());
+                if (!overrideKEC) {
+                    KEConfiguration keConfiguration = KEStoreUtilities.resolveKeConfiguration(getEnvironment(), vi);
+                    if (!keConfiguration.enabled) {
+                        return;
+                    }
+                    if (cacheLifetime != null) cacheLifetime = keConfiguration.cacheGracePeriod;
+                    if (atLifetime != null) atLifetime = keConfiguration.atGracePeriod;
+                }
+                KERecord newRecord = KEStoreUtilities.rotate(getEnvironment().getKEStore(), keRecord, cacheLifetime, atLifetime);
+                newRecord.setValid(true);
+                getEnvironment().getKEStore().update(keRecord);
+                getEnvironment().getKEStore().save(newRecord);
+                say("rotated key, kid= " + newRecord.getKid());
+                return;
+            }
+        }
+
+        FoundIdentifiables foundIdentifiables = findByIDOrRS(getStore(), inputLine.getLastArg()); // See if they are getting KErecords
+        if (foundIdentifiables != null && !foundIdentifiables.isEmpty()) {
+
+            // there are found identifiables in the key store.
+            Map<Identifier, KERecord> keRecords = new HashMap<>(foundIdentifiables.size());
+            for (Identifiable identifiable : foundIdentifiables) {
+                KERecord keRecord = (KERecord) identifiable;
+                keRecords.put(keRecord.getIdentifier(), keRecord);
+            }
+            Map<Identifier, KERecord> newRecords = KEStoreUtilities.rotate(getStore(), keRecords, cacheLifetime, atLifetime);
+            say("rotated " + newRecords.size() + " keys");
+            return;
+        }
+        // try finding VIs
+        VIStore viStore = getEnvironment().getVIStore();
+        foundIdentifiables = findByIDOrRS(viStore, inputLine.getLastArg());
+        if (foundIdentifiables == null || foundIdentifiables.isEmpty()) {
+            say("no Key entries or VIs found");
+            return;
+        }
+        KEStoreUtilities.rotate(getEnvironment(), foundIdentifiables.getIdentifiers(), false);
     }
 }
 

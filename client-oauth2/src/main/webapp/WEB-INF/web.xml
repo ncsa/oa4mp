@@ -5,7 +5,7 @@
                   http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
          version="2.5">
 
-    <display-name>OAuth for MyProxy Client</display-name>
+    <display-name>OA4MP Client</display-name>
     <!--what gets put in the browser's title bar -->
 
 

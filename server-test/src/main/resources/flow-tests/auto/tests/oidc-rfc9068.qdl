@@ -10,16 +10,30 @@ params. ≔ {'sub':'davenport',
            'resource':'foo:/bar/baz', // NOTE cannot set resource here, since RFC states to use that for the audience.
            'id_token':{'a':'b','c':'d'}
            };
+
+
+
 // another test should be to send the resource parameter which comes back as the access token audience.
 test_id:= 'oidc.rfc9068.qdl';
 // set up the client
 clc#init($$OA4MP_CLC_INI, test_id);
-refresh_params.'refresh' :=  {'scope': 'storage.read:/home/davenport/vo3 compute.create storage.modify:/public/pendav/vo3 storage.modify:/public/davenport/vo3',
-                              'resource':'foo:/bar/baz'};
-refresh_params.'exchange' :=  {'scope': 'storage.read:/home/davenport/vo3 compute.create storage.modify:/public/pendav/vo3 storage.modify:/public/davenport/vo3'};
+initialization := size(args())==1⇒args().0:import(load('test#/auto/utils/initialization.mdl'));
+/*
+   Next is to test part CIL-1637, key rotation. It just uses different keys per request.
+*/
+kid. := initialization#get_key_ids();
+           key_xa ≔ 'oa4mp:/jwt/signing/keyID'; // extended attribute to store the key id
+cert_count ≔ size(kid.);
+         i ≔ 0;
+
+refresh_params.'refresh'  ≔  {'scope': 'storage.read:/home/davenport/vo3 compute.create storage.modify:/public/pendav/vo3 storage.modify:/public/davenport/vo3',
+                              'resource':'foo:/bar/baz', key_xa : kid.mod(i++, cert_count)};
+refresh_params.'exchange' ≔  {'scope': 'storage.read:/home/davenport/vo3 compute.create storage.modify:/public/pendav/vo3 storage.modify:/public/davenport/vo3',
+                              key_xa : kid.mod(i++, cert_count)};
+   refresh_params.'token'  ≔ {key_xa : kid.mod(i++, cert_count)};
 clc#set_param(refresh_params.);
 
-initialization := size(args())==1⇒args().0:import(load('test#/auto/utils/initialization.mdl'));
+
 checks:=initialization#checks();
 ini.:=initialization#get_client_ini(test_id);
 server_defaults.:=initialization# server_defaults();

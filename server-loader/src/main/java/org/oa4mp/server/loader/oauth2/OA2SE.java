@@ -33,6 +33,8 @@ import org.oa4mp.server.loader.oauth2.cm.CMConfigs;
 import org.oa4mp.server.loader.oauth2.loader.OA2CFConfigurationLoader;
 import org.oa4mp.server.loader.oauth2.servlet.DIServiceConfig;
 import org.oa4mp.server.loader.oauth2.servlet.RFC8628ServletConfig;
+import org.oa4mp.server.loader.oauth2.storage.keys.KEConfiguration;
+import org.oa4mp.server.loader.oauth2.storage.keys.KERecord;
 import org.oa4mp.server.loader.oauth2.storage.keys.KEStore;
 import org.oa4mp.server.loader.oauth2.storage.tx.TXStore;
 import org.oa4mp.server.loader.oauth2.storage.vi.VIStore;
@@ -115,7 +117,8 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  boolean clientCredentialFlowEnabled,
                  MetaDebugUtil debugger,
                  boolean allowPromptNone,
-                 DIServiceConfig DIServiceConfig) {
+                 DIServiceConfig DIServiceConfig,
+                 KEConfiguration keConfiguration) {
 
         super(logger,
            //     mfp,
@@ -198,8 +201,18 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.monitorEnabled = isMonitorEnabled;
         this.cleanupFailOnErrors = cleanupFailOnErrors;
         this.DIServiceConfig = DIServiceConfig;
+        this.keConfiguration = keConfiguration;
     }
 
+    public KEConfiguration getKeConfiguration() {
+        return keConfiguration;
+    }
+
+    public void setKeConfiguration(KEConfiguration keConfiguration) {
+        this.keConfiguration = keConfiguration;
+    }
+
+    protected KEConfiguration keConfiguration;
     public boolean isCleanupFailOnErrors() {
         return cleanupFailOnErrors;
     }
@@ -333,15 +346,15 @@ public class OA2SE extends ServiceEnvironmentImpl {
 
     long maxRTLifetime = -1L;
 
-    public KEStore getKEStore() {
+    public KEStore<KERecord> getKEStore() {
         return keStore;
     }
 
-    public void setKEStore(KEStore keStore) {
+    public void setKEStore(KEStore<KERecord> keStore) {
         this.keStore = keStore;
     }
 
-    KEStore keStore;
+    KEStore<KERecord> keStore;
     VIStore VIStore;
 
     public VIStore getVIStore() {

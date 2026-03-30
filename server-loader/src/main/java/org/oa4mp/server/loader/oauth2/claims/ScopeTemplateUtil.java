@@ -127,11 +127,13 @@ public class ScopeTemplateUtil {
                 }
             }
             URI r = URI.create(requestedScope);
+            r = r.normalize();
             if (!r.isAbsolute() || r.getFragment() != null) {
                 return null;
             }
 
             URI c = URI.create(computedScope);
+            c = c.normalize();
             if (!c.isAbsolute() || c.getFragment() != null) {
                 return null;
             }

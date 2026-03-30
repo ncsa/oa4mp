@@ -11,5 +11,20 @@
  }
 
 */
+debugger(1);
+caput := '***FNAL cc: ';
+say(audience.);
+say(tx_audience.);
+say(resource.);
+say(tx_resource.);
+a. := (0≡size(tx_audience.)) ⇒ audience.:tx_audience.;
+r. := (0≡size(tx_resource.)) ⇒ resource.:tx_resource.;
+a. := a.~ r.;
+debugger(1, caput+'aud ~ resource=' + print(a.));
+if[ 0 < size(a.)]
+then[
+   access_token.'aud' := (1 ≡ size(a.) ⇒  a.0 : a.)  ;
+   ];
 access_token.'sub' := access_control.'client_id';
-access_token.'scope' := ['NONE'];
+access_token.'scope' := 'NONE';
+debugger(1, caput+'at=' + print(access_token.));

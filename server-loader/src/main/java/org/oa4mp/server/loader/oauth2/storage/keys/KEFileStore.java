@@ -2,6 +2,8 @@ package org.oa4mp.server.loader.oauth2.storage.keys;
 
 
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
+import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.storage.FileStore;
 import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
@@ -11,6 +13,7 @@ import org.oa4mp.server.loader.oauth2.storage.vi.VirtualIssuer;
 import java.io.File;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 public class KEFileStore<V extends KERecord> extends FileStore<V> implements KEStore<V> {
     public KEFileStore(File storeDirectory, File indexDirectory, IdentifiableProvider<V> identifiableProvider, MapConverter<V> converter, boolean removeEmptyFiles, boolean removeFailedFiles) {
@@ -44,5 +47,9 @@ public class KEFileStore<V extends KERecord> extends FileStore<V> implements KES
     @Override
     public JSONWebKeys getCurrentKeys(VirtualIssuer vi) {
         return null;
+    }
+    @Override
+    public Map<Identifier, KERecord> getByVI(VirtualIssuer vi) {
+        throw new NotImplementedException();
     }
 }

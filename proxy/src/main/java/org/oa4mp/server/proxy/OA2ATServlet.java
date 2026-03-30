@@ -252,6 +252,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
      * @throws Throwable
      */
     protected void doRFC6749_4_4(HttpServletRequest request, HttpServletResponse response, OA2Client client) throws Throwable {
+     //   ServletDebugUtil.printAllParameters(getClass(), request, true);
         String state = getFirstParameterValue(request, STATE);
         String nonce = getFirstParameterValue(request, NONCE);
         OA2ServiceTransaction serviceTransaction = (OA2ServiceTransaction) getOA2SE().getTransactionStore().create();
@@ -710,6 +711,12 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         writeATResponse(response, issuerTransactionState);
     }
 
+    /**
+     * Extract either a singleton or JSON array and returns an array of strings.
+     * @param jsonRequest
+     * @param key
+     * @return
+     */
     private static String[] extractArray(JSONObject jsonRequest, String key) {
         String[] raw;
         if (jsonRequest.containsKey(key)) {
@@ -1534,16 +1541,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         XMLMap tBackup = GenericStoreUtils.toXML(getTransactionStore(), t);
         OA2ServletUtils.processXAs(request, t, client);
         findSigningKey(request, t);
-/*
-        if (client.hasExtendedAttributeSupport()) {
-            ExtendedParameters xp = new ExtendedParameters();
-            // Take the parameters and parse them into configuration objects,
-            JSONObject extAttr = xp.snoopParameters(request.getParameterMap());
-            if (extAttr != null && !extAttr.isEmpty()) {
-                t.setExtendedAttributes(extAttr);
-            }
-        }
-*/
+
         // In practice exactly one of these is active at any given time
         TXRecord newIDTX = null;
         TXRecord newATTX = null;
@@ -1869,6 +1867,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
 
     @Override
     protected void doIt(HttpServletRequest request, HttpServletResponse response) throws Throwable {
+        ServletDebugUtil.printAllParameters(getClass(), request, true);
         String grantType = getFirstParameterValue(request, OA2Constants.GRANT_TYPE);
         if (isEmpty(grantType)) {
             warn("Error servicing request. No grant type was given. Rejecting request.");

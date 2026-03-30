@@ -1,0 +1,49 @@
+/*
+   This finds the free tier clients by looking for the administered ones and removing those from
+   the list of clients.
+
+   Also saved on TEST in the workspace free-tier at
+   /var/local/cilogon_service/oa4mp-server/work/free-tier.ws
+
+   Buffer 0 connects to database,
+   Buffer 1 is rest of script.
+   Run 0, then 1 as needed.
+*/
+db := j_load('db');
+
+/*
+╔════════════════════════════════════╗
+║NEED cfg. for conneciton parameters!║
+╚════════════════════════════════════╝
+*/
+
+db#connect(cfg.);
+say(db#read('select count(*) from ' + cfg.schema + '.clients'));
+
+// get the clients and only those that have been accessed within the last year.
+
+a. ≔ db#read('select client_id from permissions where admin_id is NOT NULL');
+k. ≔ db#read('select client_id,name,home_url, email,last_accessed from clients where last_accessed is NOT NULL AND ' + (date_ms() - 24×365.25×3600×1000) + ' < last_accessed ');
+m. ≔ (k\*\client_id ∉ a\*\client_id); // bit mask for clients not administered.
+ft. :=date_iso(~m.⌆k.) ;              // free tier, Dates in ISO 8601 format
+csv(x)→encode(x, 140);                // CSV escape each term
+out. := n(size(ft.) + 1, [' ']);      // allocate space
+kk. := keys(ft.0);                    // get column names
+out.0 :=  kk.'name'+ ',' +            // set CSV header
+          kk.'email' + ',' +
+          kk.'home_url' + ',' +
+          kk.'last_accessed' + ',' +
+          kk.'client_id';
+i := 1;
+
+while[l. ∈ ft.]
+   do[
+      try[
+        // convert every term to CSV format.
+        out.(i++) := detokenize(@csv∀[[l.'name',l.'email',l.'home_url', l.'last_accessed',l.'client_id']], ',');
+      ]catch[
+        say(error_message + ':'  + to_string(l.));
+      ];
+     ]; //end while
+
+     file_write('/tmp/free-tier.csv', out.);

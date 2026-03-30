@@ -61,4 +61,26 @@ module['oa4mp:/auto-test/init']
       ];
       get_client_config(test_id)->script_run('test#/auto/utils/get_client.qdl',get_client_ini(test_id).'id');
 
+/*
+    Get the keys from the localhost server for the default testing VI.
+*/
+   get_key_ids()->return(get_key_ids('oa4mp_test'));
+
+   /*
+      Get the key ids for the given vi.
+   */
+   get_key_ids(vi)->
+   block[
+              http ≔ j_load('http');
+               host ≔ 'https://localhost:9443';
+             key_xa ≔ 'oa4mp:/jwt/signing/keyID'; // extended attribute to store the key id
+  http#host(host);
+  http#open(true); // allow self-signed certs
+           jwks_uri ≔ http#get('oauth2/.well-known/openid-configuration/' + vi).'content'.'jwks_uri';
+               kid. ≔ http#get(jwks_uri-host)\content\keys\*\kid; // kid. now has all the ids of the certs
+                ⊨ 0 ≠ (cert_count ≔ size(kid.)) : 'no certs found';
+                return(kid.);
+                ]; // end block
+
+
   ]; // end module

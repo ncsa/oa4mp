@@ -148,7 +148,34 @@ testing immediately.
 ]]>
     </body>
     </entry>
+    <entry id="keyRotationEnabled">
+        <body>
+            <![CDATA[Property: Boolean
+Enable or disable key rotation for this virtual issuer.]]>
+        </body>
+    </entry>
+    <entry id="keyRotationCacheGracePeriod">
+        <body>
+            <![CDATA[Property: Integer
+The length of time in milliseconds that the cache(s) retain the old key. While
+systems should retrieve keys with each JWT verification, many clients cache the keys
+for 24 hours or more. When rotating keys, this is used to compute the not valid before
+property of the key to allow caches to update. Note that you may enter this as a string
+with units, e.g. 1 day, 12 hrs., etc. or as an integer in milliseconds.
 
+The default is 24 hours.]]>
+        </body>
+    </entry>
+    <entry id="keyRotationATGracePeriod">
+        <body>
+            <![CDATA[Property: Integer
+The length of time that access tokens are valid. This is used for computing the earliest
+valid time for a new key. This is stored as an integer, but may be entered as a string with
+units.
+
+The default is the maximum server access token lifetime.]]>
+        </body>
+    </entry>
 </html>
     <!--
 oa2>use vi

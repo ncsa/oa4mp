@@ -30,6 +30,8 @@ r. := http#get({'client_id':ersatz_id});
 ⊨ r.'content'.'ersatz_client' : 'wrong ersatz_client assertion';
 ⊨ ∃r.'content'.'org.oa4mp:/ersatz/provisioners' : 'missing provisioners assertion';
 ⊨ r.'content'.'org.oa4mp:/ersatz/provisioners' ≡ provisioner_id : 'wrong provisioners id';
+⊨ ∃r.'content'.'ersatz_inherit_id_token' : 'missing ersatz_inherit_id_token assertion';
+⊨ r.'content'.'ersatz_inherit_id_token' : 'wrong ersatz_inherit_id_token assertion';
 
 r. := http#delete({'client_id':provisioner_id});
 r. := http#delete({'client_id':ersatz_id});

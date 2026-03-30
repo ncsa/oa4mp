@@ -50,6 +50,34 @@ public class VirtualIssuer extends Monitored {
     String title;
     boolean valid = true;
 
+    public long getCacheGracePeriod() {
+        return cacheGracePeriod;
+    }
+
+    public void setCacheGracePeriod(long cacheGracePeriod) {
+        this.cacheGracePeriod = cacheGracePeriod;
+    }
+
+    public long getAtGracePeriod() {
+        return atGracePeriod;
+    }
+
+    public void setAtGracePeriod(long atGracePeriod) {
+        this.atGracePeriod = atGracePeriod;
+    }
+
+    public boolean isKeyRotationEnabled() {
+        return keyRotationEnabled;
+    }
+
+    public void setKeyRotationEnabled(boolean keyRotationEnabled) {
+        this.keyRotationEnabled = keyRotationEnabled;
+    }
+
+    long cacheGracePeriod = -1L;
+    long atGracePeriod = -1L;
+    boolean keyRotationEnabled = false;
+
 
     public boolean isValid() {
         return valid;

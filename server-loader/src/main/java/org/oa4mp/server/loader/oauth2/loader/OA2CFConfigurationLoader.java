@@ -167,6 +167,8 @@ public class OA2CFConfigurationLoader<T extends ServiceEnvironmentImpl> extends 
     public static long REFRESH_TOKEN_GRACE_PERIOD_USE_SERVER_DEFAULT = -2L;
     public static long REFRESH_TOKEN_GRACE_PERIOD_NOT_CONFIGURED = -3L;
 
+    public static long KEY_ROTATION_GRACE_PERIOD_DISABLED = -1L;
+
     //This is divisible by 3 and greater than 256,
     // so when it is base64 encoded there will be no extra characters:
     public static int CLIENT_SECRET_LENGTH_DEFAULT = 258;
@@ -183,7 +185,7 @@ public class OA2CFConfigurationLoader<T extends ServiceEnvironmentImpl> extends 
         super(node);
     }
 
-    public OA2CFConfigurationLoader(CFNode  node, MyLoggingFacade logger) {
+    public OA2CFConfigurationLoader(CFNode node, MyLoggingFacade logger) {
         super(node, logger);
     }
 
@@ -208,7 +210,7 @@ public class OA2CFConfigurationLoader<T extends ServiceEnvironmentImpl> extends 
                     getRTLifetime(),
                     getMaxRTLifetime(),
                     getClientApprovalStoreProvider(),
-                 //   getMyProxyFacadeProvider(),
+                    //   getMyProxyFacadeProvider(),
                     getMailUtilProvider(),
                     getMP(),
                     getAGIProvider(),
@@ -255,7 +257,8 @@ public class OA2CFConfigurationLoader<T extends ServiceEnvironmentImpl> extends 
                     isCCFEnabled(),
                     getDebugger(),
                     isAllowPromptNone(),
-                    getDISerivceConfig()
+                    getDISerivceConfig(),
+                    getKEConfiguration()
             );
 
             if (getClaimSource() instanceof BasicClaimsSourceImpl) {
@@ -279,7 +282,7 @@ public class OA2CFConfigurationLoader<T extends ServiceEnvironmentImpl> extends 
      * @param tag
      * @return
      */
-    public Collection<LocalTime> getAlarms( CFNode node, String tag) {
+    public Collection<LocalTime> getAlarms(CFNode node, String tag) {
         return UpkeepConfigUtils.getAlarms(node, tag);
     }
 
@@ -296,7 +299,6 @@ public class OA2CFConfigurationLoader<T extends ServiceEnvironmentImpl> extends 
     }
 
 
-
     public Collection<LocalTime> getMonitorAlarms() {
         if (monitorAlarms == null) {
             monitorAlarms = getAlarms(MONITOR_ALARMS);
@@ -309,6 +311,43 @@ public class OA2CFConfigurationLoader<T extends ServiceEnvironmentImpl> extends 
             cleanupAlarms = getAlarms(CLEANUP_ALARMS_TAG);
         }
         return cleanupAlarms;
+    }
+
+    KEConfiguration keConfiguration = null;
+/*   Typical config file entry:
+     <keyRotation enabled="true" allowOverride="true" cacheGracePeriod="24 hr" atGracePeriod="6 hr"/>
+ */
+    public KEConfiguration getKEConfiguration() {
+        if (keConfiguration == null) {
+            keConfiguration = new KEConfiguration();
+            List<CFNode> kids = cn.getChildren(OA4MPConfigTags.KEY_ROTATION_TAG);
+
+            if (!kids.isEmpty()) {
+                CFNode sn = kids.get(0);
+                String x = sn.getFirstAttribute(OA4MPConfigTags.KEY_ROTATION_ENABLED);
+                if (isTrivial(x)) {
+                    keConfiguration.enabled = false; // default is disable
+                } else {
+                    keConfiguration.enabled = Boolean.parseBoolean(x);
+                }
+                x = sn.getFirstAttribute(OA4MPConfigTags.KEY_ROTATION_ALLOW_OVERRIDE);
+                if (isTrivial(x)) {
+                    keConfiguration.allowOverride = true; // default is true
+                } else {
+                    keConfiguration.allowOverride = Boolean.parseBoolean(x);
+                }
+
+                x = sn.getFirstAttribute(OA4MPConfigTags.KEY_ROTATION_CACHE_GRACE_PERIOD);
+                if (!isTrivial(x)) {
+                    keConfiguration.cacheGracePeriod = TimeUtil.getValueSecsOrMillis(x, true);
+                }
+                x = sn.getFirstAttribute(OA4MPConfigTags.KEY_ROTATION_AT_GRACE_PERIOD);
+                if (!isTrivial(x)) {
+                    keConfiguration.atGracePeriod = TimeUtil.getValueSecsOrMillis(x, true);
+                }
+            }
+        }
+        return keConfiguration;
     }
 
     public RFC8628ServletConfig getRFC8628ServletConfig() {
@@ -325,17 +364,17 @@ public class OA2CFConfigurationLoader<T extends ServiceEnvironmentImpl> extends 
             if (!kids.isEmpty()) {
                 // empty means either they have an empty entry or that they have no entry.
                 rfc8628Enabled = Boolean.TRUE; // if they supply this, then
-                 CFNode sn =  kids.get(0);
-                String x = sn.getFirstAttribute( OA4MPConfigTags.DEVICE_FLOW_SERVLET_URI);
+                CFNode sn = kids.get(0);
+                String x = sn.getFirstAttribute(OA4MPConfigTags.DEVICE_FLOW_SERVLET_URI);
                 if (!StringUtils.isTrivial(x)) {
                     rfc8628ServletConfig.deviceEndpoint = x;
                 }
 
-                x = sn.getFirstAttribute( OA4MPConfigTags.DEVICE_FLOW_AUTHORIZATION_URI);
+                x = sn.getFirstAttribute(OA4MPConfigTags.DEVICE_FLOW_AUTHORIZATION_URI);
                 if (!StringUtils.isTrivial(x)) {
                     rfc8628ServletConfig.deviceAuthorizationEndpoint = x;
                 }
-                x = sn.getFirstAttribute( OA4MPConfigTags.DEVICE_FLOW_LIFETIME);
+                x = sn.getFirstAttribute(OA4MPConfigTags.DEVICE_FLOW_LIFETIME);
                 if (!isTrivial(x)) {
                     try {
                         rfc8628ServletConfig.lifetime = TimeUtil.getValueSecsOrMillis(x, true);
@@ -343,7 +382,7 @@ public class OA2CFConfigurationLoader<T extends ServiceEnvironmentImpl> extends 
 
                     }
                 }
-                x = sn.getFirstAttribute( OA4MPConfigTags.DEVICE_FLOW_INTERVAL);
+                x = sn.getFirstAttribute(OA4MPConfigTags.DEVICE_FLOW_INTERVAL);
                 if (!StringUtils.isTrivial(x)) {
                     try {
                         rfc8628ServletConfig.interval = TimeUtil.getValueSecsOrMillis(x, true);
@@ -351,24 +390,24 @@ public class OA2CFConfigurationLoader<T extends ServiceEnvironmentImpl> extends 
                         // do nothing. Default is set in servlet config.
                     }
                 }
-                x = sn.getFirstAttribute( OA4MPConfigTags.DEVICE_FLOW_USER_CODE_LENGTH);
+                x = sn.getFirstAttribute(OA4MPConfigTags.DEVICE_FLOW_USER_CODE_LENGTH);
                 if (!StringUtils.isTrivial(x)) {
                     try {
                         rfc8628ServletConfig.userCodeLength = Integer.parseInt(x);
                     } catch (NumberFormatException nfx) {
                     }
                 }
-                String separator = sn.getFirstAttribute( OA4MPConfigTags.DEVICE_FLOW_CODE_SEPARATOR);
+                String separator = sn.getFirstAttribute(OA4MPConfigTags.DEVICE_FLOW_CODE_SEPARATOR);
                 if (!StringUtils.isTrivial(separator)) {
                     rfc8628ServletConfig.userCodeSeperator = separator;
                 }
 
-                String codeChars = sn.getFirstAttribute( OA4MPConfigTags.DEVICE_FLOW_CODE_CHARS);
+                String codeChars = sn.getFirstAttribute(OA4MPConfigTags.DEVICE_FLOW_CODE_CHARS);
                 if (!StringUtils.isTrivial(codeChars)) {
                     rfc8628ServletConfig.codeChars = codeChars.toCharArray();
                 }
 
-                x = sn.getFirstAttribute( OA4MPConfigTags.DEVICE_FLOW_CODE_PERIOD_LENGTH);
+                x = sn.getFirstAttribute(OA4MPConfigTags.DEVICE_FLOW_CODE_PERIOD_LENGTH);
                 if (!StringUtils.isTrivial(x)) {
                     try {
                         rfc8628ServletConfig.userCodePeriodLength = Integer.parseInt(x);
@@ -383,18 +422,18 @@ public class OA2CFConfigurationLoader<T extends ServiceEnvironmentImpl> extends 
 
 
     protected OA2QDLEnvironment getQDLEnvironment() {
-        List< CFNode> kids = cn.getChildren(QDLConfigurationConstants.CONFIG_TAG_NAME);
-         CFNode node = null;
+        List<CFNode> kids = cn.getChildren(QDLConfigurationConstants.CONFIG_TAG_NAME);
+        CFNode node = null;
         if (kids.size() == 1) {
             node = kids.get(0);
-            String x = node.getFirstAttribute( QDLConfigurationConstants.CONFG_ATTR_NAME);
+            String x = node.getFirstAttribute(QDLConfigurationConstants.CONFG_ATTR_NAME);
             if (!getQdlConfigurationName().equals(x)) {
                 DebugUtil.trace(this, "note that a default QDL configuration of " + getQdlConfigurationName() +
                         " was specified, but the actual name of the only configuration was \"" + "\", which was loaded.");
             }
         } else {
             // hunt for the default named node.
-            for ( CFNode tempNode : kids) {
+            for (CFNode tempNode : kids) {
                 String x = tempNode.getFirstAttribute(QDLConfigurationConstants.CONFG_ATTR_NAME);
                 if (getQdlConfigurationName().equals(x)) {
                     node = tempNode;
@@ -407,7 +446,7 @@ public class OA2CFConfigurationLoader<T extends ServiceEnvironmentImpl> extends 
         }
         // Note that the first argument is the name fo the file. In server mode this won't be available anyway
         // and is optional.
-        String x = node.getFirstAttribute( STRICT_ACLS);
+        String x = node.getFirstAttribute(STRICT_ACLS);
         if (!isTrivial(x)) {
             try {
                 qdlStrictACLS = Boolean.parseBoolean(x);
@@ -423,7 +462,7 @@ public class OA2CFConfigurationLoader<T extends ServiceEnvironmentImpl> extends 
 
     public String isNotifyACEventEmailAddresses() {
         if (notifyACEventEmailAddresses == null) {
-            notifyACEventEmailAddresses = cn.getFirstAttribute( NOTIFY_ADMIN_CLIENT_ADDRESSES);
+            notifyACEventEmailAddresses = cn.getFirstAttribute(NOTIFY_ADMIN_CLIENT_ADDRESSES);
             DebugUtil.trace(this, "admin client notification addresses: " + notifyACEventEmailAddresses);
         }
         return notifyACEventEmailAddresses;
@@ -433,7 +472,7 @@ public class OA2CFConfigurationLoader<T extends ServiceEnvironmentImpl> extends 
 
     public Boolean isRFC7636Required() {
         if (rfc7636Required == null) {
-            String raw = cn.getFirstAttribute( RFC7636_REQUIRED_TAG);
+            String raw = cn.getFirstAttribute(RFC7636_REQUIRED_TAG);
             try {
                 rfc7636Required = Boolean.parseBoolean(raw);
             } catch (Throwable t) {
@@ -448,7 +487,7 @@ public class OA2CFConfigurationLoader<T extends ServiceEnvironmentImpl> extends 
     public boolean isprintTSInDebug() {
         if (printTSInDebug == null) {
             try {
-                printTSInDebug = Boolean.parseBoolean(cn.getFirstAttribute( PRINT_TS_IN_DEBUG));
+                printTSInDebug = Boolean.parseBoolean(cn.getFirstAttribute(PRINT_TS_IN_DEBUG));
             } catch (Throwable t) {
                 // use default which is to doo safe garbage collection.
                 // We let this be null to trigger pulling the value, if any, out of the
@@ -464,7 +503,7 @@ public class OA2CFConfigurationLoader<T extends ServiceEnvironmentImpl> extends 
 
     public Boolean isDemoModeEnabled() {
         if (demoModeEnabled == null) {
-            String raw = cn.getFirstAttribute( DEMO_MODE_TAG);
+            String raw = cn.getFirstAttribute(DEMO_MODE_TAG);
             if (StringUtils.isTrivial(raw)) {
                 demoModeEnabled = Boolean.FALSE;
             } else {
@@ -476,7 +515,7 @@ public class OA2CFConfigurationLoader<T extends ServiceEnvironmentImpl> extends 
 
     public String getQdlConfigurationName() {
         if (qdlConfigurationName == null) {
-            String raw = cn.getFirstAttribute( QDL_CONFIG_NAME_ATTR);
+            String raw = cn.getFirstAttribute(QDL_CONFIG_NAME_ATTR);
             if (StringUtils.isTrivial(raw)) {
                 qdlConfigurationName = QDL_DEFAULT_CONFIGURATION_NAME;
             } else {
@@ -485,13 +524,15 @@ public class OA2CFConfigurationLoader<T extends ServiceEnvironmentImpl> extends 
         }
         return qdlConfigurationName;
     }
-Boolean allowPromptNone = null;
+
+    Boolean allowPromptNone = null;
+
     public Boolean isAllowPromptNone() {
         if (allowPromptNone == null) {
-            String raw = cn.getFirstAttribute( ALLOW_PROMPT_NONE);
-            if (raw!=null&&(raw.equals("true") || raw.equals("on") || raw.equals("enabled"))) {
+            String raw = cn.getFirstAttribute(ALLOW_PROMPT_NONE);
+            if (raw != null && (raw.equals("true") || raw.equals("on") || raw.equals("enabled"))) {
                 allowPromptNone = Boolean.TRUE;
-            }else{
+            } else {
                 allowPromptNone = Boolean.FALSE;
             }
         }
@@ -528,11 +569,11 @@ Boolean allowPromptNone = null;
     public UUCConfiguration NEWgetUUCConfiguration() {
         if (uucConfiguration == null) {
             uucConfiguration = new UUCConfiguration();
-             CFNode node = cn.getFirstNode( UUC_TAG);
-            uucConfiguration.enabled = node.getFirstBooleanValue( UUC_ENABLED, false);
-            uucConfiguration.setDebugOn(node.getFirstBooleanValue( UUC_DEBUG_ON, false));
-            uucConfiguration.testMode = node.getFirstBooleanValue( UUC_TEST_MODE_ON, false);
-            String raw = node.getFirstAttribute( UUC_INTERVAL);
+            CFNode node = cn.getFirstNode(UUC_TAG);
+            uucConfiguration.enabled = node.getFirstBooleanValue(UUC_ENABLED, false);
+            uucConfiguration.setDebugOn(node.getFirstBooleanValue(UUC_DEBUG_ON, false));
+            uucConfiguration.testMode = node.getFirstBooleanValue(UUC_TEST_MODE_ON, false);
+            String raw = node.getFirstAttribute(UUC_INTERVAL);
             if (StringUtils.isTrivial(raw)) {
                 uucConfiguration.interval = UUC_INTERVAL_DEFAULT;
             } else {
@@ -540,13 +581,13 @@ Boolean allowPromptNone = null;
             }
             uucConfiguration.alarms = getAlarms(node, UUC_ALARMS);
             // Fix https://github.com/ncsa/oa4mp/issues/139
-            uucConfiguration.setWhiteList(createLR(node.getFirstNode( UUC_WHITELIST), true));
-            uucConfiguration.setBlackList(createLR(node.getFirstNode( UUC_BLACKLIST), false));
-            uucConfiguration.setUnusedRule((UnusedRule) createGPR(node.getFirstNode( UUC_RULE_UNUSED_TAG), true));
-            uucConfiguration.setAbandonedRule((AbandonedRule) createGPR(node.getFirstNode( UUC_RULE_ABANDONED_TAG), false));
+            uucConfiguration.setWhiteList(createLR(node.getFirstNode(UUC_WHITELIST), true));
+            uucConfiguration.setBlackList(createLR(node.getFirstNode(UUC_BLACKLIST), false));
+            uucConfiguration.setUnusedRule((UnusedRule) createGPR(node.getFirstNode(UUC_RULE_UNUSED_TAG), true));
+            uucConfiguration.setAbandonedRule((AbandonedRule) createGPR(node.getFirstNode(UUC_RULE_ABANDONED_TAG), false));
 
             // Finally, set up filter for the UUC itself.
-             CFNode filterNode = node.getFirstNode( UUC_FILTER_TAG);
+            CFNode filterNode = node.getFirstNode(UUC_FILTER_TAG);
             if (filterNode != null) {
                 uucConfiguration.setFilter(getRuleFilter(filterNode));
             }
@@ -554,18 +595,18 @@ Boolean allowPromptNone = null;
         return uucConfiguration;
     }
 
-    protected ListRule createLR( CFNode node, boolean isWhiteList) {
+    protected ListRule createLR(CFNode node, boolean isWhiteList) {
         if (node == null) return null;
         ListRule listRule = new ListRule();
         listRule.setBlackList(false);
         List[] outList = processUUCList(node);
         listRule.setIdList(outList[0]);
         listRule.setRegexList(outList[1]);
-        listRule.setRuleFilter(getRuleFilter(node.getFirstNode( UUC_FILTER_TAG)));
+        listRule.setRuleFilter(getRuleFilter(node.getFirstNode(UUC_FILTER_TAG)));
         return listRule;
     }
 
-    protected GPRule createGPR( CFNode node, boolean isUnused) {
+    protected GPRule createGPR(CFNode node, boolean isUnused) {
         if (node == null) {
             return null;
         }
@@ -575,9 +616,9 @@ Boolean allowPromptNone = null;
         } else {
             gpRule = new AbandonedRule();
         }
-        gpRule.setFilter(getRuleFilter(node.getFirstNode( UUC_FILTER_TAG)));
-        gpRule.setAction(node.getFirstAttribute( UUC_ACTION_TAG));
-        String rawDate = node.getFirstAttribute( UUC_RULE_UNUSED_GRACE_PERIOD);
+        gpRule.setFilter(getRuleFilter(node.getFirstNode(UUC_FILTER_TAG)));
+        gpRule.setAction(node.getFirstAttribute(UUC_ACTION_TAG));
+        String rawDate = node.getFirstAttribute(UUC_RULE_UNUSED_GRACE_PERIOD);
         if (StringUtils.isTrivial(rawDate)) {
             throw new IllegalArgumentException("Missing " + UUC_RULE_UNUSED_GRACE_PERIOD + " attribute.");
         }
@@ -586,45 +627,45 @@ Boolean allowPromptNone = null;
         return gpRule;
     }
 
-    protected RuleFilter getRuleFilter( CFNode node) {
+    protected RuleFilter getRuleFilter(CFNode node) {
         if (node == null) {
             return null;
         }
         RuleFilter filter = new RuleFilter();
-        String raw = node.getFirstAttribute( UUC_FILTER_VERSION);
+        String raw = node.getFirstAttribute(UUC_FILTER_VERSION);
         if (!StringUtils.isTrivial(raw)) {
             filter.setVersion(raw);
         }
-        raw = node.getFirstAttribute( UUC_FILTER_ALLOW_OVERRIDE);
+        raw = node.getFirstAttribute(UUC_FILTER_ALLOW_OVERRIDE);
         try {
             filter.setAllowOverride(Boolean.parseBoolean(raw));
         } catch (Throwable t) {
             filter.setAllowOverride(true);
         }
-        List< CFNode> kids = node.getChildren(UUC_FILTER_DATE);
-        for ( CFNode n : kids) {
-            String when = n.getFirstAttribute( UUC_FILTER_DATE_WHEN);
-            String type = n.getFirstAttribute( UUC_FILTER_DATE_TYPE);
-            String value = n.getFirstAttribute( UUC_FILTER_DATE_VALUE);
+        List<CFNode> kids = node.getChildren(UUC_FILTER_DATE);
+        for (CFNode n : kids) {
+            String when = n.getFirstAttribute(UUC_FILTER_DATE_WHEN);
+            String type = n.getFirstAttribute(UUC_FILTER_DATE_TYPE);
+            String value = n.getFirstAttribute(UUC_FILTER_DATE_VALUE);
             filter.add(when, type, value); // let the method figure it out.
         }
         return filter;
     }
 
-    protected List[] processUUCList( CFNode node) {
-        List< CFNode> kids = node.getChildren(UUC_LIST_ITEM);
+    protected List[] processUUCList(CFNode node) {
+        List<CFNode> kids = node.getChildren(UUC_LIST_ITEM);
         List<Identifier> ids = null;
         List<String> regex = null;
         if (kids != null && !kids.isEmpty()) {
             ids = new ArrayList<>();
-            for ( CFNode kidNode : kids) {
+            for (CFNode kidNode : kids) {
                 ids.add(BasicIdentifier.newID(kidNode.getValue().toString()));
             }
         }
-        List< CFNode> kidRegex = node.getChildren(UUC_LIST_REGEX);
+        List<CFNode> kidRegex = node.getChildren(UUC_LIST_REGEX);
         if (kidRegex != null && !kidRegex.isEmpty()) {
             regex = new ArrayList<>();
-            for ( CFNode kidNode : kidRegex) {
+            for (CFNode kidNode : kidRegex) {
                 regex.add(kidNode.getValue().toString());
             }
         }
@@ -635,7 +676,7 @@ Boolean allowPromptNone = null;
         long interval = defaultInterval;
         try {
 
-            String raw = cn.getFirstAttribute( tag);
+            String raw = cn.getFirstAttribute(tag);
             if (StringUtils.isTrivial(raw)) {
                 interval = CLEANUP_INTERVAL_DEFAULT;
             } else {
@@ -656,7 +697,7 @@ Boolean allowPromptNone = null;
     public Boolean isCleanupLockingEnabled() {
         if (cleanupLockingEnabled == null) {
 
-            String raw = cn.getFirstAttribute( CLEANUP_LOCKING_ENABLED);
+            String raw = cn.getFirstAttribute(CLEANUP_LOCKING_ENABLED);
             if (StringUtils.isTrivial(raw)) {
                 cleanupLockingEnabled = CLEANUP_LOCKING_ENABLED_DEFAULT;
             } else {
@@ -674,7 +715,7 @@ Boolean allowPromptNone = null;
     public Boolean getCleanupFailOnErrors() {
         if (cleanupFailOnErrors == null) {
 
-            String raw = cn.getFirstAttribute( CLEANUP_FAIL_ON_ERRORS);
+            String raw = cn.getFirstAttribute(CLEANUP_FAIL_ON_ERRORS);
             if (StringUtils.isTrivial(raw)) {
                 cleanupFailOnErrors = CLEANUP_FAIL_ON_ERRORS_DEFAULT;
             } else {
@@ -696,7 +737,7 @@ Boolean allowPromptNone = null;
 
     public Boolean isMonitorEnabled() {
         if (monitorEnabled == null) {
-            String raw = cn.getFirstAttribute( MONITOR_ENABLED);
+            String raw = cn.getFirstAttribute(MONITOR_ENABLED);
             if (StringUtils.isTrivial(raw)) {
                 monitorEnabled = MONITOR_ENABLED_DEFAULT;
             } else {
@@ -715,7 +756,7 @@ Boolean allowPromptNone = null;
     public boolean isSafeGC() {
         if (safeGC == null) {
             try {
-                safeGC = Boolean.parseBoolean(cn.getFirstAttribute( SAFE_GARBAGE_COLLECTION));
+                safeGC = Boolean.parseBoolean(cn.getFirstAttribute(SAFE_GARBAGE_COLLECTION));
             } catch (Throwable t) {
                 // use default which is to doo safe garbage collection.
                 // We let this be null to trigger pulling the value, if any, out of the
@@ -757,7 +798,7 @@ Boolean allowPromptNone = null;
     protected Boolean isUtilServerEnabled() {
         if (utilServerEnabled == null) {
             try {
-                utilServerEnabled = Boolean.parseBoolean(cn.getFirstAttribute( OA4MPConfigTags.ENABLE_UTIL_SERVLET));
+                utilServerEnabled = Boolean.parseBoolean(cn.getFirstAttribute(OA4MPConfigTags.ENABLE_UTIL_SERVLET));
             } catch (Throwable t) {
                 // use default which is to enable. We let this be null to trigger pulling the value, if any, out of the
                 // the configuration
@@ -772,7 +813,7 @@ Boolean allowPromptNone = null;
     protected Boolean isRFC8693Enabled() {
         if (rfc8693Enabled == null) {
             try {
-                rfc8693Enabled = Boolean.parseBoolean(cn.getFirstAttribute( OA4MPConfigTags.ENABLE_RFC8693_SUPPORT));
+                rfc8693Enabled = Boolean.parseBoolean(cn.getFirstAttribute(OA4MPConfigTags.ENABLE_RFC8693_SUPPORT));
             } catch (Throwable t) {
                 // use default which is to enable. We let this be null to trigger pulling the value, if any, out of the
                 // the configuration
@@ -782,14 +823,16 @@ Boolean allowPromptNone = null;
         }
         return rfc8693Enabled;
     }
-Boolean ccfEnabled = null;
+
+    Boolean ccfEnabled = null;
+
     protected Boolean isCCFEnabled() {
         if (ccfEnabled == null) {
             try {
-                String raw = cn.getFirstAttribute( OA4MPConfigTags.ENABLE_CCF_SUPPORT);
-                if(raw == null){
+                String raw = cn.getFirstAttribute(OA4MPConfigTags.ENABLE_CCF_SUPPORT);
+                if (raw == null) {
                     ccfEnabled = Boolean.TRUE;
-                }else {
+                } else {
                     ccfEnabled = "true".equals(raw);
                 }
             } catch (Throwable t) {
@@ -806,7 +849,7 @@ Boolean ccfEnabled = null;
     protected Boolean isRFC8628Enabled() {
         if (rfc8628Enabled == null) {
             try {
-                rfc8628Enabled = Boolean.parseBoolean(cn.getFirstAttribute( OA4MPConfigTags.ENABLE_RFC8628_SUPPORT));
+                rfc8628Enabled = Boolean.parseBoolean(cn.getFirstAttribute(OA4MPConfigTags.ENABLE_RFC8628_SUPPORT));
             } catch (Throwable t) {
                 // use default which is to disabled. We let this be null to trigger pulling the value, if any, out of the
                 // the configuration
@@ -860,7 +903,7 @@ Boolean ccfEnabled = null;
      */
     public CMConfigs getCmConfigs() {
         if (cmConfigs == null) {
-            List< CFNode> kids = cn.getChildren(ClientManagementConstants.CLIENT_MANAGEMENT_TAG);
+            List<CFNode> kids = cn.getChildren(ClientManagementConstants.CLIENT_MANAGEMENT_TAG);
             CMConfigs defaultCMConfigs = createDefaultCMConfig();
             if (kids == null || kids.isEmpty()) {
                 cmConfigs = defaultCMConfigs;
@@ -869,10 +912,10 @@ Boolean ccfEnabled = null;
             if (1 < kids.size()) {
                 throw new IllegalArgumentException("Multiple " + ClientManagementConstants.CLIENT_MANAGEMENT_TAG + " elements found.");
             }
-             CFNode cmNode = kids.get(0); // only process first one found
+            CFNode cmNode = kids.get(0); // only process first one found
             kids = cmNode.getChildren(); // This should have the API elements in it
             cmConfigs = new CMConfigs();
-            String e = cmNode.getFirstAttribute( ClientManagementConstants.ENABLE_SERVICE);
+            String e = cmNode.getFirstAttribute(ClientManagementConstants.ENABLE_SERVICE);
             if (!isTrivial(e)) {
                 try {
                     cmConfigs.setEnabled(Boolean.parseBoolean(e));
@@ -885,30 +928,30 @@ Boolean ccfEnabled = null;
             }
             String serverAddress = getServiceAddress().toString();
             // need to loop through all kids.
-            for ( CFNode sn : kids) {
+            for (CFNode sn : kids) {
                 if (sn.getName().equals(ClientManagementConstants.API_TAG)) {
                     try {
                         // If the endpoint is not configured, just use whatever the system defaults to.
-                        String endpoint = sn.getFirstAttribute( ClientManagementConstants.ENDPOINT_ATTRIBUTE);
-                        endpoint = StringUtils.isTrivial(endpoint)? DiscoveryServlet.DEFAULT_REGISTRATION_ENDPOINT:endpoint;
+                        String endpoint = sn.getFirstAttribute(ClientManagementConstants.ENDPOINT_ATTRIBUTE);
+                        endpoint = StringUtils.isTrivial(endpoint) ? DiscoveryServlet.DEFAULT_REGISTRATION_ENDPOINT : endpoint;
                         CMConfig cfg = CMConfigs.createConfigEntry(
-                                sn.getFirstAttribute( ClientManagementConstants.PROTOCOL_ATTRIBUTE),
+                                sn.getFirstAttribute(ClientManagementConstants.PROTOCOL_ATTRIBUTE),
                                 serverAddress,
                                 endpoint,
-                                sn.getFirstAttribute( ClientManagementConstants.FULL_URL_ATTRIBUTE),
-                                sn.getFirstAttribute( ClientManagementConstants.ENABLE_SERVICE),
-                                sn.getFirstAttribute( ClientManagementConstants.RFC_7591_TEMPLATE),
-                                sn.getFirstAttribute( ClientManagementConstants.RFC_7591_ANONYMOUS_OK),
-                                sn.getFirstAttribute( ClientManagementConstants.RFC_7591_AUTO_APPROVE),
-                                sn.getFirstAttribute( ClientManagementConstants.RFC_7591_AUTO_APPROVER_NAME)
+                                sn.getFirstAttribute(ClientManagementConstants.FULL_URL_ATTRIBUTE),
+                                sn.getFirstAttribute(ClientManagementConstants.ENABLE_SERVICE),
+                                sn.getFirstAttribute(ClientManagementConstants.RFC_7591_TEMPLATE),
+                                sn.getFirstAttribute(ClientManagementConstants.RFC_7591_ANONYMOUS_OK),
+                                sn.getFirstAttribute(ClientManagementConstants.RFC_7591_AUTO_APPROVE),
+                                sn.getFirstAttribute(ClientManagementConstants.RFC_7591_AUTO_APPROVER_NAME)
                         );
-                        String raw = sn.getFirstAttribute( ClientManagementConstants.DEFAULT_REFRESH_TOKEN_LIFETIME);
+                        String raw = sn.getFirstAttribute(ClientManagementConstants.DEFAULT_REFRESH_TOKEN_LIFETIME);
                         if (!StringUtils.isTrivial(raw)) {
                             cfg.setDefaultRefreshTokenLifetime(TimeUtil.getValueSecsOrMillis(raw, false));
                         }
                         if (cfg instanceof CM7591Config) {
-                            CM7591Config ccc = (CM7591Config)cfg;
-                            String allowed = sn.getFirstAttribute( ClientManagementConstants.RFC_7591_AUTO_APPROVE_ALLOWED_DOMAINS);
+                            CM7591Config ccc = (CM7591Config) cfg;
+                            String allowed = sn.getFirstAttribute(ClientManagementConstants.RFC_7591_AUTO_APPROVE_ALLOWED_DOMAINS);
                             if (ccc.autoApprove) {
                                 if (allowed == null) {
                                     ccc.getAllowedAutoApproveDomains().add("*"); // default
@@ -919,7 +962,7 @@ Boolean ccfEnabled = null;
                                     }
                                 }
                             }
-                            allowed = sn.getFirstAttribute( ClientManagementConstants.RFC_7591_ANONYMOUS_ALLOWED_DOMAINS);
+                            allowed = sn.getFirstAttribute(ClientManagementConstants.RFC_7591_ANONYMOUS_ALLOWED_DOMAINS);
                             if (ccc.anonymousOK) {
                                 if (allowed == null) {
                                     ccc.getAllowedAnonymousDomains().add("*");
@@ -981,13 +1024,13 @@ Boolean ccfEnabled = null;
     }
 
     protected JSONWebKeys getJSONWebKeys() {
-         CFNode node = cn.getFirstNode( "JSONWebKey");
+        CFNode node = cn.getFirstNode("JSONWebKey");
         if (node == null) {
             warn(" No signing keys in the configuration file. Signing is not available");
             //throw new IllegalStateException();
             return new JSONWebKeys(null);
         }
-        String json = node.getNodeContents( "json", null); // if the whole thing is included
+        String json = node.getNodeContents("json", null); // if the whole thing is included
         JSONWebKeys keys = null;
         try {
             if (json == null) {
@@ -1012,7 +1055,7 @@ Boolean ccfEnabled = null;
             // If there is a single key in the file, use that as the default.
             keys.setDefaultKeyID(keys.keySet().iterator().next());
         } else {
-            keys.setDefaultKeyID(node.getFirstAttribute( "defaultKeyID"));
+            keys.setDefaultKeyID(node.getFirstAttribute("defaultKeyID"));
         }
         return keys;
     }
@@ -1113,7 +1156,7 @@ Boolean ccfEnabled = null;
 
     public long getRTGracePeriod() {
         if (rtGracePeriod == REFRESH_TOKEN_GRACE_PERIOD_NOT_CONFIGURED) {
-            String x = cn.getFirstAttribute( REFRESH_TOKEN_GRACE_PERIOD_TAG);
+            String x = cn.getFirstAttribute(REFRESH_TOKEN_GRACE_PERIOD_TAG);
             if (isTrivial(x)) {
                 rtGracePeriod = REFRESH_TOKEN_GRACE_PERIOD_DEFAULT; // set the grace period to be the default
             } else {
@@ -1133,7 +1176,7 @@ Boolean ccfEnabled = null;
 
     protected long getAGLifetime() {
         if (agLifetime < 0) {
-            String x = cn.getFirstAttribute( AUTH_GRANT_LIFETIME);
+            String x = cn.getFirstAttribute(AUTH_GRANT_LIFETIME);
             if (isTrivial(x)) {
                 agLifetime = AUTHORIZATION_GRANT_LIFETIME_DEFAULT;
             } else {
@@ -1152,7 +1195,7 @@ Boolean ccfEnabled = null;
 
     protected long getIDTokenLifetime() {
         if (idTokenLifetime < 0) {
-            String x = cn.getFirstAttribute( DEFAULT_ID_TOKEN_LIFETIME);
+            String x = cn.getFirstAttribute(DEFAULT_ID_TOKEN_LIFETIME);
             if (isTrivial(x)) {
                 idTokenLifetime = ID_TOKEN_LIFETIME_DEFAULT;
             } else {
@@ -1168,7 +1211,7 @@ Boolean ccfEnabled = null;
 
     public long getMaxIDTokenLifetime() {
         if (maxIDTokenLifetime < 0) {
-            String x = cn.getFirstAttribute( DEFAULT_ID_TOKEN_LIFETIME);
+            String x = cn.getFirstAttribute(DEFAULT_ID_TOKEN_LIFETIME);
             if (isTrivial(x)) {
                 maxIDTokenLifetime = MAX_ID_TOKEN_LIFETIME_DEFAULT;
             } else {
@@ -1188,10 +1231,10 @@ Boolean ccfEnabled = null;
 
     protected long getATLifetime() {
         if (atLifetime < 0) {
-            String x = cn.getFirstAttribute( DEFAULT_ACCESS_TOKEN_LIFETIME);
+            String x = cn.getFirstAttribute(DEFAULT_ACCESS_TOKEN_LIFETIME);
             if (isTrivial(x)) {
                 // Old way
-                x = cn.getFirstAttribute( ACCESS_TOKEN_LIFETIME);
+                x = cn.getFirstAttribute(ACCESS_TOKEN_LIFETIME);
             }
             if (isTrivial(x)) {
                 atLifetime = ACCESS_TOKEN_LIFETIME_DEFAULT;
@@ -1212,10 +1255,10 @@ Boolean ccfEnabled = null;
     protected long getRTLifetime() {
         if (rtLifetime < 0) {
             // Fixes https://github.com/ncsa/oa4mp/issues/152
-            String x = cn.getFirstAttribute( DEFAULT_REFRESH_TOKEN_LIFETIME);
+            String x = cn.getFirstAttribute(DEFAULT_REFRESH_TOKEN_LIFETIME);
             if (isTrivial(x)) {
                 // Old way
-                x = cn.getFirstAttribute( REFRESH_TOKEN_LIFETIME);
+                x = cn.getFirstAttribute(REFRESH_TOKEN_LIFETIME);
             }
             if (isTrivial(x)) {
                 rtLifetime = REFRESH_TOKEN_LIFETIME_DEFAULT;
@@ -1234,7 +1277,7 @@ Boolean ccfEnabled = null;
 
     public long getMaxAGLifetime() {
         if (maxAGLifetime < 0) {
-            String x = cn.getFirstAttribute( MAX_AUTH_GRANT_LIFETIME);
+            String x = cn.getFirstAttribute(MAX_AUTH_GRANT_LIFETIME);
             if (isTrivial(x)) {
                 maxAGLifetime = MAX_AUTHORIZATION_GRANT_LIFETIME_DEFAULT;
             } else {
@@ -1250,7 +1293,7 @@ Boolean ccfEnabled = null;
 
     public long getMaxATLifetime() {
         if (maxATLifetime < 0) {
-            String x = cn.getFirstAttribute( OA2ConfigTags.MAX_ACCESS_TOKEN_LIFETIME);
+            String x = cn.getFirstAttribute(OA2ConfigTags.MAX_ACCESS_TOKEN_LIFETIME);
             if (isTrivial(x)) {
                 maxATLifetime = MAX_ACCESS_TOKEN_LIFETIME_DEFAULT;
             } else {
@@ -1274,7 +1317,7 @@ Boolean ccfEnabled = null;
 
     public long getMaxRTLifetime() {
         if (maxRTLifetime < 0) {
-            String x = cn.getFirstAttribute( MAX_REFRESH_TOKEN_LIFETIME);
+            String x = cn.getFirstAttribute(MAX_REFRESH_TOKEN_LIFETIME);
             if (isTrivial(x)) {
                 maxRTLifetime = MAX_REFRESH_TOKEN_LIFETIME_DEFAULT;
             } else {
@@ -1293,7 +1336,7 @@ Boolean ccfEnabled = null;
 
     protected String getIssuer() {
         if (issuer == null) {
-            String x = cn.getFirstAttribute( ISSUER);
+            String x = cn.getFirstAttribute(ISSUER);
             // Fixes OAUTH-214
             if (x == null || x.length() == 0) {
                 return null;
@@ -1309,7 +1352,7 @@ Boolean ccfEnabled = null;
 
     protected long getMaxClientRefreshTokenLifetime() {
         if (maxClientRefreshTokenLifetime < 0) {
-            String x = cn.getFirstAttribute( MAX_CLIENT_REFRESH_TOKEN_LIFETIME);
+            String x = cn.getFirstAttribute(MAX_CLIENT_REFRESH_TOKEN_LIFETIME);
             // Fixes OAUTH-214
             if (x == null || x.length() == 0) {
                 maxClientRefreshTokenLifetime = 13 * 30 * 24 * 3600 * 1000L; // default of 13 months.
@@ -1329,7 +1372,7 @@ Boolean ccfEnabled = null;
 
     public boolean isOIDCEnabled() {
         if (oidcEnabled == null) {
-            String x = cn.getFirstAttribute( OIDC_SUPPORT_ENABLED);
+            String x = cn.getFirstAttribute(OIDC_SUPPORT_ENABLED);
             if (x == null) {
                 oidcEnabled = Boolean.TRUE; // default.
             } else {
@@ -1347,7 +1390,7 @@ Boolean ccfEnabled = null;
 
     public boolean isRefreshTokenEnabled() {
         if (refreshTokenEnabled == null) {
-            String x = cn.getFirstAttribute( REFRESH_TOKEN_ENABLED);
+            String x = cn.getFirstAttribute(REFRESH_TOKEN_ENABLED);
             if (x == null) {
                 refreshTokenEnabled = Boolean.FALSE;
             } else {
@@ -1366,7 +1409,7 @@ Boolean ccfEnabled = null;
 
     public boolean isTwoFactorSupportEnabled() {
         if (twoFactorSupportEnabled == null) {
-            String x = cn.getFirstAttribute( ENABLE_TWO_FACTOR_SUPPORT);
+            String x = cn.getFirstAttribute(ENABLE_TWO_FACTOR_SUPPORT);
             if (x == null) {
                 twoFactorSupportEnabled = Boolean.FALSE;
             } else {
@@ -1396,7 +1439,7 @@ Boolean ccfEnabled = null;
             List<CFNode> scopesList = cn.getChildren(SCOPES);
             // This gets the scopes if any and injects them into the scope handler.
             if (0 < scopesList.size()) {
-                String scopeHandlerName = scopesList.get(0).getFirstAttribute( SCOPE_HANDLER);
+                String scopeHandlerName = scopesList.get(0).getFirstAttribute(SCOPE_HANDLER);
                 if (scopeHandlerName != null) {
                     Class<?> k = Class.forName(scopeHandlerName);
                     Object x = k.newInstance();
@@ -1410,9 +1453,9 @@ Boolean ccfEnabled = null;
                     // This meant that any global claim source would not have a configuration and
                     // is instantly disabled. The solution is to set a basic configuration here.
                     // Fixes https://github.com/ncsa/oa4mp/issues/180
-                        ClaimSourceConfiguration configuration = new ClaimSourceConfiguration();
-                        configuration.setEnabled(true);
-                        claimSource.setConfiguration(configuration);
+                    ClaimSourceConfiguration configuration = new ClaimSourceConfiguration();
+                    configuration.setEnabled(true);
+                    claimSource.setConfiguration(configuration);
                 } else {
                     info("Scope handler attribute found in configuration, but no value was found for it. Skipping custom loaded scope handling.");
                 }
@@ -1444,8 +1487,8 @@ Boolean ccfEnabled = null;
 
     protected LDAPConfiguration getLdapConfiguration() {
         if (ldapConfiguration == null) {
-       //     LDAPConfigurationUtil ldapConfigurationUtil = new LDAPConfigurationUtil();
-      //      ldapConfiguration = ldapConfigurationUtil.getLdapConfiguration(myLogger, cn);
+            //     LDAPConfigurationUtil ldapConfigurationUtil = new LDAPConfigurationUtil();
+            //      ldapConfiguration = ldapConfigurationUtil.getLdapConfiguration(myLogger, cn);
         }
         return ldapConfiguration;
 
@@ -1460,7 +1503,7 @@ Boolean ccfEnabled = null;
 
     public int getClientSecretLength() {
         if (clientSecretLength < 0) {
-            String x = cn.getFirstAttribute( CLIENT_SECRET_LENGTH);
+            String x = cn.getFirstAttribute(CLIENT_SECRET_LENGTH);
             if (x != null) {
                 try {
                     clientSecretLength = Integer.parseInt(x);
@@ -1490,11 +1533,11 @@ Boolean ccfEnabled = null;
     }
 
     public static class OA2MultiDSClientStoreProvider extends MultiDSClientStoreProvider {
-        public OA2MultiDSClientStoreProvider( CFNode config, boolean disableDefaultStore, MyLoggingFacade logger) {
+        public OA2MultiDSClientStoreProvider(CFNode config, boolean disableDefaultStore, MyLoggingFacade logger) {
             super(config, disableDefaultStore, logger);
         }
 
-        public OA2MultiDSClientStoreProvider( CFNode config, boolean disableDefaultStore, MyLoggingFacade logger, String type, String target, IdentifiableProvider clientProvider) {
+        public OA2MultiDSClientStoreProvider(CFNode config, boolean disableDefaultStore, MyLoggingFacade logger, String type, String target, IdentifiableProvider clientProvider) {
             super(config, disableDefaultStore, logger, type, target, clientProvider);
         }
 
@@ -1541,7 +1584,7 @@ Boolean ccfEnabled = null;
         return csp;
     }
 
-    protected OA2SQLTransactionStoreProvider createSQLTSP( CFNode config,
+    protected OA2SQLTransactionStoreProvider createSQLTSP(CFNode config,
                                                           ConnectionPoolProvider<? extends ConnectionPool> cpp,
                                                           String type,
                                                           MultiDSClientStoreProvider clientStoreProvider,
@@ -1551,7 +1594,7 @@ Boolean ccfEnabled = null;
         return new OA2SQLTransactionStoreProvider(config, cpp, type, clientStoreProvider, tp, tfp, converter);
     }
 
-    protected SQLTXRStoreProvider createSQLTXRecordP( CFNode config,
+    protected SQLTXRStoreProvider createSQLTXRecordP(CFNode config,
                                                      ConnectionPoolProvider<? extends ConnectionPool> cpp,
                                                      String type,
                                                      TXRecordProvider<? extends TXRecord> tp,
@@ -1560,16 +1603,16 @@ Boolean ccfEnabled = null;
         return new SQLTXRStoreProvider(config, cpp, type, converter, tp);
     }
 
-    protected KESQLStoreProvider createSQLKERecordP( CFNode config,
-                                                      ConnectionPoolProvider<? extends ConnectionPool> cpp,
-                                                      String type,
-                                                      KERecordProvider<? extends KERecord> tp,
-                                                      Provider<TokenForge> tfp,
-                                                      KEConverter converter) {
+    protected KESQLStoreProvider createSQLKERecordP(CFNode config,
+                                                    ConnectionPoolProvider<? extends ConnectionPool> cpp,
+                                                    String type,
+                                                    KERecordProvider<? extends KERecord> tp,
+                                                    Provider<TokenForge> tfp,
+                                                    KEConverter converter) {
         return new KESQLStoreProvider(config, cpp, type, converter, tp);
     }
 
-    protected SQLVIStoreProvider createSQLVOP( CFNode config,
+    protected SQLVIStoreProvider createSQLVOP(CFNode config,
                                               ConnectionPoolProvider<? extends ConnectionPool> cpp,
                                               String type,
                                               VIProvider<? extends VirtualIssuer> tp,
@@ -1640,8 +1683,9 @@ Boolean ccfEnabled = null;
         return voStoreProvider;
     }
 
-Provider<KEStore> keStoreProvider;
-    protected Provider<KEStore> getKEStoreProvider(){
+    Provider<KEStore> keStoreProvider;
+
+    protected Provider<KEStore> getKEStoreProvider() {
         KERecordProvider keRecordProvider = new KERecordProvider(new KEIdentifierProvider());
         KEConverter keConverter = new KEConverter(new KESerializationKeys(),
                 keRecordProvider);
@@ -1884,38 +1928,39 @@ Provider<KEStore> keStoreProvider;
     }
 
     DIServiceConfig DIServiceConfig = null;
-/*
-  element is
 
-  <diService enabled="true|false">
-     <users>
-       <user username="name" hash="hash"/>
-       ...
-     </users>
-  </diService>
+    /*
+      element is
 
-  should become
+      <diService enabled="true|false">
+         <users>
+           <user username="name" hash="hash"/>
+           ...
+         </users>
+      </diService>
 
-  <diService enabled="true|false">  <!-- throws exception on any call if false -->
-     <rfc7523 enabled="true|false"
-              required="true|false/> <!-- allows admin clients with diService true to access -->
-     <users enabled="true|false">  <!-- direct user support on/off -->
-       <user username="name" hash="hash"/> <!-- individual users, store password hash only -->
-       ...
-     </users>
-  </diService>
+      should become
 
- */
+      <diService enabled="true|false">  <!-- throws exception on any call if false -->
+         <rfc7523 enabled="true|false"
+                  required="true|false/> <!-- allows admin clients with diService true to access -->
+         <users enabled="true|false">  <!-- direct user support on/off -->
+           <user username="name" hash="hash"/> <!-- individual users, store password hash only -->
+           ...
+         </users>
+      </diService>
+
+     */
     protected DIServiceConfig getDISerivceConfig() {
         if (DIServiceConfig == null) {
-            List< CFNode> kids = cn.getChildren(DIServiceConfig.DI_SERVICE_CONFIG_TAG);
+            List<CFNode> kids = cn.getChildren(DIServiceConfig.DI_SERVICE_CONFIG_TAG);
             DIServiceConfig = new DIServiceConfig();
             DIServiceConfig.setEnabled(false); //default
             if (kids.isEmpty()) {
                 return DIServiceConfig;
             }
-             CFNode topNode = kids.get(0);
-            String rawEnabled = topNode.getFirstAttribute( DIServiceConfig.DI_SERVICE_ENABLED_ATTRIBUTE);
+            CFNode topNode = kids.get(0);
+            String rawEnabled = topNode.getFirstAttribute(DIServiceConfig.DI_SERVICE_ENABLED_ATTRIBUTE);
             if (!StringUtils.isTrivial(rawEnabled)) {
                 try {
                     DIServiceConfig.setEnabled(Boolean.parseBoolean(rawEnabled));
@@ -1923,11 +1968,11 @@ Provider<KEStore> keStoreProvider;
                     info("Could not determine if db service is enabled: got \"" + rawEnabled + "\" in tag");
                 }
             }
-             CFNode usersNode = topNode.getFirstNode( DIServiceConfig.DI_SERVICE_USERS_TAG);
-            List< CFNode> userNodes = usersNode.getChildren(DIServiceConfig.DI_SERVICE_USER_TAG);
-            for ( CFNode tempNode : userNodes) {
+            CFNode usersNode = topNode.getFirstNode(DIServiceConfig.DI_SERVICE_USERS_TAG);
+            List<CFNode> userNodes = usersNode.getChildren(DIServiceConfig.DI_SERVICE_USER_TAG);
+            for (CFNode tempNode : userNodes) {
                 String rawUser = tempNode.getFirstAttribute(DIServiceConfig.DI_SERVICE_NAME_ATTRIBUTE);
-                String rawHash = tempNode.getFirstAttribute( DIServiceConfig.DI_SERVICE_HASH_ATTRIBUTE);
+                String rawHash = tempNode.getFirstAttribute(DIServiceConfig.DI_SERVICE_HASH_ATTRIBUTE);
                 DIServiceConfig.addUser(rawUser, rawHash);
             }
         }

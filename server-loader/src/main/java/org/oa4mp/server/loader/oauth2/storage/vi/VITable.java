@@ -30,6 +30,9 @@ public class VITable extends Table {
         getColumnDescriptor().add(new ColumnDescriptorEntry(vok().discoveryPath(), java.sql.Types.LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(vok().issuer(), java.sql.Types.LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(vok().jsonWebKeys(), Types.LONGVARCHAR));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(vok().keyRotationATGracePeriod(), Types.BIGINT));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(vok().keyRotationCacheGracePeriod(), Types.BIGINT));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(vok().keyRotationEnabled(), Types.BOOLEAN));
         getColumnDescriptor().add(new ColumnDescriptorEntry(vok().lastAccessed(), Types.BIGINT));
         getColumnDescriptor().add(new ColumnDescriptorEntry(vok().lastModifiedTS(), Types.BIGINT));
         getColumnDescriptor().add(new ColumnDescriptorEntry(vok().title(), Types.LONGVARCHAR));

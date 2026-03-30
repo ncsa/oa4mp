@@ -35,6 +35,15 @@ public interface OA4MPConfigTags extends StorageConfigurationTags, MailConfigura
     String DEVICE_FLOW_SERVLET_URI = "verificationURI"; // Where the user goes give their code
     String DEVICE_FLOW_INTERVAL = "interval"; // If there is a different DF uri than the standard
     String DEVICE_FLOW_LIFETIME = "lifetime"; // If this is <= 0 , then the authorization grant lifetime is used.
+
+    /**
+     * Key Rotation configuration tags.
+     */
+    String KEY_ROTATION_TAG = "keyRotation";
+    String KEY_ROTATION_ENABLED = "enabled";
+    String KEY_ROTATION_ALLOW_OVERRIDE = "allowOverride"; // Allow VIs to override the server configuration
+    String KEY_ROTATION_CACHE_GRACE_PERIOD = "cacheGracePeriod";
+    String KEY_ROTATION_AT_GRACE_PERIOD = "atGracePeriod";
     /**
      * The characters allowed for user codes.
      */

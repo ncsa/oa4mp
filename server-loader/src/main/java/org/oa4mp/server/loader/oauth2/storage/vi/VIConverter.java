@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
+import org.oa4mp.server.loader.oauth2.loader.OA2CFConfigurationLoader;
 
 import java.util.Date;
 
@@ -54,6 +55,20 @@ public class VIConverter<V extends VirtualIssuer> extends MapConverter<V> {
                 DebugUtil.error(this, "Could not deserialize the JSON web keys for this VI.\"" + vi.getIdentifierString() + "\".", e);
             }
         }
+        if (map.containsKey(vok().keyRotationCacheGracePeriod())) {
+            vi.setCacheGracePeriod(map.getLong(vok().keyRotationCacheGracePeriod()));
+        } else {
+            vi.setCacheGracePeriod(OA2CFConfigurationLoader.KEY_ROTATION_GRACE_PERIOD_DISABLED);
+        }
+        if (map.containsKey(vok().keyRotationATGracePeriod())) {
+            vi.setAtGracePeriod(map.getLong(vok().keyRotationATGracePeriod()));
+        } else {
+            vi.setAtGracePeriod(OA2CFConfigurationLoader.KEY_ROTATION_GRACE_PERIOD_DISABLED);
+        }
+        if (map.containsKey(vok().keyRotationEnabled())) {
+            vi.setKeyRotationEnabled(map.getBoolean(vok().keyRotationEnabled()));
+        }
+
         if (map.containsKey(vok().discoveryPath()) && !isTrivial(map.getString(vok().discoveryPath()))) {
             vi.setDiscoveryPath(map.getString(vok().discoveryPath()));
         }
@@ -78,6 +93,9 @@ public class VIConverter<V extends VirtualIssuer> extends MapConverter<V> {
             // Fixes https://github.com/ncsa/oa4mp/issues/149
             data.put(vok().lastAccessed(), value.getLastAccessed().getTime());
         }
+        data.put(vok().keyRotationEnabled(), value.isKeyRotationEnabled());
+        data.put(vok().keyRotationCacheGracePeriod(), value.getCacheGracePeriod());
+        data.put(vok().keyRotationATGracePeriod(), value.getAtGracePeriod());
         if (!isTrivial(value.getIssuer())) {
             data.put(vok().issuer(), value.getIssuer());
         }

@@ -1,0 +1,28 @@
+/*
+Note that this runs in the post_auth phase only since the sub claim is over-written
+AND the only place that the redirect from the error makes sense is during the auth
+phase since there is a browser to redirect.
+
+{"tokens": {"identity": {
+ "qdl":  {
+  "load": "jlab/moller-logbook/v1/id-token.qdl",
+  "xmd": {"exec_phase": ["post_auth"]}
+ },
+ "type": "identity"
+}}}
+*/
+    // Note. No refresh tokens!
+
+script_load('utils/init.qdl'); // set up stuff
+
+   debugger(1);
+  jlab_moniker := 'JLab Moller Logbook'; // moniker for debugging
+
+user := claims.'sub';
+trace(jlab_moniker,'starting id-token for user =' + user);
+trace(jlab_moniker,'IDP =' + claims.'idp');
+//results. := script_load('jlab/get_user.qdl', user); // user == claims.sub
+results. := script_load('/home/ncsa/dev/ncsa-git/oa4mp/server-admin/src/main/resources/qdl/jlab/get_user.qdl', user); // user == claims.sub
+trace(jlab_moniker,'result of user query =' + to_string(results.));
+group := 'CO:COU:moller:members:active';
+group ∉ results.'isMemberOf' ⇒ err('user is not in the moller group', 'access_denied');

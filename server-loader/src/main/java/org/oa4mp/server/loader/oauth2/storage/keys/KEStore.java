@@ -1,10 +1,12 @@
 package org.oa4mp.server.loader.oauth2.storage.keys;
 
+import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import org.oa4mp.server.loader.oauth2.storage.vi.VirtualIssuer;
 
 import java.util.HashSet;
+import java.util.Map;
 
 public interface KEStore<V extends KERecord> extends Store<V> {
     /** For a given key id (kid) find an return. Key ids are unique in the
@@ -28,4 +30,12 @@ public interface KEStore<V extends KERecord> extends Store<V> {
      * @return
      */
     JSONWebKeys getCurrentKeys(VirtualIssuer vi);
+
+    /**
+     * Return valid Key Records for a given virtual issuer.  This means that they have
+     * no expired and are valid.
+     * @param vi
+     * @return
+     */
+    Map<Identifier, KERecord> getByVI(VirtualIssuer vi);
 }

@@ -42,6 +42,10 @@ public class VIStemMC<V extends VirtualIssuer> extends MonitoredStemMC<V> {
         if (isStringKeyOK(stem, vik().defaultKeyID())) {v.setDefaultKeyID(stem.getString(vik().defaultKeyID()));}
         if (isStringKeyOK(stem, vik().discoveryPath())) {v.setDiscoveryPath(stem.getString(vik().discoveryPath()));}
         if (isStringKeyOK(stem, vik().issuer())) {v.setIssuer(stem.getString(vik().issuer()));}
+        if (isStringKeyOK(stem, vik().keyRotationEnabled())) {v.setKeyRotationEnabled(stem.getBoolean(vik().keyRotationEnabled()));}
+        if (isStringKeyOK(stem, vik().keyRotationCacheGracePeriod())) {v.setCacheGracePeriod(stem.getLong(vik().keyRotationCacheGracePeriod()));}
+        if (isStringKeyOK(stem, vik().keyRotationATGracePeriod())) {v.setAtGracePeriod(stem.getLong(vik().keyRotationATGracePeriod()));}
+
         if(stem.containsKey(vik().jsonWebKeys())){
              QDLStem keyStem = stem.getStem(vik().jsonWebKeys());
             JSONWebKeys keys = null;
@@ -84,6 +88,9 @@ public class VIStemMC<V extends VirtualIssuer> extends MonitoredStemMC<V> {
         }
         setNonNullStemValue(stem, vik().title(), v.getTitle());
         setNonNullStemValue(stem, vik().valid(), v.isValid());
+        setNonNullStemValue(stem, vik().keyRotationEnabled(), v.isKeyRotationEnabled());
+        setNonNullStemValue(stem, vik().keyRotationCacheGracePeriod(), v.getCacheGracePeriod());
+        setNonNullStemValue(stem, vik().keyRotationATGracePeriod(), v.getAtGracePeriod());
 
         return stem;
     }
