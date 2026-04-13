@@ -1,12 +1,13 @@
 package org.oa4mp.server.loader.oauth2.storage.transactions;
 
-import org.oa4mp.server.loader.oauth2.OA2SE;
-import org.oa4mp.server.loader.oauth2.claims.BasicClaimsSourceImpl;
-import org.oa4mp.server.loader.oauth2.flows.FlowStates2;
-import org.oa4mp.server.loader.oauth2.servlet.RFC8628State;
-import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
-import org.oa4mp.server.loader.qdl.claims.ConfigtoCS;
-import org.oa4mp.server.api.OA4MPServiceTransaction;
+import edu.uiuc.ncsa.security.core.DateComparable;
+import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import org.apache.commons.codec.binary.Base64;
 import org.oa4mp.delegation.common.token.AuthorizationGrant;
 import org.oa4mp.delegation.common.token.RefreshToken;
 import org.oa4mp.delegation.common.token.impl.AuthorizationGrantImpl;
@@ -18,17 +19,16 @@ import org.oa4mp.delegation.server.server.OIDCServiceTransactionInterface;
 import org.oa4mp.delegation.server.server.RFC7636Util;
 import org.oa4mp.delegation.server.server.claims.ClaimSource;
 import org.oa4mp.delegation.server.server.claims.OA2Claims;
+import org.oa4mp.server.api.OA4MPServiceTransaction;
+import org.oa4mp.server.loader.oauth2.OA2SE;
+import org.oa4mp.server.loader.oauth2.flows.FlowStates2;
+import org.oa4mp.server.loader.oauth2.servlet.RFC8628State;
+import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
+import org.oa4mp.server.loader.qdl.claims.ConfigtoCS;
 import org.qdl_lang.variables.QDLStem;
-import edu.uiuc.ncsa.security.core.DateComparable;
-import edu.uiuc.ncsa.security.core.Identifier;
-import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
-import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import org.apache.commons.codec.binary.Base64;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectOutputStream;
 import java.net.URI;
 import java.util.*;
 
@@ -424,10 +424,9 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
             try {
                 return newCSDeserialize(oa2SE);
             } catch (Throwable t) {
-                // try the old way.
-                ServletDebugUtil.info(this, "could not deserialize claim sources new way, reverting to Java serialization");
+                ServletDebugUtil.info(this, "could not deserialize claim sources.");
             }
-        }
+        }/*
 
         if (getState().containsKey(CLAIMS_SOURCES_STATE_KEY)) {
             try {
@@ -444,6 +443,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
                 throw new GeneralException("Error deserializing claim source:" + tt.getMessage(), tt);
             }
         }
+        */
         return new ArrayList<>();
     }
 
@@ -467,21 +467,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         return claimSources;
     }
 
-    protected List<ClaimSource> oldCSDeserialize(OA2SE oa2SE) throws Throwable {
-        byte[] bytes = Base64.decodeBase64(getState().getString(CLAIMS_SOURCES_STATE_KEY));
-        ByteArrayInputStream baos = new ByteArrayInputStream(bytes);
-        ObjectInputStream in = new ObjectInputStream(baos);
-        // Method for deserialization of object
-        Object object = in.readObject();
-        List<ClaimSource> sources = (List<ClaimSource>) object;
-        for (ClaimSource source : sources) {
-            if (source instanceof BasicClaimsSourceImpl) {
-                ((BasicClaimsSourceImpl) source).setOa2SE(oa2SE);
-            }
-        }
-        in.close();
-        return sources;
-    }
+
 
     /**
      * Script engines have the option to save their state between calls too. The argument is a (probably base 64 encoded)

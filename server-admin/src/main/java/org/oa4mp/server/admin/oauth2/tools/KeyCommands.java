@@ -274,10 +274,10 @@ public class KeyCommands extends OA4MPStoreCommands {
     protected void rotateHelp(InputLine inputLine) {
         say("rotate [" + KR_ALL + " | " + KR_KID + " id " +
                 KR_CACHE_LIFETIME + " cache_lifetime " +
-                KR_AT_LIFETIME + "access_token_lifetime | index] - rotate the key at the given index");
+                KR_AT_LIFETIME + " access_token_lifetime | index] - rotate the key at the given index");
         say("This will rotate the key(s) either per VI's policy or you may directly set the lifetimes");
         say("Setting at least one of " + KR_CACHE_LIFETIME + " or " + KR_AT_LIFETIME + " will override the policy");
-        say("These accept lifetime in seconds (default) or with units, e.g. " + KR_AT_LIFETIME + "\"25 min\" (note the quotes!)");
+        say("These accept lifetime in seconds (default) or with units, e.g. " + KR_AT_LIFETIME + " \"25 min\" (note the quotes!)");
     }
 
     public void rotate(InputLine inputLine) throws Throwable {

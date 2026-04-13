@@ -77,15 +77,19 @@ script_load('utils/init.qdl'); // set up stuff
 debugger(1);
 
    drac_cc := 'DRAC'; // moniker for debugging
-   groups. := ['CO:COU:UVic Staff:members:active']; // Everyone is in here
+   0 ≡ size(args()) ⇒ raise_error('missing groups in configuration'); // must have the groups explicit
+   groups. :=  args().0;
  error_uri := 'https://object-arbutus.cloud.computecanada.ca/cilogon/error.html';
   results. := script_load('drac/v1/get-user.qdl', claims.'sub'); // user == claims.sub
-
+trace(drac_cc,'user sub = ' + claims.'sub');
 trace(drac_cc,'result of user query =' + to_string(results.));
 
-                         size(args()) ≡ 1 ⇒ groups. := groups.~args().0;
+trace(drac_cc, 'args=' + to_string(args()));
+trace(drac_cc, 'groups = ' + to_string(groups.));
+
                   (∄results.'isMemberOf') ⇒ err_uri('no groups for user found',error_uri);
 (true ∉ (groups. ∈ results.'isMemberOf')) ⇒ err_uri('user not in group', error_uri);
+claims.'groups' := results.'isMemberOf';
 /*
 
 * OIDC client ID on PROD is currently
