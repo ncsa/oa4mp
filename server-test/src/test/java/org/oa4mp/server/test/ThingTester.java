@@ -1,8 +1,8 @@
 package org.oa4mp.server.test;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import net.sf.json.util.JSONUtils;
+import org.kordamp.json.JSONArray;
+import org.kordamp.json.JSONObject;
+import org.kordamp.json.util.JSONUtils;
 
 /**
  * <p>Created by Jeff Gaynor<br>

@@ -1,18 +1,20 @@
 package org.oa4mp.server.loader.oauth2.storage.tx;
 
-import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
-import org.oa4mp.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.data.ConversionMap;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import edu.uiuc.ncsa.security.util.json.MyJSONUtil;
+import org.kordamp.json.JSONArray;
+import org.kordamp.json.JSONObject;
+import org.oa4mp.delegation.server.storage.ClientStore;
+import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -46,7 +48,7 @@ public class TXRecordConverter<V extends TXRecord> extends MapConverter<V> {
         if (map.containsKey(tkeys().audience()) && map.get(tkeys().audience()) != null) {
             //optional. Stored as JSON array.
             JSONArray a = JSONArray.fromObject(map.getString(tkeys().audience()));
-            txr.setAudience(a);
+            txr.setAudience(MyJSONUtil.arraytoList(a));
         }
         txr.setParentID(map.getIdentifier(tkeys().parentID()));
         if (map.containsKey(tkeys().ersatzID())) {
@@ -78,7 +80,7 @@ public class TXRecordConverter<V extends TXRecord> extends MapConverter<V> {
             for (int i = 0; i < a.size(); i++) {
                 a1.add(URI.create(a.getString(i)));
             }
-            a1.addAll(a);
+           // a1.addAll(a);
             txr.setResource(a1);
         }
 
@@ -86,7 +88,7 @@ public class TXRecordConverter<V extends TXRecord> extends MapConverter<V> {
             txr.setValid(map.getBoolean(tkeys().isValid()));
         }
         if (map.containsKey(tkeys().scopes()) && map.get(tkeys().scopes()) != null) {
-            txr.setScopes(JSONArray.fromObject(map.getString(tkeys().scopes())));
+            txr.setScopes(MyJSONUtil.arraytoList(JSONArray.fromObject(map.getString(tkeys().scopes()))));
         }
 
         return txr;
@@ -116,24 +118,14 @@ public class TXRecordConverter<V extends TXRecord> extends MapConverter<V> {
             data.put(tkeys().storedToken(), value.getStoredToken());
         }
         if (value.hasScopes()) {
-            JSONArray array;
-            if (value.getScopes() instanceof JSONArray) {
-                array = (JSONArray) value.getScopes();
-            } else {
-                array = new JSONArray();
-                array.addAll(value.getScopes());
-            }
-            data.put(tkeys().scopes(), array.toString());
+                JSONArray scopes = new JSONArray(); // need to serialize scopes as JSON array
+                scopes.addAll(value.getScopes());
+            data.put(tkeys().scopes(), scopes.toString());
         }
         if (value.hasAudience()) {
-            JSONArray array;
-            if (value.getAudience() instanceof JSONArray) {
-                array = (JSONArray) value.getAudience();
-            } else {
-                array = new JSONArray();
+                List<String> array = new ArrayList<>();
                 array.addAll(value.getAudience());
-            }
-            data.put(tkeys().audience(), array.toString());
+            data.put(tkeys().audience(), array);
         }
         if (value.hasResources()) {
             JSONArray array = new JSONArray();

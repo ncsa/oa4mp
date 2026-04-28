@@ -1,6 +1,6 @@
 package org.oa4mp.delegation.common.token.impl;
 
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
 
 import java.net.URI;

@@ -2,7 +2,7 @@ package org.oa4mp.delegation.server.jwt;
 
 import org.oa4mp.delegation.common.token.AccessToken;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 /**
  * <p>Created by Jeff Gaynor<br>

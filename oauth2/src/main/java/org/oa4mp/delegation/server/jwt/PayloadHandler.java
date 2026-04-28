@@ -5,7 +5,7 @@ import org.oa4mp.delegation.server.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunRequest;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.List;

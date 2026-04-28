@@ -2,7 +2,7 @@ package org.oa4mp.server.qdl.storage;
 
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 import org.oa4mp.server.api.admin.adminClient.AdminClient;
 import org.oa4mp.server.api.admin.adminClient.AdminClientKeys;
 import org.qdl_lang.variables.QDLStem;

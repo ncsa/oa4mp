@@ -11,7 +11,7 @@ import edu.uiuc.ncsa.security.servlet.HeaderUtils;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.storage.events.LastAccessedThread;
 import edu.uiuc.ncsa.security.util.pkcs.KeyPairPopulationThread;
-import net.sf.json.JSONArray;
+import org.kordamp.json.JSONArray;
 import org.apache.http.HttpStatus;
 import org.oa4mp.delegation.common.servlet.TransactionFilter;
 import org.oa4mp.delegation.common.servlet.TransactionState;

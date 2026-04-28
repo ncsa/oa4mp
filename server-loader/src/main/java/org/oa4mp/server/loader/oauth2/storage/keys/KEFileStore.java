@@ -48,6 +48,11 @@ public class KEFileStore<V extends KERecord> extends FileStore<V> implements KES
     public JSONWebKeys getCurrentKeys(VirtualIssuer vi) {
         return null;
     }
+
+    @Override
+    public JSONWebKeys getCurrentKeys() {
+        return null;
+    }
     @Override
     public Map<Identifier, KERecord> getByVI(VirtualIssuer vi) {
         throw new NotImplementedException();

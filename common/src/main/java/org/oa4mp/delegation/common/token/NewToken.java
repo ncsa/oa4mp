@@ -1,7 +1,7 @@
 package org.oa4mp.delegation.common.token;
 
 import edu.uiuc.ncsa.security.core.Identifier;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 import java.net.URI;
 

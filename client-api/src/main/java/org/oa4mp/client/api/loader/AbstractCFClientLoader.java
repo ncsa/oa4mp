@@ -9,7 +9,7 @@ import edu.uiuc.ncsa.security.servlet.ServiceClient;
 import edu.uiuc.ncsa.security.storage.CFDBConfigLoader;
 import edu.uiuc.ncsa.security.util.ssl.SSLConfiguration;
 import edu.uiuc.ncsa.security.util.ssl.SSLConfigurationUtil;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 import org.oa4mp.client.api.ClientEnvironment;
 import org.oa4mp.client.api.ClientLoaderInterface;
 import org.oa4mp.client.api.ClientXMLTags;

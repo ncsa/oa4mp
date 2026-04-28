@@ -5,7 +5,7 @@ import edu.uiuc.ncsa.security.core.util.IdentifierProvider;
 import edu.uiuc.ncsa.security.core.util.Identifiers;
 import edu.uiuc.ncsa.security.core.util.TokenUtil;
 import org.oa4mp.delegation.common.token.Token;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 import java.net.URI;
 import java.util.Base64;

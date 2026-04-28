@@ -1,7 +1,7 @@
 package org.oa4mp.delegation.server;
 
 import org.oa4mp.delegation.common.storage.clients.BaseClient;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 /**
  * Used for exceptions that must be returned as JSON.

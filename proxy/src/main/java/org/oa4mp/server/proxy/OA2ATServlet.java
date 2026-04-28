@@ -15,10 +15,11 @@ import edu.uiuc.ncsa.security.storage.sql.SQLStore;
 import edu.uiuc.ncsa.security.storage.sql.derby.DerbyConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
 import edu.uiuc.ncsa.security.util.configuration.TimeUtil;
+import edu.uiuc.ncsa.security.util.json.MyJSONUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONArray;
+import org.kordamp.json.JSONObject;
 import org.apache.http.HttpStatus;
 import org.oa4mp.delegation.common.servlet.TransactionState;
 import org.oa4mp.delegation.common.storage.TransactionStore;
@@ -440,7 +441,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         processRFC7523(request, response, tokenRequest, client);
     } // end RFC7523InitiateFlow
 
-    private void processRFC7523(HttpServletRequest request, HttpServletResponse response, JSONObject tokenRequest, OA2Client client) throws Throwable {
+    private void processRFC7523(HttpServletRequest request, HttpServletResponse response,
+                                JSONObject tokenRequest, OA2Client client) throws Throwable {
         if (!tokenRequest.containsKey(OA2Claims.ISSUER)) {
             throw new OA2ATException(OA2Errors.INVALID_REQUEST, "missing issuer");
         }
@@ -455,7 +457,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         if (tokenRequest.containsKey(OA2Constants.SCOPE)) {
             Object ss = tokenRequest.get(OA2Constants.SCOPE);
             if (ss instanceof JSONArray) {
-                scopes = (JSONArray) ss;
+                scopes = MyJSONUtil.arraytoList((JSONArray) ss);
             } else {
                 scopes = new ArrayList<>();
                 StringTokenizer stringTokenizer = new StringTokenizer(ss.toString(), " ");

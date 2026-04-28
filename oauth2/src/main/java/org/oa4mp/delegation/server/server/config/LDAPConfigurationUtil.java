@@ -1,10 +1,10 @@
 package org.oa4mp.delegation.server.server.config;
 
 import edu.uiuc.ncsa.security.util.ssl.SSLConfiguration;
-import net.sf.json.JSON;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONNull;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSON;
+import org.kordamp.json.JSONArray;
+import org.kordamp.json.JSONNull;
+import org.kordamp.json.JSONObject;
 import org.oa4mp.delegation.common.storage.JSONUtil;
 import org.oa4mp.delegation.server.server.claims.ClaimSourceConfiguration;
 import org.oa4mp.delegation.server.server.claims.ClaimSourceConfigurationUtil;

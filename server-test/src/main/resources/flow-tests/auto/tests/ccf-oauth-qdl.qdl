@@ -42,7 +42,7 @@ say(print(tokens.));
 ⊨ size(clc#claims()) == 0 : 'should not get id token by default';
 at. := clc#tokens().'access_token'.'jwt';
 ⊨ false ∉ (scopes. ∈ tokenize(at.scope, ' ')) : 'wrong scopes: ' + at.scope;
-⊨ at.'aud' == aud;
+⊨ at.'aud' == aud : 'expected AT audience = ' + aud + ' but got ' + (at.'aud');
 
 
 say('ok: OAuth client credentials flow, refresh token, with scripting');

@@ -1,5 +1,17 @@
 package org.oa4mp.server.loader.oauth2.storage.clients;
 
+import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
+import edu.uiuc.ncsa.security.util.json.MyJSONUtil;
+import org.kordamp.json.JSONObject;
+import org.oa4mp.delegation.common.storage.clients.BaseClient;
+import org.oa4mp.delegation.common.storage.clients.Client;
+import org.oa4mp.delegation.server.OA2Constants;
+import org.oa4mp.delegation.server.OA2Scopes;
+import org.oa4mp.delegation.server.server.OA2ClientScopes;
+import org.oa4mp.delegation.server.server.config.LDAPConfiguration;
+import org.oa4mp.delegation.server.server.scripts.ClientJSONConfigUtil;
 import org.oa4mp.server.loader.oauth2.claims.AbstractPayloadConfig;
 import org.oa4mp.server.loader.oauth2.claims.IDTokenClientConfig;
 import org.oa4mp.server.loader.oauth2.loader.OA2CFConfigurationLoader;
@@ -7,18 +19,6 @@ import org.oa4mp.server.loader.oauth2.servlet.OA2ClientUtils;
 import org.oa4mp.server.loader.oauth2.tokens.AccessTokenConfig;
 import org.oa4mp.server.loader.oauth2.tokens.RefreshTokenConfig;
 import org.oa4mp.server.loader.qdl.scripting.QDLRuntimeEngine;
-import edu.uiuc.ncsa.security.core.Identifier;
-import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import edu.uiuc.ncsa.security.core.util.StringUtils;
-import org.oa4mp.delegation.common.storage.clients.BaseClient;
-import org.oa4mp.delegation.common.storage.clients.Client;
-import org.oa4mp.delegation.server.OA2Constants;
-import org.oa4mp.delegation.server.OA2Scopes;
-import org.oa4mp.delegation.server.server.OA2ClientScopes;
-import org.oa4mp.delegation.server.server.config.LDAPConfiguration;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import org.oa4mp.delegation.server.server.scripts.ClientJSONConfigUtil;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -479,20 +479,22 @@ public class OA2Client extends Client implements OA2ClientScopes {
 
     protected List<String> getNamedList(String component, String key) {
         if (getNamedAttributes(component).containsKey(key)) {
-            return getNamedAttributes(component).getJSONArray(key);
+            return MyJSONUtil.arraytoList(getNamedAttributes(component).getJSONArray(key));
         }
-        return new JSONArray();
+        return new ArrayList<>();
 
     }
 
     protected void setNamedList(String component, String key, List<String> list) {
+/*
         JSONArray ja = null;
         if (list instanceof JSONArray) {
             ja = (JSONArray) list;
         } else {
-            ja = new JSONArray();
+*/
+            List<String> ja = new ArrayList<>();
             ja.addAll(list);
-        }
+
         getNamedAttributes(component).put(key, ja);
     }
 

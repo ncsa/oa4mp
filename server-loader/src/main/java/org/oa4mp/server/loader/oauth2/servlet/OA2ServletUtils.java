@@ -1,26 +1,26 @@
 package org.oa4mp.server.loader.oauth2.servlet;
 
+import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
+import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
+import edu.uiuc.ncsa.security.storage.XMLMap;
+import org.apache.http.HttpStatus;
+import org.kordamp.json.JSONObject;
+import org.oa4mp.delegation.server.OA2ATException;
+import org.oa4mp.delegation.server.OA2Errors;
+import org.oa4mp.delegation.server.jwt.ScriptRuntimeException;
 import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.state.ExtendedParameters;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
 import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction;
 import org.oa4mp.server.loader.oauth2.storage.tx.TXRecord;
-import org.oa4mp.delegation.server.OA2ATException;
-import org.oa4mp.delegation.server.OA2Errors;
-import org.oa4mp.delegation.server.jwt.ScriptRuntimeException;
 import org.qdl_lang.exceptions.AssertionException;
 import org.qdl_lang.exceptions.ParsingException;
 import org.qdl_lang.exceptions.QDLExceptionWithTrace;
-import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
-import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
-import edu.uiuc.ncsa.security.storage.XMLMap;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import org.apache.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -245,10 +245,10 @@ public class OA2ServletUtils {
             if (xa.containsKey(key)) {
                 Object object = xa.get(key);
                 List<String> templates;
-                if (object instanceof JSONArray) {
-                    templates = (JSONArray) object;
+                if (object instanceof List) {
+                    templates = (List) object;
                 } else {
-                    templates = new JSONArray();
+                    templates = new ArrayList<>();
                     templates.add(object.toString());
                 }
                 t.setUseTemplates(templates);
@@ -257,6 +257,10 @@ public class OA2ServletUtils {
         }
     }
 
+    public static void processXAs(JSONObject params, OA2ServiceTransaction t, OA2Client client) {
+        ExtendedParameters xp = new ExtendedParameters();
+        processXAs(xp.convertToParameterMap(params), t, client);
+    }
     public static void processXAs(Map<String, String[]> params, OA2ServiceTransaction t, OA2Client client) {
         ExtendedParameters xp = new ExtendedParameters();
         // Take the parameters and parse them into configuration objects,

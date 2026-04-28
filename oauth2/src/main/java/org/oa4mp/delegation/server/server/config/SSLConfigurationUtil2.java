@@ -3,7 +3,7 @@ package org.oa4mp.delegation.server.server.config;
 import org.oa4mp.delegation.common.storage.JSONUtil;
 import edu.uiuc.ncsa.security.util.ssl.SSLConfiguration;
 import edu.uiuc.ncsa.security.util.ssl.SSLConfigurationUtil;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;

@@ -1,6 +1,6 @@
 package org.oa4mp.server.loader.oauth2.claims;
 
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 import static org.oa4mp.server.loader.oauth2.claims.Groups.*;
 

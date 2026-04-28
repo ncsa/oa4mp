@@ -32,6 +32,12 @@ public interface KEStore<V extends KERecord> extends Store<V> {
     JSONWebKeys getCurrentKeys(VirtualIssuer vi);
 
     /**
+     * Get <b>all</b> currently active keys.
+     * @return
+     */
+    JSONWebKeys getCurrentKeys();
+
+    /**
      * Return valid Key Records for a given virtual issuer.  This means that they have
      * no expired and are valid.
      * @param vi

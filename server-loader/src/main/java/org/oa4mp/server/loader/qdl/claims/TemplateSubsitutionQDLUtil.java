@@ -1,5 +1,6 @@
 package org.oa4mp.server.loader.qdl.claims;
 
+import edu.uiuc.ncsa.security.util.json.MyJSONUtil;
 import org.oa4mp.server.loader.oauth2.claims.ScopeTemplateUtil;
 import org.qdl_lang.exceptions.BadArgException;
 import org.qdl_lang.extensions.QDLFunction;
@@ -51,7 +52,7 @@ public class TemplateSubsitutionQDLUtil implements QDLFunction {
             QDLStem groupClaimStem = objects[2].asStem();
             for (Object key : groupClaimStem.keySet()) {
                 QDLStem ss = groupClaimStem.get(key).asStem();
-                groups.put(String.valueOf(key), ss.getQDLList().toJSON());
+                groups.put(String.valueOf(key), MyJSONUtil.arraytoList(ss.getQDLList().toJSON()));
             }
         }
         List<String> out = new ArrayList<>();

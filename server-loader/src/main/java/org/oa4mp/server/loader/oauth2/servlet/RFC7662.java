@@ -10,7 +10,7 @@ import org.oa4mp.delegation.server.OA2GeneralError;
 import org.oa4mp.delegation.server.server.RFC8693Constants;
 import org.oa4mp.delegation.server.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

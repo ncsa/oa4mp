@@ -12,9 +12,8 @@ import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.util.configuration.TimeUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 import org.apache.http.HttpStatus;
+import org.kordamp.json.JSONObject;
 import org.oa4mp.delegation.common.servlet.TransactionState;
 import org.oa4mp.delegation.common.token.AuthorizationGrant;
 import org.oa4mp.delegation.common.token.impl.IDTokenImpl;
@@ -292,7 +291,7 @@ public class OA2AuthorizedServletUtil {
      * @return
      */
     protected List<String> getAndCheckResponseTypes(HttpServletRequest httpServletRequest) {
-        JSONArray array = new JSONArray();
+      //  JSONArray array = new JSONArray();
         String requestState = httpServletRequest.getParameter(OA2Constants.STATE);
 
         // CIL-833 fix?
@@ -325,6 +324,7 @@ public class OA2AuthorizedServletUtil {
                             requestState);
                 }
             }
+            List<String> array = new ArrayList<>();
             array.addAll(responseTypes);
             return array;
             // response type of code is all we support. They may also ask for a response

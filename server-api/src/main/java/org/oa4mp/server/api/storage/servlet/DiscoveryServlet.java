@@ -4,8 +4,8 @@ import org.oa4mp.delegation.server.OIDCDiscoveryTags;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import org.oa4mp.delegation.server.ServiceTransaction;
 import org.oa4mp.delegation.server.request.IssuerResponse;
-import net.sf.json.JSONObject;
-import net.sf.json.util.JSONUtils;
+import org.kordamp.json.JSONObject;
+import org.kordamp.json.util.JSONUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

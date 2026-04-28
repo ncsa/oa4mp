@@ -5,7 +5,7 @@ import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.cli.CLITool2;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 import org.oa4mp.delegation.common.storage.clients.Client;
 import org.oa4mp.delegation.server.storage.ClientApproval;
 import org.oa4mp.server.api.ServiceEnvironment;

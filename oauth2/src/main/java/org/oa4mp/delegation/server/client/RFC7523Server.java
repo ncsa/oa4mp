@@ -7,7 +7,7 @@ import edu.uiuc.ncsa.security.servlet.ServiceClient;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import edu.uiuc.ncsa.security.util.jwk.JWKUtil2;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 import org.oa4mp.delegation.client.request.RFC7523Request;
 import org.oa4mp.delegation.client.request.RFC7523Response;
 import org.oa4mp.delegation.common.storage.clients.BaseClient;

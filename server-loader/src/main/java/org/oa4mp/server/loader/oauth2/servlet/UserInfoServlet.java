@@ -19,7 +19,7 @@ import org.oa4mp.delegation.server.server.UII2;
 import org.oa4mp.delegation.server.server.UIIRequest2;
 import org.oa4mp.delegation.server.server.UIIResponse2;
 import edu.uiuc.ncsa.security.servlet.AbstractServlet;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 import org.apache.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;

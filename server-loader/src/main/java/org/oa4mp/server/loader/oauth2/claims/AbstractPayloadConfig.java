@@ -1,5 +1,6 @@
 package org.oa4mp.server.loader.oauth2.claims;
 
+import edu.uiuc.ncsa.security.util.json.MyJSONUtil;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
 import org.oa4mp.server.loader.qdl.scripting.QDLRuntimeEngine;
 import org.qdl_lang.scripting.AnaphorUtil;
@@ -7,9 +8,9 @@ import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.util.configuration.TimeUtil;
 import edu.uiuc.ncsa.security.util.scripting.ScriptSet;
-import net.sf.json.JSON;
-import net.sf.json.JSONException;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSON;
+import org.kordamp.json.JSONException;
+import org.kordamp.json.JSONObject;
 
 import java.io.Serializable;
 import java.text.ParseException;
@@ -92,7 +93,7 @@ public abstract class AbstractPayloadConfig implements Serializable {
             throw new IllegalStateException("Error: Missing type for access token handler configuration");
         }
         if (jsonObject.containsKey(VERSIONS_KEY)) {
-            versions = jsonObject.getJSONArray(VERSIONS_KEY);
+            versions = MyJSONUtil.arraytoList(jsonObject.getJSONArray(VERSIONS_KEY));
         }
         if (jsonObject.containsKey(ID_KEY)) {
             id = jsonObject.getString(ID_KEY);

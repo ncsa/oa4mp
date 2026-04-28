@@ -5,7 +5,7 @@ import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.storage.data.ConversionMap;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 import java.net.URI;
 

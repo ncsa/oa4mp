@@ -1,8 +1,11 @@
 package org.oa4mp.delegation.server.server.claims;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import edu.uiuc.ncsa.security.util.json.MyJSONUtil;
+import org.kordamp.json.JSONArray;
+import org.kordamp.json.JSONObject;
 import org.oa4mp.delegation.common.storage.JSONUtil;
+
+import java.util.ArrayList;
 
 /**
  * This is a utility that will take a claim source and make a configuration for it.
@@ -117,13 +120,13 @@ public class ClaimSourceConfigurationUtil {
         jsonUtil.setJSONValue(jsonConfig, NOTIFY_ON_FAIL_TAG, config.isNotifyOnFail());
         if (config.getOmitList() != null && !config.getOmitList().isEmpty()) {
             JSONArray omitList = null;
-            if (config.getOmitList() instanceof JSONArray) {
+            /* if (config.getOmitList() instanceof JSONArray) /*{
                 jsonUtil.setJSONValue(jsonConfig, OMIT_CLAIMS_LIST_TAG, config.getOmitList());
-            } else {
+            } else{*/
                 omitList = new JSONArray();
                 omitList.addAll(config.getOmitList());
                 jsonUtil.setJSONValue(jsonConfig, OMIT_CLAIMS_LIST_TAG, omitList);
-            }
+            //}
         }
 
         return jsonConfig;
@@ -155,7 +158,7 @@ public class ClaimSourceConfigurationUtil {
         // CIL-513 fix
         Object rawOmitList = jsonUtil.getJSONValue(json, OMIT_CLAIMS_LIST_TAG);
         if (rawOmitList == null) {
-            config.setOmitList(new JSONArray());
+            config.setOmitList(new ArrayList());
         }else{
             JSONArray array = null;
             if (rawOmitList instanceof JSONArray) {
@@ -163,7 +166,7 @@ public class ClaimSourceConfigurationUtil {
             } else {
                 array = JSONArray.fromObject(rawOmitList);
             }
-            config.setOmitList(array);
+            config.setOmitList(MyJSONUtil.arraytoList(array));
         }
         config.setProperties(json.getJSONObject(getComponentName()));
         return config;

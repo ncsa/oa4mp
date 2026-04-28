@@ -4,7 +4,7 @@ import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.Pacer;
 import edu.uiuc.ncsa.security.storage.FileStore;
 import edu.uiuc.ncsa.security.util.TestBase;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 import org.oa4mp.delegation.server.storage.ClientApproval;
 import org.oa4mp.delegation.server.storage.ClientApprovalStore;
 import org.oa4mp.delegation.server.storage.ClientStore;

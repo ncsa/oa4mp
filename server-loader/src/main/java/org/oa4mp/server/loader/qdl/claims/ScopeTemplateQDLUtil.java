@@ -1,5 +1,6 @@
 package org.oa4mp.server.loader.qdl.claims;
 
+import edu.uiuc.ncsa.security.util.json.MyJSONUtil;
 import org.oa4mp.server.loader.oauth2.claims.ScopeTemplateUtil;
 import org.qdl_lang.evaluate.StemEvaluator;
 import org.qdl_lang.evaluate.StringEvaluator;
@@ -197,8 +198,8 @@ public class ScopeTemplateQDLUtil implements Serializable {
     }
 
     protected QDLStem doIt(QDLStem allowedStem, QDLStem requestedStem, boolean isQuery) {
-        List<String> computedScopes = allowedStem.getQDLList().toJSON();
-        List<String> requestedScopes = requestedStem.getQDLList().toJSON();
+        List<String> computedScopes = MyJSONUtil.arraytoList(allowedStem.getQDLList().toJSON());
+        List<String> requestedScopes = MyJSONUtil.arraytoList(requestedStem.getQDLList().toJSON());
         Collection<String> returnedScopes = ScopeTemplateUtil.doCompareTemplates(computedScopes, requestedScopes, isQuery);
         List<String> rc = new ArrayList<>();
         rc.addAll(returnedScopes);

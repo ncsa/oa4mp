@@ -1,7 +1,7 @@
 package org.oa4mp.delegation.server;
 
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;

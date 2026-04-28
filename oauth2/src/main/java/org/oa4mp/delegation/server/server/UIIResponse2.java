@@ -3,7 +3,7 @@ package org.oa4mp.delegation.server.server;
 import org.oa4mp.delegation.server.request.IssuerResponse;
 import org.oa4mp.delegation.common.token.AccessToken;
 import org.oa4mp.delegation.server.UserInfo;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;

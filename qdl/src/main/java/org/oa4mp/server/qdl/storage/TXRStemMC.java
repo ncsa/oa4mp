@@ -9,7 +9,7 @@ import org.qdl_lang.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 import static org.qdl_lang.variables.StemUtility.put;
 

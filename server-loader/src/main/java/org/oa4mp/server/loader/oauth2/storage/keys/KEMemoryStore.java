@@ -45,6 +45,11 @@ public class KEMemoryStore<V extends KERecord> extends MemoryStore<V> implements
     }
 
     @Override
+    public JSONWebKeys getCurrentKeys() {
+        return null;
+    }
+
+    @Override
     public Map<Identifier, KERecord> getByVI(VirtualIssuer vi) {
         throw new NotImplementedException();
     }

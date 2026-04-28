@@ -3,8 +3,9 @@ package org.oa4mp.server.loader.qdl.acl;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import edu.uiuc.ncsa.security.util.json.MyJSONUtil;
+import org.kordamp.json.JSONArray;
+import org.kordamp.json.JSONObject;
 import org.oa4mp.server.loader.qdl.scripting.OA2State;
 import org.qdl_lang.exceptions.BadArgException;
 import org.qdl_lang.exceptions.QDLIllegalAccessException;
@@ -354,10 +355,10 @@ public class QDLACL implements QDLMetaModule {
     @Override
     public void deserializeFromJSON(JSONObject jsonObject) {
         if (jsonObject.has("blacklist")) {
-            getBlackList().addAll(jsonObject.getJSONArray("blacklist"));
+            getBlackList().addAll(MyJSONUtil.arraytoList(jsonObject,"blacklist"));
         }
         if (jsonObject.has("whitelist")) {
-            getWhiteList().addAll(jsonObject.getJSONArray("whitelist"));
+            getWhiteList().addAll(MyJSONUtil.arraytoList(jsonObject,"whitelist"));
         }
     }
 }

@@ -5,13 +5,11 @@ import edu.uiuc.ncsa.security.core.exceptions.TransactionNotFoundException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.servlet.JSPUtil;
-import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.util.cli.CLIDriver;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
-import net.sf.json.JSONObject;
-import org.apache.commons.lang.StringEscapeUtils;
+import org.kordamp.json.JSONObject;
 import org.oa4mp.delegation.server.OA2Constants;
 import org.oa4mp.delegation.server.ServiceTransaction;
 import org.oa4mp.delegation.server.jwt.HandlerRunner;
@@ -34,7 +32,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
+import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
 import static org.oa4mp.server.api.ServiceConstantKeys.TOKEN_KEY;
 import static org.oa4mp.server.proxy.ProxyUtils.setClaimsFromProxy;
 
@@ -134,9 +132,9 @@ public class ProxyCallbackServlet extends OA2AuthenticationServer {
         request.setAttribute("stateKey", "state");
  //       request.setAttribute("authorizationState", t.getRequestState());
 
-        request.setAttribute("clientHome", escapeHtml(t.getClient().getHomeUri()));
-        request.setAttribute("clientName", escapeHtml(t.getClient().getName()));
-        request.setAttribute("clientScopes", StringEscapeUtils.escapeHtml(scopesToString(t)));
+        request.setAttribute("clientHome", escapeHtml4(t.getClient().getHomeUri()));
+        request.setAttribute("clientName", escapeHtml4(t.getClient().getName()));
+        request.setAttribute("clientScopes", escapeHtml4(scopesToString(t)));
 
         request.setAttribute("actionToTake", request.getContextPath() + "/authorize");
     }

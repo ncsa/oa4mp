@@ -12,7 +12,7 @@ import org.oa4mp.delegation.server.OA2Constants;
 import org.oa4mp.delegation.server.server.RFC8693Constants;
 import org.oa4mp.delegation.server.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 import java.net.URI;
 

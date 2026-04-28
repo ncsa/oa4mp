@@ -14,7 +14,7 @@ import org.oa4mp.delegation.server.server.AGRequest2;
 import org.oa4mp.delegation.server.server.OIDCServiceTransactionInterface;
 import org.oa4mp.delegation.server.server.RTIRequest;
 import edu.uiuc.ncsa.security.util.TestBase;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 import org.junit.Test;
 
 import java.util.Collection;

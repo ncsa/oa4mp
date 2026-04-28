@@ -212,7 +212,10 @@ public class KEStoreUtilities {
     }
 
     /**
-     * For a virtual issuer (may be null), resolve the key configuration.
+     * For a virtual issuer (may be null), resolve the key configuration. This means that if the VI
+     * has these ocnfigured, and the server allows for overrides, use the VI configuration. Otherwise
+     * use the server configuration. Note that it is assumed you have checked if the server allows
+     * key rotations separately.
      *
      * @param oa2SE
      * @param vi

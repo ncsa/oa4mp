@@ -12,7 +12,7 @@ import org.oa4mp.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.core.exceptions.RetryException;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.servlet.*;
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -228,7 +228,7 @@ public abstract class AbstractRegistrationServlet extends OA4MPServlet implement
             request.setAttribute("actionToTake", request.getContextPath() + request.getServletPath());
 
 
-            request.setAttribute("retryMessage", StringEscapeUtils.escapeHtml(r.getMessage()));
+            request.setAttribute("retryMessage", StringEscapeUtils.escapeHtml4(r.getMessage()));
             logOK(request); //CIL-1722
 
             JSPUtil.fwd(request, response, getInitPage());
@@ -256,7 +256,7 @@ public abstract class AbstractRegistrationServlet extends OA4MPServlet implement
             if (p != null) {
                 String key = p.toString();
                 request.setAttribute(key, key);
-                String escapedValue = StringEscapeUtils.escapeHtml(request.getParameter(key));
+                String escapedValue = StringEscapeUtils.escapeHtml4(request.getParameter(key));
                 request.setAttribute(getValueTag(key), escapedValue);
             }
         }

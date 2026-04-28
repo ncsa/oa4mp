@@ -1,7 +1,7 @@
 package org.oa4mp.server.loader.oauth2.servlet;
 
 import edu.uiuc.ncsa.security.core.util.StringUtils;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 import java.net.URI;
 

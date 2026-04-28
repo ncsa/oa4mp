@@ -13,8 +13,8 @@ import edu.uiuc.ncsa.security.core.util.FileUtil;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.util.scripting.ScriptSet;
 import edu.uiuc.ncsa.security.util.scripting.ScriptingConstants;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONArray;
+import org.kordamp.json.JSONObject;
 
 import java.io.File;
 import java.io.StringReader;

@@ -1,5 +1,6 @@
 package org.oa4mp.server.loader.oauth2.storage.tx;
 
+import edu.uiuc.ncsa.security.util.json.MyJSONUtil;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
 import org.qdl_lang.xml.SerializationConstants;
 import org.qdl_lang.xml.XMLUtilsV2;
@@ -9,8 +10,8 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.IdentifiableImpl;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONArray;
+import org.kordamp.json.JSONObject;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
@@ -349,19 +350,19 @@ public class TXRecord extends IdentifiableImpl implements Identifiable, Cloneabl
                         case AUDIENCE:
                             j = JSONArray.fromObject(XMLUtilsV2.getText(xer, AUDIENCE));
                             audience = new ArrayList<>();
-                            audience.addAll(j);
+                            audience.addAll(MyJSONUtil.arraytoList(j));
                             //audience = readStemAsStrings(xer);
                             break;
                         case SCOPES:
                             j = JSONArray.fromObject(XMLUtilsV2.getText(xer, SCOPES));
                             scopes = new ArrayList<>();
-                            scopes.addAll(j);
+                            scopes.addAll(MyJSONUtil.arraytoList(j));
                             //scopes = readStemAsStrings(xer);
                             break;
                         case RESOURCES:
                             j = JSONArray.fromObject(XMLUtilsV2.getText(xer, RESOURCES));
                             List<String> ll = new ArrayList<>();
-                            ll.addAll(j);
+                            ll.addAll(MyJSONUtil.arraytoList(j));
                             //List<String> ll = readStemAsStrings(xer);
                             resource = new ArrayList<URI>();
                             for (String s : ll) {

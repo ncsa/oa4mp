@@ -11,9 +11,9 @@ import org.oa4mp.delegation.server.server.RFC7636Util;
 import org.oa4mp.delegation.server.server.RFC8693Constants;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import net.sf.json.util.JSONUtils;
+import org.kordamp.json.JSONArray;
+import org.kordamp.json.JSONObject;
+import org.kordamp.json.util.JSONUtils;
 import org.apache.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;

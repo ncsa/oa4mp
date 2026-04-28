@@ -4,7 +4,7 @@ import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 import org.oa4mp.delegation.client.request.ATRequest;
 import org.oa4mp.delegation.client.request.ATResponse;
 import org.oa4mp.delegation.client.server.ATServer;
@@ -34,7 +34,7 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
      * get them back, they are checked for validity and passed along to the client. The problem is that
      * many applications (such as Kubernetes) are using them as a "poor man's SciToken", necessitating
      * that we keep them around for at least a bit. This store holds the raw token (as a string) and
-     * the corresponding {@link net.sf.json.JSONObject} keyed by {@link AccessToken}.
+     * the corresponding {@link org.kordamp.json.JSONObject} keyed by {@link AccessToken}.
      */
 
     public static class IDTokenEntry {

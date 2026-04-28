@@ -4,8 +4,6 @@ import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.*;
 import edu.uiuc.ncsa.security.servlet.JSPUtil;
 import edu.uiuc.ncsa.security.servlet.PresentableState;
-import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.oa4mp.delegation.common.token.impl.AuthorizationGrantImpl;
 import org.oa4mp.delegation.common.token.impl.TokenFactory;
 import org.oa4mp.delegation.server.OA2ATException;
@@ -34,7 +32,7 @@ import java.sql.SQLException;
 import java.util.*;
 
 import static edu.uiuc.ncsa.security.core.util.DebugUtil.trace;
-import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
+import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
 import static org.apache.http.HttpStatus.*;
 import static org.oa4mp.delegation.server.OA2Errors.*;
 import static org.oa4mp.server.api.ServiceConstantKeys.TOKEN_KEY;
@@ -595,7 +593,7 @@ public class RFC8628AuthenticationServer extends EnvServlet {
                         //getTransactionStore().save(aState.getTransaction());
 
                         // make it display pretty as per usual conventions. This is never reused, however.
-                        pendingState.getRequest().setAttribute(AUTHORIZATION_USER_NAME_VALUE, StringEscapeUtils.escapeHtml(x));
+                        pendingState.getRequest().setAttribute(AUTHORIZATION_USER_NAME_VALUE, escapeHtml4(x));
                     }
                 } else {
                     info("*** PRESENT: Use headers DISABLED.");
@@ -641,9 +639,9 @@ public class RFC8628AuthenticationServer extends EnvServlet {
         request.setAttribute("stateKey", "state");
  //       request.setAttribute("authorizationState", t.getRequestState());
 
-        request.setAttribute("clientHome", escapeHtml(t.getClient().getHomeUri()));
-        request.setAttribute("clientName", escapeHtml(t.getClient().getName()));
-        request.setAttribute("clientScopes", StringEscapeUtils.escapeHtml(scopesToString(t)));
+        request.setAttribute("clientHome", escapeHtml4(t.getClient().getHomeUri()));
+        request.setAttribute("clientName", escapeHtml4(t.getClient().getName()));
+        request.setAttribute("clientScopes", escapeHtml4(scopesToString(t)));
 
         request.setAttribute("actionToTake", request.getContextPath() + "/device");
     }

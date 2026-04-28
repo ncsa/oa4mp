@@ -7,7 +7,7 @@ import org.oa4mp.delegation.server.OA2ATException;
 import org.oa4mp.delegation.server.OA2Errors;
 import org.oa4mp.delegation.server.server.RFC9068Constants;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 import static org.oa4mp.delegation.server.OA2Constants.SCOPE;
 import static org.oa4mp.delegation.server.server.claims.OA2Claims.AUDIENCE;

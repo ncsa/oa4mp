@@ -10,7 +10,7 @@ import org.oa4mp.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;

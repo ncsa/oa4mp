@@ -121,6 +121,72 @@ public class KESQLStore<V extends KERecord> extends SQLStore<V> implements KESto
         return (JSONWebKeys) getByVID(vi, true);
     }
 
+    @Override
+    public JSONWebKeys getCurrentKeys() {
+        return (JSONWebKeys) getByVID(true);
+    }
+
+    /**
+     * Identical to {@link #getByVID(VirtualIssuer, boolean)} but for all virtual issuers..
+     * @param keysOnly
+     * @return
+     */
+    protected Map getByVID(boolean keysOnly) {
+
+        Map outMap = null;
+        JSONWebKeys jsonWebKeys = null;
+        if (keysOnly) {
+            jsonWebKeys = new JSONWebKeys(null);
+        } else {
+            outMap = new HashMap();
+        }
+        String rawStatement = "SELECT * from " + getTable().getFQTablename() + " where " +
+                getKeys().isValid() + "=1 AND " +
+                "(" + getKeys().exp() + " is NULL OR ?<" + getKeys().exp() + ")"; // not expired yet.
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+
+        V t = null;
+        try {
+            PreparedStatement stmt = c.prepareStatement(rawStatement);
+            stmt.setLong(1, System.currentTimeMillis());
+            stmt.executeQuery();
+            ResultSet rs = stmt.getResultSet();
+            // Now we have to pull in all the values.
+            while (rs.next()) {
+                ColumnMap map = rsToMap(rs);
+                t = create();
+                populate(map, t);
+                if (keysOnly) {
+                    jsonWebKeys.put(t.toJWK());
+                    if (t.getDefault()) jsonWebKeys.setDefaultKeyID(t.getKid());
+                } else {
+                    outMap.put(t.getIdentifier(), t);
+                }
+            }
+
+            rs.close();
+            stmt.close();
+            releaseConnection(cr);
+        } catch (SQLException e) {
+            destroyConnection(cr);
+            throw new GeneralException("Error getting all entries.", e);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        } catch (InvalidKeySpecException e) {
+            throw new RuntimeException(e);
+        }
+        if (keysOnly) return jsonWebKeys;
+        return jsonWebKeys;
+    }
+
+    /**
+     * Return the current keys for the given virtual issuer. If keysOnly is true, then
+     * return a JSONWebKeys object. Otherwise, return a map of KERecords.
+     * @param vi
+     * @param keysOnly
+     * @return
+     */
     protected Map getByVID(VirtualIssuer vi, boolean keysOnly) {
         Identifier viID = OA2SE.SERVER_VI_ID; // default.
         if (vi != null) viID = vi.getIdentifier();

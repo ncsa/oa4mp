@@ -3,6 +3,7 @@ package org.oa4mp.server.loader.oauth2.storage.clients;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import com.typesafe.config.ConfigRenderOptions;
+import edu.uiuc.ncsa.security.util.json.MyJSONUtil;
 import org.oa4mp.delegation.common.storage.clients.ClientConverter;
 import org.oa4mp.delegation.server.server.config.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
@@ -10,10 +11,10 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.storage.data.ConversionMap;
-import net.sf.json.JSON;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import net.sf.json.JSONSerializer;
+import org.kordamp.json.JSON;
+import org.kordamp.json.JSONArray;
+import org.kordamp.json.JSONObject;
+import org.kordamp.json.JSONSerializer;
 
 import java.io.StringReader;
 import java.net.URI;
@@ -67,7 +68,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
             otherV.setErsatzInheritIDToken(map.getBoolean(getCK2().ersatzInheritIDToken()));
         }
         if (map.get(getCK2().proxyRequestScopes()) == null) {
-            JSONArray array = new JSONArray();
+            List<String> array = new ArrayList<>(1);
             array.add("*");
             otherV.setProxyRequestScopes(array);
         }else{
@@ -107,10 +108,11 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         if (map.get(getCK2().resource()) != null) {
             Collection<String> collection = jsonArrayToCollection(map, getCK2().resource()); // This is now strings.
 
-            JSONArray jsonArray = new JSONArray();
+            List<String> jsonArray = new ArrayList<>();
             for (String x : collection) {
-                jsonArray.add(URI.create(x));
+                URI.create(x); // check they are valid URIs
             }
+            jsonArray.addAll(collection);
             otherV.setAudience(jsonArray);
         }
         if (map.get(getCK2().publicClient()) != null) {
@@ -369,7 +371,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
             v.setForwardScopesToProxy(getJsonUtil().getJSONValueBoolean(json, getCK2().forwardScopesToProxy()));
         }
         if (json.containsKey(getCK2().proxyRequestScopes())) {
-            v.setProxyRequestScopes(getJsonUtil().getJSONArray(json, getCK2().proxyRequestScopes()));
+            v.setProxyRequestScopes(MyJSONUtil.arraytoList(getJsonUtil().getJSONArray(json, getCK2().proxyRequestScopes())));
         }
         if (json.containsKey(getCK2().prototypes())) {
             if (!json.getJSONArray(getCK2().prototypes()).isEmpty()) {

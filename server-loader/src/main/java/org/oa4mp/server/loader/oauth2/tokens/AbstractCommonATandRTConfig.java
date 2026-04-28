@@ -2,8 +2,8 @@ package org.oa4mp.server.loader.oauth2.tokens;
 
 import org.oa4mp.server.loader.oauth2.claims.AbstractPayloadConfig;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONArray;
+import org.kordamp.json.JSONObject;
 
 import java.net.URI;
 import java.util.ArrayList;

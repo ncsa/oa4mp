@@ -3,7 +3,7 @@ package org.oa4mp.server.api.admin.adminClient;
 import org.oa4mp.delegation.common.storage.clients.BaseClient;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.util.crypto.KeyUtil;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 import java.net.URI;
 import java.security.NoSuchAlgorithmException;

@@ -1,7 +1,7 @@
 package org.oa4mp.delegation.server.server.config;
 
 import edu.uiuc.ncsa.security.util.ssl.SSLConfiguration;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 import javax.naming.Name;
 import javax.naming.directory.Attributes;

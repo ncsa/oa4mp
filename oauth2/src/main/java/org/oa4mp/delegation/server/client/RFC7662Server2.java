@@ -2,8 +2,8 @@ package org.oa4mp.delegation.server.client;
 
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
-import net.sf.json.JSONException;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONException;
+import org.kordamp.json.JSONObject;
 import org.oa4mp.delegation.client.request.RFC7662Request;
 import org.oa4mp.delegation.client.request.RFC7662Response;
 import org.oa4mp.delegation.client.server.RFC7662Server;

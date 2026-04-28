@@ -1,6 +1,6 @@
 package org.oa4mp.delegation.server.server;
 
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 /**
  * Thanks to Java package restrictions, have to make an interface for TXRecords here.

@@ -3,9 +3,9 @@ package org.oa4mp.server.loader.qdl.scripting;
 import edu.uiuc.ncsa.security.core.cf.CFNode;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.scripting.ScriptSet;
-import net.sf.json.JSON;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSON;
+import org.kordamp.json.JSONArray;
+import org.kordamp.json.JSONObject;
 import org.qdl_lang.config.QDLCFConfigurationLoader;
 import org.qdl_lang.scripting.AnaphorUtil;
 

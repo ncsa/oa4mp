@@ -7,18 +7,21 @@ import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.storage.data.ConversionMap;
 import edu.uiuc.ncsa.security.storage.monitored.MonitoredConverter;
+import edu.uiuc.ncsa.security.util.json.MyJSONUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import edu.uiuc.ncsa.security.util.jwk.JWKUtil2;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import net.sf.json.JSONSerializer;
+import org.kordamp.json.JSONArray;
+import org.kordamp.json.JSONObject;
+import org.kordamp.json.JSONSerializer;
 import org.oa4mp.delegation.common.storage.JSONUtil;
 
 import java.net.URI;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -84,9 +87,9 @@ public class BaseClientConverter<V extends BaseClient> extends MonitoredConverte
         if (map.containsKey(getBKK().rfc7523ClientUsers()) && map.get(getBKK().rfc7523ClientUsers()) != null) {
             value.setServiceClientUsers(jsonArrayToCollection(map, getBKK().rfc7523ClientUsers()));
         } else {
-            JSONArray array = new JSONArray();
-            array.add("*");
-            value.setServiceClientUsers(array);
+            List<String> list = new ArrayList<>();
+            list.add("*");
+            value.setServiceClientUsers(list);
         }
         return value;
     }
@@ -142,7 +145,7 @@ public class BaseClientConverter<V extends BaseClient> extends MonitoredConverte
             v.setState(JSONObject.fromObject(json.getJSONObject(getBKK().state())));
         }
         if (json.containsKey(getBKK().rfc7523ClientUsers())) {
-            v.setServiceClientUsers(getJsonUtil().getJSONArray(json, getBKK().rfc7523ClientUsers()));
+            v.setServiceClientUsers(MyJSONUtil.arraytoList(getJsonUtil().getJSONArray(json, getBKK().rfc7523ClientUsers())));
         }
         String jwksuri = getJsonUtil().getJSONValueString(json, getBKK().jwksURI());
         if (jwksuri != null) {

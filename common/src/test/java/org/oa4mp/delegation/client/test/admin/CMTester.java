@@ -1,7 +1,7 @@
 package org.oa4mp.delegation.client.test.admin;
 
 import edu.uiuc.ncsa.security.core.util.BitSetUtil;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 import java.math.BigInteger;
 import java.util.BitSet;

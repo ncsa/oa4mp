@@ -1,7 +1,7 @@
 package org.oa4mp.delegation.common.storage;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONArray;
+import org.kordamp.json.JSONObject;
 
 /**
  * Budding collection of useful tools for creating complex JSON objects.

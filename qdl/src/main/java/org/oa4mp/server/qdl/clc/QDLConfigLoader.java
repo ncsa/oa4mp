@@ -7,7 +7,7 @@ import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import edu.uiuc.ncsa.security.util.jwk.JWKUtil2;
 import edu.uiuc.ncsa.security.util.ssl.SSLConfiguration;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 import org.oa4mp.client.api.loader.AbstractCFClientLoader;
 import org.oa4mp.client.api.storage.AssetStore;
 import org.oa4mp.client.api.storage.FSAssetStore;

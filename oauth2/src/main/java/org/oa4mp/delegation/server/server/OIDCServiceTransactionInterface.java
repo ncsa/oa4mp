@@ -2,7 +2,7 @@ package org.oa4mp.delegation.server.server;
 
 import org.oa4mp.delegation.server.jwt.FlowStates;
 import org.oa4mp.delegation.server.server.claims.ClaimSource;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 import java.util.Collection;
 import java.util.List;

@@ -1,7 +1,7 @@
 package org.oa4mp.server.loader.oauth2.claims;
 
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 import org.oa4mp.delegation.server.ServiceTransaction;
 import org.oa4mp.delegation.server.server.UnsupportedScopeException;
 import org.oa4mp.delegation.server.server.claims.ClaimSourceConfiguration;

@@ -1,9 +1,9 @@
 package org.oa4mp.delegation.server.server.scripts;
 
-import net.sf.json.JSON;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONException;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSON;
+import org.kordamp.json.JSONArray;
+import org.kordamp.json.JSONException;
+import org.kordamp.json.JSONObject;
 
 /**
  * This will read the configuration. It is meant to be used by the {@link ClientScriptsFactory} and

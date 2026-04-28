@@ -1,6 +1,6 @@
 package org.oa4mp.delegation.server.server.claims;
 
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 import org.oa4mp.delegation.server.ServiceTransaction;
 import org.oa4mp.delegation.server.UserInfo;
 import org.oa4mp.delegation.server.server.UnsupportedScopeException;

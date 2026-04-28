@@ -17,9 +17,10 @@ import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.util.configuration.TimeUtil;
 import edu.uiuc.ncsa.security.util.events.NotificationEvent;
+import edu.uiuc.ncsa.security.util.json.MyJSONUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JWKUtil2;
-import net.sf.json.*;
+import org.kordamp.json.*;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.HttpStatus;
@@ -522,7 +523,8 @@ public class OIDCCMServlet extends EnvServlet {
         }
         if (client.hasOIDC_CM_Attributes()) {
             // add them back
-            for (Object key : client.getOIDC_CM_Attributes().keySet()) {
+            for (Object xx : client.getOIDC_CM_Attributes().keySet()) {
+                String key = xx.toString();
                 if (!key.equals(CLIENT_ID)) {
                     // had a case where a client uploaded client_id as an extra attribute
                     // Don't allow the user to hot-rod the client id even by accident.
@@ -630,7 +632,8 @@ public class OIDCCMServlet extends EnvServlet {
         }
         if (client.hasOIDC_CM_Attributes()) {
             // add them back
-            for (Object key : client.getOIDC_CM_Attributes().keySet()) {
+            for (Object xx : client.getOIDC_CM_Attributes().keySet()) {
+                String key = xx.toString();
                 json.put(key, client.getOIDC_CM_Attributes().get(key));
             }
         }
@@ -1396,7 +1399,7 @@ public class OIDCCMServlet extends EnvServlet {
                             HttpStatus.SC_BAD_REQUEST, null, client);
                 }
             }
-            client.setCallbackURIs(redirectURIs);
+            client.setCallbackURIs(MyJSONUtil.arraytoList(redirectURIs));
             jsonRequest.remove(OIDCCMConstants.REDIRECT_URIS);
         }
         // Now we do the stuff we think we need.
@@ -1500,7 +1503,7 @@ public class OIDCCMServlet extends EnvServlet {
             // and may send along things like offline access, e.g. ["openid","openid","offline_access"]
             //  Fix for CIL-1159
             HashSet<String> unique = new HashSet<>();
-            unique.addAll(newScopes);
+            unique.addAll(MyJSONUtil.arraytoList(newScopes));
 
             if (client.isPublicClient()) {
                 // public clients cannot reset their scopes ever.
@@ -1520,7 +1523,7 @@ public class OIDCCMServlet extends EnvServlet {
             }
             newScopes.clear();
             newScopes.addAll(unique);
-            client.setScopes(newScopes);
+            client.setScopes(MyJSONUtil.arraytoList(newScopes));
         }
         jsonRequest.remove(OA2Constants.SCOPE);
         // Only generate a secret if allowed (the flag denotes that it is ok to generate one here)
@@ -1714,7 +1717,7 @@ public class OIDCCMServlet extends EnvServlet {
             }
             // CIL-1221
             if (jsonRequest.containsKey(PROXY_CLAIMS_LIST)) {
-                client.setProxyClaimsList(toJSONArray(jsonRequest, PROXY_CLAIMS_LIST, client));
+                client.setProxyClaimsList(MyJSONUtil.arraytoList(toJSONArray(jsonRequest, PROXY_CLAIMS_LIST, client)));
                 //client.setProxyClaimsList(jsonRequest.getJSONArray(PROXY_CLAIMS_LIST));
                 jsonRequest.remove(PROXY_CLAIMS_LIST);
             }
@@ -1723,7 +1726,7 @@ public class OIDCCMServlet extends EnvServlet {
                 jsonRequest.remove(FORWARD_REQUEST_SCOPES_TO_PROXY);
             }
             if (jsonRequest.containsKey(PROXY_REQUEST_SCOPES)) {
-                client.setProxyRequestScopes(toJSONArray(jsonRequest, PROXY_REQUEST_SCOPES, client));
+                client.setProxyRequestScopes(MyJSONUtil.arraytoList(toJSONArray(jsonRequest, PROXY_REQUEST_SCOPES, client)));
                 jsonRequest.remove(PROXY_REQUEST_SCOPES);
             }
             if (jsonRequest.containsKey(IS_SERVICE_CLIENT)) {
@@ -1731,7 +1734,7 @@ public class OIDCCMServlet extends EnvServlet {
                 jsonRequest.remove(IS_SERVICE_CLIENT);
             }
             if (jsonRequest.containsKey(SERVICE_CLIENT_USERS)) {
-                client.setServiceClientUsers(toJSONArray(jsonRequest, SERVICE_CLIENT_USERS, client));
+                client.setServiceClientUsers(MyJSONUtil.arraytoList(toJSONArray(jsonRequest, SERVICE_CLIENT_USERS, client)));
                 jsonRequest.remove(SERVICE_CLIENT_USERS);
             }
 
@@ -1829,7 +1832,7 @@ public class OIDCCMServlet extends EnvServlet {
                             HttpStatus.SC_BAD_REQUEST, null, client);
 
                 }
-                client.setResponseTypes(responseTypes);
+                client.setResponseTypes(MyJSONUtil.arraytoList(responseTypes));
             }
         } else {
             // Maybe add in defaults at some point if omitted? Now this works since we only have a single flow.
@@ -1881,7 +1884,7 @@ public class OIDCCMServlet extends EnvServlet {
             }
             boolean requestedRT = false;
 
-            client.setGrantTypes(grantTypes);
+            client.setGrantTypes(MyJSONUtil.arraytoList(grantTypes));
             for (int i = 0; i < grantTypes.size(); i++) {
                 if (grantTypes.getString(i).equals(OA2Constants.GRANT_TYPE_REFRESH_TOKEN)) {
                     requestedRT = true;

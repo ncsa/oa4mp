@@ -26,7 +26,7 @@ import org.oa4mp.delegation.server.OA2TokenForge;
 import org.oa4mp.delegation.server.server.RFC7662Constants;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.HttpStatus;
 

@@ -2,7 +2,7 @@ package org.oa4mp.server.loader.oauth2.servlet;
 
 import org.oa4mp.server.loader.oauth2.claims.GroupElement;
 import org.oa4mp.server.loader.oauth2.claims.Groups;
-import net.sf.json.JSONArray;
+import org.kordamp.json.JSONArray;
 
 import java.io.Serializable;
 

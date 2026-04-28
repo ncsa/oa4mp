@@ -8,9 +8,8 @@ import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
 import edu.uiuc.ncsa.security.util.cli.CLIDriver;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import org.oa4mp.client.loader.OA2ClientEnvironment;
+import org.kordamp.json.JSONArray;
+import org.kordamp.json.JSONObject;
 import org.oa4mp.delegation.common.token.impl.*;
 import org.oa4mp.delegation.server.server.RFC7523Constants;
 import org.oa4mp.delegation.server.server.claims.OA2Claims;
@@ -118,12 +117,12 @@ public class CLC implements QDLMetaModule {
             return BooleanValue.True;
         }
 
-        protected OA2ClientEnvironment createEnvironment(QDLStem ini, String name) {
+   /*     protected OA2ClientEnvironment createEnvironment(QDLStem ini, String name) {
             OA2ClientEnvironment ce = new OA2ClientEnvironment();
             JSONArray jsonArray = ini.getStem("scopes").getQDLList().toJSON();
-            ce.setScopes(QDLValue.castToQDLValues(jsonArray));
+            ce.setScopes(QDLValue.castToQDLValues(MyJSONUtil.arraytoList(jsonArray)));
             return ce;
-        }
+        }*/
 
         @Override
         public List<String> getDocumentation(int argCount) {

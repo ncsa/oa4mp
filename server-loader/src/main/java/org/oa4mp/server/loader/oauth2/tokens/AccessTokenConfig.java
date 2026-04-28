@@ -1,6 +1,6 @@
 package org.oa4mp.server.loader.oauth2.tokens;
 
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 import java.util.ArrayList;
 

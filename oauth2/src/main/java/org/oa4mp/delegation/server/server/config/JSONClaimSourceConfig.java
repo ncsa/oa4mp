@@ -1,7 +1,7 @@
 package org.oa4mp.delegation.server.server.config;
 
 import org.oa4mp.delegation.server.server.claims.ClaimSourceConfiguration;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 /**
  * All components that are configurations should probably

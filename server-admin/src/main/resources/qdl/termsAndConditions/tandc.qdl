@@ -1,0 +1,51 @@
+/*
+   This is a first cut at getting the terms and conditions via CoManage (CIL-2357).
+   The logic is that the user starts a flow, then the terms and coniditions are checked via coManage.
+   If these are found wanting, the flow is redirected to CoManage.
+
+   If T and C are accepted, then CoManage willl restart this flow.
+
+   This should be called in the post-auth phase. I put it in a directory named termsAndConditions.
+
+
+{"tokens": {
+  "identity": {
+    "qdl":  {
+     "load": "termsAndConditions/tandc.qdl",
+     "xmd": {"exec_phase": ["post_auth"]}
+    },
+  "type": "identity"
+  }
+}}
+
+    First step is to get the user's CoManage ID. This is going to require an LDAP lookup. Here we set it to null
+    I do believe that LDAP contains the information as to whether there are outstanding terms and conditions as
+    well, but am not really familiar with CoManage..
+*/
+
+
+co_id := null; // From LDAP
+oustanding_terms_and_conditions := false; // from LDAP!
+
+// Next is to get if there are outstanding terms and conditions:
+
+/*
+   As per
+    https://spaces.at.internet2.edu/spaces/COmanage/pages/43058611/Registry+Terms+and+Conditions#RegistryTermsandConditions-AgreementviaPassThroughFlows
+
+    the correct way to create the request is as follows and requires raising an error to trigger a redirect.
+*/
+
+coManage_host := 'https://registry-server/registry/co_dashboards/dashboard'; // for instance
+r := 'co:' + user_id + '/tcreturn:' + encode(request_uri);
+
+  to_comange(user_id) ->raise_error('redirect to comanage',
+                                 oa4mp_error,
+                                 {      'error_type' : 'qdl_error',
+                                  'custom_error_uri' : coManage_host + '/co:' + co_id + '/tcreturn:' + encode(request_uri),
+                                     'error_message' : 'redirect to comanage',
+                                            'status' : 302
+                                  });
+oustanding_terms_and_conditions ? to_comange(co_id); // If there are T and C, then redirect to CoManage.
+
+// otherwise, continue with the flow. You can add more logic here.

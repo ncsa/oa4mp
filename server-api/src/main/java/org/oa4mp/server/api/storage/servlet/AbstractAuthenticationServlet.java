@@ -28,7 +28,7 @@ import java.security.GeneralSecurityException;
 import java.util.Enumeration;
 import java.util.Map;
 
-import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
+import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
 import static org.oa4mp.server.api.ServiceConstantKeys.TOKEN_KEY;
 
 /**
@@ -177,8 +177,8 @@ public abstract class AbstractAuthenticationServlet extends OA4MPServlet impleme
 
          and get the form to re-display. If it is vulnerable, a popup saying so will appear.
         */
-        request.setAttribute("clientHome", escapeHtml(aState.getTransaction().getClient().getHomeUri()));
-        request.setAttribute("clientName", escapeHtml(aState.getTransaction().getClient().getName()));
+        request.setAttribute("clientHome", escapeHtml4(aState.getTransaction().getClient().getHomeUri()));
+        request.setAttribute("clientName", escapeHtml4(aState.getTransaction().getClient().getName()));
         request.setAttribute("actionToTake", request.getContextPath() + "/authorize");
     }
 
@@ -254,7 +254,7 @@ public abstract class AbstractAuthenticationServlet extends OA4MPServlet impleme
                         getTransactionStore().save(aState.getTransaction());
 
                         // make it display pretty as per usual conventions. This is never reused, however.
-                        aState.getRequest().setAttribute(AUTHORIZATION_USER_NAME_VALUE, escapeHtml(x));
+                        aState.getRequest().setAttribute(AUTHORIZATION_USER_NAME_VALUE, escapeHtml4(x));
                     }
                 } else {
                     info("*** PRESENT: Use headers DISABLED.");

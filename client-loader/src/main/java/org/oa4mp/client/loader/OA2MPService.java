@@ -10,7 +10,7 @@ import edu.uiuc.ncsa.security.util.crypto.KeyUtil;
 import edu.uiuc.ncsa.security.util.crypto.MyPKCS10CertRequest;
 import edu.uiuc.ncsa.security.util.crypto.PEMFormatUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 import org.oa4mp.client.api.Asset;
 import org.oa4mp.client.api.AssetResponse;
 import org.oa4mp.client.api.ClientEnvironment;

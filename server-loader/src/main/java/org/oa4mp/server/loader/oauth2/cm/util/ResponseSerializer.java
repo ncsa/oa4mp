@@ -21,8 +21,8 @@ import org.oa4mp.server.api.admin.adminClient.AdminClientConverter;
 import org.oa4mp.server.api.admin.adminClient.AdminClientKeys;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import org.oa4mp.delegation.common.services.Response;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONArray;
+import org.kordamp.json.JSONObject;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;

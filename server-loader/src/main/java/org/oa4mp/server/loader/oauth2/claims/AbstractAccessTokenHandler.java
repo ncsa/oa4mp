@@ -25,8 +25,8 @@ import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunRequest;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONArray;
+import org.kordamp.json.JSONObject;
 
 import java.net.URI;
 import java.util.*;
@@ -507,6 +507,14 @@ public class AbstractAccessTokenHandler extends AbstractPayloadHandler implement
                 // Note that at this point a default audience could be set, but different
                 // protocols have very different ideas. These are set in the individual handlers.
             }
+        }
+        // https://github.com/ncsa/oa4mp/issues/292 Need to check if the audience is a list. If so,
+        // then we should return a string if the list is a single entry, otherwise return a list.
+        if(atData.get(AUDIENCE) instanceof List){
+              List<String> aud = (List<String>) atData.get(AUDIENCE);
+              if(aud.size() == 1){
+                  atData.put(AUDIENCE, aud.get(0));
+              }
         }
         // If they really asserted it
         if (getATConfig().hasSubject()) {

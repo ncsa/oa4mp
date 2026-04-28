@@ -1,7 +1,7 @@
 package org.oa4mp.server.api.admin.things;
 
 import org.oa4mp.delegation.common.storage.clients.BaseClient;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 /**
  * <p>Created by Jeff Gaynor<br>

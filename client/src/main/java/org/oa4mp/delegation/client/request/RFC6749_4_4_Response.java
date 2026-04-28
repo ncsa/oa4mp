@@ -1,6 +1,6 @@
 package org.oa4mp.delegation.client.request;
 
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 public class RFC6749_4_4_Response extends BasicResponse{
     /**

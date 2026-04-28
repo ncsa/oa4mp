@@ -1,7 +1,7 @@
 package org.oa4mp.delegation.client.request;
 
 import org.oa4mp.delegation.common.token.impl.IDTokenImpl;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 import java.util.HashMap;
 

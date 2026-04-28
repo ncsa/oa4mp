@@ -1,6 +1,6 @@
 package org.oa4mp.delegation.server;
 
-import net.sf.json.JSONArray;
+import org.kordamp.json.JSONArray;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;

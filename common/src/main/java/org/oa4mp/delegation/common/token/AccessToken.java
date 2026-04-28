@@ -1,7 +1,7 @@
 package org.oa4mp.delegation.common.token;
 
 
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 /**
  * An access token for delegation.  This is used later to retrieve the {@link ProtectedAsset}.

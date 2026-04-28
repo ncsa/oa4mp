@@ -1,6 +1,6 @@
 package org.oa4mp.server.loader.qdl.claims;
 
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 import org.oa4mp.delegation.server.server.RFC9068Constants;
 import org.oa4mp.server.loader.oauth2.claims.AbstractAccessTokenHandler;
 import org.oa4mp.server.loader.oauth2.claims.AbstractPayloadConfig;

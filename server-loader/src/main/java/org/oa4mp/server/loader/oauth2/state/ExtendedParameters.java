@@ -1,9 +1,9 @@
 package org.oa4mp.server.loader.oauth2.state;
 
 import org.qdl_lang.variables.QDLStem;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import net.sf.json.JSONSerializer;
+import org.kordamp.json.JSONArray;
+import org.kordamp.json.JSONObject;
+import org.kordamp.json.JSONSerializer;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -63,13 +63,14 @@ public class ExtendedParameters {
 
     public boolean isInNamespace(String x) {
         for (String n : NS_LIST) {
-            if (n.equals(x)) return true;
+            if (x.startsWith(n)) return true;
         }
         return false;
     }
 
-    protected boolean isExtendedAttribute(String x) {
-        return 0 < x.indexOf(PREFIX_DELIMITER);
+    public boolean isExtendedAttribute(String x) {
+        //return 0 < x.indexOf(PREFIX_DELIMITER);
+        return x.startsWith(PREFIX_DELIMITER);
     }
 
     /**
@@ -107,14 +108,14 @@ public class ExtendedParameters {
      * @return
      */
     public JSONObject snoopParameters(Map<String, String[]> pmap) {
-        if(pmap instanceof JSONObject){
+ /*       if(pmap instanceof JSONObject){
             // JSONObject is a type of map, so Java does not allow for a separate function. Have to convert it here...
             pmap = convertToParameterMap((JSONObject) pmap);
-        }
+        }*/
         JSONObject cilogonEntry = null;
         JSONObject oa4mpEntry = null;
         for (String key : pmap.keySet()) {
-            if (!isExtendedAttribute(key)) {
+            if (!isInNamespace(key)) {
                 continue;
             }
             String[] values = pmap.get(key);
@@ -147,11 +148,11 @@ public class ExtendedParameters {
         }
         return entry;
     }
-    protected Map<String, String[]> convertToParameterMap(JSONObject json) {
+    public Map<String, String[]> convertToParameterMap(JSONObject json) {
         Map<String, String[]> pmap = new HashMap<>();// low budget solution is to just convert it.
         for(Object kk : json.keySet()){
             String key = kk.toString(); // poor man's cast...
-            if (!isExtendedAttribute(key)) {
+            if (!isInNamespace(key)) {
                 continue;
             }
             Object value = json.get(kk);
@@ -173,7 +174,8 @@ public class ExtendedParameters {
     protected void flattenJSON(String namespace, JSONObject cilogonEntry, JSONObject j) {
         JSONObject jo = j.getJSONObject(namespace);
         // flatten it to an object
-        for (Object kk : jo.keySet()) {
+        for (Object xx : jo.keySet()) {
+            String kk = xx.toString();
             cilogonEntry.put(kk, jo.get(kk));
         }
     }

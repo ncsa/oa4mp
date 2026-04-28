@@ -10,7 +10,7 @@ import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunRequest;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;

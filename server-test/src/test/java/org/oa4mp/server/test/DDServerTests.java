@@ -19,8 +19,8 @@ import org.oa4mp.delegation.common.storage.clients.BaseClientConverter;
 import org.oa4mp.delegation.server.OA2Scopes;
 import org.oa4mp.delegation.server.server.config.LDAPConfiguration;
 import junit.framework.TestCase;
-import net.sf.json.JSONObject;
-import net.sf.json.util.JSONUtils;
+import org.kordamp.json.JSONObject;
+import org.kordamp.json.util.JSONUtils;
 import org.apache.commons.codec.binary.Base64;
 
 import java.security.SecureRandom;

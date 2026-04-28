@@ -3,8 +3,8 @@ package org.oa4mp.server.proxy;
 
 import edu.uiuc.ncsa.security.servlet.HeaderUtils;
 import edu.uiuc.ncsa.security.servlet.PresentableState;
-import net.sf.json.JSONObject;
-import org.apache.commons.lang.StringEscapeUtils;
+import org.kordamp.json.JSONObject;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.http.HttpStatus;
 import org.oa4mp.delegation.server.OA2Constants;
 import org.oa4mp.delegation.server.OA2Errors;
@@ -70,7 +70,7 @@ public class OA2AuthenticationServer extends AbstractAuthenticationServlet {
         HttpServletRequest request = aState.getRequest();
 
         OA2ServiceTransaction t = (OA2ServiceTransaction) aState.getTransaction();
-        request.setAttribute("clientScopes", StringEscapeUtils.escapeHtml(scopesToString(t)));
+        request.setAttribute("clientScopes", StringEscapeUtils.escapeHtml4(scopesToString(t)));
 
     }
 

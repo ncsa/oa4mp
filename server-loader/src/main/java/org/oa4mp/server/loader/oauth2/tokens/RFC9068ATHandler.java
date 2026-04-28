@@ -7,8 +7,8 @@ import org.oa4mp.delegation.server.server.RFC8693Constants;
 import org.oa4mp.delegation.server.server.RFC9068Constants;
 import org.oa4mp.delegation.server.server.claims.OA2Claims;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONArray;
+import org.kordamp.json.JSONObject;
 
 import static org.oa4mp.delegation.server.server.claims.OA2Claims.AUDIENCE;
 import static org.oa4mp.delegation.server.server.claims.OA2Claims.SUBJECT;

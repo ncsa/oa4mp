@@ -1,6 +1,6 @@
 package org.oa4mp.delegation.server.jwt;
 
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 import static org.oa4mp.delegation.server.jwt.FlowType.*;
 
@@ -53,7 +53,7 @@ public class FlowStates {
             // Some old, serialized versions (such as with long-term refresh tokens)
             // Do not have this. Rather than an NPE, this will fail with a
             // message like
-            // net.sf.json.JSONException: JSONObject["at_do_templates"] is not a Boolean.
+            // org.kordamp.json.JSONException: JSONObject["at_do_templates"] is not a Boolean.
             at_do_templates = jsonObject.getBoolean(AT_DO_TEMPLATES.getValue());
         }else{
             at_do_templates = true;

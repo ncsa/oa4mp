@@ -11,7 +11,7 @@ import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunRequest;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRuntimeEngine;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;

@@ -52,7 +52,6 @@
       <module name="client-webapp" target="11" />
       <module name="myproxy" target="11" />
       <module name="myproxy-website" target="1.8" />
-      <module name="oa4mp-parent" target="11" />
       <module name="oa4mp-webapp" target="11" />
       <module name="server-installer" target="11" />
       <module name="server-webapp-jar" target="11" />

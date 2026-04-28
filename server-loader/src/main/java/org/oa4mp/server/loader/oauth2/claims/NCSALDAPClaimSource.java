@@ -2,7 +2,7 @@ package org.oa4mp.server.loader.oauth2.claims;
 
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 import org.oa4mp.delegation.server.server.claims.ClaimSourceConfiguration;
 import org.oa4mp.delegation.server.server.claims.OA2Claims;
 import org.oa4mp.delegation.server.server.config.LDAPConfiguration;

@@ -1,6 +1,6 @@
 package org.oa4mp.server.api.admin.things;
 
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 /**
  * Parses JSON strings into objects for the Client Manager.

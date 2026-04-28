@@ -1,7 +1,7 @@
 package org.oa4mp.delegation.server.client;
 
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 import org.apache.commons.codec.binary.Hex;
 import org.oa4mp.delegation.client.request.AGRequest;
 import org.oa4mp.delegation.client.request.AGResponse;

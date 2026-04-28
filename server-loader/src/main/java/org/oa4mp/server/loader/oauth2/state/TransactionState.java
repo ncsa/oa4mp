@@ -2,7 +2,7 @@ package org.oa4mp.server.loader.oauth2.state;
 
 import org.oa4mp.server.loader.oauth2.flows.FlowStates2;
 import org.oa4mp.delegation.server.OA2Constants;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 /**
  * This is a container for mutable state per transaction.

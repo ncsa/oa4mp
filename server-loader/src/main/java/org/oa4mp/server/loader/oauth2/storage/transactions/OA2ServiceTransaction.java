@@ -5,8 +5,9 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import edu.uiuc.ncsa.security.util.json.MyJSONUtil;
+import org.kordamp.json.JSONArray;
+import org.kordamp.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
 import org.oa4mp.delegation.common.token.AuthorizationGrant;
 import org.oa4mp.delegation.common.token.RefreshToken;
@@ -230,7 +231,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
      */
     public List<String> getAudience() {
         if (getState().containsKey(AUDIENCE_KEY)) {
-            return getState().getJSONArray(AUDIENCE_KEY);
+            return MyJSONUtil.arraytoList(getState().getJSONArray(AUDIENCE_KEY));
         }
         return null;
     }
@@ -247,7 +248,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
 
     public List<String> getUseTemplates() {
         if (getState().containsKey(USE_TEMPLATES_KEY)) {
-            return getState().getJSONArray(USE_TEMPLATES_KEY);
+            return MyJSONUtil.arraytoList(getState().getJSONArray(USE_TEMPLATES_KEY));
         }
         return null;
     }
@@ -271,7 +272,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
      */
     public Collection<String> getATReturnedOriginalScopes() {
         if (getState().containsKey(AT_RETURNED_ORIGINAL_SCOPES)) {
-            return getState().getJSONArray(AT_RETURNED_ORIGINAL_SCOPES);
+            return MyJSONUtil.arraytoList( getState().getJSONArray(AT_RETURNED_ORIGINAL_SCOPES));
         }
         return null;
 
@@ -324,7 +325,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         // JSON which does very odd things to URIs. Best we can do is check that the elements are URIs
         // when setting it rather than writing some handler if it gets changed.
         if (getState().containsKey(RESOURCE_KEY)) {
-            return getState().getJSONArray(RESOURCE_KEY);
+            return MyJSONUtil.arraytoList(getState().getJSONArray(RESOURCE_KEY));
         }
         return null;
     }
@@ -894,7 +895,7 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
         if (!getState().containsKey(QUERIED_ACCESS_TOKEN_SCOPES_KEY)) {
             return null;
         }
-        return getState().getJSONArray(QUERIED_ACCESS_TOKEN_SCOPES_KEY);
+        return MyJSONUtil.arraytoList(getState().getJSONArray(QUERIED_ACCESS_TOKEN_SCOPES_KEY));
 
     }
 
@@ -989,19 +990,19 @@ public class OA2ServiceTransaction extends OA4MPServiceTransaction implements OA
     @Override
     public List<String> getResponseTypes() {
         if (getState().containsKey(RESPONSE_TYPE_KEY)) {
-            return getState().getJSONArray(RESPONSE_TYPE_KEY);
+            return MyJSONUtil.arraytoList(getState().getJSONArray(RESPONSE_TYPE_KEY));
         }
         return new ArrayList<>();
     }
 
     public void setResponseTypes(List<String> responseTypes) {
-        JSONArray r;
+      /*  JSONArray r;
         if (responseTypes instanceof JSONArray) {
             r = (JSONArray) responseTypes;
-        } else {
-            r = new JSONArray();
+        } else {*/
+            List<String> r = new ArrayList<>(responseTypes.size());
             r.addAll(responseTypes);
-        }
+        //}
         getState().put(RESPONSE_TYPE_KEY, r);
     }
 }

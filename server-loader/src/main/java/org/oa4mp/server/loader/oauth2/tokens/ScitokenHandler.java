@@ -2,8 +2,8 @@ package org.oa4mp.server.loader.oauth2.tokens;
 
 import org.oa4mp.server.loader.oauth2.claims.AbstractAccessTokenHandler;
 import org.oa4mp.server.loader.oauth2.claims.PayloadHandlerConfigImpl;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONArray;
+import org.kordamp.json.JSONObject;
 
 import static org.oa4mp.delegation.server.server.claims.OA2Claims.AUDIENCE;
 import static org.oa4mp.delegation.server.server.claims.OA2Claims.SUBJECT;
