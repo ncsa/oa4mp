@@ -430,13 +430,13 @@ public class ClientUtils {
         for (Object y : passedInScopes) {
             String x = y.toString();
             // CIL-1012 offline_access. Some clients end this along, but it has no effect.
-            // Basically if get it, we don't want to throw an error.
+            // Basically, if we get it, we don't want to throw an error.
             if ((!isRFC6749_4_4) && x.equals(OA2Scopes.SCOPE_OFFLINE_ACCESS)) {
                 // Basically just always ignore it.
                 continue;
             }
             // CIL-1732 Policy clarification. Strict means either in the approved server list or in the configured client list.
-            if (oa2Client.useStrictScopes() && !OA2Scopes.ScopeUtil.hasScope(x) && !oa2Client.getScopes().contains(x)) {
+            if (oa2Client.useStrictScopes() && !hasScope(x, oa2Client) && !oa2Client.getScopes().contains(x)) {
                 throw new OA2RedirectableError(OA2Errors.INVALID_SCOPE,
                         "Unrecognized scope \"" + x + "\"",
                         HttpStatus.SC_BAD_REQUEST,
@@ -464,6 +464,20 @@ public class ClientUtils {
 
     }
 
+    /**
+     * Allows clients to have a custom list of scopes, independent of the server if {@link OA2Client#useServerScopes()} is false.
+     * <br/><br/>
+     * https://github.com/ncsa/oa4mp/issues/297
+     * @param scope
+     * @param client
+     * @return
+     */
+    protected static boolean hasScope(String scope, OA2Client client) {
+        if(client.useServerScopes()) {
+            return client.getScopes().contains(scope);
+        }
+        return OA2Scopes.ScopeUtil.hasScope(scope);
+    }
     public static Collection<String> resolveScopes(TransactionState transactionState, OA2Client oa2Client, boolean isNew, boolean isRFC8628) {
         // Next 2 parameters are so error messages can be reasonably constructed, naught else
         return resolveScopes(transactionState.getRequest(), (OA2ServiceTransaction) transactionState.getTransaction(), oa2Client, isNew, isRFC8628);

@@ -322,7 +322,9 @@ public class OA2CFConfigurationLoader<T extends ServiceEnvironmentImpl> extends 
             keConfiguration = new KEConfiguration();
             List<CFNode> kids = cn.getChildren(OA4MPConfigTags.KEY_ROTATION_TAG);
 
-            if (!kids.isEmpty()) {
+            if (kids.isEmpty()) {
+                keConfiguration.enabled = false; // default is disable
+            }else{
                 CFNode sn = kids.get(0);
                 String x = sn.getFirstAttribute(OA4MPConfigTags.KEY_ROTATION_ENABLED);
                 if (isTrivial(x)) {

@@ -97,6 +97,7 @@ public class ClientStemMC<V extends OA2Client> extends BaseClientStemMC<V> {
         if (stem.containsKey(kk().signTokens())) {v.setSignTokens(stem.getBoolean(kk().signTokens()));}
         if (stem.containsKey(kk().skipServerScripts())) {v.setSkipServerScripts(stem.getBoolean(kk().skipServerScripts()));}
         if (stem.containsKey(kk().strictScopes())) {v.setStrictscopes(stem.getBoolean(kk().strictScopes()));}
+        if (stem.containsKey(kk().useServerScopes())) {v.setUseServerScopes(stem.getBoolean(kk().useServerScopes()));}
 
         return v;
     }
@@ -203,6 +204,7 @@ public class ClientStemMC<V extends OA2Client> extends BaseClientStemMC<V> {
         setNonNullStemValue(stem, kk().signTokens(), v.isSignTokens());
         setNonNullStemValue(stem, kk().skipServerScripts(), v.isSkipServerScripts());
         setNonNullStemValue(stem, kk().strictScopes(), v.useStrictScopes());
+        setNonNullStemValue(stem, kk().useServerScopes(), v.useServerScopes());
         if(v.hasPrototypes()){
             QDLList list = new QDLList();
             for(Identifier id : v.getPrototypes()){

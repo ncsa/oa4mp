@@ -44,6 +44,7 @@ public class OA2ClientKeys extends ClientKeys {
     String signTokens="sign_tokens";
     String skipServerScripts="skip_server_scripts";
     String strictScopes="strict_scopes";
+    String useServerScopes="use_server_scopes";
 
     /*
       If you add attributes, make sure you update
@@ -56,6 +57,12 @@ public class OA2ClientKeys extends ClientKeys {
         if (0 < x.length) allowPromptNone = x[0];
         return allowPromptNone;
     }*/
+    public String useServerScopes(String... x) {
+        if (0 < x.length) useServerScopes = x[0];
+        return useServerScopes;
+    }
+
+
     public String idtLifetime(String... x) {
            if (0 < x.length) idTokenLifetime = x[0];
            return idTokenLifetime;

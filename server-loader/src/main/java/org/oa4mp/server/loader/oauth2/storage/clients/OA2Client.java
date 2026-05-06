@@ -812,5 +812,15 @@ public class OA2Client extends Client implements OA2ClientScopes {
     }
 
     boolean allowPromptNone = false;
+
+    public boolean useServerScopes() {
+        return useServerScopes;
+    }
+
+    public void setUseServerScopes(boolean useServerScopes) {
+        this.useServerScopes = useServerScopes;
+    }
+
+    boolean useServerScopes = true; // default
 }
 

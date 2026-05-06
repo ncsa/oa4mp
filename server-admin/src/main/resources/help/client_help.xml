@@ -390,10 +390,15 @@ This means that if the client requests a scope not in the
 scopes attribute, the request is refused. For clients that require complex access tokens
 (such as WLCG or SciTokens) this MUST be set false.
 
+It is possible to have a set of scopes independent of the server's default
+scopes, see the entry for use_server_scopes for more.
+
 Note that OA4MP's default policy is to strictly enforce scopes. we have the option (as per the spec)
 of simply ignoring them but do not, since in practice clients that specify a prescribed set of scopes
 and send something else have configuration issue. It is better that the request fail and they are
-told why rather than let it complete and be e.g., missing claims.]]>
+told why rather than let it complete and be e.g., missing claims.
+
+See also: use_server_scopes, scopes.]]>
        </body>
     </entry>
     <entry id="approve">
@@ -719,6 +724,20 @@ This is a JSON array of the ersatz clients for the currently active
 client. This means that there is one ersatz client.
 ]]>
     </example>
+    </entry>
+    <entry id="use_server_scopes">
+        <body>
+            <![CDATA[Property. Boolean. true
+If true, the scopes set in the server configuration are the superset for all client
+scopes -- any scopes not on that list are removed.
+
+If false, the client list is independent of the server scopes. This allows a client
+to set a list of custom scopes and, e.g., if strict_scopes is true, only
+scopes on the client list are allowed. This is useful for OAuth (not OIDC) clients
+that have very specific scopes.
+
+See also: strict_scopes, scopes]]>
+        </body>
     </entry>
 
     <!--

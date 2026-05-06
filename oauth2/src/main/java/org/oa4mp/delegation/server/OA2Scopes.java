@@ -74,6 +74,11 @@ public interface OA2Scopes {
 
         static Collection<String> scopes;
 
+        /**
+         * Is the server configured to support the given scope?
+         * @param targetScope
+         * @return
+         */
         public static boolean hasScope(String targetScope) {
             for (String x : getScopes()) {
                 if (x.equals(targetScope)) return true;

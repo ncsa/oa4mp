@@ -22,6 +22,7 @@ public interface OA2Constants {
     public static String ACCESS_TOKEN_LIFETIME = "at_lifetime";
     public static String MAX_ACCESS_TOKEN_LIFETIME = "max_at_lifetime";
     public static String STRICT_SCOPES = "strict_scopes";
+    public static String USE_SERVER_SCOPES = "use_server_scopes";
     public static String DESCRIPTION = "description";
     public static String SKIP_SERVER_SCRIPTS = "skip_server_scripts";
     public static String CERT_LIFETIME = "certlifetime";

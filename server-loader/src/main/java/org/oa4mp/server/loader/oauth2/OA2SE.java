@@ -827,6 +827,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
             storeList.add(getVIStore());
             storeList.add(getTransactionStore());
             storeList.add(getTxStore());
+            storeList.add(getKEStore());
         }
         return storeList;
     }

@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
+import edu.uiuc.ncsa.security.storage.cli.StoreArchiver;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionRecord;
@@ -290,15 +291,16 @@ public class SQLPermissionStore<V extends Permission> extends SQLStore<V> implem
         try {
             PreparedStatement stmt;
             if(permissionKeys.ersatzID().equals(colName)) {
+                // Fix https://github.com/ncsa/oa4mp/issues/295 Add %'s around like value so this looks inside JSON arrays
                 stmt = c.prepareStatement("select *  from " +
                         getTable().getFQTablename() + " where " + colName + " LIKE ?");
+                stmt.setString(1, "%"+adminID+"%"); // or it fails to work
 
             }else{
                 stmt = c.prepareStatement("select *  from " +
                         getTable().getFQTablename() + " where " + colName + "=?");
-
+                stmt.setString(1, adminID.toString());
             }
-            stmt.setString(1, adminID.toString());
             stmt.execute();// just execute() since executeQuery(x) would throw an exception regardless of content per JDBC spec.
 
 
@@ -307,7 +309,10 @@ public class SQLPermissionStore<V extends Permission> extends SQLStore<V> implem
                 V newOne = create();
                 ColumnMap map = rsToMap(rs);
                 populate(map, newOne);
-                permissions.add(newOne);
+                // don't touch archived items!
+                if(!StoreArchiver.isVersioned(newOne.getIdentifier())){
+                    permissions.add(newOne);
+                }
             }
             rs.close();
             stmt.close();
@@ -320,11 +325,4 @@ public class SQLPermissionStore<V extends Permission> extends SQLStore<V> implem
             releaseConnection(cr);
         }
     }
-/*
-   searchString = "select " + attributes +
-                        " from " + getTable().getFQTablename() +
-                        " where " + key + " LIKE ?";
- */
-
-
 }

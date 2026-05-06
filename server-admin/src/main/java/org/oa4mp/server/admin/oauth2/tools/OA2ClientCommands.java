@@ -1107,7 +1107,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
      *
      * @param newID
      * @param copyOnly
-     * @param doErsatzID
+     * @param doErsatzID if true, process the ersatz entries of the permissions.
      * @param permissions
      * @return
      */
@@ -1118,6 +1118,7 @@ public class OA2ClientCommands extends ClientStoreCommands {
                         List<Permission> permissions) {
         int count = 0;
         if (!copyOnly) {
+            // Have to do these first before the  permissions change
             // Do not just copy the permissions with the new ID, remove the old ones.
             getEnvironment().getPermissionStore().remove(permissions);
         }

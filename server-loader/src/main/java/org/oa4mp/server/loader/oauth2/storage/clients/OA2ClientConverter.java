@@ -55,6 +55,9 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         if (map.get(getCK2().strictScopes()) != null) {
             otherV.setStrictscopes(map.getBoolean(getCK2().strictScopes()));
         }
+        if (map.get(getCK2().useServerScopes()) != null) {
+            otherV.setUseServerScopes(map.getBoolean(getCK2().useServerScopes()));
+        }
         if (map.containsKey(getCK2().forwardScopesToProxy())) {
             otherV.setForwardScopesToProxy(map.getBoolean(getCK2().forwardScopesToProxy()));
         }
@@ -284,6 +287,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         }
         map.put(getCK2().signTokens(), client.isSignTokens());
         map.put(getCK2().strictScopes(), client.useStrictScopes());
+        map.put(getCK2().useServerScopes(), client.useServerScopes());
         if (client.getScopes() != null) {
             JSONArray scopes = new JSONArray();
             for (String s : client.getScopes()) {
@@ -394,6 +398,9 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         v.setPublicClient(getJsonUtil().getJSONValueBoolean(json, getCK2().publicClient())); // JSON util returns false if missing key
         if (json.containsKey(getCK2().strictScopes())) {
             v.setStrictscopes(getJsonUtil().getJSONValueBoolean(json, getCK2().strictScopes())); // JSON util returns false if missing key
+        }
+        if (json.containsKey(getCK2().useServerScopes())) {
+            v.setUseServerScopes(getJsonUtil().getJSONValueBoolean(json, getCK2().useServerScopes())); // JSON util returns false if missing key
         }
         JSON cbs = (JSON) getJsonUtil().getJSONValue(json, getCK2().callbackUri());
         if (cbs != null && cbs instanceof JSONArray) {
@@ -513,6 +520,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         getJsonUtil().setJSONValue(json, getCK2().signTokens(), client.isSignTokens());
         getJsonUtil().setJSONValue(json, getCK2().publicClient(), client.isPublicClient());
         getJsonUtil().setJSONValue(json, getCK2().strictScopes(), client.useStrictScopes());
+        getJsonUtil().setJSONValue(json, getCK2().useServerScopes(), client.useServerScopes());
 
         JSONArray scopes = new JSONArray();
         Collection<String> scopeList = client.getScopes();
