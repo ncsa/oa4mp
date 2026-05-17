@@ -20,6 +20,7 @@ lowriter --headless --convert-to pdf ${args[0]}/qdl/src/main/docs/token_handler_
 lowriter --headless --convert-to pdf ${args[0]}/server-admin/src/main/docs/Authentication_in_OA4MP.odt          > /dev/null
 lowriter --headless --convert-to pdf ${args[0]}/server-admin/src/main/docs/DIService-reference.odt              > /dev/null
 lowriter --headless --convert-to pdf ${args[0]}/server-admin/src/main/docs/filestore-migration.odt              > /dev/null
+lowriter --headless --convert-to pdf ${args[0]}/server-admin/src/main/docs/key-rotation.odt                     > /dev/null
 lowriter --headless --convert-to pdf ${args[0]}/server-admin/src/main/docs/forking_a_flow_quickstart.odt        > /dev/null
 lowriter --headless --convert-to pdf ${args[0]}/server-admin/src/main/docs/java-extension-to-oa4mp.odt          > /dev/null
 lowriter --headless --convert-to pdf ${args[0]}/server-admin/src/main/docs/jwt-util.odt                         > /dev/null

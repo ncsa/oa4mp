@@ -19,6 +19,20 @@ public class NewClientStoreTest extends TestBase {
             if(TestUtils.getFsStoreProvider().getClientStore() instanceof SQLStore) {
                 SQLStore sqlStore = (SQLStore) TestUtils.getFsStoreProvider().getClientStore();
                 DerbyConnectionParameters derbyConnectionParameters = ((DerbyConnectionPool) sqlStore.getConnectionPool()).getConnectionParameters();
+                /*
+                   If you get an error like "can't register object" and the SQl exception is something like "column oa4mp.XXX does
+                   not exist, this means one of
+                   (1) The main installed database for OA4MP needs to have the column added to the right table
+                   (2) If in a FS (file store) test, this database is created on the fly from the SQL derby file. Is the column there?
+                   (3) If The database exists from a previous run, the column will not be added. Either add it directly (you will
+                       need to find the right connection string, but if the ont he fly FS test database, just remove it and run again
+                   (4) Pay a mind to where this was started. Derby by default will put a file-based SQL store in the current directory, under
+                       the username, oa4mp. Remove that.
+                 */
+                // Might want to look in ~/dev/ncsa-git/oa4mp/oa4mp if this really gets confused and bombs in IntelliJ
+                // That would be a default location for the on-the-fly Derby file store test.
+                // Also if it fails from command line build-add, look to remove ~/dev/ncsa-git/oa4mp/server-test/oa4mp
+                System.out.println("***Derby failed. connection=" + derbyConnectionParameters);
                 System.out.println("***Derby failed. Clean up  dir=" + derbyConnectionParameters.getRootDirectory() + ", name=" + derbyConnectionParameters.getDatabaseName());
                 System.out.println("***Check that the database creation script in server-admin/src/main/resources is up to date.");
             }

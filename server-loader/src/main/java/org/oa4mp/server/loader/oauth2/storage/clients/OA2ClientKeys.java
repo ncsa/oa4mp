@@ -241,6 +241,7 @@ public class OA2ClientKeys extends ClientKeys {
         allKeys.add(signTokens());
         allKeys.add(skipServerScripts());
         allKeys.add(strictScopes());
+        allKeys.add(useServerScopes());
         return allKeys;
     }
 }

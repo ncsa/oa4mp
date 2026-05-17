@@ -188,7 +188,9 @@ public class OA2MPService extends OA4MPService {
             parameters.put(NONCE, none);
             a.setNonce(none);
         }
-        parameters.put(PROMPT, PROMPT_LOGIN);
+        // Fix https://jira.ncsa.illinois.edu/browse/CIL-2424?filter=-1 Just don't automatically send prompt parameter
+        // If they want it, they can specify it as an additional parameter.
+        //parameters.put(PROMPT, PROMPT_LOGIN);
         parameters.putAll(((OA2ClientEnvironment) getEnvironment()).getAdditionalParameters());
     }
 

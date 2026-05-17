@@ -178,7 +178,11 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.rfc8693Enabled = rfc8693Enabled;
         this.txStore = txStoreProvider.get();
         this.VIStore = voStoreProvider.get();
-        this.keStore = keStoreProvider.get();
+        try {
+            this.keStore = keStoreProvider.get();
+        }catch(Throwable t){
+            // do nothing.
+        }
         this.maxIdTokenLifetime = maxIDTokenLifetime;
         this.idTokenLifetime = idTokenLifetime;
         this.maxATLifetime = maxATLifetime;
@@ -482,15 +486,17 @@ public class OA2SE extends ServiceEnvironmentImpl {
      * @return
      */
     public JSONWebKeys getJsonWebKeys(VirtualIssuer vi) {
-        JSONWebKeys jsonWebKeys = getKEStore().getCurrentKeys(vi);
-        if (!jsonWebKeys.isEmpty()) return jsonWebKeys;
-        //  Not in new place, start looking in the old ones in case
-        // it's an older install and they did not migrate.
-        if(vi != null){
-            if(vi.hasJWKs()) {
-                jsonWebKeys = vi.getJsonWebKeys();
-                jsonWebKeys.setDefaultKeyID(vi.getDefaultKeyID());
-                return jsonWebKeys;
+        if(getKEStore() != null){
+            JSONWebKeys jsonWebKeys = getKEStore().getCurrentKeys(vi);
+            if (!jsonWebKeys.isEmpty()) return jsonWebKeys;
+            //  Not in new place, start looking in the old ones in case
+            // it's an older install and they did not migrate.
+            if(vi != null){
+                if(vi.hasJWKs()) {
+                    jsonWebKeys = vi.getJsonWebKeys();
+                    jsonWebKeys.setDefaultKeyID(vi.getDefaultKeyID());
+                    return jsonWebKeys;
+                }
             }
         }
         VirtualIssuer defaultVI = (VirtualIssuer) getVIStore().get(SERVER_VI_ID);

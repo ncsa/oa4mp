@@ -109,7 +109,7 @@ public class KeyCommands extends OA4MPStoreCommands {
                 if (hasKID) {
                     keRecord = getStore().getByKID(kid);
                 } else {
-                    keRecord = (KERecord) getStore().create();
+                    keRecord =  getStore().create();
                     keRecord.setValid(true);
                     keRecord.setVi(vi.getIdentifier().getUri());// if its in the VI record, it's implicitly valid
                 }
@@ -155,12 +155,16 @@ public class KeyCommands extends OA4MPStoreCommands {
     public static final String MIGRATE_LIST = "-list";
     public static final String MIGRATE_ALL_VIS = "-all";
     public static final String MIGRATE_CLEANUP = "-cleanup";
+    public static final String MIGRATE_SERVER_KEYS = "-server";
 
     protected void migrateHelp(InputLine line) {
         int width = 10;
-        say("migrate [-list] | [-cleanup] | [-all | vi_id] migrate the keys stored in a VI to ");
+        say("migrate ["+MIGRATE_LIST + "] | ["+ MIGRATE_CLEANUP + "] | [" +
+                MIGRATE_ALL_VIS + " | vi_id][" + MIGRATE_SERVER_KEYS + "] -  migrate the keys stored in a VI to ");
+
         say("this store. Optionally remove them from the VI. Once migrated,");
         say("the system manages them and the keys stored in the VI are ignoared");
+        say(RJustify(MIGRATE_SERVER_KEYS, width) + " = Migrate the keys in the server configuration to the store. This cannot be combined with other flags.");
         say(RJustify(MIGRATE_LIST, width) + " = return a list of VIs that have stored keys.");
         say(RJustify("vi_id", width) + " = migrate the keys stored in the given VI only.");
         say(RJustify(MIGRATE_ALL_VIS, width) + " = migrate all VI keys to this store.");
@@ -179,9 +183,29 @@ public class KeyCommands extends OA4MPStoreCommands {
         inputLine.removeSwitch(MIGRATE_LIST);
         inputLine.removeSwitch(MIGRATE_ALL_VIS);
         inputLine.removeSwitch(MIGRATE_CLEANUP);
+        boolean migrateServerKeys = inputLine.hasArg(MIGRATE_SERVER_KEYS);
 
-        VIStore viStore = getEnvironment().getVIStore();
+        VIStore<VirtualIssuer> viStore = getEnvironment().getVIStore();
 
+        if(migrateServerKeys){
+          VirtualIssuer vi =  viStore.get(OA2SE.SERVER_VI_ID);
+          // if it does note xist, create it.
+            if(vi == null){
+                vi = viStore.create();
+                vi.setIdentifier(OA2SE.SERVER_VI_ID);
+                vi.setValid(true);
+                vi.setDescription("Dafault OA4MP Server Configuration");
+                viStore.save(vi);
+            }
+            // If there are keys in the VI, migrate them.
+            if(vi.hasJWKs()){
+
+            }
+
+            // No keys in the VI, check OA2SE 9service environment) in case they are in the XML configuration.
+
+            return;
+        }
         if (listMigrated) {
             boolean firstOne = true;
             for (Object vid : viStore.keySet()) {
@@ -218,7 +242,7 @@ public class KeyCommands extends OA4MPStoreCommands {
                 }
                 JSONWebKeys jsonWebKeys = vi.getJsonWebKeys();
                 for (String kid : jsonWebKeys.keySet()) {
-                    KERecord keRecord = (KERecord) getStore().create();
+                    KERecord keRecord =  getStore().create();
                     keRecord.fromJWK(jsonWebKeys.get(kid), kid.equals(jsonWebKeys.getDefaultKeyID()));
                     newRecords.put(keRecord.getIdentifier(), keRecord);
                     keysProcessed++;

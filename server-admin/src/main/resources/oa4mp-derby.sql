@@ -131,8 +131,9 @@ CREATE TABLE oa4mp.clients
    scopes                    clob,
    sign_tokens               boolean,
    skip_server_scripts       boolean,
-    state                    clob,
-   strict_scopes             boolean
+   state                     clob,
+   strict_scopes             boolean,
+   use_server_scopes         boolean
    );
 
 CREATE TABLE oa4mp.key_records

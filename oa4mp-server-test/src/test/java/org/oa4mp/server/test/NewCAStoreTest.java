@@ -35,6 +35,9 @@ public class NewCAStoreTest extends TestBase {
         }catch(Exception t){
             SQLStore sqlStore = (SQLStore) TestUtils.getDerbyStoreProvider().getClientStore();
             DerbyConnectionParameters derbyConnectionParameters = ((DerbyConnectionPool)sqlStore.getConnectionPool()).getConnectionParameters();
+            System.out.println("user dir = " + System.getProperty("user.dir"));
+            System.out.println("user foo = " + new File("foo").getCanonicalPath());
+            System.out.println("***Derby failed. connection=" + derbyConnectionParameters);
             System.out.println("***Derby failed. Clean up  dir=" + derbyConnectionParameters.getRootDirectory() + ", name" + derbyConnectionParameters.getDatabaseName() );
             System.out.println("***Check that the database creation script in server-admin/src/main/resources is up to date.");
             throw t;

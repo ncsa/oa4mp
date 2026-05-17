@@ -206,7 +206,10 @@ The name that the user used in their log on.]]>
        <body>
   <![CDATA[Property: List of strings (--)
 If the client has strict_scopes set to false, then this is the intersection of those and the
-scopes that are stored in the scopes property. ]]>
+scopes that are stored in the scopes property.
+
+If use_server_scopes is set to false, then server scopes are ignored in favor of whatever
+the client has configured on its list.]]>
    <example>
    <![CDATA[E.g.
 In the initial request the user sends

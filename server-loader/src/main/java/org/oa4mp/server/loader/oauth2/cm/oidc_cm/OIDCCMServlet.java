@@ -853,6 +853,14 @@ public class OIDCCMServlet extends EnvServlet {
                         HttpStatus.SC_BAD_REQUEST,
                         null, client);
             }
+       //     if(!isAnonymous) {
+                if (jsonRequest.containsKey(STRICT_SCOPES)) {
+                    client.setStrictscopes(jsonRequest.getBoolean(STRICT_SCOPES));
+                }
+                if (jsonRequest.containsKey(USE_SERVER_SCOPES)) {
+                    client.setUseServerScopes(jsonRequest.getBoolean(USE_SERVER_SCOPES));
+                }
+        //    }
             if (jsonRequest.containsKey(OA2Constants.SCOPE)) {
                 // the only thing that we are concerned with  is client is attempting to increase their
                 // scopes. These are permitted to reduce them.
@@ -873,29 +881,36 @@ public class OIDCCMServlet extends EnvServlet {
 
                 }
                 Collection<String> newScopeList = new HashSet<>();
-                // Fix for CIL-725 Allow admin clients to alter scopes as desired.
-                // NOTE as long as this admin-only access this is ok. Otherwise the
-                // previous version the only permits a reduction in scopes is allowed.
-                // We do reject a scope if it is not on the supported list for this server
-                Collection<String> supportedScopes = getOA2SE().getScopes();
-                String scope = null;
-                for (Object x : newScopes) {
-                    scope = x.toString();
-                    if (!supportedScopes.contains(scope)) {
-                        // then this is not in the list, request is rejected
-                        rejectRequest = true;
-                        adminDebugger.trace(this, "rejected scope '" + scope + "', not on list of server supported scopes:" + supportedScopes);
-                        break;
+                if(client.useServerScopes()) {
+                    // Fix for CIL-725 Allow admin clients to alter scopes as desired.
+                    // NOTE as long as this admin-only access this is ok. Otherwise the
+                    // previous version the only permits a reduction in scopes is allowed.
+                    // We do reject a scope if it is not on the supported list for this server
+                    Collection<String> supportedScopes = getOA2SE().getScopes();
+                    String scope = null;
+                    for (Object x : newScopes) {
+                        scope = x.toString();
+                        if (!supportedScopes.contains(scope)) {
+                            // then this is not in the list, request is rejected
+                            rejectRequest = true;
+                            adminDebugger.trace(this, "rejected scope '" + scope + "', not on list of server supported scopes:" + supportedScopes);
+                            break;
+                        }
+                        newScopeList.add(scope);
                     }
-                    newScopeList.add(scope);
+                    if (rejectRequest) {
+                        throw new OA2JSONException(OA2Errors.INVALID_SCOPE,
+                                "invalid scope",
+                                HttpStatus.SC_FORBIDDEN, // as per spec, section RFC 7592 section 2.2
+                                null, client
+                        );
+                    }
+                }else{
+                    // Fix for https://github.com/ncsa/oa4mp/issues/297
+                    // Allow administered clients to set their scopes as desired.
+                    newScopeList.addAll(MyJSONUtil.arraytoList(newScopes));
                 }
-                if (rejectRequest) {
-                    throw new OA2JSONException(OA2Errors.INVALID_SCOPE,
-                            "invalid scope",
-                            HttpStatus.SC_FORBIDDEN, // as per spec, section RFC 7592 section 2.2
-                            null, client
-                    );
-                }
+
                 client.setScopes(newScopeList);
             }
             boolean isDebugOn = client.isDebugOn(); // CIL-1538
@@ -1495,6 +1510,16 @@ public class OIDCCMServlet extends EnvServlet {
             }
             jsonRequest.remove(OIDCCMConstants.TOKEN_ENDPOINT_AUTH_METHOD);
         }
+        if(!isAnonymous) {
+            if (jsonRequest.containsKey(STRICT_SCOPES)) {
+                client.setStrictscopes(jsonRequest.getBoolean(STRICT_SCOPES));
+                jsonRequest.remove(STRICT_SCOPES);
+            }
+            if (jsonRequest.containsKey(USE_SERVER_SCOPES)) {
+                client.setUseServerScopes(jsonRequest.getBoolean(USE_SERVER_SCOPES));
+                jsonRequest.remove(USE_SERVER_SCOPES);
+            }
+        }
         if (!jsonRequest.containsKey(OA2Constants.SCOPE)) {
             client.setScopes(new ArrayList<>()); // zeros it out
             // NOTE We no longer require that a client set scopes. If the server is OIDC aware
@@ -1711,10 +1736,8 @@ public class OIDCCMServlet extends EnvServlet {
                 }
                 getOA2SE().getPermissionStore().save(permission);
             }
-            if (jsonRequest.containsKey(STRICT_SCOPES)) {
-                client.setStrictscopes(jsonRequest.getBoolean(STRICT_SCOPES));
-                jsonRequest.remove(STRICT_SCOPES);
-            }
+
+
             if (jsonRequest.containsKey(SKIP_SERVER_SCRIPTS)) {
                 client.setSkipServerScripts(jsonRequest.getBoolean(SKIP_SERVER_SCRIPTS));
                 jsonRequest.remove(SKIP_SERVER_SCRIPTS);

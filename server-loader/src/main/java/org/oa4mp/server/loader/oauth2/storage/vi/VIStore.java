@@ -10,5 +10,10 @@ import edu.uiuc.ncsa.security.storage.data.MapConverter;
 public interface VIStore<V extends VirtualIssuer> extends Store<V> {
      MapConverter<V> getMapConverter();
 
+    /**
+     * Search for an entry by its discovery path.
+     * @param component
+     * @return
+     */
     V findByPath(String component);
 }
