@@ -88,7 +88,7 @@ please sign in with your username and password.
                     <tr>
                         <td><input type="submit" value="Sign In"/></td>
                         <td>
-                            <a href="${clientHome}" STYLE="TEXT-DECORATION: NONE"><input type="button"
+                            <a href="${clientHome}" STYLE="TEXT-DECORATION: NONE"><input type="submit"
                                                                                          name="cancel"
                                                                                          value="Cancel"/></a>
                         </td>

@@ -35,9 +35,10 @@ public class VISerializationKeys extends MonitoredKeys {
     String discoveryPath = "discovery_path";
     String issuer = "issuer";
     String jsonWebKeys = "json_web_keys";
-    String keyRotationEnabled = "keyRotationEnabled";
-    String keyRotationCacheGracePeriod = "keyRotationCacheGracePeriod";
-    String keyRotationATGracePeriod = "keyRotationATGracePeriod";
+    String keyRotationEnabled = "key_rotation_enabled";
+    String keyRotationCacheGracePeriod = "key_rotation_cache_grace_period";
+    String keyRotationATGracePeriod = "key_rotation_at_grace_period";
+    String state = "state";
     String title = "title";
     String valid = "valid";
 
@@ -54,6 +55,7 @@ public class VISerializationKeys extends MonitoredKeys {
         all.add(keyRotationEnabled());
         all.add(keyRotationCacheGracePeriod());
         all.add(keyRotationATGracePeriod());
+        all.add(state());
         return all;
     }
 
@@ -94,6 +96,11 @@ public class VISerializationKeys extends MonitoredKeys {
     public String keyRotationEnabled(String... x) {
         if (0 < x.length) keyRotationEnabled = x[0];
         return keyRotationEnabled;
+    }
+
+    public String state(String... x) {
+        if (0 < x.length) state = x[0];
+        return state;
     }
 
     public String title(String... x) {

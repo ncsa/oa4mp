@@ -169,6 +169,7 @@ public class OIDCCMServlet extends EnvServlet {
                 // A client may get itself. It presents either bearer or basic header.
                 // RFC 7592 -- only bearer token allowed
                 // Fix for https://github.com/ncsa/oa4mp/issues/117
+                // Fix for https://github.com/ncsa/oa4mp/issues/100 as well. JSON returned if no authn method found.
                 if (!HeaderUtils.hasBearerHeader(httpServletRequest)) {
                     throw new IllegalAccessException("Unsupported authorization method.");
                 }
@@ -180,7 +181,7 @@ public class OIDCCMServlet extends EnvServlet {
                 if (!rawID.equals(clientID.toString())) {
                     throw new IllegalAccessException("client id does not match requested id");
                 }
-                // finally after all of that, make sure they have the right password
+                // finally, after all of that, make sure they have the right password
                 getClient(httpServletRequest);
                 oa2Client = (OA2Client) getOA2SE().getClientStore().get(clientID);
                 if (oa2Client == null) {

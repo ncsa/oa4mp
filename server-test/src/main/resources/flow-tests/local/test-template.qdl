@@ -55,11 +55,9 @@ params.'exchange' :=  {'scope': 'read:/home/'+user_id  + // read
 
 rc := script_load('driver.qdl', cfg., params.);
 if[rc!='ok'][return(rc);];
-
 tokens. := clc#access();
 at. := tokens.'access_token'.'jwt';
 rt. := tokens.'refresh_token'.'jwt';
-
 // check scopes
 s. := tokenize(at.'scope', ' ');
 ⊨ reduce(@∧, ['x.z', 'write:/data/cluster',
@@ -74,11 +72,11 @@ s. := tokenize(at.'scope', ' ');
 
 ⊨ tokens.'refresh_token'.'lifetime' == 3600000 : 'wrong refresh token lifetime #1';
 ⊨ rt.'iss' == 'https://refresh.cilogon.org' : 'wrong refresh token issuer';
-
-⊨clc#claims().'aud' == cfg.'id' : 'wrong audience';  // Audience is a little different than usual.
-⊨clc#claims().'sub' == user_id: 'wrong user id';
-
+// Note test change to have this only be OAuth 2, so no claims returned 6/4/2026
+//⊨clc#claims().'aud' == cfg.'id' : 'wrong audience';  // Audience is a little different than usual.
+//⊨clc#claims().'sub' == user_id: 'wrong user id';
 tokens. :=clc#refresh();
+
 at. := tokens.'access_token'.'jwt';
 rt. := tokens.'refresh_token'.'jwt';
 ⊨ 'x.z'== at.'scope' : 'Wrong scopes in access token. Expected only x.z and got ' + at.'scope';
@@ -88,7 +86,6 @@ rt. := tokens.'refresh_token'.'jwt';
 ⊨ tokens.'refresh_token'.'lifetime' == 3600000 : 'wrong refresh token lifetime #2';
 
 // now to test the exchange
-
 tokens. :=clc#exchange();
 at. := tokens.'access_token'.'jwt';
 s. := tokenize(at.'scope', ' ');
@@ -102,7 +99,6 @@ s. := tokenize(at.'scope', ' ');
 ⊨ (tokens.'access_token'.'lifetime' - 750000)<=2000 : 'wrong access token lifetime #3, expected 75000, got ' + (tokens.'access_token'.'lifetime');
 ⊨ at.'iss' == 'https://access.cilogon.org' : 'wrong access token issuer';
 ⊨ at.'aud' == 'https://wlcg.cern.ch/jwt/v1/access' : 'wrong access token audience';
-
 tokens. :=clc#exchange('-rt');
 rt. := tokens.'refresh_token'.'jwt';
 ⊨ tokens.'refresh_token'.'lifetime' == 3600000 : 'wrong refresh token lifetime #3';

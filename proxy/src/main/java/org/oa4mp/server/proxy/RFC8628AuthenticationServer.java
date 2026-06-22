@@ -4,9 +4,13 @@ import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.*;
 import edu.uiuc.ncsa.security.servlet.JSPUtil;
 import edu.uiuc.ncsa.security.servlet.PresentableState;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.http.HttpStatus;
 import org.oa4mp.delegation.common.token.impl.AuthorizationGrantImpl;
 import org.oa4mp.delegation.common.token.impl.TokenFactory;
 import org.oa4mp.delegation.server.OA2ATException;
+import org.oa4mp.delegation.server.OA2Constants;
+import org.oa4mp.delegation.server.OA2Errors;
 import org.oa4mp.delegation.server.OA2GeneralError;
 import org.oa4mp.delegation.server.jwt.HandlerRunner;
 import org.oa4mp.server.api.OA4MPConfigTags;
@@ -27,6 +31,9 @@ import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.sql.SQLException;
 import java.util.*;
@@ -117,6 +124,7 @@ public class RFC8628AuthenticationServer extends EnvServlet {
             super(state, httpServletRequest, httpServletResponse);
             this.id = id;
         }
+
     }
 
     protected void setClientRequestAttributes(PendingState pendingState) {
@@ -145,7 +153,6 @@ public class RFC8628AuthenticationServer extends EnvServlet {
         trace(this, " starting with response committed #1?" + response.isCommitted());
         PendingState pendingState = null;
 
-
         switch (getState(request)) {
             case AUTHORIZATION_ACTION_OK:
                 info("RFC 8628 Authz server: starting Authz action ok");
@@ -162,6 +169,8 @@ public class RFC8628AuthenticationServer extends EnvServlet {
                         OA2SE oa2SE = (OA2SE) OA4MPServlet.getServiceEnvironment();
 
                         OA2ServiceTransaction trans = (OA2ServiceTransaction) oa2SE.getTransactionStore().get(authorizationGrant);
+                        checkCancel(request, trans.getRequestState());
+
                         trans.setConsentPageOK(true);
                         OA2Client resolvedClient = (OA2Client) trans.getClient(); // no ersatz possible at this point.
                         HandlerRunner handlerRunner = new HandlerRunner(trans, ScriptRuntimeEngineFactory.createRTE(getServiceEnvironment(), trans, resolvedClient.getConfig()));
@@ -231,6 +240,19 @@ public class RFC8628AuthenticationServer extends EnvServlet {
                 break;
             case AUTHORIZATION_ACTION_START:
                 trace(this, "Authz action start");
+                checkCancel(request); // they hit cancel right off the bat
+                if(request.getParameter("page_type") != null && request.getParameter("page_type").equals("consent") ) {
+                    // so this means they accepted the consent page, but not the device code page.
+                    // so we need to forward them to the device code page.
+                    // 1. get the user code
+                    // 2. get the device code
+                    // 3. forward to the device code page
+                    // 4. forward to the consent page
+                    // 5. forward to the OK page
+                    // 6. save the transaction
+                    // 7. redirect to the OK page
+                    // 8. save the transaction
+                }
                 String id = BasicIdentifier.randomID().toString();
                 pendingState = new PendingState(getState(request),
                         request,
@@ -266,16 +288,17 @@ public class RFC8628AuthenticationServer extends EnvServlet {
                             throw new OA2ATException("access_denied", "unknown user code \"" + userCode + "\"",
                                     SC_BAD_REQUEST, null);
                         }
+                        // A client can request consent per request, or the server may be configured to just do it.
                         String localConsentURI = request.getParameter(ProxyUtils.LOCAL_DF_CONSENT_XA);
-                        boolean localConsentRequested = !StringUtils.isTrivial(localConsentURI);
+                        boolean localConsentRequested = (!StringUtils.isTrivial(localConsentURI)) || getServiceEnvironment().getAuthorizationServletConfig().isLocalDFConsent();
                         trace(this, "checked for consent, localConsentRequested = " + localConsentRequested);
                         if (localConsentRequested) {
                             trans.setLocalConsentURI(localConsentURI);
                             trace(this, "saving transaction");
                             getServiceEnvironment().getTransactionStore().save(trans);
+                            response.sendRedirect(setClientConsentAttributes(trans, pendingState, request.getContextPath()));
+                            return;
                         }
-                        MetaDebugUtil debugger = OA4MPServlet.createDebugger(trans.getOA2Client());
-              //          printAllParameters(request, debugger);
                         // RFC 7636 support for device flow
 
                         try {
@@ -301,21 +324,42 @@ public class RFC8628AuthenticationServer extends EnvServlet {
                 break;
             case AUTHORIZATION_ACTION_DF_CONSENT:
                 // Specific case from a proxy that the local consent page is to be shown to the user.
+                Map<String, String[]> map = request.getParameterMap();
                 String userCode = request.getParameter(RFC8628Constants2.USER_CODE);
-                if (StringUtils.isTrivial(userCode)) {
-                    throw new OA2ATException("internal_error",
-                            "malformed local device flow consent request");
+                if(!map.containsKey("proxy_key")){
+                    throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                            "invalid request.",
+                            HttpStatus.SC_BAD_REQUEST,
+                            (map.containsKey(OA2Constants.STATE) ? map.get(OA2Constants.STATE)[0] : ""));
                 }
-                userCode = RFC8628Servlet.convertToCanonicalForm(userCode, getServiceEnvironment().getRfc8628ServletConfig());
+                String proxyKey = map.get("proxy_key")[0]; // unhashed key
+                String pendingID = new String(org.apache.commons.codec.binary.Base64.decodeBase64(proxyKey));
+                pendingState = pending.get(pendingID);
+                // make sure these are current or you can't respond.
+                pendingState.setResponse(response);
+                pendingState.setRequest(request);
+                if(!map.containsKey("code")){
+                    throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                            "missing token",
+                            HttpStatus.SC_BAD_REQUEST,
+                            (map.containsKey(OA2Constants.STATE) ? map.get(OA2Constants.STATE)[0] : ""));
+                }
+                AuthorizationGrantImpl ag = new AuthorizationGrantImpl(URI.create(map.get("code")[0]));
+                OA2ServiceTransaction t = (OA2ServiceTransaction) getServiceEnvironment().getTransactionStore().get(ag);
+                ProxyUtils.userCodeToProxyRedirect(getServiceEnvironment(), t, pendingState);
+
+
+/*                userCode = RFC8628Servlet.convertToCanonicalForm(userCode, getServiceEnvironment().getRfc8628ServletConfig());
                 RFC8628Store<? extends OA2ServiceTransaction> rfc8628Store = (RFC8628Store) getServiceEnvironment().getTransactionStore();
                 OA2ServiceTransaction trans = rfc8628Store.getByUserCode(userCode);
+                checkCancel(request, trans.getRequestState());
                 ProxyUtils.getProxyAccessToken(getServiceEnvironment(), trans); // finish off setting up the tokens.
                 setClientConsentAttributes(request, trans);
                 try {
                     JSPUtil.fwd(request, response, getConsentPage());
                 } catch (Throwable t) {
                     t.printStackTrace();
-                }
+                }*/
                 return;
             default:
                 // nothing to do here either.
@@ -323,6 +367,45 @@ public class RFC8628AuthenticationServer extends EnvServlet {
         present(pendingState);
     }
 
+    /**
+     * Set the attributes for the consent page. In this case, the pending state ID is set as the base 64 proxy_hash.
+     *
+     * @param t
+     * @param pendingState
+     * @param contextPath
+     * @return
+     */
+    protected String setClientConsentAttributes(OA2ServiceTransaction t,  PendingState pendingState, String contextPath) {
+        String params = contextPath + "/proxy-consent.jsp?";
+/*
+        SecureRandom secureRandom = new SecureRandom();
+        byte[] bytes = new byte[32];
+        secureRandom.nextBytes(bytes);
+        String proxyState = Base64.getEncoder().encodeToString(bytes);
+*/
+        String proxyState = Base64.getEncoder().encodeToString(pendingState.id.getBytes(StandardCharsets.UTF_8));
+        t.setProxyHash(DigestUtils.sha1Hex(proxyState)); // store a hash of the state for later use.
+        getServiceEnvironment().getTransactionStore().save(t);
+        params = params + AUTHORIZATION_ACTION_KEY + "=" + AUTHORIZATION_ACTION_KEY;
+        params = params + "&actionOk" + "=" + AUTHORIZATION_ACTION_OK_VALUE;
+        params = params + "&" + AUTHORIZATION_GRANT_KEY +  "=" + URLEncoder.encode(t.getIdentifierString(), StandardCharsets.UTF_8);
+        params = params + "&" + "tokenKey" +  "=" + URLEncoder.encode(CONST(TOKEN_KEY), StandardCharsets.UTF_8);
+
+   //     params = params + "&" + DF_USER_CODE_KEY + "=" + URLEncoder.encode(t.getUserCode(), StandardCharsets.UTF_8);
+        // OAuth 2.0 specific values that must be preserved.
+        //    params = params + "&stateKey" + "=" + OA2Constants.STATE;
+        params = params + "&" + PROXY_KEY + "=" + proxyState;
+        params = params + "&" + RESPONSE_TYPE_KEY + "=" + RESPONSE_TYPE_DF_VALUE;
+        params = params + "&clientHome" + "=" + escapeHtml4(t.getClient().getHomeUri());
+        params = params + "&clientName" + "=" + escapeHtml4(t.getClient().getName());
+        params = params + "&clientScopes" + "=" + URLEncoder.encode(scopesToString(t));
+        String deviceURI = getServiceEnvironment().getRfc8628ServletConfig().deviceEndpoint;
+        // last component of the URI is the device endpoint.
+
+        params = params + "&actionToTake" + "=" + contextPath + deviceURI.substring(deviceURI.lastIndexOf("/") );
+
+        return params;
+    }
     /**
      * This is where the user's log in is actually processed and the values they sent are checked.
      * It then forwards the user browser to the consent page, so if you do anything with the

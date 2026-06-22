@@ -1,17 +1,22 @@
 package org.oa4mp.server.api.storage.servlet;
 
-import org.oa4mp.server.api.ServiceEnvironmentImpl;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.servlet.AbstractServlet;
 import edu.uiuc.ncsa.security.servlet.NotificationListener;
 import edu.uiuc.ncsa.security.storage.sql.SQLStore;
 import edu.uiuc.ncsa.security.storage.sql.derby.DerbyConnectionPool;
+import org.oa4mp.delegation.server.OA2ATException;
+import org.oa4mp.server.api.ServiceEnvironmentImpl;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
+import static org.oa4mp.delegation.server.OA2Errors.ACCESS_DENIED;
 
 /**
  * This servlet loads the environment for all servlets. Any servlet that requires a service environment
@@ -84,4 +89,31 @@ public abstract class EnvServlet extends AbstractServlet {
 
     public static boolean storeUpdatesDone = false;
 
+    protected void checkCancel(HttpServletRequest request) {
+        checkCancel(request, null);
+    }
+
+    /**
+     * Checks if the user hit the cancel button and handles it. In some cases, additional processing is required.
+     * This lets you check if you need to do that, then yo should call {@link #checkCancel(HttpServletRequest, String)}
+     * to actually handle the cancellation.
+     * @param request
+     * @param state
+     */
+    protected void checkCancel(HttpServletRequest request, String state) {
+        if(isCancelled(request)){
+            throw new OA2ATException(ACCESS_DENIED,
+                    "user cancelled",
+                    SC_UNAUTHORIZED, state);
+        }
+    }
+
+    /**
+     * Just checks if the cancel button was pressed.
+     * @param request
+     * @return
+     */
+    protected boolean isCancelled(HttpServletRequest request) {
+        return request.getParameter("cancel") != null && request.getParameter("cancel").equals("Cancel");
+    }
 }

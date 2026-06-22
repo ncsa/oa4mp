@@ -8,6 +8,7 @@ import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.cli.FoundIdentifiables;
 import edu.uiuc.ncsa.security.util.cli.CLIDriver;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
+import edu.uiuc.ncsa.security.util.configuration.TimeUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
@@ -16,6 +17,7 @@ import org.oa4mp.server.admin.oauth2.base.OA4MPStoreCommands;
 import org.oa4mp.server.api.admin.adminClient.AdminClient;
 import org.oa4mp.server.api.admin.adminClient.AdminClientKeys;
 import org.oa4mp.server.loader.oauth2.OA2SE;
+import org.oa4mp.server.loader.oauth2.storage.keys.KEStoreUtilities;
 import org.oa4mp.server.loader.oauth2.storage.vi.VISerializationKeys;
 import org.oa4mp.server.loader.oauth2.storage.vi.VIStore;
 import org.oa4mp.server.loader.oauth2.storage.vi.VirtualIssuer;
@@ -29,7 +31,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
+import static edu.uiuc.ncsa.security.core.util.StringUtils.*;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -74,6 +76,27 @@ public class VICommands extends OA4MPStoreCommands {
         }
         vi.setAtIssuer(getPropertyHelp(keys.atIssuer(), "enter the access token issuer", iss));
         vi.setDiscoveryPath(getPropertyHelp(keys.discoveryPath(), "enter the discovery path. NOTE this should be of the form host/path e.g.cilogon.org/ligo:", vi.getDiscoveryPath()));
+        vi.setCreationTS(new Date());
+        try {
+            doKeySetup(vi, keys);
+        } catch (Throwable t) {
+            return;
+        }
+        vi.setLastModifiedTS(new Date());
+        // could ask if they really want it to be valid, but don't
+        //vi.setValid(getPropertyHelp(keys.valid(), "is this valid?", Boolean.toString(vi.isValid())).equalsIgnoreCase("y"));
+        vi.setValid(true);
+    }
+
+    /**
+     * Do setup for keys with prompts.
+     *
+     * @param vi
+     * @param keys
+     * @return True if it worked, null if the system should exit becase of an error.
+     * @throws Exception
+     */
+    protected Boolean doKeySetup(VirtualIssuer vi, VISerializationKeys keys) throws Exception {
         String ok = getInput("Did you want to specify a file with the JSON web keys(y/n)", "n");
         if (!isTrivial(ok)) {
             if (ok.trim().toLowerCase().equals("y")) {
@@ -116,7 +139,7 @@ public class VICommands extends OA4MPStoreCommands {
                             }
                         } catch (Throwable t) {
                             say("sorry but \"" + raw + "\" is not an integer");
-                            return;
+                            return null;
                         }
                         try {
                             newKeys(vi, keySize);
@@ -125,7 +148,7 @@ public class VICommands extends OA4MPStoreCommands {
                             if (DebugUtil.isEnabled()) {
                                 t.printStackTrace();
                             }
-                            return;
+                            return null;
                         }
                     } else {
                         if (type.equals("EC")) {
@@ -138,7 +161,7 @@ public class VICommands extends OA4MPStoreCommands {
                                 if (DebugUtil.isEnabled()) {
                                     e.printStackTrace();
                                 }
-                                return;
+                                return null;
                             }
                         } else {
                             say("Sorry but \"" + type + "\" is not a valid type of key");
@@ -147,16 +170,14 @@ public class VICommands extends OA4MPStoreCommands {
                 }
             }
         }
+        // Keys are now squirreled away in the vi. Put in the keystore if enabled.
+
         String defaultKey = null;
         if (vi.getJsonWebKeys() != null) {
             defaultKey = vi.getJsonWebKeys().getDefaultKeyID();
         }
         vi.setDefaultKeyID(getPropertyHelp(keys.defaultKeyID(), "enter the default key id", defaultKey));
-        vi.setCreationTS(new Date());
-        vi.setLastModifiedTS(new Date());
-        // could ask if they really want it to be valid, but don't
-        //vi.setValid(getPropertyHelp(keys.valid(), "is this valid?", Boolean.toString(vi.isValid())).equalsIgnoreCase("y"));
-        vi.setValid(true);
+        return true;
     }
 
     public void new_keys(InputLine inputLine) throws Throwable {
@@ -180,7 +201,8 @@ public class VICommands extends OA4MPStoreCommands {
         if (identifiables == null) {
             say("sorry, no such virtual issuer");
             return;
-        }      if(!identifiables.isSingleton()){
+        }
+        if (!identifiables.isSingleton()) {
             say("only a single object is supported by this operation");
             return;
         }
@@ -272,7 +294,8 @@ public class VICommands extends OA4MPStoreCommands {
         if (identifiables == null) {
             say("sorry, no such virtual issuer");
             return;
-        }        if(!identifiables.isSingleton()){
+        }
+        if (!identifiables.isSingleton()) {
             say("only single object are supported");
             return;
         }
@@ -310,21 +333,21 @@ public class VICommands extends OA4MPStoreCommands {
         getHelpUtil().load("/help/vi_help.xml");
     }
 
-    public void add_admin(InputLine inputLine) throws Throwable{
-        if(showHelp(inputLine)){
+    public void add_admin(InputLine inputLine) throws Throwable {
+        if (showHelp(inputLine)) {
             say("add_admin admin_id [vi_id] - add the admin client or a result set of them ");
             say("to the current or given virtual issuer");
             printIndexHelp(true);
             return;
         }
-List<Identifiable> identifiables = findByIDOrRS(getEnvironment().getAdminClientStore(), inputLine.getArg(1));
-        if(identifiables == null){
+        List<Identifiable> identifiables = findByIDOrRS(getEnvironment().getAdminClientStore(), inputLine.getArg(1));
+        if (identifiables == null) {
             say("no admin id could be found.");
             return;
         }
         int count = 0;
         Identifiable vi = findSingleton(inputLine, "virtual issuer not found");
-        for(Identifiable identifiable: identifiables){
+        for (Identifiable identifiable : identifiables) {
             AdminClient adminClient = (AdminClient) identifiable;
             adminClient.setVirtualIssuer(vi.getIdentifier());
             adminClient.setExternalVIName(vi.getIdentifierString());
@@ -348,19 +371,21 @@ List<Identifiable> identifiables = findByIDOrRS(getEnvironment().getAdminClientS
         Identifier oldID = changeIDRecord.oldID;
         // now we have to find the admin records that use this
         AdminClientKeys adminClientKeys = new AdminClientKeys();
-        List<AdminClient> admins = getEnvironment().getAdminClientStore().search(adminClientKeys.vo(),oldID.toString(), false);
-        for(AdminClient adminClient: admins){
+        List<AdminClient> admins = getEnvironment().getAdminClientStore().search(adminClientKeys.vo(), oldID.toString(), false);
+        for (AdminClient adminClient : admins) {
             adminClient.setVirtualIssuer(newID);
-            if(adminClient.getExternalVIName().equals(oldID.toString())){
+            if (adminClient.getExternalVIName().equals(oldID.toString())) {
                 adminClient.setExternalVIName(newID.toString());
-            };
+            }
+            ;
             getEnvironment().getAdminClientStore().save(adminClient);
         }
-        changeIDRecord.updateCount = changeIDRecord.updateCount +admins.size();
+        changeIDRecord.updateCount = changeIDRecord.updateCount + admins.size();
         return changeIDRecord;
     }
+
     public void list_admins(InputLine inputLine) throws Throwable {
-        if(showHelp(inputLine)){
+        if (showHelp(inputLine)) {
             say("list_admins [-rs name] id - list the admin IDs for the current VI.");
             say("You may save them in a result set if you want.");
             say("This is restricted to a single VI.");
@@ -373,25 +398,26 @@ List<Identifiable> identifiables = findByIDOrRS(getEnvironment().getAdminClientS
         }
         String rsName = null;
         boolean hasRS = inputLine.hasArg(RESULT_SET_KEY);
-        if(hasRS){
+        if (hasRS) {
             rsName = inputLine.getNextArgFor(RESULT_SET_KEY);
             inputLine.removeSwitchAndValue(RESULT_SET_KEY);
         }
         AdminClientKeys adminClientKeys = new AdminClientKeys();
-        List<AdminClient> admins  = getEnvironment().getAdminClientStore().search(adminClientKeys.vo(),identifiable.getIdentifierString(), false);
-        if(hasRS) {
+        List<AdminClient> admins = getEnvironment().getAdminClientStore().search(adminClientKeys.vo(), identifiable.getIdentifierString(), false);
+        if (hasRS) {
             List<Identifiable> hackyList = new ArrayList<Identifiable>(admins.size());
             hackyList.addAll(admins); // since java won't allow certain casts.
             RSRecord rsRecord = new RSRecord(hackyList, adminClientKeys.allKeys());
             getResultSets().put(rsName, rsRecord);
         }
-        for(AdminClient adminClient: admins){
+        for (AdminClient adminClient : admins) {
             say(adminClient.getIdentifierString());
         }
         say("found " + admins.size() + " admin clients");
     }
-    public void set_default_key(InputLine inputLine) throws Throwable{
-        if(showHelp(inputLine)){
+
+    public void set_default_key(InputLine inputLine) throws Throwable {
+        if (showHelp(inputLine)) {
             say("set_default_key id [-show] key_id - set the default key for the given VI.");
             say("Setting it to " + OA2SE.NO_KEY_ID + " will disable the default key.");
             say("-show = will list the current key ids in the VI.");
@@ -401,34 +427,159 @@ List<Identifiable> identifiables = findByIDOrRS(getEnvironment().getAdminClientS
         if (identifiables == null) {
             say("sorry, no such virtual issuer");
             return;
-        }      if(!identifiables.isSingleton()){
+        }
+        if (!identifiables.isSingleton()) {
             say("only a single object is supported by this operation");
             return;
         }
         VirtualIssuer vi = (VirtualIssuer) identifiables.get(0);
-        List<String> currentIDs = new ArrayList<>(vi.getJsonWebKeys().keySet());;
-        if(inputLine.hasArg("-show")){
+        List<String> currentIDs = new ArrayList<>(vi.getJsonWebKeys().keySet());
+        ;
+        if (inputLine.hasArg("-show")) {
             say("The current keys have ids:");
-            for(String keyId: currentIDs){
+            for (String keyId : currentIDs) {
                 say(keyId);
             }
         }
         boolean retry = true;
         String kid = null;
-        while(retry){
+        while (retry) {
             kid = readline("Enter the new default key id (or exit to cancel):");
-            if(kid.equalsIgnoreCase("exit")){
+            if (kid.equalsIgnoreCase("exit")) {
                 say("Settting default key cancelled");
                 return;
             }
-            if(!(kid.equals(OA2SE.NO_KEY_ID) || currentIDs.contains(kid))){
+            if (!(kid.equals(OA2SE.NO_KEY_ID) || currentIDs.contains(kid))) {
                 say("   Sorry, that key id is not in the list of keys for this VI.");
-            }else{
+            } else {
                 retry = false;
             }
         }
         vi.setDefaultKeyID(kid);
         getStore().save(vi);
 
+    }
+
+    public void allow_key_rotation_overrides(InputLine inputLine) throws Throwable {
+        if (showHelp(inputLine)) {
+            say("allow_key_rotation_overrides [arg]- query or set the key rotation overrides for the service.");
+            say("Note that this applies to the service and governs whether virtual issuers can override the server's");
+            say("defaults.");
+            String yeses = "";
+            String nos = "";
+            for (int i = 0; i < LOGICAL_TRUES.length; i++) {
+                yeses = yeses + (i != 0 ? "," : "") + LOGICAL_TRUES[i];
+            }
+            for (int i = 0; i < LOGICAL_FALSES.length; i++) {
+                nos = nos + (i != 0 ? "," : "") + LOGICAL_FALSES[i];
+            }
+            say("arg - true is  any  of " + yeses);
+            say("      false is any of " + nos);
+            say("No argument queries current value.");
+            return;
+        }
+        boolean hasArg = !inputLine.hasArg();
+
+        VirtualIssuer defaultIssuer = getStore().get(OA2SE.SERVER_VI_ID);
+        if (defaultIssuer == null) {
+            say("no default issuer found.");
+            return;
+        }
+        if (!hasArg) {
+            say("current value: " + defaultIssuer.isAllowOverrides());
+            return;
+        }
+        String arg = inputLine.getLastArg();
+        Boolean b = StringUtils.toBoolean(arg);
+        if (b == null) {
+            say("Did not understand \" " + arg + " \" as a boolean value.");
+            return;
+        }
+        defaultIssuer.setAllowOverrides(b);
+        getStore().save(defaultIssuer);
+        say("updated default issuer");
+    }
+
+    @Override
+    public VIStore<VirtualIssuer> getStore() {
+        return (VIStore) super.getStore();
+    }
+
+    public void create_default(InputLine inputLine) throws Throwable {
+        if (showHelp(inputLine)) {
+            say("create_default - create the default issuer. This needs to exist before the service is run.");
+            say("This is the issuer that is used for all requests that do not have a virtual issuer.");
+            return;
+        }
+        VirtualIssuer vi = getStore().get(OA2SE.SERVER_VI_ID);
+/*        if (vi != null) {
+            say("default virtual issuer already exists.");
+            return;
+        }*/
+        VISerializationKeys keys = (VISerializationKeys) getSerializationKeys();
+        vi = getStore().create();
+        vi.setIdentifier(OA2SE.SERVER_VI_ID);
+        vi.setTitle("Default Issuer");
+        vi.setDescription("Default Issuer");
+        vi.setCreationTS(new Date());
+        vi.setLastModifiedTS(new Date());
+        vi.setValid(true);
+
+        boolean noKeys = true;
+        if(getEnvironment().getServerJWKS() != null && !getEnvironment().getServerJWKS().isEmpty()) {
+            if("y".equals(readline("Server keys detected in the configuration. Do you want to use these(y/n)?"))) {
+                if(getEnvironment().hasKEStore()){
+                    List<String> skipped = KEStoreUtilities.ingest(getEnvironment().getKEStore(),getEnvironment().getServerJWKS(), vi, true );
+                    if(skipped != null && !skipped.isEmpty()) {
+                        say("The following keys were not used because they were already in the keystore:");
+                        for(String s : skipped) {
+                            say(s);
+                        }
+                    }
+                }else{
+                    vi.setJsonWebKeys(getEnvironment().getServerJWKS());
+                }
+
+                noKeys = false;
+            }else{
+                if (null == doKeySetup(vi, keys)) {
+                    return;
+                }
+            }
+        }
+        if (noKeys && "y".equals(readline("Do you want to setup key rotation? (y/n)"))) {
+            vi.setKeyRotationEnabled(true);
+            vi.setAllowOverrides("y".equals(readline("Do you want to allow key rotation overrides? (y/n)")));
+            String gracePeriod = getInput("Enter the key rotation cache grace period:", "24 hr.");
+            Long x = TimeUtil.getValueSecsOrMillis(gracePeriod, true);
+            vi.setCacheGracePeriod(x);
+           gracePeriod = getInput("Enter the key rotation access token grace period:", (getEnvironment().getMaxATLifetime() / 1000) + " sec.");
+            x = TimeUtil.getValueSecsOrMillis(gracePeriod, true);
+            vi.setAtGracePeriod(x);
+        }
+        getStore().save(vi);
+        say("created default virtual issuer");
+    }
+
+    @Override
+    protected void showLSHelp() {
+        super.showLSHelp();
+        say("You may also just use the index \"default\" to show the default virtual issuer");
+    }
+
+    @Override
+    public void ls(InputLine inputLine) throws Throwable {
+        if(inputLine.hasLastArg() && inputLine.getLastArg().equalsIgnoreCase("default")) {
+            inputLine.setLastArg(OA2SE.SERVER_VI_ID.toString());
+        }
+        super.ls(inputLine);
+    }
+
+    public void get_default_id(InputLine inputLine) throws Throwable {
+        if (showHelp(inputLine)) {
+            say("get_default_id - get the default virtual issuer id");
+            return;
+        }
+        say(OA2SE.SERVER_VI_ID.toString());
     }
 }

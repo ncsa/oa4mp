@@ -55,7 +55,7 @@ please accept, otherwise, cancel.
         <tr>
             <td>
                 <input type="submit" style="float: left;" value="Accept"/>
-                <input type="button" style="float: right;" name="cancel" value="Cancel"/></a>
+                <input type="submit" style="float: right;" name="cancel" value="Cancel"/></a>
             </td>
         </tr>
         <tr>

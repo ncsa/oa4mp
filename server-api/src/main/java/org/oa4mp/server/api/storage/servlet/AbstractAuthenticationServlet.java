@@ -125,6 +125,28 @@ public abstract class AbstractAuthenticationServlet extends OA4MPServlet impleme
     public static final int AUTHORIZATION_ACTION_OK = 1;
     public static final int AUTHORIZATION_ACTION_START = 0;
     public static final String RETRY_MESSAGE = "retryMessage";
+    public static final String AUTHORIZATION_GRANT_KEY = "authorizationGrant";
+    public static final String AUTHORIZATION_STATE_KEY = "authorizationState";
+    public static final String PROXY_KEY = "proxyKey";
+    public static final String RESPONSE_TYPE_KEY = "responseType";
+    public static final String RESPONSE_TYPE_TOKEN_VALUE = "token";
+    public static final String RESPONSE_TYPE_DF_VALUE = "device";
+    public static final String TOKEN_KEY_KEY = "tokenKey";
+    public static final String DF_USER_CODE_KEY = "userCode";
+    /*
+         params = params + "&actionOk" + "=" + AUTHORIZATION_ACTION_OK_VALUE;
+        params = params + "&authorizationGrant" + "=" + URLEncoder.encode(t.getIdentifierString(), StandardCharsets.UTF_8);
+        //      params = params + "&authorizationState" + "=" + t.getRequestState();
+        params = params + "&tokenKey" + "=" + CONST(TOKEN_KEY);
+        // OAuth 2.0 specific values that must be preserved.
+        //    params = params + "&stateKey" + "=" + OA2Constants.STATE;
+        params = params + "&proxyKey" + "=" + state;
+        params = params + "&responseType" + "=token";
+        params = params + "&clientHome" + "=" + escapeHtml4(t.getClient().getHomeUri());
+        params = params + "&clientName" + "=" + escapeHtml4(t.getClient().getName());
+        params = params + "&clientScopes" + "=" + URLEncoder.encode(scopesToString(t));
+        params = params + "&actionToTake" + "=" + contextPath + "/authorize";
+     */
 
     /**
      * State object after authorization has worked.
@@ -226,7 +248,7 @@ public abstract class AbstractAuthenticationServlet extends OA4MPServlet impleme
                 info("*** STARTING present");
                 if (getServiceEnvironment().getAuthorizationServletConfig().getUseMode().equals(OA4MPConfigTags.AUTHORIZATION_SERVLET_USE_MODE_HEADER)) {
                     initPage = getRemoteUserInitialPage();
-    //                ServletDebugUtil.printAllParameters(getClass(), state.getRequest(), true);
+                    //                ServletDebugUtil.printAllParameters(getClass(), state.getRequest(), true);
                     info("*** PRESENT: Use headers enabled.");
                     String x = null;
                     if (getServiceEnvironment().getAuthorizationServletConfig().getHeaderFieldName().equals("REMOTE_USER")) {
@@ -350,6 +372,9 @@ public abstract class AbstractAuthenticationServlet extends OA4MPServlet impleme
     public static int getState(HttpServletRequest request) {
         String action = request.getParameter(AUTHORIZATION_ACTION_KEY);
         ServletDebugUtil.trace(AbstractAuthenticationServlet.class, "action = " + action);
+        if(request.getParameterMap().containsKey("page_type") && request.getParameter("page_type").equals("consent")) {
+            return AUTHORIZATION_ACTION_DF_CONSENT;
+        }
         if (action == null || action.length() == 0) return AUTHORIZATION_ACTION_START;
         switch (action) {
             case AUTHORIZATION_ACTION_OK_VALUE:
@@ -412,11 +437,16 @@ public abstract class AbstractAuthenticationServlet extends OA4MPServlet impleme
                 trans.setUsername(userName);
             }
         } else {
-            // Headers not used, just pull it off the form the user POSTs.
-            userName = request.getParameter(AUTHORIZATION_USER_NAME_KEY);
-            password = request.getParameter(AUTHORIZATION_PASSWORD_KEY);
-            checkUser(userName, password);
-            trans.setUsername(userName);
+            // Headers not used, just pull it off the form the user POSTs
+            if (!getServiceEnvironment().getAuthorizationServletConfig().isLocalDFConsent()) {
+                if (!request.getParameterMap().containsKey(AUTHORIZATION_USER_NAME_KEY)) {
+                    throw new GeneralException("Error: No user name was specified.");
+                }
+                userName = request.getParameter(AUTHORIZATION_USER_NAME_KEY);
+                password = request.getParameter(AUTHORIZATION_PASSWORD_KEY);
+                checkUser(userName, password);
+                trans.setUsername(userName);
+            }
         }
 
         userName = trans.getUsername();

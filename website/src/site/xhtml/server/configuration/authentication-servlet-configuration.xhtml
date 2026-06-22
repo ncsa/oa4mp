@@ -81,6 +81,12 @@
         </td>
     </tr>
     <tr>
+        <!--
+           Partial fix for https://github.com/ncsa/oa4mp/issues/107. Consent page is, actually, optional
+           and only in the case of device flow can it be forced. There is a parameter that the server
+           can send to the proxy requesting it display the server consent form before its own, but that
+           is a specific OA4MP feature.
+        -->
         <td>localDFConsent</td>
         <td>N</td>
         <td>false</td>

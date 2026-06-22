@@ -3,6 +3,14 @@
 /*
   Test for https://github.com/ncsa/oa4mp/issues/299. Client with custom scope list
   should be able to set it.
+
+  Create a client using an admin, set the strict_scopes to true and use_server_scope to false.
+  Then on update, show we can set the scope list to something completely different.
+
+  This shows that we can make (OAuth 2) clients who have scopes completely indepednent of the server's scopes.
+  Note that otherwise, clients are restricted to setting scopes that are a subset of the server's scopes.
+  For the vast majority of clients, this is what we want and the aim is to catch errors (such as setting a client scope to
+  "emial" vs. "email" by accident.
 */
 
 script_load('init.qdl', args(0));
@@ -16,7 +24,7 @@ resp. := http#post(payload.);
 ⊨ resp.'status'.'code' == ini.'status' : 'incorrect returned status: expected '+ ini.'status' +' but got ' + resp.'status'.'code';
 
 update. := from_json(file_read(ini.'payloads' + 'update.json'));
-// remember that updating a client means to send everything or as per contract it is removed/set to its default value.
+// remember that updating a client means to send everything or, as per spec.,  it is removed/set to its default value.
 update.'scope' := ['P','Q','R'];
 update.'strict_scopes' := true;
 update.'use_server_scopes' := false;
@@ -25,7 +33,6 @@ resp2. := http#put(update.);
 ⊨ resp2.'status'.'code' == 200 : logger(4,say('incorrect returned status of ' + resp.'status'.'code'));
 r. := http#get({'client_id':resp2.'content'.'client_id'}).'content';
 // r. now contains the uploaded client
-say(print(r.));
 ⊨ r.'strict_scopes' : 'strict_scopes is not set to true';
 ⊨ !r.'use_server_scopes' : 'use_server_scopes is not set to false';
 ⊨ false ∉ (['P','Q','R'] ∈ r.'scope') : 'scope is not set to [P,Q,R]';

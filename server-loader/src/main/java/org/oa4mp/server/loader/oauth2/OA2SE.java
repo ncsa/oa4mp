@@ -359,6 +359,9 @@ public class OA2SE extends ServiceEnvironmentImpl {
     }
 
     KEStore<KERecord> keStore;
+    public boolean hasKEStore(){
+        return null != getKEStore();
+    }
     VIStore VIStore;
 
     public VIStore getVIStore() {
@@ -540,7 +543,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.jsonWebKeys = jsonWebKeys;
     }
 
-    protected JSONWebKeys getServerJWKS(){
+    public JSONWebKeys getServerJWKS(){
         return jsonWebKeys;
     }
     protected void setServerJWKS(JSONWebKeys jsonWebKeys){
@@ -858,4 +861,13 @@ public class OA2SE extends ServiceEnvironmentImpl {
     }
 
     DIServiceConfig DIServiceConfig = null;
+
+    /**
+     * Is this the default server virtual issuer?
+     * @param vi
+     * @return
+     */
+    public boolean isServerVI(VirtualIssuer vi){
+        return vi.getIdentifier().equals(SERVER_VI_ID);
+    }
 }

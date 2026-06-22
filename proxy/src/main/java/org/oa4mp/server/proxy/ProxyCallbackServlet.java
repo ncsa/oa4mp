@@ -4,11 +4,11 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.TransactionNotFoundException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
-import edu.uiuc.ncsa.security.servlet.JSPUtil;
 import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.util.cli.CLIDriver;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.kordamp.json.JSONObject;
 import org.oa4mp.delegation.server.OA2Constants;
 import org.oa4mp.delegation.server.ServiceTransaction;
@@ -27,6 +27,9 @@ import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
@@ -101,7 +104,7 @@ public class ProxyCallbackServlet extends OA2AuthenticationServer {
         HandlerRunner handlerRunner = new HandlerRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2SE, t, resolvedClient.getConfig()));
         OA2ClientUtils.setupHandlers(handlerRunner, oa2SE, t, resolvedClient, request);
         XMLMap backup = GenericStoreUtils.toXML(getTransactionStore(), t);
-        Date now  = new Date();
+        Date now = new Date();
         t.setAuthTime(now);
         t.getClient().setLastAccessed(now);
         try {
@@ -115,22 +118,55 @@ public class ProxyCallbackServlet extends OA2AuthenticationServer {
         cbParams.put(OA2Constants.STATE, t.getRequestState()); // Make sure that the original state that was sent is returned to the client callback
         String cb = createCallback(t, cbParams);
         oa2SE.getTransactionStore().save(t);
-     //   response.sendRedirect(cb);
-        if(oa2SE.getAuthorizationServletConfig().isLocalDFConsent()) {
-            setClientConsentAttributes(request, t);
-            JSPUtil.fwd(request, response, "/proxy-consent.jsp");
-        }else {
+        //   response.sendRedirect(cb);
+        if (oa2SE.getAuthorizationServletConfig().isLocalDFConsent()) {
+            // In order to get the correct address in the browser, we need to send a redirect, not a forward.
+            response.sendRedirect(setClientConsentAttributes(t, request.getContextPath()));
+        } else {
             response.sendRedirect(cb);
         }
     }
-    protected void setClientConsentAttributes(HttpServletRequest request, OA2ServiceTransaction t) {
+
+    /**
+     * Set the parameters for the local consent page. These must be passed as parameters for the redirect,
+     * which is a new HTTP request hence can have no state.
+     *
+     * @param t
+     * @param contextPath
+     * @return
+     */
+    protected String setClientConsentAttributes(OA2ServiceTransaction t, String contextPath) {
+        String params = contextPath + "/proxy-consent.jsp?";
+        SecureRandom secureRandom = new SecureRandom();
+        byte[] bytes = new byte[32];
+        secureRandom.nextBytes(bytes);
+        String proxyState = Base64.getEncoder().encodeToString(bytes);
+        t.setProxyHash(DigestUtils.sha1Hex(proxyState)); // store a hash of the state for later use.
+        getServiceEnvironment().getTransactionStore().save(t);
+        params = params + AUTHORIZATION_ACTION_KEY + "=" + AUTHORIZATION_ACTION_KEY;
+        params = params + "&actionOk" + "=" + AUTHORIZATION_ACTION_OK_VALUE;
+        params = params + "&" + AUTHORIZATION_GRANT_KEY +  "=" + URLEncoder.encode(t.getIdentifierString(), StandardCharsets.UTF_8);
+        //      params = params + "&authorizationState" + "=" + t.getRequestState();
+        params = params + "&" + TOKEN_KEY_KEY + "=" + CONST(TOKEN_KEY);
+        // OAuth 2.0 specific values that must be preserved.
+        //    params = params + "&stateKey" + "=" + OA2Constants.STATE;
+        params = params + "&" + PROXY_KEY + "=" + proxyState;
+        params = params + "&" + RESPONSE_TYPE_KEY + "=" + RESPONSE_TYPE_TOKEN_VALUE;
+        params = params + "&clientHome" + "=" + escapeHtml4(t.getClient().getHomeUri());
+        params = params + "&clientName" + "=" + escapeHtml4(t.getClient().getName());
+        params = params + "&clientScopes" + "=" + URLEncoder.encode(scopesToString(t));
+        params = params + "&actionToTake" + "=" + contextPath + "/authorize";
+        return params;
+    }
+
+    protected void setClientConsentAttributesOLD(HttpServletRequest request, OA2ServiceTransaction t) {
         request.setAttribute(AUTHORIZATION_ACTION_KEY, AUTHORIZATION_ACTION_KEY);
         request.setAttribute("actionOk", AUTHORIZATION_ACTION_OK_VALUE);
         request.setAttribute("authorizationGrant", t.getIdentifierString());
         request.setAttribute("tokenKey", CONST(TOKEN_KEY));
         // OAuth 2.0 specific values that must be preserved.
         request.setAttribute("stateKey", "state");
- //       request.setAttribute("authorizationState", t.getRequestState());
+        //       request.setAttribute("authorizationState", t.getRequestState());
 
         request.setAttribute("clientHome", escapeHtml4(t.getClient().getHomeUri()));
         request.setAttribute("clientName", escapeHtml4(t.getClient().getName()));

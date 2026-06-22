@@ -18,9 +18,9 @@ import edu.uiuc.ncsa.security.util.configuration.TimeUtil;
 import edu.uiuc.ncsa.security.util.json.MyJSONUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
+import org.apache.http.HttpStatus;
 import org.kordamp.json.JSONArray;
 import org.kordamp.json.JSONObject;
-import org.apache.http.HttpStatus;
 import org.oa4mp.delegation.common.servlet.TransactionState;
 import org.oa4mp.delegation.common.storage.TransactionStore;
 import org.oa4mp.delegation.common.storage.clients.BaseClient;
@@ -34,7 +34,6 @@ import org.oa4mp.delegation.server.request.ATRequest;
 import org.oa4mp.delegation.server.request.IssuerResponse;
 import org.oa4mp.delegation.server.server.*;
 import org.oa4mp.delegation.server.server.claims.OA2Claims;
-import org.oa4mp.server.api.OA4MPConfigTags;
 import org.oa4mp.server.api.admin.adminClient.AdminClient;
 import org.oa4mp.server.api.admin.permissions.Permission;
 import org.oa4mp.server.api.admin.permissions.PermissionsStore;
@@ -2814,7 +2813,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
 
         // Logic is simple. If proxy, farm it out to the proxy and it works or doesn't.
         // otherwise, manage all the state for retries.
-        if (getOA2SE().getAuthorizationServletConfig().getUseMode().equals(OA4MPConfigTags.AUTHORIZATION_SERVLET_USE_MODE_PROXY)) {
+        if (getOA2SE().getAuthorizationServletConfig().useExternalAuthorization()) {
             //forward to the proxy. If it succeeds there, set the rfc state to valid.
             try {
                 ProxyUtils.getProxyAccessToken(getOA2SE(), transaction);

@@ -166,6 +166,7 @@ public class OA2CFConfigurationLoader<T extends ServiceEnvironmentImpl> extends 
     public static long REFRESH_TOKEN_GRACE_PERIOD_DISABLED = -1L;
     public static long REFRESH_TOKEN_GRACE_PERIOD_USE_SERVER_DEFAULT = -2L;
     public static long REFRESH_TOKEN_GRACE_PERIOD_NOT_CONFIGURED = -3L;
+    public static long GRACE_PERIOD_NOT_CONFIGURED = -3L;
 
     public static long KEY_ROTATION_GRACE_PERIOD_DISABLED = -1L;
 

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Key Rotation</title>
+</head>
+
+<body class="composite">
+<h2>Key rotation in OA4MP</h2>
+
+<p>
+    Signing keys for JSON web tokens (JWTs) are required. It is good practice to rotate, i.e., periodically
+    invalidate and replace them, to ensure cryptographic integrity, limit long-term exploits, etc.
+    Since many clients cache keys from the server, the basic policy is to set a date for the rotation to occur
+    and on that date, issue new valid keys, setting the expiration for the current keys. The new keys are
+    then made active immediately and used. The old keys remain available and the expiration is set to be the
+    sum of the (expected) client's cache and the service's access token lifetime.
+</p>
+<p>
+    The reson is that this lets clients refresh their cache and exchange/refrsh any access tokens before the old keys are invalidated.
+    Do remember that refresh tokens are not signed, so even though they have very long lifetimes
+    compared to access tokens, they play no role.
+</p>
+
+<table style="text-align: left; width: 50%;" border="1" cellspacing="2" cellpadding="2">
+    <tbody>
+    <tr>
+        <td style="vertical-align: top;">Name</td>
+        <td style="vertical-align: top;">Required</td>
+        <td style="vertical-align: top;">Default</td>
+        <td style="vertical-align: top;"></td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">enabled</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">false</td>
+        <td style="vertical-align: top;">Enable key rotation? If false, then <b>no</b> key rotation of the server keys
+        will occur. If overrides are allowed, virtual issuers are, however, still permitted to set them.</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">allowOverride</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">false</td>
+        <td style="vertical-align: top;">If virtual issuers can set their own key rotation policy. This means they
+        may specify the grace periods for the cache and accesss token (if differnt from the </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">cacheGracePeriod</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">-1</td>
+        <td style="vertical-align: top;">Keys <i>may</i> be cached by clients. This may be given in various <a href="../manuals/units.html">units</a>,
+            but the default is in seconds. The policy will be set as the sum of this and the access token grace period.
+            A value of -1 (default) means to just use the server's value.</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">atGracePeriod</td>
+        <td style="vertical-align: top;">N</td>
+        <td style="vertical-align: top;">-1</td>
+        <td style="vertical-align: top;">The duration of the access token grace period if different from the one configured for the server.
+        A value of -1 (default) means to just use the server's value.</td>
+    </tr>
+    </tbody>
+</table>
+
+<p>A typical server entry might be</p>
+<pre>
+    &lt;keyRotation enabled="true"
+                 allowOverride="true"
+                 cacheGracePeriod="24 hr"
+                 atGracePeriod="6 hr"/&gt;
+</pre>
+
+<p>
+   For more details see the <a href="../pdf/key-rotation.pdf">key rotation documentation</a>
+</p>
+
+
+
+</body>
+</html>

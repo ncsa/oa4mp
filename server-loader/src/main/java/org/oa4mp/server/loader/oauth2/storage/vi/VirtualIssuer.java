@@ -7,6 +7,8 @@ import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import org.kordamp.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
+import org.oa4mp.server.loader.oauth2.loader.OA2CFConfigurationLoader;
+import org.oa4mp.server.loader.oauth2.storage.keys.KEConfiguration;
 import org.qdl_lang.xml.XMLUtils;
 
 import javax.xml.stream.XMLEventReader;
@@ -50,6 +52,19 @@ public class VirtualIssuer extends Monitored {
     String title;
     boolean valid = true;
 
+    public JSONObject getState() {
+        if (state == null) {
+            state = new JSONObject();
+        }
+        return state;
+    }
+
+    public void setState(JSONObject state) {
+        this.state = state;
+    }
+
+    JSONObject state = null;
+
     public long getCacheGracePeriod() {
         return cacheGracePeriod;
     }
@@ -74,8 +89,8 @@ public class VirtualIssuer extends Monitored {
         this.keyRotationEnabled = keyRotationEnabled;
     }
 
-    long cacheGracePeriod = -1L;
-    long atGracePeriod = -1L;
+    long cacheGracePeriod = OA2CFConfigurationLoader.GRACE_PERIOD_NOT_CONFIGURED;
+    long atGracePeriod = OA2CFConfigurationLoader.GRACE_PERIOD_NOT_CONFIGURED;
     boolean keyRotationEnabled = false;
 
 
@@ -117,6 +132,7 @@ public class VirtualIssuer extends Monitored {
 
     /**
      * The signing keys for this issuer.
+     *
      * @return
      */
     public JSONWebKeys getJsonWebKeys() {
@@ -233,6 +249,7 @@ public class VirtualIssuer extends Monitored {
     public boolean hasJWKs() {
         return jsonWebKeys != null;
     }
+
     @Override
     public String toString() {
         return "VirtualIssuer{" +
@@ -248,4 +265,39 @@ public class VirtualIssuer extends Monitored {
                 '}';
     }
 
+    public static String ALLOW_OVERRIDES_KEY = "allow_overrides";
+
+    /**
+     * Do note that this is only used for the default issuer. It should be
+     * ignored for any other.
+     * @return
+     */
+    public boolean isAllowOverrides() {
+        return getState().optBoolean(ALLOW_OVERRIDES_KEY, false);
+    }
+
+    public void setAllowOverrides(boolean allowOverrides) {
+        getState().put(ALLOW_OVERRIDES_KEY, allowOverrides);
+    }
+
+    /**
+     * Mint the {@link KEConfiguration} for this issuer.
+     *
+     * @return
+     */
+    public KEConfiguration getKeyRotationConfiguration() {
+        KEConfiguration keConfiguration = new KEConfiguration();
+        keConfiguration.enabled = isKeyRotationEnabled();
+        keConfiguration.atGracePeriod = getAtGracePeriod();
+        keConfiguration.cacheGracePeriod = getCacheGracePeriod();
+        return keConfiguration;
+    }
+
+    /**
+     * If either of the grace periods for key rotation are not set, then this returns false.
+     * @return
+     */
+    public boolean hasKeyRotationConfiguration(){
+        return getAtGracePeriod() != -OA2CFConfigurationLoader.GRACE_PERIOD_NOT_CONFIGURED || getCacheGracePeriod() != OA2CFConfigurationLoader.GRACE_PERIOD_NOT_CONFIGURED;
+    }
 }

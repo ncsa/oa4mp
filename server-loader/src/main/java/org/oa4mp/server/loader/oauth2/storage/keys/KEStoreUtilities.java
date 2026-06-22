@@ -2,13 +2,16 @@ package org.oa4mp.server.loader.oauth2.storage.keys;
 
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
+import edu.uiuc.ncsa.security.core.util.IdentifiableMap;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import edu.uiuc.ncsa.security.util.jwk.JWKUtil2;
 import org.oa4mp.server.loader.oauth2.OA2SE;
 import org.oa4mp.server.loader.oauth2.storage.vi.VirtualIssuer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.URI;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
@@ -24,11 +27,34 @@ public class KEStoreUtilities {
         throw new NotImplementedException("Implement me!");
     }
 
-    public static HashSet<String> getKIDs(KEStore store) {
-        throw new NotImplementedException("Implement me!");
+    public static HashSet<String> getKIDs(KEStore<KERecord> store) {
+        HashSet<String> kids = new HashSet<>();
+        for (KERecord ker : store.values()) {
+            kids.add(ker.getKid());
+        }
+        return kids;
+    }
+    public static IdentifiableMap<KERecord> getByVI(KEStore<KERecord> store, VirtualIssuer vi){
+        IdentifiableMap<KERecord> map = new IdentifiableMap<>();
+        URI viURI = vi.getIdentifier().getUri();
+        for (KERecord ker : store.values()) {
+            if (ker.getVi().equals(viURI)){
+                map.put(ker.getIdentifier(), ker);
+            }
+        }
+        return map;
     }
 
-
+    public static JSONWebKeys getCurrentKeys(KEStore<KERecord> store, VirtualIssuer vi) {
+        if(store.isEmpty()){
+            return new JSONWebKeys(null);
+        }
+        Map<Identifier, KERecord> map = getByVI(store, vi);
+        if(map == null || map.isEmpty()){
+            return new JSONWebKeys(null);
+        }
+        return vi.getJsonWebKeys();
+    }
     /**
      * Rotate the keys for the given virtual issuers, optionally removing the keys from the VI if retainInVI is true,
      * Default should be false.
@@ -42,25 +68,24 @@ public class KEStoreUtilities {
      */
     public static void rotate(OA2SE oa2SE,
                               List<Identifier> vIDs,
+                              KEConfiguration keConfiguration,
                               boolean retainInVI) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, InvalidKeySpecException {
         if (vIDs == null || vIDs.isEmpty()) {
             return;
         }
         // If the server disallows key rotations, bail here.
-        KEConfiguration keConfiguration = oa2SE.getKeConfiguration();
         if (!keConfiguration.allowOverride && !keConfiguration.enabled) return;
-        Map<Identifier, KERecord> newRecords = new HashMap<>();
+        IdentifiableMap<KERecord> newRecords = new IdentifiableMap<>();
         Collection<JSONWebKey> jsonWebKeys = null;
 
         for (Identifier vID : vIDs) {
             VirtualIssuer vi = (VirtualIssuer) oa2SE.getVIStore().get(vID);
-            keConfiguration = resolveKeConfiguration(oa2SE, vi); // actual config for this VI
             if (!keConfiguration.enabled) continue;
             boolean useVI = false;
             String defaultID = null;
             if (vi == null) continue; // no such VI
             // first case, check the store for keys.
-            Map<Identifier, KERecord> kers = oa2SE.getKEStore().getByVI(vi);
+            IdentifiableMap<KERecord> kers = oa2SE.getKEStore().getByVI(vi);
 
             if (kers == null || kers.isEmpty()) {
                 // so no keys in the store, for this VI,
@@ -80,9 +105,9 @@ public class KEStoreUtilities {
                     newRecords.put(keRecord.getIdentifier(), keRecord);
                 }
                 oa2SE.getKEStore().putAll(newRecords); // mass update in case there are lots so store doesn't choke.
-            }else{
+            } else {
                 // have keys in store to rotate.
-                KEStoreUtilities.rotate(oa2SE.getKEStore(), kers, keConfiguration.cacheGracePeriod, keConfiguration.atGracePeriod);
+                KEStoreUtilities.rotate(oa2SE.getKEStore(), kers, keConfiguration.cacheGracePeriod, keConfiguration.atGracePeriod, true);
             }
         }
     }
@@ -93,7 +118,7 @@ public class KEStoreUtilities {
      * with both new and old keys.
      *
      * @param keStore
-     * @param oldKeys
+     * @param oldKERS
      * @param cacheGracePeriod
      * @param atGracePeriod
      * @return Map of the new key entry records.
@@ -101,26 +126,35 @@ public class KEStoreUtilities {
      * @throws NoSuchAlgorithmException
      * @throws InvalidKeySpecException
      */
-    public static Map<Identifier, KERecord> rotate(KEStore keStore, Map<Identifier, KERecord> oldKeys, long cacheGracePeriod, long atGracePeriod) throws
+    public static Map<Identifier, KERecord> rotate(KEStore keStore,
+                                                   Map<Identifier, KERecord> oldKERS,
+                                                   long cacheGracePeriod,
+                                                   long atGracePeriod,
+                                                   boolean updateOldKeys) throws
             InvalidAlgorithmParameterException, NoSuchAlgorithmException, InvalidKeySpecException {
         Date now = new Date();
-        if (oldKeys == null || oldKeys.isEmpty()) {
+        if (oldKERS == null || oldKERS.isEmpty()) {
             return new HashMap<>();
         }
-        Map<Identifier, KERecord> kers = new HashMap<>(oldKeys.size());
-        List<KERecord> oldKERs = new ArrayList<>(oldKeys.size());
-        for (Identifier identifier : oldKeys.keySet()) {
-            KERecord oldKey = oldKeys.get(identifier);
+        Map<Identifier, KERecord> kers = new HashMap<>(oldKERS.size());
+        IdentifiableMap<KERecord> updatedOLDKERs = new IdentifiableMap<>(oldKERS.size());
+        for (Identifier identifier : oldKERS.keySet()) {
+            KERecord oldKER = oldKERS.get(identifier);
 
-            if (oldKey.isValid && (oldKey.getNbf().before(now) && now.before(oldKey.getExp()))) {
-                KERecord newKER = rotate(keStore, oldKey, cacheGracePeriod, atGracePeriod);
+            // If a key does not have a not before and is requested to rotate, do so.
+            //if (oldKey.isValid && (oldKey.getNbf() == null || (oldKey.getNbf().before(now) && now.before(oldKey.getExp())))) {
+        if (oldKER.isValid && oldKER.getExp() == null && (oldKER.getNbf() == null || (oldKER.getNbf().before(now)))) {
+            //if (oldKey.isValid) {
+                KERecord newKER = rotate(keStore, oldKER, cacheGracePeriod, atGracePeriod);
                 newKER.setValid(true);
                 kers.put(newKER.getIdentifier(), newKER);
-                oldKERs.add(oldKey);
+                updatedOLDKERs.put(oldKER);
             }
         }
         // now update the store
-        keStore.update(oldKeys); // updated expirations
+        if (updateOldKeys) {
+            keStore.update(updatedOLDKERs); // updated expirations
+        }
         keStore.putAll(kers); // all new
         return kers;
     }
@@ -180,15 +214,20 @@ public class KEStoreUtilities {
         if (newKey == null) {
             throw new IllegalArgumentException("Unknown key type to rotate");
         }
+
         KERecord newRecord = keStore.create();
         newRecord.setVi(oldKER.getVi());
-        Date now = new Date();
-        newKey.issuedAt = now;
-        newKey.notValidBefore = new Date(newKey.issuedAt.getTime() + cacheGracePeriod);
-        oldKER.setExp(new Date(newKey.issuedAt.getTime() + cacheGracePeriod + atGracePeriod));
-
         newRecord.fromJWK(newKey, oldKER.getDefault());
-
+        Date now = new Date();
+        if(oldKER.getDefault()){
+            oldKER.setDefault(false);
+            newRecord.setDefault(true);
+        }
+        newRecord.setIat(now);
+        //newRecord.setNbf(new Date(now.getTime() + cacheGracePeriod));
+        newRecord.setNbf(now);
+        oldKER.setExp(new Date(now.getTime() + cacheGracePeriod + atGracePeriod));
+        newRecord.setUse(oldKER.getUse());
         return newRecord;
     }
 
@@ -222,8 +261,24 @@ public class KEStoreUtilities {
      * @return
      */
     public static KEConfiguration resolveKeConfiguration(OA2SE oa2SE, VirtualIssuer vi) {
-        KEConfiguration outKEC = new KEConfiguration();
+        if (vi == null) {
+            vi = (VirtualIssuer) oa2SE.getVIStore().get(OA2SE.SERVER_VI_ID);
+            if (vi == null) {
+                return oa2SE.getKeConfiguration();
+            }
+            if (!vi.hasKeyRotationConfiguration()) {
+                return oa2SE.getKeConfiguration();
+            }
+        }
+        if (oa2SE.isServerVI(vi)) {
+            if (vi.getKeyRotationConfiguration().isConfgured()) {
+                return vi.getKeyRotationConfiguration();
+            }
+            return oa2SE.getKeConfiguration();
+        }
+
         KEConfiguration serverKEC = oa2SE.getKeConfiguration();
+        KEConfiguration outKEC = new KEConfiguration();
 
         if (serverKEC.allowOverride && vi != null) {
             if (!vi.isKeyRotationEnabled()) {
@@ -238,4 +293,56 @@ public class KEStoreUtilities {
         }
         return outKEC;
     }
+
+    /**
+     * Ingest a set of webkeys into the store. Default values are set if needed.
+     *
+     * @param keStore
+     * @param jwks
+     * @param vi
+     * @param isValid set all keys to valid.
+     * @return
+     */
+    public static List<String> ingest(KEStore<KERecord> keStore, JSONWebKeys jwks, VirtualIssuer vi, boolean isValid) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        List<String> skipped = new ArrayList<>(jwks.size());
+        Map<Identifier, KERecord> kers = new HashMap<>(jwks.size());
+        Set<String> allKIDs = keStore.getKIDs();
+        String defaultID = vi.getDefaultKeyID();
+        for (JSONWebKey jwk : jwks.values()) {
+            if (allKIDs.contains(jwk.id)) {
+                skipped.add(jwk.id);
+                continue;
+            }
+            KERecord keRecord = createSingleKERecord(keStore, vi.getIdentifier().getUri(), isValid, jwk, defaultID);
+            kers.put(keRecord.getIdentifier(), keRecord);
+        }
+        keStore.putAll(kers);
+        return skipped;
+    }
+
+    /** Create a single KE record from a JWK. This is not saved..
+     *
+     * @param keStore
+     * @param viID
+     * @param isValid
+     * @param jwk
+     * @param defaultID
+     * @return
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeySpecException
+     */
+    public static KERecord createSingleKERecord(KEStore<KERecord> keStore,
+                                             URI viID,
+                                             boolean isValid,
+                                             JSONWebKey jwk,
+                                             String defaultID) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        KERecord keRecord = keStore.create();
+        keRecord.setVi(viID);
+        keRecord.fromJWK(jwk, jwk.id.equals(defaultID));
+        keRecord.setValid(isValid);
+        if(keRecord.getIat() == null){keRecord.setIat(new Date());}
+        if(keRecord.getNbf() == null){keRecord.setNbf(new Date());}
+        return keRecord;
+    }
+
 }

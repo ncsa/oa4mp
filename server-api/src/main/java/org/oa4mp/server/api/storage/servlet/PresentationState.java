@@ -28,6 +28,11 @@ public class PresentationState implements PresentableState {
     }
 
     int state;
+
+    public void setRequest(HttpServletRequest request) {
+        this.request = request;
+    }
+
     HttpServletRequest request;
 
     public void setResponse(HttpServletResponse response) {

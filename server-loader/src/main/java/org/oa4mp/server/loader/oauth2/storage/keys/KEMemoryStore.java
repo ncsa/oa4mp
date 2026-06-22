@@ -1,9 +1,8 @@
 package org.oa4mp.server.loader.oauth2.storage.keys;
 
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
-import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.XMLConverter;
-import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
+import edu.uiuc.ncsa.security.core.util.IdentifiableMap;
 import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.MemoryStore;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
@@ -11,7 +10,6 @@ import org.oa4mp.server.loader.oauth2.storage.vi.VirtualIssuer;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 
 public class KEMemoryStore<V extends KERecord> extends MemoryStore<V> implements KEStore<V> {
     public KEMemoryStore(IdentifiableProvider<V> identifiableProvider, KEConverter<V> converter) {
@@ -36,12 +34,12 @@ public class KEMemoryStore<V extends KERecord> extends MemoryStore<V> implements
     }
     @Override
     public HashSet<String> getKIDs() {
-        return KEStoreUtilities.getKIDs(this);
+        return KEStoreUtilities.getKIDs((KEStore<KERecord>) this);
     }
 
     @Override
     public JSONWebKeys getCurrentKeys(VirtualIssuer vi) {
-        return null;
+        return KEStoreUtilities.getCurrentKeys((KEStore<KERecord>) this, vi);
     }
 
     @Override
@@ -50,7 +48,7 @@ public class KEMemoryStore<V extends KERecord> extends MemoryStore<V> implements
     }
 
     @Override
-    public Map<Identifier, KERecord> getByVI(VirtualIssuer vi) {
-        throw new NotImplementedException();
+    public IdentifiableMap<KERecord> getByVI(VirtualIssuer vi) {
+        return KEStoreUtilities.getByVI((KEStore<KERecord>) this, vi);
     }
 }

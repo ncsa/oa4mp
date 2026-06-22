@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
+import org.kordamp.json.JSONObject;
 import org.oa4mp.server.loader.oauth2.loader.OA2CFConfigurationLoader;
 
 import java.util.Date;
@@ -36,7 +37,9 @@ public class VIConverter<V extends VirtualIssuer> extends MapConverter<V> {
         // Fixes https://github.com/ncsa/oa4mp/issues/149
         vi.setLastAccessed(new Date(map.getLong(vok().lastAccessed())));
         vi.setValid(map.getBoolean(vok().valid()));
-
+        if(map.containsKey(vok().state()) && !isTrivial(map.getString(vok().state()))) {
+            vi.setState(JSONObject.fromObject(map.getString(vok().state())));
+        }
         if (map.containsKey(vok().issuer()) && !isTrivial(map.getString(vok().issuer()))) {
             vi.setIssuer(map.getString(vok().issuer()));
         }
@@ -92,6 +95,9 @@ public class VIConverter<V extends VirtualIssuer> extends MapConverter<V> {
         if (value.getLastAccessed() != null) {
             // Fixes https://github.com/ncsa/oa4mp/issues/149
             data.put(vok().lastAccessed(), value.getLastAccessed().getTime());
+        }
+        if(value.getState() != null) {
+            data.put(vok().state(), value.getState().toString());
         }
         data.put(vok().keyRotationEnabled(), value.isKeyRotationEnabled());
         data.put(vok().keyRotationCacheGracePeriod(), value.getCacheGracePeriod());

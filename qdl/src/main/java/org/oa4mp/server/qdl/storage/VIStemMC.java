@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
+import org.kordamp.json.JSONObject;
 import org.oa4mp.server.loader.oauth2.storage.vi.VISerializationKeys;
 import org.oa4mp.server.loader.oauth2.storage.vi.VirtualIssuer;
 import org.qdl_lang.variables.QDLStem;
@@ -45,6 +46,10 @@ public class VIStemMC<V extends VirtualIssuer> extends MonitoredStemMC<V> {
         if (isStringKeyOK(stem, vik().keyRotationEnabled())) {v.setKeyRotationEnabled(stem.getBoolean(vik().keyRotationEnabled()));}
         if (isStringKeyOK(stem, vik().keyRotationCacheGracePeriod())) {v.setCacheGracePeriod(stem.getLong(vik().keyRotationCacheGracePeriod()));}
         if (isStringKeyOK(stem, vik().keyRotationATGracePeriod())) {v.setAtGracePeriod(stem.getLong(vik().keyRotationATGracePeriod()));}
+        if(stem.containsKey(vik().state())){
+            QDLStem state = stem.getStem(vik().state());
+            v.setState((JSONObject) state.toJSON());
+        }
 
         if(stem.containsKey(vik().jsonWebKeys())){
              QDLStem keyStem = stem.getStem(vik().jsonWebKeys());
@@ -86,6 +91,12 @@ public class VIStemMC<V extends VirtualIssuer> extends MonitoredStemMC<V> {
             ss.fromJSON(JSONWebKeyUtil.toJSON(v.getJsonWebKeys()));
             setNonNullStemValue(stem, vik().jsonWebKeys(), ss);
         }
+        if (v.getState()!=null && v.getJsonWebKeys().size()>0) {
+            QDLStem ss = new QDLStem();
+            ss.fromJSON(v.getState());
+            setNonNullStemValue(stem, vik().state(), ss);
+        }
+
         setNonNullStemValue(stem, vik().title(), v.getTitle());
         setNonNullStemValue(stem, vik().valid(), v.isValid());
         setNonNullStemValue(stem, vik().keyRotationEnabled(), v.isKeyRotationEnabled());

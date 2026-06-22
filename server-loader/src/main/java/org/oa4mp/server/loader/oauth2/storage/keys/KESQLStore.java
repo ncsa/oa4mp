@@ -2,6 +2,7 @@ package org.oa4mp.server.loader.oauth2.storage.keys;
 
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.util.IdentifiableMap;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionRecord;
@@ -190,12 +191,12 @@ public class KESQLStore<V extends KERecord> extends SQLStore<V> implements KESto
     protected Map getByVID(VirtualIssuer vi, boolean keysOnly) {
         Identifier viID = OA2SE.SERVER_VI_ID; // default.
         if (vi != null) viID = vi.getIdentifier();
-        Map outMap = null;
+        IdentifiableMap<KERecord> outMap = null;
         JSONWebKeys jsonWebKeys = null;
         if (keysOnly) {
             jsonWebKeys = new JSONWebKeys(null);
         } else {
-            outMap = new HashMap();
+            outMap = new IdentifiableMap<>();
         }
         String rawStatement = "SELECT * from " + getTable().getFQTablename() + " where " +
                 getKeys().vi() + "=? AND " +
@@ -220,7 +221,7 @@ public class KESQLStore<V extends KERecord> extends SQLStore<V> implements KESto
                     jsonWebKeys.put(t.toJWK());
                     if (t.getDefault()) jsonWebKeys.setDefaultKeyID(t.getKid());
                 } else {
-                    outMap.put(t.getIdentifier(), t);
+                    outMap.put(t);
                 }
             }
 
@@ -236,12 +237,12 @@ public class KESQLStore<V extends KERecord> extends SQLStore<V> implements KESto
             throw new RuntimeException(e);
         }
         if (keysOnly) return jsonWebKeys;
-        return jsonWebKeys;
+        return outMap;
     }
 
     @Override
-    public Map<Identifier, KERecord> getByVI(VirtualIssuer vi) {
-        return getByVID(vi, false);
+    public IdentifiableMap<KERecord> getByVI(VirtualIssuer vi) {
+        return (IdentifiableMap<KERecord>)getByVID(vi, false);
     }
 
 }

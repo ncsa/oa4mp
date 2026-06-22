@@ -688,19 +688,7 @@ public class JWKUtilCommands extends CommonCommands2 {
         } else {
             localKeys = keys;
         }
-/*
-        if (showPrivateKeys && !hasInputFile) {
-            // try to use the defined keys
-            if (keys == null || keys.isEmpty()) {
-                say("Sorry, there are no keys specified. Either use set_keys or specify a key file.");
-                return;
-            }
-            localKeys = keys;
-        } else {
-            File publicKeyFile = new File(inputLine.getNextArgFor(CL_INPUT_FILE_FLAG));
-            localKeys = readKeys(publicKeyFile);
-        }
-*/
+
         boolean hasDefault = localKeys.hasDefaultKey();
         String defaultKey = null;
         if (hasDefault) {

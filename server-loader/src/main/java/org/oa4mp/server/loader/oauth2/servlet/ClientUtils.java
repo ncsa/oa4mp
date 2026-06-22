@@ -161,6 +161,7 @@ public class ClientUtils {
 
     public static long computeRTGracePeriod(OA2Client client, OA2SE oa2SE) {
         if (!oa2SE.isRTGracePeriodEnabled()) {
+            // Fix https://github.com/ncsa/oa4mp/issues/300
             return 0L; // means no grace period.
         }
         if (client.getRtGracePeriod() == OA2CFConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_USE_SERVER_DEFAULT) {

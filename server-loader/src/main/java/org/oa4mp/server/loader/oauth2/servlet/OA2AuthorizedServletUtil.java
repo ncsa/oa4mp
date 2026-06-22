@@ -104,7 +104,7 @@ public class OA2AuthorizedServletUtil {
             agResponse.setEncodeToken(encodeTokenInResponse);
             OA2ServiceTransaction transaction = createNewTransaction(agResponse.getGrant());
             OA4MPServlet.findSigningKey(req, transaction);
-            transaction.setOriginalURL( HttpUtils. getRequestURL(req).toString() + "?" + req.getQueryString());
+            transaction.setOriginalURL(HttpUtils.getRequestURL(req).toString() + "?" + req.getQueryString());
             //transaction.setOriginalURL(req.getRequestURI() + "?" + req.getQueryString());
 
             transaction.setResponseTypes(getAndCheckResponseTypes(req));
@@ -291,7 +291,7 @@ public class OA2AuthorizedServletUtil {
      * @return
      */
     protected List<String> getAndCheckResponseTypes(HttpServletRequest httpServletRequest) {
-      //  JSONArray array = new JSONArray();
+        //  JSONArray array = new JSONArray();
         String requestState = httpServletRequest.getParameter(OA2Constants.STATE);
 
         // CIL-833 fix?
@@ -603,31 +603,31 @@ public class OA2AuthorizedServletUtil {
         OA2SE oa2SE = (OA2SE) getServiceEnvironment();
         // Ignored for non-OIDC clients, check this client supports it.
         if (prompt.contains(PROMPT_NONE) && transaction.getOA2Client().isOIDCClient()) {
-            if(transaction.getOA2Client().isAllowPromptNone()) {
+            if (transaction.getOA2Client().isAllowPromptNone()) {
                 // this overrides.
-            }else{
+            } else {
                 throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST,
                         "Specifying prompt with value  \"none\" is not supported for this client " + ID_TOKEN_HINT,
                         HttpStatus.SC_BAD_REQUEST,
                         transaction.getRequestState(),
                         transaction.getCallback());
             }
-            if(oa2SE.isAllowPromptNone()){
+            if (oa2SE.isAllowPromptNone()) {
                 // if server allows it and client does, do it.
-                if(!transaction.getOA2Client().isAllowPromptNone()){
+                if (!transaction.getOA2Client().isAllowPromptNone()) {
                     throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST,
                             "Specifying prompt with value  \"none\" is not supported for this client " + ID_TOKEN_HINT,
                             HttpStatus.SC_BAD_REQUEST,
                             transaction.getRequestState(),
                             transaction.getCallback());
                 }
-            }else{
+            } else {
                 // if server does not allow it, let the client override it.
-                    throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST,
-                            "Specifying prompt with value  \"none\" is not supported for this server " + ID_TOKEN_HINT,
-                            HttpStatus.SC_BAD_REQUEST,
-                            transaction.getRequestState(),
-                            transaction.getCallback());
+                throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST,
+                        "Specifying prompt with value  \"none\" is not supported for this server " + ID_TOKEN_HINT,
+                        HttpStatus.SC_BAD_REQUEST,
+                        transaction.getRequestState(),
+                        transaction.getCallback());
             }
             // Fix for https://github.com/ncsa/oa4mp/issues/236
             if (!map.containsKey(ID_TOKEN_HINT)) {
@@ -664,8 +664,7 @@ public class OA2AuthorizedServletUtil {
             // At this point, it MUST be an OA4MP issued token that is valid.
             // now, double check a few things.
             if (!(idTokenHint.getString(OA2Claims.ISSUER).equals(issuer)
-                    && idTokenHint.getString(OA2Claims.AUDIENCE).equals(transaction.getClient().getIdentifierString())))
-            {
+                    && idTokenHint.getString(OA2Claims.AUDIENCE).equals(transaction.getClient().getIdentifierString()))) {
                 throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST,
                         "ID token not found." + ID_TOKEN_HINT,
                         HttpStatus.SC_BAD_REQUEST,
@@ -885,12 +884,14 @@ public class OA2AuthorizedServletUtil {
         }
         try {
             cb = cb + (cb.indexOf(responseDelimiter) == -1 ? responseDelimiter : "&") + AUTHORIZATION_CODE + "=" + TokenUtils.b32EncodeToken(idStr);
+            String state = ((OA2ServiceTransaction) trans).getRequestState();
             if (params.containsKey(OA2Constants.STATE)) {
-                cb = cb + "&" + OA2Constants.STATE + "=" + URLEncoder.encode(params.get(OA2Constants.STATE), "UTF-8");
+                state = params.get(OA2Constants.STATE);
             }
+            cb = cb + "&" + OA2Constants.STATE + "=" + URLEncoder.encode(state, "UTF-8");
             // Fix https://github.com/ncsa/oa4mp/issues/214 RFC 9207 support
-            if(((OA2ServiceTransaction) trans).getUserMetaData().containsKey(OA2Claims.ISSUER)){
-                cb = cb + (cb.indexOf(responseDelimiter) == -1 ? responseDelimiter : "&")  + OA2Claims.ISSUER + "=" + st.getUserMetaData().get(OA2Claims.ISSUER);
+            if (((OA2ServiceTransaction) trans).getUserMetaData().containsKey(OA2Claims.ISSUER)) {
+                cb = cb + (cb.indexOf(responseDelimiter) == -1 ? responseDelimiter : "&") + OA2Claims.ISSUER + "=" + st.getUserMetaData().get(OA2Claims.ISSUER);
             }
 
         } catch (UnsupportedEncodingException e) {

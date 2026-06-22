@@ -38,10 +38,12 @@
 
 <h2>How do they work?</h2>
 <p>It is important to understand that if an admin clients use virtual issuers, and then all of the clients it manages
-    us the VI as well. This makes it easy to manage a large system of clients who have specialized signing requirements.
+    use the VI as well. There is a default issuer for the system so that any client
+    not in specific virtual issuer lands there.
+    This makes it easy to manage a large system of clients who have specialized signing requirements.
     (Historical note, these were called virtual organization for a time, but that names was taken over
     by other projects unrelated to OA4MP, causing confusion. We hence switched to calling these virtual issuers. If you
-    run into the term virtual organization, let us know to fix it and rock on.)</p>
+    run into the term virtual organization in the OA4MP documentation, let us know to fix it and rock on.)</p>
 
 <h2>Relation to administrative clients</h2>
 <p>After you create a VI, you simply set it for the admin client using the add_admin command in the CLI (in the

@@ -3,9 +3,11 @@ package org.oa4mp.server.proxy;
 
 import edu.uiuc.ncsa.security.servlet.HeaderUtils;
 import edu.uiuc.ncsa.security.servlet.PresentableState;
-import org.kordamp.json.JSONObject;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.http.HttpStatus;
+import org.kordamp.json.JSONObject;
+import org.oa4mp.delegation.common.token.impl.AuthorizationGrantImpl;
 import org.oa4mp.delegation.server.OA2Constants;
 import org.oa4mp.delegation.server.OA2Errors;
 import org.oa4mp.delegation.server.OA2GeneralError;
@@ -22,12 +24,15 @@ import org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.net.URI;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.oa4mp.delegation.server.OA2Constants.AUTHORIZATION_CODE;
 import static org.oa4mp.delegation.server.OA2Constants.AUTHORIZATION_STATE;
+import static org.oa4mp.server.api.OA4MPConfigTags.AUTHORIZATION_SERVLET_USE_MODE_PROXY;
 
 
 /**
@@ -41,9 +46,6 @@ public class OA2AuthenticationServer extends AbstractAuthenticationServlet {
     protected void createRedirectInit(ServiceTransaction trans, String userName, String password) {
 
     }
-
- //   public String AUTHORIZATION_REFRESH_TOKEN_LIFETIME_KEY = "AuthRTL";
-
 
     /**
      * Turn the scopes into a string. Since the user may send the same scope repetedly
@@ -68,6 +70,7 @@ public class OA2AuthenticationServer extends AbstractAuthenticationServlet {
     protected void setClientRequestAttributes(AuthorizedState aState) {
         super.setClientRequestAttributes(aState);
         HttpServletRequest request = aState.getRequest();
+        request.setAttribute("authorizationState", ((OA2ServiceTransaction)aState.getTransaction()).getRequestState());
 
         OA2ServiceTransaction t = (OA2ServiceTransaction) aState.getTransaction();
         request.setAttribute("clientScopes", StringEscapeUtils.escapeHtml4(scopesToString(t)));
@@ -83,6 +86,67 @@ public class OA2AuthenticationServer extends AbstractAuthenticationServlet {
     protected void doIt(HttpServletRequest request, HttpServletResponse response) throws Throwable {
      //   ServletDebugUtil.printAllParameters(getClass(), request,true);
         Map<String, String> map = getFirstParameters(request);
+        checkCancel(request, map.get(OA2Constants.STATE));
+        if(getServiceEnvironment().getAuthorizationServletConfig().getUseMode().equals(AUTHORIZATION_SERVLET_USE_MODE_PROXY) &&
+        getServiceEnvironment().getAuthorizationServletConfig().isLocalDFConsent()){
+            if(map.containsKey("page_type") && map.get("page_type").equals("consent")){
+                // The user is doing the local consent page *after* the proxy's consent page was
+                // accepted.
+                if(!map.containsKey("proxy_key")){
+                    throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                            "invalid request.",
+                            HttpStatus.SC_BAD_REQUEST,
+                            (map.containsKey(OA2Constants.STATE) ? map.get(OA2Constants.STATE) : ""));
+                }
+                String proxyKey = map.get("proxy_key"); // unhashed key
+                if(!map.containsKey("code")){
+                    throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                            "missing token",
+                            HttpStatus.SC_BAD_REQUEST,
+                            (map.containsKey(OA2Constants.STATE) ? map.get(OA2Constants.STATE) : ""));
+                }
+                AuthorizationGrantImpl ag = new AuthorizationGrantImpl(URI.create(map.get("code")));
+                OA2ServiceTransaction t = (OA2ServiceTransaction) getServiceEnvironment().getTransactionStore().get(ag);
+                if(t == null){
+                    throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                            "missing token",
+                            HttpStatus.SC_BAD_REQUEST,
+                            (map.containsKey(OA2Constants.STATE) ? map.get(OA2Constants.STATE) : ""));
+                }
+                String shash = DigestUtils.sha1Hex(proxyKey);
+                if(!t.getProxyHash().equals(shash)){
+                    throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                            "invalid request.",
+                            HttpStatus.SC_BAD_REQUEST,
+                            (map.containsKey(OA2Constants.STATE) ? map.get(OA2Constants.STATE) : ""));
+
+                }
+
+                String s = t.getRequestState();
+                t.setConsentPageOK(true);
+                getServiceEnvironment().getTransactionStore().save(t);
+                Map params = new HashMap();
+                params.put(OA2Constants.STATE, s);
+                String cb = createCallback(t, params);
+                t.setCreatedCallback(cb);
+                getServiceEnvironment().getTransactionStore().save(t);
+                response.sendRedirect(cb);
+                return;
+            }
+        }
+        if(isCancelled(request)){
+            if(map.containsKey("code")){
+                // If it has the code so we can find the transaction, remove it, killing the flow in toto.
+                AuthorizationGrantImpl ag = new AuthorizationGrantImpl(URI.create(map.get("code")));
+                OA2ServiceTransaction t = (OA2ServiceTransaction) getServiceEnvironment().getTransactionStore().get(ag);
+                if(t != null){
+                    getServiceEnvironment().getTransactionStore().remove(t.getIdentifier());
+                }
+                checkCancel(request, t.getRequestState()); // no state
+
+            }
+            checkCancel(request); // no state
+           }
         if(map.containsKey("action") && map.get("action").equals("ok")){
             // If authZ in progress, send to consent page here.
             super.doIt(request, response);

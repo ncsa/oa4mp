@@ -44,6 +44,7 @@ public class KEConverter<V extends KERecord> extends MonitoredConverter<V> {
         if (isOK(map, getKeys().kty())) v.setKty(map.getString(getKeys().kty()));
         if (isOK(map, getKeys().nbf())) v.setNbf(toDate(map.getLong(getKeys().nbf())));
         if (isOK(map, getKeys().vi())) v.setVi(URI.create(map.getString(getKeys().vi())));
+        if (isOK(map, getKeys().use())) v.setUse(map.getString(getKeys().use()));
         return v;
     }
 

@@ -148,13 +148,13 @@ testing immediately.
 ]]>
     </body>
     </entry>
-    <entry id="keyRotationEnabled">
+    <entry id="key_rotation_enabled">
         <body>
             <![CDATA[Property: Boolean
 Enable or disable key rotation for this virtual issuer.]]>
         </body>
     </entry>
-    <entry id="keyRotationCacheGracePeriod">
+    <entry id="key_rotation_at_grace_period">
         <body>
             <![CDATA[Property: Integer
 The length of time in milliseconds that the cache(s) retain the old key. While
@@ -166,7 +166,7 @@ with units, e.g. 1 day, 12 hrs., etc. or as an integer in milliseconds.
 The default is 24 hours.]]>
         </body>
     </entry>
-    <entry id="keyRotationATGracePeriod">
+    <entry id="key_rotation_cache_grace_period">
         <body>
             <![CDATA[Property: Integer
 The length of time that access tokens are valid. This is used for computing the earliest
@@ -174,6 +174,11 @@ valid time for a new key. This is stored as an integer, but may be entered as a 
 units.
 
 The default is the maximum server access token lifetime.]]>
+        </body>
+    </entry>
+    <entry id="">
+        <body>
+            <![CDATA[]]>
         </body>
     </entry>
 </html>

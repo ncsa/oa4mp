@@ -132,13 +132,7 @@ public class OA2DiscoveryServlet extends DiscoveryServlet {
             VirtualIssuer vi = getOA2SE().getVIStore().findByPath(getOA2SE().getServiceAddress().getHost() + DISCOVERY_PATH_SEPARATOR + discoveryPath);
             JSONWebKeys publicKeys;
             publicKeys = JSONWebKeyUtil.makePublic(((OA2SE) getServiceEnvironment()).getJsonWebKeys(vi));
-/*∃
-            if (vo == null) {
-                publicKeys = JSONWebKeyUtil.makePublic(((OA2SE) getServiceEnvironment()).getJsonWebKeys());
-            } else {
-                publicKeys = JSONWebKeyUtil.makePublic(vo.getJsonWebKeys());
-            }
-*/
+
             JSONObject json = JSONWebKeyUtil.toJSON(publicKeys);
             String out = JSONUtils.valueToString(json, 1, 0);
 

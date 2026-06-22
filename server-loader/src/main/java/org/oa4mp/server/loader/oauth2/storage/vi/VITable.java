@@ -35,6 +35,7 @@ public class VITable extends Table {
         getColumnDescriptor().add(new ColumnDescriptorEntry(vok().keyRotationEnabled(), Types.BOOLEAN));
         getColumnDescriptor().add(new ColumnDescriptorEntry(vok().lastAccessed(), Types.BIGINT));
         getColumnDescriptor().add(new ColumnDescriptorEntry(vok().lastModifiedTS(), Types.BIGINT));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(vok().state(), Types.LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(vok().title(), Types.LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(vok().valid(), Types.BOOLEAN));
     }
