@@ -322,10 +322,13 @@ public class RFC8628AuthenticationServer extends EnvServlet {
                     return;
                 }
                 break;
-            case AUTHORIZATION_ACTION_DF_CONSENT:
+            case AUTHORIZATION_ACTION_PROXY_DF_CONSENT:
                 // Specific case from a proxy that the local consent page is to be shown to the user.
                 Map<String, String[]> map = request.getParameterMap();
                 String userCode = request.getParameter(RFC8628Constants2.USER_CODE);
+                if(getServiceEnvironment().getAuthorizationServletConfig().getUseMode().equals(OA4MPConfigTags.AUTHORIZATION_SERVLET_USE_MODE_PROXY)){
+
+                }
                 if(!map.containsKey("proxy_key")){
                     throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
                             "invalid request.",
@@ -346,6 +349,8 @@ public class RFC8628AuthenticationServer extends EnvServlet {
                 }
                 AuthorizationGrantImpl ag = new AuthorizationGrantImpl(URI.create(map.get("code")[0]));
                 OA2ServiceTransaction t = (OA2ServiceTransaction) getServiceEnvironment().getTransactionStore().get(ag);
+                t.setConsentPageOK(true); // or they can't continue the flow
+                getServiceEnvironment().getTransactionStore().save(t);
                 ProxyUtils.userCodeToProxyRedirect(getServiceEnvironment(), t, pendingState);
 
 
@@ -396,8 +401,8 @@ public class RFC8628AuthenticationServer extends EnvServlet {
         //    params = params + "&stateKey" + "=" + OA2Constants.STATE;
         params = params + "&" + PROXY_KEY + "=" + proxyState;
         params = params + "&" + RESPONSE_TYPE_KEY + "=" + RESPONSE_TYPE_DF_VALUE;
-        params = params + "&clientHome" + "=" + escapeHtml4(t.getClient().getHomeUri());
-        params = params + "&clientName" + "=" + escapeHtml4(t.getClient().getName());
+        params = params + "&clientHome" + "=" + URLEncoder.encode(t.getClient().getHomeUri());
+        params = params + "&clientName" + "=" + URLEncoder.encode(t.getClient().getName());
         params = params + "&clientScopes" + "=" + URLEncoder.encode(scopesToString(t));
         String deviceURI = getServiceEnvironment().getRfc8628ServletConfig().deviceEndpoint;
         // last component of the URI is the device endpoint.
@@ -489,13 +494,15 @@ public class RFC8628AuthenticationServer extends EnvServlet {
         } else {
             trace(this, "not using header");
 
-            if (!getServiceEnvironment().hasAuthorizationServletConfig()) {
+            if (!getServiceEnvironment().hasAuthorizationServletConfig() ||
+                getServiceEnvironment().getAuthorizationServletConfig().getUseMode().equals(OA4MPConfigTags.AUTHORIZATION_SERVLET_USE_MODE_NATIVE)) {
                 switch (pendingState.getState()) {
                     case AUTHORIZATION_ACTION_OK:
                         // nothing to do, really
                         break;
                     case AUTHORIZATION_ACTION_START:
                         info("3.a. Starting authorization device");
+                        setClientRequestAttributes(pendingState);
                         JSPUtil.fwd(request, pendingState.getResponse(), getInitialPage());
                         return;
                 }

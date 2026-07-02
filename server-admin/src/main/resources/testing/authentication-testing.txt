@@ -10,21 +10,21 @@ tweak the server configuration and run the tests.
 
 
 Web file:proxy-web.xml
-Test case: Any stadnard client should work for testing auth code or device flow.
+Test case: Any standnad client should work for testing auth code or device flow.
 
 authorizationServlet is missing. Note that this requires a class that overrides
 
 server-api/src/main/java/org/oa4mp/server/api/storage/servlet/AuthenticationUtil.java
 
-checkUser to check for username and password. Normally this implies you hav written a system
+checkUser to check for username and password. Normally this implies you have written a system
 that has these OR are fronting an existing user management system with OA4MP.
 
-the proxy-web.xml file works because ti si the most minimal and does not have any other machiner.
+the proxy-web.xml file works because it is the most minimal and does not have any other machinery.
 The entire flow is handled by OA4MP itself.
 
 2. Proxy
 
-In this case, antoher OAuth2 server is used to proxy the requests. Testing uses CILogon.
+In this case, another OAuth2 server is used to proxy the requests. Testing uses CILogon.
 
 Web file: proxy-web.xml
 Test case: Any stadnard client should work for testing auth code or device flow.

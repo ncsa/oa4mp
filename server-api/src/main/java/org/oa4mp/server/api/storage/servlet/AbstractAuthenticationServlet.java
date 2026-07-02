@@ -121,7 +121,7 @@ public abstract class AbstractAuthenticationServlet extends OA4MPServlet impleme
     public static final String AUTHORIZATION_ACTION_DONE_VALUE = "done";
     public static final String AUTHORIZATION_ACTION_DF_CONSENT_VALUE = "df_consent";
     public static final int AUTHORIZATION_ACTION_DONE = 2;
-    public static final int AUTHORIZATION_ACTION_DF_CONSENT = 3;
+    public static final int AUTHORIZATION_ACTION_PROXY_DF_CONSENT = 3;
     public static final int AUTHORIZATION_ACTION_OK = 1;
     public static final int AUTHORIZATION_ACTION_START = 0;
     public static final String RETRY_MESSAGE = "retryMessage";
@@ -372,8 +372,8 @@ public abstract class AbstractAuthenticationServlet extends OA4MPServlet impleme
     public static int getState(HttpServletRequest request) {
         String action = request.getParameter(AUTHORIZATION_ACTION_KEY);
         ServletDebugUtil.trace(AbstractAuthenticationServlet.class, "action = " + action);
-        if(request.getParameterMap().containsKey("page_type") && request.getParameter("page_type").equals("consent")) {
-            return AUTHORIZATION_ACTION_DF_CONSENT;
+        if(getServiceEnvironment().getAuthorizationServletConfig().getUseMode().equals(OA4MPConfigTags.AUTHORIZATION_SERVLET_USE_MODE_PROXY) && request.getParameterMap().containsKey("page_type") && request.getParameter("page_type").equals("consent")) {
+            return AUTHORIZATION_ACTION_PROXY_DF_CONSENT;
         }
         if (action == null || action.length() == 0) return AUTHORIZATION_ACTION_START;
         switch (action) {
@@ -382,7 +382,7 @@ public abstract class AbstractAuthenticationServlet extends OA4MPServlet impleme
             case AUTHORIZATION_ACTION_DONE_VALUE:
                 return AUTHORIZATION_ACTION_DONE;
             case AUTHORIZATION_ACTION_DF_CONSENT_VALUE:
-                return AUTHORIZATION_ACTION_DF_CONSENT;
+                return AUTHORIZATION_ACTION_PROXY_DF_CONSENT;
         }
         throw new GeneralException("Error: unknown authorization request action = \"" + action + "\"");
     }

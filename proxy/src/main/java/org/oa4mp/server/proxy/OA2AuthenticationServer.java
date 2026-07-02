@@ -92,13 +92,6 @@ public class OA2AuthenticationServer extends AbstractAuthenticationServlet {
             if(map.containsKey("page_type") && map.get("page_type").equals("consent")){
                 // The user is doing the local consent page *after* the proxy's consent page was
                 // accepted.
-                if(!map.containsKey("proxy_key")){
-                    throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
-                            "invalid request.",
-                            HttpStatus.SC_BAD_REQUEST,
-                            (map.containsKey(OA2Constants.STATE) ? map.get(OA2Constants.STATE) : ""));
-                }
-                String proxyKey = map.get("proxy_key"); // unhashed key
                 if(!map.containsKey("code")){
                     throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
                             "missing token",
@@ -113,13 +106,21 @@ public class OA2AuthenticationServer extends AbstractAuthenticationServlet {
                             HttpStatus.SC_BAD_REQUEST,
                             (map.containsKey(OA2Constants.STATE) ? map.get(OA2Constants.STATE) : ""));
                 }
-                String shash = DigestUtils.sha1Hex(proxyKey);
-                if(!t.getProxyHash().equals(shash)){
-                    throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
-                            "invalid request.",
-                            HttpStatus.SC_BAD_REQUEST,
-                            (map.containsKey(OA2Constants.STATE) ? map.get(OA2Constants.STATE) : ""));
-
+                if(getServiceEnvironment().getAuthorizationServletConfig().getUseMode().equals(AUTHORIZATION_SERVLET_USE_MODE_PROXY)){
+                    if(!map.containsKey("proxy_key")){
+                        throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                                "invalid request.",
+                                HttpStatus.SC_BAD_REQUEST,
+                                (map.containsKey(OA2Constants.STATE) ? map.get(OA2Constants.STATE) : ""));
+                    }
+                    String proxyKey = map.get("proxy_key"); // unhashed key
+                    String shash = DigestUtils.sha1Hex(proxyKey);
+                    if(!t.getProxyHash().equals(shash)){
+                        throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                                "invalid request.",
+                                HttpStatus.SC_BAD_REQUEST,
+                                (map.containsKey(OA2Constants.STATE) ? map.get(OA2Constants.STATE) : ""));
+                    }
                 }
 
                 String s = t.getRequestState();

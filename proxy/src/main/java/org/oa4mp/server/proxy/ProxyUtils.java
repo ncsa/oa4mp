@@ -139,7 +139,7 @@ public class ProxyUtils {
         /*
          The look up at our end is in whatever canonical form we have set. The user may type in
          whatever they want as long as the letters are (up to case) the same, so a user code
-         of "abc-def-g" might come back as "aBc DE+fg". We have to look this up on on our side
+         of "abc-def-g" might come back as "aBc DE+fg". We have to look this up on our side
          so we always set the user code in the transaction (which is actually a unique key in
          the store) to the uppercase canonical form.
 

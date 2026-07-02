@@ -36,7 +36,7 @@ public class AuthenticationUtil {
         // Uncomment the next line when testing for release. This gives the test server a single
         // user with a password. Also check the wrong user/password fails.
         //
-        //if(username.equals("me") && password.equals("12345678")) return;
+        if(username.equals("me") && password.equals("12345678")) return;
         // If you were checking users and there  were a problem, you would do this:
         String message = "invalid login";
         throw new AbstractAuthenticationServlet.UserLoginException(message, username, password);

@@ -152,8 +152,8 @@ public class ProxyCallbackServlet extends OA2AuthenticationServer {
         //    params = params + "&stateKey" + "=" + OA2Constants.STATE;
         params = params + "&" + PROXY_KEY + "=" + proxyState;
         params = params + "&" + RESPONSE_TYPE_KEY + "=" + RESPONSE_TYPE_TOKEN_VALUE;
-        params = params + "&clientHome" + "=" + escapeHtml4(t.getClient().getHomeUri());
-        params = params + "&clientName" + "=" + escapeHtml4(t.getClient().getName());
+        params = params + "&clientHome" + "=" + URLEncoder.encode(t.getClient().getHomeUri());
+        params = params + "&clientName" + "=" + URLEncoder.encode(t.getClient().getName());
         params = params + "&clientScopes" + "=" + URLEncoder.encode(scopesToString(t));
         params = params + "&actionToTake" + "=" + contextPath + "/authorize";
         return params;

@@ -3,7 +3,7 @@
   Date: 5/20/2024
   Time: 3:10 PM
   This is for the case that the device flow has an existing logon (so no logon page
-  has been displayed) but consent is setill required.
+  has been displayed) but consent is still required.
   Properties supplied:
   * clientName = the name of the client
   * clientHome = the home uri of the client
