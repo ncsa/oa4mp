@@ -399,10 +399,10 @@ public class RFC8628AuthenticationServer extends EnvServlet {
    //     params = params + "&" + DF_USER_CODE_KEY + "=" + URLEncoder.encode(t.getUserCode(), StandardCharsets.UTF_8);
         // OAuth 2.0 specific values that must be preserved.
         //    params = params + "&stateKey" + "=" + OA2Constants.STATE;
-        params = params + "&" + PROXY_KEY + "=" + proxyState;
+        params = params + "&" + PROXY_KEY + "=" + URLEncoder.encode(proxyState);
         params = params + "&" + RESPONSE_TYPE_KEY + "=" + RESPONSE_TYPE_DF_VALUE;
-        params = params + "&clientHome" + "=" + URLEncoder.encode(t.getClient().getHomeUri());
-        params = params + "&clientName" + "=" + URLEncoder.encode(t.getClient().getName());
+        params = params + "&clientHome" + "=" + URLEncoder.encode(t.getClient().getHomeUri()==null?"(none)":t.getClient().getHomeUri());
+        params = params + "&clientName" + "=" + URLEncoder.encode(t.getClient().getName() == null?"(none)":t.getClient().getName());
         params = params + "&clientScopes" + "=" + URLEncoder.encode(scopesToString(t));
         String deviceURI = getServiceEnvironment().getRfc8628ServletConfig().deviceEndpoint;
         // last component of the URI is the device endpoint.

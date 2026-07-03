@@ -150,10 +150,10 @@ public class ProxyCallbackServlet extends OA2AuthenticationServer {
         params = params + "&" + TOKEN_KEY_KEY + "=" + CONST(TOKEN_KEY);
         // OAuth 2.0 specific values that must be preserved.
         //    params = params + "&stateKey" + "=" + OA2Constants.STATE;
-        params = params + "&" + PROXY_KEY + "=" + proxyState;
+        params = params + "&" + PROXY_KEY + "=" + URLEncoder.encode(proxyState);
         params = params + "&" + RESPONSE_TYPE_KEY + "=" + RESPONSE_TYPE_TOKEN_VALUE;
-        params = params + "&clientHome" + "=" + URLEncoder.encode(t.getClient().getHomeUri());
-        params = params + "&clientName" + "=" + URLEncoder.encode(t.getClient().getName());
+        params = params + "&clientHome" + "=" + URLEncoder.encode(t.getClient().getHomeUri() == null ? "(none)":t.getClient().getHomeUri());
+        params = params + "&clientName" + "=" + URLEncoder.encode(t.getClient().getName()==null?"(none)":t.getClient().getName());
         params = params + "&clientScopes" + "=" + URLEncoder.encode(scopesToString(t));
         params = params + "&actionToTake" + "=" + contextPath + "/authorize";
         return params;

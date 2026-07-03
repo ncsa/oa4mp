@@ -11,17 +11,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="https://github.com/ncsa/oa4mp/issues/107, https://github.com/ncsa/oa4mp/issues/281, https://github.com/ncsa/oa4mp/issues/299,  https://github.com/ncsa/oa4mp/issues/301">
+    <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="More from https://github.com/ncsa/oa4mp/issues/301. Incorrectg escaping prevented finishing authentication if local consent needed.">
+      <change afterPath="$PROJECT_DIR$/.idea/webContexts.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/src/main/webapp/device-consent.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/src/main/webapp/device-consent.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/OA2ATServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/OA2ATServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/OA2AuthenticationServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/OA2AuthenticationServer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/ProxyCallbackServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/ProxyCallbackServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/ProxyUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/ProxyUtils.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/RFC8628AuthenticationServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/RFC8628AuthenticationServer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/resources/testing/authentication-testing.txt" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/resources/testing/authentication-testing.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/servlet/AbstractAuthenticationServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/servlet/AbstractAuthenticationServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/servlet/AuthenticationUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/servlet/AuthenticationUtil.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -150,7 +144,7 @@
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "Tomcat Server.DEV OA4MP.executor": "Run",
     "Tomcat Server.MyProxy.executor": "Run",
-    "Tomcat Server.OA4MP server.executor": "Debug",
+    "Tomcat Server.OA4MP server.executor": "Run",
     "WebServerToolWindowFactoryState": "false",
     "git-widget-placeholder": "master",
     "jdk.selected.JAVA_MODULE": "11 (2)",
@@ -1287,15 +1281,7 @@
       <workItem from="1779104740896" duration="240476000" />
       <workItem from="1781435498335" duration="328000" />
       <workItem from="1781435871874" duration="89149000" />
-      <workItem from="1782815402307" duration="22420000" />
-    </task>
-    <task id="LOCAL-00097" summary="https://github.com/ncsa/oa4mp/issues/255">
-      <option name="closed" value="true" />
-      <created>1751463377844</created>
-      <option name="number" value="00097" />
-      <option name="presentableId" value="LOCAL-00097" />
-      <option name="project" value="LOCAL" />
-      <updated>1751463377844</updated>
+      <workItem from="1782815402307" duration="29204000" />
     </task>
     <task id="LOCAL-00098" summary="More fallout from improving bootstrap sequence in command line utilities. Found some issues in the QDL storage module. Wrote basic Pelican startup scripts.">
       <option name="closed" value="true" />
@@ -1681,7 +1667,15 @@
       <option name="project" value="LOCAL" />
       <updated>1782163645139</updated>
     </task>
-    <option name="localTasksCounter" value="146" />
+    <task id="LOCAL-00146" summary="More from https://github.com/ncsa/oa4mp/issues/301. Incorrectg escaping prevented finishing authentication if local consent needed.">
+      <option name="closed" value="true" />
+      <created>1782999751524</created>
+      <option name="number" value="00146" />
+      <option name="presentableId" value="LOCAL-00146" />
+      <option name="project" value="LOCAL" />
+      <updated>1782999751525</updated>
+    </task>
+    <option name="localTasksCounter" value="147" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1703,7 +1697,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
-    <MESSAGE value="https://github.com/ncsa/oa4mp/issues/274 wrong skin referenced" />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/270 and https://github.com/ncsa/oa4mp/issues/275. Build script now copies well-known.war to staging directory so I don't have to." />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/276 add support for request_uri in QDL session" />
     <MESSAGE value="https://github.com/cilogon/cilogon-java/issues/45" />
@@ -1728,7 +1721,8 @@
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/297" />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/299" />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/107, https://github.com/ncsa/oa4mp/issues/281, https://github.com/ncsa/oa4mp/issues/299,  https://github.com/ncsa/oa4mp/issues/301" />
-    <option name="LAST_COMMIT_MESSAGE" value="https://github.com/ncsa/oa4mp/issues/107, https://github.com/ncsa/oa4mp/issues/281, https://github.com/ncsa/oa4mp/issues/299,  https://github.com/ncsa/oa4mp/issues/301" />
+    <MESSAGE value="More from https://github.com/ncsa/oa4mp/issues/301. Incorrectg escaping prevented finishing authentication if local consent needed." />
+    <option name="LAST_COMMIT_MESSAGE" value="More from https://github.com/ncsa/oa4mp/issues/301. Incorrectg escaping prevented finishing authentication if local consent needed." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="GROUP_MULTIFILE_MERGE_BY_DIRECTORY" value="true" />
   </component>
@@ -2449,11 +2443,6 @@
           <option name="timeStamp" value="1671" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/qdl/acl/QDLACL.java</url>
-          <line>122</line>
-          <option name="timeStamp" value="1677" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/OA4MPQDLWorkspaceCommands.java</url>
           <line>59</line>
           <option name="timeStamp" value="1679" />
@@ -2719,11 +2708,6 @@
           <option name="timeStamp" value="1910" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/ProxyCallbackServlet.java</url>
-          <line>121</line>
-          <option name="timeStamp" value="1911" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/servlet/OA2ExceptionHandler.java</url>
           <line>176</line>
           <option name="timeStamp" value="1912" />
@@ -2813,6 +2797,16 @@
           <line>735</line>
           <option name="timeStamp" value="1943" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/OA2AuthenticationServer.java</url>
+          <line>117</line>
+          <option name="timeStamp" value="1944" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/RFC8628AuthenticationServer.java</url>
+          <line>403</line>
+          <option name="timeStamp" value="1945" />
+        </line-breakpoint>
         <line-breakpoint enabled="true" type="java-method">
           <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/storage/transactions/OA2MTStore.java</url>
           <line>135</line>
@@ -2848,6 +2842,11 @@
         <PinnedItemInfo parentTag="org.oa4mp.server.loader.oauth2.storage.transactions.OA2ServiceTransaction" memberName="scopes" />
       </pinned-members>
     </pin-to-top-manager>
+    <watches-manager>
+      <configuration name="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory">
+        <watch expression="proxyKey" />
+      </configuration>
+    </watches-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
