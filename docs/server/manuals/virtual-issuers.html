@@ -13,7 +13,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <title>OAuth for MyProxy</title>
+    <title>OAuth for Many People</title>
     <style type="text/css" media="all">
         @import url("../../css/oa4mp-custom.css");
         @import url("../../css/oa4mp-theme.css");
@@ -48,7 +48,7 @@
     
         
                     <div class="xleft">
-            Last Published: 2025-11-14
+            Last Published: 2026-07-07
                                 </div>
                 <div class="xright">            
     
@@ -58,7 +58,7 @@
                         
     
         
-                         Version: 6.x-SNAPSHOT
+                         Version: 6.3.0
             </div>
     <div class="clear">
         <hr/>
@@ -147,14 +147,14 @@
 
 <h1>Overview</h1>
 
-<p>OA4MP is an OAuth 2 <i>issuer</i>, meaning that it creates tokens. It must set itself as
+<p>OA4MP is an OAuth 2 <i>issuer</i>, meaning that it creates (&quot;issues&quot;) tokens. It must set itself as
     the originator of the token by asserting an <b>iss</b> claim wherever needed. E.g.,
     <font color="blue">https://math.bigstate.edu/oauth2</font>. A common situation is that
     an institution requires that the issuer be scoped to itself (so all of the tokens used by group X
     have an issuer indicated they were created for group X) and have its own set of signing keys.
     The issuer claim reflects this, e.g. If the Geometry group at Big State University wanted to set
     up a token issuer for all of its users, a reasonable <b>iss</b> claim in the tokens would be <font color="blue">https://math.bigstate.edu/oauth2/geometry</font>.
-    Specialized issuers are really quite handly since they can ensure that tokens can be ignored or
+    Specialized issuers are really quite handy since they can ensure that tokens can be ignored or
     not misued. As such, once savored, people tend to want to have an issuer for each and every
     project, group, department, you name it.</p>
 
@@ -180,10 +180,12 @@
 <h2><a name="How_do_they_work.3F"></a>How do they work?</h2>
 
 <p>It is important to understand that if an admin clients use virtual issuers, and then all of the clients it manages
-    us the VI as well. This makes it easy to manage a large system of clients who have specialized signing requirements.
+    use the VI as well. There is a default issuer for the system so that any client
+    not in specific virtual issuer lands there.
+    This makes it easy to manage a large system of clients who have specialized signing requirements.
     (Historical note, these were called virtual organization for a time, but that names was taken over
     by other projects unrelated to OA4MP, causing confusion. We hence switched to calling these virtual issuers. If you
-    run into the term virtual organization, let us know to fix it and rock on.)</p>
+    run into the term virtual organization in the OA4MP documentation, let us know to fix it and rock on.)</p>
 
 </section><section>
 <h2><a name="Relation_to_administrative_clients"></a>Relation to administrative clients</h2>
@@ -298,8 +300,8 @@
         to that set of keys. Here we accept the default of RSA.
     </li>
     
-<li>For RSA keys, the key leangth is required. The larger the key size, the better the security and the longer key
-        generation takes. Note that the key length must be a multiple 256. Each geenrated key has a unique identifier.
+<li>For RSA keys, the key length is required. The larger the key size, the better the security and the longer key
+        generation takes. Note that the key length must be a multiple 256. Each generated key has a unique identifier.
         These are printed and the most common one for whatever the set is, is selected as the default for signing.
     </li>
     
@@ -307,7 +309,7 @@
         paste it (or type) it in. It is case sensitive.
     </li>
     
-<li>The entire record is printed and you are asked if you want to save it. If you answer <b>n</b> then the entire
+<li>The entire record is printed, and you are asked if you want to save it. If you answer <b>n</b> then the entire
         set of edits is lost, requiring that you set up the record manually.
     </li>
 </ol>
@@ -387,7 +389,7 @@ virtual issuer &quot;edgestow:geometry&quot; set for admin with id &quot;oa4mp:/
 </div>
 <div id="footer">
     <div class="xright">&#169;    
-                    2025
+                    2026
         
                     
     

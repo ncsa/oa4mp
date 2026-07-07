@@ -13,7 +13,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <title>OAuth for MyProxy</title>
+    <title>OAuth for Many People</title>
     <style type="text/css" media="all">
         @import url("../../css/oa4mp-custom.css");
         @import url("../../css/oa4mp-theme.css");
@@ -48,7 +48,7 @@
     
         
                     <div class="xleft">
-            Last Published: 2025-11-14
+            Last Published: 2026-07-07
                                 </div>
                 <div class="xright">            
     
@@ -58,7 +58,7 @@
                         
     
         
-                         Version: 6.x-SNAPSHOT
+                         Version: 6.3.0
             </div>
     <div class="clear">
         <hr/>
@@ -202,7 +202,7 @@
 
 <ul>
     
-<li>Remeber that ersatz clients cannot start flows, they may only substitute for a provisioning client.</li>
+<li>Remember that ersatz clients cannot start flows, they may only substitute for a provisioning client.</li>
     
 <li>The scopes for <b>&#x3b1;</b> are restricted to be <i>at most</i> what <b>A</b> was granted.
         During the fork, you may downscope. At that point, the resulting scopes become the maximum
@@ -215,7 +215,7 @@
         actually needing an access token.
     </li>
     
-<li>You may fork as freely as you like. Every exchange as per above will fork the flow.</li>
+<li>You may fork as freely as you like. <i>Every exchange as per above will fork the flow.</i> </li>
     
 <li>OA4MP supports <a class="externalLink" href="https://www.rfc-editor.org/rfc/rfc7523">JWTs for authorization</a>
         which means that <b>A</b> may start a completely automated flow and hand off its
@@ -240,18 +240,15 @@
 
 <ul>
     
-<li>All ersatz relations are explicit and must be set out of band.</li>
+<li>All ersatz relations are explicit and must be set out of band. This may be done with via the client management endpoint too.</li>
     
 <li>Ersatz clients cannot start a flow.</li>
     
 <li>Ersatz clients can only be substituted at the token exchange (RFC 8693) endpoint.</li>
     
-<li>once provisioned, they are simply clients can be used at the
-        refresh endpoint, revoked, introspected etc.
-    </li>
+<li>Once provisioned, they are simply clients can be used at the refresh endpoint, revoked, introspected etc.</li>
     
-<li>Ersatz clients are restricted in their scopes to whatever the provisioning client has and may only downscope.
-    </li>
+<li>Ersatz clients are restricted in their scopes to whatever the provisioning client has and may only downscope.</li>
     
 <li>If A &#x227b; &#x3b1;, then &#x3b1; inherits the configuration (lifetimes, scripts etc.) from A unless explicitly overridden.</li>
     
@@ -291,17 +288,17 @@
 <p>What this means is that our substitutions are a form of impersonation and that
     the trust relations are made out of band. Why not call this impersonation? Because
     other OAuth systems are free to implement this any way they want, and we want to be clear
-    exactly how we do it. </p>
+    exactly how we do it. Sad differently, there can be many implmenetations of <i>impersonation</i>
+    with their own policies. We want a unique name so there is no confusion what OA4MP does.</p>
 
 </section><section>
 <h3><a name="Note_on_provisioning_chains"></a>Note on provisioning chains</h3>
 
 <p>
     You may have ersatz clients substitute for other ersatz clients, so A &#x227b; &#x3b1;, &#x3b1; &#x227b; &#x3b2; and &#x3b2; &#x227b; &#x3b3; is perfectly fine.
-    This means that A provisions and that &#x3b1; may substitute for it. Later, &#x3b2; may substitute for &#x3b1;, but cannot substitute
-    for
-    A (unless that relation is made explicit). This allows for chains of substitution. We may write this chain
-    more compactly as A &#x227b; &#x3b1; &#x227b; &#x3b2; &#x227b; &#x3b3;
+    This means that A provisions &#x3b1;, and that &#x3b1; may substitute for it. Later, &#x3b2; may substitute for &#x3b1;, but cannot substitute
+    for A. This allows for chains of substitution. We may write this chain
+    more compactly as A &#x227b; &#x3b1; &#x227b; &#x3b2; &#x227b; &#x3b3;.
 </p>
 
 </section></section><section>
@@ -366,7 +363,7 @@
 </div>
 <div id="footer">
     <div class="xright">&#169;    
-                    2025
+                    2026
         
                     
     

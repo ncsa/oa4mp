@@ -1,6 +1,7 @@
 - app_name: OA4MP
   help: {success: /oa4mp/success.txt}
   versions:
+  - {file: /oa4mp/v6_3.yaml, name: v6.3, description: Version 6.3, notes: /oa4mp/v6_3_notes.txt}
   - {file: /oa4mp/v6_2.yaml, name: v6.2, description: Version 6.2, notes: /oa4mp/v6_2_notes.txt}
   - {file: /oa4mp/v6_1.yaml, name: v6.1, description: Version 6.1, notes: /oa4mp/v6_1_notes.txt}
   - {file: /oa4mp/v6_0.yaml, name: v6.0, description: Version 6.0, notes: /oa4mp/v6_0_notes.txt}

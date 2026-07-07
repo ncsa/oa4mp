@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.IdentifiableMap;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.cli.FoundIdentifiables;
 import edu.uiuc.ncsa.security.util.cli.ArgumentNotFoundException;
 import edu.uiuc.ncsa.security.util.cli.CLIDriver;
@@ -326,15 +327,12 @@ public class KeyCommands extends OA4MPStoreCommands {
 
     public void get_current(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
-            say("get_current " + DEFAULT_SERVER_VI + " | index - get the current values for the given key");
+            say("get_current " + DEFAULT_SERVER_VI + " | index - get the current keys (valid or not) for a given VI");
+            say("No argument means to list the keys for the default VI.");
             return;
         }
         VIStore viStore = getEnvironment().getVIStore();
-        if (!inputLine.hasArgs()) {
-            say("no arguments provided");
-            return;
-        }
-        if (inputLine.getLastArg().equals(DEFAULT_SERVER_VI)) {
+        if ((!inputLine.hasArgs()) || inputLine.getLastArg().equals(DEFAULT_SERVER_VI)) {
             inputLine.setLastArg(OA2SE.SERVER_VI_ID.toString());
         }
         FoundIdentifiables foundIdentifiables = findByIDOrRS(viStore, inputLine.getLastArg());
@@ -344,7 +342,10 @@ public class KeyCommands extends OA4MPStoreCommands {
         }
         for (Identifiable identifiable : foundIdentifiables) {
             VirtualIssuer vi = (VirtualIssuer) identifiable;
-            say(getStore().getCurrentKeys(vi).toString());
+            JSONWebKeys keys = getStore().getCurrentKeys(vi);
+            for(String k : keys.keySet()){
+                say(k + " : " + StringUtils.justify(4,keys.get(k).toString(),120).trim());
+            }
         }
 
     }
@@ -358,24 +359,24 @@ public class KeyCommands extends OA4MPStoreCommands {
     protected void rotateHelp(InputLine inputLine) {
         say("rotate [" + KR_ALL + " | " + KR_KID + " id | " + KR_VI + " vi " +
                 KR_CACHE_LIFETIME + " cache_lifetime " +
-                KR_AT_LIFETIME + " access_token_lifetime | index] - rotate the key at the given index");
+                KR_AT_LIFETIME + " access_token_lifetime | index] - rotate the key for the given index");
         say(KR_ALL + " = rotate all keys in the store. If the " + KR_VI + " argument is present, this is ignored and only the speicifed VI is rotated.");
         say(KR_KID + " = rotate the specific key by is key id.");
         say(KR_VI + " = rotate the keys by for a given virtual issuer. A valid of default rotates the server keys.");
-        say(KR_CACHE_LIFETIME + " = set the cache lifetime grace perdiod. Default is 24 hours.");
-        say(KR_AT_LIFETIME + " = set the access token lifetime grace period. Default is the max server access token lifetime.");
-        say("The index is the index (unique identifier or element in a result set) of the key in the store.");
+        say(KR_CACHE_LIFETIME + " = set the cache lifetime grace period. Default is 24 hours.");
+        say(KR_AT_LIFETIME + " = set the access token lifetime grace period. Default is the max server access token lifetime:" + getEnvironment().getMaxATLifetime()/1000 + " sec.");
         say("This will rotate the key(s) either per VI's policy or you may directly set the lifetimes");
         say("Setting at least one of " + KR_CACHE_LIFETIME + " or " + KR_AT_LIFETIME + " will override the policy");
         say("These accept lifetime in seconds (default) or with units, e.g. " + KR_AT_LIFETIME + " \"25 min\" (note the quotes!)");
-        say("The scope of this is always the minimum, so specifying a kid and a vi will oinly process teh specific key for that kid.");
+        say("The scope of this is always the minimum, so specifying a kid and a vi will only process the specific key for that kid.");
         say();
         say("E.g. Rotate every key in the store, using specific cache lifetime.");
         sayi("  rotate " + KR_ALL + " " + KR_CACHE_LIFETIME + " \"2 days\"");
         say("E.g. Rotate the keys for a given VI.");
         sayi("  rotate " + KR_VI + " oa4mp:/vi/1234567890");
         say("Note that this uses the policies of the VI and server.");
-        ;
+        say("If you need to remove expired keys, find them in a result set and use the rm command.");
+        say("/nSee also:  get_current");
     }
 
     public void rotate(InputLine inputLine) throws Throwable {
@@ -384,7 +385,7 @@ public class KeyCommands extends OA4MPStoreCommands {
             return;
         }
         if(!inputLine.hasArgs()){
-            say("no artguments provided");
+            say("no arguments provided");
             return;
         }
         if (getEnvironment().getKEStore() == null) {
@@ -510,7 +511,7 @@ public class KeyCommands extends OA4MPStoreCommands {
             say("rotated " + newRecords.size() + " keys");
             return;
         }
-
+        say("no keys rotated -- specify a VI,  kid or " + KR_ALL + " to rotate");
     }
 
     public static String CREATE_KEYS_CURVE = "-curve";
@@ -752,19 +753,6 @@ public class KeyCommands extends OA4MPStoreCommands {
             return;
         }
         super.ls(inputLine);
-    }
-    public static String PURGE_TIMESTAMP_FLAG = "-ts";
-    public static final String PURGE_ALL_VIS = "-all";
-    public static final String PURGE_LIST = "-list";
-
-    public void purge(InputLine inputLine) throws Throwable {
-        if (showHelp(inputLine)) {
-            say("purge [" + PURGE_TIMESTAMP_FLAG + " iso | ms] [" + PURGE_LIST + " [vi] - Purge, i.e., remove old keys.  The default is to list keys that have expired.");
-            say("age - get the age of the keys for the server");
-            say(PURGE_TIMESTAMP_FLAG + " -an ISO 8601 timestamp or milliseconds since epoch. This also accepts \"now\" as an argument. This will be used as the cur off, so you can list expired keys before this date, or purge them.");
-            say(PURGE_ALL_VIS + " - apply this to all VIs. Default is to apply it to the server keys only.");
-            return;
-        }
     }
 }
 
