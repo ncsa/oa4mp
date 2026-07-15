@@ -198,18 +198,22 @@ public class KESQLStore<V extends KERecord> extends SQLStore<V> implements KESto
         } else {
             outMap = new IdentifiableMap<>();
         }
-        String rawStatement = "SELECT * from " + getTable().getFQTablename() + " where " +
+    /*    String rawStatement = "SELECT * from " + getTable().getFQTablename() + " where " +
                 getKeys().vi() + "=? AND " +
                 getKeys().isValid() + "=1 AND " +
                 "(" + getKeys().exp() + " is NULL OR ?<" + getKeys().exp() + ")"; // not expired yet.
-        ConnectionRecord cr = getConnection();
+    */
+        String rawStatement = "SELECT * from " + getTable().getFQTablename() + " where " +
+                getKeys().vi() + "=? AND " +
+                getKeys().isValid() + "=1" ;
+               ConnectionRecord cr = getConnection();
         Connection c = cr.connection;
 
         V t = null;
         try {
             PreparedStatement stmt = c.prepareStatement(rawStatement);
             stmt.setString(1, viID.toString());
-            stmt.setLong(2, System.currentTimeMillis());
+            //stmt.setLong(2, System.currentTimeMillis());
             stmt.executeQuery();
             ResultSet rs = stmt.getResultSet();
             // Now we have to pull in all the values.

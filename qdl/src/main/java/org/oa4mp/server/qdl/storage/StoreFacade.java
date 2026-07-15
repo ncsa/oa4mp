@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.cf.CFNode;
 import edu.uiuc.ncsa.security.core.cf.CFXMLConfigurations;
+import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
@@ -38,13 +39,14 @@ import static org.qdl_lang.variables.values.QDLValue.asQDLValue;
  * <p>Created by Jeff Gaynor<br>
  * on 12/18/20 at  7:05 AM
  */
-public class StoreFacade  {
+public class StoreFacade {
     QDLStem types;
 
     public QDLStem getStoreTypes() {
         if (types == null) {
             types = new QDLStem();
             put(types, "client", STORE_TYPE_CLIENT);
+            put(types, "keys", STORE_TYPE_KEYS);
             put(types, "approval", STORE_TYPE_APPROVALS);
             put(types, "admin", STORE_TYPE_ADMIN_CLIENT_STORE);
             put(types, "permission", STORE_TYPE_PERMISSION_STORE);
@@ -73,15 +75,13 @@ public class StoreFacade  {
         this.cfNode = cfNode;
     }
 
-    transient CFNode cfNode ;
+    transient CFNode cfNode;
     transient protected OA2SE environment = null;
 
 
     public ConfigurationLoader<? extends AbstractEnvironment> getLoader() {
         return new OA2CFConfigurationLoader<OA2SE>(getCFNode(), getLogger());
     }
-
-
 
 
     public OA2SE getEnvironment() throws Exception {
@@ -117,6 +117,7 @@ public class StoreFacade  {
     public static final String STORE_TYPE_CLIENT = "client";
     public static final String STORE_TYPE_APPROVALS = "client_approval";
     public static final String STORE_TYPE_TRANSACTION = "transaction";
+    public static final String STORE_TYPE_KEYS = "keys";
     public static final String STORE_TYPE_TX_STORE = "tx_record";
     public static final String STORE_TYPE_VI_STORE = "vi";
     public static final String STORE_TYPE_PERMISSION_STORE = "permission";
@@ -292,10 +293,16 @@ public class StoreFacade  {
                 storeAccessor = new QDLStoreAccessor(storeType, getEnvironment().getClientStore(), getEnvironment().getMyLogger());
                 storeAccessor.setMapConverter(new ClientStemMC(getEnvironment().getClientStore().getMapConverter()));
                 break;
+            case STORE_TYPE_KEYS:
+                if (getEnvironment().getKEStore() == null) {
+                    throw new GeneralException("keys store is not supported");
+                }
+                storeAccessor = new QDLStoreAccessor(storeType, getEnvironment().getKEStore(), getEnvironment().getMyLogger());
+                storeAccessor.setMapConverter(new KeyStemMC((MapConverter) getEnvironment().getKEStore().getXMLConverter()));
+                break;
             case STORE_TYPE_APPROVALS:
                 storeAccessor = new QDLStoreAccessor(storeType, getEnvironment().getClientApprovalStore(), getEnvironment().getMyLogger());
                 MapConverter mc = getEnvironment().getClientApprovalStore().getMapConverter();
-
                 storeAccessor.setMapConverter(new ApprovalStemMC(mc));
                 break;
             case STORE_TYPE_TRANSACTION:
@@ -1115,7 +1122,7 @@ public class StoreFacade  {
             doxx.add("{'client0':[1,3],'client42':[0,1,2,3,5]}");
             doxx.add("These are the valid version of each of these.");
             doxx.add(checkInitMessage);
-            doxx.add("\nSee also:" + VERSION_RESTORE_NAME + ", " + VERSION_CREATE_NAME+ ", dyadic " + READ_NAME);
+            doxx.add("\nSee also:" + VERSION_RESTORE_NAME + ", " + VERSION_CREATE_NAME + ", dyadic " + READ_NAME);
             return doxx;
         }
     }

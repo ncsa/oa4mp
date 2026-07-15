@@ -39,7 +39,7 @@ say(print(z.));
  while[for_keys(x, z.)]
    do [caput := 'ζ.' + input_form(x);
    say('ζ.' + x);
-       caput :=  ((65 - size(caput))*' ')+ caput; // justifies on the ≔ sign
+       caput :=  ((85 - size(caput))*' ')+ caput; // justifies on the ≔ sign
        //say(caput + ' ≔ ' + input_form(z.x) + ';');
        out. := out. ~ (caput + ' ≔ ' + input_form(z.x) + ';');
      ];

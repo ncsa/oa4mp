@@ -13,11 +13,11 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
 
 /**
- * Store entry that modesl a single JWK key. It contains all the administrative
+ * Store entry that models a single JWK key. It contains all the administrative
  * information for the key, as well as the actual key itself.
  * <p>
- * Each key has a VI (no VI means default). Much of this is aslo in the key itself, but
- * this allows for searching and better management.
+ * Each key has a VI (no VI means default). Much of this is usually also in the key itself,
+ * but pulling it out allows for searching and better management.
  */
 public class KERecord extends Monitored {
     public KERecord(Identifier identifier) {
@@ -190,5 +190,24 @@ public class KERecord extends Monitored {
         jwk2.issuedAt = getIat();
         jwk2.notValidBefore = getNbf();
         return jwk2;
+    }
+
+    /**
+     * Has the exp date of this record passed? True if expired.
+     * @return
+     */
+    public boolean isExpired() {
+        //return expiresAt != null && (expiresAt).before(new Date());
+        if(getExp() == null) {return false;}
+        return getExp().getTime() < System.currentTimeMillis() ;
+    }
+
+    /**
+     * Checks that the nbf (not before) date has
+     * @return
+     */
+    public boolean hasValidDate() {
+        //return notValidBefore == null || (new Date()).after(notValidBefore);
+        return getNbf()==null ||  getNbf().getTime() < System.currentTimeMillis() ;
     }
 }

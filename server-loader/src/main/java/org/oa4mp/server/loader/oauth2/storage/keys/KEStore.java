@@ -24,7 +24,7 @@ public interface KEStore<V extends KERecord> extends Store<V> {
     /**
      * Gets the currently active keys for a given virtual issuer. Note that the
      * virtual issuer for the server is  OA2SE#SERVER_VI_ID. A current key is defined as
-     * having not expred and being valid.
+     * having not expired and being valid.
      * @param vi
      * @return
      */

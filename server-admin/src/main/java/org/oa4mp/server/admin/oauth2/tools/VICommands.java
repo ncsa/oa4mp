@@ -478,14 +478,14 @@ public class VICommands extends OA4MPStoreCommands {
             say("No argument queries current value.");
             return;
         }
-        boolean hasArg = !inputLine.hasArg();
+        boolean hasArgs = inputLine.hasArgs();
 
         VirtualIssuer defaultIssuer = getStore().get(OA2SE.SERVER_VI_ID);
         if (defaultIssuer == null) {
             say("no default issuer found.");
             return;
         }
-        if (!hasArg) {
+        if (!hasArgs) {
             say("current value: " + defaultIssuer.isAllowOverrides());
             return;
         }
@@ -526,34 +526,34 @@ public class VICommands extends OA4MPStoreCommands {
         vi.setValid(true);
 
         boolean noKeys = true;
-        if(getEnvironment().getServerJWKS() != null && !getEnvironment().getServerJWKS().isEmpty()) {
-            if("y".equals(readline("Server keys detected in the configuration. Do you want to use these(y/n)?"))) {
-                if(getEnvironment().hasKEStore()){
-                    List<String> skipped = KEStoreUtilities.ingest(getEnvironment().getKEStore(),getEnvironment().getServerJWKS(), vi, true );
-                    if(skipped != null && !skipped.isEmpty()) {
+        if (getEnvironment().getServerJWKS() != null && !getEnvironment().getServerJWKS().isEmpty()) {
+            if ("y".equals(readline("Server keys detected in the configuration. Do you want to use these(y/n)?"))) {
+                if (getEnvironment().hasKEStore()) {
+                    List<String> skipped = KEStoreUtilities.ingest(getEnvironment().getKEStore(), getEnvironment().getServerJWKS(), vi, true);
+                    if (skipped != null && !skipped.isEmpty()) {
                         say("The following keys were not used because they were already in the keystore:");
-                        for(String s : skipped) {
+                        for (String s : skipped) {
                             say(s);
                         }
                     }
-                }else{
+                } else {
                     vi.setJsonWebKeys(getEnvironment().getServerJWKS());
                 }
 
                 noKeys = false;
-            }else{
+            } else {
                 if (null == doKeySetup(vi, keys)) {
                     return;
                 }
             }
         }
-        if (noKeys && "y".equals(readline("Do you want to setup key rotation? (y/n)"))) {
+        if ("y".equals(readline("Do you want to setup key rotation? (y/n)"))) {
             vi.setKeyRotationEnabled(true);
             vi.setAllowOverrides("y".equals(readline("Do you want to allow key rotation overrides? (y/n)")));
             String gracePeriod = getInput("Enter the key rotation cache grace period:", "24 hr.");
             Long x = TimeUtil.getValueSecsOrMillis(gracePeriod, true);
             vi.setCacheGracePeriod(x);
-           gracePeriod = getInput("Enter the key rotation access token grace period:", (getEnvironment().getMaxATLifetime() / 1000) + " sec.");
+            gracePeriod = getInput("Enter the key rotation access token grace period:", (getEnvironment().getMaxATLifetime() / 1000) + " sec.");
             x = TimeUtil.getValueSecsOrMillis(gracePeriod, true);
             vi.setAtGracePeriod(x);
         }
@@ -569,7 +569,7 @@ public class VICommands extends OA4MPStoreCommands {
 
     @Override
     public void ls(InputLine inputLine) throws Throwable {
-        if(inputLine.hasLastArg() && inputLine.getLastArg().equalsIgnoreCase("default")) {
+        if (inputLine.hasLastArg() && inputLine.getLastArg().equalsIgnoreCase("default")) {
             inputLine.setLastArg(OA2SE.SERVER_VI_ID.toString());
         }
         super.ls(inputLine);

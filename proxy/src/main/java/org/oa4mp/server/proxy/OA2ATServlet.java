@@ -1311,16 +1311,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         OA2ServletUtils.processXAs(request, t, client);
         findSigningKey(request, t);
 
-        /*
-        if (client.hasExtendedAttributeSupport()) {
-            ExtendedParameters xp = new ExtendedParameters();
-            // Take the parameters and parse them into configuration objects,
-            JSONObject extAttr = xp.snoopParameters(request.getParameterMap());
-            if (extAttr != null && !extAttr.isEmpty()) {
-                t.setExtendedAttributes(extAttr);
-            }
-        }
-*/
+
         TXRecord newIDTX = null;
         TXRecord newATTX = null;
         TXRecord newRTTX = null;
@@ -1418,7 +1409,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         getOA2SE().getTxStore().save(newRTTX);
 
 
-        HandlerRunner handlerRunner = new HandlerRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2se, t, activeTX, client.getConfig()));
+        HandlerRunner handlerRunner = new HandlerRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2se, t, activeTX, null, client.getConfig()));
         try {
             OA2ClientUtils.setupHandlers(handlerRunner, oa2se, t, client, newIDTX, newATTX, newRTTX, request);
             // NOTE WELL that the next two lines are where our identifiers are used to create JWTs (like SciTokens)
@@ -1655,7 +1646,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                         t.getRequestState());
         }
 
-        HandlerRunner handlerRunner = new HandlerRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2se, t, activeTX, client.getConfig()));
+        HandlerRunner handlerRunner = new HandlerRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2se, t, activeTX, null, client.getConfig()));
         try {
             OA2ClientUtils.setupHandlers(handlerRunner, oa2se, t, client, newIDTX, newATTX, newRTTX, request);
             // NOTE WELL that the next two lines are where our identifiers are used to create JWTs (like SciTokens)
@@ -2071,7 +2062,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             st2.setRefreshToken(null);
             st2.setRefreshTokenLifetime(0L);
         }
-        HandlerRunner handlerRunner = new HandlerRunner(st2, ScriptRuntimeEngineFactory.createRTE(oa2SE, st2, atTX, client.getConfig()));
+        HandlerRunner handlerRunner = new HandlerRunner(st2, ScriptRuntimeEngineFactory.createRTE(oa2SE, st2, atTX, null, client.getConfig()));
         OA2ClientUtils.setupHandlers(handlerRunner, oa2SE, st2, client, null, atTX, rtTX, state.getRequest());
         if (state.isRfc8628() || st2.getAuthorizationGrant().getVersion() == null || st2.getAuthorizationGrant().getVersion().equals(Identifiers.VERSION_1_0_TAG)) {
             // Handlers have not been initialized yet. Either because of old tokens or rfc 8628 (so no tokens).
@@ -2181,14 +2172,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             debugger = OA4MPServlet.createDebugger(client);
         }
         JSONWebKey key = OA2ClientUtils.getSigningKey(oa2SE, st2, (OA2Client) st2.getClient());
-/*
-        VirtualIssuer vo = oa2SE.getVI(client.getIdentifier());
-        if (vo != null && vo.getJsonWebKeys() != null) {
-            key = vo.getJsonWebKeys().get(vo.getDefaultKeyID());
-        } else {
-            key = oa2SE.getJsonWebKeys().getDefault();
-        }
-*/
         if (handlerRunner.hasATHandler()) {
             AccessTokenImpl newAT = (AccessTokenImpl) handlerRunner.getAccessTokenHandler().getSignedPayload(key);
             debugger.trace(this, "jwt has at handler: at=" + newAT + ", for claims " + st2.getATData().toString(2));
@@ -2443,7 +2426,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
 
         debugger.trace(this, "set new access token = " + rtiResponse.getAccessToken().getToken());
         // remember that the client may have been resolved from prototypes, so use the one passed in, not in the transaction.
-        HandlerRunner handlerRunner = new HandlerRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2SE, t, txAT, client.getConfig()));
+        //HandlerRunner handlerRunner = new HandlerRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2SE, t, txAT, client.getConfig()));
+        HandlerRunner handlerRunner = new HandlerRunner(t, ScriptRuntimeEngineFactory.createRTE(oa2SE, t,
+                txAT,  keys, client.getConfig()));
         OA2ClientUtils.setupHandlers(handlerRunner, oa2SE, t, client, txIDT, txAT, txRT, request);
 
         try {
@@ -2475,15 +2460,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         rtiResponse.setServiceTransaction(t);
         JSONWebKey key = OA2ClientUtils.getSigningKey(oa2SE, t, client);
         rtiResponse.setJsonWebKey(key);
-/*
-        VirtualIssuer vo = oa2SE.getVI(client.getIdentifier());
 
-        if (vo == null) {
-            rtiResponse.setJsonWebKey(oa2SE.getJsonWebKeys().getDefault());
-        } else {
-            rtiResponse.setJsonWebKey(vo.getJsonWebKeys().get(vo.getDefaultKeyID()));
-        }
-*/
         if (txIDT == null) {
             rtiResponse.setUserMetadata(t.getUserMetaData());
         } else {

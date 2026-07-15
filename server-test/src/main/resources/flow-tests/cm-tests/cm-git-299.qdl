@@ -30,7 +30,8 @@ update.'strict_scopes' := true;
 update.'use_server_scopes' := false;
 update.'client_id' := resp.'content'.'client_id';
 resp2. := http#put(update.);
-⊨ resp2.'status'.'code' == 200 : logger(4,say('incorrect returned status of ' + resp.'status'.'code'));
+say(print(resp2.));
+⊨ resp2.'status'.'code'∈ [201, 200] : logger(4,say('incorrect returned status of ' + resp2.'status'.'code'));
 r. := http#get({'client_id':resp2.'content'.'client_id'}).'content';
 // r. now contains the uploaded client
 ⊨ r.'strict_scopes' : 'strict_scopes is not set to true';

@@ -585,31 +585,19 @@ public class OA2ClientUtils {
         JSONWebKey key = null;
         JSONArray keyIDs = transaction.getSigningKeyIds();
 
-        // so the requested a specific signing key. Find it. Search backwards in list to emulate a stack.
+        // so they requested a specific signing key. Find it. Search backwards in list to emulate a stack.
         if (keyIDs != null && !keyIDs.isEmpty()) {
             for (int i = keyIDs.size() - 1; 0 <= i; i--) {
                 String currentKeyID = keyIDs.getString(i);
                 key = keys.get(currentKeyID);
-/*∃
-                if (hasVOKeys) {
-                    key = vo.getJsonWebKeys().get(currentKeyID);
-                } else {
-                    key = oa2SE.getJsonWebKeys().get(currentKeyID);
-                }
-*/
                 if (key != null) {
                     return key;
                 }
             }
         }
         // no such requested key, return default
-        return keys.getDefault();
-/*
-        if (hasVOKeys) {
-            return vo.getJsonWebKeys().get(vo.getDefaultKeyID());
-        } else {
-            return oa2SE.getJsonWebKeys().getDefault();
-        }
-*/
+        key =  keys.getDefault();
+
+        return key;
     }
 }

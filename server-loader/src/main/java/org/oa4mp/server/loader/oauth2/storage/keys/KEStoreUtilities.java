@@ -66,15 +66,15 @@ public class KEStoreUtilities {
      * @throws InvalidAlgorithmParameterException
      * @throws NoSuchAlgorithmException
      */
-    public static void rotate(OA2SE oa2SE,
+    public static Map<Identifier, KERecord> rotate(OA2SE oa2SE,
                               List<Identifier> vIDs,
                               KEConfiguration keConfiguration,
                               boolean retainInVI) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, InvalidKeySpecException {
         if (vIDs == null || vIDs.isEmpty()) {
-            return;
+            return new HashMap<>();
         }
         // If the server disallows key rotations, bail here.
-        if (!keConfiguration.allowOverride && !keConfiguration.enabled) return;
+        if (!keConfiguration.allowOverride && !keConfiguration.enabled) return new HashMap<>();
         IdentifiableMap<KERecord> newRecords = new IdentifiableMap<>();
         Collection<JSONWebKey> jsonWebKeys = null;
 
@@ -105,16 +105,18 @@ public class KEStoreUtilities {
                     newRecords.put(keRecord.getIdentifier(), keRecord);
                 }
                 oa2SE.getKEStore().putAll(newRecords); // mass update in case there are lots so store doesn't choke.
+                return  newRecords;
             } else {
                 // have keys in store to rotate.
-                KEStoreUtilities.rotate(oa2SE.getKEStore(), kers, keConfiguration.cacheGracePeriod, keConfiguration.atGracePeriod, true);
+                return KEStoreUtilities.rotate(oa2SE.getKEStore(), kers, keConfiguration.cacheGracePeriod, keConfiguration.atGracePeriod, true);
             }
         }
+        return new HashMap<>();
     }
 
 
     /**
-     * Rotate a set of records. This sets the new kleys to be valid and updates the store
+     * Rotate a set of records. This sets the new keys to be valid and updates the store
      * with both new and old keys.
      *
      * @param keStore
@@ -142,9 +144,9 @@ public class KEStoreUtilities {
             KERecord oldKER = oldKERS.get(identifier);
 
             // If a key does not have a not before and is requested to rotate, do so.
-            //if (oldKey.isValid && (oldKey.getNbf() == null || (oldKey.getNbf().before(now) && now.before(oldKey.getExp())))) {
-        if (oldKER.isValid && oldKER.getExp() == null && (oldKER.getNbf() == null || (oldKER.getNbf().before(now)))) {
-            //if (oldKey.isValid) {
+        if (oldKER.isValid
+                && oldKER.getExp() == null
+                && (oldKER.getNbf() == null || (oldKER.getNbf().before(now)))) {
                 KERecord newKER = rotate(keStore, oldKER, cacheGracePeriod, atGracePeriod);
                 newKER.setValid(true);
                 kers.put(newKER.getIdentifier(), newKER);
@@ -217,15 +219,18 @@ public class KEStoreUtilities {
 
         KERecord newRecord = keStore.create();
         newRecord.setVi(oldKER.getVi());
-        newRecord.fromJWK(newKey, oldKER.getDefault());
         Date now = new Date();
-        if(oldKER.getDefault()){
+        Date notBefore = new Date(now.getTime() + cacheGracePeriod);
+        newKey.notValidBefore = notBefore;
+        newRecord.fromJWK(newKey, oldKER.getDefault());
+        // If the cache grace period is zero (so immediate invalidation), remove flag for default
+        // key if present. Otherwise, leave it.
+        if(cacheGracePeriod == 0L && oldKER.getDefault()){
             oldKER.setDefault(false);
             newRecord.setDefault(true);
         }
         newRecord.setIat(now);
-        //newRecord.setNbf(new Date(now.getTime() + cacheGracePeriod));
-        newRecord.setNbf(now);
+        newRecord.setNbf(notBefore);
         oldKER.setExp(new Date(now.getTime() + cacheGracePeriod + atGracePeriod));
         newRecord.setUse(oldKER.getUse());
         return newRecord;

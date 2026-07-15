@@ -4,14 +4,12 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
-import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import edu.uiuc.ncsa.security.core.util.BeanUtils;
-import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
-import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.core.util.*;
 import edu.uiuc.ncsa.security.servlet.UsernameTransformer;
 import edu.uiuc.ncsa.security.util.json.JSONEntry;
 import edu.uiuc.ncsa.security.util.json.JSONStore;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
+import edu.uiuc.ncsa.security.util.jwk.JWKUtil2;
 import edu.uiuc.ncsa.security.util.mail.MailUtilProvider;
 import org.oa4mp.delegation.common.storage.TransactionStore;
 import org.oa4mp.delegation.common.token.TokenForge;
@@ -71,7 +69,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  long rtLifetime,
                  long maxRTLifetime,
                  Provider<ClientApprovalStore> casp,
-          //       List<MyProxyFacadeProvider> mfp,
+                 //       List<MyProxyFacadeProvider> mfp,
                  MailUtilProvider mup,
                  MessagesProvider messagesProvider,
                  Provider<AGIssuer> agip,
@@ -121,7 +119,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
                  KEConfiguration keConfiguration) {
 
         super(logger,
-           //     mfp,
+                //     mfp,
                 tsp,
                 csp,
                 maxAllowedNewClientRequests,
@@ -180,7 +178,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.VIStore = voStoreProvider.get();
         try {
             this.keStore = keStoreProvider.get();
-        }catch(Throwable t){
+        } catch (Throwable t) {
             // do nothing.
         }
         this.maxIdTokenLifetime = maxIDTokenLifetime;
@@ -217,6 +215,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
     }
 
     protected KEConfiguration keConfiguration;
+
     public boolean isCleanupFailOnErrors() {
         return cleanupFailOnErrors;
     }
@@ -359,9 +358,11 @@ public class OA2SE extends ServiceEnvironmentImpl {
     }
 
     KEStore<KERecord> keStore;
-    public boolean hasKEStore(){
+
+    public boolean hasKEStore() {
         return null != getKEStore();
     }
+
     VIStore VIStore;
 
     public VIStore getVIStore() {
@@ -418,6 +419,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
 
     /**
      * Is the client credential flow enabled for this server?
+     *
      * @return
      */
     public boolean isCCFEnabled() {
@@ -481,58 +483,119 @@ public class OA2SE extends ServiceEnvironmentImpl {
      */
     public static final String NO_KEY_ID = "--";
 
+    protected JSONWebKeys doNormalization(IdentifiableMap<KERecord> identifiableMap)  {
+        IdentifiableMap<KERecord> updateMap = new IdentifiableMap<>(); // any updates
+         JSONWebKeys jsonWebKeys = new JSONWebKeys(null);
+         /*
+           We have to construct the correct key set since it is possible that keys age
+           out and become valid or expire, so it is non-trivial to determine the actual
+           set of keys at a given instance.
+          */
+         for(Identifier key : identifiableMap.keySet()) {
+             KERecord k = identifiableMap.get(key);
+             if(k.hasValidDate() && !k.isExpired() ) {
+                 try{
+                 jsonWebKeys.put(k.getKid(), k.toJWK());
+                 }catch(Exception e) {
+                     if(e instanceof RuntimeException) {
+                         throw (RuntimeException)e;
+                     }
+                     throw new GeneralException(e);
+                 }
+                 if(k.getDefault()){
+                     jsonWebKeys.setDefaultKeyID(k.getKid());
+                 }
+             }
+         }
+         if(!updateMap.isEmpty()){
+             getKEStore().update(updateMap);
+         }
+         return jsonWebKeys;
+    }
+    protected JSONWebKeys doNormalization(JSONWebKeys jsonWebKeys) {
+        JWKUtil2 jwkUtil = new JWKUtil2();
+        String defaultID = jsonWebKeys.getDefaultKeyID();
+        jsonWebKeys = jwkUtil.normalize(jsonWebKeys);
+        if (jsonWebKeys.isNormalized()) {
+            if (jsonWebKeys.hasDefaultKey() && !jsonWebKeys.getDefaultKeyID().equals(defaultID)) {
+                // In this case, the keys have aged out and the old default did too,
+                // so normalizing it has yielded a new default. Update the store.
+                KERecord ker = getKEStore().getByKID(jsonWebKeys.getDefaultKeyID());
+                KERecord oldKER = getKEStore().getByKID(defaultID);
+                ker.setDefault(true);
+                oldKER.setDefault(false);
+                getKEStore().save(ker);
+                getKEStore().save(oldKER);
+            }
+        }
+        return jsonWebKeys;
+    }
+
     /**
-     * Get the keys for the Virtual issuer (may be null implying use
+     * Get the valid keys for the Virtual issuer (may be null implying use
      * server default). This is used in cases where there is no client
      * ID, such as you are accessing the keys for an admin client directly.
+     *
      * @param vi
      * @return
      */
-    public JSONWebKeys getJsonWebKeys(VirtualIssuer vi) {
-        if(getKEStore() != null){
-            JSONWebKeys jsonWebKeys = getKEStore().getCurrentKeys(vi);
-            if (!jsonWebKeys.isEmpty()) return jsonWebKeys;
-            //  Not in new place, start looking in the old ones in case
-            // it's an older install and they did not migrate.
-            if(vi != null){
-                if(vi.hasJWKs()) {
-                    jsonWebKeys = vi.getJsonWebKeys();
-                    jsonWebKeys.setDefaultKeyID(vi.getDefaultKeyID());
-                    return jsonWebKeys;
-                }
+    public JSONWebKeys getJsonWebKeys(VirtualIssuer vi)  {
+        if (getKEStore() != null ) {
+            JSONWebKeys jsonWebKeys;
+            IdentifiableMap<KERecord> identifiableMap;
+            if(vi == null) {
+                VirtualIssuer defaultVI = (VirtualIssuer) getVIStore().get(SERVER_VI_ID);
+                identifiableMap = getKEStore().getByVI(defaultVI);
+            }else{
+                identifiableMap = getKEStore().getByVI(vi);
+            }
+
+            if (!identifiableMap.isEmpty()) {
+                return doNormalization(identifiableMap);
+            }
+        }
+        //  Not in new place, start looking in the old ones in case
+        // it's an older install and they did not migrate.
+        if (vi != null) {
+            if (vi.hasJWKs()) {
+                jsonWebKeys = vi.getJsonWebKeys();
+                jsonWebKeys.setDefaultKeyID(vi.getDefaultKeyID());
+                return jsonWebKeys; // not in key store so can't normalize
             }
         }
         VirtualIssuer defaultVI = (VirtualIssuer) getVIStore().get(SERVER_VI_ID);
-        if(defaultVI != null){
-            if(defaultVI.hasJWKs()){ jsonWebKeys = defaultVI.getJsonWebKeys();
-            jsonWebKeys.setDefaultKeyID(defaultVI.getDefaultKeyID());
-            return jsonWebKeys;
+        if (defaultVI != null) {
+            if (defaultVI.hasJWKs()) {
+                jsonWebKeys = defaultVI.getJsonWebKeys();
+                jsonWebKeys.setDefaultKeyID(defaultVI.getDefaultKeyID());
+                return doNormalization(jsonWebKeys); // Best we can do, since keys in a config, not a store.
             }
         }
-        return getServerJWKS(); // *should* have a default.
+        return getServerJWKS(); // Last ditch, see if they stuck them in the server configuration.
     }
 
     /**
      * For a given client, get the keys for the Virtual issuer (may be null implying use)
+     *
      * @param clientID
      * @return
      */
-    public JSONWebKeys getJsonWebKeys(Identifier clientID) {
+    public JSONWebKeys getJsonWebKeys(Identifier clientID){
         return getJsonWebKeys(getVI(clientID));
     }
 
     /**
-     * @deprecated
      * @return
+     * @deprecated
      */
     public JSONWebKeys getJsonWebKeys() {
         VirtualIssuer vi = (VirtualIssuer) getVIStore().get(SERVER_VI_ID);
         String defaultKeyID = getServerJWKS().getDefaultKeyID();
         JSONWebKeys jwks = new JSONWebKeys(defaultKeyID);
         jwks.putAll(getServerJWKS());
-        if(vi != null){
+        if (vi != null) {
             jwks.putAll(vi.getJsonWebKeys());
-            if(!vi.getDefaultKeyID().equals(NO_KEY_ID)){
+            if (!vi.getDefaultKeyID().equals(NO_KEY_ID)) {
                 jwks.setDefaultKeyID(vi.getDefaultKeyID());
             }
         }
@@ -543,12 +606,14 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.jsonWebKeys = jsonWebKeys;
     }
 
-    public JSONWebKeys getServerJWKS(){
+    public JSONWebKeys getServerJWKS() {
         return jsonWebKeys;
     }
-    protected void setServerJWKS(JSONWebKeys jsonWebKeys){
+
+    protected void setServerJWKS(JSONWebKeys jsonWebKeys) {
         this.jsonWebKeys = jsonWebKeys;
     }
+
     protected JSONWebKeys jsonWebKeys;
 
     public boolean isTwoFactorSupportEnabled() {
@@ -702,7 +767,8 @@ public class OA2SE extends ServiceEnvironmentImpl {
      * This has its own call here because it involves multiple store lookups. It cannot
      * be done as a join in SQL or some such because there are no guarantees the stores
      * are all SQL -- some may be file stores or even in another unrelated database.
-     *<p>Note that this will throw an exception is the client is in multiple VIs.</p>
+     * <p>Note that this will throw an exception is the client is in multiple VIs.</p>
+     *
      * @param clientID
      * @return
      */
@@ -720,24 +786,24 @@ public class OA2SE extends ServiceEnvironmentImpl {
         Identifier currentVI = null;
         Identifier lastVI = null;
         boolean firstPass = true;
-        for(Identifier adminID : adminIDs){
+        for (Identifier adminID : adminIDs) {
             AdminClient ac = getAdminClientStore().get(adminID);
             if (ac == null) {
                 currentVI = null; // no VI set. Most common case.
-            }else{
+            } else {
                 currentVI = ac.getVirtualIssuer();
             }
-            if(firstPass){
+            if (firstPass) {
                 lastVI = currentVI;
                 firstPass = false;
             }
-            if(!BeanUtils.checkEquals(lastVI, currentVI)){
+            if (!BeanUtils.checkEquals(lastVI, currentVI)) {
                 // then we have different VIs and cannot resolve it
                 throw new GeneralException("too many VIs for client \"" + clientID + "\".");
             }
             lastVI = currentVI;
         }
-        if(lastVI == null){
+        if (lastVI == null) {
             return null; // so no VIs set anywhere. Use server default.
         }
         VirtualIssuer vi = (VirtualIssuer) getVIStore().get(lastVI);
@@ -817,10 +883,11 @@ public class OA2SE extends ServiceEnvironmentImpl {
     }
 
     boolean useProxyForCerts = false;
-   protected  List<Store> storeList = null;
+    protected List<Store> storeList = null;
 
     /**
      * A list of all stores. This is used in bootstrapping the system and initializing it.
+     *
      * @return
      */
 
@@ -844,6 +911,7 @@ public class OA2SE extends ServiceEnvironmentImpl {
     /**
      * Allow prompt = none parameter in OIDC clients. https://github.com/ncsa/oa4mp/issues/236.
      * This should be configurable.
+     *
      * @return
      */
     public boolean isAllowPromptNone() {
@@ -864,10 +932,11 @@ public class OA2SE extends ServiceEnvironmentImpl {
 
     /**
      * Is this the default server virtual issuer?
+     *
      * @param vi
      * @return
      */
-    public boolean isServerVI(VirtualIssuer vi){
+    public boolean isServerVI(VirtualIssuer vi) {
         return vi.getIdentifier().equals(SERVER_VI_ID);
     }
 }

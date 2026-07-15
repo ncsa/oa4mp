@@ -174,7 +174,8 @@ public abstract class StemConverter<V extends Identifiable> extends MapConverter
     }
 
     /**
-     * Convenience. If the value is not null, this will put it in the stem.
+     * Convenience. If the value is not null, this will put it in the stem. This handles dates
+     * as well by converting them to longs.
      * @param stem
      * @param key
      * @param value
@@ -184,7 +185,6 @@ public abstract class StemConverter<V extends Identifiable> extends MapConverter
             if(value instanceof Date){
                 put(stem,key, ((Date)value).getTime());
             }else{
-
                 put(stem,key, value);
             }
         }

@@ -5,5 +5,5 @@ This is not a release but will install the most recent
 development branch, termed mutable, for OA4MP. Generally
 this is only of interest to, for instance, developers
 who are testing specific features. It should not
-be installed for production purposes as there is not
+be installed for production purposes as there is no
 guarantee that it is wholly stable.

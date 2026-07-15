@@ -1,5 +1,6 @@
 package org.oa4mp.server.loader.oauth2.state;
 
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunRequest;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRuntimeEngine;
@@ -24,7 +25,19 @@ import org.qdl_lang.variables.VStack;
  * on 2/12/20 at  1:36 PM
  */
 public class ScriptRuntimeEngineFactory {
-    public static ScriptRuntimeEngine createRTE(OA2SE oa2SE, OA2ServiceTransaction transaction, TXRecord txRecord, JSONObject config) {
+    /**
+     * Create the runtime engine. If
+     * @param oa2SE
+     * @param transaction
+     * @param txRecord
+     * @param keys if null, these will be gotten from the environment. Pass them if you have them.
+     * @param config
+     * @return
+     */
+    public static ScriptRuntimeEngine createRTE(OA2SE oa2SE, OA2ServiceTransaction transaction,
+                                                TXRecord txRecord,
+                                                JSONWebKeys keys,
+                                                JSONObject config) {
         // note: No QDL tag means no scripting for QDL even if there is an environment configured.
         // This is because there is nothing to execute so no reason to incur the overhead of creating it.
 /*        if (config.containsKey(OA2ClientFunctorScriptsUtil.CLAIMS_KEY)) {
@@ -71,14 +84,11 @@ public class ScriptRuntimeEngineFactory {
             OA2State state = qrt.getState();
             state.setOa2se(oa2SE);
             //VirtualIssuer vo = oa2SE.getVI(oa2Client.getIdentifier());
-            state.setJsonWebKeys(oa2SE.getJsonWebKeys(oa2Client.getIdentifier()));
-/*
-            if (vo != null) {
-                state.setJsonWebKeys(vo.getJsonWebKeys());
-            } else {
-                state.setJsonWebKeys(oa2SE.getJsonWebKeys());
+            if(keys == null){
+                state.setJsonWebKeys(oa2SE.getJsonWebKeys(oa2Client.getIdentifier()));
+            }else {
+                state.setJsonWebKeys(keys);
             }
-*/
             state.setTransaction(transaction);
             state.setTxRecord(txRecord);
             state.setLogger(oa2SE.getMyLogger()); // This lets scripts write to the log.
@@ -89,7 +99,7 @@ public class ScriptRuntimeEngineFactory {
     }
 
     public static ScriptRuntimeEngine createRTE(OA2SE oa2SE, OA2ServiceTransaction transaction, JSONObject config) {
-        return createRTE(oa2SE, transaction, null, config);
+        return createRTE(oa2SE, transaction, null, null, config);
     }
 
 

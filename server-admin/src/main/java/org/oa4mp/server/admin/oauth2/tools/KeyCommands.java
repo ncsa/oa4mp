@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.IdentifiableMap;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.cli.FoundIdentifiables;
 import edu.uiuc.ncsa.security.util.cli.ArgumentNotFoundException;
 import edu.uiuc.ncsa.security.util.cli.CLIDriver;
@@ -58,7 +59,7 @@ public class KeyCommands extends OA4MPStoreCommands {
                 " " + LJustify(keRecord.getAlg(), s) +
                 " " + LJustify(keRecord.getUse(), s) +
                 " " + (keRecord.getValid() ? "true " : "false") + // make length match
-                //      " " + center((keRecord.getNbf() == null?"--": Iso8601.date2String(keRecord.getNbf())),width) +
+                " " + center((keRecord.getNbf() == null ? "--" : Iso8601.date2String(keRecord.getNbf())), width) +
                 " " + center((keRecord.getExp() == null ? "--" : Iso8601.date2String(keRecord.getExp())), width) +
                 " " + LJustify(keRecord.getVi().toString(), 35) +
                 " " + keRecord.getIdentifierString();
@@ -214,11 +215,15 @@ public class KeyCommands extends OA4MPStoreCommands {
         if (migrateServerKeys) {
             VirtualIssuer vi = viStore.get(OA2SE.SERVER_VI_ID);
             // if the default VI for the server does not exist, create it.
+            // https://github.com/ncsa/oa4mp/issues/305
             if (vi == null) {
                 vi = viStore.create();
                 vi.setIdentifier(OA2SE.SERVER_VI_ID);
                 vi.setValid(true);
-                vi.setDescription("Dafault OA4MP Server Configuration");
+                vi.setKeyRotationEnabled(true);
+                vi.setAtGracePeriod(getEnvironment().getMaxATLifetime());
+                vi.setCacheGracePeriod(24L * 3600 * 1000L);
+                vi.setDescription("Default OA4MP Server Configuration");
                 viStore.save(vi);
             }
             if (!getStore().getCurrentKeys(vi).isEmpty()) { // has keys in config. Contract is to move them
@@ -231,7 +236,7 @@ public class KeyCommands extends OA4MPStoreCommands {
                         return;
                     }
                     IdentifiableMap map = new IdentifiableMap();
-                    for(String kid : getEnvironment().getServerJWKS().keySet()){
+                    for (String kid : getEnvironment().getServerJWKS().keySet()) {
                         JSONWebKey webKey = getEnvironment().getServerJWKS().get(kid);
                         map.put(KEStoreUtilities.createSingleKERecord(getStore(),
                                 OA2SE.SERVER_VI_ID.getUri(), true, webKey, getEnvironment().getServerJWKS().getDefaultKeyID()));
@@ -326,15 +331,12 @@ public class KeyCommands extends OA4MPStoreCommands {
 
     public void get_current(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
-            say("get_current " + DEFAULT_SERVER_VI + " | index - get the current values for the given key");
+            say("get_current " + DEFAULT_SERVER_VI + " | index - get the current keys (valid or not) for a given VI");
+            say("No argument means to list the keys for the default VI.");
             return;
         }
         VIStore viStore = getEnvironment().getVIStore();
-        if (!inputLine.hasArgs()) {
-            say("no arguments provided");
-            return;
-        }
-        if (inputLine.getLastArg().equals(DEFAULT_SERVER_VI)) {
+        if ((!inputLine.hasArgs()) || inputLine.getLastArg().equals(DEFAULT_SERVER_VI)) {
             inputLine.setLastArg(OA2SE.SERVER_VI_ID.toString());
         }
         FoundIdentifiables foundIdentifiables = findByIDOrRS(viStore, inputLine.getLastArg());
@@ -342,11 +344,49 @@ public class KeyCommands extends OA4MPStoreCommands {
             say("VI not found");
             return;
         }
+        int total = 0;
         for (Identifiable identifiable : foundIdentifiables) {
             VirtualIssuer vi = (VirtualIssuer) identifiable;
-            say(getStore().getCurrentKeys(vi).toString());
+            JSONWebKeys keys = getStore().getCurrentKeys(vi);
+            String defaultID = keys.getDefaultKeyID();
+            total += keys.size();
+            boolean first = true;
+            for (String k : keys.keySet()) {
+                if(first){
+                    first = false;
+                }else{
+                    say("_____________________________________________________".substring(0,k.length()));
+                }
+                JSONWebKey jwk = keys.get(k);
+                k = (k.equals(defaultID) ? "*" : "") + k;
+
+                String out = fff("algorithm=", jwk.algorithm);
+                out = out + "\n" + fff("is valid", jwk.isValid());
+                out = out + "\n" + fff("use", jwk.use);
+                out = out + "\n" + fff("type", jwk.type);
+                if (jwk.isRSAKey() || jwk.isOctetKey()) {
+                    out = out + "\n" + fff("bits", Integer.toString(jwk.getSize()));
+                }
+                if (jwk.isECKey()) {
+                    out = out + "\n" + fff("curve", jwk.curve);
+                }
+                out = out + "\n" + fff("issued at" , jwk.issuedAt);
+                out = out + "\n" + fff("not before", jwk.notValidBefore);
+                out = out + "\n" + fff("expires at", jwk.expiresAt);
+                say(k + ":");
+                say(out);
+            }
+            say(keys.size() +" entries for " + vi.getIdentifierString());
+        }
+        if(1 < foundIdentifiables.size()){
+            say("Total keys found over " + foundIdentifiables.size() + " VIs: " + total);
         }
 
+    }
+
+    String fff(String key, Object value) {
+        return StringUtils.RJustify(key, 12) + " = "  +
+         (value == null ? "not set" : value.toString());
     }
 
     public static String KR_ALL = "-all";
@@ -383,8 +423,8 @@ public class KeyCommands extends OA4MPStoreCommands {
             rotateHelp(inputLine);
             return;
         }
-        if(!inputLine.hasArgs()){
-            say("no artguments provided");
+        if (!inputLine.hasArgs()) {
+            say("no arguments provided");
             return;
         }
         if (getEnvironment().getKEStore() == null) {
@@ -413,7 +453,7 @@ public class KeyCommands extends OA4MPStoreCommands {
             if (cacheLifetime != null) serverKEC.cacheGracePeriod = cacheLifetime;
             if (atLifetime != null) serverKEC.atGracePeriod = atLifetime;
             if (!serverKEC.isConfgured()) {
-                say("No ration configuration found.");
+                say("No server key configuration found. \n>>Use create_default in the vi component first");
                 return;
             }
         } else {
@@ -461,7 +501,12 @@ public class KeyCommands extends OA4MPStoreCommands {
             VIStore viStore = getEnvironment().getVIStore();
             FoundIdentifiables foundIdentifiables = findByIDOrRS(viStore, viID.toString());
             if (foundIdentifiables != null && !foundIdentifiables.isEmpty()) {
-                KEStoreUtilities.rotate(getEnvironment(), foundIdentifiables.getIdentifiers(), serverKEC,false);
+                Map map = KEStoreUtilities.rotate(getEnvironment(), foundIdentifiables.getIdentifiers(), serverKEC, false);
+                if(map.size() == 0){
+                    say("No keys found for VI \"" + viIDString + "\". This utility does not rotate keys that already have an expiration date.\nJust change that if you need to.");
+                }else {
+                    say("rotated " + map.size() + " keys");
+                }
                 return;
             } // Last ditch effort -- find in server config.
             if (viID.equals(OA2SE.SERVER_VI_ID)) {
@@ -483,7 +528,7 @@ public class KeyCommands extends OA4MPStoreCommands {
                 Map<Identifier, KERecord> map = getIdentifierKERecordMap(keys, true, null);
                 map = KEStoreUtilities.rotate(getStore(), map, serverKEC.cacheGracePeriod, serverKEC.atGracePeriod, false);
                 say("Rotated " + serverKERs.size() + " keys");
-            }else{
+            } else {
                 say("VI \"" + viIDString + "\" not found");
             }
             return;
@@ -667,7 +712,7 @@ public class KeyCommands extends OA4MPStoreCommands {
                     map = new HashMap<>();
                     for (JSONWebKey webKey : jwks.values()) {
                         KERecord keRecord = KEStoreUtilities.createSingleKERecord(getStore(), OA2SE.SERVER_VI_ID.getUri(), true, webKey, jwks.getDefaultKeyID());
-                        map.put(keRecord.getIdentifier(), keRecord );
+                        map.put(keRecord.getIdentifier(), keRecord);
                     }
                 }
             }
@@ -752,19 +797,6 @@ public class KeyCommands extends OA4MPStoreCommands {
             return;
         }
         super.ls(inputLine);
-    }
-    public static String PURGE_TIMESTAMP_FLAG = "-ts";
-    public static final String PURGE_ALL_VIS = "-all";
-    public static final String PURGE_LIST = "-list";
-
-    public void purge(InputLine inputLine) throws Throwable {
-        if (showHelp(inputLine)) {
-            say("purge [" + PURGE_TIMESTAMP_FLAG + " iso | ms] [" + PURGE_LIST + " [vi] - Purge, i.e., remove old keys.  The default is to list keys that have expired.");
-            say("age - get the age of the keys for the server");
-            say(PURGE_TIMESTAMP_FLAG + " -an ISO 8601 timestamp or milliseconds since epoch. This also accepts \"now\" as an argument. This will be used as the cur off, so you can list expired keys before this date, or purge them.");
-            say(PURGE_ALL_VIS + " - apply this to all VIs. Default is to apply it to the server keys only.");
-            return;
-        }
     }
 }
 

@@ -105,7 +105,7 @@ public class UserInfoServlet extends BearerTokenServlet {
                 null));
         idTokenHandler.refreshAccountingInformation();
 
-        HandlerRunner handlerRunner = new HandlerRunner(transaction, ScriptRuntimeEngineFactory.createRTE(oa2SE, transaction, null, resolvedClient.getConfig()));
+        HandlerRunner handlerRunner = new HandlerRunner(transaction, ScriptRuntimeEngineFactory.createRTE(oa2SE, transaction, null, null, resolvedClient.getConfig()));
         OA2ClientUtils.setupHandlers(handlerRunner, oa2SE, transaction, resolvedClient, request);
         try {
             handlerRunner.doUserInfo();
