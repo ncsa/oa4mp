@@ -33,6 +33,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
+import static edu.uiuc.ncsa.security.core.util.StringUtils.pad2;
 import static edu.uiuc.ncsa.security.util.cli.CLIDriver.CLEAR_BUFFER_COMMAND;
 import static edu.uiuc.ncsa.security.util.cli.CLIDriver.EXIT_COMMAND;
 import static org.oa4mp.delegation.server.storage.ClientApproval.Status.*;
@@ -195,6 +197,14 @@ public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
         int i = 0;
         getSortable().setState(null);
         entries = getSortable().sort(entries);
+        int countLength = Integer.toString(entries.size()).length();
+
+        if(!lineList){
+            String header = columnHeader(countLength);
+            if(!isTrivial(header)){
+                say(header);
+            }
+        }
         for (Identifiable x : entries) {
             ClientApproval tempA = approvalMap.get(x.getIdentifier());
             if (tempA == null) {
@@ -211,8 +221,7 @@ public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
                     longFormat((BaseClient) x, tempA, true);
 
                 } else {
-                    say(i + ". " + format((BaseClient) x, tempA));
-
+                    say(formatCounter(i, countLength) + ". " + format((BaseClient) x, tempA));
                 }
                 i++;
             }
@@ -260,23 +269,37 @@ public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
     ClientApprovalStore clientApprovalStore;
 
     protected String format(BaseClient client, ClientApproval ca) {
-        String rc = null;
+        String rc = "(";
         if (ca == null) {
-            rc = "(?) " + client.getIdentifier() + " ";
+            rc = rc + "?";
         } else {
             boolean isApproved = ca != null && ca.isApproved();
-            rc = "(" + (isApproved ? "Y" : "N") + ") " + client.getIdentifier() + " ";
+            rc =  rc + (isApproved ? "Y" : "N") ;
         }
-        String name = (client.getName() == null ? "no name" : client.getName());
-        if (20 < name.length()) {
-            name = name.substring(0, 20) + "...";
-        }
-        rc = rc + "(" + name + ")";
-        rc = rc + " created on " + Iso8601.date2String(client.getCreationTS());
+        rc  = rc + ")";
+        //rc = rc + " created on " + Iso8601.date2String(client.getCreationTS());
+        String name = (client.getName() == null ? "---" : client.getName());
+        rc = rc  + " " + pad2(name, 35);
+        rc = rc + " " + pad2(Iso8601.date2String(client.getCreationTS()), 27);
+        rc = rc + " " + client.getIdentifierString();
         return rc;
-
     }
 
+    @Override
+    protected String columnHeader(int offset) {
+        String out = StringUtils.getBlanks(offset + 2);
+        out = out +  pad2("app", 3)
+                + " " + pad2("name", 35)
+                + " " + pad2("creation date", 27)
+                + " " + "identifier";
+        return out;
+    }
+
+    /*
+      0. (Y) myproxy:oa4mp,2012:/client_id/77e050c68e7d6728b60ac9e919c64944 (OIDC DEV Client) created on 2017-08-22T16:14:49.000Z
+      1. (Y) cilogon:/client_id/19f315500e6f4def300518b624401cb4 (Ashigaru test client...) created on 2018-05-31T19:39:28.000Z
+      2. (Y) cilogon:/client_id/100c74e105fb9652d80817d4106b5696 (Serge CILogon OIDC T...) created on 2018-06-08T18:34:05.000Z
+     */
     @Override
     protected String archiveFormat(Identifiable identifiable) {
         Long version = getStoreArchiver().getVersionNumber(identifiable.getIdentifier());
@@ -775,7 +798,7 @@ public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
         }
 
 
-        if (StringUtils.isTrivial(secret)) {
+        if (isTrivial(secret)) {
             say("sorry but could not determine a secret for client '" + client.getIdentifier() + "'");  // test just in case.
             return;
         }

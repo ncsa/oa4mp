@@ -75,8 +75,15 @@ public class TransactionStoreCommands extends OA4MPStoreCommands {
     @Override
     protected String format(Identifiable identifiable) {
         OA2ServiceTransaction t = (OA2ServiceTransaction) identifiable;
-        return "id : " + t.getIdentifierString() + " | " +
-                "auth time : " + t.getAuthTime();
+        return StringUtils.pad2(Iso8601.date2String(t.getAuthTime()), 27) + " " + t.getIdentifierString();
+    }
+
+    @Override
+    protected String columnHeader(int offset) {
+        String out = StringUtils.getBlanks(offset + 2)
+                + pad2("auth time", 27)
+                + " identifier";
+        return out;
     }
 
     public void tokens(InputLine inputLine) throws Throwable {

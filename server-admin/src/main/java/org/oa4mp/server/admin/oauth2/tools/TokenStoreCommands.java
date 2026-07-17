@@ -3,6 +3,8 @@ package org.oa4mp.server.admin.oauth2.tools;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
+import edu.uiuc.ncsa.security.core.util.Iso8601;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.util.cli.CLIDriver;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import org.oa4mp.server.admin.oauth2.base.OA4MPStoreCommands;
@@ -11,6 +13,7 @@ import org.oa4mp.server.loader.oauth2.storage.tx.TXStore;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -38,7 +41,7 @@ public class TokenStoreCommands extends OA4MPStoreCommands {
     }
 
     @Override
-    protected String format(Identifiable identifiable) {
+    protected String format(Identifiable identifiable) { // old but does not get callewd any more. Keep for reference
         TXRecord txRecord = (TXRecord) identifiable;
         Date issuedAt = new Date();
         Date expiresAt = new Date();
@@ -47,6 +50,26 @@ public class TokenStoreCommands extends OA4MPStoreCommands {
         String r = txRecord.getIdentifierString() + "\n" + INDENT + "  parent= " + txRecord.getParentID() +
                 "\n" + INDENT + "  issued at " + issuedAt + ", expires at " + expiresAt;
         return r;
+    }
+
+    @Override
+    protected String format(Identifiable identifiable, int offset) {
+        TXRecord txRecord = (TXRecord) identifiable;
+        HashMap<String,String> map = new HashMap<>();
+        map.put("issued at", Iso8601.date2String(txRecord.getIssuedAt()));
+        map.put("expires at", Iso8601.date2String(txRecord.getExpiresAt()));
+        map.put("parent", txRecord.getParentID().toString());
+        map.put("identifier", txRecord.getIdentifierString());
+        List<String> pp = StringUtils.formatMap(map,null, false,false,
+                3,150);
+        String out = "";
+        boolean isFirst = true;
+        String blanks = StringUtils.getBlanks(offset+4);
+        for(String x : pp){
+            out = out + (isFirst?"":("\n" + blanks)) + x;
+            if (isFirst) isFirst = false;
+        }
+        return out;
     }
 
     protected TXStore<? extends TXRecord> getTXStore() {

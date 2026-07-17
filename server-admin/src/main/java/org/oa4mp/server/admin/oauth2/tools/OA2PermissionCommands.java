@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.util.cli.CLIDriver;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
@@ -15,6 +16,7 @@ import org.oa4mp.server.api.admin.permissions.PermissionsStore;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -40,10 +42,31 @@ public class OA2PermissionCommands extends OA4MPStoreCommands {
 
     @Override
     protected String format(Identifiable identifiable) {
+        return null;
+    }
+    protected String format(Identifiable identifiable, int offset ) {
+        Permission p = (Permission) identifiable;
+        HashMap<String, String> map = new HashMap<>();
+       map.put("admin", p.getAdminID().toString());
+       map.put("client", p.getClientID().toString());
+       map.put("ersatz id = ", p.getErsatzChain().toString());
+       map.put("identifier", p.getIdentifier().toString());
+       List<String> pp = StringUtils.formatMap(map,null, false,false, 3,100);
+       String out = "";
+       boolean isFirst = true;
+       String blanks = StringUtils.getBlanks(offset+4);
+       for(String x : pp){
+           out = out + (isFirst?"":("\n" + blanks)) + x;
+           if (isFirst) isFirst = false;
+       }
+       return out;
+    }
+    protected String OLDformat(Identifiable identifiable) {
         Permission p = (Permission) identifiable;
         String output = "admin=" + p.getAdminID() + ", client=" + p.getClientID() + ", ersatz id=" + p.getErsatzChain() + ", id=" + p.getIdentifierString();
         return output;
     }
+
 
     @Override
     public boolean update(Identifiable identifiable) throws IOException {
@@ -89,6 +112,10 @@ public class OA2PermissionCommands extends OA4MPStoreCommands {
         return false;
     }
 
+    @Override
+    protected String columnHeader(int offset) {
+        return super.columnHeader(offset);
+    }
 
     protected void removeEntry(Identifiable identifiable, JSONObject json) {
         HashMap<String, Object> map = new HashMap();

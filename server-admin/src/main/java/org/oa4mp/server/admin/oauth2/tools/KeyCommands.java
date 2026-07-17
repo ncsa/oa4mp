@@ -30,6 +30,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.*;
 
 import static edu.uiuc.ncsa.security.core.util.StringUtils.*;
+import static edu.uiuc.ncsa.security.core.util.StringUtils.center;
 
 public class KeyCommands extends OA4MPStoreCommands {
 
@@ -63,6 +64,22 @@ public class KeyCommands extends OA4MPStoreCommands {
                 " " + center((keRecord.getExp() == null ? "--" : Iso8601.date2String(keRecord.getExp())), width) +
                 " " + LJustify(keRecord.getVi().toString(), 35) +
                 " " + keRecord.getIdentifierString();
+        return out;
+    }
+
+    @Override
+    protected String columnHeader(int offset) {
+        int width = 25; // long width, for ISO dates e.g.
+        int s = 5; // short width
+        String out = StringUtils.getBlanks(offset + 2);
+        out = out + pad2("kid",35) +
+                " " + pad2("alg",s) +
+                " " + pad2("use", s) +
+                " " + pad2("valid" , s) +
+                " " + pad2("not before", width) +
+                " " + pad2("expires", width) +
+                " " + pad2("VI", 35) +
+                " " + "identifier";
         return out;
     }
 
@@ -398,12 +415,13 @@ public class KeyCommands extends OA4MPStoreCommands {
     protected void rotateHelp(InputLine inputLine) {
         say("rotate [" + KR_ALL + " | " + KR_KID + " id | " + KR_VI + " vi " +
                 KR_CACHE_LIFETIME + " cache_lifetime " +
-                KR_AT_LIFETIME + " access_token_lifetime | index] - rotate the key at the given index");
+                KR_AT_LIFETIME + " access_token_lifetime -test | index] - rotate the key at the given index");
         say(KR_ALL + " = rotate all keys in the store. If the " + KR_VI + " argument is present, this is ignored and only the speicifed VI is rotated.");
         say(KR_KID + " = rotate the specific key by is key id.");
         say(KR_VI + " = rotate the keys by for a given virtual issuer. A valid of default rotates the server keys.");
         say(KR_CACHE_LIFETIME + " = set the cache lifetime grace perdiod. Default is 24 hours.");
         say(KR_AT_LIFETIME + " = set the access token lifetime grace period. Default is the max server access token lifetime.");
+        say("-test = (flag) test only, do not actually rotate the keys.");
         say("The index is the index (unique identifier or element in a result set) of the key in the store.");
         say("This will rotate the key(s) either per VI's policy or you may directly set the lifetimes");
         say("Setting at least one of " + KR_CACHE_LIFETIME + " or " + KR_AT_LIFETIME + " will override the policy");
@@ -435,7 +453,8 @@ public class KeyCommands extends OA4MPStoreCommands {
         Long atLifetime = null;
         Identifier viID = null;
         boolean overrideKEC = false;
-
+         boolean testOnly = inputLine.hasArg("-test");
+         inputLine.removeSwitch("-test");
         if (inputLine.hasArg(KR_CACHE_LIFETIME)) {
             cacheLifetime = TimeUtil.getValueSecsOrMillis(inputLine.getNextArgFor(KR_CACHE_LIFETIME), true);
             inputLine.removeSwitchAndValue(KR_CACHE_LIFETIME);
@@ -479,11 +498,17 @@ public class KeyCommands extends OA4MPStoreCommands {
                     if (cacheLifetime == null) cacheLifetime = keConfiguration.cacheGracePeriod;
                     if (atLifetime == null) atLifetime = keConfiguration.atGracePeriod;
                 }
-                KERecord newRecord = KEStoreUtilities.rotate(getEnvironment().getKEStore(), keRecord, cacheLifetime, atLifetime);
+                KERecord newRecord = KEStoreUtilities.rotate(getEnvironment().getKEStore(),
+                        keRecord, cacheLifetime, atLifetime, testOnly);
                 newRecord.setValid(true);
-                getEnvironment().getKEStore().update(keRecord);
-                getEnvironment().getKEStore().save(newRecord);
-                say("rotated key, kid= " + newRecord.getKid());
+                if(testOnly) {
+                    say("Test rotation of key with ID " + keRecord.getKid());
+                }else{
+                    getEnvironment().getKEStore().update(keRecord);
+                    getEnvironment().getKEStore().save(newRecord);
+
+                    say("rotated key, kid= " + newRecord.getKid());
+                }
             }
             return;
         }
@@ -501,11 +526,22 @@ public class KeyCommands extends OA4MPStoreCommands {
             VIStore viStore = getEnvironment().getVIStore();
             FoundIdentifiables foundIdentifiables = findByIDOrRS(viStore, viID.toString());
             if (foundIdentifiables != null && !foundIdentifiables.isEmpty()) {
-                Map map = KEStoreUtilities.rotate(getEnvironment(), foundIdentifiables.getIdentifiers(), serverKEC, false);
+                Map<Identifier, KERecord> map = KEStoreUtilities.rotate(getEnvironment(), foundIdentifiables.getIdentifiers(),
+                        serverKEC, false, testOnly);
                 if(map.size() == 0){
-                    say("No keys found for VI \"" + viIDString + "\". This utility does not rotate keys that already have an expiration date.\nJust change that if you need to.");
+                    say("No keys found for VI \"" + viIDString + "\". This utility only rotates valid keys that no not " +
+                            "have an expiration date." +
+                            "\nJust change that if you need to.");
                 }else {
-                    say("rotated " + map.size() + " keys");
+                    if(testOnly){
+                        say("Testing found  " + map.size() + " keys to rotate. No keys altered or added. Key IDs are");
+                        for(Identifier id : map.keySet()){
+                            KERecord keRecord = map.get(id);
+                            say(keRecord.getKid() + " (" + keRecord.getAlg() + ")");
+                        }
+                    }else{
+                        say("rotated " + map.size() + " keys");
+                    }
                 }
                 return;
             } // Last ditch effort -- find in server config.
@@ -516,7 +552,7 @@ public class KeyCommands extends OA4MPStoreCommands {
 
                 Map<Identifier, KERecord> serverKERs = getStore().getByVI(vi); // it is *possible* that there is no VI if it's the default.
                 if (serverKERs != null && !serverKERs.isEmpty()) {
-                    serverKERs = KEStoreUtilities.rotate(getStore(), serverKERs, serverKEC.cacheGracePeriod, serverKEC.atGracePeriod, true);
+                    serverKERs = KEStoreUtilities.rotate(getStore(), serverKERs, serverKEC.cacheGracePeriod, serverKEC.atGracePeriod, true, testOnly);
                     say("Rotated " + serverKERs.size() + " keys");
                     return;
                 }
@@ -526,8 +562,17 @@ public class KeyCommands extends OA4MPStoreCommands {
                     return;
                 }
                 Map<Identifier, KERecord> map = getIdentifierKERecordMap(keys, true, null);
-                map = KEStoreUtilities.rotate(getStore(), map, serverKEC.cacheGracePeriod, serverKEC.atGracePeriod, false);
-                say("Rotated " + serverKERs.size() + " keys");
+                map = KEStoreUtilities.rotate(getStore(), map, serverKEC.cacheGracePeriod, serverKEC.atGracePeriod, false, testOnly);
+                if(testOnly){
+                 say("tested and found " + map.size() + " keys to rotate:");
+                 for(Identifier id : map.keySet()){
+                     KERecord keRecord = map.get(id);
+                     say(keRecord.getKid() + " (" + keRecord.getAlg() + ")");
+                 }
+                 say("No keys altered or added.");
+                }else {
+                    say("Rotated " + serverKERs.size() + " keys");
+                }
             } else {
                 say("VI \"" + viIDString + "\" not found");
             }
@@ -551,8 +596,12 @@ public class KeyCommands extends OA4MPStoreCommands {
                 KERecord keRecord = (KERecord) identifiable;
                 keRecords.put(keRecord.getIdentifier(), keRecord);
             }
-            Map<Identifier, KERecord> newRecords = KEStoreUtilities.rotate(getStore(), keRecords, cacheLifetime, atLifetime, true);
-            say("rotated " + newRecords.size() + " keys");
+            Map<Identifier, KERecord> newRecords = KEStoreUtilities.rotate(getStore(), keRecords, cacheLifetime, atLifetime, true,testOnly);
+            if(testOnly){
+                say("tested and found " + newRecords.size() + " keys to rotate:");
+            }else{
+                say("rotated " + newRecords.size() + " keys");
+            }
             return;
         }
 

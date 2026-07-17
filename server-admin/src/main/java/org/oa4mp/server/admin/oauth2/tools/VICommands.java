@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.cli.FoundIdentifiables;
 import edu.uiuc.ncsa.security.util.cli.CLIDriver;
@@ -323,9 +324,18 @@ public class VICommands extends OA4MPStoreCommands {
     @Override
     protected String format(Identifiable identifiable) {
         VirtualIssuer vo = (VirtualIssuer) identifiable;
-        return vo.getIdentifierString() + " (" + vo.getTitle() + ") created on " + vo.getCreationTS();
+        return pad2(vo.getTitle(), 35)
+                + " " + pad2(Iso8601.date2String(vo.getCreationTS()), 27)
+                + " " + vo.getIdentifierString();
     }
 
+    @Override
+    protected String columnHeader(int offset) {
+        return StringUtils.getBlanks(offset+2)
+                + pad2("title",35)
+                + " " + pad2("creation date", 27) +
+                " identifier";
+    }
 
     @Override
     public void initHelp() throws Throwable {

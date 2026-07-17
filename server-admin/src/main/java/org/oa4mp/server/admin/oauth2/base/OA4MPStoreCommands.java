@@ -259,4 +259,14 @@ say("and for QDL lists, see");
     public void about(boolean showBanner, boolean showHeader) {
        // No-op since logo is not displayed by components
     }
+
+    @Override
+    protected String columnHeader(int offset) {
+        return null;
+    }
+
+    @Override
+    protected String format(Identifiable identifiable, int offset) {
+        return format(identifiable);
+    }
 }

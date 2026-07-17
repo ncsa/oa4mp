@@ -3,6 +3,7 @@ package org.oa4mp.server.admin.oauth2.base;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
+import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.cli.FoundIdentifiables;
 import edu.uiuc.ncsa.security.util.cli.CLIDriver;
@@ -14,6 +15,8 @@ import org.oa4mp.delegation.server.storage.ClientApprovalStore;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+
+import static edu.uiuc.ncsa.security.core.util.StringUtils.pad2;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -51,11 +54,25 @@ public class ClientApprovalStoreCommands extends OA4MPStoreCommands {
             case PENDING:
             case NONE:
         }
-        String x = "(" + statusString + ") " + ca.getIdentifierString();
+        String x = pad2(statusString, 6);
         if (ca.isApproved() || ca.getStatus() == ClientApproval.Status.APPROVED) {
-            x = x + " by \"" + ca.getApprover() + "\" on " + ca.getApprovalTimestamp();
+            x = x + " " + pad2(ca.getApprover(),30) +
+                    " " + pad2(Iso8601.date2String(ca.getApprovalTimestamp()), 27);
+        }else{
+            x = x + " " + pad2("---",30) +
+                    " " + pad2("---", 27);
         }
+        x = x + " " + ca.getIdentifierString();
         return x;
+    }
+
+    @Override
+    protected String columnHeader(int offset) {
+        return StringUtils.getBlanks(offset + 2) +
+                "status"
+                + " " + pad2("by", 30)
+                + " " + pad2("approved on", 27) +
+                " " + "identifier";
     }
 
     @Override
@@ -100,6 +117,7 @@ public class ClientApprovalStoreCommands extends OA4MPStoreCommands {
         info("Approval update cancelled for id=" + clientApproval.getIdentifierString());
         return false;
     }
+
     public void showApproveHelp() {
         say("approve index");
         say("This is the simple case of approving a client or set of them.");
@@ -111,9 +129,10 @@ public class ClientApprovalStoreCommands extends OA4MPStoreCommands {
         say("\nSee also: set_status");
     }
 
-    public static boolean hasApprover(){
-        return approver.length()!=0;
+    public static boolean hasApprover() {
+        return approver.length() != 0;
     }
+
     public static String getApprover() {
         return approver;
     }
@@ -135,9 +154,9 @@ public class ClientApprovalStoreCommands extends OA4MPStoreCommands {
         approver = getInput("approver", getApprover());
         FoundIdentifiables identifiables = findItem(inputLine);
         for (Identifiable identifiable : identifiables) {
-            if(approve((ClientApproval) identifiable, isapproved, approver)){
+            if (approve((ClientApproval) identifiable, isapproved, approver)) {
                 pass++;
-            }else{
+            } else {
                 fail++;
             }
         }
@@ -172,7 +191,7 @@ public class ClientApprovalStoreCommands extends OA4MPStoreCommands {
         }
         for (Identifiable i : item) {
             ClientApproval approval = (ClientApproval) i;
-            if(item.isRS()){
+            if (item.isRS()) {
                 // Result sets are static and should supply the identifier. Don't just
                 // use the result set since that may overwrite other changes during save.
                 approval = (ClientApproval) getStore().get(approval.getIdentifierString());
@@ -220,7 +239,7 @@ public class ClientApprovalStoreCommands extends OA4MPStoreCommands {
     public boolean approve(ClientApproval ca) throws IOException {
         boolean isapproved = isOk(getInput("set approved?", ca.isApproved() ? "y" : "n"));
         String approver = getInput("approver", ca.getApprover());
-       return  approve(ca, isapproved, approver);
+        return approve(ca, isapproved, approver);
     }
 
     /**
@@ -229,6 +248,7 @@ public class ClientApprovalStoreCommands extends OA4MPStoreCommands {
      * and are exposed as static methods to be called by other classes to central approvals.
      * This does do the save of this record since it has the logic to invoke {@link Store#update(Identifiable)}
      * versus {@link Store#save(Identifiable)}
+     *
      * @param identifier
      * @param isapproved
      * @param approver
@@ -240,21 +260,22 @@ public class ClientApprovalStoreCommands extends OA4MPStoreCommands {
                                                      String approver) throws IOException {
         ClientApproval ca;
         boolean wasCreated = false;
-        if(caStore.containsKey(identifier)){
+        if (caStore.containsKey(identifier)) {
             ca = (ClientApproval) caStore.get(identifier);
-        }else{
+        } else {
             ca = (ClientApproval) caStore.create();
             ca.setIdentifier(identifier);
             wasCreated = true;
         }
         setupApprovalRecord(ca, isapproved, approver);
-        if(wasCreated){
+        if (wasCreated) {
             caStore.save(ca);
-        }else{
+        } else {
             caStore.update(ca);
         }
         return ca;
     }
+
     protected boolean approve(ClientApproval ca, boolean isapproved, String approver) throws IOException {
         setupApprovalRecord(ca, isapproved, approver);
 
@@ -272,6 +293,7 @@ public class ClientApprovalStoreCommands extends OA4MPStoreCommands {
 
     /**
      * Does the work of setting the approval status, approver etc. Does not save it.
+     *
      * @param ca
      * @param isapproved
      * @param approver
