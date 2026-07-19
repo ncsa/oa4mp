@@ -33,8 +33,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
-import static edu.uiuc.ncsa.security.core.util.StringUtils.pad2;
+import static edu.uiuc.ncsa.security.core.util.Iso8601.ISO_8601_FORMAT_LENGTH;
+import static edu.uiuc.ncsa.security.core.util.StringUtils.*;
 import static edu.uiuc.ncsa.security.util.cli.CLIDriver.CLEAR_BUFFER_COMMAND;
 import static edu.uiuc.ncsa.security.util.cli.CLIDriver.EXIT_COMMAND;
 import static org.oa4mp.delegation.server.storage.ClientApproval.Status.*;
@@ -183,7 +183,8 @@ public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
     }
 
     @Override
-    protected List<Identifiable> listEntries(List<Identifiable> entries, boolean lineList, boolean verboseList) {
+    protected List<Identifiable> listEntries(List<Identifiable> entries, boolean showVersions,
+                                             boolean lineList, boolean verboseList) {
         if (entries == null || entries.isEmpty()) {
             say("(no entries found)");
             return entries;
@@ -206,6 +207,8 @@ public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
             }
         }
         for (Identifiable x : entries) {
+            if(edu.uiuc.ncsa.security.storage.cli.StoreArchiver.isVersioned(x.getIdentifier()) && !showVersions) {continue;}
+
             ClientApproval tempA = approvalMap.get(x.getIdentifier());
             if (tempA == null) {
                 tempA = new ClientApproval(x.getIdentifier());
@@ -230,45 +233,28 @@ public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
 
     }
 
-/*    @Override
-    protected List<Identifiable> listAll(boolean useLongFormat, String otherFlags) {
-        loadAllEntries();
-
-        if (allEntries.isEmpty()) {
-            say("(no entries found)");
-            return allEntries;
-        }
-        List<ClientApproval> approvals = getClientApprovalStore().getAll();
-        HashMap<Identifier, ClientApproval> approvalMap = new HashMap<>();
-        for (ClientApproval a : approvals) {
-            approvalMap.put(a.getIdentifier(), a);
-        }
-
-        int i = 0;
-        getSortable().setState(otherFlags);
-        allEntries = getSortable().sort(allEntries);
-        for (Identifiable x : allEntries) {
-            ClientApproval tempA = approvalMap.get(x.getIdentifier());
-            if (tempA == null) {
-                tempA = new ClientApproval(x.getIdentifier());
-                tempA.setStatus(ClientApproval.Status.NONE);
-            }
-            if (useLongFormat) {
-                if (i != 0) {
-                    say("-----");
-                }
-                longFormat((BaseClient) x, tempA, false);
-            } else {
-                say(i + ". " + format((BaseClient) x, tempA));
-            }
-            i++;
-        }
-        return allEntries;
-    }*/
 
     ClientApprovalStore clientApprovalStore;
 
     protected String format(BaseClient client, ClientApproval ca) {
+       return NEWformat(client,ca);
+    }
+    protected String NEWformat(BaseClient client, ClientApproval ca) {
+        String rc = "";
+        if (ca == null) {
+            rc = rc + "?";
+        } else {
+            boolean isApproved = ca != null && ca.isApproved();
+            rc =  rc + (isApproved ? "Y" : "N") ;
+        }
+        String name = (client.getName() == null ? "---" : client.getName());
+        rc = rc  + STILE +  pad2(name, 35);
+        rc = rc + STILE + pad2(Iso8601.date2String(client.getCreationTS()), ISO_8601_FORMAT_LENGTH);
+        rc = rc + STILE + client.getIdentifierString();
+
+        return rc;
+    }
+    protected String OLDformat(BaseClient client, ClientApproval ca) {
         String rc = "(";
         if (ca == null) {
             rc = rc + "?";
@@ -278,9 +264,9 @@ public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
         }
         rc  = rc + ")";
         //rc = rc + " created on " + Iso8601.date2String(client.getCreationTS());
-        String name = (client.getName() == null ? "---" : client.getName());
-        rc = rc  + " " + pad2(name, 35);
-        rc = rc + " " + pad2(Iso8601.date2String(client.getCreationTS()), 27);
+        String name = (client.getName() == null ? center("---",35) : pad2(client.getName(), 35));
+        rc = rc  + " " + name ;
+        rc = rc + " " + pad2(Iso8601.date2String(client.getCreationTS()), ISO_8601_FORMAT_LENGTH);
         rc = rc + " " + client.getIdentifierString();
         return rc;
     }
@@ -288,10 +274,10 @@ public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
     @Override
     protected String columnHeader(int offset) {
         String out = StringUtils.getBlanks(offset + 2);
-        out = out +  pad2("app", 3)
-                + " " + pad2("name", 35)
-                + " " + pad2("creation date", 27)
-                + " " + "identifier";
+        out = out +  "a" // for "approved?"
+                + STILE + pad2("name", 35)
+                + STILE + pad2("creation date", ISO_8601_FORMAT_LENGTH)
+                + STILE + "identifier";
         return out;
     }
 
@@ -436,6 +422,7 @@ public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
         }
         say(identifiables.size() + " clients " + (doApproval ? "approved." : "unapproved."));
     }
+
 
     protected abstract ApprovalModsConfig createApprovalModsConfig(InputLine inputLine, BaseClient client, boolean doPrompt);
 

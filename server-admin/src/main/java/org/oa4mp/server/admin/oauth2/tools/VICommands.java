@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static edu.uiuc.ncsa.security.core.util.Iso8601.ISO_8601_FORMAT_LENGTH;
 import static edu.uiuc.ncsa.security.core.util.StringUtils.*;
 
 /**
@@ -323,18 +324,21 @@ public class VICommands extends OA4MPStoreCommands {
 
     @Override
     protected String format(Identifiable identifiable) {
-        VirtualIssuer vo = (VirtualIssuer) identifiable;
-        return pad2(vo.getTitle(), 35)
-                + " " + pad2(Iso8601.date2String(vo.getCreationTS()), 27)
-                + " " + vo.getIdentifierString();
+        VirtualIssuer vi = (VirtualIssuer) identifiable;
+        String path = isTrivial(vi.getDiscoveryPath()) ? center("---",40) : vi.getDiscoveryPath();
+        return pad2(vi.getTitle(), 35)
+                + STILE + pad2(path, 40)
+                + STILE + pad2(Iso8601.date2String(vi.getCreationTS()), ISO_8601_FORMAT_LENGTH)
+                + STILE + vi.getIdentifierString();
     }
 
     @Override
     protected String columnHeader(int offset) {
         return StringUtils.getBlanks(offset+2)
                 + pad2("title",35)
-                + " " + pad2("creation date", 27) +
-                " identifier";
+                + STILE + pad2("discovery path", 40)
+                + STILE + pad2("creation date", ISO_8601_FORMAT_LENGTH)
+                + STILE + "identifier";
     }
 
     @Override

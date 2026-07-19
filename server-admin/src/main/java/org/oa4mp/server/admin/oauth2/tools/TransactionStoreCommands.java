@@ -35,6 +35,7 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import static edu.uiuc.ncsa.security.core.cache.LockingCleanup.lockID;
+import static edu.uiuc.ncsa.security.core.util.Iso8601.ISO_8601_FORMAT_LENGTH;
 import static edu.uiuc.ncsa.security.core.util.StringUtils.*;
 
 /**
@@ -75,14 +76,14 @@ public class TransactionStoreCommands extends OA4MPStoreCommands {
     @Override
     protected String format(Identifiable identifiable) {
         OA2ServiceTransaction t = (OA2ServiceTransaction) identifiable;
-        return StringUtils.pad2(Iso8601.date2String(t.getAuthTime()), 27) + " " + t.getIdentifierString();
+        return StringUtils.pad2(Iso8601.date2String(t.getAuthTime()), ISO_8601_FORMAT_LENGTH) + STILE + t.getIdentifierString();
     }
 
     @Override
     protected String columnHeader(int offset) {
         String out = StringUtils.getBlanks(offset + 2)
-                + pad2("auth time", 27)
-                + " identifier";
+                + pad2("auth time", ISO_8601_FORMAT_LENGTH)
+                + STILE + "identifier";
         return out;
     }
 
@@ -374,7 +375,7 @@ if(1 < foundIdentifiables.size()){
         try {
             super.ls(inputLine);
         } catch (Throwable t) {
-            say("uh-oh... there wasn an error:" + t.getMessage());
+            say("uh-oh... there was an error:" + t.getMessage());
             return;
         }
         // set it back.

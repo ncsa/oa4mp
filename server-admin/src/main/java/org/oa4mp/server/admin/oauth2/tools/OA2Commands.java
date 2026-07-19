@@ -23,8 +23,7 @@ import org.oa4mp.server.loader.oauth2.loader.OA2CFConfigurationLoader;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import static edu.uiuc.ncsa.security.core.util.StringUtils.pad2;
-import static edu.uiuc.ncsa.security.core.util.StringUtils.repeatString;
+import static edu.uiuc.ncsa.security.core.util.StringUtils.*;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -164,15 +163,16 @@ protected static void newMain(String[] args) {
 
     @Override
     public void useHelp() {
+        int width = 11;
         say("Choose the component you wish to use.");
         say("you specify the component as use + name. Supported components are");
-        say(CLIENTS + " - edit client records");
-        say(CLIENT_APPROVALS + " - edit client approval records");
-        say(PERMISSIONS + " - basic permission management.");
-        say(ADMINS + " - create or manage administrative clients.");
-        say(TOKENS + " - manage tokens created in the token exchange endpoint");
-        sayi(KEYS + " - manage keys used for singing and validation");
-        say(VIRTUAL_ISSUER + " - manage virtual issuers");
+        say(RJustify(CLIENTS,width) + " - edit client records");
+        say(RJustify(CLIENT_APPROVALS, width) + " - edit client approval records");
+        say(RJustify(PERMISSIONS, width) + " - basic permission management.");
+        say(RJustify(ADMINS, width) + " - create or manage administrative clients.");
+        say(RJustify(TOKENS, width) + " - manage tokens created in the token exchange endpoint");
+        say(RJustify(KEYS, width) + " - manage keys used for singing and validation");
+        say(RJustify(VIRTUAL_ISSUER, width) + " - manage virtual issuers");
         say("e.g.\n\nuse " + CLIENTS + "\n\nwill call up the client management component.");
         say("Type 'exit' or /q when you wish to exit the component and return to the main menu");
         say(" --> and /h prints your command history, /r runs the last command");

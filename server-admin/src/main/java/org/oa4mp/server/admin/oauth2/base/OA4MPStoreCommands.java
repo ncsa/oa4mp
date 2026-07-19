@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static edu.uiuc.ncsa.security.util.cli.CLIDriver.LIST_ALL_METHODS_COMMAND;
 import static org.qdl_lang.variables.values.QDLValue.asQDLValue;
 
 /**
@@ -155,7 +154,8 @@ rs show -range [2^2;2^3] -attr [client_id,creation_ts] X
             int index = Integer.parseInt(inputLine.getNextArgFor(key));
             List<Integer> outList = new ArrayList<Integer>(1);
             outList.add(index);
-            inputLine.removeSwitchAndValue(key);
+            inputLine.truncate(key); // also remove result set if there
+            //inputLine.removeSwitchAndValue(key);
             return outList ;
         } catch (Throwable t) {
             // was not just a number
@@ -233,7 +233,7 @@ rs show -range [2^2;2^3] -attr [client_id,creation_ts] X
     protected void printIndexHelp(boolean singletonsOnly) {
         super.printIndexHelp(singletonsOnly);
 say("and for QDL lists, see");
-    say(LIST_ALL_METHODS_COMMAND  + " qdl_lists");
+    say(   "/help qdl_lists");
     }
 
     public State getState() {

@@ -14,6 +14,7 @@ import org.kordamp.json.JSONArray;
 import org.kordamp.json.JSONObject;
 import org.oa4mp.delegation.common.storage.clients.BaseClient;
 import org.oa4mp.delegation.server.server.config.LDAPConfigurationUtil;
+import org.oa4mp.delegation.server.storage.ClientApproval;
 import org.oa4mp.delegation.server.storage.ClientStore;
 import org.oa4mp.delegation.server.storage.uuc.UUCConfiguration;
 import org.oa4mp.server.admin.oauth2.base.ClientApprovalStoreCommands;
@@ -517,7 +518,17 @@ public class OA2ClientCommands extends ClientStoreCommands {
         }
         boolean noStile = inputLine.hasArg(NO_STILE_FLAG);
         for (Identifiable identifiable : identifiables) {
-            OA2Client oa2Client = (OA2Client) identifiable;
+            OA2Client oa2Client = null;
+            if(identifiable instanceof ClientApproval){
+                oa2Client = (OA2Client) getEnvironment().getClientStore().get(identifiable.getIdentifier());
+            }
+            if(identifiable instanceof OA2Client){
+                 oa2Client = (OA2Client) identifiable;
+            }
+            if(oa2Client == null){
+                say("Could not find client");
+                return;
+            }
             say(oa2Client.getIdentifierString());
             List<String> comments = oa2Client.getComment();
             if (comments == null || comments.isEmpty()) {
@@ -638,13 +649,20 @@ public class OA2ClientCommands extends ClientStoreCommands {
         String action = "";
         final String ACTION_ENABLE = "enabled";
         final String ACTION_DISABLE = "disabled";
-        if (inputLine.getLastArg().equalsIgnoreCase("on") || inputLine.getLastArg().equalsIgnoreCase("true")) {
-            action = ACTION_ENABLE;
-        } else {
-            if (inputLine.getLastArg().equalsIgnoreCase("off") || inputLine.getLastArg().equalsIgnoreCase("false")) {
-                action = ACTION_DISABLE;
+        String arg0  = null;
+        if(inputLine.hasArgs()) {
+            arg0 = inputLine.getArg(1);
+            if(arg0 != null && arg0.equals("--")){
+                arg0 = null; // then the are using a result set, so don't snarf up that arg
+            }
+            if (arg0.equalsIgnoreCase("on") || arg0.equalsIgnoreCase("true")) {
+                action = ACTION_ENABLE;
             } else {
-                action = inputLine.getLastArg();
+                if (arg0.equalsIgnoreCase("off") || arg0.equalsIgnoreCase("false")) {
+                    action = ACTION_DISABLE;
+                } else {
+                    action = inputLine.getLastArg();
+                }
             }
         }
 
@@ -652,21 +670,34 @@ public class OA2ClientCommands extends ClientStoreCommands {
                 if(identifiables.isRS()){
                     identifiable = (Identifiable) getStore().get(identifiable.getIdentifier());
                 }
-                OA2Client client = (OA2Client) identifiable;
-                switch (action) {
-                    case ACTION_ENABLE:
-                        client.setExtendedAttributeSupport(true);
-                        break;
-                    case ACTION_DISABLE:
-                        client.setExtendedAttributeSupport(false);
-                        break;
-                    default:
-                        say("unknown action \"" + action + "\", aborting");
-                        return;
-
+                OA2Client client = null;
+                if(identifiable instanceof  OA2Client){
+                    client = (OA2Client) identifiable;
+                }else{
+                    client = (OA2Client) getEnvironment().getClientStore().get(identifiable.getIdentifier());
                 }
-                getStore().save(client);
-            }
+                if(client == null){
+                    say("client not found");
+                    return;
+                }
+                if(arg0 != null){
+                    switch (action) {
+                        case ACTION_ENABLE:
+                            client.setExtendedAttributeSupport(true);
+                            break;
+                        case ACTION_DISABLE:
+                            client.setExtendedAttributeSupport(false);
+                            break;
+                        default:
+                            say("unknown action \"" + action + "\", aborting");
+                            return;
+                    }
+                    getStore().save(client);
+                }else{
+                    say(client.getIdentifierString() + " : " + client.hasExtendedAttributeSupport());
+                }
+
+            } // end for
             say(identifiables.size() + " clients ea_support " + action);
     }
 

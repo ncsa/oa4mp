@@ -47,9 +47,11 @@ public class OA2PermissionCommands extends OA4MPStoreCommands {
     protected String format(Identifiable identifiable, int offset ) {
         Permission p = (Permission) identifiable;
         HashMap<String, String> map = new HashMap<>();
-       map.put("admin", p.getAdminID().toString());
-       map.put("client", p.getClientID().toString());
-       map.put("ersatz id = ", p.getErsatzChain().toString());
+        // Well-formed permissions always have these, but it is possible something went wrong
+        // in which case, show the bad ones so they can be expunged.
+       map.put("admin", p.getAdminID() == null ? "---" : p.getAdminID().toString());
+       map.put("client", p.getClientID() == null ? "---" : p.getClientID().toString());
+       map.put("ersatz id = ", p.getErsatzChain() == null ? "---" : p.getErsatzChain().toString());
        map.put("identifier", p.getIdentifier().toString());
        List<String> pp = StringUtils.formatMap(map,null, false,false, 3,100);
        String out = "";

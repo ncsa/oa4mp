@@ -56,14 +56,14 @@ public class KeyCommands extends OA4MPStoreCommands {
         KERecord keRecord = (KERecord) identifiable;
         int width = 25; // long width, for ISO dates e.g.
         int s = 5; // short width
-        String out = LJustify((keRecord.getDefault() ? "*" : "") + keRecord.getKid(), 35) +
-                " " + LJustify(keRecord.getAlg(), s) +
-                " " + LJustify(keRecord.getUse(), s) +
-                " " + (keRecord.getValid() ? "true " : "false") + // make length match
-                " " + center((keRecord.getNbf() == null ? "--" : Iso8601.date2String(keRecord.getNbf())), width) +
-                " " + center((keRecord.getExp() == null ? "--" : Iso8601.date2String(keRecord.getExp())), width) +
-                " " + LJustify(keRecord.getVi().toString(), 35) +
-                " " + keRecord.getIdentifierString();
+        String out = LJustify((keRecord.getDefault() ? "*" : "") + keRecord.getKid(), 32) +
+                STILE + LJustify(keRecord.getAlg(), s) +
+                STILE + LJustify(keRecord.getUse(), s) +
+                STILE + (keRecord.getValid() ? "true " : "false") + // make length match
+                STILE + center((keRecord.getNbf() == null ? "--" : Iso8601.date2String(keRecord.getNbf())), width) +
+                STILE + center((keRecord.getExp() == null ? "--" : Iso8601.date2String(keRecord.getExp())), width) +
+                STILE + LJustify(keRecord.getVi().toString(), 35) +
+                STILE + keRecord.getIdentifierString();
         return out;
     }
 
@@ -72,14 +72,14 @@ public class KeyCommands extends OA4MPStoreCommands {
         int width = 25; // long width, for ISO dates e.g.
         int s = 5; // short width
         String out = StringUtils.getBlanks(offset + 2);
-        out = out + pad2("kid",35) +
-                " " + pad2("alg",s) +
-                " " + pad2("use", s) +
-                " " + pad2("valid" , s) +
-                " " + pad2("not before", width) +
-                " " + pad2("expires", width) +
-                " " + pad2("VI", 35) +
-                " " + "identifier";
+        out = out + pad2("kid",32) +
+                STILE + pad2("alg",s) +
+                STILE + pad2("use", s) +
+                STILE + pad2("valid" , s) +
+                STILE + pad2("not before", width) +
+                STILE + pad2("expires", width) +
+                STILE + pad2("VI", 35) +
+                STILE + "identifier";
         return out;
     }
 
@@ -236,6 +236,7 @@ public class KeyCommands extends OA4MPStoreCommands {
             if (vi == null) {
                 vi = viStore.create();
                 vi.setIdentifier(OA2SE.SERVER_VI_ID);
+                vi.setTitle("Default issuer");
                 vi.setValid(true);
                 vi.setKeyRotationEnabled(true);
                 vi.setAtGracePeriod(getEnvironment().getMaxATLifetime());
@@ -377,7 +378,7 @@ public class KeyCommands extends OA4MPStoreCommands {
                 JSONWebKey jwk = keys.get(k);
                 k = (k.equals(defaultID) ? "*" : "") + k;
 
-                String out = fff("algorithm=", jwk.algorithm);
+                String out = fff("algorithm", jwk.algorithm);
                 out = out + "\n" + fff("is valid", jwk.isValid());
                 out = out + "\n" + fff("use", jwk.use);
                 out = out + "\n" + fff("type", jwk.type);
@@ -402,7 +403,7 @@ public class KeyCommands extends OA4MPStoreCommands {
     }
 
     String fff(String key, Object value) {
-        return StringUtils.RJustify(key, 12) + " = "  +
+        return StringUtils.RJustify(key, 12) + " : "  +
          (value == null ? "not set" : value.toString());
     }
 

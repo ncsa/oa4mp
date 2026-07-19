@@ -16,7 +16,8 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
-import static edu.uiuc.ncsa.security.core.util.StringUtils.pad2;
+import static edu.uiuc.ncsa.security.core.util.Iso8601.ISO_8601_FORMAT_LENGTH;
+import static edu.uiuc.ncsa.security.core.util.StringUtils.*;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -54,15 +55,15 @@ public class ClientApprovalStoreCommands extends OA4MPStoreCommands {
             case PENDING:
             case NONE:
         }
-        String x = pad2(statusString, 6);
+        String x = center(statusString, 6);
         if (ca.isApproved() || ca.getStatus() == ClientApproval.Status.APPROVED) {
-            x = x + " " + pad2(ca.getApprover(),30) +
-                    " " + pad2(Iso8601.date2String(ca.getApprovalTimestamp()), 27);
+            x = x + STILE + pad2(ca.getApprover(),30) +
+                    STILE + pad2(Iso8601.date2String(ca.getApprovalTimestamp()), ISO_8601_FORMAT_LENGTH);
         }else{
-            x = x + " " + pad2("---",30) +
-                    " " + pad2("---", 27);
+            x = x + STILE + center("---",30) +
+                    STILE + center("---", ISO_8601_FORMAT_LENGTH);
         }
-        x = x + " " + ca.getIdentifierString();
+        x = x + STILE + ca.getIdentifierString();
         return x;
     }
 
@@ -70,9 +71,9 @@ public class ClientApprovalStoreCommands extends OA4MPStoreCommands {
     protected String columnHeader(int offset) {
         return StringUtils.getBlanks(offset + 2) +
                 "status"
-                + " " + pad2("by", 30)
-                + " " + pad2("approved on", 27) +
-                " " + "identifier";
+                + STILE + pad2("by", 30)
+                + STILE + pad2("approved on", ISO_8601_FORMAT_LENGTH)
+                + STILE + "identifier";
     }
 
     @Override
@@ -238,7 +239,11 @@ public class ClientApprovalStoreCommands extends OA4MPStoreCommands {
      */
     public boolean approve(ClientApproval ca) throws IOException {
         boolean isapproved = isOk(getInput("set approved?", ca.isApproved() ? "y" : "n"));
-        String approver = getInput("approver", ca.getApprover());
+        String approver = ca.getApprover();  // if there was an approver already, get it
+        if(isTrivial(approver)) {
+            approver = getApprover(); // if not, see if there is one active
+        }
+        approver = getInput("approver", approver);
         return approve(ca, isapproved, approver);
     }
 
