@@ -58,13 +58,13 @@ public class KeyCommands extends OA4MPStoreCommands {
         KERecord keRecord = (KERecord) identifiable;
         int width = 25; // long width, for ISO dates e.g.
         int s = 5; // short width
-        String out = LJustify((keRecord.getDefault() ? "*" : "") + keRecord.getKid(), 32) +
+        String out = LJustify((keRecord.getDefault() ? "*" : "") + keRecord.getKid(), 33) +
                 STILE + LJustify(keRecord.getAlg(), s) +
                 STILE + LJustify(keRecord.getUse(), s) +
                 STILE + (keRecord.getValid() ? "true " : "false") + // make length match
                 STILE + center((keRecord.getNbf() == null ? "--" : Iso8601.date2String(keRecord.getNbf())), width) +
                 STILE + center((keRecord.getExp() == null ? "--" : Iso8601.date2String(keRecord.getExp())), width) +
-                STILE + LJustify(keRecord.getVi().toString(), 35) +
+                STILE + LJustify(keRecord.getVi().toString(), 32) +
                 STILE + keRecord.getIdentifierString();
         return out;
     }
@@ -74,13 +74,13 @@ public class KeyCommands extends OA4MPStoreCommands {
         int width = 25; // long width, for ISO dates e.g.
         int s = 5; // short width
         String out = StringUtils.getBlanks(offset + 2);
-        out = out + pad2("kid", 32) +
+        out = out + pad2("kid", 33) +
                 STILE + pad2("alg", s) +
                 STILE + pad2("use", s) +
                 STILE + pad2("valid", s) +
                 STILE + pad2("not before", width) +
                 STILE + pad2("expires", width) +
-                STILE + pad2("VI", 35) +
+                STILE + pad2("VI", 32) +
                 STILE + "identifier";
         return out;
     }
