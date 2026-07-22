@@ -58,29 +58,46 @@ public class KeyCommands extends OA4MPStoreCommands {
         KERecord keRecord = (KERecord) identifiable;
         int width = 25; // long width, for ISO dates e.g.
         int s = 5; // short width
-        String out = LJustify((keRecord.getDefault() ? "*" : "") + keRecord.getKid(), 32) +
+        String out = LJustify((keRecord.getDefault() ? "*" : "") + keRecord.getKid(), 33) +
                 STILE + LJustify(keRecord.getAlg(), s) +
                 STILE + LJustify(keRecord.getUse(), s) +
                 STILE + (keRecord.getValid() ? "true " : "false") + // make length match
                 STILE + center((keRecord.getNbf() == null ? "--" : Iso8601.date2String(keRecord.getNbf())), width) +
                 STILE + center((keRecord.getExp() == null ? "--" : Iso8601.date2String(keRecord.getExp())), width) +
-                STILE + LJustify(keRecord.getVi().toString(), 35) +
+                STILE + LJustify(keRecord.getVi().toString(), 32) +
                 STILE + keRecord.getIdentifierString();
         return out;
     }
 
     @Override
-    protected String columnHeader(int offset) {
+    public int[] fieldWidths(List<Identifiable> identifiables) {
+        int width = 25; // long width, for ISO dates e.g.
+        int s = 5; // short width
+        if(100 < identifiables.size()) {
+            return new int[]{33,s,s,s, width,width,32};
+        }
+        int[] fieldWidths =  new int[]{5,s,s,s,width,width,5};
+        for(Identifiable identifiable : identifiables) {
+            KERecord keRecord = (KERecord) identifiable;
+            fieldWidths[0] = Math.max(fieldWidths[0],keRecord.getKid().length());
+            fieldWidths[6] = Math.max(fieldWidths[6],keRecord.getVi().toString().length());
+        }
+        return fieldWidths;
+    }
+
+    @Override
+    protected String columnHeader(int offset, int[] fieldWidths) {
         int width = 25; // long width, for ISO dates e.g.
         int s = 5; // short width
         String out = StringUtils.getBlanks(offset + 2);
-        out = out + pad2("kid", 32) +
-                STILE + pad2("alg", s) +
-                STILE + pad2("use", s) +
-                STILE + pad2("valid", s) +
-                STILE + pad2("not before", width) +
-                STILE + pad2("expires", width) +
-                STILE + pad2("VI", 35) +
+        int i = 0;
+        out = out + pad2("kid", fieldWidths[i++]) +
+                STILE + pad2("alg", fieldWidths[i++]) +
+                STILE + pad2("use", fieldWidths[i++]) +
+                STILE + pad2("valid", fieldWidths[i++]) +
+                STILE + pad2("not before", fieldWidths[i++]) +
+                STILE + pad2("expires", fieldWidths[i++]) +
+                STILE + pad2("VI", fieldWidths[i++]) +
                 STILE + "identifier";
         return out;
     }

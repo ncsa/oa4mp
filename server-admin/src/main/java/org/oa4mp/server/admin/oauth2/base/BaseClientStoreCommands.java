@@ -272,7 +272,15 @@ public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
     }
 
     @Override
-    protected String columnHeader(int offset) {
+    public int[] fieldWidths(List<Identifiable> identifiables) {
+        if(100  < identifiables.size()){
+            return new int[]{35, ISO_8601_FORMAT_LENGTH};
+        }
+        int[] fieldWidths =  new int[]{5, ISO_8601_FORMAT_LENGTH};
+    }
+
+    @Override
+    protected String columnHeader(int offset, int[] fieldWidths) {
         String out = StringUtils.getBlanks(offset + 2);
         out = out +  "a" // for "approved?"
                 + STILE + pad2("name", 35)

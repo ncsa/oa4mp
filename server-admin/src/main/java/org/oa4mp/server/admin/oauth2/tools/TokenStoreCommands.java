@@ -53,7 +53,7 @@ public class TokenStoreCommands extends OA4MPStoreCommands {
     }
 
     @Override
-    protected String format(Identifiable identifiable, int offset) {
+    protected String format(Identifiable identifiable, int offset, int[] fieldWidths) {
         TXRecord txRecord = (TXRecord) identifiable;
         HashMap<String,String> map = new HashMap<>();
         map.put("issued at", Iso8601.date2String(txRecord.getIssuedAt()));
