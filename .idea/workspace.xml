@@ -11,51 +11,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="Last CLI output formatting tweak.">
+    <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="Check in 6.3.1">
+      <change afterPath="$PROJECT_DIR$/client-installer/src/main/resources/oa4mp/v6_3.yaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client-installer/src/main/resources/oa4mp/v6_3_notes.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-api/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/client-api/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/client-installer/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-installer/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/client-installer/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-loader/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/client-loader/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-oauth2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/client-oauth2/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-test/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/client-test/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-webapp/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/client-webapp/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/client/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/common/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/src/main/java/org/oa4mp/delegation/common/OA4MPVersion.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/org/oa4mp/delegation/common/OA4MPVersion.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/di-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/di-service/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/installer/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/installer/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/myproxy-logon/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/myproxy-logon/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/myproxy-website/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/myproxy-website/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/myproxy/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/myproxy/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-test/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-webapp/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-webapp/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oauth2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oauth2/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proxy/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qdl/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rfc8414/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/rfc8414/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rfc8414/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/rfc8414/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/scripts/installer/version.txt" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/scripts/installer/version.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-api/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-installer/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-installer/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/server-installer/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-test/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-test/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/server/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/skin/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/skin/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/website/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/website/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/website/src/site/site.xml" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/site.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/website/src/site/xhtml/client/manuals/api-reference.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/xhtml/client/manuals/api-reference.xhtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/website/src/site/xhtml/common/configuration/derby-store.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/xhtml/common/configuration/derby-store.xhtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/website/src/site/xhtml/server/dtd/server-dtd-content-tags.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/xhtml/server/dtd/server-dtd-content-tags.xhtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/website/src/site/xhtml/server/manuals/getting-started.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/xhtml/server/manuals/getting-started.xhtml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -1324,14 +1283,6 @@
       <workItem from="1782815402307" duration="29204000" />
       <workItem from="1783850833509" duration="119802000" />
     </task>
-    <task id="LOCAL-00104" summary="Routine checkin. Added a test, tweaked a few others.">
-      <option name="closed" value="true" />
-      <created>1755296649184</created>
-      <option name="number" value="00104" />
-      <option name="presentableId" value="LOCAL-00104" />
-      <option name="project" value="LOCAL" />
-      <updated>1755296649184</updated>
-    </task>
     <task id="LOCAL-00105" summary="Port of CILogon DBService to OA4MP.">
       <option name="closed" value="true" />
       <created>1755348980364</created>
@@ -1716,7 +1667,15 @@
       <option name="project" value="LOCAL" />
       <updated>1784730646584</updated>
     </task>
-    <option name="localTasksCounter" value="153" />
+    <task id="LOCAL-00153" summary="Check in 6.3.1">
+      <option name="closed" value="true" />
+      <created>1784732376901</created>
+      <option name="number" value="00153" />
+      <option name="presentableId" value="LOCAL-00153" />
+      <option name="project" value="LOCAL" />
+      <updated>1784732376901</updated>
+    </task>
+    <option name="localTasksCounter" value="154" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1738,7 +1697,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
-    <MESSAGE value="Website rebuild" />
     <MESSAGE value="FOund/corrected info in getting started blurb." />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/280" />
     <MESSAGE value="website update" />
@@ -1763,7 +1721,8 @@
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/306 Making sure that the short format of store elements is consistent so that time-consuming hunting and pecking in long out put is greatly reduced." />
     <MESSAGE value="Tweaks and cleanup for CLI." />
     <MESSAGE value="Last CLI output formatting tweak." />
-    <option name="LAST_COMMIT_MESSAGE" value="Last CLI output formatting tweak." />
+    <MESSAGE value="Check in 6.3.1" />
+    <option name="LAST_COMMIT_MESSAGE" value="Check in 6.3.1" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="GROUP_MULTIFILE_MERGE_BY_DIRECTORY" value="true" />
   </component>
