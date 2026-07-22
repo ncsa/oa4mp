@@ -13,7 +13,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <title>OAuth for MyProxy</title>
+    <title>OAuth for Many People</title>
     <style type="text/css" media="all">
         @import url("../../css/oa4mp-custom.css");
         @import url("../../css/oa4mp-theme.css");
@@ -48,7 +48,7 @@
     
         
                     <div class="xleft">
-            Last Published: 2025-11-14
+            Last Published: 2026-07-22
                                 </div>
                 <div class="xright">            
     
@@ -58,7 +58,7 @@
                         
     
         
-                         Version: 6.x-SNAPSHOT
+                         Version: 6.3.1
             </div>
     <div class="clear">
         <hr/>
@@ -260,17 +260,19 @@
     
 <tr class="a">
         
+        
 <td>localDFConsent</td>
         
 <td>N</td>
         
 <td>false</td>
         
-<td>(Proxy case) As per the OIDC specification, showing a consent screen is optional. When proxying,
-            this will request that the proxy redirect the user back to the local service to use the consent
-            screen there. Otherwise, the assumption is that the consent the user gave on the proxy
-            is sufficient. Also, note that the request parameters used are OA4MP only, so if
-            you are using another system for proxying, the request will be ignored by that proxy.
+<td>(Proxy case only) As per the OIDC specification, showing a consent screen is optional. When proxying,
+            if true, this will show OA4MP's local consent screen before the proxy consent screen in the authorization
+            code flow, and after in the device flow. Otherwise, the assumption is that the consent
+            the user gives on the proxy
+            is sufficient. This is especially useful in cases where the proxy does not show all of
+            the requested scopes. Note that this is server-wide and applies to all proxy requests.
         </td>
     </tr>
     
@@ -496,7 +498,7 @@ for more.
 </div>
 <div id="footer">
     <div class="xright">&#169;    
-                    2025
+                    2026
         
                     
     
