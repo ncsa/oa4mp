@@ -210,4 +210,17 @@ public class KERecord extends Monitored {
         //return notValidBefore == null || (new Date()).after(notValidBefore);
         return getNbf()==null ||  getNbf().getTime() < System.currentTimeMillis() ;
     }
+
+    @Override
+    public String toString() {
+        return "KERecord{" +
+                "valid? " + hasValidDate() +
+                ", expired? " + isExpired() +
+                ", alg='" + alg + '\'' +
+                ", exp=" + exp +
+                ", nbf=" + nbf +
+                ", kid='" + kid + '\'' +
+                ", vi=" + vi +
+                '}';
+    }
 }

@@ -5,6 +5,7 @@ import org.oa4mp.server.loader.oauth2.claims.ScopeTemplateUtil;
 import org.qdl_lang.exceptions.BadArgException;
 import org.qdl_lang.extensions.QDLFunction;
 import org.qdl_lang.state.State;
+import org.qdl_lang.variables.QDLSet;
 import org.qdl_lang.variables.QDLStem;
 import org.qdl_lang.variables.values.QDLValue;
 
@@ -13,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.qdl_lang.variables.Constants.*;
 import static org.qdl_lang.variables.values.QDLValue.asQDLValue;
 
 /**
@@ -36,14 +38,23 @@ public class TemplateSubsitutionQDLUtil implements QDLFunction {
     @Override
     public QDLValue evaluate(QDLValue[] objects, State state) {
         QDLStem arg = null;
-        if(objects[0].isString()){
-            arg = new QDLStem();
-            arg.listAdd(objects[0]);
-        }else if(objects[0].isStem()){
-            arg = objects[0].asStem();
+        // Fix https://github.com/ncsa/oa4mp/issues/308
+        switch (objects[0].getType()) {
+            case STRING_TYPE:
+                arg = new QDLStem();
+                arg.listAdd(objects[0]);
+                break;
+            case STEM_TYPE:
+                arg = objects[0].asStem();
+                break;
+            case SET_TYPE:
+                arg = objects[0].asSet().toStem();
+            default:
+                break;
         }
+
         if(arg == null){
-            throw new BadArgException("error: The first argument must be a string or list of strings",0);
+            throw new BadArgException("error: The first argument must be a string or set or list of strings",0);
         }
         QDLStem otherClaimStem = objects[1].asStem();
         Map<String, List<String>> groups = new HashMap<>();
@@ -59,6 +70,11 @@ public class TemplateSubsitutionQDLUtil implements QDLFunction {
         for(Object key: arg.keySet()){
             String rawString = String.valueOf(arg.get(key));
             out.addAll( ScopeTemplateUtil.replaceTemplate(rawString, groups, otherClaimStem));
+        }
+        if(objects[0].isSet()){
+            QDLSet set = new QDLSet();
+            set.addAll(out);
+            return asQDLValue(set);
         }
         QDLStem outStem = new QDLStem();
         outStem.addList(out);
@@ -78,13 +94,13 @@ public class TemplateSubsitutionQDLUtil implements QDLFunction {
                 break;
         }
         doxx.add("Output is always a list with all possible substitutions done.");
-        doxx.add("arg = a string or stem to be acted upon");
+        doxx.add("arg = a string, stem or set to be acted upon");
         doxx.add("scalar_claims.  = a stem of the scalar substitutions");
 
 
         switch (argCount) {
             case 2:
-                doxx.add("Note, you will get back a single string with all possible substitutions done for each argument.");
+                doxx.add("Note, if arg is s string, you will get back a single string with all possible substitutions done for each argument.");
                 doxx.add("E.g. # 1 -- apply to a string");
                 doxx.add("Take the raw_string and apply templates to it. So if the string were");
                 doxx.add("'storage.read:/home/${uid} and scalar_claims.uid := 'bob', the result would be");
@@ -96,6 +112,10 @@ public class TemplateSubsitutionQDLUtil implements QDLFunction {
                 doxx.add("[a.x, b.x]");
                 doxx.add("If we had a general stem (so not just a list) as the arg, we would");
                 doxx.add("still get back a list.");
+                doxx.add("E.g. # 3 -- a simple example for a set");
+                doxx.add("This looks just like example 2, just with a set");
+                doxx.add("   template_substitution({'a.${u}','b.${u}'},{'u':'x'})");
+                doxx.add("{a.x, b.x}");
                 break;
             case 3:
                 doxx.add("list_claims.  = a stem of the list substitutions. Used for groups.");
