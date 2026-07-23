@@ -44,7 +44,14 @@ public class OA2PermissionCommands extends OA4MPStoreCommands {
     protected String format(Identifiable identifiable) {
         return null;
     }
-    protected String format(Identifiable identifiable, int offset ) {
+
+    @Override
+    public int[] fieldWidths(List<Identifiable> identifiables) {
+        return new int[0];
+    }
+
+    @Override
+    protected String format(Identifiable identifiable, int offset, int[] fieldWidths ) {
         Permission p = (Permission) identifiable;
         HashMap<String, String> map = new HashMap<>();
         // Well-formed permissions always have these, but it is possible something went wrong
@@ -115,8 +122,8 @@ public class OA2PermissionCommands extends OA4MPStoreCommands {
     }
 
     @Override
-    protected String columnHeader(int offset) {
-        return super.columnHeader(offset);
+    protected String columnHeader(int offset, int[] fieldWidths) {
+        return super.columnHeader(offset, fieldWidths);
     }
 
     protected void removeEntry(Identifiable identifiable, JSONObject json) {

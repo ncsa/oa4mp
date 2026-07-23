@@ -52,6 +52,7 @@ public abstract class CAStoreTest extends StoreTest {
         ClientApproval ca1 = getApprovalStore().get(ca.getIdentifier());
         assert ca.equals(ca1);
         getApprovalStore().remove(ca.getIdentifier());
+        getClientStore().remove(ca.getIdentifier());
     }
 
     @Test

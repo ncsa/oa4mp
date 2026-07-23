@@ -261,12 +261,12 @@ say("and for QDL lists, see");
     }
 
     @Override
-    protected String columnHeader(int offset) {
+    protected String columnHeader(int offset, int[] fieldWidths) {
         return null;
     }
 
     @Override
-    protected String format(Identifiable identifiable, int offset) {
+    protected String format(Identifiable identifiable, int offset,  int[] fieldWidths) {
         return format(identifiable);
     }
 }

@@ -3,6 +3,7 @@ package org.oa4mp.server.admin.oauth2.base;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
+import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.cli.FoundIdentifiables;
@@ -36,9 +37,13 @@ public class ClientApprovalStoreCommands extends OA4MPStoreCommands {
         super(driver, store);
     }
 
-
     @Override
     protected String format(Identifiable identifiable) {
+        return null;
+    }
+
+    @Override
+    protected String format(Identifiable identifiable, int offset, int[] fieldWidths) {
         if (identifiable == null) return "(null)";
         ClientApproval ca = (ClientApproval) identifiable;
         String statusString = "?";
@@ -55,24 +60,42 @@ public class ClientApprovalStoreCommands extends OA4MPStoreCommands {
             case PENDING:
             case NONE:
         }
-        String x = center(statusString, 6);
+        String x = center(statusString, fieldWidths[0]);
         if (ca.isApproved() || ca.getStatus() == ClientApproval.Status.APPROVED) {
-            x = x + STILE + pad2(ca.getApprover(),30) +
-                    STILE + pad2(Iso8601.date2String(ca.getApprovalTimestamp()), ISO_8601_FORMAT_LENGTH);
+            x = x + STILE + pad2(ca.getApprover(),fieldWidths[1]) +
+                    STILE + pad2(Iso8601.date2String(ca.getApprovalTimestamp()), fieldWidths[2]);
         }else{
-            x = x + STILE + center("---",30) +
-                    STILE + center("---", ISO_8601_FORMAT_LENGTH);
+            x = x + STILE + center("---",fieldWidths[1]) +
+                    STILE + center("---", fieldWidths[2]);
         }
         x = x + STILE + ca.getIdentifierString();
         return x;
     }
 
     @Override
-    protected String columnHeader(int offset) {
+    public int[] fieldWidths(List<Identifiable> identifiables) {
+
+        if(100 < identifiables.size()){
+            return new int[]{6,30,ISO_8601_FORMAT_LENGTH,};
+        }
+        int[]  fieldWidths =  new int[]{6,8,ISO_8601_FORMAT_LENGTH,};
+        for(Identifiable identifiable :  identifiables){
+            if(!(identifiable instanceof ClientApproval)){
+                throw new GeneralException("object with id " + identifiable.getIdentifierString() + " is not an approval record.");
+            }
+            ClientApproval ca = (ClientApproval) identifiable;
+            int aLength = isTrivial(ca.getApprover()) ? 0 : ca.getApprover().length();
+            fieldWidths[1] = Math.max(fieldWidths[1],aLength);
+        }
+        return fieldWidths;
+    }
+
+    @Override
+    protected String columnHeader(int offset, int[] fieldWidths) {
         return StringUtils.getBlanks(offset + 2) +
                 "status"
-                + STILE + pad2("by", 30)
-                + STILE + pad2("approved on", ISO_8601_FORMAT_LENGTH)
+                + STILE + pad2("approver", fieldWidths[1])
+                + STILE + pad2("approved on", fieldWidths[2])
                 + STILE + "identifier";
     }
 

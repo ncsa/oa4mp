@@ -157,6 +157,7 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
         }
         TreeSet<Identifier> sortedClients = new TreeSet<>();
         sortedClients.addAll(clients);
+
         for (Identifier identifier : sortedClients) {
             say("(" + (getClientApprovalStore().isApproved(identifier) ? "Y" : "N") + ") " + identifier);
         }
@@ -208,6 +209,7 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
         }
         Identifier clientID = BasicIdentifier.newID(inputLine.getLastArg());
         FoundIdentifiables foundClients = findItem(getEnvironment().getClientStore(), inputLine, true);
+        int[] fieldWidths = fieldWidths(foundClients);
         //BaseClient baseClient = (BaseClient) getEnvironment().getClientStore().get(clientID);
         if (foundClients == null) {
             say("client not found.");
@@ -224,7 +226,9 @@ public class OA2AdminClientCommands extends BaseClientStoreCommands {
             for (Identifier id : admins) {
                 AdminClient adminClient = (AdminClient) getStore().get(id);
                 if (adminClient != null) { // if there are dead ids in the store, don't bomb with an NPE.
-                    say(format(adminClient, (ClientApproval) getClientApprovalStore().get(adminClient.getIdentifier())));
+                    say(format(adminClient, (ClientApproval)
+                            getClientApprovalStore().get(adminClient.getIdentifier()),
+                            fieldWidths));
                 }
             }
             if (1 < foundClients.size()) {

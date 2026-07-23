@@ -199,9 +199,9 @@ public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
         getSortable().setState(null);
         entries = getSortable().sort(entries);
         int countLength = Integer.toString(entries.size()).length();
-
+        int[] fieldWidths = fieldWidths(entries);
         if(!lineList){
-            String header = columnHeader(countLength);
+            String header = columnHeader(countLength,fieldWidths);
             if(!isTrivial(header)){
                 say(header);
             }
@@ -224,7 +224,7 @@ public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
                     longFormat((BaseClient) x, tempA, true);
 
                 } else {
-                    say(formatCounter(i, countLength) + ". " + format((BaseClient) x, tempA));
+                    say(formatCounter(i, countLength) + ". " + format((BaseClient) x, tempA, fieldWidths));
                 }
                 i++;
             }
@@ -236,10 +236,15 @@ public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
 
     ClientApprovalStore clientApprovalStore;
 
-    protected String format(BaseClient client, ClientApproval ca) {
-       return NEWformat(client,ca);
+    @Override
+    protected String format(Identifiable identifiable) {
+        return null;
     }
-    protected String NEWformat(BaseClient client, ClientApproval ca) {
+
+    protected String format(BaseClient client, ClientApproval ca, int[] fieldWidths) {
+       return NEWformat(client,ca, fieldWidths);
+    }
+    protected String NEWformat(BaseClient client, ClientApproval ca, int[] fieldWidths) {
         String rc = "";
         if (ca == null) {
             rc = rc + "?";
@@ -248,12 +253,13 @@ public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
             rc =  rc + (isApproved ? "Y" : "N") ;
         }
         String name = (client.getName() == null ? "---" : client.getName());
-        rc = rc  + STILE +  pad2(name, 35);
-        rc = rc + STILE + pad2(Iso8601.date2String(client.getCreationTS()), ISO_8601_FORMAT_LENGTH);
+        rc = rc  + STILE +  pad2(name, fieldWidths[0]);
+        rc = rc + STILE + pad2(Iso8601.date2String(client.getCreationTS()), fieldWidths[1]);
         rc = rc + STILE + client.getIdentifierString();
 
         return rc;
     }
+/*
     protected String OLDformat(BaseClient client, ClientApproval ca) {
         String rc = "(";
         if (ca == null) {
@@ -270,13 +276,28 @@ public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
         rc = rc + " " + client.getIdentifierString();
         return rc;
     }
+*/
 
     @Override
-    protected String columnHeader(int offset) {
+    public int[] fieldWidths(List<Identifiable> identifiables) {
+        if(100  < identifiables.size()){
+            return new int[]{35, ISO_8601_FORMAT_LENGTH};
+        }
+        int[] fieldWidths =  new int[]{5, ISO_8601_FORMAT_LENGTH};
+        for(Identifiable x : identifiables){
+            BaseClient baseClient = (BaseClient) x;
+            int nameLength = isTrivial(baseClient.getName())? 0 : baseClient.getName().length();
+            fieldWidths[0] = Math.max(fieldWidths[0], nameLength);
+        }
+        return fieldWidths;
+    }
+
+    @Override
+    protected String columnHeader(int offset, int[] fieldWidths) {
         String out = StringUtils.getBlanks(offset + 2);
         out = out +  "a" // for "approved?"
-                + STILE + pad2("name", 35)
-                + STILE + pad2("creation date", ISO_8601_FORMAT_LENGTH)
+                + STILE + pad2("name", fieldWidths[0])
+                + STILE + pad2("creation date", fieldWidths[1])
                 + STILE + "identifier";
         return out;
     }
@@ -301,11 +322,18 @@ public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
     }
 
     @Override
+    protected String format(Identifiable identifiable, int offset, int[] fieldWidths) {
+        BaseClient client = (BaseClient) identifiable;
+        ClientApproval ca = (ClientApproval) getClientApprovalStore().get(client.getIdentifier());
+        return format(client, ca,  fieldWidths);
+    }
+
+   /* @Override
     protected String format(Identifiable identifiable) {
         BaseClient client = (BaseClient) identifiable;
         ClientApproval ca = (ClientApproval) getClientApprovalStore().get(client.getIdentifier());
         return format(client, ca);
-    }
+    }*/
 
     @Override
     protected int longFormat(Identifiable identifiable, boolean isVerbose) {
