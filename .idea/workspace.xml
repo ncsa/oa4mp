@@ -13,16 +13,15 @@
   <component name="ChangeListManager">
     <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="https://github.com/ncsa/oa4mp/issues/308 Fixing an annoyance in a QDL utility.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/client-installer/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rfc8414/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/rfc8414/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-test/src/test/java/org/oa4mp/server/test/CAStoreTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-test/src/test/java/org/oa4mp/server/test/CAStoreTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/BaseClientStoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/BaseClientStoreCommands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/OA4MPStoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/OA4MPStoreCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/ClientApprovalStoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/ClientApprovalStoreCommands.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/KeyCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/KeyCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2AdminClientCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2AdminClientCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2PermissionCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2PermissionCommands.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/TokenStoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/TokenStoreCommands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-installer/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-test/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/TransactionStoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/TransactionStoreCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/VICommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/VICommands.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -117,7 +116,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Application.CLC.executor": "Run",
-    "Application.CLI.executor": "Run",
+    "Application.CLI.executor": "Debug",
     "Application.FSMigrate.executor": "Run",
     "Application.JWKCLI.executor": "Run",
     "Application.OA4MPClientInstaller.executor": "Run",
@@ -153,7 +152,7 @@
     "Tomcat Server.MyProxy.executor": "Run",
     "Tomcat Server.OA4MP server.executor": "Run",
     "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "master",
+    "git-widget-placeholder": "format__cli",
     "jdk.selected.JAVA_MODULE": "11 (2)",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "/home/ncsa/dev/ncsa-git/oa4mp/server-admin/src/main/resources/web-inf",
@@ -209,7 +208,7 @@
         <entry key="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory">
           <value>
             <map>
-              <entry key="OA4MP server" value="STOPPED" />
+              <entry key="OA4MP server" value="FAILED" />
             </map>
           </value>
         </entry>
@@ -2029,62 +2028,62 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>3925</line>
+          <line>3884</line>
           <option name="timeStamp" value="962" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>1775</line>
+          <line>1783</line>
           <option name="timeStamp" value="963" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>3969</line>
+          <line>3928</line>
           <option name="timeStamp" value="974" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2AdminClientCommands.java</url>
-          <line>252</line>
+          <line>256</line>
           <option name="timeStamp" value="981" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2AdminClientCommands.java</url>
-          <line>363</line>
+          <line>367</line>
           <option name="timeStamp" value="983" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/BaseClientStoreCommands.java</url>
-          <line>641</line>
+          <line>661</line>
           <option name="timeStamp" value="987" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>3148</line>
+          <line>3107</line>
           <option name="timeStamp" value="990" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>3140</line>
+          <line>3099</line>
           <option name="timeStamp" value="995" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>4214</line>
+          <line>4173</line>
           <option name="timeStamp" value="1003" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>4230</line>
+          <line>4189</line>
           <option name="timeStamp" value="1004" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>4240</line>
+          <line>4199</line>
           <option name="timeStamp" value="1005" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>3700</line>
+          <line>3659</line>
           <option name="timeStamp" value="1010" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2094,7 +2093,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>2836</line>
+          <line>2795</line>
           <option name="timeStamp" value="1049" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2112,17 +2111,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2AdminClientCommands.java</url>
-          <line>204</line>
+          <line>205</line>
           <option name="timeStamp" value="1076" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>2550</line>
+          <line>2509</line>
           <option name="timeStamp" value="1077" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>1226</line>
+          <line>1234</line>
           <option name="timeStamp" value="1078" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2142,17 +2141,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>1974</line>
+          <line>1941</line>
           <option name="timeStamp" value="1172" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>1683</line>
+          <line>1691</line>
           <option name="timeStamp" value="1173" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>1161</line>
+          <line>1166</line>
           <option name="timeStamp" value="1176" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2177,12 +2176,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>3049</line>
+          <line>3008</line>
           <option name="timeStamp" value="1259" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>3044</line>
+          <line>3003</line>
           <option name="timeStamp" value="1260" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2192,22 +2191,22 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2AdminClientCommands.java</url>
-          <line>448</line>
+          <line>452</line>
           <option name="timeStamp" value="1278" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2AdminClientCommands.java</url>
-          <line>435</line>
+          <line>439</line>
           <option name="timeStamp" value="1281" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2AdminClientCommands.java</url>
-          <line>496</line>
+          <line>500</line>
           <option name="timeStamp" value="1282" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>2442</line>
+          <line>2401</line>
           <option name="timeStamp" value="1285" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2257,7 +2256,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/BaseClientStoreCommands.java</url>
-          <line>750</line>
+          <line>770</line>
           <option name="timeStamp" value="1358" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2377,22 +2376,22 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/BaseClientStoreCommands.java</url>
-          <line>417</line>
+          <line>437</line>
           <option name="timeStamp" value="1615" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/BaseClientStoreCommands.java</url>
-          <line>422</line>
+          <line>442</line>
           <option name="timeStamp" value="1616" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/BaseClientStoreCommands.java</url>
-          <line>369</line>
+          <line>389</line>
           <option name="timeStamp" value="1617" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/BaseClientStoreCommands.java</url>
-          <line>378</line>
+          <line>398</line>
           <option name="timeStamp" value="1619" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2482,7 +2481,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands2.java</url>
-          <line>3241</line>
+          <line>3218</line>
           <option name="timeStamp" value="1756" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2507,7 +2506,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands2.java</url>
-          <line>4230</line>
+          <line>4207</line>
           <option name="timeStamp" value="1824" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2662,7 +2661,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/KeyCommands.java</url>
-          <line>406</line>
+          <line>412</line>
           <option name="timeStamp" value="1946" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2682,32 +2681,32 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/KeyCommands.java</url>
-          <line>533</line>
+          <line>539</line>
           <option name="timeStamp" value="1962" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/KeyCommands.java</url>
-          <line>534</line>
+          <line>540</line>
           <option name="timeStamp" value="1963" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/KeyCommands.java</url>
-          <line>594</line>
+          <line>600</line>
           <option name="timeStamp" value="1964" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/VICommands.java</url>
-          <line>477</line>
+          <line>498</line>
           <option name="timeStamp" value="1965" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/VICommands.java</url>
-          <line>494</line>
+          <line>515</line>
           <option name="timeStamp" value="1966" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/KeyCommands.java</url>
-          <line>250</line>
+          <line>256</line>
           <option name="timeStamp" value="1967" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2722,7 +2721,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/KeyCommands.java</url>
-          <line>505</line>
+          <line>511</line>
           <option name="timeStamp" value="1973" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2747,33 +2746,23 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/BaseClientStoreCommands.java</url>
-          <line>280</line>
+          <line>293</line>
           <option name="timeStamp" value="1981" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/BaseClientStoreCommands.java</url>
-          <line>257</line>
+          <line>263</line>
           <option name="timeStamp" value="1982" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/BaseClientStoreCommands.java</url>
-          <line>226</line>
-          <option name="timeStamp" value="1983" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/BaseClientStoreCommands.java</url>
-          <line>267</line>
+          <line>273</line>
           <option name="timeStamp" value="1986" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands2.java</url>
           <line>800</line>
           <option name="timeStamp" value="1989" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2PermissionCommands.java</url>
-          <line>47</line>
-          <option name="timeStamp" value="1990" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2PermissionCommands.java</url>
@@ -2792,8 +2781,18 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/KeyCommands.java</url>
-          <line>411</line>
+          <line>417</line>
           <option name="timeStamp" value="1994" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/VICommands.java</url>
+          <line>345</line>
+          <option name="timeStamp" value="1996" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/base/ClientApprovalStoreCommands.java</url>
+          <line>89</line>
+          <option name="timeStamp" value="1999" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-method">
           <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/storage/transactions/OA2MTStore.java</url>

@@ -53,6 +53,11 @@ public class TokenStoreCommands extends OA4MPStoreCommands {
     }
 
     @Override
+    public int[] fieldWidths(List<Identifiable> identifiables) {
+        return new int[0];
+    }
+
+    @Override
     protected String format(Identifiable identifiable, int offset, int[] fieldWidths) {
         TXRecord txRecord = (TXRecord) identifiable;
         HashMap<String,String> map = new HashMap<>();

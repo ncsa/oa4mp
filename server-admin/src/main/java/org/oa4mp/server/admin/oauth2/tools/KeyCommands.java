@@ -55,16 +55,21 @@ public class KeyCommands extends OA4MPStoreCommands {
 
     @Override
     protected String format(Identifiable identifiable) {
+        return null;
+    }
+
+    @Override
+    protected String format(Identifiable identifiable, int offset, int[] fieldWidths) {
         KERecord keRecord = (KERecord) identifiable;
         int width = 25; // long width, for ISO dates e.g.
         int s = 5; // short width
-        String out = LJustify((keRecord.getDefault() ? "*" : "") + keRecord.getKid(), 33) +
-                STILE + LJustify(keRecord.getAlg(), s) +
-                STILE + LJustify(keRecord.getUse(), s) +
+        String out = LJustify((keRecord.getDefault() ? "*" : "") + keRecord.getKid(), fieldWidths[0]) +
+                STILE + LJustify(keRecord.getAlg(), fieldWidths[1]) +
+                STILE + LJustify(keRecord.getUse(), fieldWidths[2]) +
                 STILE + (keRecord.getValid() ? "true " : "false") + // make length match
-                STILE + center((keRecord.getNbf() == null ? "--" : Iso8601.date2String(keRecord.getNbf())), width) +
-                STILE + center((keRecord.getExp() == null ? "--" : Iso8601.date2String(keRecord.getExp())), width) +
-                STILE + LJustify(keRecord.getVi().toString(), 32) +
+                STILE + center((keRecord.getNbf() == null ? "--" : Iso8601.date2String(keRecord.getNbf())), fieldWidths[4]) +
+                STILE + center((keRecord.getExp() == null ? "--" : Iso8601.date2String(keRecord.getExp())), fieldWidths[5]) +
+                STILE + LJustify(keRecord.getVi().toString(), fieldWidths[6]) +
                 STILE + keRecord.getIdentifierString();
         return out;
     }
@@ -82,6 +87,7 @@ public class KeyCommands extends OA4MPStoreCommands {
             fieldWidths[0] = Math.max(fieldWidths[0],keRecord.getKid().length());
             fieldWidths[6] = Math.max(fieldWidths[6],keRecord.getVi().toString().length());
         }
+        fieldWidths[0] = fieldWidths[0]+1; // since it may get a * if its a  default key
         return fieldWidths;
     }
 

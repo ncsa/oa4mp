@@ -80,9 +80,14 @@ public class TransactionStoreCommands extends OA4MPStoreCommands {
     }
 
     @Override
-    protected String columnHeader(int offset) {
+    public int[] fieldWidths(List<Identifiable> identifiables) {
+        return new int[]{ISO_8601_FORMAT_LENGTH};
+    }
+
+    @Override
+    protected String columnHeader(int offset, int[] fieldWidths) {
         String out = StringUtils.getBlanks(offset + 2)
-                + pad2("auth time", ISO_8601_FORMAT_LENGTH)
+                + pad2("auth time", fieldWidths[0])
                 + STILE + "identifier";
         return out;
     }

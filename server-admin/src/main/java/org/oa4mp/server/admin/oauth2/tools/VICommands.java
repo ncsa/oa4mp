@@ -324,20 +324,41 @@ public class VICommands extends OA4MPStoreCommands {
 
     @Override
     protected String format(Identifiable identifiable) {
+        return null;
+    }
+
+    @Override
+    protected String format(Identifiable identifiable, int offset, int[] fieldWidths) {
         VirtualIssuer vi = (VirtualIssuer) identifiable;
-        String path = isTrivial(vi.getDiscoveryPath()) ? center("---",40) : vi.getDiscoveryPath();
-        return pad2(vi.getTitle(), 35)
-                + STILE + pad2(path, 40)
-                + STILE + pad2(Iso8601.date2String(vi.getCreationTS()), ISO_8601_FORMAT_LENGTH)
+        String path = isTrivial(vi.getDiscoveryPath()) ? center("---",fieldWidths[1]) : vi.getDiscoveryPath();
+        return pad2(vi.getTitle(), fieldWidths[0])
+                + STILE + pad2(path, fieldWidths[1])
+                + STILE + pad2(Iso8601.date2String(vi.getCreationTS()), fieldWidths[2])
                 + STILE + vi.getIdentifierString();
     }
 
     @Override
-    protected String columnHeader(int offset) {
+    public int[] fieldWidths(List<Identifiable> identifiables) {
+        if(100 < identifiables.size()){
+            return new int[]{35,40,ISO_8601_FORMAT_LENGTH};
+        }
+        int[] fieldWidths = new int[]{5,5,ISO_8601_FORMAT_LENGTH};
+        for(Identifiable identifiable : identifiables){
+            VirtualIssuer vo = (VirtualIssuer) identifiable;
+            int titleLength = isTrivial(vo.getTitle())?0:vo.getTitle().length();
+            fieldWidths[0] = Math.max(fieldWidths[0],titleLength);
+            int pathLength = isTrivial(vo.getDiscoveryPath())?0:vo.getDiscoveryPath().length();
+            fieldWidths[1] = Math.max(fieldWidths[1],pathLength);
+        }
+        return fieldWidths ;
+    }
+
+    @Override
+    protected String columnHeader(int offset, int[] fieldWidths) {
         return StringUtils.getBlanks(offset+2)
-                + pad2("title",35)
-                + STILE + pad2("discovery path", 40)
-                + STILE + pad2("creation date", ISO_8601_FORMAT_LENGTH)
+                + pad2("title",fieldWidths[0])
+                + STILE + pad2("discovery path", fieldWidths[1])
+                + STILE + pad2("creation date", fieldWidths[2])
                 + STILE + "identifier";
     }
 
