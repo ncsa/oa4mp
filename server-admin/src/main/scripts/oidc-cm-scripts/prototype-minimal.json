@@ -3,6 +3,6 @@
      "This also sets prototypes, so that all the settings will be taken from them."
      ],
    "redirect_uris":["https://client.example.org/callback"],
-   "client_name": "My Example",
+   "client_name": "RFC 7591 Example Client",
    "prototypes": ["client:/ldap_0", "client:/ligo/onboarding"]
   }

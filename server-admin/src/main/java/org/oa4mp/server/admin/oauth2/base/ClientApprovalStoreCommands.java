@@ -42,30 +42,42 @@ public class ClientApprovalStoreCommands extends OA4MPStoreCommands {
         return null;
     }
 
+    public static String statusToShortString(ClientApproval ca) {
+        String statusString = "?";
+        switch (ca.getStatus()) {
+            case APPROVED:
+                statusString = "a";
+                break;
+            case DENIED:
+                statusString = "d";
+                break;
+            case REVOKED:
+                statusString = "r";
+                break;
+            case PENDING:
+                statusString = "p";
+                break;
+            default:
+                statusString = "?";
+                break;
+            case NONE:
+                statusString = "n";
+                break;
+        }
+        return statusString;
+    }
+
     @Override
     protected String format(Identifiable identifiable, int offset, int[] fieldWidths) {
         if (identifiable == null) return "(null)";
         ClientApproval ca = (ClientApproval) identifiable;
-        String statusString = "?";
-        switch (ca.getStatus()) {
-            case APPROVED:
-                statusString = "A";
-                break;
-            case DENIED:
-                statusString = "D";
-                break;
-            case REVOKED:
-                statusString = "R";
-                break;
-            case PENDING:
-            case NONE:
-        }
+        String statusString = statusToShortString(ca);
         String x = center(statusString, fieldWidths[0]);
         if (ca.isApproved() || ca.getStatus() == ClientApproval.Status.APPROVED) {
-            x = x + STILE + pad2(ca.getApprover(),fieldWidths[1]) +
+            x = x + STILE + pad2(ca.getApprover(), fieldWidths[1]) +
                     STILE + pad2(Iso8601.date2String(ca.getApprovalTimestamp()), fieldWidths[2]);
-        }else{
-            x = x + STILE + center("---",fieldWidths[1]) +
+        } else {
+            x = x + STILE + center("---", fieldWidths[1]) +
                     STILE + center("---", fieldWidths[2]);
         }
         x = x + STILE + ca.getIdentifierString();
@@ -75,17 +87,17 @@ public class ClientApprovalStoreCommands extends OA4MPStoreCommands {
     @Override
     public int[] fieldWidths(List<Identifiable> identifiables) {
 
-        if(100 < identifiables.size()){
-            return new int[]{6,30,ISO_8601_FORMAT_LENGTH,};
+        if (100 < identifiables.size()) {
+            return new int[]{6, 30, ISO_8601_FORMAT_LENGTH,};
         }
-        int[]  fieldWidths =  new int[]{6,8,ISO_8601_FORMAT_LENGTH,};
-        for(Identifiable identifiable :  identifiables){
-            if(!(identifiable instanceof ClientApproval)){
+        int[] fieldWidths = new int[]{6, 8, ISO_8601_FORMAT_LENGTH,};
+        for (Identifiable identifiable : identifiables) {
+            if (!(identifiable instanceof ClientApproval)) {
                 throw new GeneralException("object with id " + identifiable.getIdentifierString() + " is not an approval record.");
             }
             ClientApproval ca = (ClientApproval) identifiable;
             int aLength = isTrivial(ca.getApprover()) ? 0 : ca.getApprover().length();
-            fieldWidths[1] = Math.max(fieldWidths[1],aLength);
+            fieldWidths[1] = Math.max(fieldWidths[1], aLength);
         }
         return fieldWidths;
     }
@@ -263,7 +275,7 @@ public class ClientApprovalStoreCommands extends OA4MPStoreCommands {
     public boolean approve(ClientApproval ca) throws IOException {
         boolean isapproved = isOk(getInput("set approved?", ca.isApproved() ? "y" : "n"));
         String approver = ca.getApprover();  // if there was an approver already, get it
-        if(isTrivial(approver)) {
+        if (isTrivial(approver)) {
             approver = getApprover(); // if not, see if there is one active
         }
         approver = getInput("approver", approver);

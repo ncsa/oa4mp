@@ -7,7 +7,7 @@
   "redirect_uris": [
     "http://localhost/callback"
   ],
-  "client_name": "Another test client",
+  "client_name": "RFC 7591 Example Client",
   "scope": "openid email profile",
   "contacts": [
     "your.email@here.org"

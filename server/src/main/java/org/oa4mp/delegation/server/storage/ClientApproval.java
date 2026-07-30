@@ -53,6 +53,11 @@ public class ClientApproval extends IdentifiableImpl implements DateComparable {
             return status;
         }
 
+        /**
+         * Given the string for the status, return the enumeration element.
+         * @param code
+         * @return
+         */
         public static Status resolveByStatusValue(String code) {
             Status[] enumConstants = Status.class.getEnumConstants();
             for (Status entry : enumConstants) {

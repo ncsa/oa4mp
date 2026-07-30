@@ -103,7 +103,7 @@ public class KeyCommands extends OA4MPStoreCommands {
                 STILE + pad2("valid", fieldWidths[i++]) +
                 STILE + pad2("not before", fieldWidths[i++]) +
                 STILE + pad2("expires", fieldWidths[i++]) +
-                STILE + pad2("VI", fieldWidths[i++]) +
+                STILE + pad2("VI", fieldWidths[i]) +
                 STILE + "identifier";
         return out;
     }
@@ -189,7 +189,7 @@ public class KeyCommands extends OA4MPStoreCommands {
                     continue;
                 }
                 // Remember that putAll for the store will only decide whether to update or create
-                // reords based on the identifier. We, however, need to check if the key is already in the store
+                // records based on the identifier. We, however, need to check if the key is already in the store
                 // by kid.
                 if (hasKID) {
                     updateKERecords.put(keRecord.getIdentifier(), keRecord);
@@ -575,6 +575,7 @@ public class KeyCommands extends OA4MPStoreCommands {
                 newRecord.setValid(true);
                 if (testOnly) {
                     say("Test rotation of key with ID " + keRecord.getKid());
+                    testBlurb(keRecord,cacheLifetime,atLifetime);
                 } else {
                     getEnvironment().getKEStore().update(keRecord);
                     getEnvironment().getKEStore().save(newRecord);
@@ -606,11 +607,21 @@ public class KeyCommands extends OA4MPStoreCommands {
                             "\nJust change that if you need to.");
                 } else {
                     if (testOnly) {
-                        say("Testing found  " + map.size() + " keys to rotate. No keys altered or added. Key IDs are");
+                        int countLength = Integer.toString(map.size()).length();
+                        List<Identifiable> keys = new ArrayList<>(map.values());
+                        keys.addAll(map.values());
+                        int[] fieldWidths = fieldWidths(keys);
+                        say("Testing found  " + map.size() + " keys to rotate. No keys altered or added.");
+                        String header = columnHeader(countLength, fieldWidths);
+                        if (0 < map.size() && !isTrivial(header)) {
+                            say(header);
+                        }
                         for (Identifier id : map.keySet()) {
                             KERecord keRecord = map.get(id);
-                            say(keRecord.getKid() + " (" + keRecord.getAlg() + ")");
+                            say(StringUtils.getBlanks(countLength + 2) + format(keRecord,countLength,fieldWidths));
+                            //say(keRecord.getKid() + " | " + keRecord.getAlg() + " | exp = " +")");
                         }
+                        testBlurb(null, cacheLifetime, atLifetime);
                     } else {
                         say("rotated " + map.size() + " keys");
                     }
@@ -618,7 +629,7 @@ public class KeyCommands extends OA4MPStoreCommands {
                 return;
             } // Last ditch effort -- find in server config.
             if (viID.equals(OA2SE.SERVER_VI_ID)) {
-                // edge ccase is that they have not made a virtual issuer for the default
+                // edge case is that they have not made a virtual issuer for the default
                 // but have rotate keys.
                 VirtualIssuer vi = new VirtualIssuer(viID);
 
@@ -639,7 +650,8 @@ public class KeyCommands extends OA4MPStoreCommands {
                     say("tested and found " + map.size() + " keys to rotate:");
                     for (Identifier id : map.keySet()) {
                         KERecord keRecord = map.get(id);
-                        say(keRecord.getKid() + " (" + keRecord.getAlg() + ")");
+                        say(format(keRecord));
+                        //say(keRecord.getKid() + " (" + keRecord.getAlg() + ")");
                     }
                     say("No keys altered or added.");
                 } else {
@@ -670,7 +682,12 @@ public class KeyCommands extends OA4MPStoreCommands {
             }
             Map<Identifier, KERecord> newRecords = KEStoreUtilities.rotate(getStore(), keRecords, cacheLifetime, atLifetime, true, testOnly);
             if (testOnly) {
+                for(Identifier id : newRecords.keySet()) {
+                    KERecord keRecord = newRecords.get(id);
+                    say(format(keRecord));
+                }
                 say("tested and found " + newRecords.size() + " keys to rotate:");
+                testBlurb(null, cacheLifetime, atLifetime);
             } else {
                 say("rotated " + newRecords.size() + " keys");
             }
@@ -679,6 +696,15 @@ public class KeyCommands extends OA4MPStoreCommands {
 
     }
 
+    protected void testBlurb(KERecord keRecord, long cache, long at) {
+        if(keRecord != null) {
+            say("key exp : " + Iso8601.date2String(keRecord.getExp()));
+            say("key nbf : " + Iso8601.date2String(keRecord.getNbf()));
+        }
+        say("cache lifetime : " + cache + " ms.");
+        say("   at lifetime : " + at  + " ms.");
+        say("  current time : " + Iso8601.date2String(new Date()));
+    }
     public static String CREATE_KEYS_CURVE = "-curve";
     public static String CREATE_KEYS_TYPE = "-type";
     public static String CREATE_KEYS_SIZE = "-size";
@@ -911,10 +937,40 @@ public class KeyCommands extends OA4MPStoreCommands {
     public void ls(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
             super.ls(inputLine);
+            say("You may also specify just a VI with the " + KR_VI + " switch.");
+            say("This lists only keys in that VI.");
+            say("Compare with get_current which will give a summary of the keys for a given");;
+            say("VI, not listing the key store records.");
             return;
         }
         if (getEnvironment().getKEStore() == null) {
             say("No key store enabled. You may still call \"show\" to see the signing keys for various VIs.");
+            return;
+        }
+        if(inputLine.hasArg(KR_VI)) {
+            String vi = inputLine.getNextArgFor(KR_VI);
+            inputLine.removeSwitchAndValue(KR_VI);
+            if(vi.equals(DEFAULT_SERVER_VI)) {
+                vi = OA2SE.SERVER_VI_ID.toString();
+            }
+            VirtualIssuer virtualIssuer = (VirtualIssuer) getEnvironment().getVIStore().get(BasicIdentifier.newID(vi));
+            if(virtualIssuer == null) {
+                say("no ViI for " + vi + " found.");
+                return;
+            }
+
+            IdentifiableMap<KERecord> map = getStore().getByVI(virtualIssuer);
+            FoundIdentifiables foundIdentifiables = new FoundIdentifiables(false, map.values());
+
+            boolean listSingleLines = inputLine.hasArg(LINE_LIST_COMMAND);
+            boolean listMultiLines = inputLine.hasArg(VERBOSE_COMMAND);
+            boolean shortForm = !(listMultiLines || listSingleLines);
+
+            if ((listSingleLines && listMultiLines)) {
+                say("inconsistent flags. You cannot have both single and multiline output at the same time.");
+                return;
+            }
+            printLS(foundIdentifiables,listSingleLines,listMultiLines,shortForm);
             return;
         }
         super.ls(inputLine);

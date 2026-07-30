@@ -1,6 +1,6 @@
 {
    "redirect_uris":["https://client.example.org/callback"],
-   "client_name": "My Example",
+   "client_name": "RFC 7591 Example Client",
   "token_endpoint_auth_method": "client_secret_basic",
   "scope": "openid email profile"
   }

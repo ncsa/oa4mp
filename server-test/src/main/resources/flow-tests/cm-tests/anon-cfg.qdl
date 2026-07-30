@@ -1,6 +1,6 @@
 #! /usr/bin/env -S qdl-run
 /*
-  This is an anonyumous attempt to set several things that are off limits, such
+  This is an anonymous attempt to set several things that are off limits, such
   as a cfg property with the letter qdl in it, or whether to change the server policies
   for skipping server scripts.
 */

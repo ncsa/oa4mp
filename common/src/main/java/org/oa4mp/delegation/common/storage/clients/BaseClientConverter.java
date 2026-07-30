@@ -241,9 +241,19 @@ public class BaseClientConverter<V extends BaseClient> extends MonitoredConverte
     protected Collection<String> jsonArrayToCollection(ConversionMap<String, Object> map, String key) {
         JSONArray json;
         try {
-            json = (JSONArray) JSONSerializer.toJSON(map.get(key));
+            Object obj = map.get(key);
+            if(obj instanceof String) {
+                // Fix https://github.com/ncsa/oa4mp/issues/309
+                // Kord AMP JSON library handles white space inside JSON objects.
+                // but blows up if the string has any initial whitespace.
+                obj = ((String)obj).trim();
+            }
+            json = (JSONArray) JSONSerializer.toJSON(obj);
         } catch (Throwable t) {
-            t.printStackTrace();
+            if(DebugUtil.isEnabled()) {
+                t.printStackTrace();
+                System.err.println("JSON parsing error. (Cutting and pasting text can embed illegal characters. Remove any whitedspace.)");
+            }
             throw t;
         }
         Collection<String> zzz = (Collection<String>) JSONSerializer.toJava(json);

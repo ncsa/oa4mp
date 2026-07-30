@@ -5,7 +5,7 @@
     "https://client.example.org/callback",
     "https://client.example.org/callback2"
   ],
-  "client_name": "My Example",
+  "client_name": "RFC 7591 Example Client",
   "scope": ["openid", "email", "profile"],
   "contacts": [
     "ve7jtb@example.org"

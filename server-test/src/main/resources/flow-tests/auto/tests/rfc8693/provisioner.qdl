@@ -26,10 +26,11 @@
 ⊨ 0 < size(args()) : 'Missing file name';
 
 saved_cfg := args().0;
+provisioner_id := size(args()) == 2 ? args().1 : 'localhost:p1';
 params. ≔ {'sub':'jeff',
          'scope':['openid', 'read:/X', 'read:/Y/Q', 'p.q'] // should be able to pass in scopes as a simple list
          };
-clc#init($$OA4MP_CLC_XML_INI, 'localhost:p1');
+clc#init($$OA4MP_CLC_XML_INI, provisioner_id);
 tokens. := clc#rfc7523(params.);
 rm(saved_cfg); // just in case
 clc#write(saved_cfg); // for reference later

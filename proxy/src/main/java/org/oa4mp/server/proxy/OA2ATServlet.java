@@ -345,13 +345,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 // do nothing.
             }
         }
-/*        if (client.isRTLifetimeEnabled()) {
-            long lifetime = ClientUtils.computeRefreshLifetime(serviceTransaction, client, getOA2SE());
-            serviceTransaction.setRefreshTokenLifetime(ClientUtils.computeRefreshLifetime(serviceTransaction, client, getOA2SE()));
-            serviceTransaction.setRefreshTokenExpiresAt(System.currentTimeMillis() + lifetime);
-        } else {
-            serviceTransaction.setRefreshTokenLifetime(0L);
-        }*/
+
         if (request.getParameter(OA2Constants.ID_TOKEN_LIFETIME) != null) {
             String rawATLifetime = getFirstParameterValue(request, OA2Constants.ID_TOKEN_LIFETIME);
             try {
@@ -363,8 +357,6 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                 // do nothing.
             }
         }
-        //  serviceTransaction.setIDTokenLifetime(ClientUtils.computeIDTLifetime(serviceTransaction, client, getOA2SE()));
-
 
         OA2ServletUtils.processXAs(request, serviceTransaction, client);
 
@@ -690,14 +682,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         issuerTransactionState = doAT(issuerTransactionState, client);
         // Now, get the right signing key
         JSONWebKey key = OA2ClientUtils.getSigningKey(getOA2SE(), serviceTransaction, client);
-/*
-        VirtualIssuer vo = getOA2SE().getVI(client.getIdentifier());
-        if (vo != null && vo.getJsonWebKeys() != null) {
-            key = vo.getJsonWebKeys().get(vo.getDefaultKeyID());
-        } else {
-            key = getOA2SE().getJsonWebKeys().getDefault();
-        }
-*/
+
         ATIResponse2 atResponse = (ATIResponse2) issuerTransactionState.getIssuerResponse();
         atResponse.setJsonWebKey(key);
         if (isRFC6749_4_4) {
@@ -1177,6 +1162,8 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
                     long lifetime = ClientUtils.computeRefreshLifetime(t2, client, getOA2SE());
                     t2.setRefreshTokenLifetime(lifetime);
                     t2.setRefreshTokenExpiresAt(System.currentTimeMillis() + lifetime);
+                    // Fix https://github.com/ncsa/oa4mp/issues/310
+                    t2.setRefreshTokenValid(true);
                 } else {
                     t2.setRefreshTokenLifetime(0L);
                 }

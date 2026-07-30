@@ -71,6 +71,7 @@ public class TransactionCacheTest extends BaseTransactionStoreTest {
         }
         cc.age();
         assert maxCacheSize == cc.getMap().size();
+        getStore().remove(hashMap);
     }
 
 }

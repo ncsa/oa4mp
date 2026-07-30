@@ -200,14 +200,16 @@ public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
         entries = getSortable().sort(entries);
         int countLength = Integer.toString(entries.size()).length();
         int[] fieldWidths = fieldWidths(entries);
-        if(!lineList){
-            String header = columnHeader(countLength,fieldWidths);
-            if(!isTrivial(header)){
+        if (!lineList) {
+            String header = columnHeader(countLength, fieldWidths);
+            if (!isTrivial(header)) {
                 say(header);
             }
         }
         for (Identifiable x : entries) {
-            if(edu.uiuc.ncsa.security.storage.cli.StoreArchiver.isVersioned(x.getIdentifier()) && !showVersions) {continue;}
+            if (edu.uiuc.ncsa.security.storage.cli.StoreArchiver.isVersioned(x.getIdentifier()) && !showVersions) {
+                continue;
+            }
 
             ClientApproval tempA = approvalMap.get(x.getIdentifier());
             if (tempA == null) {
@@ -242,51 +244,34 @@ public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
     }
 
     protected String format(BaseClient client, ClientApproval ca, int[] fieldWidths) {
-       return NEWformat(client,ca, fieldWidths);
+        return NEWformat(client, ca, fieldWidths);
     }
+
     protected String NEWformat(BaseClient client, ClientApproval ca, int[] fieldWidths) {
         String rc = "";
         if (ca == null) {
             rc = rc + "?";
         } else {
-            boolean isApproved = ca != null && ca.isApproved();
-            rc =  rc + (isApproved ? "Y" : "N") ;
+            rc = rc + ClientApprovalStoreCommands.statusToShortString(ca);
         }
         String name = (client.getName() == null ? "---" : client.getName());
-        rc = rc  + STILE +  pad2(name, fieldWidths[0]);
+        rc = rc + STILE + pad2(name, fieldWidths[0]);
         rc = rc + STILE + pad2(Iso8601.date2String(client.getCreationTS()), fieldWidths[1]);
         rc = rc + STILE + client.getIdentifierString();
 
         return rc;
     }
-/*
-    protected String OLDformat(BaseClient client, ClientApproval ca) {
-        String rc = "(";
-        if (ca == null) {
-            rc = rc + "?";
-        } else {
-            boolean isApproved = ca != null && ca.isApproved();
-            rc =  rc + (isApproved ? "Y" : "N") ;
-        }
-        rc  = rc + ")";
-        //rc = rc + " created on " + Iso8601.date2String(client.getCreationTS());
-        String name = (client.getName() == null ? center("---",35) : pad2(client.getName(), 35));
-        rc = rc  + " " + name ;
-        rc = rc + " " + pad2(Iso8601.date2String(client.getCreationTS()), ISO_8601_FORMAT_LENGTH);
-        rc = rc + " " + client.getIdentifierString();
-        return rc;
-    }
-*/
+
 
     @Override
     public int[] fieldWidths(List<Identifiable> identifiables) {
-        if(100  < identifiables.size()){
+        if (100 < identifiables.size()) {
             return new int[]{35, ISO_8601_FORMAT_LENGTH};
         }
-        int[] fieldWidths =  new int[]{5, ISO_8601_FORMAT_LENGTH};
-        for(Identifiable x : identifiables){
+        int[] fieldWidths = new int[]{5, ISO_8601_FORMAT_LENGTH};
+        for (Identifiable x : identifiables) {
             BaseClient baseClient = (BaseClient) x;
-            int nameLength = isTrivial(baseClient.getName())? 0 : baseClient.getName().length();
+            int nameLength = isTrivial(baseClient.getName()) ? 0 : baseClient.getName().length();
             fieldWidths[0] = Math.max(fieldWidths[0], nameLength);
         }
         return fieldWidths;
@@ -295,7 +280,7 @@ public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
     @Override
     protected String columnHeader(int offset, int[] fieldWidths) {
         String out = StringUtils.getBlanks(offset + 2);
-        out = out +  "a" // for "approved?"
+        out = out + "s" // for "status"
                 + STILE + pad2("name", fieldWidths[0])
                 + STILE + pad2("creation date", fieldWidths[1])
                 + STILE + "identifier";
@@ -325,7 +310,7 @@ public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
     protected String format(Identifiable identifiable, int offset, int[] fieldWidths) {
         BaseClient client = (BaseClient) identifiable;
         ClientApproval ca = (ClientApproval) getClientApprovalStore().get(client.getIdentifier());
-        return format(client, ca,  fieldWidths);
+        return format(client, ca, fieldWidths);
     }
 
    /* @Override
@@ -434,13 +419,13 @@ public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
 
         for (Identifiable identifiable : identifiables) {
             BaseClient client = null;
-            if(identifiable instanceof BaseClient) {
+            if (identifiable instanceof BaseClient) {
                 client = (BaseClient) identifiable;
             }
-            if(identifiable instanceof ClientApproval) {
+            if (identifiable instanceof ClientApproval) {
                 client = (BaseClient) getStore().get(identifiable.getIdentifier());
             }
-            if(client == null) {
+            if (client == null) {
                 say("unknown identifiable " + identifiable.getClass().getSimpleName());
             }
             approvalModsConfig.client = client;
@@ -457,13 +442,13 @@ public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
     protected void old_approve(InputLine inputLine, Identifiable identifiable) throws Throwable {
         // But everyone expects it to behave in the kludgy way for single approvals.
         BaseClient client = null;
-        if(identifiable instanceof BaseClient) {
-             client = (BaseClient) identifiable;
+        if (identifiable instanceof BaseClient) {
+            client = (BaseClient) identifiable;
         }
-        if(identifiable instanceof ClientApproval) {
+        if (identifiable instanceof ClientApproval) {
             client = (BaseClient) getStore().get(identifiable.getIdentifier());
         }
-        if(client == null) {
+        if (client == null) {
             say("unknown identifiable " + identifiable.getClass().getSimpleName());
         }
         client = doApprovalMods(new ApprovalModsConfig(client, true));
@@ -575,6 +560,8 @@ public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
             say("E.g.");
             sayi("status_search -rs my_pending p");
             say("would search for all pending approvals and save them in the result set named my_pending");
+            say("N.B. It is still possible to not find some approvals if the approval flag \"approved\" is false.");
+            say("You may have to use search for that directly.");
             say("See also: search, approver_search, rs");
             return;
         }
@@ -590,18 +577,23 @@ public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
         String rawStatus = inputLine.getLastArg();
         switch (rawStatus) {
             case "a":
+            case "approved":
                 rawStatus = APPROVED.getStatus();
                 break;
             case "d":
+            case "denied":
                 rawStatus = DENIED.getStatus();
                 break;
             case "n":
+            case "none":
                 rawStatus = NONE.getStatus();
                 break;
             case "p":
+            case "pending":
                 rawStatus = PENDING.getStatus();
                 break;
             case "r":
+            case "revoked":
                 rawStatus = REVOKED.getStatus();
                 break;
             default:
@@ -613,6 +605,10 @@ public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
 
         if (sizeOnly) {
             say("there are " + ids.size() + " clients with the status " + rawStatus);
+            return;
+        }
+        if (ids.isEmpty()) {
+            say("no clients with the status " + rawStatus);
             return;
         }
         List<Identifiable> acs = new ArrayList<>(ids.size());

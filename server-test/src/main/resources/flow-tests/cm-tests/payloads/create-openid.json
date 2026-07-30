@@ -8,7 +8,7 @@
         "http://localhost/callback2",
         "http://localhost/callback3"
   ],
-  "client_name": "Another test client",
+  "client_name": "RFC 7591 Example Client",
   "scope": "openid",
   "token_endpoint_auth_method": "client_secret_basic",
   "contacts": [
