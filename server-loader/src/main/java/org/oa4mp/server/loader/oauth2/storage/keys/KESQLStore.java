@@ -119,7 +119,7 @@ public class KESQLStore<V extends KERecord> extends SQLStore<V> implements KESto
 
     @Override
     public JSONWebKeys getCurrentKeys(VirtualIssuer vi) {
-        return (JSONWebKeys) getByVID(vi, true);
+        return (JSONWebKeys) getByVID(vi, true, true);
     }
 
     @Override
@@ -188,7 +188,7 @@ public class KESQLStore<V extends KERecord> extends SQLStore<V> implements KESto
      * @param keysOnly
      * @return
      */
-    protected Map getByVID(VirtualIssuer vi, boolean keysOnly) {
+    protected Map getByVID(VirtualIssuer vi, boolean validKeysOnly, boolean keysOnly) {
         Identifier viID = OA2SE.SERVER_VI_ID; // default.
         if (vi != null) viID = vi.getIdentifier();
         IdentifiableMap<KERecord> outMap = null;
@@ -205,7 +205,7 @@ public class KESQLStore<V extends KERecord> extends SQLStore<V> implements KESto
     */
         String rawStatement = "SELECT * from " + getTable().getFQTablename() + " where " +
                 getKeys().vi() + "=? AND " +
-                getKeys().isValid() + "=1" ;
+                getKeys().isValid() + "=" + (validKeysOnly?"1":"0") ;
                ConnectionRecord cr = getConnection();
         Connection c = cr.connection;
 
@@ -246,7 +246,12 @@ public class KESQLStore<V extends KERecord> extends SQLStore<V> implements KESto
 
     @Override
     public IdentifiableMap<KERecord> getByVI(VirtualIssuer vi) {
-        return (IdentifiableMap<KERecord>)getByVID(vi, false);
+        return (IdentifiableMap<KERecord>)getByVID(vi, true, false);
     }
 
+    @Override
+    public IdentifiableMap<KERecord> getByVI(VirtualIssuer vi, boolean validKeysOnly) {
+        return (IdentifiableMap<KERecord>)getByVID(vi, validKeysOnly, false);
+
+    }
 }

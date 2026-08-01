@@ -493,7 +493,8 @@ public class OA2SE extends ServiceEnvironmentImpl {
           */
          for(Identifier key : identifiableMap.keySet()) {
              KERecord k = identifiableMap.get(key);
-             if(k.hasValidDate() && !k.isExpired() ) {
+             //if(k.hasValidDate() && !k.isExpired() ) {
+             if(!k.isExpired() ) {
                  try{
                  jsonWebKeys.put(k.getKid(), k.toJWK());
                  }catch(Exception e) {

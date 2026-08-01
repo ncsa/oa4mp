@@ -186,6 +186,9 @@ public class KERecord extends Monitored {
         // and let them have their own copy.
         JSONObject json = JSONWebKeyUtil.toJSON(getJwk());
         JSONWebKey jwk2 = JSONWebKeyUtil.fromJSON(json).get(getKid());
+        if(jwk2 == null) {
+            return null;
+        }
         jwk2.expiresAt = getExp();
         jwk2.issuedAt = getIat();
         jwk2.notValidBefore = getNbf();

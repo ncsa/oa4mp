@@ -36,10 +36,13 @@ public class KEStoreUtilities {
     }
 
     public static IdentifiableMap<KERecord> getByVI(KEStore<KERecord> store, VirtualIssuer vi) {
+        return getByVI(store, vi, true);
+    }
+    public static IdentifiableMap<KERecord> getByVI(KEStore<KERecord> store, VirtualIssuer vi, boolean validKeysOnly) {
         IdentifiableMap<KERecord> map = new IdentifiableMap<>();
         URI viURI = vi.getIdentifier().getUri();
         for (KERecord ker : store.values()) {
-            if (ker.getVi().equals(viURI)) {
+            if (ker.getVi().equals(viURI) && (ker.getValid() == validKeysOnly)) {
                 map.put(ker.getIdentifier(), ker);
             }
         }
@@ -71,7 +74,7 @@ public class KEStoreUtilities {
     public static Map<Identifier, KERecord> rotate(OA2SE oa2SE,
                                                    List<Identifier> vIDs,
                                                    KEConfiguration keConfiguration,
-                                                   boolean retainInVI,
+                                                   boolean forceFlag,
                                                    boolean testOnly) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, InvalidKeySpecException {
         if (vIDs == null || vIDs.isEmpty()) {
             return new HashMap<>();
@@ -111,7 +114,7 @@ public class KEStoreUtilities {
                 return newRecords;
             } else {
                 // have keys in store to rotate.
-                return KEStoreUtilities.rotate(oa2SE.getKEStore(), kers, keConfiguration.cacheGracePeriod, keConfiguration.atGracePeriod, true, testOnly);
+                return KEStoreUtilities.rotate(oa2SE.getKEStore(), kers, forceFlag, keConfiguration.cacheGracePeriod, keConfiguration.atGracePeriod, true, testOnly);
             }
         }
         return new HashMap<>();
@@ -136,6 +139,7 @@ public class KEStoreUtilities {
      */
     public static Map<Identifier, KERecord> rotate(KEStore keStore,
                                                    Map<Identifier, KERecord> oldKERS,
+                                                   boolean force,
                                                    long cacheGracePeriod,
                                                    long atGracePeriod,
                                                    boolean updateOldKeys,
@@ -151,9 +155,9 @@ public class KEStoreUtilities {
             KERecord oldKER = oldKERS.get(identifier);
 
             // If a key does not have a not before and is requested to rotate, do so.
-            if (oldKER.isValid
+            if (force || (oldKER.isValid
                     && oldKER.getExp() == null
-                    && (oldKER.getNbf() == null || (oldKER.getNbf().before(now)))) {
+                    && (oldKER.getNbf() == null || (oldKER.getNbf().before(now))))) {
                 KERecord newKER = rotate(keStore, oldKER, cacheGracePeriod, atGracePeriod, testOnly);
                 newKER.setValid(true);
                 kers.put(newKER.getIdentifier(), newKER);
@@ -221,6 +225,9 @@ public class KEStoreUtilities {
         JWKUtil2 jwkUtil2 = new JWKUtil2();
         JSONWebKey newKey = null;
         JSONWebKey oldKey = oldKER.getJwk();
+        if (oldKey == null) {
+            throw new IllegalArgumentException("No key to rotate");
+        }
         if (oldKey.isRSAKey()) {
             newKey = jwkUtil2.createRSAKey(oldKey.JOSEJWK.size(), oldKey.algorithm);
         }

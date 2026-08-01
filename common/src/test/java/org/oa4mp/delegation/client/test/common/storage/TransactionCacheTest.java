@@ -15,6 +15,7 @@ import org.oa4mp.delegation.common.token.AccessToken;
 import org.oa4mp.delegation.common.token.AuthorizationGrant;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 
@@ -71,7 +72,8 @@ public class TransactionCacheTest extends BaseTransactionStoreTest {
         }
         cc.age();
         assert maxCacheSize == cc.getMap().size();
-        getStore().remove(hashMap);
+        ArrayList<Identifier> list = new ArrayList<>(hashMap.keySet());
+        getStore().remove(list);
     }
 
 }

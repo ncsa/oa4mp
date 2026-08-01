@@ -27,6 +27,7 @@ import org.oa4mp.server.loader.qdl.util.SigningCommands;
 
 import java.io.IOException;
 import java.net.URI;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.*;
@@ -69,7 +70,7 @@ public class KeyCommands extends OA4MPStoreCommands {
                 STILE + (keRecord.getValid() ? "true " : "false") + // make length match
                 STILE + center((keRecord.getNbf() == null ? "--" : Iso8601.date2String(keRecord.getNbf())), fieldWidths[4]) +
                 STILE + center((keRecord.getExp() == null ? "--" : Iso8601.date2String(keRecord.getExp())), fieldWidths[5]) +
-                STILE + LJustify(keRecord.getVi().toString(), fieldWidths[6]) +
+                STILE + LJustify(keRecord.getVi() == null ? "--" : keRecord.getVi().toString(), fieldWidths[6]) +
                 STILE + keRecord.getIdentifierString();
         return out;
     }
@@ -78,16 +79,20 @@ public class KeyCommands extends OA4MPStoreCommands {
     public int[] fieldWidths(List<Identifiable> identifiables) {
         int width = 25; // long width, for ISO dates e.g.
         int s = 5; // short width
-        if(100 < identifiables.size()) {
-            return new int[]{33,s,s,s, width,width,32};
+        if (100 < identifiables.size()) {
+            return new int[]{33, s, s, s, width, width, 32};
         }
-        int[] fieldWidths =  new int[]{5,s,s,s,width,width,5};
-        for(Identifiable identifiable : identifiables) {
+        int[] fieldWidths = new int[]{5, s, s, s, width, width, 5};
+        for (Identifiable identifiable : identifiables) {
             KERecord keRecord = (KERecord) identifiable;
-            fieldWidths[0] = Math.max(fieldWidths[0],keRecord.getKid().length());
-            fieldWidths[6] = Math.max(fieldWidths[6],keRecord.getVi().toString().length());
+            if (!isTrivial(keRecord.getKid())) {
+                fieldWidths[0] = Math.max(fieldWidths[0], keRecord.getKid().length());
+            }
+            if (keRecord.getVi() != null) {
+                fieldWidths[6] = Math.max(fieldWidths[6], keRecord.getVi().toString().length());
+            }
         }
-        fieldWidths[0] = fieldWidths[0]+1; // since it may get a * if its a  default key
+        fieldWidths[0] = fieldWidths[0] + 1; // since it may get a * if its a  default key
         return fieldWidths;
     }
 
@@ -378,11 +383,11 @@ public class KeyCommands extends OA4MPStoreCommands {
     public void get_current(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
             say("get_current [" + CURRENT_EXP_FLAG + " true | false] [" +
-                   CURRENT_VALID_FLAG + " true | false] " +  DEFAULT_SERVER_VI + " | index - get the current keys (valid or not) for a given VI");
+                    CURRENT_VALID_FLAG + " true | false] " + DEFAULT_SERVER_VI + " | index - get the current keys (valid or not) for a given VI");
             say("No argument means to list the keys for the default VI.");
-            say(RJustify(CURRENT_EXP_FLAG,7) + " - if true, return only expired keys. If false, return un-expired.");
+            say(RJustify(CURRENT_EXP_FLAG, 7) + " - if true, return only expired keys. If false, return un-expired.");
             say(getBlanks(10) + "Omitting it returns all keys.");
-            say(RJustify(CURRENT_VALID_FLAG,7) + " - If true, return only valid (nbf is before now) and if false ");
+            say(RJustify(CURRENT_VALID_FLAG, 7) + " - If true, return only valid (nbf is before now) and if false ");
             say(getBlanks(10) + "return nbf is after now. Omit means ignore valid date.");
             say("You can do this with the search command, it is just a convenience.");
             return;
@@ -399,7 +404,7 @@ public class KeyCommands extends OA4MPStoreCommands {
             returnExpired = inputLine.getBooleanNextArgFor(CURRENT_EXP_FLAG);
             inputLine.removeSwitchAndValue(CURRENT_EXP_FLAG);
         }
-        if(hasValidFlag){
+        if (hasValidFlag) {
             returnValid = inputLine.getBooleanNextArgFor(CURRENT_VALID_FLAG);
             inputLine.removeSwitchAndValue(CURRENT_VALID_FLAG);
         }
@@ -426,13 +431,13 @@ public class KeyCommands extends OA4MPStoreCommands {
                         }
                     }
                 }
-                if(hasValidFlag){
-                    if(returnValid){
-                        if(!keRecord.hasValidDate()){
+                if (hasValidFlag) {
+                    if (returnValid) {
+                        if (!keRecord.hasValidDate()) {
                             continue;
                         }
-                    }else{
-                        if(keRecord.hasValidDate()){
+                    } else {
+                        if (keRecord.hasValidDate()) {
                             continue;
                         }
                     }
@@ -483,17 +488,21 @@ public class KeyCommands extends OA4MPStoreCommands {
     public static String KR_VI = "-vi";
     public static String KR_CACHE_LIFETIME = "-cache";
     public static String KR_AT_LIFETIME = "-at";
+    public static String KR_FORCE_FLAG = "-force";
+    public static String KR_TEST_FLAG = "-test";
 
     protected void rotateHelp(InputLine inputLine) {
         say("rotate [" + KR_ALL + " | " + KR_KID + " id | " + KR_VI + " vi " +
                 KR_CACHE_LIFETIME + " cache_lifetime " +
-                KR_AT_LIFETIME + " access_token_lifetime -test | index] - rotate the key at the given index");
-        say(KR_ALL + " = rotate all keys in the store. If the " + KR_VI + " argument is present, this is ignored and only the speicifed VI is rotated.");
-        say(KR_KID + " = rotate the specific key by is key id.");
-        say(KR_VI + " = rotate the keys by for a given virtual issuer. A valid of default rotates the server keys.");
-        say(KR_CACHE_LIFETIME + " = set the cache lifetime grace perdiod. Default is 24 hours.");
-        say(KR_AT_LIFETIME + " = set the access token lifetime grace period. Default is the max server access token lifetime.");
-        say("-test = (flag) test only, do not actually rotate the keys.");
+                KR_AT_LIFETIME + " access_token_lifetime " +
+                KR_TEST_FLAG + " " + KR_FORCE_FLAG + "]  [index] - rotate the key at the given index");
+        say(RJustify(KR_ALL, 6) + " = rotate all keys in the store. If the " + KR_VI + " argument is present, this is ignored and only the speicifed VI is rotated.");
+        say(RJustify(KR_KID, 6) + " = rotate the specific key by is key id.");
+        say(RJustify(KR_VI, 6) + " = rotate the keys by for a given virtual issuer. A valid of default rotates the server keys.");
+        say(RJustify(KR_CACHE_LIFETIME, 6) + " = set the cache lifetime grace perdiod. Default is 24 hours.");
+        say(RJustify(KR_AT_LIFETIME, 6) + " = set the access token lifetime grace period. Default is the max server access token lifetime.");
+        say(RJustify(KR_TEST_FLAG, 6) + " = (flag) test only, do not actually rotate the keys.");
+        say(RJustify(KR_FORCE_FLAG, 6) + " = (flag) force the rotation, even if the key is not yet expired.");
         say("The index is the index (unique identifier or element in a result set) of the key in the store.");
         say("This will rotate the key(s) either per VI's policy or you may directly set the lifetimes");
         say("Setting at least one of " + KR_CACHE_LIFETIME + " or " + KR_AT_LIFETIME + " will override the policy");
@@ -521,6 +530,8 @@ public class KeyCommands extends OA4MPStoreCommands {
             say("No key store enabled.");
             return;
         }
+        boolean forceFlag = inputLine.hasArg(KR_FORCE_FLAG);
+        inputLine.removeSwitch(KR_FORCE_FLAG);
         Long cacheLifetime = null;
         Long atLifetime = null;
         Identifier viID = null;
@@ -552,6 +563,12 @@ public class KeyCommands extends OA4MPStoreCommands {
             if (cacheLifetime == null) cacheLifetime = serverKEC.cacheGracePeriod;
             if (atLifetime == null) atLifetime = serverKEC.atGracePeriod;
         }
+        if(cacheLifetime == 0L && atLifetime == 0L) {
+            if(!"y".equals(getInput("Warning -- zero cache and lifetime. Are you sure you want to do this? (y/n) ", "y"))){
+                say("aborting...");
+                return;
+            }
+        }
         boolean doKID = inputLine.hasArg(KR_KID);
         if (doKID) {
             String kid = inputLine.getNextArgFor(KR_KID);
@@ -575,7 +592,7 @@ public class KeyCommands extends OA4MPStoreCommands {
                 newRecord.setValid(true);
                 if (testOnly) {
                     say("Test rotation of key with ID " + keRecord.getKid());
-                    testBlurb(keRecord,cacheLifetime,atLifetime);
+                    testBlurb(keRecord, cacheLifetime, atLifetime);
                 } else {
                     getEnvironment().getKEStore().update(keRecord);
                     getEnvironment().getKEStore().save(newRecord);
@@ -600,7 +617,7 @@ public class KeyCommands extends OA4MPStoreCommands {
             FoundIdentifiables foundIdentifiables = findByIDOrRS(viStore, viID.toString());
             if (foundIdentifiables != null && !foundIdentifiables.isEmpty()) {
                 Map<Identifier, KERecord> map = KEStoreUtilities.rotate(getEnvironment(), foundIdentifiables.getIdentifiers(),
-                        serverKEC, false, testOnly);
+                        serverKEC, forceFlag, testOnly);
                 if (map.size() == 0) {
                     say("No keys found for VI \"" + viIDString + "\". This utility only rotates valid keys that no not " +
                             "have an expiration date." +
@@ -618,7 +635,7 @@ public class KeyCommands extends OA4MPStoreCommands {
                         }
                         for (Identifier id : map.keySet()) {
                             KERecord keRecord = map.get(id);
-                            say(StringUtils.getBlanks(countLength + 2) + format(keRecord,countLength,fieldWidths));
+                            say(StringUtils.getBlanks(countLength + 2) + format(keRecord, countLength, fieldWidths));
                             //say(keRecord.getKid() + " | " + keRecord.getAlg() + " | exp = " +")");
                         }
                         testBlurb(null, cacheLifetime, atLifetime);
@@ -635,7 +652,7 @@ public class KeyCommands extends OA4MPStoreCommands {
 
                 Map<Identifier, KERecord> serverKERs = getStore().getByVI(vi); // it is *possible* that there is no VI if it's the default.
                 if (serverKERs != null && !serverKERs.isEmpty()) {
-                    serverKERs = KEStoreUtilities.rotate(getStore(), serverKERs, serverKEC.cacheGracePeriod, serverKEC.atGracePeriod, true, testOnly);
+                    serverKERs = KEStoreUtilities.rotate(getStore(), serverKERs, forceFlag, serverKEC.cacheGracePeriod, serverKEC.atGracePeriod, true, testOnly);
                     say("Rotated " + serverKERs.size() + " keys");
                     return;
                 }
@@ -645,7 +662,7 @@ public class KeyCommands extends OA4MPStoreCommands {
                     return;
                 }
                 Map<Identifier, KERecord> map = getIdentifierKERecordMap(keys, true, null);
-                map = KEStoreUtilities.rotate(getStore(), map, serverKEC.cacheGracePeriod, serverKEC.atGracePeriod, false, testOnly);
+                map = KEStoreUtilities.rotate(getStore(), map, forceFlag, serverKEC.cacheGracePeriod, serverKEC.atGracePeriod, false, testOnly);
                 if (testOnly) {
                     say("tested and found " + map.size() + " keys to rotate:");
                     for (Identifier id : map.keySet()) {
@@ -680,9 +697,9 @@ public class KeyCommands extends OA4MPStoreCommands {
                 KERecord keRecord = (KERecord) identifiable;
                 keRecords.put(keRecord.getIdentifier(), keRecord);
             }
-            Map<Identifier, KERecord> newRecords = KEStoreUtilities.rotate(getStore(), keRecords, cacheLifetime, atLifetime, true, testOnly);
+            Map<Identifier, KERecord> newRecords = KEStoreUtilities.rotate(getStore(), keRecords, forceFlag, cacheLifetime, atLifetime, true, testOnly);
             if (testOnly) {
-                for(Identifier id : newRecords.keySet()) {
+                for (Identifier id : newRecords.keySet()) {
                     KERecord keRecord = newRecords.get(id);
                     say(format(keRecord));
                 }
@@ -697,14 +714,15 @@ public class KeyCommands extends OA4MPStoreCommands {
     }
 
     protected void testBlurb(KERecord keRecord, long cache, long at) {
-        if(keRecord != null) {
+        if (keRecord != null) {
             say("key exp : " + Iso8601.date2String(keRecord.getExp()));
             say("key nbf : " + Iso8601.date2String(keRecord.getNbf()));
         }
         say("cache lifetime : " + cache + " ms.");
-        say("   at lifetime : " + at  + " ms.");
+        say("   at lifetime : " + at + " ms.");
         say("  current time : " + Iso8601.date2String(new Date()));
     }
+
     public static String CREATE_KEYS_CURVE = "-curve";
     public static String CREATE_KEYS_TYPE = "-type";
     public static String CREATE_KEYS_SIZE = "-size";
@@ -937,41 +955,63 @@ public class KeyCommands extends OA4MPStoreCommands {
     public void ls(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
             super.ls(inputLine);
-            say("You may also specify just a VI with the " + KR_VI + " switch.");
-            say("This lists only keys in that VI.");
-            say("Compare with get_current which will give a summary of the keys for a given");;
-            say("VI, not listing the key store records.");
+            say("You may also specify the following switches.");
+            say(RJustify(KR_VI, 6) + " = specify a specific VI to get all the keys for.");
+            say("Compare with get_current which will give a summary of the keys for a given");
+            say("VI, not just listing the key store records.");
+            say(RJustify(KR_KID, 6) + " = specify a specific key id to get the key record.");
             return;
         }
         if (getEnvironment().getKEStore() == null) {
             say("No key store enabled. You may still call \"show\" to see the signing keys for various VIs.");
             return;
         }
-        if(inputLine.hasArg(KR_VI)) {
+        FoundIdentifiables foundIdentifiables = null;
+        IdentifiableMap<KERecord> map = null;
+        boolean gotOne = false;
+        if (inputLine.hasArg(KR_KID)) {
+            String kid = inputLine.getNextArgFor(KR_KID);
+            inputLine.removeSwitchAndValue(KR_KID);
+            KERecord keRecord = getStore().getByKID(kid);
+            if (keRecord == null) {
+                say("no entry found with kid \"" + kid + "\"");
+                return;
+            }
+            map = new IdentifiableMap<>();
+            map.put(keRecord);
+            gotOne = true;
+        }
+        if (inputLine.hasArg(KR_VI) && !gotOne) {
             String vi = inputLine.getNextArgFor(KR_VI);
             inputLine.removeSwitchAndValue(KR_VI);
-            if(vi.equals(DEFAULT_SERVER_VI)) {
+            if (vi.equals(DEFAULT_SERVER_VI)) {
                 vi = OA2SE.SERVER_VI_ID.toString();
             }
             VirtualIssuer virtualIssuer = (VirtualIssuer) getEnvironment().getVIStore().get(BasicIdentifier.newID(vi));
-            if(virtualIssuer == null) {
-                say("no ViI for " + vi + " found.");
-                return;
+            if (virtualIssuer == null) {
+                virtualIssuer = new VirtualIssuer(BasicIdentifier.newID(vi));
             }
 
-            IdentifiableMap<KERecord> map = getStore().getByVI(virtualIssuer);
-            FoundIdentifiables foundIdentifiables = new FoundIdentifiables(false, map.values());
-
+            map = getStore().getByVI(virtualIssuer);
+            if(map == null || map.isEmpty()) {
+                say("no entries for VI \"" + vi + "\"");
+                return;
+            }
+            gotOne = true;
+        }
+        if (gotOne) {
             boolean listSingleLines = inputLine.hasArg(LINE_LIST_COMMAND);
             boolean listMultiLines = inputLine.hasArg(VERBOSE_COMMAND);
             boolean shortForm = !(listMultiLines || listSingleLines);
-
             if ((listSingleLines && listMultiLines)) {
                 say("inconsistent flags. You cannot have both single and multiline output at the same time.");
                 return;
             }
-            printLS(foundIdentifiables,listSingleLines,listMultiLines,shortForm);
+            foundIdentifiables = new FoundIdentifiables(false, map.values());
+
+            printLS(foundIdentifiables, listSingleLines, listMultiLines, shortForm);
             return;
+
         }
         super.ls(inputLine);
     }
@@ -1010,10 +1050,10 @@ public class KeyCommands extends OA4MPStoreCommands {
         if (newKER.getDefault()) {
             say("Warning, new key with kid \"" + newKID + "\" was already the current default.");
         } else {
-            if(newKER.isExpired()){
+            if (newKER.isExpired()) {
                 say("Warning, the new key is expired.");
                 try {
-                    if("y".equalsIgnoreCase(getInput("Abort?","y"))){
+                    if ("y".equalsIgnoreCase(getInput("Abort?", "y"))) {
                         say("aborting...");
                         return;
                     }
@@ -1028,6 +1068,58 @@ public class KeyCommands extends OA4MPStoreCommands {
         }
         getStore().update(updateMap);
         say("done!");
+    }
+
+    @Override
+    protected Identifiable preCreation(Identifiable identifiable, int magicNumber) {
+        KERecord kerecord = (KERecord) super.preCreation(identifiable, magicNumber);
+
+        JWKUtil2 jwkUtil2 = new JWKUtil2();
+        try {
+            JSONWebKey jwk = jwkUtil2.createRSAKey();
+            kerecord.fromJWK(jwk, false);
+            Date now = new Date();
+            kerecord.setLastModifiedTS(now);
+            kerecord.setCreationTS(now);
+            kerecord.setLastAccessed(now);
+            kerecord.setVi(OA2SE.SERVER_VI_ID.getUri());
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        } catch (InvalidAlgorithmParameterException e) {
+            throw new RuntimeException(e);
+        } catch (InvalidKeySpecException e) {
+            throw new RuntimeException(e);
+        }
+        return kerecord;
+    }
+
+    @Override
+    protected Identifiable preCopy(Identifiable x) {
+        KERecord kerecord = (KERecord) super.preCopy(x);
+        // Since a constraint on the store is that the KID
+        // is unique, we set it to something random here.
+        JWKUtil2 jwkUtil2 = new JWKUtil2();
+        kerecord.setKid(jwkUtil2.createID());
+        Date now = new Date();
+        kerecord.setLastAccessed(now);
+        kerecord.setCreationTS(now);
+        kerecord.setLastModifiedTS(now);
+        return kerecord;
+    }
+
+    @Override
+    protected void showCreateHelp() {
+        super.showCreateHelp();
+        say("Note that for a generic key, a default RSA key is created. You can just resetrun the");
+        ;
+        say("this from the command line, e.g. from a file.");
+    }
+
+    @Override
+    protected void showCopyHelp() {
+        super.showCopyHelp();
+        say("Note that this generates a random kid (key id) for the new record.");
+        say("This is because all kids in the store must be unique. Reset it if you choose.");
     }
 }
 

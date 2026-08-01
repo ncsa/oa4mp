@@ -258,6 +258,15 @@ public class TransactionCache<V extends BasicTransaction> extends CachedMapFacad
 
     public V remove(Object key) {
         checkDestroyed();
+        if(key instanceof List){
+            List l = (List) key;
+            for(Object o:l){
+                getTransactionIndices().remove(o);
+                // NOTE that super removes it from the cache too.
+                 super.remove(o);
+            }
+            return null;
+        }
         BasicTransaction t = getTransactionIndices().remove(key);
         // NOTE that super removes it from the cache too.
         return super.remove(key);

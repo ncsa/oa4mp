@@ -43,4 +43,5 @@ public interface KEStore<V extends KERecord> extends Store<V> {
      * @return
      */
     IdentifiableMap<KERecord> getByVI(VirtualIssuer vi);
+    IdentifiableMap<KERecord> getByVI(VirtualIssuer vi, boolean validKeysOnly);
 }

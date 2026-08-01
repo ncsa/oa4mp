@@ -51,4 +51,9 @@ public class KEMemoryStore<V extends KERecord> extends MemoryStore<V> implements
     public IdentifiableMap<KERecord> getByVI(VirtualIssuer vi) {
         return KEStoreUtilities.getByVI((KEStore<KERecord>) this, vi);
     }
+
+    @Override
+    public IdentifiableMap<KERecord> getByVI(VirtualIssuer vi, boolean validKeysOnly) {
+        return KEStoreUtilities.getByVI((KEStore<KERecord>) this, vi);
+    }
 }
