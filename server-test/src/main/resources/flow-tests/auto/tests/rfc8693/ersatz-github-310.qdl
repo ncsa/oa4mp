@@ -30,15 +30,5 @@ old_tokens. := clc#tokens();
 old_id. := clc#claims();
 //say('claims:\n' + print(old_id.));
 tokens. := clc#exchange('-rt', args.0, args.1); // forks flow
-//rt. := tokens.'refresh_token';
-// same token returned by the service, not a new one.
-//⊨ (rt.'jti') != (old_tokens.'refresh_token'.'jti') : 'refresh token not swapped';
-
-// As per the spec, the access_token is always returned but the content is no specified.
-// If the return type is a RT, then BOTh are the same token, the RT
-//⊨ tokens.'access_token'.'jti' == rt.'jti' : 'refresh token not returned as main token';
-//⊨ 4800000 == rt.'lifetime' : 'refresh token has incorrect lifetime';
-//⊨ 'https://wlcg.cern.ch/jwt/refresh1' == rt.'jwt'.'aud' : 'refresh token has incorrect audience';
 tokens. := clc#refresh();
-
 say('ok: 𝕰𝖗s𝖆𝖙𝖟 GitHub issue 310 passed ' + (args.1) + ' for the subject token, followed by refresh');
