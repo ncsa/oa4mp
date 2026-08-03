@@ -173,6 +173,11 @@
     </dependencies>
     <reporting>
         <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <version>5.1.9</version> <!-- Use the latest stable version -->
+            </plugin>
             <!-- <plugin>
                  <groupId>org.apache.maven.plugins</groupId>
                  <artifactId>maven-javadoc-plugin</artifactId>
@@ -191,7 +196,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>3.12.0</version>
+                <version>3.12.1</version>
                 <configuration>
                     <locales>en</locales>
                 </configuration>
@@ -226,6 +231,12 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <version>5.1.9</version> <!-- Use the latest stable version -->
+                <extensions>true</extensions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
                 <version>3.0.0</version>
@@ -233,7 +244,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>3.8.2</version>
+                <version>3.12.1</version>
                 <dependencies>
 
                     <dependency>

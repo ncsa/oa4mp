@@ -58,6 +58,7 @@
           </mailingList>
       </mailingLists>
 
+<!--
       <distributionManagement>
           <repository>
               <id>sonatype-nexus-staging</id>
@@ -72,6 +73,7 @@
               <uniqueVersion>false</uniqueVersion>
           </snapshotRepository>
       </distributionManagement>
+-->
     <modules>
         <module>myproxy-logon</module>
         <module>server-api</module>
