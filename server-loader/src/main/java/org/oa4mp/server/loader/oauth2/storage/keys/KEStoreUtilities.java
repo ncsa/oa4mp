@@ -2,6 +2,7 @@ package org.oa4mp.server.loader.oauth2.storage.keys;
 
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.IdentifiableMap;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
@@ -67,7 +68,6 @@ public class KEStoreUtilities {
      *
      * @param oa2SE
      * @param vIDs
-     * @param retainInVI
      * @throws InvalidAlgorithmParameterException
      * @throws NoSuchAlgorithmException
      */
@@ -154,14 +154,34 @@ public class KEStoreUtilities {
         for (Identifier identifier : oldKERS.keySet()) {
             KERecord oldKER = oldKERS.get(identifier);
 
+            /*
+             * Secret debugging -- set /trace on and a bunch of stuff about the
+             * key will be printed.
+             */
+            if(DebugUtil.isTraceEnabled()){
+                String out = "processing " +oldKER.getKid() + ":" +
+                        "\n     force ? " + force +
+                        "\n   isValid = " + oldKER.isValid +
+                        "\nexp = null ? "  + (oldKER.getExp() == null) +
+                        "\nnbf = null ? " + (oldKER.getNbf() == null) +
+                        "\n nbf < now ? " + (oldKER.getNbf().before(now));
+                System.err.println(out);
+            }
             // If a key does not have a not before and is requested to rotate, do so.
             if (force || (oldKER.isValid
                     && oldKER.getExp() == null
                     && (oldKER.getNbf() == null || (oldKER.getNbf().before(now))))) {
-                KERecord newKER = rotate(keStore, oldKER, cacheGracePeriod, atGracePeriod, testOnly);
+                if(DebugUtil.isTraceEnabled()) {
+                    System.err.println("passed conditional, rotating key");
+                }
+                    KERecord newKER = rotate(keStore, oldKER, cacheGracePeriod, atGracePeriod, testOnly);
                 newKER.setValid(true);
                 kers.put(newKER.getIdentifier(), newKER);
                 updatedOLDKERs.put(oldKER);
+            }else{
+                if(DebugUtil.isTraceEnabled()) {
+                    System.err.println("Skipping key rotation.");
+                }
             }
         }
         // now update the store
