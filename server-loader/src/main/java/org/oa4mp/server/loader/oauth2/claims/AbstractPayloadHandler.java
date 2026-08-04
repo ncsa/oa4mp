@@ -224,7 +224,9 @@ abstract   public String getToken(JSONWebKey key)
     }
 
     /**
-     * Do template substitutions for subject, audience, resource and issuer.
+     * Do template substitutions for subject, audience, resource and issuer. This allows
+     * for strings and JSON arrays of strings to be substituted, but skips unknown object
+     * types.
      *
      * @param key
      * @param targetClaims
@@ -234,13 +236,14 @@ abstract   public String getToken(JSONWebKey key)
         if (!targetClaims.containsKey(key)) {
             return;
         }
-        Object obj = targetClaims.getString(key);
+        // Fix https://github.com/ncsa/oa4mp/issues/311
+        Object obj = targetClaims.get(key);
         if (obj instanceof JSONArray) {
             JSONArray jsonArray = (JSONArray) obj;
             for (int i = 0; i < jsonArray.size(); i++) {
                 Object y = jsonArray.get(i);
                 if (y instanceof String) {
-                    String s = (String) obj;
+                    String s = (String) y;
                     String newSubject = TemplateUtil.replaceAll(s, x);
                     jsonArray.set(i, newSubject);
                 }

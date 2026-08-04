@@ -6,6 +6,7 @@
 */
 params. ≔ {'sub':'davenport',
            'scope':'storage.read: storage.modify: compute.create',
+           'audience':['a', 'b', 'c'],
            'org.oa4mp:/rt/value/foo':'woof'};
 // another test should be to send the resource parameter which comes back as the access token audience.
 test_id:= 'oauth.rfc9068.qdl';
@@ -25,7 +26,7 @@ cc_rt.:=cc.'cfg'.'tokens'.'refresh';
 // first part of test is to get tokens with the server defaults.
 at_expected.:={'iss':server_defaults.'at_issuer',
                'sub':params.'sub',
-               'aud':cc_at.'audience',
+               'aud':['a','b','c'], // regression test for https://github.com/ncsa/oa4mp/issues/311
                'client_id':ini.'id',
                'scopes':['storage.read:/home/davenport/vo3', 'compute.create', 'storage.modify:/public/pendav/vo3', 'storage.modify:/public/davenport/vo3']};
 
@@ -62,4 +63,4 @@ try[
      ⊨ false : 'got claims and should not:\n' + print(claims.);
    ]catch[];
 verify();
-say('ok: OAuth RFC9068 test');
+say('ok: OAuth RFC9068 test (w/ multiple audiences).');
