@@ -166,7 +166,7 @@ body[
           //⊨ size(c.) == 0 : 'incorrect claim values:' + print(c.);
           ⊨ asserted.'sub' ≡ expected.'sub' : 'wrong AT subject, got ' + (asserted.'sub') + ', expected ' + (expected.'sub');
           ⊨ asserted.'iss' ≡ expected..'iss' : 'wrong AT issuer, got ' + (asserted.'iss') + ', expected ' + (expected.'iss');
-          ⊨ asserted.'aud' ≡ expected.'aud' : 'wrong AT audience, got ' + (asserted.'aud') + ', expected ' + (expected.'aud');
+          ⊨ ⊗∧⊙asserted.'aud' ≡ expected.'aud' : 'wrong AT audience, got ' + (asserted.'aud') + ', expected ' + (expected.'aud');
 
           version := (∃expected.'ver')⇒expected.'ver': 'scitoken:2.0';
           ⊨ asserted.'ver' ≡ version : 'incorrect scitokens version claim, got ' + (asserted.'ver') + ', expected ' + version;

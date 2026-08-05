@@ -1,7 +1,8 @@
 #! /usr/bin/env -S qdl-run
 
 /*
-   Basic SciToken test. This will do the exchanges with all defaults -- no overrides -- and
+   Basic SciToken test, including having multiple audience values.
+   This will do the exchanges with all defaults -- no overrides -- and
    is the most basic possible. N.B. this is OAuth 2 only, so no claims are returned.
 */
 params. ≔ {'sub':'davenport',
