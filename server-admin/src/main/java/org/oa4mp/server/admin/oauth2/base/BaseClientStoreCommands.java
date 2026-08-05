@@ -270,9 +270,23 @@ public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
         }
         int[] fieldWidths = new int[]{5, ISO_8601_FORMAT_LENGTH};
         for (Identifiable x : identifiables) {
-            BaseClient baseClient = (BaseClient) x;
-            int nameLength = isTrivial(baseClient.getName()) ? 0 : baseClient.getName().length();
-            fieldWidths[0] = Math.max(fieldWidths[0], nameLength);
+            BaseClient baseClient;
+            if(x instanceof ClientApproval){ // in case its a client approval from a result set.
+               baseClient = (BaseClient) getStore().get(x.getIdentifier());
+            }else {
+                if(x instanceof BaseClient){
+                    baseClient = (BaseClient) x;
+                }else{
+                    throw new IllegalArgumentException("unknown identifiable type: " + x.getClass().getName());
+                }
+            }
+            // Note: Base clients cover admin and standard clients, but the approval store
+            // just has approval records in it. Subclasses will check in their stores,
+            // and if not found, skip.
+            if(baseClient != null) {
+                int nameLength = isTrivial(baseClient.getName()) ? 0 : baseClient.getName().length();
+                fieldWidths[0] = Math.max(fieldWidths[0], nameLength);
+            }
         }
         return fieldWidths;
     }
@@ -308,6 +322,7 @@ public abstract class BaseClientStoreCommands extends OA4MPStoreCommands {
 
     @Override
     protected String format(Identifiable identifiable, int offset, int[] fieldWidths) {
+        if(identifiable == null){ return null;}
         BaseClient client = (BaseClient) identifiable;
         ClientApproval ca = (ClientApproval) getClientApprovalStore().get(client.getIdentifier());
         return format(client, ca, fieldWidths);
