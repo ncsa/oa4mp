@@ -3,6 +3,7 @@ package org.oa4mp.server.admin.oauth2.tools;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
+import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
@@ -330,7 +331,7 @@ public class VICommands extends OA4MPStoreCommands {
     @Override
     protected String format(Identifiable identifiable, int offset, int[] fieldWidths) {
         VirtualIssuer vi = (VirtualIssuer) identifiable;
-        String path = isTrivial(vi.getDiscoveryPath()) ? center("---",fieldWidths[1]) : vi.getDiscoveryPath();
+        String path = isTrivial(vi.getDiscoveryPath()) ? center("---", fieldWidths[1]) : vi.getDiscoveryPath();
         return pad2(vi.getTitle(), fieldWidths[0])
                 + STILE + pad2(path, fieldWidths[1])
                 + STILE + pad2(Iso8601.date2String(vi.getCreationTS()), fieldWidths[2])
@@ -339,24 +340,24 @@ public class VICommands extends OA4MPStoreCommands {
 
     @Override
     public int[] fieldWidths(List<Identifiable> identifiables) {
-        if(100 < identifiables.size()){
-            return new int[]{35,40,ISO_8601_FORMAT_LENGTH};
+        if (100 < identifiables.size()) {
+            return new int[]{35, 40, ISO_8601_FORMAT_LENGTH};
         }
-        int[] fieldWidths = new int[]{5,5,ISO_8601_FORMAT_LENGTH};
-        for(Identifiable identifiable : identifiables){
+        int[] fieldWidths = new int[]{5, 5, ISO_8601_FORMAT_LENGTH};
+        for (Identifiable identifiable : identifiables) {
             VirtualIssuer vo = (VirtualIssuer) identifiable;
-            int titleLength = isTrivial(vo.getTitle())?0:vo.getTitle().length();
-            fieldWidths[0] = Math.max(fieldWidths[0],titleLength);
-            int pathLength = isTrivial(vo.getDiscoveryPath())?0:vo.getDiscoveryPath().length();
-            fieldWidths[1] = Math.max(fieldWidths[1],pathLength);
+            int titleLength = isTrivial(vo.getTitle()) ? 0 : vo.getTitle().length();
+            fieldWidths[0] = Math.max(fieldWidths[0], titleLength);
+            int pathLength = isTrivial(vo.getDiscoveryPath()) ? 0 : vo.getDiscoveryPath().length();
+            fieldWidths[1] = Math.max(fieldWidths[1], pathLength);
         }
-        return fieldWidths ;
+        return fieldWidths;
     }
 
     @Override
     protected String columnHeader(int offset, int[] fieldWidths) {
-        return StringUtils.getBlanks(offset+2)
-                + pad2("title",fieldWidths[0])
+        return StringUtils.getBlanks(offset + 2)
+                + pad2("title", fieldWidths[0])
                 + STILE + pad2("discovery path", fieldWidths[1])
                 + STILE + pad2("creation date", fieldWidths[2])
                 + STILE + "identifier";
@@ -370,7 +371,9 @@ public class VICommands extends OA4MPStoreCommands {
 
     public void add_admin(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
-            say("add_admin admin_id [vi_id] - add the admin client or a result set of them ");
+            String name = getMethodName(2);
+
+            say(name + " admin_id [vi_id] - add the admin client or a result set of them ");
             say("to the current or given virtual issuer");
             printIndexHelp(true);
             return;
@@ -497,31 +500,46 @@ public class VICommands extends OA4MPStoreCommands {
 
     public void allow_key_rotation_overrides(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
-            say("allow_key_rotation_overrides [arg]- query or set the key rotation overrides for the service.");
-            say("Note that this applies to the service and governs whether virtual issuers can override the server's");
-            say("defaults.");
+            say("allow_key_rotation_overrides [arg] index - query or set the key rotation overrides for the VI.");
             String yeses = "";
             String nos = "";
+            int width = 5;
+            for(String y : LOGICAL_TRUES){
+                width = Math.max(width, y.length());
+            }
+            for(String y : LOGICAL_FALSES){
+                width = Math.max(width, y.length());
+            }
+
             for (int i = 0; i < LOGICAL_TRUES.length; i++) {
-                yeses = yeses + (i != 0 ? "," : "") + LOGICAL_TRUES[i];
+               // yeses = yeses + (i != 0 ? "," : "") + pad(LOGICAL_TRUES[i], width);
+                yeses = yeses +  pad(LOGICAL_TRUES[i], width);
             }
             for (int i = 0; i < LOGICAL_FALSES.length; i++) {
-                nos = nos + (i != 0 ? "," : "") + LOGICAL_FALSES[i];
+                //nos = nos + (i != 0 ? "," : "") + pad(LOGICAL_FALSES[i], width);
+                nos = nos +  pad(LOGICAL_FALSES[i], width);
             }
-            say("arg - true is  any  of " + yeses);
-            say("      false is any of " + nos);
+            say("arg - true  is any of: " + yeses);
+            say("      false is any of: " + nos);
             say("No argument queries current value.");
             return;
         }
+        if(! inputLine.hasArgs()){
+            say("no arguments found.");
+            return;
+        }
+        String lastArg = inputLine.getLastArg();
+        inputLine.removeLastArg();
+
         boolean hasArgs = inputLine.hasArgs();
 
-        VirtualIssuer defaultIssuer = getStore().get(OA2SE.SERVER_VI_ID);
-        if (defaultIssuer == null) {
-            say("no default issuer found.");
+        VirtualIssuer vi = getStore().get(BasicIdentifier.newID(lastArg));
+        if (vi == null) {
+            say("no issuer found for \"" + lastArg + "\"");
             return;
         }
         if (!hasArgs) {
-            say("current value: " + defaultIssuer.isAllowOverrides());
+            say("current value: " + vi.isAllowOverrides());
             return;
         }
         String arg = inputLine.getLastArg();
@@ -530,9 +548,8 @@ public class VICommands extends OA4MPStoreCommands {
             say("Did not understand \" " + arg + " \" as a boolean value.");
             return;
         }
-        defaultIssuer.setAllowOverrides(b);
-        getStore().save(defaultIssuer);
-        say("updated default issuer");
+        vi.setAllowOverrides(b);
+        getStore().save(vi);
     }
 
     @Override
@@ -540,17 +557,22 @@ public class VICommands extends OA4MPStoreCommands {
         return (VIStore) super.getStore();
     }
 
-    public void create_default(InputLine inputLine) throws Throwable {
+    public void create_default_vi(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
-            say("create_default - create the default issuer. This needs to exist before the service is run.");
+            String methodName = StackWalker.getInstance()
+                    .walk(frames -> frames.findFirst())
+                    .map(StackWalker.StackFrame::getMethodName)
+                    .orElse("Unknown");
+
+            say(methodName + " - create the default issuer. This needs to exist before the service is run.");
             say("This is the issuer that is used for all requests that do not have a virtual issuer.");
             return;
         }
         VirtualIssuer vi = getStore().get(OA2SE.SERVER_VI_ID);
-/*        if (vi != null) {
+        if (vi != null) {
             say("default virtual issuer already exists.");
             return;
-        }*/
+        }
         VISerializationKeys keys = (VISerializationKeys) getSerializationKeys();
         vi = getStore().create();
         vi.setIdentifier(OA2SE.SERVER_VI_ID);
@@ -600,6 +622,7 @@ public class VICommands extends OA4MPStoreCommands {
     protected void showLSHelp() {
         super.showLSHelp();
         say("You may also just use the index \"default\" to show the default virtual issuer");
+        say("If you just want to see the key, use the show command in the keys module.");
     }
 
     @Override
@@ -616,5 +639,20 @@ public class VICommands extends OA4MPStoreCommands {
             return;
         }
         say(OA2SE.SERVER_VI_ID.toString());
+    }
+
+
+    @Override
+    public VISerializationKeys getKeys() {
+        return (VISerializationKeys) super.getKeys();
+    }
+
+
+    @Override
+    public void update(InputLine inputLine) throws Throwable {
+        if(inputLine.hasLastArg() && inputLine.getLastArg().equalsIgnoreCase("default")) {
+            inputLine.setLastArg(OA2SE.SERVER_VI_ID.toString());
+        }
+        super.update(inputLine);
     }
 }

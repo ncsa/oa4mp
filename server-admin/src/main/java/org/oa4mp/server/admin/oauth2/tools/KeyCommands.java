@@ -3,10 +3,7 @@ package org.oa4mp.server.admin.oauth2.tools;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
-import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import edu.uiuc.ncsa.security.core.util.IdentifiableMap;
-import edu.uiuc.ncsa.security.core.util.Iso8601;
-import edu.uiuc.ncsa.security.core.util.StringUtils;
+import edu.uiuc.ncsa.security.core.util.*;
 import edu.uiuc.ncsa.security.storage.cli.FoundIdentifiables;
 import edu.uiuc.ncsa.security.util.cli.ArgumentNotFoundException;
 import edu.uiuc.ncsa.security.util.cli.CLIDriver;
@@ -21,6 +18,7 @@ import org.oa4mp.server.loader.oauth2.storage.keys.KEConfiguration;
 import org.oa4mp.server.loader.oauth2.storage.keys.KERecord;
 import org.oa4mp.server.loader.oauth2.storage.keys.KEStore;
 import org.oa4mp.server.loader.oauth2.storage.keys.KEStoreUtilities;
+import org.oa4mp.server.loader.oauth2.storage.vi.VISerializationKeys;
 import org.oa4mp.server.loader.oauth2.storage.vi.VIStore;
 import org.oa4mp.server.loader.oauth2.storage.vi.VirtualIssuer;
 import org.oa4mp.server.loader.qdl.util.SigningCommands;
@@ -33,7 +31,10 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.*;
 
 import static edu.uiuc.ncsa.security.core.util.StringUtils.*;
-import static edu.uiuc.ncsa.security.core.util.StringUtils.center;
+import static org.oa4mp.server.loader.oauth2.OA2SE.SERVER_VI_ID;
+import static org.oa4mp.server.loader.oauth2.loader.OA2CFConfigurationLoader.GRACE_PERIOD_NOT_CONFIGURED;
+import static org.oa4mp.server.loader.oauth2.loader.OA2CFConfigurationLoader.MAX_ACCESS_TOKEN_LIFETIME_DEFAULT;
+import static org.oa4mp.server.loader.oauth2.storage.keys.KEStoreUtilities.jwksToIDMap;
 
 public class KeyCommands extends OA4MPStoreCommands {
 
@@ -79,7 +80,7 @@ public class KeyCommands extends OA4MPStoreCommands {
     public int[] fieldWidths(List<Identifiable> identifiables) {
         int width = 25; // long width, for ISO dates e.g.
         int s = 5; // short width
-        if (100 < identifiables.size()) {
+        if (identifiables == null || 100 < identifiables.size()) {
             return new int[]{33, s, s, s, width, width, 32};
         }
         int[] fieldWidths = new int[]{5, s, s, s, width, width, 5};
@@ -227,17 +228,23 @@ public class KeyCommands extends OA4MPStoreCommands {
 
     protected void migrateHelp(InputLine line) {
         int width = 10;
-        say("migrate [" + MIGRATE_LIST + "] | [" + MIGRATE_CLEANUP + "] | [" +
+        String name = getMethodName(4);
+        say(name + " [" + MIGRATE_LIST + "] | [" + MIGRATE_CLEANUP + "] | [" +
                 MIGRATE_ALL_VIS + " | vi_id][" + MIGRATE_SERVER_KEYS + "] -  migrate the keys stored in a VI to ");
 
         say("this store. Optionally remove them from the VI. Once migrated,");
-        say("the system manages them and the keys stored in the VI are ignoared");
+        say("the system manages them and the keys stored in the VI (or server config file) are ignored");
         say(RJustify(MIGRATE_SERVER_KEYS, width) + " = Migrate the keys in the server configuration to the store. This cannot be combined with other flags.");
         say(RJustify(MIGRATE_LIST, width) + " = return a list of VIs that have stored keys.");
         say(RJustify("vi_id", width) + " = migrate the keys stored in the given VI only.");
         say(RJustify(MIGRATE_ALL_VIS, width) + " = migrate all VI keys to this store.");
         say(RJustify(MIGRATE_CLEANUP, width) + " = remove the keys stored in a VI.");
         say("This does allow for result sets as well for migration.");
+        say("Keys must beion the store (with all of the correct accounting information) to be rotated.");
+        say("Therefore rotating keys will inplicitly migrate them.");
+        say("E.g. to migrate your keys from teh server configuration to the store.");
+        say(name + " -server");
+        say("6 keys migrated.");
     }
 
     public void migrate(InputLine inputLine) throws Throwable {
@@ -256,16 +263,22 @@ public class KeyCommands extends OA4MPStoreCommands {
         inputLine.removeSwitch(MIGRATE_ALL_VIS);
         inputLine.removeSwitch(MIGRATE_CLEANUP);
         boolean migrateServerKeys = inputLine.hasArg(MIGRATE_SERVER_KEYS);
+        inputLine.removeSwitch(MIGRATE_SERVER_KEYS);
 
         VIStore<VirtualIssuer> viStore = getEnvironment().getVIStore();
 
+        // Intercept if they issue a call to do the default vi directly. They meant
+        // to migrate the server keys.
+        if(inputLine.hasLastArg() && (DEFAULT_SERVER_VI.equals(inputLine.getLastArg()) || SERVER_VI_ID.toString().equals(inputLine.getLastArg()))) {
+            migrateServerKeys = true;
+        }
         if (migrateServerKeys) {
-            VirtualIssuer vi = viStore.get(OA2SE.SERVER_VI_ID);
+            VirtualIssuer vi = viStore.get(SERVER_VI_ID);
             // if the default VI for the server does not exist, create it.
             // https://github.com/ncsa/oa4mp/issues/305
             if (vi == null) {
                 vi = viStore.create();
-                vi.setIdentifier(OA2SE.SERVER_VI_ID);
+                vi.setIdentifier(SERVER_VI_ID);
                 vi.setTitle("Default issuer");
                 vi.setValid(true);
                 vi.setKeyRotationEnabled(true);
@@ -287,7 +300,7 @@ public class KeyCommands extends OA4MPStoreCommands {
                     for (String kid : getEnvironment().getServerJWKS().keySet()) {
                         JSONWebKey webKey = getEnvironment().getServerJWKS().get(kid);
                         map.put(KEStoreUtilities.createSingleKERecord(getStore(),
-                                OA2SE.SERVER_VI_ID.getUri(), true, webKey, getEnvironment().getServerJWKS().getDefaultKeyID()));
+                                SERVER_VI_ID.getUri(), true, webKey, getEnvironment().getServerJWKS().getDefaultKeyID()));
                     }
 
                     getStore().putAll(new HashMap(map));
@@ -324,22 +337,22 @@ public class KeyCommands extends OA4MPStoreCommands {
             }
             return;
         }
-        FoundIdentifiables foundIdentifiables = null;
+        FoundIdentifiables foundVIs = null;
         if (migrateAll) {
             migrate(null, cleanupMigrated);
         } else {
             if (inputLine.hasArgs()) {
-                foundIdentifiables = findByIDOrRS(viStore, inputLine.getLastArg());
+                foundVIs = findByIDOrRS(viStore, inputLine.getLastArg());
             }
-            migrate(foundIdentifiables, cleanupMigrated);
+            migrate(foundVIs, cleanupMigrated);
         }
         Map<Identifier, KERecord> newRecords = new HashMap<>();
         // case 1, do explicitly requested migration
-        if (foundIdentifiables != null && !foundIdentifiables.isEmpty()) {
+        if (foundVIs != null && !foundVIs.isEmpty()) {
             int keysProcessed = 0;
             int visProcessed = 0;
             int visSkipped = 0;
-            for (Identifiable identifiable : foundIdentifiables) {
+            for (Identifiable identifiable : foundVIs) {
                 VirtualIssuer vi = (VirtualIssuer) identifiable;
                 if (!vi.hasJWKs()) {
                     visSkipped++;
@@ -379,27 +392,40 @@ public class KeyCommands extends OA4MPStoreCommands {
 
     public static String CURRENT_EXP_FLAG = "-exp";
     public static String CURRENT_VALID_FLAG = "-valid";
+    public static String CURRENT_SIGNING_KEYS = "-signing";
 
     public void get_current(InputLine inputLine) throws Throwable {
+        int width = 8;
         if (showHelp(inputLine)) {
-            say("get_current [" + CURRENT_EXP_FLAG + " true | false] [" +
+            say("get_current [" + LINE_LIST_COMMAND + "] [" + CURRENT_SIGNING_KEYS + "] [" + CURRENT_EXP_FLAG + " true | false] [" +
                     CURRENT_VALID_FLAG + " true | false] " + DEFAULT_SERVER_VI + " | index - get the current keys (valid or not) for a given VI");
             say("No argument means to list the keys for the default VI.");
-            say(RJustify(CURRENT_EXP_FLAG, 7) + " - if true, return only expired keys. If false, return un-expired.");
-            say(getBlanks(10) + "Omitting it returns all keys.");
-            say(RJustify(CURRENT_VALID_FLAG, 7) + " - If true, return only valid (nbf is before now) and if false ");
-            say(getBlanks(10) + "return nbf is after now. Omit means ignore valid date.");
-            say("You can do this with the search command, it is just a convenience.");
+            say(RJustify(LINE_LIST_COMMAND, width) + " - If present, use the line list (long form) rather than short.");
+            say(RJustify(CURRENT_SIGNING_KEYS, width) + " - If present, return the signing keys the server wouldl use for the VI(s).");
+            say(RJustify(CURRENT_EXP_FLAG, width) + " - if true, return only expired keys. If false, return un-expired.");
+            say(getBlanks(width + +3) + "Omitting it returns all keys.");
+            say(RJustify(CURRENT_VALID_FLAG, width) + " - If true (default), return only valid (nbf is before now) and if false ");
+            say(getBlanks(width + 3) + "return nbf is after now. Omit means ignore valid date.");
+            say("You can do all this with the search command, it is just a convenience.");
+            say();
+            say("E.g. Get the current signing keys, including those not yet valid, in the default VI");
+            say("get_current -valid false -signing -vi default");
+            say("typically, this is displayed on the well-known page for server keys.");
+            say("E.g. get exactly what the server is using now to sign requests.");
+            say("get_current  -signing -vi default");
             return;
         }
+
         VIStore viStore = getEnvironment().getVIStore();
         if ((!inputLine.hasArgs()) || inputLine.getLastArg().equals(DEFAULT_SERVER_VI)) {
-            inputLine.setLastArg(OA2SE.SERVER_VI_ID.toString());
+            inputLine.setLastArg(SERVER_VI_ID.toString());
         }
+        boolean lineList = inputLine.hasArg(LINE_LIST_COMMAND);
+        inputLine.removeSwitch(LINE_LIST_COMMAND);
         boolean hasExpFlag = inputLine.hasArg(CURRENT_EXP_FLAG);
         boolean returnExpired = false;
         boolean hasValidFlag = inputLine.hasArg(CURRENT_VALID_FLAG);
-        boolean returnValid = false;
+        boolean returnValid = true;
         if (hasExpFlag) {
             returnExpired = inputLine.getBooleanNextArgFor(CURRENT_EXP_FLAG);
             inputLine.removeSwitchAndValue(CURRENT_EXP_FLAG);
@@ -407,6 +433,13 @@ public class KeyCommands extends OA4MPStoreCommands {
         if (hasValidFlag) {
             returnValid = inputLine.getBooleanNextArgFor(CURRENT_VALID_FLAG);
             inputLine.removeSwitchAndValue(CURRENT_VALID_FLAG);
+        }
+        boolean signingKeys = inputLine.hasArg(CURRENT_SIGNING_KEYS);
+        inputLine.removeSwitch(CURRENT_SIGNING_KEYS);
+
+        if(!inputLine.hasLastArg()){
+            say("no vi specified.");
+            return;
         }
         FoundIdentifiables foundIdentifiables = findByIDOrRS(viStore, inputLine.getLastArg());
         if (foundIdentifiables == null || foundIdentifiables.isEmpty()) {
@@ -416,59 +449,70 @@ public class KeyCommands extends OA4MPStoreCommands {
         int total = 0;
         for (Identifiable identifiable : foundIdentifiables) {
             VirtualIssuer vi = (VirtualIssuer) identifiable;
-            IdentifiableMap<KERecord> map = getStore().getByVI(vi);
+            IdentifiableMap<KERecord> map;
             int totalKeys = 0;
-            for (KERecord keRecord : map.values()) {
-                boolean first = true;
-                if (hasExpFlag) {
-                    if (returnExpired) {
-                        if (!keRecord.isExpired()) {
-                            continue;
-                        }
-                    } else {
-                        if (keRecord.isExpired()) {
-                            continue;
-                        }
-                    }
-                }
-                if (hasValidFlag) {
-                    if (returnValid) {
-                        if (!keRecord.hasValidDate()) {
-                            continue;
-                        }
-                    } else {
-                        if (keRecord.hasValidDate()) {
-                            continue;
-                        }
-                    }
-                }
-                totalKeys++;
-                JSONWebKey jwk = keRecord.toJWK();
-                total++;
-                String kid = jwk.id;
-                kid = (keRecord.getDefault() ? "*" : "") + kid;
-                if (first) {
-                    first = false;
-                } else {
-                    say("_____________________________________________________".substring(0, kid.length()));
-                }
-                String out = fff("algorithm", jwk.algorithm);
-                out = out + "\n" + fff("is valid", jwk.isValid());
-                out = out + "\n" + fff("use", jwk.use);
-                out = out + "\n" + fff("type", jwk.type);
-                if (jwk.isRSAKey() || jwk.isOctetKey()) {
-                    out = out + "\n" + fff("bits", Integer.toString(jwk.getSize()));
-                }
-                if (jwk.isECKey()) {
-                    out = out + "\n" + fff("curve", jwk.curve);
-                }
-                out = out + "\n" + fff("issued at", jwk.issuedAt);
-                out = out + "\n" + fff("not before", jwk.notValidBefore);
-                out = out + "\n" + fff("expires at", jwk.expiresAt);
-                say(kid + ":");
-                say(out);
 
-            } //end keys for
+            if (signingKeys) {
+                map = new IdentifiableMap<>();
+                // aim is to get exactly what server signs with,
+                JSONWebKeys jwks = getEnvironment().getJsonWebKeys(vi, returnValid);
+                for (String kid : jwks.keySet()) {
+                    KERecord ker = getStore().getByKID(kid);
+                    if (ker != null) {
+                        map.put(ker);
+                    }
+                }
+                if (map.isEmpty()) {
+                    if (getEnvironment().isServerVI(vi)) {
+                        map = jwksToIDMap(jwks);
+                        totalKeys = map.size();
+                    }else {
+                        say("No signing keys found for VI " + vi.getIdentifierString());
+                        return;
+                    }
+                }
+            } else {
+                map = getStore().getByVI(vi);
+            }
+
+            FoundIdentifiables foundIdentifiables1 = new FoundIdentifiables(false);
+            // filter elements
+            for (KERecord keRecord : map.values()) {
+                if (!signingKeys) {
+                    if (hasExpFlag) {
+                        if (returnExpired) {
+                            if (!keRecord.isExpired()) {
+                                continue;
+                            }
+                        } else {
+                            if (keRecord.isExpired()) {
+                                continue;
+                            }
+                        }
+                    }
+                    if (hasValidFlag) {
+                        if (returnValid) {
+                            if (!keRecord.hasValidDate()) {
+                                continue;
+                            }
+                        } else {
+                            if (keRecord.hasValidDate()) {
+                                continue;
+                            }
+                        }
+                    }
+                }
+                foundIdentifiables1.add(keRecord);
+            }
+            //FoundIdentifiables foundIdentifiables1 = new FoundIdentifiables(false, map.values());
+            if (lineList) {
+                printLS(foundIdentifiables1, true, false, false);
+            } else {
+                printLS(foundIdentifiables1, false, false, true);
+            }
+
+
+            //end keys for
             say(totalKeys + " entries for " + vi.getIdentifierString());
 
         } // end VI for
@@ -476,11 +520,6 @@ public class KeyCommands extends OA4MPStoreCommands {
             say("Total keys found over " + foundIdentifiables.size() + " VIs: " + total);
         }
 
-    }
-
-    String fff(String key, Object value) {
-        return StringUtils.RJustify(key, 12) + " : " +
-                (value == null ? "not set" : value.toString());
     }
 
     public static String KR_ALL = "-all";
@@ -492,7 +531,8 @@ public class KeyCommands extends OA4MPStoreCommands {
     public static String KR_TEST_FLAG = "-test";
 
     protected void rotateHelp(InputLine inputLine) {
-        say("rotate [" + KR_ALL + " | " + KR_KID + " id | " + KR_VI + " vi " +
+        String name = getMethodName(4);
+        say(name + " [" + KR_ALL + " | " + KR_KID + " id | " + KR_VI + " vi " +
                 KR_CACHE_LIFETIME + " cache_lifetime " +
                 KR_AT_LIFETIME + " access_token_lifetime " +
                 KR_TEST_FLAG + " " + KR_FORCE_FLAG + "]  [index] - rotate the key at the given index");
@@ -508,13 +548,16 @@ public class KeyCommands extends OA4MPStoreCommands {
         say("Setting at least one of " + KR_CACHE_LIFETIME + " or " + KR_AT_LIFETIME + " will override the policy");
         say("These accept lifetime in seconds (default) or with units, e.g. " + KR_AT_LIFETIME + " \"25 min\" (note the quotes!)");
         say("The scope of this is always the minimum, so specifying a kid and a vi will oinly process teh specific key for that kid.");
+        say("\nNote that if you rotate a set of keys that are in the VI record, they will be automatically");
+        say("migrated to the store since they require specific accounting information.");
+        say("Once keys are in the store, for a VI, those are definitive, and supercede and other keys.");
+        say("See also: get_rotation_configuration in the vi component.");
         say();
         say("E.g. Rotate every key in the store, using specific cache lifetime.");
-        sayi("  rotate " + KR_ALL + " " + KR_CACHE_LIFETIME + " \"2 days\"");
+        sayi(name + " " + KR_ALL + " " + KR_CACHE_LIFETIME + " \"2 days\"");
         say("E.g. Rotate the keys for a given VI.");
-        sayi("  rotate " + KR_VI + " oa4mp:/vi/1234567890");
+        sayi(name + " " + KR_VI + " oa4mp:/vi/1234567890");
         say("Note that this uses the policies of the VI and server.");
-        ;
     }
 
     public void rotate(InputLine inputLine) throws Throwable {
@@ -548,27 +591,7 @@ public class KeyCommands extends OA4MPStoreCommands {
             inputLine.removeSwitchAndValue(KR_AT_LIFETIME);
             overrideKEC = true;
         }
-        KEConfiguration serverKEC;
-        VirtualIssuer serverVI = (VirtualIssuer) getEnvironment().getVIStore().get(OA2SE.SERVER_VI_ID);
-        if (serverVI == null) {
-            serverKEC = getEnvironment().getKeConfiguration();
-            if (cacheLifetime != null) serverKEC.cacheGracePeriod = cacheLifetime;
-            if (atLifetime != null) serverKEC.atGracePeriod = atLifetime;
-            if (!serverKEC.isConfgured()) {
-                say("No server key configuration found. \n>>Use create_default in the vi component first");
-                return;
-            }
-        } else {
-            serverKEC = KEStoreUtilities.resolveKeConfiguration(getEnvironment(), serverVI);
-            if (cacheLifetime == null) cacheLifetime = serverKEC.cacheGracePeriod;
-            if (atLifetime == null) atLifetime = serverKEC.atGracePeriod;
-        }
-        if(cacheLifetime == 0L && atLifetime == 0L) {
-            if(!"y".equals(getInput("Warning -- zero cache and lifetime. Are you sure you want to do this? (y/n) ", "y"))){
-                say("aborting...");
-                return;
-            }
-        }
+
         boolean doKID = inputLine.hasArg(KR_KID);
         if (doKID) {
             String kid = inputLine.getNextArgFor(KR_KID);
@@ -603,22 +626,54 @@ public class KeyCommands extends OA4MPStoreCommands {
             return;
         }
 
+        boolean updateOldKeys = false;
         boolean doVI = inputLine.hasArg(KR_VI);
         if (doVI) {
             String viIDString = inputLine.getNextArgFor(KR_VI);
             inputLine.removeSwitchAndValue(KR_VI);
             if (viIDString.equals(DEFAULT_SERVER_VI)) {
-                viID = OA2SE.SERVER_VI_ID;
+                viID = SERVER_VI_ID;
             } else {
                 viID = BasicIdentifier.newID(viIDString);
             }
             // try finding VIs
             VIStore viStore = getEnvironment().getVIStore();
-            FoundIdentifiables foundIdentifiables = findByIDOrRS(viStore, viID.toString());
-            if (foundIdentifiables != null && !foundIdentifiables.isEmpty()) {
-                Map<Identifier, KERecord> map = KEStoreUtilities.rotate(getEnvironment(), foundIdentifiables.getIdentifiers(),
-                        serverKEC, forceFlag, testOnly);
+            VirtualIssuer vi = (VirtualIssuer) viStore.get(viID);
+            KEConfiguration viKEC;
+            if(vi == null ){
+                if(viIDString.equals(DEFAULT_SERVER_VI)) {
+                    viKEC = getEnvironment().getKeConfiguration();
+                }else{
+                    say("No configuration for VI: " + viIDString);
+                    return;
+                }
+            }else{
+                 viKEC = KEStoreUtilities.resolveKeConfiguration(getEnvironment(), vi);
+            }
+            FoundIdentifiables foundVIs = findByIDOrRS(viStore, viID.toString());
+            if((foundVIs == null || foundVIs.isEmpty()) && viIDString.equals(SERVER_VI_ID.toString())){
+                foundVIs=new FoundIdentifiables(true);
+                foundVIs.add(vi);
+            }
+            if (foundVIs == null || foundVIs.isEmpty()) {
+                 if(viIDString.equals(DEFAULT_SERVER_VI)) {
+                     foundVIs=new FoundIdentifiables(true);
+                     if(vi == null){
+                         // Case is that the default VI is only configured in the server config, there
+                         // is no VI for it. Make a dummy for the rotation utility
+                         foundVIs.add(new VirtualIssuer(SERVER_VI_ID));
+                     }else{
+                         foundVIs.add(vi);
+                     }
+                 }else{
+                     say("No VI: " + viIDString);
+                     return;
+                 }
+            }
+                Map<Identifier, KERecord> map = KEStoreUtilities.rotate(getEnvironment(), foundVIs.getIdentifiers(),
+                        viKEC, forceFlag, testOnly);
                 if (map.size() == 0) {
+                    DebugUtil.trace(this, "No keys found to rotate, KEC=" + viKEC);
                     say("No keys found for VI \"" + viIDString + "\". This utility only rotates valid keys that no not " +
                             "have an expiration date." +
                             "\nJust change that if you need to.");
@@ -638,47 +693,14 @@ public class KeyCommands extends OA4MPStoreCommands {
                             say(StringUtils.getBlanks(countLength + 2) + format(keRecord, countLength, fieldWidths));
                             //say(keRecord.getKid() + " | " + keRecord.getAlg() + " | exp = " +")");
                         }
-                        testBlurb(null, cacheLifetime, atLifetime);
+                        testBlurb(null, viKEC.cacheGracePeriod, viKEC.atGracePeriod);
                     } else {
                         say("rotated " + map.size() + " keys");
                     }
                 }
                 return;
-            } // Last ditch effort -- find in server config.
-            if (viID.equals(OA2SE.SERVER_VI_ID)) {
-                // edge case is that they have not made a virtual issuer for the default
-                // but have rotate keys.
-                VirtualIssuer vi = new VirtualIssuer(viID);
 
-                Map<Identifier, KERecord> serverKERs = getStore().getByVI(vi); // it is *possible* that there is no VI if it's the default.
-                if (serverKERs != null && !serverKERs.isEmpty()) {
-                    serverKERs = KEStoreUtilities.rotate(getStore(), serverKERs, forceFlag, serverKEC.cacheGracePeriod, serverKEC.atGracePeriod, true, testOnly);
-                    say("Rotated " + serverKERs.size() + " keys");
-                    return;
-                }
-                JSONWebKeys keys = getEnvironment().getServerJWKS();
-                if (keys == null || keys.isEmpty()) {
-                    say("No keys found, cannot rotate");
-                    return;
-                }
-                Map<Identifier, KERecord> map = getIdentifierKERecordMap(keys, true, null);
-                map = KEStoreUtilities.rotate(getStore(), map, forceFlag, serverKEC.cacheGracePeriod, serverKEC.atGracePeriod, false, testOnly);
-                if (testOnly) {
-                    say("tested and found " + map.size() + " keys to rotate:");
-                    for (Identifier id : map.keySet()) {
-                        KERecord keRecord = map.get(id);
-                        say(format(keRecord));
-                        //say(keRecord.getKid() + " (" + keRecord.getAlg() + ")");
-                    }
-                    say("No keys altered or added.");
-                } else {
-                    say("Rotated " + serverKERs.size() + " keys");
-                }
-            } else {
-                say("VI \"" + viIDString + "\" not found");
-            }
-            return;
-        }
+        } //end if VI
 
         boolean doAll = inputLine.hasArg(KR_ALL);
         inputLine.removeSwitch(KR_ALL);
@@ -710,7 +732,7 @@ public class KeyCommands extends OA4MPStoreCommands {
             }
             return;
         }
-
+   say("no keys found.");
     }
 
     protected void testBlurb(KERecord keRecord, long cache, long at) {
@@ -736,7 +758,7 @@ public class KeyCommands extends OA4MPStoreCommands {
             say("The default is RSA curves with a key size of " + CREATE_KEYS_DEFAULT_SIZE + " bits.");
             say("Supported EC curves are P-256 |  P-384 | P-521");
             say("If the vi argument is given, the keys will be created for the given VI. No VI or");
-            say("A VI of " + OA2SE.SERVER_VI_ID + " means to create the keys for the server.");
+            say("A VI of " + SERVER_VI_ID + " means to create the keys for the server.");
             say("It also supports creating a result set for the new keys with the -rs flag.");
             return;
         }
@@ -793,7 +815,7 @@ public class KeyCommands extends OA4MPStoreCommands {
                 }
             }
         } else {
-            vi = OA2SE.SERVER_VI_ID.getUri();
+            vi = SERVER_VI_ID.getUri();
         }
 
         if (jsonWebKeys == null) {
@@ -824,10 +846,13 @@ public class KeyCommands extends OA4MPStoreCommands {
     }
 
     protected void showHelp() {
-        say("show [vi_id | default] - show the signing keys for the given VI. No ID means show the server signing keys.");
+        String name = getMethodName(3);
+        say(name + " [vi_id | default] - show the signing keys for the given VI. No ID means show the server signing keys.");
         say("You may also supply the word \"default\" to show the keys for the server (in the default VI).");
         say("This will find them wherever they are and tell you where it found them.");
         say("Note that the default for the set will have an * next to its key id, e.g. *BD9327856EF");
+        say("This is different than the ls command, since the ls command will show what is in the key store.");
+        say("If there is no key store (e.g., the keys are in the server config), this will show the keys in the server config.");
     }
 
     public void show(InputLine inputLine) throws Throwable {
@@ -835,66 +860,115 @@ public class KeyCommands extends OA4MPStoreCommands {
             showHelp();
             return;
         }
+
         boolean defaultID = false;
         if (inputLine.hasLastArg()) {
-            defaultID = inputLine.getLastArg().equals(OA2SE.SERVER_VI_ID.toString());
+            defaultID = inputLine.getLastArg().equals(SERVER_VI_ID.toString());
             if (inputLine.getLastArg().equals(DEFAULT_SERVER_VI)) {
-                inputLine.setLastArg(OA2SE.SERVER_VI_ID.toString());
+                inputLine.setLastArg(SERVER_VI_ID.toString());
                 defaultID = true;
             }
         } else {
-            inputLine.setLastArg(OA2SE.SERVER_VI_ID.toString());
+            inputLine.setLastArg(SERVER_VI_ID.toString());
             defaultID = true;
         }
         JSONWebKeys jwks = null;
         VIStore viStore = getEnvironment().getVIStore();
-        VirtualIssuer vi = (VirtualIssuer) viStore.get(BasicIdentifier.newID(inputLine.getLastArg()));
+        Identifier viID = BasicIdentifier.newID(inputLine.getLastArg());
+        VirtualIssuer vi = (VirtualIssuer) viStore.get(viID);
         String location = "";
-        Map<Identifier, KERecord> map = null;
-        if (getEnvironment().getKEStore() == null || (defaultID && vi == null)) { // handles case default keys not in store
+        IdentifiableMap<KERecord> map = null;
+
+        // Eight cases to unscramble.
+        if (getEnvironment().hasKEStore()) {
             if (vi == null) {
                 if (defaultID) {
-                    location = "Keys are in the system configuration file.";
-                    jwks = getEnvironment().getServerJWKS();
-                }
-            } else {
-                location = "keys are in the VI record";
-                jwks = vi.getJsonWebKeys();
-                if (!jwks.hasDefaultKey()) {
-                    jwks.setDefaultKeyID(vi.getDefaultKeyID());
-                }
-            }
-            // create dummy map for formatting. This creates it from the VI.
-            map = getIdentifierKERecordMap(jwks, defaultID, OA2SE.SERVER_VI_ID.getUri());
-        } else {
-            map = getStore().getByVI(vi);
-            location = "keys are in the key store";
-            if (map == null || map.isEmpty()) {
-                // edge case -- no keys in VI, but only server keys in Environemnt.
-                if (defaultID) {
-                    location = "keys are in the system configuration file.";
-                    jwks = getEnvironment().getServerJWKS();
-                    map = new HashMap<>();
-                    for (JSONWebKey webKey : jwks.values()) {
-                        KERecord keRecord = KEStoreUtilities.createSingleKERecord(getStore(), OA2SE.SERVER_VI_ID.getUri(), true, webKey, jwks.getDefaultKeyID());
-                        map.put(keRecord.getIdentifier(), keRecord);
+                    location = "keys in the store";
+                    map = getStore().getByVI(new VirtualIssuer(SERVER_VI_ID));
+                    if (map.isEmpty()) {
+                        location = "keys are in the server configuration";
+                        jwks = getEnvironment().getJsonWebKeys(); // Form teh server config, has default key set.
+                        map = jwksToIDMap(jwks);
                     }
-                }
-            }
-        }
+                } else {
+                    // has keys store, no vi and is not the default
+                    location = "keys in the issuer";
+                    map = getStore().getByVI(new VirtualIssuer(viID)); // dummy VI
+                    // It is possible to create (e.g. test) keys in the store with no
+                    // VI *or* being trying to track down orphans after deleting a VI.
+                } // end if has default ID
+            } else {
+                if (defaultID) {
+                    // has key store, has VI, is the default
+                    location = "keys in the store";
+                    map = getStore().getByVI(new VirtualIssuer(SERVER_VI_ID)); // dummy VI
+                    if (map.isEmpty()) {
+                        jwks = vi.getJsonWebKeys();
+                        location = "keys in the VI";
+                        if (jwks.isEmpty()) {
+                            location = "keys are in the server configuration";
+                            jwks = getEnvironment().getJsonWebKeys(); // From the server config, has default key set.
+                        }
+                        map = jwksToIDMap(jwks);
+                    }
+                } else {
+                    // has key store, has VI, not default
+                    location = "keys in the store";
+                    // no VI, so *maybe* they are requesting keys in the store that do not
+                    // have one. This can happen if a VI is deleted and its keys are still
+                    // stored. This lets the user find orphans.
+                    map = getStore().getByVI(new VirtualIssuer(viID));
+                    if (map.isEmpty()) {
+                        say("no keys found for virtual issuer \"" + viID + "\"");
+                        return;
+                    }
+                } // end if has default ID
+            } // end if for vi null
+        } else {
+            if (vi == null) {
+                if (defaultID) {
+                    // no store, no vi, is default can only be in the server.
+                    location = "keys are in the server configuration";
+                    jwks = getEnvironment().getJsonWebKeys(); // Form teh server config, has default key set.
+                    map = jwksToIDMap(jwks);
+                } else {
+                    // no store, no VI, not default
+                    // can't happen. ?? Throw exception?
+                } // end if has default ID
+            } else {
+                if (defaultID) {
+                    // no store, has VI, is default
+                    location = "keys in the issuer";
+                    jwks = vi.getJsonWebKeys();
+                    if (jwks == null || jwks.isEmpty()) {
+                        jwks = getEnvironment().getJsonWebKeys();
+                        location = "keys in the server configuration";
+                    }
+                    map = jwksToIDMap(jwks);
+                } else {
+                    // no store, has VI, not default
+                    jwks = vi.getJsonWebKeys();
+                    jwks.setDefaultKeyID(vi.getDefaultKeyID());
+                    location = "keys in the VI";
+                    map = jwksToIDMap(jwks);
+                } // end if has default ID
+            } // end if for vi null
+        } //end conditional for having a store
+
+
         // Now we have a general VI and need to get its keys. These are either in the
         if ((jwks == null || jwks.isEmpty()) && map == null) {
             say("no keys found.");
             return;
         } else {
-            for (Identifier id : map.keySet()) {
-                KERecord keRecord = map.get(id);
-                say(format(keRecord));
-            }
+            FoundIdentifiables foundIdentifiables = new FoundIdentifiables(false);
+            foundIdentifiables.addAll(map.values());
+            printLS(foundIdentifiables, false, false, true);
         }
         say(location);
 
     }
+
 
     /**
      * Converts a set of JSONWeb keys to a map of KERecords. This is used for a variety of purposes,
@@ -915,7 +989,7 @@ public class KeyCommands extends OA4MPStoreCommands {
             KERecord keRecord = new KERecord(BasicIdentifier.randomID());
             keRecord.fromJWK(webKey, jwks.getDefaultKeyID().equals(kid));
             if (defaultID) {
-                keRecord.setVi(OA2SE.SERVER_VI_ID.getUri());
+                keRecord.setVi(SERVER_VI_ID.getUri());
             } else {
                 keRecord.setVi(viID);
             }
@@ -926,31 +1000,78 @@ public class KeyCommands extends OA4MPStoreCommands {
         return map;
     }
 
+    public static final String KEY_ROTATION_SYSTEM_CFG = "system";
+
     public void policy(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
-            say("policy [vi] - get the key rotation policy for the given VI. No argument means default.");
-            say("policy - get the policy for the server");
+            String name = getMethodName(2);
+            say(name + " [" + KEY_ROTATION_SYSTEM_CFG + "] | [" + DEFAULT_SERVER_VI + "] vi - get the current key rotation configuration for the VI.");
+            say(RJustify(KEY_ROTATION_SYSTEM_CFG,10) + " = the system's rotation configuration.");
+            say(RJustify(DEFAULT_SERVER_VI,10) + " = the rotation configuration for the default virtual issuer.");
+            say("or supply the id of a virtual issuer to get its configuration.");
+            say("No argument means to show whatever the system is using for its configuration, regardless of its origin.");
+            say();
+            rotationDefaults();
             return;
         }
-        VIStore viStore = getEnvironment().getVIStore();
-        if (inputLine.hasArgs()) {
-            String vi = inputLine.getLastArg();
-            VirtualIssuer virtualIssuer;
-            if (vi.equals(DEFAULT_SERVER_VI) || vi.equals(OA2SE.SERVER_VI_ID.toString())) {
-                virtualIssuer = (VirtualIssuer) viStore.get(OA2SE.SERVER_VI_ID);
-                if (virtualIssuer == null) {
-                    say("no default VI");
-                    return;
-                }
+        if(!inputLine.hasArgs()){
+            formatKEC(getEnvironment().getKeConfiguration());
+             return;
+        }
+        if (inputLine.hasArg(KEY_ROTATION_SYSTEM_CFG)) {
+            if(getEnvironment().getKeConfiguration().isInConfigFile){
+                formatKEC(getEnvironment().getKeConfiguration());
+                say("Configuration explicitly given in server configuration file.");
+            }else{
+                say("Not configured in the server configuration file.");
             }
-            virtualIssuer = (VirtualIssuer) viStore.get(BasicIdentifier.newID(vi));
-            if (virtualIssuer == null) {
-                say("VI not found");
-                return;
+            return;
+        }
+        if (inputLine.hasArg(DEFAULT_SERVER_VI) || inputLine.hasArg(OA2SE.SERVER_VI_ID.toString())) {
+            VirtualIssuer vi = (VirtualIssuer) getEnvironment().getVIStore().get(OA2SE.SERVER_VI_ID);
+            if (vi == null) {
+                say("No default virtual issuer found.");
+            } else {
+                formatKEC(vi);
             }
+            return;
+        }
+
+        FoundIdentifiables identifiables = findItem(getEnvironment().getVIStore(), inputLine, false);
+        if (identifiables == null || identifiables.isEmpty()) {
+            say("sorry, no such virtual issuer \"" + inputLine.getLastArg() + "\"");
+            return;
+        }
+        VirtualIssuer vi = (VirtualIssuer) identifiables.get(0);
+        formatKEC(vi);
+    }
+
+    protected void rotationDefaults() {
+        int width = 11;
+
+        say("The following are the default values for key rotation:");
+        say(RJustify(Long.toString(GRACE_PERIOD_NOT_CONFIGURED), width) + " = grace period not configured");
+        say(RJustify(MAX_ACCESS_TOKEN_LIFETIME_DEFAULT + " ms", width) + " = max access token lifetime");
+        say(RJustify((24 * 3600 * 1000L) + " ms", width) + " = 24 hours (suggested cache grace period)");
+    }
+    protected void formatKEC(KEConfiguration keConfiguration) {
+        int width = 35;
+        VISerializationKeys vik = new VISerializationKeys();
+        say(RJustify(vik.keyRotationCacheGracePeriod(), width) + " = " + keConfiguration.cacheGracePeriod + " ms");
+        say(RJustify(vik.keyRotationATGracePeriod(), width) + " = " + keConfiguration.atGracePeriod + " ms");
+        say(RJustify(vik.keyRotationEnabled(), width) + " = " + keConfiguration.enabled);
+        say(RJustify("allow overrides", width) + " = " + keConfiguration.allowOverride);
+        if (!keConfiguration.isConfgured() && !keConfiguration.allowOverride ) {
+            say( " *** not configured ***");
         }
     }
 
+    protected void formatKEC(VirtualIssuer vi) {
+        if (!vi.hasKeyRotationConfiguration()) {
+            say( "key rotation not configured");
+        }
+        formatKEC(vi.getKeyRotationConfiguration());
+    }
     @Override
     public void ls(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
@@ -985,7 +1106,7 @@ public class KeyCommands extends OA4MPStoreCommands {
             String vi = inputLine.getNextArgFor(KR_VI);
             inputLine.removeSwitchAndValue(KR_VI);
             if (vi.equals(DEFAULT_SERVER_VI)) {
-                vi = OA2SE.SERVER_VI_ID.toString();
+                vi = SERVER_VI_ID.toString();
             }
             VirtualIssuer virtualIssuer = (VirtualIssuer) getEnvironment().getVIStore().get(BasicIdentifier.newID(vi));
             if (virtualIssuer == null) {
@@ -993,7 +1114,7 @@ public class KeyCommands extends OA4MPStoreCommands {
             }
 
             map = getStore().getByVI(virtualIssuer);
-            if(map == null || map.isEmpty()) {
+            if (map == null || map.isEmpty()) {
                 say("no entries for VI \"" + vi + "\"");
                 return;
             }
@@ -1082,7 +1203,7 @@ public class KeyCommands extends OA4MPStoreCommands {
             kerecord.setLastModifiedTS(now);
             kerecord.setCreationTS(now);
             kerecord.setLastAccessed(now);
-            kerecord.setVi(OA2SE.SERVER_VI_ID.getUri());
+            kerecord.setVi(SERVER_VI_ID.getUri());
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         } catch (InvalidAlgorithmParameterException e) {
@@ -1121,6 +1242,7 @@ public class KeyCommands extends OA4MPStoreCommands {
         say("Note that this generates a random kid (key id) for the new record.");
         say("This is because all kids in the store must be unique. Reset it if you choose.");
     }
+
 }
 
 

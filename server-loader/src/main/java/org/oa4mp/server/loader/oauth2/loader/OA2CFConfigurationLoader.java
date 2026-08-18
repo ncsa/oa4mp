@@ -166,9 +166,11 @@ public class OA2CFConfigurationLoader<T extends ServiceEnvironmentImpl> extends 
     public static long REFRESH_TOKEN_GRACE_PERIOD_DISABLED = -1L;
     public static long REFRESH_TOKEN_GRACE_PERIOD_USE_SERVER_DEFAULT = -2L;
     public static long REFRESH_TOKEN_GRACE_PERIOD_NOT_CONFIGURED = -3L;
+    /**
+     * The grace period for key rotation has not been configured. This is the
+     * default value.
+     */
     public static long GRACE_PERIOD_NOT_CONFIGURED = -3L;
-
-    public static long KEY_ROTATION_GRACE_PERIOD_DISABLED = -1L;
 
     //This is divisible by 3 and greater than 256,
     // so when it is base64 encoded there will be no extra characters:
@@ -179,7 +181,6 @@ public class OA2CFConfigurationLoader<T extends ServiceEnvironmentImpl> extends 
     public static boolean CLEANUP_FAIL_ON_ERRORS_DEFAULT = true; // fail on errors
     public static boolean MONITOR_ENABLED_DEFAULT = false; // Don't enabled monitoring by default
     public static long UUC_INTERVAL_DEFAULT = 6 * 60 * 60 * 1000L; // 6 hours minutes
-    public static long UUC_GRACE_PERIOD_DEFAULT = 6 * 60 * 60 * 1000L; // 6 hours minutes
     public static long MONITOR_INTERVAL_DEFAULT = 120 * 60 * 1000L; // 2 hours minutes
 
     public OA2CFConfigurationLoader(CFNode node) {
@@ -348,6 +349,7 @@ public class OA2CFConfigurationLoader<T extends ServiceEnvironmentImpl> extends 
                 if (!isTrivial(x)) {
                     keConfiguration.atGracePeriod = TimeUtil.getValueSecsOrMillis(x, true);
                 }
+                keConfiguration.isInConfigFile = true;
             }
         }
         return keConfiguration;

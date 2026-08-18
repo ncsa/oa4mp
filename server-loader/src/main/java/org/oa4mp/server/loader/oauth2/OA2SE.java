@@ -40,6 +40,8 @@ import org.oa4mp.server.loader.oauth2.storage.vi.VirtualIssuer;
 import org.oa4mp.server.loader.qdl.scripting.OA2QDLEnvironment;
 
 import javax.inject.Provider;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -47,6 +49,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.oa4mp.server.loader.oauth2.loader.OA2CFConfigurationLoader.*;
+import static org.oa4mp.server.loader.oauth2.storage.keys.KEStoreUtilities.jwksToIDMap;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -483,36 +486,47 @@ public class OA2SE extends ServiceEnvironmentImpl {
      */
     public static final String NO_KEY_ID = "--";
 
-    protected JSONWebKeys doNormalization(IdentifiableMap<KERecord> identifiableMap)  {
+    /**
+     * Converts a map of {@link KERecord}s to {@link JSONWebKeys}.
+     *
+     * @param identifiableMap
+     * @param validDatesOnly  if true only keys with valid dates (so nbf  < now) are returned.
+     * @return
+     */
+    protected JSONWebKeys doNormalization(IdentifiableMap<KERecord> identifiableMap, boolean validDatesOnly) {
         IdentifiableMap<KERecord> updateMap = new IdentifiableMap<>(); // any updates
-         JSONWebKeys jsonWebKeys = new JSONWebKeys(null);
+        JSONWebKeys jsonWebKeys = new JSONWebKeys(null);
          /*
            We have to construct the correct key set since it is possible that keys age
            out and become valid or expire, so it is non-trivial to determine the actual
            set of keys at a given instance.
           */
-         for(Identifier key : identifiableMap.keySet()) {
-             KERecord k = identifiableMap.get(key);
-             //if(k.hasValidDate() && !k.isExpired() ) {
-             if(!k.isExpired() ) {
-                 try{
-                 jsonWebKeys.put(k.getKid(), k.toJWK());
-                 }catch(Exception e) {
-                     if(e instanceof RuntimeException) {
-                         throw (RuntimeException)e;
-                     }
-                     throw new GeneralException(e);
-                 }
-                 if(k.getDefault()){
-                     jsonWebKeys.setDefaultKeyID(k.getKid());
-                 }
-             }
-         }
-         if(!updateMap.isEmpty()){
-             getKEStore().update(updateMap);
-         }
-         return jsonWebKeys;
+        for (Identifier key : identifiableMap.keySet()) {
+            KERecord k = identifiableMap.get(key);
+            // if(k.hasValidDate() && !k.isExpired() ) {
+            if (!k.isExpired()) {
+                if (validDatesOnly) {
+                    if (!k.hasValidDate()) continue;
+                }
+                try {
+                    jsonWebKeys.put(k.getKid(), k.toJWK());
+                } catch (Exception e) {
+                    if (e instanceof RuntimeException) {
+                        throw (RuntimeException) e;
+                    }
+                    throw new GeneralException(e);
+                }
+                if (k.getDefault()) {
+                    jsonWebKeys.setDefaultKeyID(k.getKid());
+                }
+            }
+        }
+        if (!updateMap.isEmpty()) {
+            getKEStore().update(updateMap);
+        }
+        return jsonWebKeys;
     }
+
     protected JSONWebKeys doNormalization(JSONWebKeys jsonWebKeys) {
         JWKUtil2 jwkUtil = new JWKUtil2();
         String defaultID = jsonWebKeys.getDefaultKeyID();
@@ -540,23 +554,48 @@ public class OA2SE extends ServiceEnvironmentImpl {
      * @param vi
      * @return
      */
-    public JSONWebKeys getJsonWebKeys(VirtualIssuer vi)  {
-        if (getKEStore() != null ) {
+    public JSONWebKeys getJsonWebKeys(VirtualIssuer vi) {
+        return getJsonWebKeys(vi, true);
+    }
+
+    /**
+     * Get the valid keys for the Virtual issuer.
+     *
+     * @param vi
+     * @param validDatesOnly If true only keys with valid dates (so nbf  < now) are returned.
+     * @return
+     */
+    public JSONWebKeys getJsonWebKeys(VirtualIssuer vi, boolean validDatesOnly) {
+        if (getKEStore() != null) {
             JSONWebKeys jsonWebKeys;
             IdentifiableMap<KERecord> identifiableMap;
-            if(vi == null) {
+            if (vi == null) {
                 VirtualIssuer defaultVI = (VirtualIssuer) getVIStore().get(SERVER_VI_ID);
                 identifiableMap = getKEStore().getByVI(defaultVI);
-            }else{
+            } else {
                 identifiableMap = getKEStore().getByVI(vi);
-            }
+                if (identifiableMap == null || identifiableMap.isEmpty()) {
+                    JSONWebKeys jwks = vi.getJsonWebKeys();
+                    jwks.setDefaultKeyID(vi.getDefaultKeyID());
+                    if ((jwks == null || jwks.isEmpty() && vi.isDefaultVI())) {
+                        jwks = getServerJWKS();
+                        jwks.setDefaultKeyID(getServerJWKS().getDefaultKeyID());
+                    }
+                    try {
+                        identifiableMap = jwksToIDMap(jwks);
+                    } catch (NoSuchAlgorithmException | InvalidKeySpecException x) {
+                        throw new GeneralException(x);
+                    }
+                }
 
+            }
             if (!identifiableMap.isEmpty()) {
-                return doNormalization(identifiableMap);
+                return doNormalization(identifiableMap, validDatesOnly);
             }
         }
         //  Not in new place, start looking in the old ones in case
         // it's an older install and they did not migrate.
+        System.err.println("**********");
         if (vi != null) {
             if (vi.hasJWKs()) {
                 jsonWebKeys = vi.getJsonWebKeys();
@@ -581,25 +620,32 @@ public class OA2SE extends ServiceEnvironmentImpl {
      * @param clientID
      * @return
      */
-    public JSONWebKeys getJsonWebKeys(Identifier clientID){
+    public JSONWebKeys getJsonWebKeys(Identifier clientID) {
         return getJsonWebKeys(getVI(clientID));
     }
 
     /**
+     * Get the current server keys.
+     *
      * @return
      * @deprecated
      */
     public JSONWebKeys getJsonWebKeys() {
         VirtualIssuer vi = (VirtualIssuer) getVIStore().get(SERVER_VI_ID);
-        String defaultKeyID = getServerJWKS().getDefaultKeyID();
-        JSONWebKeys jwks = new JSONWebKeys(defaultKeyID);
-        jwks.putAll(getServerJWKS());
-        if (vi != null) {
+        JSONWebKeys jwks;
+        if (vi != null && vi.hasJWKs()) {
+            jwks = new JSONWebKeys(null);
             jwks.putAll(vi.getJsonWebKeys());
             if (!vi.getDefaultKeyID().equals(NO_KEY_ID)) {
                 jwks.setDefaultKeyID(vi.getDefaultKeyID());
             }
+            return jwks;
         }
+
+        String defaultKeyID = getServerJWKS().getDefaultKeyID();
+        jwks = new JSONWebKeys(defaultKeyID);
+        jwks.putAll(getServerJWKS());
+
         return jwks;
     }
 
@@ -607,6 +653,12 @@ public class OA2SE extends ServiceEnvironmentImpl {
         this.jsonWebKeys = jsonWebKeys;
     }
 
+    /**
+     * If the server configuration has JWKs then this will be set at load time.
+     * Otherwise it will be null.
+     *
+     * @return
+     */
     public JSONWebKeys getServerJWKS() {
         return jsonWebKeys;
     }
@@ -940,4 +992,5 @@ public class OA2SE extends ServiceEnvironmentImpl {
     public boolean isServerVI(VirtualIssuer vi) {
         return vi.getIdentifier().equals(SERVER_VI_ID);
     }
+
 }

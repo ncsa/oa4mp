@@ -9,21 +9,22 @@
 debugger(10);
 script_load('test#/cm-tests/init.qdl', args(0));
 payload. := from_json(file_read(ini.'payloads' + 'create.json'));
-provisioner_id := custom_id();
-payload.'client_id' := provisioner_id;
+//provisioner_id := custom_id()+'-provisioner';
+//payload.'client_id' := provisioner_id;
 
-debugger(1,'creating provisioner ' + provisioner_id);
 provisioner_resp. := http#post(payload.);
 ⊨ provisioner_resp.'status'.'code' == ini.'status' : 'incorrect provisioner status: expected '+ ini.'status' +' but got ' + provisioner_resp.'status'.'code';
-
+provisioner_id :=  provisioner_resp.'content'.'client_id';
+debugger(1,'creating provisioner ' + provisioner_id);
 // now create an ersatz client.
-ersatz_id := custom_id();
-payload.'client_id' := ersatz_id;
+ersatz_id := custom_id() + '-ersatz';
+// payload.'client_id' := ersatz_id;
 payload.'ersatz_client' := true;
 payload.'org.oa4mp:/ersatz/provisioners' := provisioner_id;
-debugger(1,'creating ersatz client ' + ersatz_id);
 ersatz_resp. := http#post(payload.);
 ⊨ ersatz_resp.'status'.'code' == ini.'status' : 'incorrect ersatz status: expected '+ ini.'status' +' but got ' + ersatz_resp.'status'.'code';
+ersatz_id := ersatz_resp.'content'.'client_id';
+debugger(1,'created ersatz client ' + ersatz_id);
 
 r. := http#get({'client_id':ersatz_id});
 ⊨ ∃r.'content'.'ersatz_client' : 'missing ersatz_client assertion';
@@ -32,6 +33,19 @@ r. := http#get({'client_id':ersatz_id});
 ⊨ r.'content'.'org.oa4mp:/ersatz/provisioners' ≡ provisioner_id : 'wrong provisioners id';
 ⊨ ∃r.'content'.'ersatz_inherit_id_token' : 'missing ersatz_inherit_id_token assertion';
 ⊨ r.'content'.'ersatz_inherit_id_token' : 'wrong ersatz_inherit_id_token assertion';
+// now we actually go to the store and check that the permissions are correct.
+
+ps ≔ j_load('oa4mp.client.p_store');
+ps#init('/home/ncsa/dev/csd/config/server-oa2.xml','localhost:oa4mp.oa2.mariadb','permission');
+permissions. := ps#search('client_id', '\\Q' + provisioner_id+'\\E'); // make sure ID is literal
+ debugger(1,'permission:\n' + print(permissions.));
+ debugger(1,'ersatz_id:' + ersatz_id);
+ debugger(1,'provisioner_id:' + provisioner_id);
+ debugger(1,permissions\*\'ersatz_id');
+ debugger(1,ersatz_id ∈ permissions\*\'ersatz_id') ;
+// \ for the win!!
+⊨ ersatz_id ∈ permissions\*\'ersatz_id' : 'missing ersatz_id in permissions';
+⊨ 2 == size(provisioner_id == permissions\*\'client_id') : 'missing provisioner_id in permissions';
 
 r. := http#delete({'client_id':provisioner_id});
 r. := http#delete({'client_id':ersatz_id});

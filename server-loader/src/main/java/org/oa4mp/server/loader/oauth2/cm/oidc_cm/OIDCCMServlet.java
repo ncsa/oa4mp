@@ -268,10 +268,10 @@ public class OIDCCMServlet extends EnvServlet {
                         }
                     }
                 }
-                if(!provisioners.isEmpty()) {
-                    if(provisioners.size() == 1){
+                if (!provisioners.isEmpty()) {
+                    if (provisioners.size() == 1) {
                         json.put(ERSATZ_CLIENT_PROVISIONERS, provisioners.get(0));
-                    }else{
+                    } else {
                         json.put(ERSATZ_CLIENT_PROVISIONERS, provisioners);
                     }
                 }
@@ -854,14 +854,14 @@ public class OIDCCMServlet extends EnvServlet {
                         HttpStatus.SC_BAD_REQUEST,
                         null, client);
             }
-       //     if(!isAnonymous) {
-                if (jsonRequest.containsKey(STRICT_SCOPES)) {
-                    client.setStrictscopes(jsonRequest.getBoolean(STRICT_SCOPES));
-                }
-                if (jsonRequest.containsKey(USE_SERVER_SCOPES)) {
-                    client.setUseServerScopes(jsonRequest.getBoolean(USE_SERVER_SCOPES));
-                }
-        //    }
+            //     if(!isAnonymous) {
+            if (jsonRequest.containsKey(STRICT_SCOPES)) {
+                client.setStrictscopes(jsonRequest.getBoolean(STRICT_SCOPES));
+            }
+            if (jsonRequest.containsKey(USE_SERVER_SCOPES)) {
+                client.setUseServerScopes(jsonRequest.getBoolean(USE_SERVER_SCOPES));
+            }
+            //    }
             if (jsonRequest.containsKey(OA2Constants.SCOPE)) {
                 // the only thing that we are concerned with  is client is attempting to increase their
                 // scopes. These are permitted to reduce them.
@@ -882,7 +882,7 @@ public class OIDCCMServlet extends EnvServlet {
 
                 }
                 Collection<String> newScopeList = new HashSet<>();
-                if(client.useServerScopes()) {
+                if (client.useServerScopes()) {
                     // Fix for CIL-725 Allow admin clients to alter scopes as desired.
                     // NOTE as long as this admin-only access this is ok. Otherwise the
                     // previous version the only permits a reduction in scopes is allowed.
@@ -906,7 +906,7 @@ public class OIDCCMServlet extends EnvServlet {
                                 null, client
                         );
                     }
-                }else{
+                } else {
                     // Fix for https://github.com/ncsa/oa4mp/issues/297
                     // Allow administered clients to set their scopes as desired.
                     newScopeList.addAll(MyJSONUtil.arraytoList(newScopes));
@@ -1222,35 +1222,8 @@ public class OIDCCMServlet extends EnvServlet {
         }
 
         JSONObject jsonResp = new JSONObject(); // The response object.
-        String newID = newClient.getIdentifierString(); // default, random id with default configured head.
-        // CIL-1671
-        if (jsonRequest.containsKey(OIDCCMConstants.CLIENT_ID)) {
-            if (adminClient != null && adminClient.isAllowCustomIDs()) {
-                newID = jsonRequest.getString(OIDCCMConstants.CLIENT_ID);
-            }
-        } else {
-            // other case is that there is no explicit request, but the admin wants
-            // us to generate the ids.
-            if (adminClient != null && adminClient.isAllowCustomIDs() && adminClient.isGenerateIDs()) {
-                if (adminClient.getIdHead() == null) {
-                    // at this point, not setting still results in a random client ID
-                    warn(adminClient.getIdentifierString() + " requested generate client id but there is no id head set");
-                } else {
-                    byte[] u = new byte[16];
-                    secureRandom.nextBytes(u);
-                    BigInteger bi = new BigInteger(u);
-                    bi = bi.abs(); // since negative random integers occur.
-                    String uniquePart = bi.toString(16);
-                    if (adminClient.isUseTimestampInIDs()) {
-                        uniquePart = uniquePart + "/" + System.currentTimeMillis();
-                    }
-                    newID = adminClient.getIdHead().toString();
-                    newID = newID + (newID.endsWith("/") ? "" : "/") + uniquePart;
-                }
-            }
-        }
-        newClient.setIdentifier(BasicIdentifier.newID(newID));
-        jsonResp.put(OIDCCMConstants.CLIENT_ID, newID);
+        //   String newID = setNewClientID(newClient, jsonRequest, adminClient);
+        jsonResp.put(OIDCCMConstants.CLIENT_ID, newClient.getIdentifierString());
         if (!StringUtils.isTrivial(newClient.getSecret())) {
 
             jsonResp.put(OIDCCMConstants.CLIENT_SECRET, newClient.getSecret());
@@ -1320,6 +1293,46 @@ public class OIDCCMServlet extends EnvServlet {
         //  writeOK(httpServletResponse, jsonResp);
     }
 
+    /**
+     * Determines (in new clients only!) if the requested ID should be used,
+     *
+     * @param newClient
+     * @param jsonRequest
+     * @param adminClient
+     * @return
+     */
+    private String setNewClientID(OA2Client newClient, JSONObject jsonRequest, AdminClient adminClient) {
+        String newID = newClient.getIdentifierString(); // default, random id with default configured head.
+        // CIL-1671
+        if (jsonRequest.containsKey(OIDCCMConstants.CLIENT_ID)) {
+            if (adminClient != null && adminClient.isAllowCustomIDs()) {
+                newID = jsonRequest.getString(OIDCCMConstants.CLIENT_ID);
+            }
+        } else {
+            // other case is that there is no explicit request, but the admin wants
+            // us to generate the ids.
+            if (adminClient != null && adminClient.isAllowCustomIDs() && adminClient.isGenerateIDs()) {
+                if (adminClient.getIdHead() == null) {
+                    // at this point, not setting still results in a random client ID
+                    warn(adminClient.getIdentifierString() + " requested generate client id but there is no id head set");
+                } else {
+                    byte[] u = new byte[16];
+                    secureRandom.nextBytes(u);
+                    BigInteger bi = new BigInteger(u);
+                    bi = bi.abs(); // since negative random integers occur.
+                    String uniquePart = bi.toString(16);
+                    if (adminClient.isUseTimestampInIDs()) {
+                        uniquePart = uniquePart + "/" + System.currentTimeMillis();
+                    }
+                    newID = adminClient.getIdHead().toString();
+                    newID = newID + (newID.endsWith("/") ? "" : "/") + uniquePart;
+                }
+            }
+        }
+        newClient.setIdentifier(BasicIdentifier.newID(newID));
+        return newID;
+    }
+
 
     protected SecureRandom secureRandom = new SecureRandom();
 
@@ -1379,10 +1392,15 @@ public class OIDCCMServlet extends EnvServlet {
                                      String version) {
         OA2ClientKeys keys = new OA2ClientKeys();
 
+        if (newClient) {
+            // If the client is ersatz, then we need to determine
+            setNewClientID(client, jsonRequest, adminClient);
+        }
+
         /*
         NOTE that this will check for required attributes, process them, then remove them from the JSON.
         This allows us to store the non-essential parameters in the request. At this point we keep
-        them in case we need them, but we are not going to allocate actual storage for them, just folding them
+        them in case we need tsetIhem, but we are not going to allocate actual storage for them, just folding them
         into the extra attributes of the client's configuration.
          */
 
@@ -1511,7 +1529,7 @@ public class OIDCCMServlet extends EnvServlet {
             }
             jsonRequest.remove(OIDCCMConstants.TOKEN_ENDPOINT_AUTH_METHOD);
         }
-        if(!isAnonymous) {
+        if (!isAnonymous) {
             if (jsonRequest.containsKey(STRICT_SCOPES)) {
                 client.setStrictscopes(jsonRequest.getBoolean(STRICT_SCOPES));
                 jsonRequest.remove(STRICT_SCOPES);
@@ -1699,27 +1717,38 @@ public class OIDCCMServlet extends EnvServlet {
             }
             if (jsonRequest.containsKey(clientKeys.ersatzInheritIDToken())) {
                 client.setErsatzInheritIDToken(jsonRequest.getBoolean(clientKeys.ersatzInheritIDToken()));
-            }else{
-                if(newClient )
+            } else {
+                if (newClient)
                     client.setErsatzInheritIDToken(true); // default on new clients
             }
             if (jsonRequest.containsKey(EA_SUPPORT)) {
                 client.setExtendedAttributeSupport(jsonRequest.getBoolean(EA_SUPPORT));
             }
             if (client.isErsatzClient() && jsonRequest.containsKey(ERSATZ_CLIENT_PROVISIONERS)) {
+                DebugUtil.trace(this, "Ersatz client provisioners for new client " + client.getIdentifierString());
                 // Fix https://github.com/ncsa/oa4mp/issues/221
                 List<Identifier> ersatzChain;
+                String pID;
                 try {
-                    JSONArray array = jsonRequest.getJSONArray(ERSATZ_CLIENT_PROVISIONERS);
-                    ersatzChain = new ArrayList<>(array.size());
+                    JSONArray provisioners = jsonRequest.getJSONArray(ERSATZ_CLIENT_PROVISIONERS);
+                    if (provisioners.size() == 0) {
+                        throw new IllegalArgumentException("MIssing provisioner");
+                    }
+                    pID = provisioners.getString(0);
+                    /*ersatzChain = new ArrayList<>(array.size());
                     for(Object obj : array) {
                         ersatzChain.add(BasicIdentifier.newID(obj.toString()));
-                    }
+                    }*/
                 } catch (Throwable t) {
-                    ersatzChain = new ArrayList<>(1);
-                    ersatzChain.add(BasicIdentifier.newID( jsonRequest.getString(ERSATZ_CLIENT_PROVISIONERS)));
+                    pID = jsonRequest.getString(ERSATZ_CLIENT_PROVISIONERS);
+                    //ersatzChain.add(BasicIdentifier.newID( jsonRequest.getString(ERSATZ_CLIENT_PROVISIONERS)));
                 }
-                Identifier provisionerID = ersatzChain.get(0);
+                if (pID == null) {
+                    throw new IllegalArgumentException("MIssing provisioner");
+                }
+                ersatzChain = new ArrayList<>(1);
+                ersatzChain.add(client.getIdentifier());
+                Identifier provisionerID = BasicIdentifier.newID(pID);
                 Permission permission = getOA2SE().getPermissionStore().getErsatzChain(
                         adminClient.getIdentifier(),
                         provisionerID,
@@ -1732,11 +1761,13 @@ public class OIDCCMServlet extends EnvServlet {
                     permission.setClientID(provisionerID);
                     permission.setErsatzChain(ersatzChain);
                 } else {
+                    DebugUtil.trace(this, "    creating permission " + ersatzChain);
+
                     // check that this has the right information, so treat this as an update
                     permission.setErsatzChain(ersatzChain);
                 }
                 getOA2SE().getPermissionStore().save(permission);
-            }
+            } //end ersatz block
 
 
             if (jsonRequest.containsKey(SKIP_SERVER_SCRIPTS)) {

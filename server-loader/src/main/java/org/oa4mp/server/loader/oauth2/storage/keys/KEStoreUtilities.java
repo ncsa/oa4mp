@@ -2,6 +2,7 @@ package org.oa4mp.server.loader.oauth2.storage.keys;
 
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
+import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.IdentifiableMap;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
@@ -17,8 +18,6 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.*;
-
-import static org.oa4mp.server.loader.oauth2.loader.OA2CFConfigurationLoader.KEY_ROTATION_GRACE_PERIOD_DISABLED;
 
 public class KEStoreUtilities {
     private static final Logger log = LoggerFactory.getLogger(KEStoreUtilities.class);
@@ -39,6 +38,7 @@ public class KEStoreUtilities {
     public static IdentifiableMap<KERecord> getByVI(KEStore<KERecord> store, VirtualIssuer vi) {
         return getByVI(store, vi, true);
     }
+
     public static IdentifiableMap<KERecord> getByVI(KEStore<KERecord> store, VirtualIssuer vi, boolean validKeysOnly) {
         IdentifiableMap<KERecord> map = new IdentifiableMap<>();
         URI viURI = vi.getIdentifier().getUri();
@@ -77,10 +77,16 @@ public class KEStoreUtilities {
                                                    boolean forceFlag,
                                                    boolean testOnly) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, InvalidKeySpecException {
         if (vIDs == null || vIDs.isEmpty()) {
+            DebugUtil.trace(KEStoreUtilities.class, "vIDs is null/empty. Returning... ");
+
             return new HashMap<>();
         }
         // If the server disallows key rotations, bail here.
-        if (!keConfiguration.allowOverride && !keConfiguration.enabled) return new HashMap<>();
+        if (!keConfiguration.allowOverride && !keConfiguration.enabled) {
+            DebugUtil.trace(KEStoreUtilities.class, "keConfiguration disabled. Returning... ");
+            DebugUtil.trace(KEStoreUtilities.class, keConfiguration.toString());
+            return new HashMap<>();
+        }
         IdentifiableMap<KERecord> newRecords = new IdentifiableMap<>();
         Collection<JSONWebKey> jsonWebKeys = null;
 
@@ -89,34 +95,82 @@ public class KEStoreUtilities {
             if (!keConfiguration.enabled) continue;
             boolean useVI = false;
             String defaultID = null;
-            if (vi == null) continue; // no such VI
+            IdentifiableMap<KERecord> kers;
+            if (vi == null){
+                 if(vID.equals(OA2SE.SERVER_VI_ID)){
+                     kers = jwksToIDMap(oa2SE.getServerJWKS());
+                     for(KERecord ker : kers.values()){
+                         ker.setVi(OA2SE.SERVER_VI_ID.getUri());
+                         ker.isValid = true;
+                     }
+                 }else{
+                     continue; // no such VI
+                 }
+            } else{
+                 kers = oa2SE.getKEStore().getByVI(vi);
+            }
             // first case, check the store for keys.
-            IdentifiableMap<KERecord> kers = oa2SE.getKEStore().getByVI(vi);
 
             if (kers == null || kers.isEmpty()) {
+                DebugUtil.trace(KEStoreUtilities.class, "kers is null/empty ");
+                // So there are no keys in the store, just in the VI. Migrate and clean up dates.
+                IdentifiableMap<KERecord> migratedRecords = new IdentifiableMap<>();
+
                 // so no keys in the store, for this VI,
                 // which *always* supersede keys in the VI.
-                if (!vi.hasJWKs()) continue;  // no keys anyplace.
-                useVI = true;
-                jsonWebKeys = vi.getJsonWebKeys().values();
-                defaultID = vi.getDefaultKeyID();
+                if (vi.hasJWKs()) {
+                    jsonWebKeys = vi.getJsonWebKeys().values();
+                    defaultID = vi.getDefaultKeyID();
+
+                }else{
+                    if(oa2SE.isServerVI(vi)) {
+                      if(oa2SE.getServerJWKS() != null || !oa2SE.getServerJWKS().isEmpty() ){
+                          jsonWebKeys = oa2SE.getServerJWKS().values();
+                          defaultID= oa2SE.getServerJWKS().getDefaultKeyID();
+                      }else{
+                          DebugUtil.trace(KEStoreUtilities.class, "oa2SE.getServerJWKS() is null");
+                          continue;
+                      }
+                    }
+                }
+
+                DebugUtil.trace(KEStoreUtilities.class, "getting keys from VI ");
+
                 // rotate these and put them in the store.
                 for (JSONWebKey jwk : jsonWebKeys) {
-                    if (jwk.isExpired() || !jwk.isValid()) continue;
+                    if (jwk.isExpired() || !jwk.isValid()) {
+                        DebugUtil.trace(KEStoreUtilities.class, "invalid key, skipping");
+                        continue;
+                    }
+
                     JSONWebKey newKey = rotate(jwk, keConfiguration.cacheGracePeriod, keConfiguration.atGracePeriod);
                     KERecord keRecord = oa2SE.getKEStore().create();
-                    keRecord.fromJWK(newKey, defaultID.equals(newKey.id));
+                    keRecord.fromJWK(newKey, defaultID.equals(jwk.id));
                     keRecord.setValid(true);
                     keRecord.setVi(vi.getIdentifier().getUri());
                     newRecords.put(keRecord.getIdentifier(), keRecord);
+                    KERecord migratedRecord = oa2SE.getKEStore().create();
+                    migratedRecord.fromJWK(jwk, defaultID.equals(jwk.id));
+                    migratedRecord.setValid(true);
+                    migratedRecord.setVi(vi.getIdentifier().getUri());
+                    migratedRecord.setNbf(new Date(System.currentTimeMillis() - 1000L)); // Backdate it by a second so it doesn't get flagged as not valid yet.
+                    migratedRecords.put(migratedRecord.getIdentifier(), migratedRecord);
                 }
-                oa2SE.getKEStore().putAll(newRecords); // mass update in case there are lots so store doesn't choke.
+                if (testOnly) {
+                    newRecords.putAll(migratedRecords); //send back everything.
+                }else{
+                    oa2SE.getKEStore().putAll(newRecords); // mass update in case there are lots so store doesn't choke.
+                    oa2SE.getKEStore().putAll(migratedRecords); // mass update in case there are lots so store doesn't choke.
+                }
                 return newRecords;
             } else {
+                DebugUtil.trace(KEStoreUtilities.class, "Using KEStore Utilities to rotate " + vID);
                 // have keys in store to rotate.
                 return KEStoreUtilities.rotate(oa2SE.getKEStore(), kers, forceFlag, keConfiguration.cacheGracePeriod, keConfiguration.atGracePeriod, true, testOnly);
             }
         }
+        DebugUtil.trace(KEStoreUtilities.class, "Default case, no keys to rotate. Returning... ");
+
         return new HashMap<>();
     }
 
@@ -151,6 +205,9 @@ public class KEStoreUtilities {
         }
         Map<Identifier, KERecord> kers = new HashMap<>(oldKERS.size());
         IdentifiableMap<KERecord> updatedOLDKERs = new IdentifiableMap<>(oldKERS.size());
+        if (DebugUtil.isTraceEnabled()) {
+            System.err.println("rotate called with " + oldKERS.size() + " keys");
+        }
         for (Identifier identifier : oldKERS.keySet()) {
             KERecord oldKER = oldKERS.get(identifier);
 
@@ -158,41 +215,48 @@ public class KEStoreUtilities {
              * Secret debugging -- set /trace on and a bunch of stuff about the
              * key will be printed.
              */
-            if(DebugUtil.isTraceEnabled()){
-                String out = "processing " +oldKER.getKid() + ":" +
+            if (DebugUtil.isTraceEnabled()) {
+                boolean x = force || (oldKER.isValid
+                        && oldKER.getExp() == null
+                        && (oldKER.getNbf() == null || (oldKER.getNbf().before(now))));
+                String out = "\n-----\nprocessing " + oldKER.getKid() + ":" +
                         "\n     force ? " + force +
                         "\n   isValid = " + oldKER.isValid +
-                        "\nexp = null ? "  + (oldKER.getExp() == null) +
+                        "\nexp = null ? " + (oldKER.getExp() == null) +
                         "\nnbf = null ? " + (oldKER.getNbf() == null) +
-                        "\n nbf < now ? " + (oldKER.getNbf().before(now));
+                        "\n nbf < now ? " + (oldKER.getNbf() != null && oldKER.getNbf().before(now)) +
+                        "\n" + x + " = force || (valid && exp == null && (nbf == null || nbf < now))";
                 System.err.println(out);
             }
             // If a key does not have a not before and is requested to rotate, do so.
             if (force || (oldKER.isValid
                     && oldKER.getExp() == null
                     && (oldKER.getNbf() == null || (oldKER.getNbf().before(now))))) {
-                if(DebugUtil.isTraceEnabled()) {
+                if (DebugUtil.isTraceEnabled()) {
                     System.err.println("passed conditional, rotating key");
                 }
-                    KERecord newKER = rotate(keStore, oldKER, cacheGracePeriod, atGracePeriod, testOnly);
+                KERecord newKER = rotate(keStore, oldKER, cacheGracePeriod, atGracePeriod, testOnly);
                 newKER.setValid(true);
                 kers.put(newKER.getIdentifier(), newKER);
                 updatedOLDKERs.put(oldKER);
-            }else{
-                if(DebugUtil.isTraceEnabled()) {
+            } else {
+                if (DebugUtil.isTraceEnabled()) {
                     System.err.println("Skipping key rotation.");
                 }
             }
         }
         // now update the store
         if (updateOldKeys && !testOnly) {
-            keStore.update(updatedOLDKERs); // updated expirations
+            ArrayList<KERecord> updatedOLDKERsList = new ArrayList<>(updatedOLDKERs.values());
+            int[] rcs = keStore.save(updatedOLDKERsList);
         }
         if (testOnly) {
-            return updatedOLDKERs;
-        }else{
+            kers.putAll(updatedOLDKERs);
+            return kers;
+        } else {
             keStore.putAll(kers); // all new
         }
+        kers.putAll(updatedOLDKERs);
         return kers;
     }
 
@@ -209,6 +273,11 @@ public class KEStoreUtilities {
             NoSuchAlgorithmException {
         JWKUtil2 jwkUtil2 = new JWKUtil2();
         JSONWebKey newKey = null;
+        DebugUtil.trace(KEStoreUtilities.class, "rotating key id = " + oldKey.id);
+
+        if (cacheGracePeriod < 0L || atGracePeriod < 0L) {
+            throw new IllegalArgumentException("Cache and at grace periods must be non-negative");
+        }
         if (oldKey.isRSAKey()) {
             newKey = jwkUtil2.createRSAKey(oldKey.JOSEJWK.size(), oldKey.algorithm);
         }
@@ -218,7 +287,8 @@ public class KEStoreUtilities {
         if (newKey == null) {
             throw new IllegalArgumentException("Unknown key type to rotate");
         }
-        newKey = rotate(oldKey, cacheGracePeriod, atGracePeriod);
+        // newKey = rotate(oldKey, cacheGracePeriod, atGracePeriod);
+        DebugUtil.trace(KEStoreUtilities.class, "   >> rotated key id = " + oldKey.id);
         setRotationDates(oldKey, newKey, cacheGracePeriod, atGracePeriod);
         return newKey;
     }
@@ -298,7 +368,7 @@ public class KEStoreUtilities {
 
     /**
      * For a virtual issuer (may be null), resolve the key configuration. This means that if the VI
-     * has these ocnfigured, and the server allows for overrides, use the VI configuration. Otherwise
+     * has these configured, and the server allows for overrides, use the VI configuration. Otherwise
      * use the server configuration. Note that it is assumed you have checked if the server allows
      * key rotations separately.
      *
@@ -307,37 +377,63 @@ public class KEStoreUtilities {
      * @return
      */
     public static KEConfiguration resolveKeConfiguration(OA2SE oa2SE, VirtualIssuer vi) {
+        DebugUtil.trace(KEStoreUtilities.class, "Starting resolveKeConfiguration for VI= " + vi);
         if (vi == null) {
-            vi = (VirtualIssuer) oa2SE.getVIStore().get(OA2SE.SERVER_VI_ID);
-            if (vi == null) {
-                return oa2SE.getKeConfiguration();
+            throw new IllegalArgumentException("Virtual issuer is null");
+        }
+        KEConfiguration serverKEC;
+        VirtualIssuer serverVI = (VirtualIssuer) oa2SE.getVIStore().get(OA2SE.SERVER_VI_ID);
+        if (serverVI == null) {
+            serverKEC = oa2SE.getKeConfiguration(); // so key rotation has not been configured.
+            DebugUtil.trace(KEStoreUtilities.class, "    resolveKeConfiguration server vi null, using OA2SE default ");
+        } else {
+            if (!serverVI.hasKeyRotationConfiguration()) {
+                // So they overrode the server configuration file KEC (if any) but did not configure it.
+                DebugUtil.trace(KEStoreUtilities.class, "    resolveKeConfiguration server vi has not been configuration.");
+                throw new IllegalStateException("Server VI exists, but has not been configured.");
             }
-            if (!vi.hasKeyRotationConfiguration()) {
-                return oa2SE.getKeConfiguration();
-            }
+            serverKEC = serverVI.getKeyRotationConfiguration();
+            DebugUtil.trace(KEStoreUtilities.class, "    resolveKeConfiguration using server vi for default KEC");
         }
         if (oa2SE.isServerVI(vi)) {
-            if (vi.getKeyRotationConfiguration().isConfgured()) {
-                return vi.getKeyRotationConfiguration();
+            if (!serverVI.hasKeyRotationConfiguration()) {
+                DebugUtil.trace(KEStoreUtilities.class, "    resolveKeConfiguration server vi has not been configuration.");
+                throw new IllegalStateException("Server VI has not been configured.");
             }
-            return oa2SE.getKeConfiguration();
+            DebugUtil.trace(KEStoreUtilities.class, "    resolveKeConfiguration server vi requested KEC");
+            checkKEC(vi, serverKEC);
+            return serverKEC;
         }
 
-        KEConfiguration serverKEC = oa2SE.getKeConfiguration();
-        KEConfiguration outKEC = new KEConfiguration();
-
-        if (serverKEC.allowOverride && vi != null) {
-            if (!vi.isKeyRotationEnabled()) {
-                outKEC.enabled = false;
-                return outKEC;
-            }
-            outKEC.enabled = true;
-            if (KEY_ROTATION_GRACE_PERIOD_DISABLED != vi.getAtGracePeriod())
-                outKEC.atGracePeriod = vi.getAtGracePeriod();
-            if (KEY_ROTATION_GRACE_PERIOD_DISABLED != vi.getCacheGracePeriod())
-                outKEC.cacheGracePeriod = vi.getCacheGracePeriod();
+        KEConfiguration viKEC = vi.getKeyRotationConfiguration();
+        if(!viKEC.allowOverride) {
+            // If this allows overrides, then we can pass it along. Otherwise, it has to be checked.
+            checkKEC(vi, viKEC);
         }
-        return outKEC;
+
+        if (!viKEC.allowOverride) return viKEC;
+
+        // OK, so there is a VI with a configuration and now we have to unscramble overrides.
+
+        if (viKEC.allowOverride) {
+            DebugUtil.trace(KEStoreUtilities.class, "    resolveKeConfiguration  VI found, allows overrides");
+            DebugUtil.trace(KEStoreUtilities.class, "    resolveKeConfiguration  setting KEC values as overrides");
+            if (viKEC.atGracePeriod < 0) viKEC.atGracePeriod = serverKEC.atGracePeriod;
+            if (viKEC.cacheGracePeriod < 0) viKEC.cacheGracePeriod = serverKEC.cacheGracePeriod;
+            DebugUtil.trace(KEStoreUtilities.class, "    resolveKeConfiguration  returned KEC=" + viKEC);
+        }
+        return viKEC;
+    }
+
+    private static void checkKEC(VirtualIssuer vi, KEConfiguration viKEC) {
+        if (!viKEC.isConfgured()) {
+            DebugUtil.trace(KEStoreUtilities.class, "    resolveKeConfiguration VI has no configuration,  returning server KEC");
+            throw new IllegalStateException("VI \"" + vi.getIdentifierString() + "\" has no key rotation configuration");
+        }
+        if (!viKEC.enabled) {
+            DebugUtil.trace(KEStoreUtilities.class, "    resolveKeConfiguration VI has disabled configuration.");
+            throw new IllegalStateException("VI \"" + vi.getIdentifierString() + "\" has no key rotation configuration");
+        }
     }
 
     /**
@@ -394,6 +490,27 @@ public class KEStoreUtilities {
             keRecord.setNbf(new Date());
         }
         return keRecord;
+    }
+
+    /**
+     * Convert a set of JWKs to a map of KE records. This is a useful utility for many programs.
+     * @param jwks
+     * @return
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeySpecException
+     */
+    public static IdentifiableMap<KERecord> jwksToIDMap(JSONWebKeys jwks) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        IdentifiableMap map = new IdentifiableMap<>();
+        if (jwks == null || jwks.isEmpty()) {
+            return map;
+        }
+        String defaultKeyID = jwks.getDefaultKeyID();
+        for (JSONWebKey jwk : jwks.values()) {
+            KERecord keRecord = new KERecord(BasicIdentifier.newID(jwk.id));
+            keRecord.fromJWK(jwk, defaultKeyID.equals(jwk.id));
+            map.put(keRecord.getIdentifier(), keRecord);
+        }
+        return map;
     }
 
 }

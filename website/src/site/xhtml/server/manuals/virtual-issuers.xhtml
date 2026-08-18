@@ -37,8 +37,8 @@
     it usually just works.</p>
 
 <h2>How do they work?</h2>
-<p>It is important to understand that if an admin clients use virtual issuers, and then all of the clients it manages
-    use the VI as well. There is a default issuer for the system so that any client
+<p>It is important to understand that if an admin client is in a virtual issuer, and then all of the clients it manages
+    are in the VI as well. There is a default issuer for the system so that any client
     not in specific virtual issuer lands there.
     This makes it easy to manage a large system of clients who have specialized signing requirements.
     (Historical note, these were called virtual organization for a time, but that names was taken over
@@ -71,6 +71,21 @@
     allows you
     to always just check what is actually there.</p>
 
+<h2>The default issuer</h2>
+<p>
+    There is a default issuer (implicit) with reserved id <b>oa4mp:/vi/default</b>.
+    Generally you don't need to configure this. If you want to
+    To create it, the simplest way is to use the CLI call create_default_vi which prompts you for all
+    the information.
+</p>
+<p>
+    A very simple setup uses no virtual issuers and may not have key rotation enabled.
+    It is always possible to rotate the keys manually just using the server configuration.
+     In that case
+    you may certainly just have a default issuer or may have the same configuration in the server
+    XML file. If the system discovers both an XML configuration for rotation and a default issuer, then
+    the issuer is considered definitive.
+</p>
 
 <h2>An example</h2>
 <p>In this case OA4MP has been set up at the (mythical) university of Edgestow. The task is to create an

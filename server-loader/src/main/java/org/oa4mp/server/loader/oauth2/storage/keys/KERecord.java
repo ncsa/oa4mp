@@ -206,7 +206,7 @@ public class KERecord extends Monitored {
     }
 
     /**
-     * Checks that the nbf (not before) date has
+     * Checks that the nbf (not before) date has passed
      * @return
      */
     public boolean hasValidDate() {

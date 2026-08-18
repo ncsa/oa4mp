@@ -56,12 +56,13 @@ public abstract class OA4MPStoreCommands extends StoreCommands2 {
 
     public void encode(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
-            say("encode [" + BASE_32_FLAG + "] arg");
+            String name = getMethodName(2);
+            say(name + " [" + BASE_32_FLAG + "] arg");
             sayi("encode a string using base 64 or base 32. The default is base 64");
             sayi("Note: Enclose your argument in double quotes. You must escape embedded");
             sayi("      double quotes with \\\"");
             say("E.g.");
-            sayi("clients>encode \"config \\\" foo \\\"\"\n" +
+            sayi("clients>" + name + " \"config \\\" foo \\\"\"\n" +
                     "  Y29uZmlnICIgZm9vICI\n" +
                     "  clients>decode Y29uZmlnICIgZm9vICI\n" +
                     "  config \" foo \"");
@@ -98,7 +99,9 @@ public abstract class OA4MPStoreCommands extends StoreCommands2 {
 
     public void decode(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
-            say("decode [" + BASE_32_FLAG + "] arg");
+            String name = getMethodName(2);
+
+            say(name + " [" + BASE_32_FLAG + "] arg");
             sayi("decode a string using base 64 or base 32. The default is base 64");
 
             return;
@@ -196,7 +199,9 @@ rs show -range [2^2;2^3] -attr [client_id,creation_ts] X
 
     public void run_qdl(InputLine inputLine) throws Throwable {
         if(showHelp(inputLine)) {
-            say("run_qdl [" + FILE_FLAG + " file_path] [statements]");
+            String name = getMethodName(2);
+
+            say(name + " [" + FILE_FLAG + " file_path] [statements]");
             say("Run either a file using QDL's script_load call or directly interpret");
             say(" the rest of the line as parseable QDL. Each store has a separate QDL state and");
             say("interpreter. Since E.g. lists are generally processed as QDL, you can set variables");
@@ -206,7 +211,7 @@ rs show -range [2^2;2^3] -attr [client_id,creation_ts] X
             say("E.g.");
             say("The rest of the line must be completely valid QDL as all that we do is truncate off the commnd and pass the");
             say("rest to the interpreter:");
-            say("run_qdl script_load('vfs#boot/init.qdl', true, -1);");
+            say(name + " script_load('vfs#boot/init.qdl', true, -1);");
             return;
 
         }

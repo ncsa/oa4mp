@@ -13,16 +13,24 @@
 <p>
     Signing keys for JSON web tokens (JWTs) are required. It is good practice to rotate, i.e., periodically
     invalidate and replace them, to ensure cryptographic integrity, limit long-term exploits, etc.
-    Since many clients cache keys from the server, the basic policy is to set a date for the rotation to occur
-    and on that date, issue new valid keys, setting the expiration for the current keys. The new keys are
-    then made active immediately and used. The old keys remain available and the expiration is set to be the
-    sum of the (expected) client's cache and the service's access token lifetime.
+    Since many clients cache keys from the server, we have to take into account the <i>cache lifetime</i>
+    as well as the <i>access token lifetime</i>. Caches are updated daily.
+    The rotation method is to issue new keys, that become valid only at the end of the cache liftime,
+    then setting the expiration for the current keys to be the sum of the cache and access token lifetimes.
 </p>
 <p>
-    The reson is that this lets clients refresh their cache and exchange/refrsh any access tokens before the old keys are invalidated.
+    The reson is that this lets clients refresh their cache and exchange/refrsh any
+    access tokens before the old keys are invalidated.
     Do remember that refresh tokens are not signed, so even though they have very long lifetimes
     compared to access tokens, they play no role.
 </p>
+<p>You may either set the policy in the server XML file (described here), along with an
+    initial set of keys, or create a default
+   virtual issuer and set it there.
+    <b>Note that if there is an XML configuration and a VI, the VI is used.</b>
+    Some OA4MP installs do not use virtual issuers and have no need to set one up. The XML
+    configuration allows for a very simple, basic configuration to do server key rotation.
+  </p>
 
 <table style="text-align: left; width: 50%;" border="1" cellspacing="2" cellpadding="2">
     <tbody>

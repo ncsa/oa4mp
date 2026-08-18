@@ -539,4 +539,18 @@ public class TransactionCache<V extends BasicTransaction> extends CachedMapFacad
         throw new NotImplementedException(" This is not yet implemented for cache");
     }
 
+    @Override
+    public int[] update(List<V> m) {
+        return new int[0];
+    }
+
+    @Override
+    public int[] register(List<V> value) {
+        return new int[0];
+    }
+
+    @Override
+    public int[] save(List<V> value) {
+        return new int[0];
+    }
 }

@@ -716,7 +716,7 @@ public class StoreFacade {
         @Override
         public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
-            doxx.add(getName() + "(key, regex) -  search for all clients with the given key whose values satisfy the regex.");
+            doxx.add(getName() + "(key, regex) -  search for all objects with the given key whose values satisfy the regex.");
             doxx.add("Note #1: This returns a bunch of stems, one for each object that is found, so it is equivalent to a multi-read");
             doxx.add("Note #2: This may be a huge result if the regex is too general. Do be careful.");
             doxx.add(checkInitMessage);

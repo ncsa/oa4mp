@@ -61,12 +61,12 @@ public class VIConverter<V extends VirtualIssuer> extends MapConverter<V> {
         if (map.containsKey(vok().keyRotationCacheGracePeriod())) {
             vi.setCacheGracePeriod(map.getLong(vok().keyRotationCacheGracePeriod()));
         } else {
-            vi.setCacheGracePeriod(OA2CFConfigurationLoader.KEY_ROTATION_GRACE_PERIOD_DISABLED);
+            vi.setCacheGracePeriod(OA2CFConfigurationLoader.GRACE_PERIOD_NOT_CONFIGURED);
         }
         if (map.containsKey(vok().keyRotationATGracePeriod())) {
             vi.setAtGracePeriod(map.getLong(vok().keyRotationATGracePeriod()));
         } else {
-            vi.setAtGracePeriod(OA2CFConfigurationLoader.KEY_ROTATION_GRACE_PERIOD_DISABLED);
+            vi.setAtGracePeriod(OA2CFConfigurationLoader.GRACE_PERIOD_NOT_CONFIGURED);
         }
         if (map.containsKey(vok().keyRotationEnabled())) {
             vi.setKeyRotationEnabled(map.getBoolean(vok().keyRotationEnabled()));

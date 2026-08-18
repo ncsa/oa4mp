@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.Iterator;
 
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
+import static org.oa4mp.server.loader.oauth2.OA2SE.SERVER_VI_ID;
 import static org.oa4mp.server.loader.qdl.QDLXMLConstants.*;
 
 /**
@@ -290,6 +291,7 @@ public class VirtualIssuer extends Monitored {
         keConfiguration.enabled = isKeyRotationEnabled();
         keConfiguration.atGracePeriod = getAtGracePeriod();
         keConfiguration.cacheGracePeriod = getCacheGracePeriod();
+        keConfiguration.allowOverride = isAllowOverrides();
         return keConfiguration;
     }
 
@@ -299,5 +301,9 @@ public class VirtualIssuer extends Monitored {
      */
     public boolean hasKeyRotationConfiguration(){
         return getAtGracePeriod() != -OA2CFConfigurationLoader.GRACE_PERIOD_NOT_CONFIGURED || getCacheGracePeriod() != OA2CFConfigurationLoader.GRACE_PERIOD_NOT_CONFIGURED;
+    }
+
+    public boolean isDefaultVI(){
+        return SERVER_VI_ID.equals(getIdentifier());
     }
 }
