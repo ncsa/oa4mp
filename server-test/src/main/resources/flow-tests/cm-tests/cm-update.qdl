@@ -9,10 +9,17 @@ resp. := http#post(payload.);
 
 update. := from_json(file_read(ini.'payloads' + 'update.json'));
 update.'client_id' := resp.'content'.'client_id';
+update.'rt_grace_period' := 1000000;
 resp2. := http#put(update.);
+debugger(1,print(resp2.'content'));
 ⊨ resp2.'status'.'code' == 200 : logger(4,say('incorrect returned status of ' + resp.'status'.'code'));
+⊨ ∃resp2.'content'.'rt_grace_period';
+⊨ resp2.'content'.'rt_grace_period' ≡ 1000000 : 'Git 159 regression failed: rt_grace_period not round-tripped.' ;
 r. := http#get({'client_id':resp2.'content'.'client_id'});
+⊨ ∃r.'content'.'rt_grace_period';
+⊨ r.'content'.'rt_grace_period' ≡ 1000000 : 'Git 159 regression failed: rt_grace_period not round-tripped.' ;
 // r. now contains the uploaded client
+debugger(1,print(r.'content'));
 script_load('cm-compare.qdl', r.'content', update., {'application_type', 'token_endpoint_auth_method'});
 r. := http#delete({'client_id':resp.'content'.'client_id'});
 say('ok: Admin creation and update of a client');

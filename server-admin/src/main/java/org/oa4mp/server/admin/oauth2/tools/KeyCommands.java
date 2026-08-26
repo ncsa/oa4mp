@@ -455,7 +455,7 @@ public class KeyCommands extends OA4MPStoreCommands {
             if (signingKeys) {
                 map = new IdentifiableMap<>();
                 // aim is to get exactly what server signs with,
-                JSONWebKeys jwks = getEnvironment().getJsonWebKeys(vi, returnValid);
+                JSONWebKeys jwks = getEnvironment().getJsonWebKeys(vi, true);
                 for (String kid : jwks.keySet()) {
                     KERecord ker = getStore().getByKID(kid);
                     if (ker != null) {

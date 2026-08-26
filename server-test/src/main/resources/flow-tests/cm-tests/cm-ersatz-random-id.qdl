@@ -1,0 +1,4 @@
+#! /usr/bin/env -S qdl-run
+
+
+script_load('test#/cm-tests/cm-ersatz.qdl', args(0), false);

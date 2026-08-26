@@ -2,33 +2,58 @@
 
 /*
    Script that creates a provisioner and then an ersatz client. It then gets the ersatz client
-   and checks that the round trip works.
+   and checks that the round trip works. There is an option to use custom ids.
+   This is necessary since several clients can and do do that and the code path
+   are substantially different.
 
    Test for https://github.com/ncsa/oa4mp/issues/252
+   https://github.com/ncsa/oa4mp/issues/313
 */
-debugger(10);
 script_load('test#/cm-tests/init.qdl', args(0));
+custom_ids := size(args())==2?args(1):false;
+if[debugger().'level' == 1][say();]; // add a blank to debug output
+debugger(1,'custom ids: ' + custom_ids);
 payload. := from_json(file_read(ini.'payloads' + 'create.json'));
-//provisioner_id := custom_id()+'-provisioner';
-//payload.'client_id' := provisioner_id;
+provisioner_id := 'provisioner-id-not-set';
+if[custom_ids][
+  provisioner_id := custom_id()+'-provisioner';
+  payload.'client_id' := provisioner_id;
+  debugger(1,'using custom provisioner id ' + provisioner_id);
+];
+    payload.'ersatz_client' := false; // this is the provisioner
 
+  debugger(1,'1');
 provisioner_resp. := http#post(payload.);
+  remove(payload.'client_id'); // or it may try to recreate the provisioner.
+  debugger(1,'2');
+  debugger(1,print(provisioner_resp.'content'));
 ⊨ provisioner_resp.'status'.'code' == ini.'status' : 'incorrect provisioner status: expected '+ ini.'status' +' but got ' + provisioner_resp.'status'.'code';
-provisioner_id :=  provisioner_resp.'content'.'client_id';
+  debugger(1,'\n'+print(provisioner_resp.'content'));
+debugger(1,'has provisioner id:' + provisioner_id);
+provisioner_id :=  custom_ids ⇒ provisioner_id:(provisioner_resp.'content'.'client_id');
 debugger(1,'creating provisioner ' + provisioner_id);
 // now create an ersatz client.
-ersatz_id := custom_id() + '-ersatz';
-// payload.'client_id' := ersatz_id;
+ersatz_id := 'ersatz-id-not-set';
+if[custom_ids][
+    ersatz_id := custom_id() + '-ersatz';
+    payload.'client_id' := ersatz_id;
+   debugger(1,'using custom ersatz id ' + ersatz_id);
+ ];
 payload.'ersatz_client' := true;
 payload.'org.oa4mp:/ersatz/provisioners' := provisioner_id;
+  debugger(1,'3');
+
 ersatz_resp. := http#post(payload.);
+  debugger(1,'\n'+print(ersatz_resp.'content'));
+  debugger(1,'4');
 ⊨ ersatz_resp.'status'.'code' == ini.'status' : 'incorrect ersatz status: expected '+ ini.'status' +' but got ' + ersatz_resp.'status'.'code';
-ersatz_id := ersatz_resp.'content'.'client_id';
+ersatz_id := custom_ids ⇒ ersatz_id: (ersatz_resp.'content'.'client_id');
 debugger(1,'created ersatz client ' + ersatz_id);
 
 r. := http#get({'client_id':ersatz_id});
+debugger(1,'ersatz client for id ' + ersatz_id +'\n'+print(r.'content'));
 ⊨ ∃r.'content'.'ersatz_client' : 'missing ersatz_client assertion';
-⊨ r.'content'.'ersatz_client' : 'wrong ersatz_client assertion';
+⊨ r.'content'.'ersatz_client' : 'ersatz_client flag is false, should be true';
 ⊨ ∃r.'content'.'org.oa4mp:/ersatz/provisioners' : 'missing provisioners assertion';
 ⊨ r.'content'.'org.oa4mp:/ersatz/provisioners' ≡ provisioner_id : 'wrong provisioners id';
 ⊨ ∃r.'content'.'ersatz_inherit_id_token' : 'missing ersatz_inherit_id_token assertion';
@@ -42,12 +67,13 @@ permissions. := ps#search('client_id', '\\Q' + provisioner_id+'\\E'); // make su
  debugger(1,'ersatz_id:' + ersatz_id);
  debugger(1,'provisioner_id:' + provisioner_id);
  debugger(1,permissions\*\'ersatz_id');
- debugger(1,ersatz_id ∈ permissions\*\'ersatz_id') ;
-// \ for the win!!
+ debugger(1,ersatz_id ∈ permissions\*\'ersatz_id') ; // \ for the win!!
 ⊨ ersatz_id ∈ permissions\*\'ersatz_id' : 'missing ersatz_id in permissions';
-⊨ 2 == size(provisioner_id == permissions\*\'client_id') : 'missing provisioner_id in permissions';
+// Now check for GitHub 252.
+⊨ 2 ≡ size(provisioner_id ≡ permissions\*\'client_id') : 'missing provisioner_id in permissions';
 
 r. := http#delete({'client_id':provisioner_id});
 r. := http#delete({'client_id':ersatz_id});
-say('ok: Admin ersatz client test');
+ps#remove(permissions\*\'permission_id'); //clean up store!
+say('ok: Admin ersatz client test for ' + (custom_ids ⇒ 'custom' : 'random') + ' id ');
 

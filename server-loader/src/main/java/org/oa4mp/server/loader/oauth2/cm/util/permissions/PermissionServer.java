@@ -95,8 +95,17 @@ public class PermissionServer extends AbstractDDServer {
             case 1:
                 p = pList.get(0);
                 break;
+            case 2:
+                // Can happen if an ersatz client is added. Then there are two permissions, one
+                // for the ersatz client and one to allow substitutions.
+                if(pList.get(0).canSubstitute()){ // don't do the ersatz permission.
+                    p= pList.get(1);
+                }else{
+                    p= pList.get(0);
+                }
+                break;
             default:
-                throw new GeneralException("Internal error. Multiple permissiions entries found");
+                throw new GeneralException("Internal error. Multiple permission entries found");
 
         }
         p.setAdminID(request.getAdminClient().getIdentifier());

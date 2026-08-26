@@ -8,6 +8,7 @@ import edu.uiuc.ncsa.security.core.util.*;
 import edu.uiuc.ncsa.security.servlet.UsernameTransformer;
 import edu.uiuc.ncsa.security.util.json.JSONEntry;
 import edu.uiuc.ncsa.security.util.json.JSONStore;
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import edu.uiuc.ncsa.security.util.jwk.JWKUtil2;
 import edu.uiuc.ncsa.security.util.mail.MailUtilProvider;
@@ -43,10 +44,7 @@ import javax.inject.Provider;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import static org.oa4mp.server.loader.oauth2.loader.OA2CFConfigurationLoader.*;
 import static org.oa4mp.server.loader.oauth2.storage.keys.KEStoreUtilities.jwksToIDMap;
@@ -487,14 +485,37 @@ public class OA2SE extends ServiceEnvironmentImpl {
     public static final String NO_KEY_ID = "--";
 
     /**
-     * Converts a map of {@link KERecord}s to {@link JSONWebKeys}.
+     * Converts a map of {@link KERecord}s to {@link JSONWebKeys}. Note this returns
+     * the set of unexpired keys if signingKeysOnly is false. Otherwise, it returns
+     * exactly the set of keys that are valid for signing.
+     * <p>Why filter by dates? Because otherwise we need a complex set of metadata
+     * which will require updating on the fly to manage as expirations, not-before dates
+     * come and go. This is much easier.</p>
      *
      * @param identifiableMap
-     * @param validDatesOnly  if true only keys with valid dates (so nbf  < now) are returned.
+     * @param signingKeysOnly if true only keys with valid dates (so nbf  < now) are returned.
      * @return
      */
-    protected JSONWebKeys doNormalization(IdentifiableMap<KERecord> identifiableMap, boolean validDatesOnly) {
-        IdentifiableMap<KERecord> updateMap = new IdentifiableMap<>(); // any updates
+    protected JSONWebKeys doNormalization(IdentifiableMap<KERecord> identifiableMap, boolean signingKeysOnly) {
+        //   IdentifiableMap<KERecord> updateMap = new IdentifiableMap<>(); // any updates
+        JSONWebKeys jsonWebKeys = new JSONWebKeys(null);
+       // System.err.println("**** keys start with " + identifiableMap.size() + ", signing keys only = " + signingKeysOnly);
+         /*
+           We have to construct the correct key set since it is possible that keys age
+           out and become valid or expire, so it is non-trivial to determine the actual
+           set of keys at a given instance.
+          */
+        JSONWebKeys typeAKeys = getTypeA(identifiableMap , signingKeysOnly);
+        if (signingKeysOnly) {
+            if (typeAKeys.isEmpty()) return getTypeB(identifiableMap);
+            return typeAKeys;
+        }
+        typeAKeys.putAll(getTypeB(identifiableMap));
+    //    System.err.println("**** keys finish with " + jsonWebKeys.size() + ", " + jsonWebKeys.getDefaultKeyID() + " = default");
+        return typeAKeys;
+    }
+
+    JSONWebKeys getTypeA(IdentifiableMap<KERecord> identifiableMap, boolean signingKeysOnly) {
         JSONWebKeys jsonWebKeys = new JSONWebKeys(null);
          /*
            We have to construct the correct key set since it is possible that keys age
@@ -503,26 +524,60 @@ public class OA2SE extends ServiceEnvironmentImpl {
           */
         for (Identifier key : identifiableMap.keySet()) {
             KERecord k = identifiableMap.get(key);
-            // if(k.hasValidDate() && !k.isExpired() ) {
-            if (!k.isExpired()) {
-                if (validDatesOnly) {
-                    if (!k.hasValidDate()) continue;
-                }
-                try {
-                    jsonWebKeys.put(k.getKid(), k.toJWK());
-                } catch (Exception e) {
-                    if (e instanceof RuntimeException) {
-                        throw (RuntimeException) e;
+            if (!k.getValid()) continue;
+            JSONWebKey jwk = null;
+            try {
+                if (k.getExp() == null) {
+                    if (signingKeysOnly) {
+                        if (k.hasValidDate())  jwk = k.toJWK();
+                    } else {
+                        jwk = k.toJWK();
                     }
-                    throw new GeneralException(e);
                 }
-                if (k.getDefault()) {
-                    jsonWebKeys.setDefaultKeyID(k.getKid());
+                if (jwk != null) {
+        //            System.err.println("**** type A keys adding " + k.getKid() + " to signing keys.");
+                    jsonWebKeys.put(k.getKid(), jwk);
+                    if (k.getDefault()) {
+                        jsonWebKeys.setDefaultKeyID(k.getKid());
+                    }
                 }
+            } catch (Exception e) {
+                if (e instanceof RuntimeException) {
+                    throw (RuntimeException) e;
+                }
+                throw new GeneralException(e);
             }
         }
-        if (!updateMap.isEmpty()) {
-            getKEStore().update(updateMap);
+        return jsonWebKeys;
+    }
+
+
+    JSONWebKeys getTypeB(IdentifiableMap<KERecord> identifiableMap) {
+        JSONWebKeys jsonWebKeys = new JSONWebKeys(null);
+         /*
+           We have to construct the correct key set since it is possible that keys age
+           out and become valid or expire, so it is non-trivial to determine the actual
+           set of keys at a given instance.
+          */
+        for (Identifier key : identifiableMap.keySet()) {
+            KERecord k = identifiableMap.get(key);
+            if (!k.getValid()) continue;
+            JSONWebKey jwk = null;
+            try {
+                if (k.hasValidDate() && !k.isExpired()) {
+        //            System.err.println("**** type B keys adding " + k.getKid() + " to signing keys.");
+                    jwk = k.toJWK();
+                    jsonWebKeys.put(k.getKid(), jwk);
+                    if (k.getDefault()) {
+                        jsonWebKeys.setDefaultKeyID(k.getKid());
+                    }
+                }
+            } catch (Exception e) {
+                if (e instanceof RuntimeException) {
+                    throw (RuntimeException) e;
+                }
+                throw new GeneralException(e);
+            }
         }
         return jsonWebKeys;
     }
@@ -559,13 +614,15 @@ public class OA2SE extends ServiceEnvironmentImpl {
     }
 
     /**
-     * Get the valid keys for the Virtual issuer.
+     * Get the unexpired keys for the Virtual issuer.
+     * <p>Note that the unexpired kehys are shown on the discovery page,
+     * but for signing, only keys that have no expiration date are used.</p>
      *
      * @param vi
-     * @param validDatesOnly If true only keys with valid dates (so nbf  < now) are returned.
+     * @param signingKeysOnly If true only keys used for signing are returned.
      * @return
      */
-    public JSONWebKeys getJsonWebKeys(VirtualIssuer vi, boolean validDatesOnly) {
+    public JSONWebKeys getJsonWebKeys(VirtualIssuer vi, boolean signingKeysOnly) {
         if (getKEStore() != null) {
             JSONWebKeys jsonWebKeys;
             IdentifiableMap<KERecord> identifiableMap;
@@ -587,15 +644,14 @@ public class OA2SE extends ServiceEnvironmentImpl {
                         throw new GeneralException(x);
                     }
                 }
-
             }
             if (!identifiableMap.isEmpty()) {
-                return doNormalization(identifiableMap, validDatesOnly);
+                return doNormalization(identifiableMap, signingKeysOnly);
             }
         }
         //  Not in new place, start looking in the old ones in case
         // it's an older install and they did not migrate.
-        System.err.println("**********");
+  //      System.err.println("**********");
         if (vi != null) {
             if (vi.hasJWKs()) {
                 jsonWebKeys = vi.getJsonWebKeys();

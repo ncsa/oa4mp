@@ -3,12 +3,14 @@
 script_load('test#/cm-tests/init.qdl', args(0));
 payload. := from_json(file_read(ini.'payloads' + 'create.json'));
 payload.'client_id' := custom_id();
+payload.'rt_grace_period' := -1;
 resp. := http#post(payload.);
 debugger(1,'creating basic client');
 ⊨ resp.'status'.'code' == ini.'status' : 'incorrect returned status: expected '+ ini.'status' +' but got ' + resp.'status'.'code';
 debugger(1,'got client id=' + resp.'content'.'client_id');
 ⊨ ini.'caput' < resp.'content'.'client_id' : 'failed to get custom generated client id';
 r. := http#get({'client_id':resp.'content'.'client_id'});
+debugger(1,print(r.'content'));
 // r. now contains the uploaded client
 script_load('cm-compare.qdl', r.'content', payload., {'application_type', 'token_endpoint_auth_method'});
 r. := http#delete({'client_id':resp.'content'.'client_id'});

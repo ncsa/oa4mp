@@ -40,6 +40,7 @@ import org.oa4mp.server.loader.oauth2.cm.util.permissions.AddClientRequest;
 import org.oa4mp.server.loader.oauth2.cm.util.permissions.PermissionServer;
 import org.oa4mp.server.loader.oauth2.cm.util.permissions.RemoveClientRequest;
 import org.oa4mp.server.loader.oauth2.loader.OA2CFConfigurationLoader;
+import org.oa4mp.server.loader.oauth2.loader.OA2ServletInitializer;
 import org.oa4mp.server.loader.oauth2.servlet.OA2ExceptionHandlerThingie;
 import org.oa4mp.server.loader.oauth2.servlet.OA2HeaderUtils;
 import org.oa4mp.server.loader.oauth2.storage.clients.OA2Client;
@@ -440,11 +441,7 @@ public class OIDCCMServlet extends EnvServlet {
             json.put(OIDCCMConstants.JWKS, jwks);
         }
         if (client.getGrantTypes().isEmpty()) {
-            /*JSONArray grants = new JSONArray();
-            grants.add(OA2Constants.GRANT_TYPE_AUTHORIZATION_CODE);
-            if (client.isRTLifetimeEnabled()) {
-                grants.add(OA2Constants.REFRESH_TOKEN);
-            }*/
+
         } else {
             json.put(OIDCCMConstants.GRANT_TYPES, client.getGrantTypes());
         }
@@ -766,6 +763,20 @@ public class OIDCCMServlet extends EnvServlet {
         }
     }
 
+    /**
+     * Gets the {@link #API_VERSION_KEY} parameter from the request. If it is not present, it will return the default.
+     * The values are {@link #API_VERSION_LATEST}, {@link #API_VERSION_5_4} and {@link #API_VERSION_5_5}.
+     * You can set the default with {@link #setDefaultAPIVersion(String)}, typically in the the
+     * {@link OA2ServletInitializer#init()} method (which CILogon does.)
+     * <p>Alternately, the request may have the version number appended to the URL path
+     * rather than passed in as a parameter, so e.g.</p>
+     * <pre>
+     *     http://localhost:8080/oauth2/oidc-cm/v5.5?...
+     * </pre>
+     * @param cmConfig
+     * @param req
+     * @return
+     */
     protected String getVersion(CMConfig cmConfig, HttpServletRequest req) {
         if (null != req.getParameter(API_VERSION_KEY)) {
             return req.getParameter(API_VERSION_KEY);
@@ -1177,7 +1188,7 @@ public class OIDCCMServlet extends EnvServlet {
 
         if ((!isAnonymous) && adminClient.getMaxClients() < getOA2SE().getPermissionStore().getClientCount(adminClient.getIdentifier())) {
             debugger.info(this, " Max client count of " + adminClient.getMaxClients() + " exceeded.");
-            throw new GeneralException("Max client count of " + adminClient.getMaxClients() + " exceeded.");
+            throw new GeneralException("Max client count of " + adminClient.getMaxClients() + " exceeded for \"" + adminClient.getIdentifierString() + "\" .");
         }
         debugger.trace(this, rawJSON.toString());
         if (rawJSON.isArray()) {

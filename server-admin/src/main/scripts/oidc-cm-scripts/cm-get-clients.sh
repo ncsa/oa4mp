@@ -11,9 +11,8 @@
 # response is a JSON object, echo-ed to the command line and stored in the local file output.json.
 
 source ./cm-setenv.sh
-export REGISTRATION_URI=https://localhost:9443/oauth2/oidc-cm?client_id=oa4mp:/client_id/24dc9281b8520538719105087a671f02 
 
-curl -k -X GET -H "Authorization: Bearer $BEARER_TOKEN"  $REGISTRATION_URI> output.json
+curl -k -X GET -H "Authorization: Bearer $BEARER_TOKEN" > output.json
 cat output.json
 
 

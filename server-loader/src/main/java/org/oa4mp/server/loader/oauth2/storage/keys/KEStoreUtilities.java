@@ -508,6 +508,7 @@ public class KEStoreUtilities {
         for (JSONWebKey jwk : jwks.values()) {
             KERecord keRecord = new KERecord(BasicIdentifier.newID(jwk.id));
             keRecord.fromJWK(jwk, defaultKeyID.equals(jwk.id));
+            keRecord.setValid(true);
             map.put(keRecord.getIdentifier(), keRecord);
         }
         return map;

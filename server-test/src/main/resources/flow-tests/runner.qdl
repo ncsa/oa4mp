@@ -16,24 +16,24 @@ while[x∈test.][
   script_name:=null;
 
 try[
-    if[var_type(x) == 4]
-  then[
-       zzz.:=x;
-       script_name:=zzz.0;
-       //contract is that two arguments [a,b] are interpreted
-       // as script_load(a,b), but [a,b,...,c] as
-       // script_load(a, [b,...c]) i.e. rolled into a list.
-       rc:=script_load(script_name, 2==size(zzz.)?zzz.1:sublist(zzz., 1));
-       ]
-  else[
-      script_name := x;
-      rc := script_load(script_name);
-      ];
+      if[var_type(x) == 4]
+    then[
+         zzz.:=x;
+         script_name:=zzz.0;
+         //contract is that two arguments [a,b] are interpreted
+         // as script_load(a,b), but [a,b,...,c] as
+         // script_load(a, [b,...c]) i.e. rolled into a list.
+         rc:=script_load(script_name, 2==size(zzz.)?zzz.1:sublist(zzz., 1));
+         ]
+    else[
+        script_name := x;
+        rc := script_load(script_name);
+        ];
 
-  if[rc == 'q'][break();]; // exit app
-  if[rc=='s'][counter.'skipped'+=1;continue();]; // skip this test
-  if[!skip_line][say('');]; // blank line for clean display.
-  counter.'pass' += 1;
+    if[rc == 'q'][break();]; // exit app
+    if[rc=='s'][counter.'skipped'+=1;continue();]; // skip this test
+    if[!skip_line][say('');]; // blank line for clean display.
+    counter.'pass' += 1;
   ]catch[
      say('error running script ' + script_name);
      say('error message:' + (∃error_message⇒error_message:'(no message)'));
@@ -57,3 +57,4 @@ if[0 < counter.'fail'][
    msg := 'check the logs'  + (is_defined(info().'boot'.'log_file') ? (' at ' + info().'boot'.'log_file') : '');
    say(msg);
 ];
+return(counter.);

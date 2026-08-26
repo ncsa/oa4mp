@@ -14,26 +14,30 @@
 */
 path := 'test#/cm-tests/';
 script_path(path ~ script_path());
+debugger(10);
+
 test.:= path + [
+                'cm-basic.qdl',
+                'cm-update.qdl',
+                'cm-ersatz-custom-id.qdl',
+                'cm-ersatz-random-id.qdl',
                 'cm-git-299.qdl',
-                'cm-ersatz.qdl',
                 'cm-roundtrip.qdl',
                 'cm-minimal-v5_5.qdl',
                 'cm-minimal-v5_4.qdl',
                 'cm-no-refresh.qdl',
-                'cm-basic.qdl',
                 'cm-private-key.qdl',
                 'cm-extra.qdl',
                 'cm-public.qdl',
                 'cm-public-update.qdl',
-                'cm-update.qdl',
                 'cm-rt-test.qdl',
                 'cm-rt-test2.qdl',
                 'anon-public.qdl',
                 'anon-basic.qdl',
                 'anon-cfg.qdl',
                 'anon-extra.qdl',
-                'cm-cleanup.qdl'];
+                'cm-cleanup.qdl'
+                ];
 say('Running all client management tests');
 say('--------------------');
 http := j_load('http');
@@ -64,4 +68,4 @@ say(counter.'pass' + ' passed');
 say(counter.'fail' + ' failed');
 say('CM tests run = ' + (counter.'pass' + counter.'fail'));
 say('     runtime = ' + script_run('test#/utils/pp_elapsed.qdl', start_time));
-
+return(counter.);

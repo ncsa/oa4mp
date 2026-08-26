@@ -10,7 +10,7 @@ payload. := from_json(file_read(ini.'payloads' + 'create-openid.json'));
 resp. := http#post(payload.);
 ⊨ resp.'status'.'code' == ini.'status' : logger(4,say('incorrect returned status of ' + resp.'status'.'code'));
 update. := from_json(file_read(ini.'payloads' + 'update.json'));
-update.'client_id' := resp.'content'.'client_id';  // has a lot mroe scopes in it.
+update.'client_id' := resp.'content'.'client_id';  // has a lot mooe scopes in it.
 resp2. := http#put(update.);
 ⊨ resp2.'status'.'code' == 200 : logger(4,say('incorrect returned status of ' + resp.'status'.'code'));
 r. := http#get({'client_id':resp2.'content'.'client_id'});

@@ -12,6 +12,7 @@ suite := 0 < size(args()) ? args(0):'cm_local';//which test to run. Default is c
 version := size(args()) == 2 ? args(1):null;//which test to run. Default is cm for local test
 
 ini. := file_read('/home/ncsa/dev/csd/config/ini/cm-test.ini',2).suite;
+// Append version to address if it is not null. This is read on the server.
 address := ini.'address' + (version==null?'':'/' + version);
 http#host(address) ;
 h. := {'Authorization': 'Bearer ' + bearer_token(ini.'id', ini.'secret'),
