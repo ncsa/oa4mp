@@ -423,6 +423,23 @@ public class OIDCCMServlet extends EnvServlet {
         // Next, we have to construct the registration URI by adding in the client ID.
         // Spec says we can add parameters here, but not elsewhere.
         json.put(OIDCCMConstants.REGISTRATION_CLIENT_URI, registrationURI + "?" + CLIENT_ID + "=" + client.getIdentifierString());
+        /*
+           Fix https://github.com/ncsa/oa4mp/issues/314
+           Put custom values in first so stored values overwrite them. This way the stored values
+           are definitive. It can happen that attributes are uploaded at creation time and much, much
+           later we start to support them directly. This prevents old values from overwriting new ones,
+         */
+        if (client.hasOIDC_CM_Attributes()) {
+            // add them back
+            for (Object xx : client.getOIDC_CM_Attributes().keySet()) {
+                String key = xx.toString();
+                if (!key.equals(CLIENT_ID)) {
+                    // had a case where a client uploaded client_id as an extra attribute
+                    // Don't allow the user to hot-rod the client id even by accident.
+                    json.put(key, client.getOIDC_CM_Attributes().get(key));
+                }
+            }
+        }
         json.put(CLIENT_ID, client.getIdentifierString());
         json.put(OIDCCMConstants.CLIENT_NAME, client.getName());
         JSONArray cbs = new JSONArray();
@@ -497,7 +514,13 @@ public class OIDCCMServlet extends EnvServlet {
         json.put(SERVICE_CLIENT_USERS, array);
         OA2ClientKeys clientKeys = (OA2ClientKeys) getOA2SE().getClientStore().getMapConverter().getKeys();
         // Fix https://github.com/ncsa/oa4mp/issues/159
-        json.put(clientKeys.rtGracePeriod(), client.getRtGracePeriod());
+        System.err.println( getClass().getSimpleName() + " &&& client: " + client);
+        System.err.println( getClass().getSimpleName() + " &&& clientKeys.rtGracePeriod() = " + clientKeys.rtGracePeriod());
+        if(client.getRtGracePeriod()<0 ){
+            json.put(clientKeys.rtGracePeriod(), client.getRtGracePeriod()); //Negative values are for control info
+        }else{
+            json.put(clientKeys.rtGracePeriod(), client.getRtGracePeriod()/1000L); //transmit in seconds
+        }
         json.put(clientKeys.extendsProvisioners(), client.isExtendsProvisioners());
         json.put(clientKeys.ersatzClient(), client.isErsatzClient());
         json.put(clientKeys.ersatzInheritIDToken(), client.isErsatzInheritIDToken());
@@ -521,6 +544,22 @@ public class OIDCCMServlet extends EnvServlet {
             json.remove(clientKeys.email());
             json.put(OIDCCMConstants.CONTACTS, jsonArray);
         }
+
+        return json;
+    }
+
+    protected JSONObject toJSONObject5_4(OA2Client client, boolean isGet) {
+        JSONObject json = new JSONObject();
+        String registrationURI = getOA2SE().getCmConfigs().getRFC7591Config().uri.toString();
+        // Next, we have to construct the registration URI by adding in the client ID.
+        // Spec says we can add parameters here, but not elsewhere.
+        json.put(OIDCCMConstants.REGISTRATION_CLIENT_URI, registrationURI + "?" + CLIENT_ID + "=" + client.getIdentifierString());
+                /*
+           Fix https://github.com/ncsa/oa4mp/issues/314
+           Put custom values in first so stored values overwrite them. This way the stored values
+           are definitive. It can happen that attributes are uploaded at creation time and much, much
+           later we start to support them directly. This prevents old values from overwriting new ones,
+         */
         if (client.hasOIDC_CM_Attributes()) {
             // add them back
             for (Object xx : client.getOIDC_CM_Attributes().keySet()) {
@@ -532,15 +571,7 @@ public class OIDCCMServlet extends EnvServlet {
                 }
             }
         }
-        return json;
-    }
 
-    protected JSONObject toJSONObject5_4(OA2Client client, boolean isGet) {
-        JSONObject json = new JSONObject();
-        String registrationURI = getOA2SE().getCmConfigs().getRFC7591Config().uri.toString();
-        // Next, we have to construct the registration URI by adding in the client ID.
-        // Spec says we can add parameters here, but not elsewhere.
-        json.put(OIDCCMConstants.REGISTRATION_CLIENT_URI, registrationURI + "?" + CLIENT_ID + "=" + client.getIdentifierString());
         json.put(CLIENT_ID, client.getIdentifierString());
         json.put(OIDCCMConstants.CLIENT_NAME, client.getName());
         JSONArray cbs = new JSONArray();
@@ -632,13 +663,7 @@ public class OIDCCMServlet extends EnvServlet {
             json.remove(clientKeys.email());
             json.put(OIDCCMConstants.CONTACTS, jsonArray);
         }
-        if (client.hasOIDC_CM_Attributes()) {
-            // add them back
-            for (Object xx : client.getOIDC_CM_Attributes().keySet()) {
-                String key = xx.toString();
-                json.put(key, client.getOIDC_CM_Attributes().get(key));
-            }
-        }
+
         return json;
     }
 
@@ -1720,14 +1745,18 @@ public class OIDCCMServlet extends EnvServlet {
                 // if missing, set it to use whatever the server default is.
                 client.setRtGracePeriod(OA2CFConfigurationLoader.REFRESH_TOKEN_GRACE_PERIOD_USE_SERVER_DEFAULT);
             }
+            jsonRequest.remove(clientKeys.rtGracePeriod()); // https://github.com/ncsa/oa4mp/issues/314
             if (jsonRequest.containsKey(clientKeys.extendsProvisioners())) {
                 client.setExtendsProvisioners(jsonRequest.getBoolean(clientKeys.extendsProvisioners()));
+                jsonRequest.remove(clientKeys.extendsProvisioners());
             }
             if (jsonRequest.containsKey(clientKeys.ersatzClient())) {
                 client.setErsatzClient(jsonRequest.getBoolean(clientKeys.ersatzClient()));
+                jsonRequest.remove(clientKeys.ersatzClient());
             }
             if (jsonRequest.containsKey(clientKeys.ersatzInheritIDToken())) {
                 client.setErsatzInheritIDToken(jsonRequest.getBoolean(clientKeys.ersatzInheritIDToken()));
+                jsonRequest.remove(clientKeys.ersatzInheritIDToken());
             } else {
                 if (newClient)
                     client.setErsatzInheritIDToken(true); // default on new clients

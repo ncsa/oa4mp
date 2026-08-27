@@ -82,13 +82,13 @@ public class Client extends BaseClient {
     @Override
     public String toString() {
         return getClass().getSimpleName() + "[name=\"" + getName() +
-                "\", id=\"" + getIdentifierString() +
-                "\", homeUri=\"" + getHomeUri() +
-                "\", errorUri=\"" + getErrorUri() +
-                "\", email=\"" + getEmail() +
-                "\", serviceClient=\"" + isServiceClient() +
-                "\", secret=" + (getSecret()==null?"(none)":getSecret().substring(0,Math.min(25, getSecret().length()))) +
-                "\", proxy limited=" + isProxyLimited() +
+                ",\n id=" + getIdentifierString() +
+                ",\n homeUri=" + getHomeUri() +
+                ",\n errorUri=" + getErrorUri() +
+                ",\n email=" + getEmail() +
+                ",\n serviceClient=" + isServiceClient() +
+                ",\n secret=" + (getSecret()==null?"(none)":getSecret().substring(0,Math.min(25, getSecret().length()))) +
+                ",\n proxy limited=" + isProxyLimited() +
                 "]";
     }
     public Collection<String> getScopes() {

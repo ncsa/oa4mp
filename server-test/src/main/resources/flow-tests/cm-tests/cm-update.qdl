@@ -14,7 +14,7 @@ resp2. := http#put(update.);
 debugger(1,print(resp2.'content'));
 ⊨ resp2.'status'.'code' == 200 : logger(4,say('incorrect returned status of ' + resp.'status'.'code'));
 ⊨ ∃resp2.'content'.'rt_grace_period';
-⊨ resp2.'content'.'rt_grace_period' ≡ 1000000 : 'Git 159 regression failed: rt_grace_period not round-tripped.' ;
+⊨ resp2.'content'.'rt_grace_period' ≡ 1000000 : 'Git 159 regression failed: rt_grace_period not round-tripped. Expected 1000000, got ' + (resp2.'content'.'rt_grace_period') ;
 r. := http#get({'client_id':resp2.'content'.'client_id'});
 ⊨ ∃r.'content'.'rt_grace_period';
 ⊨ r.'content'.'rt_grace_period' ≡ 1000000 : 'Git 159 regression failed: rt_grace_period not round-tripped.' ;

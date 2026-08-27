@@ -3,18 +3,18 @@ package org.oa4mp.server.loader.oauth2.storage.clients;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import com.typesafe.config.ConfigRenderOptions;
-import edu.uiuc.ncsa.security.util.json.MyJSONUtil;
-import org.oa4mp.delegation.common.storage.clients.ClientConverter;
-import org.oa4mp.delegation.server.server.config.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.storage.data.ConversionMap;
+import edu.uiuc.ncsa.security.util.json.MyJSONUtil;
 import org.kordamp.json.JSON;
 import org.kordamp.json.JSONArray;
 import org.kordamp.json.JSONObject;
 import org.kordamp.json.JSONSerializer;
+import org.oa4mp.delegation.common.storage.clients.ClientConverter;
+import org.oa4mp.delegation.server.server.config.LDAPConfigurationUtil;
 
 import java.io.StringReader;
 import java.net.URI;
@@ -126,6 +126,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         }
         otherV.setRtLifetime(map.getLong(getCK2().rtLifetime()));
         otherV.setIdTokenLifetime(map.getLong(getCK2().idtLifetime()));
+        System.err.println(getClass().getSimpleName() + "fromMap:  rt_grace_period = " + map.getLong(getCK2().rtGracePeriod()));
         otherV.setRtGracePeriod(map.getLong(getCK2().rtGracePeriod()));
         otherV.setDfLifetime(map.getLong(getCK2().dfLifetime()));
         otherV.setDfInterval(map.getLong(getCK2().dfInterval()));
@@ -250,6 +251,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         super.toMap(client, map);
  //       map.put(getCK2().allowPromptNone(), client.isAllowPromptNone());
         map.put(getCK2().rtLifetime(), client.getRtLifetime());
+        System.err.println(getClass().getSimpleName() + "toMap:  rt_grace_period = " + client.getRtGracePeriod());
         map.put(getCK2().rtGracePeriod(), client.getRtGracePeriod());
         map.put(getCK2().atLifetime(), client.getAtLifetime());
         map.put(getCK2().idtLifetime(), client.getIdTokenLifetime());

@@ -407,6 +407,9 @@ public class OA2Client extends Client implements OA2ClientScopes {
         setNamedAttributes(oidc_cm_attributes, attr);
     }
 
+    /**
+     * Clears currently stored OIDC CM extgra attributes
+     */
     public void removeOIDC_CM_Attributes() {
         getExtendedAttributes().remove(oidc_cm_attributes);
     }
@@ -631,8 +634,7 @@ public class OA2Client extends Client implements OA2ClientScopes {
         return extended_attributes != null;
     }
 
-    @Override
-    public String toString() {
+    public String toXXXString() {
         String x = super.toString();
         x = x.substring(0, x.lastIndexOf("]"));
         x = x + "scopes=" + ((getScopes() == null) ? "[]" : getScopes().toString());
@@ -644,6 +646,50 @@ public class OA2Client extends Client implements OA2ClientScopes {
         x = x + ",rt lifetime enabled?=" + isRTLifetimeEnabled();
         x = x + ",sign ID tokens?=" + isSignTokens();
         return x + "]";
+    }
+
+    @Override
+    public String toString() {
+        String x = super.toString();
+        x = x.substring(0, x.lastIndexOf("]"));
+        return x +
+                ",\n allowPromptNone=" + allowPromptNone +
+                ",\n atLifetime=" + atLifetime +
+                ",\n audience=" + audience +
+                ",\n callbackURIs=" + callbackURIs +
+                ",\n comment='" + comment + '\'' +
+                ",\n config='" + config + '\'' +
+                ",\n dfInterval=" + dfInterval +
+                ",\n dfLifetime=" + dfLifetime +
+                ",\n ersatzClient=" + ersatzClient +
+                ",\n ersatzInheritIDToken=" + ersatzInheritIDToken +
+                ",\n extendedAttributesEnabledKey='" + extendedAttributesEnabledKey + '\'' +
+                ",\n extended_attributes=" + extended_attributes +
+                ",\n extendsProvisioners=" + extendsProvisioners +
+                ",\n forwardScopesToProxy=" + forwardScopesToProxy +
+                ",\n idTokenLifetime=" + idTokenLifetime +
+                ",\n issuer='" + issuer + '\'' +
+                ",\n jsonConfig=" + jsonConfig +
+                ",\n ldaps=" + ldaps +
+                ",\n maxATLifetime=" + maxATLifetime +
+                ",\n maxIDTLifetime=" + maxIDTLifetime +
+                ",\n maxRTLifetime=" + maxRTLifetime +
+                ",\n oa4mp_attributes='" + oa4mp_attributes + '\'' +
+                ",\n oidc_cm_attributes='" + oidc_cm_attributes + '\'' +
+                ",\n prototypes=" + prototypes +
+                ",\n proxyClaimsList=" + proxyClaimsList +
+                ",\n proxyRequestScopes=" + proxyRequestScopes +
+                ",\n publicClient=" + publicClient +
+                ",\n resource=" + resource +
+                ",\n rtGracePeriod=" + rtGracePeriod +
+                // https://github.com/rcauth-eu/OA4MP/commit/bf2ea509aebbf90da74ed529e701a0db44bcac96 remove redundant printing of rt lifetime
+                ",\n rtLifetime=" + rtLifetime +
+                ",\n signTokens=" + signTokens +
+                ",\n skipServerScripts=" + skipServerScripts +
+                ",\n strictScopes=" + strictScopes +
+                ",\n useServerScopes=" + useServerScopes +
+                ",\n xoauth_attributes='" + xoauth_attributes +
+                ']';
     }
 
     @Override

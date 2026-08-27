@@ -531,7 +531,7 @@ public class KeyCommands extends OA4MPStoreCommands {
     public static String KR_TEST_FLAG = "-test";
 
     protected void rotateHelp(InputLine inputLine) {
-        String name = getMethodName(4);
+        String name = getMethodName(3);
         say(name + " [" + KR_ALL + " | " + KR_KID + " id | " + KR_VI + " vi " +
                 KR_CACHE_LIFETIME + " cache_lifetime " +
                 KR_AT_LIFETIME + " access_token_lifetime " +
@@ -558,6 +558,7 @@ public class KeyCommands extends OA4MPStoreCommands {
         say("E.g. Rotate the keys for a given VI.");
         sayi(name + " " + KR_VI + " oa4mp:/vi/1234567890");
         say("Note that this uses the policies of the VI and server.");
+        say("See also: policy help for rotation defaults.");
     }
 
     public void rotate(InputLine inputLine) throws Throwable {
@@ -1053,6 +1054,7 @@ public class KeyCommands extends OA4MPStoreCommands {
         say(RJustify(Long.toString(GRACE_PERIOD_NOT_CONFIGURED), width) + " = grace period not configured");
         say(RJustify(MAX_ACCESS_TOKEN_LIFETIME_DEFAULT + " ms", width) + " = max access token lifetime");
         say(RJustify((24 * 3600 * 1000L) + " ms", width) + " = 24 hours (suggested cache grace period)");
+        say("If overrides are allowed for a VI, then the server configuration will override unconfigured values.");
     }
     protected void formatKEC(KEConfiguration keConfiguration) {
         int width = 35;
