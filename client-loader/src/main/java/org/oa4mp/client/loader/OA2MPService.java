@@ -171,6 +171,14 @@ public class OA2MPService extends OA4MPService {
         if (parameters.containsKey(SCOPE)) {
             s = s + " " + parameters.get(SCOPE);
         }
+        // Issue at this point is that there are multiple places for the user to specify scopes
+        // so there may be redundant ones. Fugly, but whilttle down to what we want
+        StringTokenizer st = new StringTokenizer(s, " ");
+        TreeSet<String> scopes = new TreeSet<>();
+        while (st.hasMoreTokens()) {
+            scopes.add(st.nextToken());
+        }
+        s = String.join(" ", scopes);
         parameters.put(SCOPE, s);
 
         // Allow the user to specify this in case they really need to track it themselves.

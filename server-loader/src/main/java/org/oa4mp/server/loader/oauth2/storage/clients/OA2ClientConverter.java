@@ -126,7 +126,6 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         }
         otherV.setRtLifetime(map.getLong(getCK2().rtLifetime()));
         otherV.setIdTokenLifetime(map.getLong(getCK2().idtLifetime()));
-        System.err.println(getClass().getSimpleName() + "fromMap:  rt_grace_period = " + map.getLong(getCK2().rtGracePeriod()));
         otherV.setRtGracePeriod(map.getLong(getCK2().rtGracePeriod()));
         otherV.setDfLifetime(map.getLong(getCK2().dfLifetime()));
         otherV.setDfInterval(map.getLong(getCK2().dfInterval()));
@@ -251,7 +250,6 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         super.toMap(client, map);
  //       map.put(getCK2().allowPromptNone(), client.isAllowPromptNone());
         map.put(getCK2().rtLifetime(), client.getRtLifetime());
-        System.err.println(getClass().getSimpleName() + "toMap:  rt_grace_period = " + client.getRtGracePeriod());
         map.put(getCK2().rtGracePeriod(), client.getRtGracePeriod());
         map.put(getCK2().atLifetime(), client.getAtLifetime());
         map.put(getCK2().idtLifetime(), client.getIdTokenLifetime());

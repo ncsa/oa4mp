@@ -40,5 +40,8 @@ if[suites.1][
     then[test_counter. += script_load('test#/local/all.qdl');];
  ];
 // print it nice
-say('\nAll tests runtime = ' + script_run('test#/utils/pp_elapsed.qdl', all_test_start));
-say(test_counter.);
+out.0 := 'All tests statistics:';
+out.1 := ' Passed : ' + test_counter.'pass';
+out.2 := ' Failed : ' + test_counter.'fail';
+out.4 := 'Elapsed : ' + script_run('test#/utils/pp_elapsed.qdl', all_test_start);
+say(print(out., {'show_keys' : false,'box':true}));

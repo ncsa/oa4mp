@@ -168,6 +168,36 @@ public class CLC implements QDLMetaModule {
         }
     }
 
+    protected String GET_CALLBACK = "get_callback";
+    public class GetCallback implements QDLFunction {
+        @Override
+        public String getName() {
+            return GET_CALLBACK;
+        }
+
+        @Override
+        public int[] getArgCount() {
+            return new int[]{0};
+        }
+
+        @Override
+        public QDLValue evaluate(QDLValue[] objects, State state) throws Throwable {
+            if (clcCommands.getCallback() == null) {
+                return QDLNullValue.getNullValue();
+            }
+            return asQDLValue(clcCommands.getCallback());
+        }
+
+        @Override
+        public List<String> getDocumentation(int argCount) {
+            List<String> doxx = new ArrayList<>();
+            doxx.add(getName() + "() - get the current callback.");
+            doxx.add(checkInitMessage);
+            return doxx;
+        }
+    }
+
+
     protected String GRANT_NAME = "grant";
 
     public class Grant implements QDLFunction {
@@ -183,11 +213,11 @@ public class CLC implements QDLMetaModule {
 
         @Override
         public QDLValue evaluate(QDLValue[] objects, State state) throws Throwable {
-            QDLStem g = new QDLStem();
             clcCommands.grant(argsToInputLine(getName(), objects));
             if (clcCommands.getGrant() == null) {
                 throw new GeneralException("unable to get grant");
             }
+            QDLStem g = new QDLStem();
             g.fromJSON(clcCommands.getGrant().toJSON());
             return asQDLValue(g);
         }

@@ -11,20 +11,34 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="Tests added and others had output formatted.                         https://github.com/ncsa/oa4mp/issues/313 https://github.com/ncsa/oa4mp/issues/312&#10;                                             Key rotation refactored into something more readable to reduce nested conditionals.">
+    <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="Fix for https://github.com/ncsa/oa4mp/issues/314">
+      <change afterPath="$PROJECT_DIR$/server-admin/src/main/scripts/jwks-watch.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/auto/tests/oauth-basic-no-json.qdl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/client-installer/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/src/main/java/org/oa4mp/delegation/common/storage/clients/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/common/src/main/java/org/oa4mp/delegation/common/storage/clients/Client.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client-loader/src/main/java/org/oa4mp/client/loader/OA2MPService.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-loader/src/main/java/org/oa4mp/client/loader/OA2MPService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oauth2/src/main/java/org/oa4mp/delegation/server/client/ATServer2.java" beforeDir="false" afterPath="$PROJECT_DIR$/oauth2/src/main/java/org/oa4mp/delegation/server/client/ATServer2.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oauth2/src/main/java/org/oa4mp/delegation/server/server/AGIResponse2.java" beforeDir="false" afterPath="$PROJECT_DIR$/oauth2/src/main/java/org/oa4mp/delegation/server/server/AGIResponse2.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/OA2ATServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/OA2ATServlet.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/CLC.java" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/CLC.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/CLCModule.java" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/CLCModule.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rfc8414/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/rfc8414/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/KeyCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/KeyCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2CLCCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/OA2CLCCommands.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-installer/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/cm/oidc_cm/OIDCCMServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/cm/oidc_cm/OIDCCMServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/storage/clients/OA2Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/storage/clients/OA2Client.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/servlet/OA2AuthorizedServletUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/servlet/OA2AuthorizedServletUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/servlet/OA2HeaderUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/servlet/OA2HeaderUtils.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/storage/clients/OA2ClientConverter.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/storage/clients/OA2ClientConverter.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-test/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/cm-tests/cm-update.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/cm-tests/cm-update.qdl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/all-local.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/all-local.qdl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/auto/tests/all.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/auto/tests/all.qdl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/driver.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/driver.qdl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/local/all.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/local/all.qdl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/local/no_config.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/local/no_config.qdl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/runner.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/runner.qdl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/utils/pp_elapsed.qdl" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/utils/pp_elapsed.qdl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -118,7 +132,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "Application.CLC.executor": "Run",
+    "Application.CLC.executor": "Debug",
     "Application.CLI.executor": "Debug",
     "Application.FSMigrate.executor": "Run",
     "Application.JWKCLI.executor": "Run",
@@ -159,7 +173,7 @@
     "git-widget-placeholder": "master",
     "jdk.selected.JAVA_MODULE": "11 (2)",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/home/ncsa/dev/ncsa-git/oa4mp/server-admin/src/main/scripts/oidc-cm-scripts",
+    "last_opened_file_path": "/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests/auto/tests",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -182,11 +196,11 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/auto/tests" />
       <recent name="$PROJECT_DIR$/server-admin/src/main/scripts/oidc-cm-scripts" />
       <recent name="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/cm-tests" />
       <recent name="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/auto/tests/rfc8693" />
       <recent name="$PROJECT_DIR$/server-admin/src/main/resources/web-inf" />
-      <recent name="$PROJECT_DIR$/website/src/site/xhtml/server/configuration" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/oa4mp-server-test/src/test/resources" />
@@ -1307,14 +1321,6 @@
       <workItem from="1782815402307" duration="29204000" />
       <workItem from="1783850833509" duration="119802000" />
     </task>
-    <task id="LOCAL-00110" summary="Cleanup for various items including tracking down &quot;MyProxy&quot; in various text strings.">
-      <option name="closed" value="true" />
-      <created>1756678788906</created>
-      <option name="number" value="00110" />
-      <option name="presentableId" value="LOCAL-00110" />
-      <option name="project" value="LOCAL" />
-      <updated>1756678788906</updated>
-    </task>
     <task id="LOCAL-00111" summary="Incorporating changes in 6.2.1 to publish to Maven">
       <option name="closed" value="true" />
       <created>1757540537246</created>
@@ -1699,7 +1705,15 @@
       <option name="project" value="LOCAL" />
       <updated>1787747606308</updated>
     </task>
-    <option name="localTasksCounter" value="159" />
+    <task id="LOCAL-00159" summary="Fix for https://github.com/ncsa/oa4mp/issues/314">
+      <option name="closed" value="true" />
+      <created>1787797909368</created>
+      <option name="number" value="00159" />
+      <option name="presentableId" value="LOCAL-00159" />
+      <option name="project" value="LOCAL" />
+      <updated>1787797909368</updated>
+    </task>
+    <option name="localTasksCounter" value="160" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1721,7 +1735,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
-    <MESSAGE value="Fix for https://github.com/ncsa/oa4mp/issues/283" />
     <MESSAGE value="Fix for https://github.com/ncsa/oa4mp/issues/284" />
     <MESSAGE value="Pre-travel commit. This includes fixes for https://github.com/ncsa/oa4mp/issues/285 and https://github.com/ncsa/oa4mp/issues/286." />
     <MESSAGE value="Unit tests for key rotation checking." />
@@ -1746,7 +1759,8 @@
     <MESSAGE value="Integrate fixes from 6.3.2" />
     <MESSAGE value="Last checkin of key rotation before 6.3.3 releases." />
     <MESSAGE value="Tests added and others had output formatted.                         https://github.com/ncsa/oa4mp/issues/313 https://github.com/ncsa/oa4mp/issues/312&#10;                                             Key rotation refactored into something more readable to reduce nested conditionals." />
-    <option name="LAST_COMMIT_MESSAGE" value="Tests added and others had output formatted.                         https://github.com/ncsa/oa4mp/issues/313 https://github.com/ncsa/oa4mp/issues/312&#10;                                             Key rotation refactored into something more readable to reduce nested conditionals." />
+    <MESSAGE value="Fix for https://github.com/ncsa/oa4mp/issues/314" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix for https://github.com/ncsa/oa4mp/issues/314" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="GROUP_MULTIFILE_MERGE_BY_DIRECTORY" value="true" />
   </component>
@@ -2035,7 +2049,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/CLC.java</url>
-          <line>583</line>
+          <line>613</line>
           <option name="timeStamp" value="891" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2223,7 +2237,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/client-loader/src/main/java/org/oa4mp/client/loader/OA2MPService.java</url>
-          <line>613</line>
+          <line>621</line>
           <option name="timeStamp" value="1356" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2278,7 +2292,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/qdl/src/main/java/org/oa4mp/server/qdl/CLC.java</url>
-          <line>1190</line>
+          <line>1220</line>
           <option name="timeStamp" value="1504" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2428,12 +2442,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/servlet/OA2HeaderUtils.java</url>
-          <line>243</line>
+          <line>252</line>
           <option name="timeStamp" value="1805" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/servlet/OA2HeaderUtils.java</url>
-          <line>84</line>
+          <line>88</line>
           <option name="timeStamp" value="1806" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2493,12 +2507,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/OA2ATServlet.java</url>
-          <line>1961</line>
-          <option name="timeStamp" value="1915" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/OA2ATServlet.java</url>
-          <line>2757</line>
+          <line>2760</line>
           <option name="timeStamp" value="1916" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2538,7 +2547,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/OA2ATServlet.java</url>
-          <line>2824</line>
+          <line>2827</line>
           <option name="timeStamp" value="1938" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2563,7 +2572,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/OA2ATServlet.java</url>
-          <line>808</line>
+          <line>811</line>
           <option name="timeStamp" value="1953" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2613,18 +2622,8 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/OA2ATServlet.java</url>
-          <line>962</line>
-          <option name="timeStamp" value="2015" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/OA2ATServlet.java</url>
-          <line>1282</line>
+          <line>1285</line>
           <option name="timeStamp" value="2017" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/OA2ATServlet.java</url>
-          <line>1032</line>
-          <option name="timeStamp" value="2018" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/common/src/test/java/org/oa4mp/delegation/client/test/common/storage/TransactionCacheTest.java</url>
@@ -2638,7 +2637,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/KeyCommands.java</url>
-          <line>722</line>
+          <line>734</line>
           <option name="timeStamp" value="2021" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2653,12 +2652,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/KeyCommands.java</url>
-          <line>432</line>
+          <line>444</line>
           <option name="timeStamp" value="2060" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/KeyCommands.java</url>
-          <line>457</line>
+          <line>469</line>
           <option name="timeStamp" value="2063" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2668,7 +2667,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/KeyCommands.java</url>
-          <line>632</line>
+          <line>644</line>
           <option name="timeStamp" value="2071" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2683,22 +2682,22 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/KeyCommands.java</url>
-          <line>864</line>
+          <line>876</line>
           <option name="timeStamp" value="2083" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/KeyCommands.java</url>
-          <line>883</line>
+          <line>895</line>
           <option name="timeStamp" value="2084" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/KeyCommands.java</url>
-          <line>849</line>
+          <line>861</line>
           <option name="timeStamp" value="2085" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/KeyCommands.java</url>
-          <line>920</line>
+          <line>932</line>
           <option name="timeStamp" value="2086" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2728,22 +2727,22 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/KeyCommands.java</url>
-          <line>418</line>
+          <line>430</line>
           <option name="timeStamp" value="2101" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/KeyCommands.java</url>
-          <line>464</line>
+          <line>476</line>
           <option name="timeStamp" value="2108" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/KeyCommands.java</url>
-          <line>1030</line>
+          <line>1042</line>
           <option name="timeStamp" value="2109" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/KeyCommands.java</url>
-          <line>658</line>
+          <line>670</line>
           <option name="timeStamp" value="2110" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2753,12 +2752,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/KeyCommands.java</url>
-          <line>274</line>
+          <line>286</line>
           <option name="timeStamp" value="2118" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/KeyCommands.java</url>
-          <line>271</line>
+          <line>283</line>
           <option name="timeStamp" value="2119" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2812,38 +2811,8 @@
           <option name="timeStamp" value="2133" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/cm/oidc_cm/OIDCCMServlet.java</url>
-          <line>259</line>
-          <option name="timeStamp" value="2135" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/OA2SE.java</url>
-          <line>508</line>
-          <option name="timeStamp" value="2149" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/OA2SE.java</url>
-          <line>550</line>
-          <option name="timeStamp" value="2152" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/OA2SE.java</url>
-          <line>512</line>
-          <option name="timeStamp" value="2154" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/cm/oidc_cm/OIDCCMServlet.java</url>
-          <line>519</line>
-          <option name="timeStamp" value="2155" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/events/LastAccessedThread.java</url>
-          <line>33</line>
-          <option name="timeStamp" value="2156" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/KeyCommands.java</url>
-          <line>533</line>
+          <line>545</line>
           <option name="timeStamp" value="2161" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -2860,6 +2829,46 @@
           <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/cm/oidc_cm/OIDCCMServlet.java</url>
           <line>1741</line>
           <option name="timeStamp" value="2165" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/servlet/OA2HeaderUtils.java</url>
+          <line>312</line>
+          <option name="timeStamp" value="2168" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/OA2ATServlet.java</url>
+          <line>403</line>
+          <option name="timeStamp" value="2169" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/OA2ATServlet.java</url>
+          <line>587</line>
+          <option name="timeStamp" value="2170" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/OA2ATServlet.java</url>
+          <line>463</line>
+          <option name="timeStamp" value="2171" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/OA2ATServlet.java</url>
+          <line>608</line>
+          <option name="timeStamp" value="2172" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/client/src/main/java/org/oa4mp/delegation/client/DelegationService.java</url>
+          <line>78</line>
+          <option name="timeStamp" value="2182" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/oauth2/src/main/java/org/oa4mp/delegation/server/client/ATServer2.java</url>
+          <line>133</line>
+          <option name="timeStamp" value="2183" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/proxy/src/main/java/org/oa4mp/server/proxy/OA2ATServlet.java</url>
+          <line>2098</line>
+          <option name="timeStamp" value="2184" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-method">
           <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/storage/transactions/OA2MTStore.java</url>

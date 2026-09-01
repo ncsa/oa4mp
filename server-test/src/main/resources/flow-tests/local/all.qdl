@@ -5,12 +5,12 @@
 */
 path:='test#/';
 test.:=(path + 'local/') + [
+                             'no_config.qdl',
                              'ac-revoke.qdl',
                              'test_acl.qdl',
                              'test_qdl.qdl',
                              'cil1550.qdl',
                              'file_claims.qdl',
-                             'no_config.qdl',
                              'no_config_refresh_test.qdl',
                              'test-template.qdl',
                              'prototype.qdl',

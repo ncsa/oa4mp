@@ -1,10 +1,39 @@
 // pp_elapsed(start_time) - pretty print (format) elapsed time in hr min and sec for an event.
 //args().0 == start time of event;
 duration  := date_ms() - args().0;
-       d. := duration%(60^[;3]*1000); // yields [sec, min hrs]
-      hrs := d.2;
-     mins := d.1 - 60*d.2;
-      sec := d.0 - 60*d.1;
-       ms := duration - 1000*d.0;
-         hh:= 0<hrs?(hrs+' hrs '):'';
-return(hh  + mins + ' min ' + sec+'.'+ms + ' sec.');
+
+       q.'ms' ≔ mod(duration,1000);
+      duration ≔ duration%1000; // seconds
+      q.'days' ≔ duration%86400;
+           rem ≔ duration - q.'days'*86400;
+       q.'hrs' ≔ rem%3600;
+           rem ≔ rem - 3600×q.'hrs';
+       q.'mins'≔ rem%60;
+      q.'secs' ≔ rem - q.'mins'*60;
+           out ≔ q.'secs' + '.' + q.'ms' + ' secs. ';
+           if[q.'days' == 0]
+           then[
+              if[q.'hrs' == 0]
+              then[
+                 if[q.'mins' == 0]
+                 then[
+                    // do nothing, only seconds.
+                  ]
+                 else[
+                    out ≔ q.'mins' + ' min' + (q.'mins' == 1?'. ':'s. ')  + out;
+                 ];
+              ]
+              else[
+                out ≔  q.'hrs' + ' hr'  + (q.'hrs'==1?'. ':'s. ') +
+                q.'mins' + ' min' + (q.'mins'==1?'. ' :'s. ') + out;
+              ];
+           ]
+           else[
+             out ≔ q.'days' + ' day' + (q.'days'==1?' ':'s ') +
+             q.'hrs' + ' hr' + (q.'hrs'==1?'. ':'s. ') +
+             q.'mins' + ' min' + (q.'mins' ==1?'. ':'s. ') + out;
+           ];
+
+           return(out);
+           //out ≔ q.'hrs' + ' hr. ' + q.'mins' + ' min. ' + q.'secs' + ' sec. ' + q.'ms' + ' ms';
+       //q.'days' != 0 ? return(q.'days' + ' days ' + out) : return(out);

@@ -43,6 +43,7 @@ public class CLCModule extends JavaModule {
         funcs.add(clc.new Exchange());
         funcs.add(clc.new GetCert());
         funcs.add(clc.new GetClaim());
+        funcs.add(clc.new GetCallback());
         funcs.add(clc.new GetParam());
         funcs.add(clc.new Grant());
         funcs.add(clc.new InitMethod());

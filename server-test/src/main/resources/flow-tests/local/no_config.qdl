@@ -10,10 +10,17 @@ cfg.'idp'  := 'ANY';
 cfg.'file' := $$OA4MP_CLC_XML_INI;
 cfg.'description' :=  'Test with no configuration -- most basic test. (Uses Derby)';
 cfg.'flow_type' := 'uri'; // Note to use df you need to set param for the token endpoint
-
-rc := script_load('driver.qdl', cfg.);
+     params.'authz' :=  {'state': '{"csrf_token":"oIqN8MkW2y5DnljuBma2Fg","realm":"cilogon"}'};
+say('Github 320 regression test');
+say('Check that the callback contains the state parameter as a string. Raw string is');
+say(params.'authz'.'state' + ', state parameter in callback is:');
+say('   state=%7B%22csrf_token%22%3A%22oIqN8MkW2y5DnljuBma2Fg%22%2C%22realm%22%3A%22cilogon%22%7D');
+say('Easiest to check with the substring, <, operator in QDL');
+     // Set state to a JSON **string** to check if it comes back as a string
+rc := script_load('driver.qdl', cfg., params.);
 if[rc!='ok'][return(rc);];
-
+say(clc#get_callback());
+⊨ 'state=%7B%22csrf_token%22%3A%22oIqN8MkW2y5DnljuBma2Fg%22%2C%22realm%22%3A%22cilogon%22%7D' < clc#get_callback() : 'Incorrect state parameter in callback';
 tokens. := clc#access();
 claims. := clc#claims();
 // Check that the server-side scripting is working.

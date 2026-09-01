@@ -6,8 +6,8 @@ import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.servlet.AbstractServlet;
 import edu.uiuc.ncsa.security.servlet.HeaderUtils;
-import org.kordamp.json.JSONObject;
 import org.apache.http.HttpStatus;
+import org.kordamp.json.JSONObject;
 import org.oa4mp.delegation.common.storage.clients.BaseClient;
 import org.oa4mp.delegation.server.OA2Constants;
 import org.oa4mp.delegation.server.OA2Errors;
@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 
+import static org.oa4mp.delegation.server.OA2Constants.STATE;
 import static org.oa4mp.delegation.server.server.claims.OA2Claims.*;
 import static org.oa4mp.server.api.ServiceConstantKeys.CONSUMER_KEY;
 
@@ -62,8 +63,11 @@ public class OA2HeaderUtils extends HeaderUtils {
      * @throws NoSuchAlgorithmException
      * @throws InvalidKeySpecException
      */
+    // Fixes https://github.com/ncsa/oa4mp/issues/320
     public static BaseClient findRFC7523Client(HttpServletRequest request, OA2SE oa2SE, JSONObject json) throws NoSuchAlgorithmException, InvalidKeySpecException {
-        String state = json.containsKey(OA2Constants.STATE) ? json.getString(OA2Constants.STATE) : null;
+        String state = getAndCheckStateParameter(json, request);
+
+        //String state = json.containsKey(STATE) ? json.getString(STATE) : null;
         if (!json.containsKey(SUBJECT)) {
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "missing " + SUBJECT + " claim, i.e., no client ID", HttpStatus.SC_BAD_REQUEST, state);
         }
@@ -135,7 +139,8 @@ public class OA2HeaderUtils extends HeaderUtils {
         // In order to decode this, we need to get the client ID (required in the sub claim) and grab the key.
         JSONObject json = hp[1];
         BaseClient client = findRFC7523Client(request, oa2SE, json);
-        String state = json.containsKey(OA2Constants.STATE) ? json.getString(OA2Constants.STATE) : null;
+        String state = getAndCheckStateParameter(json, request);
+        //String state = json.containsKey(STATE) ? json.getString(STATE) : null;
 
         try {
             MyOtherJWTUtil2.verifyAndReadJWT(raw, client.getJWKS());
@@ -206,7 +211,9 @@ public class OA2HeaderUtils extends HeaderUtils {
         }
         // In order to decode this, we need to get the client ID (required in the sub claim) and grab the key.
         JSONObject json = hp[1];
-        String state = json.containsKey(OA2Constants.STATE) ? json.getString(OA2Constants.STATE) : null;
+        String state = getAndCheckStateParameter(json, request);
+
+        //String state = json.containsKey(STATE) ? json.getString(STATE) : null;
         if (!json.containsKey(SUBJECT)) {
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "missing " + SUBJECT + " claim, i.e., no client ID", HttpStatus.SC_BAD_REQUEST, state);
         }
@@ -238,7 +245,9 @@ public class OA2HeaderUtils extends HeaderUtils {
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "could not decode JWT:" + t.getMessage(), HttpStatus.SC_BAD_REQUEST, null);
         }
         JSONObject json = hp[1];
-        String state = json.containsKey(OA2Constants.STATE) ? json.getString(OA2Constants.STATE) : null;
+        String state = getAndCheckStateParameter(json, request);
+
+        //String state = json.containsKey(STATE) ? json.getString(STATE) : null;
 
         if (!client.hasJWKS()) {
             throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "client does not support RFC 7523", HttpStatus.SC_BAD_REQUEST, state);
@@ -288,4 +297,26 @@ public class OA2HeaderUtils extends HeaderUtils {
     }
 
 
+    /**
+     * We shouldl explicitly exclude JSON objects as State paraemters since the spec. only
+     * allows for them as strings. Complex ones can cause mischief and we are not obliged at
+     * all to manage them.
+     *
+     * This will take the JSON object and check that it is not a JSONoject. If it is, an
+     * exception will be thrown. Otherwise, it returns the value for it.
+     * @param json
+     * @param request
+     * @return
+     */
+    public static String getAndCheckStateParameter(JSONObject json, HttpServletRequest request) {
+        if(json.containsKey(STATE) ){
+            if(!(json.get(STATE) instanceof String)) {
+                throw new OA2GeneralError(OA2Errors.INVALID_REQUEST, "JSON not supported for " + STATE, HttpStatus.SC_BAD_REQUEST, null);
+            }
+        }else{
+            return null;
+        }
+        return json.getString(STATE);
+
+    }
 }

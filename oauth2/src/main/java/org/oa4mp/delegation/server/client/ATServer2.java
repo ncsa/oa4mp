@@ -169,7 +169,6 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
             if (m.containsKey(NONCE) && !idToken.getPayload().getString(NONCE).equals(atRequest.getParameters().get(NONCE))) {
                 throw new GeneralException(" Incorrect nonce \"" + atRequest.getParameters().get(NONCE) + "\" returned from server");
             }
-
         } else {
             ServletDebugUtil.trace(this, "Skipping id token entry...");
         }

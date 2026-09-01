@@ -6,7 +6,7 @@ path := os_env('NCSA_DEV_INPUT')+'/oa4mp/server-test/src/main/resources/flow-tes
 script_path(path ~ script_path());
 test. := args().0;
 skip_line := 1<size(args())?args().1:false; // print a blank line between tests?
-
+start_time  := date_ms();
 counter.'pass' := 0;
 counter.'fail' := 0;
 counter.'skipped' := 0;
@@ -45,7 +45,9 @@ try[
 say(counter.'pass' + ' passed');
 say(counter.'fail' + ' failed');
 say(counter.'skipped' + ' skipped');
-say('total tests run: ' + reduce(@+, counter.));
+say('  total : ' + reduce(@+, counter.));
+say('runtime : ' + script_run('test#/utils/pp_elapsed.qdl', start_time));
+
 // hand back a nice list
 if[0 < size(failures.)][
   say('failed tests :' );

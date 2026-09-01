@@ -108,8 +108,32 @@ public class OA2AuthorizedServletUtil {
             //transaction.setOriginalURL(req.getRequestURI() + "?" + req.getQueryString());
 
             transaction.setResponseTypes(getAndCheckResponseTypes(req));
-            transaction.setAuthGrantLifetime(oa2se.getAuthorizationGrantLifetime()); // make sure these match.
+            transaction.setAuthGrantLifetime(oa2se.getAuthorizationGrantLifetime());
+            // make sure these match.
             String requestState = req.getParameter(OA2Constants.STATE);
+
+            // Directly exclude a JSON object as a parameter for the state.
+          /*  if (requestState != null) {
+
+                try {
+                    JSONObject.fromObject(requestState);
+                    throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                            "The " + OA2Constants.STATE + " parameter cannot be a JSON object.",
+                            HttpStatus.SC_BAD_REQUEST,
+                            requestState);
+                } catch (JSONException je) {
+                    try {
+                        JSONArray.fromObject(requestState);
+                        throw new OA2GeneralError(OA2Errors.INVALID_REQUEST,
+                                "The " + OA2Constants.STATE + " parameter cannot be a JSON object.",
+                                HttpStatus.SC_BAD_REQUEST,
+                                requestState);
+                    } catch (JSONException je2) {
+                        // peachy! This means it is not a JSON object.
+                    }
+                }
+            }*/
+
             transaction.setRequestState(requestState);
             transaction.setClient(client); // set the actual client, not the resolved one
             OA2Client resolvedClient = OA2ClientUtils.resolvePrototypes(oa2se, client);

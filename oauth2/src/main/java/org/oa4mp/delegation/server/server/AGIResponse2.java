@@ -104,6 +104,8 @@ public class AGIResponse2 extends IResponse2 implements AGResponse {
         } else {
             m.put(OA2Constants.AUTHORIZATION_CODE, grant.getToken());
         }
+
+        String x = "{\"csrf_token\":\"oIqN8MkW2y5DnljuBma2Fg\",\"realm\":\"cilogon\"}";
         if (parameters.get(OA2Constants.STATE) != null && 0 < parameters.get(OA2Constants.STATE).length()) {
             m.put(OA2Constants.STATE, parameters.get(OA2Constants.STATE));
         }

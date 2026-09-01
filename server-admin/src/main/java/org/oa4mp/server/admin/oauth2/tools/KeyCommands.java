@@ -36,6 +36,18 @@ import static org.oa4mp.server.loader.oauth2.loader.OA2CFConfigurationLoader.GRA
 import static org.oa4mp.server.loader.oauth2.loader.OA2CFConfigurationLoader.MAX_ACCESS_TOKEN_LIFETIME_DEFAULT;
 import static org.oa4mp.server.loader.oauth2.storage.keys.KEStoreUtilities.jwksToIDMap;
 
+/*
+  Testing -- use the CLC and load client named localhost:/vo1/test0. This uses the VO oa4mp:test
+  which has well-lnown page at https://localhost:9443/oauth2/.well-known/openid-configuration/oa4mp_test and
+  the keys are at
+
+  https://localhost:9443/oauth2/certs/oa4mp_test
+
+  Test by migrating, rotating keys. The VO has cache and at lifetime set to 6 minutes, so
+  this gives enough time to test, wait and test again, without having to wait a day or two
+  between tests. It should print out the raw id token so grab the head, base 64 decode
+  and check the key ids against the main page.
+ */
 public class KeyCommands extends OA4MPStoreCommands {
 
     public static final String DEFAULT_SERVER_VI = "default";

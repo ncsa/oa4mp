@@ -446,7 +446,7 @@ public class OA2CLCCommands extends CommonCommands2 {
         Identifier id = AssetStoreUtil.createID();
         HashMap<String, Object> copyOfParams = new HashMap<>();
         copyOfParams.putAll(getRequestParameters());
-        createScopes(copyOfParams, true);
+        createScopes(copyOfParams, false); // client scopes added later
         OA4MPResponse resp = getService().requestCert(id, copyOfParams);
         getDebugger().trace(this, "client id = " + getCe().getClientId());
         currentURI = resp.getRedirect();
@@ -662,6 +662,7 @@ public class OA2CLCCommands extends CommonCommands2 {
             say("The callback in the configuration does not match that in the argument you gave");
             return;
         }
+        setCallback(x); // stash it for reference
         String args = x.substring(x.indexOf("?") + 1); // skip the ? in the substring.
         StringTokenizer st = new StringTokenizer(args, "&");
         boolean gotGrant = false;
@@ -711,6 +712,16 @@ public class OA2CLCCommands extends CommonCommands2 {
             say("No grant found. Check the URL?");
         }
     }
+
+    public String getCallback() {
+        return callback;
+    }
+
+    public void setCallback(String callback) {
+        this.callback = callback;
+    }
+
+    String callback;
 
     public OA2Asset getDummyAsset() {
         return dummyAsset;
@@ -1978,10 +1989,11 @@ public class OA2CLCCommands extends CommonCommands2 {
     public static final String SHORT_EXCHANGE_PARAM_SWITCH = "-x";
     public static final String REFRESH_PARAM_SWITCH = "-refresh";
     public static final String SHORT_REFRESH_PARAM_SWITCH = "-r";
+    public static final String BASE64_PARAM_SWITCH = "-64";
 
     public void set_param(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
-            say("set_param " + REQ_PARAM_SWITCH +
+            say("set_param " + "[" + BASE64_PARAM_SWITCH + "] " + REQ_PARAM_SWITCH +
                     " | " + TOKEN_PARAM_SWITCH +
                     " | " + REFRESH_PARAM_SWITCH +
                     " | " + EXCHANGE_PARAM_SWITCH +
@@ -1989,6 +2001,7 @@ public class OA2CLCCommands extends CommonCommands2 {
             sayi("Usage: Sets an additional request parameter to be send along with the request.");
             sayi("For scopes, these are added to whatever the client is sending. For other parameters, they override");
             sayi("what the client sends.");
+            sayi(BASE64_PARAM_SWITCH + " - (optional) if set, the value is base64 encoded before being sent. It will be decoded and that value is used.");
             sayi(REQ_PARAM_SWITCH + " = parameters for the initial request to the authorization endpoint.");
             sayi(TOKEN_PARAM_SWITCH + " = parameters to send in the token request. Note these supercede " + SHORT_REQ_PARAM_SWITCH + " parameters.");
             sayi(REFRESH_PARAM_SWITCH + " = parameters for the refresh request.");
@@ -1997,6 +2010,8 @@ public class OA2CLCCommands extends CommonCommands2 {
             say("See also: get_param, clear_param");
             return;
         }
+        boolean base64 = inputLine.hasArg(BASE64_PARAM_SWITCH);
+        inputLine.removeSwitch(BASE64_PARAM_SWITCH);
         boolean setRP = inputLine.hasArg(REQ_PARAM_SWITCH, SHORT_REQ_PARAM_SWITCH);
         boolean setTP = inputLine.hasArg(TOKEN_PARAM_SWITCH, SHORT_TOKEN_PARAM_SWITCH);
         boolean setXP = inputLine.hasArg(EXCHANGE_PARAM_SWITCH, SHORT_EXCHANGE_PARAM_SWITCH);
@@ -2017,17 +2032,21 @@ public class OA2CLCCommands extends CommonCommands2 {
             say("sorry, too many args -- can't determine which is they key and value. Perhaps use double quotes around arguments?");
             return;
         }
+        String value = inputLine.getArg(2);
+        if(base64) {
+            value = new String(java.util.Base64.getDecoder().decode(value));
+        }
         if (setRP) {
-            requestParameters.put(inputLine.getArg(1), inputLine.getArg(2));
+            requestParameters.put(inputLine.getArg(1), value);
         }
         if (setTP) {
-            tokenParameters.put(inputLine.getArg(1), inputLine.getArg(2));
+            tokenParameters.put(inputLine.getArg(1), value);
         }
         if (setXP) {
-            exchangeParameters.put(inputLine.getArg(1), inputLine.getArg(2));
+            exchangeParameters.put(inputLine.getArg(1), value);
         }
         if (setRFP) {
-            refreshParameters.put(inputLine.getArg(1), inputLine.getArg(2));
+            refreshParameters.put(inputLine.getArg(1), value);
         }
     }
 

@@ -71,6 +71,7 @@ import static org.oa4mp.delegation.server.server.RFC8693Constants.*;
 import static org.oa4mp.delegation.server.server.RFC8693Constants.AUDIENCE;
 import static org.oa4mp.delegation.server.server.RFC8693Constants.RESOURCE;
 import static org.oa4mp.delegation.server.server.claims.OA2Claims.*;
+import static org.oa4mp.server.loader.oauth2.servlet.OA2HeaderUtils.getAndCheckStateParameter;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -460,7 +461,9 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
         } else {
             scopes = new ArrayList<>();
         }
-        String state = tokenRequest.containsKey(STATE) ? tokenRequest.getString(STATE) : null;
+        String state = getAndCheckStateParameter(tokenRequest, request);
+
+        //String state = tokenRequest.containsKey(STATE) ? tokenRequest.getString(STATE) : null;
         String nonce = tokenRequest.containsKey(NONCE) ? tokenRequest.getString(NONCE) : null;
 
         OA2ServiceTransaction serviceTransaction = (OA2ServiceTransaction) getOA2SE().getTransactionStore().create();
@@ -2594,7 +2597,7 @@ public class OA2ATServlet extends AbstractAccessTokenServlet2 {
             // so if the URI is sent, verify it
             URI uri = URI.create(atResponse.getParameters().get(OA2Constants.REDIRECT_URI));
             if (!transaction.getCallback().equals(uri)) {
-                String msg = "Attempt to use alternate redirect uri rejected.";
+                String msg = "Attempt to use alternate redirect uri \"" + uri + "\"  rejected.";
                 warn(msg);
                 throw new OA2ATException(OA2Errors.INVALID_REQUEST, msg);
             }
