@@ -515,6 +515,7 @@ public class KeyCommands extends OA4MPStoreCommands {
                     }
                 }
                 foundIdentifiables1.add(keRecord);
+                totalKeys++;
             }
             //FoundIdentifiables foundIdentifiables1 = new FoundIdentifiables(false, map.values());
             if (lineList) {

@@ -169,6 +169,11 @@ public class CLC implements QDLMetaModule {
     }
 
     protected String GET_CALLBACK = "get_callback";
+
+    /**
+     * Return the callback for an authorization code flow or null if there is none.
+     *
+     */
     public class GetCallback implements QDLFunction {
         @Override
         public String getName() {
@@ -191,7 +196,8 @@ public class CLC implements QDLMetaModule {
         @Override
         public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
-            doxx.add(getName() + "() - get the current callback.");
+            doxx.add(getName() + "() - get the callback for the current authorization code flow.");
+            doxx.add("Note that if this flow is not authorization, then this will return null.");
             doxx.add(checkInitMessage);
             return doxx;
         }

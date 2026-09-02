@@ -504,6 +504,12 @@ public class OA2SE extends ServiceEnvironmentImpl {
            We have to construct the correct key set since it is possible that keys age
            out and become valid or expire, so it is non-trivial to determine the actual
            set of keys at a given instance.
+           Type "A" keys = new keys, have null expiration and might have a valid date.
+           type "B" keys = =old keys being aged.. Have valid date and expiration that has not passed
+
+           Keys for the discovery servlet are A + B, current signing keys are A or B (not both!)
+           depending on the NBF and expirations. So keys are valid as sets of keys.
+
           */
         JSONWebKeys typeAKeys = getTypeA(identifiableMap , signingKeysOnly);
         if (signingKeysOnly) {
@@ -515,6 +521,13 @@ public class OA2SE extends ServiceEnvironmentImpl {
         return typeAKeys;
     }
 
+    /**
+     * Type "A" keys are those that are valid, and have a null expiration. These are typically the current
+     * keys.
+     * @param identifiableMap
+     * @param signingKeysOnly
+     * @return
+     */
     JSONWebKeys getTypeA(IdentifiableMap<KERecord> identifiableMap, boolean signingKeysOnly) {
         JSONWebKeys jsonWebKeys = new JSONWebKeys(null);
          /*
@@ -552,8 +565,16 @@ public class OA2SE extends ServiceEnvironmentImpl {
     }
 
 
+    /**
+     * Type "B" keys are the ones in the proccess of ageing out. So they are valid,
+     * have not before date that is current and that have not yet expired.
+     * @param identifiableMap
+     * @return
+     */
     JSONWebKeys getTypeB(IdentifiableMap<KERecord> identifiableMap) {
         JSONWebKeys jsonWebKeys = new JSONWebKeys(null);
+      //  getExp().getTime() < System.currentTimeMillis()
+                long now = System.currentTimeMillis();
          /*
            We have to construct the correct key set since it is possible that keys age
            out and become valid or expire, so it is non-trivial to determine the actual
@@ -564,7 +585,9 @@ public class OA2SE extends ServiceEnvironmentImpl {
             if (!k.getValid()) continue;
             JSONWebKey jwk = null;
             try {
-                if (k.hasValidDate() && !k.isExpired()) {
+                if (k.hasValidDate() &&
+                        k.getExp() != null &&
+                        now < k.getExp().getTime()) {
         //            System.err.println("**** type B keys adding " + k.getKid() + " to signing keys.");
                     jwk = k.toJWK();
                     jsonWebKeys.put(k.getKid(), jwk);

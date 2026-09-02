@@ -2441,6 +2441,16 @@ public class OA2CLCCommands extends CommonCommands2 {
 
     JSONObject ccfResponse;
 
+    public void get_callback(InputLine inputLine) throws Exception {
+        if(showHelp(inputLine)) {
+            say("get_callback = in an authorization code flow, show the callback.");
+        }
+        if(isTrivial(getCallback())){
+            say("(none)");
+        }else{
+            say(getCallback());
+        }
+    }
 }
 /*
 load localhost:test/rfc9068 /home/ncsa/dev/csd/config/client-oa2.xml
