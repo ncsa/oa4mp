@@ -184,6 +184,7 @@ rs show -range [2^2;2^3] -attr [client_id,creation_ts] X
             List outList = new ArrayList<>(qdlStem.getQDLList().size());
             for(QDLValue qdlValue : qdlStem.getQDLList()) {
                 if(qdlValue.isString()) outList.add(qdlValue.asString());
+                if(qdlValue.isLong()) outList.add(qdlValue.asLong().intValue());
             }
             return outList;
         } catch (Throwable e) {

@@ -426,22 +426,7 @@ public class OA2CLCCommands extends CommonCommands2 {
             say("Oops! No configuration has been loaded.");
             return;
         }
-        // Maybe one of these days allow for it all in one swoop. Lots of state to change though...
-        // And in particular, if there are issues (wrong config name) then hard to handle errors here.
 
-/*        if (inputLine.hasArg(CLIENT_CFG_NAME_KEY)) {
-            String name = inputLine.getNextArgFor(CLIENT_CFG_NAME_KEY);
-            say("...loading configuration named \"" + name + "\"");
-            try {
-                ConfigurationNode node = ConfigUtil.findConfiguration(getConfigFile(),
-                        name,
-                        ClientXMLTags.COMPONENT);
-                OA2ClientLoader loader = new OA2ClientLoader(node);
-                service = new OA2MPService(loader.load());
-            } catch (Throwable t) {
-                say("Sorry, I could not find the configuration with id =\"" + name + "\":" + t.getMessage());
-            }
-        }*/
         clear(inputLine, false); //clear out everything except any set parameters
         Identifier id = AssetStoreUtil.createID();
         HashMap<String, Object> copyOfParams = new HashMap<>();
@@ -754,6 +739,7 @@ public class OA2CLCCommands extends CommonCommands2 {
         deviceCode = null;
         dfResponse = null;
         introspectResponse = null;
+        callback = null;
     }
 
     public static String CLEAR_PARAMETERS_FLAG = "-all";
