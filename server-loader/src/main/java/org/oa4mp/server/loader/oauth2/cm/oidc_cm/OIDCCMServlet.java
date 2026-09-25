@@ -1178,6 +1178,7 @@ public class OIDCCMServlet extends EnvServlet {
         if (!getOA2SE().getCmConfigs().isEnabled()) {
             throw new ServletException("unsupported service");
         }
+        ServletDebugUtil.printAllParameters(getClass(), httpServletRequest, true);
         String version = getVersion(getOA2SE().getCmConfigs().getRFC7591Config(), httpServletRequest);
 
         CM7591Config cm7591Config = getOA2SE().getCmConfigs().getRFC7591Config();

@@ -51,6 +51,7 @@ counter.'pass' := 0;
 counter.'fail' := 0;
 while[x∈test.][
   suite =='cm_dev' && '.*anon\\-.*'=~x?continue():''; // DEV does not support anonymous access.
+  suite != 'cm_local' && '.*ersatz\\-.*'=~x?continue():''; // Only local can run ersatz tests. Checks database directly..
 try[
   script_load(x,suite);
   http#close(); // extra close is benign, so do it here to be sure.

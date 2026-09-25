@@ -9,6 +9,7 @@
    Test for https://github.com/ncsa/oa4mp/issues/252
    https://github.com/ncsa/oa4mp/issues/313
 */
+debugger(1);
 script_load('test#/cm-tests/init.qdl', args(0));
 custom_ids := size(args())==2?args(1):false;
 if[debugger().'level' == 1][say();]; // add a blank to debug output
