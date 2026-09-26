@@ -12,13 +12,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="6.3.3 checkin">
+      <change afterPath="$PROJECT_DIR$/docs/pdf/key-rotation.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/server/configuration/key-rotation.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/client-installer/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client-webapp/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/client-webapp/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/myproxy-website/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/myproxy-website/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/myproxy/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/myproxy/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-webapp/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-webapp/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rfc8414/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/rfc8414/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-installer/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-installer/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/server-installer/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-installer/src/main/scripts/create-distro.sh" beforeDir="false" afterPath="$PROJECT_DIR$/server-installer/src/main/scripts/create-distro.sh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-test/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/buildNumber.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -111,70 +119,70 @@
     <option name="showLibraryContents" value="true" />
     <option name="showMembers" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.CLC.executor": "Debug",
-    "Application.CLI.executor": "Debug",
-    "Application.FSMigrate.executor": "Run",
-    "Application.JWKCLI.executor": "Run",
-    "Application.OA4MPClientInstaller.executor": "Run",
-    "Application.OA4MPServerInstaller.executor": "Run",
-    "Application.QDL CLC.executor": "Run",
-    "Application.QDL.executor": "Debug",
-    "Application.QDLConfigLoader.executor": "Debug",
-    "Application.SAS CLI.executor": "Debug",
-    "Application.jwt.executor": "Debug",
-    "Application.org.oa4mp.server.admin.oauth2.tools.JWKCLI.executor": "Debug",
-    "Application.org.oa4mp.server.installer.OA4MPServerInstaller.executor": "Run",
-    "DefaultHtmlFileTemplate": "HTML File",
-    "Downloaded.Files.Path.Enabled": "false",
-    "JUnit.QDLTests.testVFSFileClaimSourceA.executor": "Run",
-    "JUnit.Test Suite.executor": "Debug",
-    "JUnit.TransactionCacheTest.executor": "Run",
-    "Java Scratch.Scratch (3).executor": "Run",
-    "Java Scratch.Scratch.executor": "Run",
-    "Java Scratch.Scratch_5.executor": "Run",
-    "Maven. [org.apache.maven.plugins:maven-archetype-plugin:RELEASE:generate].executor": "Run",
-    "Maven.myproxy [clean,install].executor": "Run",
-    "Maven.myproxy-website [clean,install].executor": "Run",
-    "Maven.oa4mp-parent [clean,install].executor": "Run",
-    "Maven.proxy [org.apache.maven.plugins:maven-javadoc-plugin:3.5.0:javadoc].executor": "Run",
-    "Repository.Attach.Annotations": "false",
-    "Repository.Attach.JavaDocs": "false",
-    "Repository.Attach.Sources": "false",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "Tomcat Server.DEV OA4MP.executor": "Run",
-    "Tomcat Server.MyProxy.executor": "Run",
-    "Tomcat Server.OA4MP server.executor": "Run",
-    "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "6.3.3",
-    "jdk.selected.JAVA_MODULE": "11 (2)",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests/auto/tests",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Libraries",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.45913818",
-    "settings.editor.selected.configurable": "editor.preferences.fonts.default",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.CLC.executor&quot;: &quot;Debug&quot;,
+    &quot;Application.CLI.executor&quot;: &quot;Debug&quot;,
+    &quot;Application.FSMigrate.executor&quot;: &quot;Run&quot;,
+    &quot;Application.JWKCLI.executor&quot;: &quot;Run&quot;,
+    &quot;Application.OA4MPClientInstaller.executor&quot;: &quot;Run&quot;,
+    &quot;Application.OA4MPServerInstaller.executor&quot;: &quot;Run&quot;,
+    &quot;Application.QDL CLC.executor&quot;: &quot;Run&quot;,
+    &quot;Application.QDL.executor&quot;: &quot;Debug&quot;,
+    &quot;Application.QDLConfigLoader.executor&quot;: &quot;Debug&quot;,
+    &quot;Application.SAS CLI.executor&quot;: &quot;Debug&quot;,
+    &quot;Application.jwt.executor&quot;: &quot;Debug&quot;,
+    &quot;Application.org.oa4mp.server.admin.oauth2.tools.JWKCLI.executor&quot;: &quot;Debug&quot;,
+    &quot;Application.org.oa4mp.server.installer.OA4MPServerInstaller.executor&quot;: &quot;Run&quot;,
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;Downloaded.Files.Path.Enabled&quot;: &quot;false&quot;,
+    &quot;JUnit.QDLTests.testVFSFileClaimSourceA.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.Test Suite.executor&quot;: &quot;Debug&quot;,
+    &quot;JUnit.TransactionCacheTest.executor&quot;: &quot;Run&quot;,
+    &quot;Java Scratch.Scratch (3).executor&quot;: &quot;Run&quot;,
+    &quot;Java Scratch.Scratch.executor&quot;: &quot;Run&quot;,
+    &quot;Java Scratch.Scratch_5.executor&quot;: &quot;Run&quot;,
+    &quot;Maven. [org.apache.maven.plugins:maven-archetype-plugin:RELEASE:generate].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.myproxy [clean,install].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.myproxy-website [clean,install].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.oa4mp-parent [clean,install].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.proxy [org.apache.maven.plugins:maven-javadoc-plugin:3.5.0:javadoc].executor&quot;: &quot;Run&quot;,
+    &quot;Repository.Attach.Annotations&quot;: &quot;false&quot;,
+    &quot;Repository.Attach.JavaDocs&quot;: &quot;false&quot;,
+    &quot;Repository.Attach.Sources&quot;: &quot;false&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;Tomcat Server.DEV OA4MP.executor&quot;: &quot;Run&quot;,
+    &quot;Tomcat Server.MyProxy.executor&quot;: &quot;Run&quot;,
+    &quot;Tomcat Server.OA4MP server.executor&quot;: &quot;Run&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;6.3.3&quot;,
+    &quot;jdk.selected.JAVA_MODULE&quot;: &quot;11 (2)&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/ncsa/dev/ncsa-git/oa4mp/server-test/src/main/resources/flow-tests/auto/tests&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Libraries&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.45913818&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.fonts.default&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
-      "Markdown",
-      "PLAIN_TEXT",
-      "JSON",
-      "JAVA"
+  &quot;keyToStringList&quot;: {
+    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
+      &quot;Markdown&quot;,
+      &quot;PLAIN_TEXT&quot;,
+      &quot;JSON&quot;,
+      &quot;JAVA&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/server-test/src/main/resources/flow-tests/auto/tests" />
@@ -2443,11 +2451,6 @@
           <option name="timeStamp" value="1827" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/cm/oidc_cm/OIDCCMServlet.java</url>
-          <line>760</line>
-          <option name="timeStamp" value="1835" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/oa4mp-server-test/src/test/java/org/oa4mp/server/test/NewClientStoreTest.java</url>
           <line>34</line>
           <option name="timeStamp" value="1842" />
@@ -2628,11 +2631,6 @@
           <option name="timeStamp" value="2032" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/cm/oidc_cm/OIDCCMServlet.java</url>
-          <line>1767</line>
-          <option name="timeStamp" value="2055" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/KeyCommands.java</url>
           <line>444</line>
           <option name="timeStamp" value="2060" />
@@ -2763,11 +2761,6 @@
           <option name="timeStamp" value="2126" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/cm/oidc_cm/OIDCCMServlet.java</url>
-          <line>1795</line>
-          <option name="timeStamp" value="2127" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/cm/util/permissions/PermissionServer.java</url>
           <line>107</line>
           <option name="timeStamp" value="2128" />
@@ -2778,21 +2771,6 @@
           <option name="timeStamp" value="2129" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/cm/oidc_cm/OIDCCMServlet.java</url>
-          <line>1215</line>
-          <option name="timeStamp" value="2130" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/cm/oidc_cm/OIDCCMServlet.java</url>
-          <line>245</line>
-          <option name="timeStamp" value="2131" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/cm/oidc_cm/OIDCCMServlet.java</url>
-          <line>1808</line>
-          <option name="timeStamp" value="2133" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-admin/src/main/java/org/oa4mp/server/admin/oauth2/tools/KeyCommands.java</url>
           <line>546</line>
           <option name="timeStamp" value="2161" />
@@ -2801,16 +2779,6 @@
           <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/storage/6.x-SNAPSHOT/storage-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/storage/cli/StoreCommands2.java</url>
           <line>3462</line>
           <option name="timeStamp" value="2162" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/cm/oidc_cm/OIDCCMServlet.java</url>
-          <line>1849</line>
-          <option name="timeStamp" value="2164" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/cm/oidc_cm/OIDCCMServlet.java</url>
-          <line>1741</line>
-          <option name="timeStamp" value="2165" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/servlet/OA2HeaderUtils.java</url>
