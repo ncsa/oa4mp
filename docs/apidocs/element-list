@@ -1,3 +1,4 @@
+edu.uiuc.ncsa.myproxy
 org.oa4mp.client.api
 org.oa4mp.client.api.loader
 org.oa4mp.client.api.servlet
@@ -73,6 +74,7 @@ org.oa4mp.server.loader.oauth2.servlet
 org.oa4mp.server.loader.oauth2.state
 org.oa4mp.server.loader.oauth2.storage
 org.oa4mp.server.loader.oauth2.storage.clients
+org.oa4mp.server.loader.oauth2.storage.keys
 org.oa4mp.server.loader.oauth2.storage.transactions
 org.oa4mp.server.loader.oauth2.storage.tx
 org.oa4mp.server.loader.oauth2.storage.vi

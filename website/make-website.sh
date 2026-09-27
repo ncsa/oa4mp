@@ -3,7 +3,7 @@
 #
 OA4MP_ROOT=$NCSA_DEV_INPUT/oa4mp
 
-GITHUB_ROOT=$OA4MP_ROOT/docs
+GITHUB_ROOT=$OA4MP_ROOT/docsaggregate
 $OA4MP_ROOT/website/convert-docs.sh $OA4MP_ROOT $GITHUB_ROOT/pdf
 
 
