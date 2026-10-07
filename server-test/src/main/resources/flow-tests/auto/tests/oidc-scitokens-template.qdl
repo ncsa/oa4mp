@@ -6,6 +6,8 @@
 */
 params. ≔ {'sub':'pilbeam',
            'scope':'openid profile email org.oa4mp:userinfo read: write: execute',
+           'org.oa4mp:/user/md':{'a':'b','c':'d'},
+
            'org.oa4mp:/templates':'https://wærstan.edu'};
 test_id:= 'oidc.scitokens.template';
 // set up the client

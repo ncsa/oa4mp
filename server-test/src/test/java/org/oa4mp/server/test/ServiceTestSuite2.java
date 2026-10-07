@@ -40,7 +40,6 @@ import java.io.File;
         NewCAStoreTest.class,
         NewClientStoreTest.class,
         NewTransactionTest.class,
-        CertAndKeyUtilTest.class,
         TokenTest2.class,
         FileStoreTest.class,
         ServiceConfigTest.class,

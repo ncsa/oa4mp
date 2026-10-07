@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>server-test</artifactId>
-    <name>OA4MP server tests</name>
+    <name>Server tests</name>
     <packaging>jar</packaging>
     <dependencies>
         <dependency>
@@ -90,7 +90,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.4.4</version>
+            <version>42.7.11</version>
         </dependency>
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
@@ -128,8 +128,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M7</version>
+                <version>3.2.5</version>
                 <configuration>
+                    <argLine>--add-exports=java.base/sun.security.util=ALL-UNNAMED</argLine>
                     <excludes>
                         <exclude>**/*Test.java</exclude>
                     </excludes>

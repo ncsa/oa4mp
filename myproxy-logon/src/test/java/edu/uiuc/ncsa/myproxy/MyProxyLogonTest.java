@@ -86,7 +86,7 @@ public class MyProxyLogonTest extends TestCase {
     /**
      * Very basic test that gets a credential and writes it to a predetermined file (or a temporary file
      * if none is specified). If you need to skip the test it can be done from the command line,
-     * with the skipTests flag, e.g.<br.<br>
+     * with the skipTests flag, e.g.<br><br>
      * <code>mvn -DskipTests=true clean install</code>
      *
      * @throws Exception

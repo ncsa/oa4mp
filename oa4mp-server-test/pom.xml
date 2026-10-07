@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>oa4mp-server-test</artifactId>
-    <name>OA4MP server tests.</name>
+    <name>OA4MP tests</name>
     <packaging>jar</packaging>
     <dependencies>
 
@@ -85,8 +85,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.14.1</version>
+                <version>3.2.5</version>
                 <configuration>
+                    <argLine>--add-exports=java.base/sun.security.util=ALL-UNNAMED</argLine>
                     <excludes>
                         <exclude>**/*Test.java</exclude>
                         <exclude>**/Test*.java</exclude>
