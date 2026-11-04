@@ -539,11 +539,14 @@ public class OA2AuthorizedServletUtil {
         // We can't support this because the spec says we must re-authenticate the user. We should have to track this
         // in all subsequent attempts. Since all requests have an expiration date, this parameter is redundant in any case.
         if (agResponse.getParameters().containsKey(OA2Constants.MAX_AGE)) {
-            throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST,
-                    "The " + OA2Constants.MAX_AGE + " parameter is not supported at this time.",
-                    HttpStatus.SC_BAD_REQUEST,
-                    st.getRequestState(),
-                    st.getCallback());
+            // Fix https://github.com/ncsa/oa4mp/issues/326
+            if(!agResponse.getParameters().get(OA2Constants.MAX_AGE).equals("0")) {
+                throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST,
+                        "The " + OA2Constants.MAX_AGE + " parameter is not supported at this time.",
+                        HttpStatus.SC_BAD_REQUEST,
+                        st.getRequestState(),
+                        st.getCallback());
+            }
         }
 
         // Store the callback the user needs to use for this request, since the spec allows for many.

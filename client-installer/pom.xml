@@ -23,12 +23,12 @@
             <artifactId>installer</artifactId>
             <version>6.x-SNAPSHOT</version>
         </dependency>
-        <dependency>
+<!--        <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>installer</artifactId>
             <version>6.x-SNAPSHOT</version>
             <scope>compile</scope>
-        </dependency>
+        </dependency>-->
     </dependencies>
    <build>
        <plugins>

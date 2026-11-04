@@ -1,0 +1,112 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.oa4mp</groupId>
+        <artifactId>oa4mp-parent</artifactId>
+        <version>6.x-SNAPSHOT</version>
+    </parent>
+    <artifactId>oa4mp-jetty</artifactId>
+    <name>OA4MP Jetty server</name>
+    <url>http://maven.apache.org</url>
+  <properties>
+    <!--<jetty.version>11.0.26</jetty.version>-->
+    <jetty.version>12.1.14</jetty.version>
+  </properties>
+
+    <dependencies>
+        <!-- Core Jetty Server -->
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
+            <version>${jetty.version}</version>
+        </dependency>
+
+        <!-- EE Integration layer for Servlets (Jakarta EE 10/11) -->
+ <!--       <dependency>
+            <groupId>org.eclipse.jetty.ee10</groupId>
+            <artifactId>jetty-ee10-servlet</artifactId>
+            <version>${jetty.version}</version>
+        </dependency>-->
+        <!-- Source: https://mvnrepository.com/artifact/org.eclipse.jetty.ee11/jetty-ee11-servlet -->
+        <dependency>
+            <groupId>org.eclipse.jetty.ee11</groupId>
+            <artifactId>jetty-ee11-servlet</artifactId>
+            <version>${jetty.version}</version>
+        </dependency>
+   <!--     <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-webapp</artifactId>
+            <version>11.0.26</version>
+            <scope>compile</scope>
+        </dependency>-->
+        <!-- Source: https://mvnrepository.com/artifact/org.eclipse.jetty.ee11/jetty-ee11-webapp -->
+        <dependency>
+            <groupId>org.eclipse.jetty.ee11</groupId>
+            <artifactId>jetty-ee11-webapp</artifactId>
+            <version>${jetty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-security</artifactId>
+            <version>${jetty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.qdl-lang</groupId>
+            <artifactId>language</artifactId>
+            <version>1.6-QDL-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <version>9.1.0</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.derby/derby -->
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derby</artifactId>
+            <version>10.14.2.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.7.11</version>
+        </dependency>
+        <dependency>
+            <groupId>org.oa4mp</groupId>
+            <artifactId>di-service</artifactId>
+            <version>6.x-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.oa4mp</groupId>
+            <artifactId>server-api</artifactId>
+            <version>6.x-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.oa4mp</groupId>
+            <artifactId>proxy</artifactId>
+            <version>6.x-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.qdl-lang</groupId>
+            <artifactId>language</artifactId>
+            <version>1.6.3.3</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Exec Plugin to run directly from Maven -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <mainClass>com.example.AppServer</mainClass>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

@@ -2,23 +2,44 @@
 <project version="4">
   <component name="ArtifactsWorkspaceSettings">
     <artifacts-to-build>
-      <artifact name="client-oauth2:war exploded" />
-      <artifact name="oa4mp-server-oauth2:war exploded" />
-      <artifact name="rfc8414:war exploded" />
+      <artifact name="client-oauth2:war" />
+      <artifact name="oa4mp-server-oauth2:war" />
+      <artifact name="rfc8414:war" />
     </artifacts-to-build>
   </component>
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="Moved key and cert test to security lib where it really ought to be. Changes to pom.xml for new compile java version">
+    <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="https://github.com/ncsa/oa4mp/issues/322">
+      <change afterPath="$PROJECT_DIR$/oa4mp-jetty/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/oa4mp-jetty/src/main/java/org/oa4mp/server/jetty/HelloServlet.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/oa4mp-jetty/src/main/java/org/oa4mp/server/jetty/JettyServer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/oa4mp-jetty/src/main/resources/META-INF/maven/archetype.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/oa4mp-jetty/src/main/resources/archetype-resources/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/oa4mp-jetty/src/main/resources/archetype-resources/src/main/java/App.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/oa4mp-jetty/src/main/resources/archetype-resources/src/test/java/AppTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/client-installer/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client-installer/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/client-installer/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client-oauth2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/client-oauth2/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client-test/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/client-test/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/di-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/di-service/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/myproxy-logon/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/myproxy-logon/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rfc8414/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/rfc8414/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rfc8414/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/rfc8414/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-admin/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/server-admin/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-installer/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-loader/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/servlet/OA2AuthorizedServletUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/servlet/OA2AuthorizedServletUtil.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server-test/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/website/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/website/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -117,6 +138,7 @@
     "Application.CLI.executor": "Run",
     "Application.FSMigrate.executor": "Run",
     "Application.JWKCLI.executor": "Run",
+    "Application.JettyServer.executor": "Run",
     "Application.OA4MPClientInstaller.executor": "Run",
     "Application.OA4MPServerInstaller.executor": "Run",
     "Application.QDL CLC.executor": "Run",
@@ -138,6 +160,7 @@
     "Maven. [org.apache.maven.plugins:maven-archetype-plugin:RELEASE:generate].executor": "Run",
     "Maven.myproxy [clean,install].executor": "Run",
     "Maven.myproxy-website [clean,install].executor": "Run",
+    "Maven.oa4mp-jetty [clean,compile].executor": "Run",
     "Maven.oa4mp-parent [clean,compile].executor": "Run",
     "Maven.oa4mp-parent [clean,install].executor": "Run",
     "Maven.proxy [org.apache.maven.plugins:maven-javadoc-plugin:3.5.0:javadoc].executor": "Run",
@@ -151,7 +174,7 @@
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "Tomcat Server.DEV OA4MP.executor": "Run",
     "Tomcat Server.MyProxy.executor": "Run",
-    "Tomcat Server.OA4MP server.executor": "Run",
+    "Tomcat Server.OA4MP server.executor": "Debug",
     "WebServerToolWindowFactoryState": "false",
     "git-widget-placeholder": "master",
     "jdk.selected.JAVA_MODULE": "11 (2)",
@@ -162,7 +185,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Artifacts",
+    "project.structure.last.edited": "Libraries",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.45913818",
     "settings.editor.selected.configurable": "editor.preferences.fonts.default",
@@ -216,7 +239,7 @@
       </map>
     </option>
   </component>
-  <component name="RunManager" selected="Jetty Server.Jetty OA4MP">
+  <component name="RunManager" selected="Application.JettyServer">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="WIDTH" value="400" />
       <option name="HEIGHT" value="300" />
@@ -398,12 +421,13 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="JWKCLI" type="Application" factoryName="Application" temporary="true">
-      <option name="MAIN_CLASS_NAME" value="org.oa4mp.server.admin.oauth2.tools.JWKCLI" />
-      <module name="server-admin" />
+    <configuration name="JettyServer" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="org.oa4mp.server.jetty.JettyServer" />
+      <module name="oa4mp-jetty" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="org.oa4mp.server.admin.myproxy.oauth2.tools.*" />
+          <option name="PATTERN" value="org.oa4mp.server.jetty.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -3089,7 +3113,7 @@
       <item itemvalue="Application.QDL CLC" />
       <item itemvalue="Application.QDL Scripts" />
       <item itemvalue="Application.QDL" />
-      <item itemvalue="Application.JWKCLI" />
+      <item itemvalue="Application.JettyServer" />
       <item itemvalue="Java Scratch.Scratch_5" />
       <item itemvalue="Java Scratch.Scratch" />
       <item itemvalue="Jetty Server.Jetty OA4MP" />
@@ -3101,11 +3125,11 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.JettyServer" />
         <item itemvalue="Java Scratch.Scratch" />
         <item itemvalue="Java Scratch.Scratch_5" />
         <item itemvalue="JUnit.TransactionCacheTest" />
         <item itemvalue="JUnit.QDLTests.testVFSFileClaimSourceA" />
-        <item itemvalue="Application.JWKCLI" />
       </list>
     </recent_temporary>
   </component>
@@ -3238,14 +3262,6 @@
       <workItem from="1782815402307" duration="29204000" />
       <workItem from="1783850833509" duration="119802000" />
       <workItem from="1788873761302" duration="11155000" />
-    </task>
-    <task id="LOCAL-00114" summary="Integrating fixes for https://github.com/ncsa/oa4mp/issues/267&#10;https://github.com/ncsa/oa4mp/issues/268&#10;https://github.com/ncsa/oa4mp/issues/269">
-      <option name="closed" value="true" />
-      <created>1758029809915</created>
-      <option name="number" value="00114" />
-      <option name="presentableId" value="LOCAL-00114" />
-      <option name="project" value="LOCAL" />
-      <updated>1758029809915</updated>
     </task>
     <task id="LOCAL-00115" summary="Added QDL stack trace when debugging enabled for a client. Store accessors needed cleanup too.">
       <option name="closed" value="true" />
@@ -3631,7 +3647,15 @@
       <option name="project" value="LOCAL" />
       <updated>1791376055433</updated>
     </task>
-    <option name="localTasksCounter" value="163" />
+    <task id="LOCAL-00163" summary="https://github.com/ncsa/oa4mp/issues/322">
+      <option name="closed" value="true" />
+      <created>1791549362890</created>
+      <option name="number" value="00163" />
+      <option name="presentableId" value="LOCAL-00163" />
+      <option name="project" value="LOCAL" />
+      <updated>1791549362890</updated>
+    </task>
+    <option name="localTasksCounter" value="164" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -3653,7 +3677,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
-    <MESSAGE value="More key rotation checking. Found bug that prevented running some unit tests and fixed it." />
     <MESSAGE value="CLI: Fix https://github.com/ncsa/oa4mp/issues/289 return formatted output of key subet in ls" />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/290 and https://github.com/ncsa/oa4mp/issues/288" />
     <MESSAGE value="Pre-travel chekin" />
@@ -3678,7 +3701,8 @@
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/320" />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/320 amnd tweaking tests." />
     <MESSAGE value="Moved key and cert test to security lib where it really ought to be. Changes to pom.xml for new compile java version" />
-    <option name="LAST_COMMIT_MESSAGE" value="Moved key and cert test to security lib where it really ought to be. Changes to pom.xml for new compile java version" />
+    <MESSAGE value="https://github.com/ncsa/oa4mp/issues/322" />
+    <option name="LAST_COMMIT_MESSAGE" value="https://github.com/ncsa/oa4mp/issues/322" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="GROUP_MULTIFILE_MERGE_BY_DIRECTORY" value="true" />
   </component>
@@ -4742,6 +4766,21 @@
           <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/servlet/OA2ServletUtils.java</url>
           <line>268</line>
           <option name="timeStamp" value="2200" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/oa4mp-jetty/src/main/java/org/oa4mp/server/jetty/HelloServlet.java</url>
+          <line>16</line>
+          <option name="timeStamp" value="2202" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>jar://$MAVEN_REPOSITORY$/edu/uiuc/ncsa/security/servlet/6.x-SNAPSHOT/servlet-6.x-SNAPSHOT-sources.jar!/edu/uiuc/ncsa/security/servlet/ServletTimeUtil.java</url>
+          <line>62</line>
+          <option name="timeStamp" value="2206" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/oa4mp-jetty/src/main/java/org/oa4mp/server/jetty/JettyServer.java</url>
+          <line>156</line>
+          <option name="timeStamp" value="2208" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-method">
           <url>file://$PROJECT_DIR$/server-loader/src/main/java/org/oa4mp/server/loader/oauth2/storage/transactions/OA2MTStore.java</url>
