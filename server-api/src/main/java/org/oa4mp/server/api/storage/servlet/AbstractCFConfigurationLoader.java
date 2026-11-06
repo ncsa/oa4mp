@@ -204,8 +204,16 @@ public abstract class AbstractCFConfigurationLoader<T extends ServiceEnvironment
             IdentifierProvider.setScheme(scheme);
         }
         // scheme specific part
+        // Fixes https://github.com/ncsa/oa4mp/issues/329
+        boolean hasSPP = cn.hasAttribute(ID_SPP);
         String spp = cn.getFirstAttribute(ID_SPP);
-        if (spp != null) {
+        if (spp == null) {
+            if(hasSPP){
+                IdentifierProvider.setSchemeSpecificPart("");
+
+            }
+        }
+        else{
             // If this is omitted in the configuration, then a null value results, so use the default.
             // It is possible to suppress this component by passing in an empty string.
             IdentifierProvider.setSchemeSpecificPart(spp);
