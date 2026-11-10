@@ -118,11 +118,7 @@
             <artifactId>server-loader</artifactId>
             <version>6.3.3</version>
         </dependency>
-        <dependency>
-            <groupId>org.oa4mp</groupId>
-            <artifactId>server</artifactId>
-            <version>6.3.3</version>
-        </dependency>
+
         <dependency>
             <groupId>org.oa4mp</groupId>
             <artifactId>server-test</artifactId>
