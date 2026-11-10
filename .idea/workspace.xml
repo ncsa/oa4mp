@@ -11,16 +11,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="https://github.com/ncsa/oa4mp/issues/326 Allow max_age = 0">
+    <list default="true" id="8e2d727f-106f-4316-98ff-77b4db768ea7" name="Changes" comment="https://github.com/ncsa/oa4mp/issues/329 fix">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/client-installer/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-jetty/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-jetty/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/oa4mp-server-oauth2/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/qdl/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rfc8414/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/rfc8414/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/servlet/AbstractCFConfigurationLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/servlet/AbstractCFConfigurationLoader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-installer/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server-test/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/server-test/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/servlet/AuthenticationUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/server-api/src/main/java/org/oa4mp/server/api/storage/servlet/AuthenticationUtil.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -3244,14 +3237,6 @@
       <workItem from="1783850833509" duration="119802000" />
       <workItem from="1788873761302" duration="11155000" />
     </task>
-    <task id="LOCAL-00116" summary="https://github.com/ncsa/oa4mp/issues/272 side effect of https://github.com/ncsa/security-lib/issues/60, help system sudited and now displaying properly in the CLI">
-      <option name="closed" value="true" />
-      <created>1759664679839</created>
-      <option name="number" value="00116" />
-      <option name="presentableId" value="LOCAL-00116" />
-      <option name="project" value="LOCAL" />
-      <updated>1759664679839</updated>
-    </task>
     <task id="LOCAL-00117" summary="6.2.2 checkin, includes website rebuild">
       <option name="closed" value="true" />
       <created>1759756516273</created>
@@ -3636,7 +3621,15 @@
       <option name="project" value="LOCAL" />
       <updated>1793806200553</updated>
     </task>
-    <option name="localTasksCounter" value="165" />
+    <task id="LOCAL-00165" summary="https://github.com/ncsa/oa4mp/issues/329 fix">
+      <option name="closed" value="true" />
+      <created>1794003814417</created>
+      <option name="number" value="00165" />
+      <option name="presentableId" value="LOCAL-00165" />
+      <option name="project" value="LOCAL" />
+      <updated>1794003814417</updated>
+    </task>
+    <option name="localTasksCounter" value="166" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -3658,7 +3651,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
-    <MESSAGE value="https://github.com/ncsa/oa4mp/issues/290 and https://github.com/ncsa/oa4mp/issues/288" />
     <MESSAGE value="Pre-travel chekin" />
     <MESSAGE value="All tests work now. Net effect of migratrion back up to zero!" />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/297" />
@@ -3683,7 +3675,8 @@
     <MESSAGE value="Moved key and cert test to security lib where it really ought to be. Changes to pom.xml for new compile java version" />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/322" />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/326 Allow max_age = 0" />
-    <option name="LAST_COMMIT_MESSAGE" value="https://github.com/ncsa/oa4mp/issues/326 Allow max_age = 0" />
+    <MESSAGE value="https://github.com/ncsa/oa4mp/issues/329 fix" />
+    <option name="LAST_COMMIT_MESSAGE" value="https://github.com/ncsa/oa4mp/issues/329 fix" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="GROUP_MULTIFILE_MERGE_BY_DIRECTORY" value="true" />
   </component>
